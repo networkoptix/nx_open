@@ -313,6 +313,160 @@ void addFakeVideowallUser()
 
 } // namespace
 
+namespace aux {
+LocalSystemIndentityHelper::LocalSystemIndentityHelper(
+        const BeforeRestoreDbData& restoreData,
+        SystemNameProxyPtr systemName):
+    m_restoreData(restoreData),
+    m_systemName(std::move(systemName))
+{}
+
+QString LocalSystemIndentityHelper::getSystemNameString() const
+{
+    if (!m_restoreData.localSystemName.isNull())
+        return QString::fromLocal8Bit(m_restoreData.localSystemName);
+
+    return generateSystemName();
+}
+
+QString LocalSystemIndentityHelper::getDefaultSystemNameString() const
+{
+    nx::SystemName systemName;
+    systemName.resetToDefault();
+    return systemName.value();
+}
+
+QString LocalSystemIndentityHelper::generateSystemName() const
+{
+    m_systemName->loadFromConfig();
+    if (m_systemName->value().isEmpty())
+        return QString();
+
+    return m_systemName->value();
+}
+
+QnUuid LocalSystemIndentityHelper::getLocalSystemId() const
+{
+    if (!m_restoreData.localSystemId.isNull())
+        return QnUuid::fromStringSafe(m_restoreData.localSystemId);
+
+    return generateLocalSystemId();
+}
+
+QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
+{
+    NX_ASSERT(!m_systemName->isDefault());
+    if (m_systemName->isDefault())
+        NX_LOG(lit("%1 SystemName is default. System state should be reseted."), cl_logWARNING);
+
+    QString serverKey;
+    if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
+    {
+        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+            serverKey = qMax(serverKey, server->getAuthKey());
+    }
+    return guidFromArbitraryData(m_systemName->value() + serverKey);
+
+}
+
+void LocalSystemIndentityHelper::clearMigrationInfo()
+{
+    m_systemName->clearFromConfig();
+}
+
+class ServerSystemNameProxy : public SystemNameProxy
+{
+public:
+    virtual void loadFromConfig() override
+    {
+        m_systemName.loadFromConfig();
+    }
+
+    virtual void clearFromConfig() override
+    {
+        nx::SystemName().saveToConfig();
+    }
+
+    virtual void resetToDefault() override
+    {
+        m_systemName.resetToDefault();
+    }
+
+
+    virtual bool isDefault() const override
+    {
+        return m_systemName.isDefault();
+    }
+
+    virtual QString value() const override
+    {
+        return m_systemName.value();
+    }
+
+private:
+    nx::SystemName m_systemName;
+};
+
+SystemNameProxyPtr createServerSystemNameProxy()
+{
+    return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy);
+}
+
+class ServerSettingsProxy : public SettingsProxy
+{
+public:
+    virtual QString systemName() const override
+    {
+        return qnGlobalSettings->systemName();
+    }
+
+    virtual QnUuid localSystemId() const override
+    {
+        return qnGlobalSettings->localSystemId();
+    }
+
+    virtual void setSystemName(const QString& systemName) override
+    {
+        qnGlobalSettings->setSystemName(systemName);
+    }
+
+    virtual void setLocalSystemId(const QnUuid& localSystemId) override
+    {
+        qnGlobalSettings->setLocalSystemId(localSystemId);
+    }
+
+    virtual bool isCloudInstanceChanged() const override
+    {
+        return !qnGlobalSettings->cloudHost().isEmpty() &&
+                qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
+    }
+
+    virtual bool isConnectedToCloud() const override
+    {
+        return !qnGlobalSettings->cloudSystemId().isEmpty();
+    }
+};
+
+SettingsProxyPtr createServerSettingsProxy()
+{
+    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy);
+}
+
+bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
+{
+    return isNewServerInstance ||
+           (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
+}
+
+bool isNewServerInstance(const BeforeRestoreDbData& restoreData)
+{
+    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
+    return !noSetupWizardFlag && restoreData.localSystemId.isNull();
+}
+
+} // namespace aux
+
+
 
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
@@ -1104,7 +1258,11 @@ void MediaServerProcess::at_databaseDumped()
     if (isStopping())
         return;
 
-    savePersistentDataBeforeDbRestore();
+    aux::savePersistentDataBeforeDbRestore(
+                qnResPool->getAdministrator(),
+                m_mediaServer,
+                aux::createServerSettingsProxy().get()
+            ).saveToSettings(MSSettings::roSettings());
     restartServer(500);
 }
 
@@ -1118,7 +1276,11 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         // If system Id has been changed, reset 'database restore time' variable
-        savePersistentDataBeforeDbRestore();
+        aux::savePersistentDataBeforeDbRestore(
+                    qnResPool->getAdministrator(),
+                    m_mediaServer,
+                    aux::createServerSettingsProxy().get()
+                ).saveToSettings(MSSettings::roSettings());
         restartServer(0);
     }
 }
@@ -1868,12 +2030,17 @@ void aux::saveStoragesInfoToBeforeRestoreData(
     beforeRestoreDbData->storageInfo = result;
 }
 
-void MediaServerProcess::savePersistentDataBeforeDbRestore()
+BeforeRestoreDbData aux::savePersistentDataBeforeDbRestore(
+        const QnUserResourcePtr& admin,
+        const QnMediaServerResourcePtr& mediaServer,
+        SettingsProxy* settingsProxy)
 {
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
     BeforeRestoreDbData data;
 
-    if (admin)
+    NX_ASSERT(admin);
+    NX_ASSERT(mediaServer);
+
+    if (admin && admin->isEnabled())
     {
         data.digest = admin->getDigest();
         data.hash = admin->getHash();
@@ -1881,14 +2048,14 @@ void MediaServerProcess::savePersistentDataBeforeDbRestore()
         data.realm = admin->getRealm().toUtf8();
     }
 
-    data.localSystemId = qnGlobalSettings->localSystemId().toByteArray();
-    data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
-    if (m_mediaServer)
-        data.serverName = m_mediaServer->getName().toLocal8Bit();
+    data.localSystemId = settingsProxy->localSystemId().toByteArray();
+    data.localSystemName = settingsProxy->systemName().toLocal8Bit();
+    if (mediaServer)
+        data.serverName = mediaServer->getName().toLocal8Bit();
 
-    aux::saveStoragesInfoToBeforeRestoreData(&data, m_mediaServer->getStorages());
+    aux::saveStoragesInfoToBeforeRestoreData(&data, mediaServer->getStorages());
 
-    data.saveToSettings(MSSettings::roSettings());
+    return data;
 }
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
@@ -2023,64 +2190,24 @@ void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
     m_engineVersion = version;
 }
 
-void MediaServerProcess::setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager)
+bool MediaServerProcess::setUpSystemIdentity(
+        const BeforeRestoreDbData& restoreData,
+        aux::SettingsProxy* settings,
+        aux::SystemNameProxyPtr systemNameProxy)
 {
-    loadBeforeRestoreDbData();
-    if (qnGlobalSettings->systemName().isEmpty())
+    aux::LocalSystemIndentityHelper systemIdentityHelper(restoreData, std::move(systemNameProxy));
+    if (systemIdentityHelper.getSystemNameString().isEmpty())
     {
-        setUpSystemName();
-        setUpLocalSystemId(cloudConnectionManager);
+        settings->setSystemName(systemIdentityHelper.getDefaultSystemNameString());
+        return false;
     }
 
-    clearMigrationInfo();
-    qnGlobalSettings->synchronizeNow();
-}
+    settings->setSystemName(systemIdentityHelper.getSystemNameString());
+    settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
 
-void MediaServerProcess::loadBeforeRestoreDbData()
-{
-    if (!qnCommon->beforeRestoreDbData().localSystemId.isNull())
-        qnGlobalSettings->setLocalSystemId(QnUuid::fromStringSafe(qnCommon->beforeRestoreDbData().localSystemId));
+    systemIdentityHelper.clearMigrationInfo();
 
-    if (!qnCommon->beforeRestoreDbData().localSystemName.isNull())
-        qnGlobalSettings->setSystemName(QString::fromLocal8Bit(qnCommon->beforeRestoreDbData().localSystemName));
-}
-
-void MediaServerProcess::setUpSystemName()
-{
-    loadOrGenerateDefaultSystemName();
-    qnGlobalSettings->setSystemName(m_systemName.value());
-}
-
-void MediaServerProcess::setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager)
-{
-    if (m_systemName.isDefault())
-        resetSystemState(cloudConnectionManager);
-    else
-        qnGlobalSettings->setLocalSystemId(generateSystemIdFromSystemName());
-}
-
-QnUuid MediaServerProcess::generateSystemIdFromSystemName()
-{
-    QString serverKey;
-    if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
-    {
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-            serverKey = qMax(serverKey, server->getAuthKey());
-    }
-    return guidFromArbitraryData(m_systemName.value() + serverKey);
-}
-
-void MediaServerProcess::clearMigrationInfo()
-{
-    nx::SystemName().saveToConfig(); //< remove from config file
-}
-
-void MediaServerProcess::loadOrGenerateDefaultSystemName()
-{
-    m_systemName.loadFromConfig();
-
-    if (m_systemName.value().isEmpty())
-        m_systemName.resetToDefault();
+    return true;
 }
 
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
@@ -2459,8 +2586,6 @@ void MediaServerProcess::run()
             nx_ms_conf::ALLOW_SSL_CONNECTIONS,
             nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
 
-    bool isNewServerInstance = false;
-    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     m_moduleFinder = new QnModuleFinder(false);
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
@@ -2481,9 +2606,6 @@ void MediaServerProcess::run()
                 server->setName(QString::fromLocal8Bit(beforeRestoreDbData.serverName));
             else
                 server->setName(getDefaultServerName());
-
-            if (!noSetupWizardFlag && beforeRestoreDbData.localSystemId.isNull())
-                isNewServerInstance = true;
         }
 
         server->setServerFlags((Qn::ServerFlags) calcServerFlags());
@@ -2524,7 +2646,10 @@ void MediaServerProcess::run()
         ec2::ApiMediaServerData newServerData;
         fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
-            m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
+            m_mediaServer = registerServer(
+                        ec2Connection,
+                        server,
+                        aux::isNewServerInstance(qnCommon->beforeRestoreDbData()));
         else
             m_mediaServer = server;
 
@@ -2682,7 +2807,10 @@ void MediaServerProcess::run()
 
     qnGlobalSettings->initialize();
 
-    setUpSystemIdentity(cloudManagerGroup.connectionManager);
+    auto settingsProxy = aux::createServerSettingsProxy();
+    auto systemNameProxy = aux::createServerSystemNameProxy();
+
+    setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
 
     BeforeRestoreDbData::clearSettings(settings);
 
@@ -2691,19 +2819,15 @@ void MediaServerProcess::run()
 
     if (!QnPermissionsHelper::isSafeMode())
     {
-        bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
-            qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
-        if (isNewServerInstance ||
-            (isCloudInstanceChanged && isConnectedToCloud))
+        if (aux::needToResetSystem(aux::isNewServerInstance(qnCommon->beforeRestoreDbData()), settingsProxy.get()))
         {
-            if (isCloudInstanceChanged)
+            if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudManagerGroup.connectionManager);
         }
-        if (isCloudInstanceChanged)
+        if (settingsProxy->isCloudInstanceChanged())
         {
             ec2::ErrorCode errCode;
             do

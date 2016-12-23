@@ -54,6 +54,63 @@ private:
     QString m_mediaFolderName;
 };
 
+class SystemNameProxy
+{
+public:
+    virtual void loadFromConfig() = 0;
+    virtual void clearFromConfig() = 0;
+    virtual void resetToDefault() = 0;
+    virtual bool isDefault() const = 0;
+    virtual QString value() const = 0;
+};
+
+using SystemNameProxyPtr = std::unique_ptr<SystemNameProxy>;
+
+SystemNameProxyPtr createServerSystemNameProxy();
+
+class LocalSystemIndentityHelper
+{
+public:
+    LocalSystemIndentityHelper(
+            const BeforeRestoreDbData& restoreData,
+            SystemNameProxyPtr systemName);
+
+    QString getSystemNameString() const;
+    QString getDefaultSystemNameString() const;
+    QnUuid getLocalSystemId() const;
+    void clearMigrationInfo();
+
+private:
+    QString generateSystemName() const;
+    QnUuid generateLocalSystemId() const;
+
+private:
+    const BeforeRestoreDbData& m_restoreData;
+    SystemNameProxyPtr m_systemName;
+};
+
+class SettingsProxy
+{
+public:
+    virtual QString systemName() const = 0;
+    virtual QnUuid localSystemId() const = 0;
+    virtual void setSystemName(const QString& systemName) = 0;
+    virtual void setLocalSystemId(const QnUuid& localSystemId) = 0;
+    virtual bool isCloudInstanceChanged() const = 0;
+    virtual bool isConnectedToCloud() const = 0;
+};
+
+using SettingsProxyPtr = std::unique_ptr<SettingsProxy>;
+SettingsProxyPtr createServerSettingsProxy();
+
+bool needToResetSystem(bool noSetupWizardFlag, const SettingsProxy* settings);
+
+bool isNewServerInstance(const BeforeRestoreDbData& restoreData);
+
+BeforeRestoreDbData savePersistentDataBeforeDbRestore(
+        const QnUserResourcePtr& admin,
+        const QnMediaServerResourcePtr& mediaServer,
+        SettingsProxy* settingsProxy);
 }
 
 struct CloudManagerGroup;
@@ -118,15 +175,11 @@ private:
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void savePersistentDataBeforeDbRestore();
     bool isStopping() const;
-    void setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager);
-    void loadBeforeRestoreDbData();
-    void loadOrGenerateDefaultSystemName();
-    void clearMigrationInfo();
-    QnUuid generateSystemIdFromSystemName();
-    void setUpSystemName();
-    void setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager);
+    bool setUpSystemIdentity(
+            const BeforeRestoreDbData& restoreData,
+            aux::SettingsProxy* settings,
+            aux::SystemNameProxyPtr systemNameProxy);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
 
