@@ -16,6 +16,7 @@ QWidget* QnWidgetTableDelegate::createWidget(QAbstractItemModel* model,
     Q_UNUSED(model);
 
     auto label = new QLabel(parent);
+    label->setIndent(style::Metrics::kStandardPadding);
     label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     label->setWordWrap(false);
     return label;
@@ -50,7 +51,7 @@ QnIndents QnWidgetTableDelegate::itemIndents(QWidget* widget, const QModelIndex&
 {
     Q_UNUSED(widget);
     Q_UNUSED(index);
-    return QnIndents(style::Metrics::kStandardPadding, 0);
+    return QnIndents(0, style::Metrics::kStandardPadding);
 }
 
 QSize QnWidgetTableDelegate::sizeHint(QWidget* widget, const QModelIndex& index) const

@@ -10,6 +10,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ioports_view_model.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/widget_table.h>
 
 
@@ -71,6 +72,9 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent):
     ui->table->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->table->header()->setSectionResizeMode(QnIOPortsViewModel::NameColumn, QHeaderView::Stretch);
     ui->table->header()->setSortIndicator(QnIOPortsViewModel::IdColumn, Qt::AscendingOrder);
+
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     //TODO: #vkutin #gdm #common Change to usual hasChanges/hasChangesChanged logic
     connect(m_model, &QAbstractItemModel::dataChanged,
