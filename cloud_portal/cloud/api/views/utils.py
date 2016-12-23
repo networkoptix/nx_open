@@ -59,7 +59,7 @@ def language(request):
                     lang = l
                     break
                 if l.split('-')[0] in settings.LANGUAGES:
-                    lang = l
+                    lang = l.split('-')[0]
                     break
 
         if not lang:  # not supported language
