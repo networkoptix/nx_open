@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_endpoint_fetcher.h"
 
 #include <QtCore/QBuffer>
@@ -17,7 +12,6 @@
 
 #include "cloud_modules_xml_sax_handler.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -28,12 +22,18 @@ CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
 :
     m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
     m_endpointSelector(std::move(endpointSelector)),
-    m_requestIsRunning(false)
+    m_requestIsRunning(false),
+    m_modulesXmlUrl(QnAppInfo::defaultCloudModulesXmlUrl())
 {
     NX_ASSERT(
         m_moduleAttrName != stree::INVALID_RES_ID,
         Q_FUNC_INFO,
         lit("Given bad cloud module name %1").arg(moduleName));
+
+    // Preparing compatibility data.
+    m_moduleToDefaultUrlScheme.emplace("cdb", "http");
+    m_moduleToDefaultUrlScheme.emplace("hpm", "stun");
+    m_moduleToDefaultUrlScheme.emplace("notification_module", "http");
 }
 
 CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
@@ -47,6 +47,11 @@ void CloudModuleEndPointFetcher::stopWhileInAioThread()
     //    and internal events are delivered in same aio thread.
     m_httpClient.reset();
     m_endpointSelector.reset();
+}
+
+void CloudModuleEndPointFetcher::setModulesXmlUrl(QUrl url)
+{
+    m_modulesXmlUrl = std::move(url);
 }
 
 void CloudModuleEndPointFetcher::setUrl(QUrl endpoint)
@@ -94,7 +99,7 @@ void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
         },
         Qt::DirectConnection);
     m_requestIsRunning = true;
-    m_httpClient->doGet(QUrl(QnAppInfo::defaultCloudModulesXmlUrl()));
+    m_httpClient->doGet(QUrl(m_modulesXmlUrl));
 }
 
 void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
@@ -133,8 +138,8 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
     }
 
     //selecting endpoint
-    QUrl moduleEndpoint;
-    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleEndpoint))
+    QUrl moduleUrl;
+    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleUrl))
     {
         return signalWaitingHandlers(
             &lk,
@@ -142,13 +147,13 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
             QUrl());
     }
 
-    endpointSelected(&lk, nx_http::StatusCode::ok, moduleEndpoint);
+    endpointSelected(&lk, nx_http::StatusCode::ok, moduleUrl);
 }
 
 bool CloudModuleEndPointFetcher::findModuleEndpoint(
     const stree::AbstractNode& treeRoot,
     const int moduleAttrName,
-    QUrl* const moduleEndpoint)
+    QUrl* const moduleUrl)
 {
     stree::ResourceContainer inputData;
     const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
@@ -180,7 +185,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))
     {
-        *moduleEndpoint = QUrl(foundEndpointStr);
+        *moduleUrl = buildUrl(foundEndpointStr);
         return true;
     }
     return false;
@@ -213,6 +218,36 @@ void CloudModuleEndPointFetcher::endpointSelected(
     signalWaitingHandlers(lk, result, selectedEndpoint);
 }
 
+QUrl CloudModuleEndPointFetcher::buildUrl(const QString& str)
+{
+    QUrl url(str);
+    if (url.host().isEmpty())
+    {
+        // str could be host:port
+        const SocketAddress endpoint(str);
+        url = QUrl();
+        url.setHost(endpoint.address.toString());
+        if (endpoint.port > 0)
+            url.setPort(endpoint.port);
+    }
+
+    if (url.scheme().isEmpty())
+    {
+        const auto it = m_moduleToDefaultUrlScheme.find(
+            m_nameset.findResourceByID(m_moduleAttrName).name);
+        if (it != m_moduleToDefaultUrlScheme.end())
+            url.setScheme(it->second);
+        else
+            url.setScheme("http");
+
+        if ((url.scheme() == "http") && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+            url.setScheme("https");
+    }
+
+    return url;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 CloudModuleEndPointFetcher::ScopedOperation::ScopedOperation(
     CloudModuleEndPointFetcher* const fetcher)

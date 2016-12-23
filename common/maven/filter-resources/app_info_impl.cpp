@@ -197,7 +197,7 @@ QString QnAppInfo::defaultCloudPortalUrl()
 
 QString QnAppInfo::defaultCloudModulesXmlUrl()
 {
-    return QString::fromLatin1("http://%1/api/cloud_modules2.xml").arg(defaultCloudHost());
+    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
 }
 
 QString QnAppInfo::cloudName()

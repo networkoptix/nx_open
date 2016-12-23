@@ -1,12 +1,7 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CC_CDB_ENDPOINT_FETCHER_H
-#define NX_CC_CDB_ENDPOINT_FETCHER_H
+#pragma once
 
 #include <functional>
+#include <map>
 #include <vector>
 
 #include <boost/optional.hpp>
@@ -24,7 +19,6 @@
 #include <plugins/videodecoder/stree/resourcenameset.h>
 
 #include "endpoint_selector.h"
-
 
 namespace nx {
 namespace network {
@@ -84,6 +78,11 @@ public:
 
     virtual void stopWhileInAioThread() override;
 
+    /**
+     * Default value taken from application setup.
+     */
+    void setModulesXmlUrl(QUrl url);
+
     //!Specify endpoint explicitely
     void setUrl(QUrl url);
     //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
@@ -99,6 +98,8 @@ private:
     std::vector<Handler> m_resolveHandlers;
     std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
     bool m_requestIsRunning;
+    QUrl m_modulesXmlUrl;
+    std::map<QString, QString> m_moduleToDefaultUrlScheme;
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
     bool findModuleEndpoint(
@@ -113,10 +114,9 @@ private:
         QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value result,
         QUrl selectedEndpoint);
+    QUrl buildUrl(const QString& str);
 };
 
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif  //NX_CC_CDB_ENDPOINT_FETCHER_H
