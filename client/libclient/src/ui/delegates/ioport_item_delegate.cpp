@@ -123,8 +123,10 @@ QWidget* QnIoPortItemDelegate::createWidget(
                 return nullptr;
 
             auto spinBox = new QSpinBox(parent);
-            spinBox->setSuffix(lit(" ") + tr("s", "Seconds"));
             spinBox->setMinimum(1);
+
+            //TODO: #vkutin #gdm Move all time unit suffixes to one place
+            spinBox->setSuffix(L' ' + tr("s", "Seconds"));
 
             auto commit =
                 [model, spinBox](int value)
