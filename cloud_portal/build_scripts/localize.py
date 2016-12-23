@@ -125,6 +125,7 @@ save_content(app_filename, active_content)
 
 
 languages = config['languages']
+languages_json = []
 # Localize this language
 for lang in languages:
     # copy static/views to target dir
@@ -135,3 +136,11 @@ for lang in languages:
 
     process_files(lang, 'static', 'cloud_portal.ts')
     process_files(lang, 'templates', 'cloud_templates.ts')
+
+    language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
+
+    with open(language_json_filename, 'r') as file_descriptor:
+        data = json.load(file_descriptor)
+        languages_json.append(data)
+
+save_content('static/languages.json', json.dumps(languages_json))
