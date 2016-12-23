@@ -21,7 +21,7 @@ Product
     Properties
     {
         condition: product.type.contains("application") && qbs.targetOS.contains("linux")
-        overrideListProperties: true
+        overrideListProperties: !project.developerBuild // Leaving Qt RPATH for developer builds.
         cpp.rpaths: ["$ORIGIN/../lib"]
     }
 

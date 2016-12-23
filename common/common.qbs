@@ -87,6 +87,7 @@ GenericProduct
     }
     Group
     {
+        condition: project.developerBuild
         files: "qt.conf"
         fileTags: "configure.input"
         configure.outputTags: "resources.resource_data"

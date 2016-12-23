@@ -20,6 +20,7 @@ Project
     property string fullVersion:
         versionMajor + "." + versionMinor + "." + versionBugfix + "." + buildNumber
 
+    property bool developerBuild: true
     property string target: "linux-x64"
     property string customization: "default"
     property bool beta: true
