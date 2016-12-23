@@ -57,7 +57,7 @@ private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
     mutable QnMutex m_mutex;
-    mutable bool m_isOwnPeerIdDesignated;
+    mutable bool m_isOwnPeerIdAssigned;
     String m_ownPeerId;
     TunnelDictionary m_pool;
     bool m_terminated;
