@@ -961,6 +961,7 @@ namespace nx_http
                 break;
             }
             
+            case StatusCode::found:
             case StatusCode::movedPermanently:
                 return sendRequestToNewLocation(response);
 
