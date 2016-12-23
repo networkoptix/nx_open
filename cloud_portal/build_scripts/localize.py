@@ -130,7 +130,7 @@ for lang in languages:
     lang_dir = os.path.join('static', 'lang_' + lang)
     if os.path.isdir(lang_dir):
         shutil.rmtree(lang_dir)
-    shutil.copytree(os.path.join('static', 'views'), lang_dir)
+    shutil.copytree(os.path.join('static', 'views'), os.path.join('static', lang_dir, 'views'))
 
     process_files(lang, 'static', 'cloud_portal.ts')
     process_files(lang, 'templates', 'cloud_templates.ts')

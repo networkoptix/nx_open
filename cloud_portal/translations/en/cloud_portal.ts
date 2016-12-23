@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>views/language.json</name>
+    <name>language.json</name>
     <message>
-      <location filename="views/language.json"/>
+      <location filename="language.json"/>
       <source>You are about to change the owner of the system. You will lose owner permissions. This action is irreversible. Are you sure?</source>
       <translation> </translation>
     </message>

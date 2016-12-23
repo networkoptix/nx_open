@@ -189,7 +189,7 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('static', 'views', '.json', mode='js')
+js_strings = extract_strings('static', '', 'language.json', mode='js')
 html_strings = extract_strings('static', 'views', '.html')  # , dir_exclude='static'
 html_strings1 = extract_strings('static', '', '503.html')  # , dir_exclude='static'
 
