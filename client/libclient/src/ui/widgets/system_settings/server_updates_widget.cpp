@@ -318,9 +318,9 @@ void QnServerUpdatesWidget::initDownloadActions()
 
 void QnServerUpdatesWidget::updateButtonText()
 {
-    QString text = tr("Update System");
-    if (m_mode == Mode::SpecificBuild)
-        text = tr("Update to Specific Build");
+    QString text = m_mode == Mode::SpecificBuild
+        ? tr("Update to Specific Build")
+        : tr("Update System");
     ui->updateButton->setText(text);
 }
 
