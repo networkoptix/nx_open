@@ -49,7 +49,7 @@ void CloudModuleEndPointFetcher::stopWhileInAioThread()
     m_endpointSelector.reset();
 }
 
-void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
+void CloudModuleEndPointFetcher::setUrl(QUrl endpoint)
 {
     QnMutexLocker lk(&m_mutex);
     m_endpoint = std::move(endpoint);
@@ -87,9 +87,11 @@ void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient->bindToAioThread(getAioThread());
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client) {
-        onHttpClientDone(std::move(client));
-    },
+        m_httpClient.get(),
+        [this](nx_http::AsyncHttpClientPtr client)
+        {
+            onHttpClientDone(std::move(client));
+        },
         Qt::DirectConnection);
     m_requestIsRunning = true;
     m_httpClient->doGet(QUrl(QnAppInfo::defaultCloudModulesXmlUrl()));
@@ -102,35 +104,43 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
     m_httpClient.reset();
 
     if (!client->response())
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::serviceUnavailable,
-            SocketAddress());
+            QUrl());
+    }
 
     if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
         return signalWaitingHandlers(
             &lk,
             static_cast<nx_http::StatusCode::Value>(
                 client->response()->statusLine.statusCode),
-            SocketAddress());
+            QUrl());
+    }
 
     QByteArray xmlData = client->fetchMessageBodyBuffer();
     QBuffer xmlDataSource(&xmlData);
     std::unique_ptr<stree::AbstractNode> stree =
         stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
     if (!stree)
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::serviceUnavailable,
-            SocketAddress());
+            QUrl());
+    }
 
     //selecting endpoint
-    SocketAddress moduleEndpoint;
+    QUrl moduleEndpoint;
     if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleEndpoint))
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::notFound,
-            SocketAddress());
+            QUrl());
+    }
 
     endpointSelected(&lk, nx_http::StatusCode::ok, moduleEndpoint);
 }
@@ -138,7 +148,7 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
 bool CloudModuleEndPointFetcher::findModuleEndpoint(
     const stree::AbstractNode& treeRoot,
     const int moduleAttrName,
-    SocketAddress* const moduleEndpoint)
+    QUrl* const moduleEndpoint)
 {
     stree::ResourceContainer inputData;
     const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
@@ -170,7 +180,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))
     {
-        *moduleEndpoint = SocketAddress(foundEndpointStr);
+        *moduleEndpoint = QUrl(foundEndpointStr);
         return true;
     }
     return false;
@@ -179,7 +189,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
 void CloudModuleEndPointFetcher::signalWaitingHandlers(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value statusCode,
-    const SocketAddress& endpoint)
+    const QUrl& endpoint)
 {
     auto handlers = std::move(m_resolveHandlers);
     m_resolveHandlers = decltype(m_resolveHandlers)();
@@ -193,7 +203,7 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
 void CloudModuleEndPointFetcher::endpointSelected(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value result,
-    SocketAddress selectedEndpoint)
+    QUrl selectedEndpoint)
 {
     if (result != nx_http::StatusCode::ok)
         return signalWaitingHandlers(lk, result, std::move(selectedEndpoint));
@@ -226,7 +236,7 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Ha
     m_fetcher->get(
         auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
-            nx_http::StatusCode::Value statusCode, SocketAddress result) mutable
+            nx_http::StatusCode::Value statusCode, QUrl result) mutable
         {
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);

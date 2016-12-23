@@ -100,7 +100,7 @@ bool CdbLauncher::waitUntilStarted()
         return false;
     m_port = httpEndpoints.front().port;
 
-    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+    m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
     //retrieving module info
     auto connection = m_connectionFactory->createConnection();

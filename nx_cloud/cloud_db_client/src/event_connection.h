@@ -29,8 +29,7 @@ class CloudModuleEndPointFetcher;
 namespace cdb {
 namespace cl {
 
-class EventConnection
-:
+class EventConnection:
     public QObject,
     public api::EventConnection
 {

@@ -38,10 +38,8 @@ public:
     //!Implementation of \a api::ConnectionFactory::createConnection
     virtual std::string toString(api::ResultCode resultCode) const override;
 
-    //!Implementation of \a api::ConnectionFactory::setCloudEndpoint
-    virtual void setCloudEndpoint(
-        const std::string& host,
-        unsigned short port) override;
+    //!Implementation of \a api::ConnectionFactory::setCloudUrl
+    virtual void setCloudUrl(const std::string& url) override;
 
 private:
     network::cloud::CloudModuleEndPointFetcher m_endPointFetcher;

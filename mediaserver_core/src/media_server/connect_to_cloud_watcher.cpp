@@ -56,22 +56,22 @@ void QnConnectToCloudWatcher::at_updateConnection()
 
     m_cdbEndPointFetcher->get(
         nx_http::AuthInfo(),
-        [this](int statusCode, boost::optional<SocketAddress> endpoint)
+        [this](int statusCode, QUrl url)
         {
-            if (statusCode != nx_http::StatusCode::ok || endpoint->isNull())
+            if (statusCode != nx_http::StatusCode::ok)
             {
-                NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1").str(statusCode), cl_logWARNING);
+                NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
+                    .str(statusCode), cl_logWARNING);
                 // try once more later
                 metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                 return;
             }
 
             NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
-                .str(endpoint), cl_logDEBUG1);
+                .str(url), cl_logDEBUG1);
 
-            m_cloudUrl = QUrl(lit("http://%1:%2/ec2/events").
-                arg(endpoint->address.toString()).
-                arg(endpoint->port));
+            m_cloudUrl = url;
+            m_cloudUrl.setPath(lit("/ec2/events"));
             m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
             m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
             qnTransactionBus->addConnectionToPeer(m_cloudUrl);

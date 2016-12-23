@@ -25,11 +25,11 @@ TEST(CloudModuleEndPointFetcher, common)
             std::make_unique<nx::network::cloud::RandomEndpointSelector>());
         std::promise<nx_http::StatusCode::Value> endpointPromise;
         auto endpointFuture = endpointPromise.get_future();
-        SocketAddress cdbEndpoint;
+        QUrl cdbEndpoint;
         endPointFetcher.get(
             [&endpointPromise, &cdbEndpoint](
                 nx_http::StatusCode::Value resCode,
-                SocketAddress endpoint)
+                QUrl endpoint)
             {
                 cdbEndpoint = endpoint;
                 endpointPromise.set_value(resCode);
@@ -61,7 +61,7 @@ TEST(CloudModuleEndPointFetcher, cancellation)
             operation.get(
                 [&s](
                     nx_http::StatusCode::Value /*resCode*/,
-                    SocketAddress endpoint)
+                    QUrl endpoint)
                 {
                     //if called after s desruction, will get segfault here
                     s = endpoint.toString().toStdString();
