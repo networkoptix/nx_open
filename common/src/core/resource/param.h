@@ -9,6 +9,7 @@ namespace Qn
     //dynamic parameters of resource
 
     static const QString POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME = lit("possibleDefaultCredentials");
+    static const QString FORCED_DEFAULT_CREDENTIALS_PARAM_NAME = lit("forcedDefaultCredentials");
     static const QString PREFERRED_AUTH_SCHEME_PARAM_NAME = lit("preferredAuthScheme");
     static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
     static const QString DTS_PARAM_NAME = lit("dts");
@@ -23,6 +24,7 @@ namespace Qn
     static const QString FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME = lit("forcedIsAudioSupported");
     static const QString FORCE_BITRATE_PER_GOP = lit("bitratePerGOP");
     static const QString DESIRED_TRANSPORT_PARAM_NAME = lit("desiredTransport");
+    static const QString ONVIF_INPUT_PORT_ALIASES_PARAM_NAME = lit("onvifInputPortAliases");
     /*!
         String parameter with following values allowed:\n
         - \a softwaregrid. Software motion calculated on mediaserver
@@ -55,6 +57,8 @@ namespace Qn
     static const QString HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("highStreamBitrateBounds");
     static const QString LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("lowStreamBitrateBounds");
 
+    static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
+
     static const QString PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME = lit("preStreamConfigureRequests");
 
     static const QString SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME = lit("shouldAppearAsSingleChannel");
@@ -68,6 +72,7 @@ namespace Qn
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
+    static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");

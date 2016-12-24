@@ -79,9 +79,9 @@ public:
     QModelIndex createIndex(int row, int col);
     QModelIndex createIndex(int col);
 
-    Qt::ItemFlags flags(int column) const ;
+    virtual Qt::ItemFlags flags(int column) const;
 
-    QVariant data(int role, int column) const ;
+    virtual QVariant data(int role, int column) const;
 
     bool setData(const QVariant &value, int role, int column) ;
 
@@ -90,6 +90,11 @@ public:
     void setModified(bool modified) ;
 
 protected:
+    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+
+    void setName(const QString& name);
+    void setIcon(const QIcon& icon);
+
     bool isInitialized() const;
 
     QnResourceTreeModel* model() const;
@@ -101,10 +106,10 @@ protected:
     virtual void removeChildInternal(const QnResourceTreeModelNodePtr& child);
     void changeInternal();
 
-    void setName(const QString& name);
-private:
-    QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
+    void updateResourceStatus();
 
+private:
+    void setNameInternal(const QString& name);
 
     bool isValid() const;
     State state() const;
@@ -115,6 +120,12 @@ private:
 
     bool isBastard() const;
     void setBastard(bool bastard);
+
+    int helpTopicId() const;
+
+    bool changeCheckStateRecursivelyUp(Qt::CheckState newState);
+    void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate = false);
+    void propagateCheckStateRecursivelyDown();
 
 private:
     //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
@@ -173,6 +184,10 @@ private:
 
     /** Whether this resource is checked. */
     Qt::CheckState m_checkState;
+
+    /** Number of unchecked and checked children. */
+    int m_uncheckedChildren;
+    int m_checkedChildren;
 
     //TODO: #GDM #Common implement cache invalidating in case of permissions change
     /** Whether this resource can be renamed, cached value. */

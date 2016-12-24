@@ -1,23 +1,17 @@
-/**********************************************************
-* 18 sep 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STREAM_SOCKET_SERVER_H
-#define STREAM_SOCKET_SERVER_H
+#pragma once
 
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <set>
 
-#include <utils/common/stoppable.h>
 #include <nx/network/abstract_socket.h>
-#include <nx/network/socket_factory.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/socket_factory.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
+#include <utils/common/stoppable.h>
 
 template<class _ConnectionType>
 class StreamConnectionHolder
@@ -115,9 +109,13 @@ template<class CustomServerType, class ConnectionType>
 
 public:
     //!Initialization
-    StreamSocketServer( bool sslRequired, SocketFactory::NatTraversalType natTraversalRequired )
+    StreamSocketServer(
+        bool sslRequired,
+        nx::network::NatTraversalSupport natTraversalSupport)
     :
-        m_socket( SocketFactory::createStreamServerSocket( sslRequired, natTraversalRequired ) )
+        m_socket(SocketFactory::createStreamServerSocket(
+            sslRequired,
+            natTraversalSupport))
     {
     }
 
@@ -158,20 +156,30 @@ public:
         return m_socket->getLocalAddress();
     }
 
-    void newConnectionAccepted(
-        SystemError::ErrorCode /*errorCode*/,
-        AbstractStreamSocket* newConnection )
+    void newConnectionAccepted(SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
-        //TODO #ak handle errorCode: try to call acceptAsync after some delay?
+        // TODO: #ak handle errorCode: try to call acceptAsync after some delay?
+        m_socket->acceptAsync(
+            [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+            {
+                newConnectionAccepted(code, socket);
+            });
 
-        if( newConnection )
+        if (code != SystemError::noError)
         {
-            auto conn = createConnection( std::unique_ptr<AbstractStreamSocket>(newConnection) );
-            conn->startReadingConnection(m_connectionInactivityTimeout);
-            this->saveConnection(std::move(conn));
+            NX_LOGX(lm("Accept has failed: %1").arg(SystemError::toString(code)), cl_logWARNING);
+            return;
         }
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
-                                        std::placeholders::_1, std::placeholders::_2));
+
+        if (m_keepAliveOptions)
+        {
+            const auto isKeepAliveSet = socket->setKeepAlive(m_keepAliveOptions);
+            NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+        }
+
+        auto connection = createConnection(std::unique_ptr<AbstractStreamSocket>(socket));
+        connection->startReadingConnection(m_connectionInactivityTimeout);
+        this->saveConnection(std::move(connection));
     }
 
     void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
@@ -189,6 +197,11 @@ public:
         m_connectionInactivityTimeout = value;
     }
 
+    void setConnectionKeepAliveOptions(boost::optional<KeepAliveOptions> options)
+    {
+        m_keepAliveOptions = std::move(options);
+    }
+
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;
@@ -196,9 +209,8 @@ protected:
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;
     boost::optional<std::chrono::milliseconds> m_connectionInactivityTimeout;
+    boost::optional<KeepAliveOptions> m_keepAliveOptions;
 
     StreamSocketServer( StreamSocketServer& );
     StreamSocketServer& operator=( const StreamSocketServer& );
 };
-
-#endif  //STREAM_SOCKET_SERVER_H

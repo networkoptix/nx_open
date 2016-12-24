@@ -23,6 +23,13 @@ namespace {
 
 static const QSize kHugeSize(100000, 100000);
 
+
+void correctPixelRatio(QPixmap& pixmap)
+{
+    if (QnSkin::isHiDpi())
+        pixmap.setDevicePixelRatio(2.0);
+}
+
 } // namespace
 
 QnSkin::QnSkin(QObject* parent): QObject(parent)
@@ -70,6 +77,9 @@ const QStringList& QnSkin::paths() const
 
 QString QnSkin::path(const QString& name) const
 {
+    if (QDir::isAbsolutePath(name))
+        return QFile::exists(name) ? name : QString();
+
     for (int i = m_paths.size() - 1; i >= 0; i--)
     {
         QString path = m_paths[i] + name;
@@ -115,30 +125,41 @@ QIcon QnSkin::icon(const QIcon& icon)
 QPixmap QnSkin::pixmap(const char* name,
     const QSize& size,
     Qt::AspectRatioMode aspectMode,
-    Qt::TransformationMode mode)
+    Qt::TransformationMode mode,
+    bool correctDevicePixelRatio)
 {
-    return pixmap(QString::fromLatin1(name), size, aspectMode, mode);
+    return pixmap(QString::fromLatin1(name), size, aspectMode, mode, correctDevicePixelRatio);
 }
 
 QPixmap QnSkin::pixmap(const QString& name,
     const QSize& size,
     Qt::AspectRatioMode aspectMode,
-    Qt::TransformationMode mode)
+    Qt::TransformationMode mode,
+    bool correctDevicePixelRatio)
 {
     static const auto kHiDpiSuffix = lit("@2x");
 
-    if (isHiDpi())
-    {
-        QFileInfo info(name);
-        const auto suffix = info.completeSuffix();
-        const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
-            + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
-        auto result = getPixmapInternal(newName, size, aspectMode, mode);
-        if (!result.isNull())
-            return result;
-    }
+    auto result =
+        [this, name, size, aspectMode, mode]()
+        {
+            if (isHiDpi())
+            {
+                QFileInfo info(name);
+                const auto suffix = info.completeSuffix();
+                const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
+                    + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
+                auto result = getPixmapInternal(newName, size, aspectMode, mode);
+                if (!result.isNull())
+                    return result;
+            }
 
-    return getPixmapInternal(name, size, aspectMode, mode);
+            return getPixmapInternal(name, size, aspectMode, mode);
+        }();
+
+    if (correctDevicePixelRatio)
+        correctPixelRatio(result);
+
+    return result;
 }
 
 QPixmap QnSkin::getPixmapInternal(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
@@ -195,8 +216,8 @@ QPixmap QnSkin::maximumSizePixmap(const QIcon& icon, QIcon::Mode mode,
     QIcon::State state, bool correctDevicePixelRatio)
 {
     auto pixmap = icon.pixmap(kHugeSize, mode, state);
-    if (correctDevicePixelRatio && isHiDpi())
-        pixmap.setDevicePixelRatio(2.0);
+    if (correctDevicePixelRatio)
+        correctPixelRatio(pixmap);
     return pixmap;
 }
 

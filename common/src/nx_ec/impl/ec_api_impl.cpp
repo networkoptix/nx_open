@@ -28,6 +28,8 @@ namespace ec2
                 return lit( "unauthorized" );
             case ErrorCode::ldap_temporary_unauthorized:
                 return lit("ldap temporary unauthorized");
+            case ErrorCode::forbidden:
+                return lit( "forbidden" );
             case ErrorCode::cloud_temporary_unauthorized:
                 return lit( "cloud temporary unauthorized" );
             case ErrorCode::badResponse:

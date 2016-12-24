@@ -149,6 +149,21 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
         } );
 }
 
+void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    if (itr == m_items.end())
+        return;
+    const QnResourcePropertyList& properties = itr.value();
+    QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
+    for (auto itrProperty = properties.begin(); itrProperty != properties.end(); ++itrProperty)
+    {
+        if (!modifiedProperties.contains(itrProperty.key()))
+            modifiedProperties[itrProperty.key()] = itrProperty.value();
+    }
+}
+
 bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)
 {
     QnMutexLocker lock( &m_mutex );

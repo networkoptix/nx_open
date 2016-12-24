@@ -14,18 +14,17 @@ angular.module('webadminApp')
 
 
         function formatUrl(url){
-            return decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,''));
+            var visibleUrl = decodeURIComponent(url.replace(/file:\/\/.+?:.+?\//gi,''));
+            return visibleUrl.replace(/\/\/.+?@/,'//'); // Cut login and password from url
         }
-
-        mediaserver.getStorages().then(function (r) {
-            $scope.storages = _.sortBy(r.data.reply.storages,function(storage){
-                return formatUrl(storage.url);
+        function getStorages() {
+            mediaserver.getStorages().then(function (r) {
+                $scope.storages = _.sortBy(r.data.reply.storages, function (storage) {
+                    storage.url = formatUrl(storage.url);
+                    return storage.url;
+                });
             });
-
-            _.each($scope.storages,function(storage){
-                storage.url = formatUrl(storage.url);
-            });
-        });
+        }
         $scope.formatSpace = function(bytes){
             var precision = 2;
             var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -40,4 +39,10 @@ angular.module('webadminApp')
             return Number(bytes).toFixed(precision) + ' ' + sizes[posttxt];
         };
 
+        mediaserver.getUser().then(function (user) {
+            $scope.user = user;
+            if (user.isAdmin) {
+                getStorages();
+            }
+        });
     });

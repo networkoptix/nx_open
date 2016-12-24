@@ -2,35 +2,30 @@ import QtQuick 2.6
 import QtMultimedia 5.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import com.networkoptix.qml 1.0
 
 ZoomableFlickable
 {
     id: zf
 
-    property alias source: video.source
-    property alias screenshotSource: screenshot.source
-    property alias customAspectRatio: content.customAspectRatio
-    property alias videoRotation: content.videoRotation
+    property alias mediaPlayer: video.mediaPlayer
+    property alias resourceHelper: video.resourceHelper
 
     property real maxZoomFactor: 4
-
-    readonly property size sourceSize: (screenshot.visible
-        ? screenshot.sourceSize
-        : Qt.size(video.sourceRect.width, video.sourceRect.height))
 
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
         maxZoomFactor * Math.max(
             content.rotated90
-                ? sourceSize.height
-                : sourceSize.width,
+                ? content.sourceSize.height
+                : content.sourceSize.width,
             width)
     maxContentHeight:
         maxZoomFactor * Math.max(
             content.rotated90
-                ? sourceSize.width
-                : sourceSize.height,
+                ? content.sourceSize.width
+                : content.sourceSize.height,
             height)
 
     readonly property bool zoomed: contentWidth > width * 1.05 || contentHeight > height * 1.05
@@ -46,21 +41,10 @@ ZoomableFlickable
 
         width: contentWidth
         height: contentHeight
-        sourceSize: Qt.size(video.sourceRect.width, video.sourceRect.height)
+        sourceSize: Qt.size(video.implicitWidth, video.implicitHeight)
+        videoRotation: resourceHelper ? resourceHelper.customRotation : 0
 
-        item: VideoOutput
-        {
-            id: video
-            fillMode: VideoOutput.Stretch
-        }
-
-        Image
-        {
-            id: screenshot
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
-            visible: source != ""
-        }
+        item: MultiVideoOutput { id: video }
 
         onSourceSizeChanged: fitToBounds()
     }

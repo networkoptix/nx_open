@@ -40,7 +40,6 @@
 
 #include <nx/utils/string.h>
 #include <utils/common/warnings.h>
-#include <utils/aspect_ratio.h>
 
 #include "transcoding/filters/fisheye_image_filter.h"
 #include "transcoding/filters/filter_helper.h"
@@ -501,8 +500,12 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             //TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
             for(auto filter: filters)
+            {
                 frame = filter->updateImage(frame);
-            result = frame->toImage();
+                if (!frame)
+                    break;
+            }
+            result = (bool)frame ? frame->toImage() : QImage();
         }
     }
 

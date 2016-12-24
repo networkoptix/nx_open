@@ -6,6 +6,7 @@
 #include <nx/utils/log/log.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
+const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
 
 QnStorageResource::QnStorageResource():
     base_type(),
@@ -125,6 +126,18 @@ QString QnStorageResource::urlToPath(const QString& url)
         return url;
     else
         return QUrl(url).path();
+}
+
+QString QnStorageResource::urlWithoutCredentials(const QString& url)
+{
+    if (!url.contains(lit("://")))
+        return url;
+    
+    QUrl result(url);
+    result.setUserName(QString());
+    result.setPassword(QString());
+
+    return result.toString();
 }
 
 float QnStorageResource::getAvarageWritingUsage() const

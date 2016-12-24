@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
-     xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <Product Id="*" Name="${display.product.name} Server" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="301" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Server Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Server Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
-        <?include BuildVars.wxi ?>
         
         <?define ProductName="${display.product.name}"?>
-        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
@@ -24,27 +21,11 @@
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
 
-        <?define Remove_S1="(INSTALL_SERVER <> 1 AND !ServerFeature = 3)"?>
-
         <?define InstallServer="&ServerFeature = 3 AND !ServerFeature <> 3"?>
 
         <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
-        <?define Inst_S0="(NOT $(var.Inst_S1))"?>
 
-        <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
-        <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0)"?>
-
-        <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
-        <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
-        <?define IsSettingsCorrect=$(var.IsSettingsFilled) AND $(var.PasswordsEqual)?>
-        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual) AND NOT BUSYPORT)"?>
         <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
-
-        <?if $(var.arch) = x86 ?>
-        <Condition Message="!(loc.Product_ArchMismatch)">
-            <![CDATA[ NOT VersionNT64 ]]>
-        </Condition>
-        <?endif?>
 
         <!-- Exit if upgrading and cloud hosts differ -->
         <Condition Message="!(loc.Product_CloudHostMismatch)">
@@ -53,9 +34,6 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
-
-        <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
-        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="[FREEPORT1]" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
 
@@ -82,11 +60,8 @@
 
         <Property Id="BUSYPORT" Secure="yes"/>
 
-        <Property Id="REMOVE_DATABASE" Secure="yes" Value="0"/>
-
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
         <Property Id="OLDEC_REGISTRY_PATH" Value="$(var.ECRegPath)"/>
-        <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- MediaServer properties-->
 
@@ -114,25 +89,15 @@
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property> -->
 
-        <Property Id="SERVER_PORT_EC" Secure="yes">
-            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
-        </Property>
-
-        <!-- Demo only!!! -->
         <Property Id="ALLOW_CAMERA_CHANGES" Value="1" Secure="yes"/>
         <Property Id="STATISTICS_REPORT_ALLOWED" Value="1" Secure="yes"/>
-        <!-- <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes"/>
-        <Property Id="STATISTICS_REPORT_ALLOWED" Secure="yes"/> -->
    
         <Property Id="SERVER_LOGIN" Value="admin"/>
         
-        <!-- Demo only!!! -->
         <?if NOT $(var.VmsUpgrading) ?>
             <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
             <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
         <?endif?>
-        <!-- <Property Id="SERVER_PASSWORD" Value="admin" Secure="yes"/>
-        <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/> -->
 
         <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
         <Property Id="STATISTICS_REPORT_ALLOWED_REF" Value="STATISTICS_REPORT_ALLOWED"/>        
@@ -145,8 +110,8 @@
         <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-        <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
+        <CustomAction Id="BackupDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="BackupDatabaseFile" Execute="deferred" Impersonate="no"/>
 
 
         <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
@@ -163,11 +128,11 @@
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
         
-        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="no"
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" 
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite"/>
         <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
-        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" Impersonate="no"
+        <CustomAction Id="CopyHostedFiles_Cmd" Property="CopyHostedFiles" Execute="immediate" 
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\hostedfiles;#LocalAppDataFolder#\${company.name}\${mediaserver.name}\vms_storedfiles"/>
         <CustomAction Id="CopyHostedFiles" BinaryKey="CustomActions.dll" DllEntry="CopyHostedFiles" Execute="deferred" Impersonate="no"/>
 
@@ -176,12 +141,6 @@
         
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT1]"/>
-
-        <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
-                      Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="check" Impersonate="no" />
-
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -192,14 +151,10 @@
         <CustomAction Id="CloseTrayToolAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
-                      Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
-                      Value="&quot;[#dbsync.exe]&quot;;100500;" Execute="immediate" Impersonate="yes"/>
-        <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
-                      Execute="deferred" Return="check" Impersonate="no" />
+        <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate"
+                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite;Software\[Manufacturer]\version;"/>
 
-        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="no"
+        <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
                       Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}"/>
 
         <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" Directory="${customization}TrayToolDir" ExeCommand="[${customization}TrayToolDir]traytool.exe"/>
@@ -215,15 +170,18 @@
         <InstallUISequence>
             <Custom Action="SetPreviousServerInstalled" Before="MigrateFeatureStates">(NOT Installed) AND (NOT (REMOVE="ALL"))</Custom>
             <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
+
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="SetServerPort1"/>
-            <Custom Action="AssignServerPort" After="SetServerPort2">NOT SERVER_PORT</Custom>
-            <Custom Action="FindConfiguredStorages" After="AssignServerPort"/> 
+            <Custom Action="FindFreePorts" Before="AssignServerPort">NOT SERVER_PORT</Custom>
+            <Custom Action="AssignServerPort" Before="CostInitialize">NOT SERVER_PORT</Custom>
         </InstallUISequence>
 
         <InstallExecuteSequence>
+            <Custom Action="FindFreePorts" Before="AssignServerPort">NOT SERVER_PORT</Custom>
+            <Custom Action="AssignServerPort" Before="CostInitialize">NOT SERVER_PORT</Custom>
+
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
@@ -239,19 +197,6 @@
             <Custom Action="CopyHostedFiles" After="CopyHostedFiles_Cmd">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CertGenAction" After="CertGenAction_Cmd">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-
-            <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
-                <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
-                <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
-
-            <Custom Action="SyncDatabaseAction" After="CertGenAction">
-                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" AND $(var.VmsUpgrading) ]]></Custom>
-
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
@@ -262,38 +207,36 @@
             <Custom Action="CloseTrayToolAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
-            <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
+            <![CDATA[ (!ServerFeature=3 OR &ServerFeature = 3) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
-            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">REMOVE_DATABASE=1</Custom>
+            <Custom Action="BackupDatabaseFile_Cmd" After="StopServices">1</Custom>
+            <Custom Action="BackupDatabaseFile" After="BackupDatabaseFile_Cmd">1</Custom>
+
+            <Custom Action="DeleteDatabaseFile_Cmd" After="BackupDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+
+            <Custom Action="DeleteAllRegistryKeys_Cmd" After="StopServices">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+            <Custom Action="DeleteAllRegistryKeys" After="DeleteAllRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
+
             <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
             <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="srvmisc.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="yes" />
-        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="yes" />
-        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="yes" />
-        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="yes" />
-        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="yes" />
-        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="yes" />
-        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="yes" />
-        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="yes" />
+
+        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="$(var.NoStrip)" />
+
         <Media Id="10" Cabinet="srvlib.cab" EmbedCab="yes" />
         <Media Id="11" Cabinet="srvexec.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-            <Directory Id="LocalAppDataFolder">
-                                <Directory Id="sysfocona" Name="${company.name}">
-                                    <Component Id="sysfomediaservercomponent">
-                                        <CreateFolder Directory="sysfocona"/>
-                                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\version' Type='string' Value='${release.version}.${buildNumber}' KeyPath='yes' />
-                                    </Component>
-                                </Directory>
-                            </Directory>
-
             <Directory Id="MyPicturesFolder">
                 <Directory Id="${customization}BgDir" Name="$(var.ProductName) Backgrounds"/>
             </Directory>
@@ -307,7 +250,7 @@
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
-                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
+                        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
                 </Directory>
@@ -317,50 +260,8 @@
             <Directory Id="StartupFolder" Name="Startup"/>            
         </Directory>
 
-        <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist90" SourceFile="MergeModules\Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist140" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <?if ${build.configuration} = debug ?>
-            <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist140Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90Debug" SourceFile="MergeModules\Microsoft_VC90_DebugCRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90PolicyDebug" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_DebugCRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
-            <?endif?>
-        </DirectoryRef>
-
-        <Feature Id="VCRedistVS9" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist90"/>
-            <MergeRef Id="VCRedist90Policy"/>
-            <?if ${build.configuration} = Debug ?>
-            <MergeRef Id="VCRedist90Debug"/>
-            <MergeRef Id="VCRedist90PolicyDebug"/>
-            <?endif?>
-        </Feature>
-
-        <Feature Id="VCRedistVS10" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist100"/>
-        </Feature>
-
-        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist110"/>
-            <?if ${build.configuration} = debug ?>
-            <MergeRef Id="VCRedist110Debug"/>
-            <?endif?>
-        </Feature>
-
-        <Feature Id="VCRedistVS14" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist140"/>
-            <?if ${build.configuration} = debug ?>
-            <MergeRef Id="VCRedist140Debug"/>
-            <?endif?>
-        </Feature>
-
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
-            <ComponentRef Id="ARPAltRegistryEntries"/>            
             <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
 
@@ -399,7 +300,6 @@
 
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND NOT LICENSE_ALREADY_ACCEPTED ]]></Publish>          
-            <!-- Demo only!!! <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> -->
             
             <!-- Demo only!!! -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ PREVIOUSSERVERINSTALLED <> "1" AND LICENSE_ALREADY_ACCEPTED ]]></Publish> 
@@ -409,7 +309,6 @@
 
             <!-- LicenseAgreementDlg -->
             <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-            <!-- Demo only!!! <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">LicenseAccepted = "1"</Publish> -->
             
             <!-- Demo only!!! -->
             <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">LicenseAccepted = "1"</Publish>
@@ -420,43 +319,12 @@
             <Publish Dialog="UpgradeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
             <Publish Dialog="UpgradeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
-            <!-- MediaServerDlg -->
-            <!-- Demo only!!! 
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT LICENSE_ALREADY_ACCEPTED</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
-
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg" Order="1">NOT $(var.IsSettingsFilled)</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg" Order="1">$(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual)</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">$(var.IsSettingsCorrect)</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_PORT]" Order="1">$(var.IsSettingsCorrect)</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">$(var.IsSettingsCorrect)</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">$(var.IsSettingsCorrect) AND BUSYPORT</Publish>
-
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[ $(var.IsSettingsValid) ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="ALLOW_CAMERA_CHANGES" Value="0" Order="4">ALLOW_CAMERA_CHANGES = ""</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="STATISTICS_REPORT_ALLOWED" Value="0" Order="4">STATISTICS_REPORT_ALLOWED = ""</Publish>
-
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish> 
-
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish> 
-            <Publish Dialog="LicenseAgreementDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish> -->           
-            
-            <!-- PortIsBusyDlg -->
-            <!-- <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
-            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish> -->
-
-            <!-- VerifyReadyDlg -->
-            <!-- Demo only!!! <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading)</Publish> -->
-            
             <!-- Demo only!!! -->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND NOT LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">LICENSE_ALREADY_ACCEPTED</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="ALLOW_CAMERA_CHANGES" Value="{}">ALLOW_CAMERA_CHANGES = "0"</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ NOT $(var.Remove_S1) AND $(var.VmsRemoving) AND !ServerFeature <> 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg">$(var.Remove_S1) OR (!ServerFeature = 3 AND $(var.VmsRemoving))</Publish>            
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">1</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
@@ -472,21 +340,6 @@
 
             <!-- MyExitDialog -->
             <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-
-            <!-- MaintenanceWelcomeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
-
-            <!-- MaintenanceTypeDlg -->
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="UninstallOptionsDlg">!ServerFeature = 3</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !ServerFeature <> 3 ]]></Publish>            
-            
-            <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
-            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE_DATABASE" Value="0">1</Publish>
-            
         </UI>
     </Product>
 </Wix>

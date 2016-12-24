@@ -38,7 +38,7 @@ namespace Qn {
                     : Qn::ValidationResult(QnValidatorStrings::tr("Email cannot be empty."));
             }
 
-            if (!QnEmailAddress::isValid(text)) /* isValid() trims it before checking. */
+            if (!nx::email::isValidAddress(text)) /* isValid() trims it before checking. */
                 return Qn::ValidationResult(QnValidatorStrings::tr("Email is not valid."));
 
             return kValidResult;

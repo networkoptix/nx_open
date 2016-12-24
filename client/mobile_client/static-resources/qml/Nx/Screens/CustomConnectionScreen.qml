@@ -32,8 +32,8 @@ Page
     Column
     {
         width: parent.width
-        leftPadding: 16
-        rightPadding: 16
+        leftPadding: 8
+        rightPadding: 8
         spacing: 8
         enabled: !d.connecting
 
@@ -83,9 +83,7 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
-            {
                 Workflow.openResourcesScreen(connectionManager.systemName)
-            }
         }
 
         onConnectionFailed:
@@ -100,7 +98,7 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer("http://" + address, login, password)
+        connectionManager.connectByUserInput(address, login, password)
     }
 
     function showWarning(status, info)

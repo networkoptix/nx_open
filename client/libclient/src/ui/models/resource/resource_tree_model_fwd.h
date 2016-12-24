@@ -1,10 +1,10 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
 
 class QnResourceTreeModel;
 class QnResourceTreeModelNode;
-class QnResourceTreeModelUserNodes;
 
 typedef QnSharedResourcePointer<QnResourceTreeModelNode> QnResourceTreeModelNodePtr;
 

@@ -94,7 +94,7 @@ public:
         {
             resolveAsync(
                 address,
-                [&](SystemError::ErrorCode, std::vector<AddressEntry>)
+                [&](SystemError::ErrorCode /*code*/, std::deque<AddressEntry> /*enries*/)
                 {
                     {
                         QnMutexLocker lk(&m_mutex);
@@ -103,7 +103,7 @@ public:
 
                     syncQueue.push(true);
                 },
-                true,
+                NatTraversalSupport::enabled,
                 AF_INET);
         }
 
@@ -121,6 +121,11 @@ public:
     }
 
 private:
+    virtual bool isMediatorAvailable() const override
+    {
+        return true;
+    }
+
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
     static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };
@@ -129,7 +134,7 @@ std::map<QString, std::list<SocketAddress>> AddressResolverTest::s_endpoints;
 std::shared_ptr<stun::test::AsyncClientMock> AddressResolverTest::s_stunClient;
 
 static const HostAddress kAddress("ya.ru");
-static const SocketAddress kResult("10.11.12.13:12345");
+static const SocketAddress kResult(*HostAddress::ipV4from(lit("10.11.12.13")), 12345);
 
 /**
  * Usual DNS addresses like "ya.ru" shell be resolved in order:
@@ -332,7 +337,7 @@ TEST_F(AddressResolverTest, DnsVsMediator)
 
 TEST(AddressResolverRealTest, Cancel)
 {
-    const auto doNone = [&](SystemError::ErrorCode, std::vector<AddressEntry>) {};
+    const auto doNone = [&](SystemError::ErrorCode, std::deque<AddressEntry>) {};
 
     const std::vector<HostAddress> kTestAddresses =
     {
@@ -345,10 +350,13 @@ TEST(AddressResolverRealTest, Cancel)
     {
         for (const auto& address : kTestAddresses)
         {
-            SocketGlobals::addressResolver().resolveAsync(address, doNone, true, AF_INET, this);
-            if (timeout) std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+            SocketGlobals::addressResolver().resolveAsync(
+                address, doNone, NatTraversalSupport::enabled, AF_INET, this);
+            if (timeout)
+                std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             SocketGlobals::addressResolver().cancel(this);
-            if (!timeout) timeout = 10;
+            if (!timeout)
+                timeout = 10;
         }
     }
 }

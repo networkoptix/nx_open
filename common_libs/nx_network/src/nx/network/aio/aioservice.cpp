@@ -34,7 +34,6 @@ AIOService::AIOService( unsigned int threadCount )
 {
     if( !threadCount )
         threadCount = QThread::idealThreadCount();
-    //threadCount = 1;
 
     initializeAioThreadPool(&m_systemSocketAIO, threadCount);
 }
@@ -88,9 +87,18 @@ void AIOService::registerTimer(
     std::chrono::milliseconds timeoutMillis,
     AIOEventHandler<Pollable>* const eventHandler)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
+    registerTimerNonSafe(&locker, sock, timeoutMillis, eventHandler);
+}
+
+void AIOService::registerTimerNonSafe(
+    QnMutexLockerBase* const locker,
+    Pollable* const sock,
+    std::chrono::milliseconds timeoutMillis,
+    AIOEventHandler<Pollable>* const eventHandler)
+{
     watchSocketNonSafe(
-        &lk,
+        locker,
         sock,
         aio::etTimedOut,
         eventHandler,
@@ -145,9 +153,10 @@ AbstractAioThread* AIOService::getRandomAioThread() const
     return nx::utils::random::choice(m_systemSocketAIO.aioThreadPool).get();
 }
 
-bool AIOService::isInAnyAioThread() const
+AbstractAioThread* AIOService::getCurrentAioThread() const
 {
     QnMutexLocker lk(&m_mutex);
+
     const auto thisThread = QThread::currentThread();
     const auto it = std::find_if(
         m_systemSocketAIO.aioThreadPool.begin(),
@@ -157,7 +166,12 @@ bool AIOService::isInAnyAioThread() const
             return thisThread == aioThread.get();
         });
 
-    return it != m_systemSocketAIO.aioThreadPool.end();
+    return (it != m_systemSocketAIO.aioThreadPool.end()) ? it->get() : nullptr;
+}
+
+bool AIOService::isInAnyAioThread() const
+{
+    return getCurrentAioThread() != nullptr;
 }
 
 void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThread)

@@ -42,35 +42,21 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv )
-:
-#ifdef USE_QAPPLICATION
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibVmsGatewayAppInfo::applicationName()),
-#endif
+VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv ):
     m_argc( argc ),
     m_argv( argv ),
     m_terminated( false ),
     m_timerID( -1 )
 {
-#ifdef USE_QAPPLICATION
-    setServiceDescription(QnLibVmsGatewayAppInfo::applicationDisplayName());
-#endif
-
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
 }
 
 void VmsGatewayProcess::pleaseStop()
 {
-#ifdef USE_QAPPLICATION
-    m_terminated = true;
-    if (application())
-        application()->quit();
-#else
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
     m_cond.wakeAll();
-#endif
 }
 
 void VmsGatewayProcess::setOnStartedEventHandler(
@@ -89,11 +75,7 @@ void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool e
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
 
-#ifdef USE_QAPPLICATION
-int VmsGatewayProcess::executeApplication()
-#else
 int VmsGatewayProcess::exec()
-#endif
 {
     using namespace std::placeholders;
 
@@ -117,7 +99,7 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        initializeQnLog(
+        nx::utils::log::initialize(
             settings.logging(), settings.general().dataDir,
             QnLibVmsGatewayAppInfo::applicationDisplayName());
 
@@ -188,7 +170,7 @@ int VmsGatewayProcess::exec()
             &authenticationManager,
             &httpMessageDispatcher,
             settings.http().sslSupport,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
@@ -200,9 +182,6 @@ int VmsGatewayProcess::exec()
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-#ifdef USE_QAPPLICATION
-        application()->installEventFilter(this);
-#endif
         if (m_terminated)
             return 0;
 
@@ -213,15 +192,6 @@ int VmsGatewayProcess::exec()
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
-#ifdef USE_QAPPLICATION
-        //starting timer to check for m_terminated again after event loop start
-        m_timerID = application()->startTimer(0);
-
-        //TODO #ak remove qt event loop
-        //application's main loop
-        const int result = application()->exec();
-        return result
-#else
         {
             QnMutexLocker lk(&m_mutex);
             while (!m_terminated)
@@ -229,7 +199,6 @@ int VmsGatewayProcess::exec()
         }
 
         return 0;
-#endif
     }
     catch (const std::exception& e)
     {
@@ -238,46 +207,15 @@ int VmsGatewayProcess::exec()
     }
 }
 
-#ifdef USE_QAPPLICATION
-void VmsGatewayProcess::start()
-{
-    QtSingleCoreApplication* application = this->application();
-
-    if (application->isRunning())
-    {
-        NX_LOG("Server already started", cl_logERROR);
-        application->quit();
-        return;
-    }
-}
-
-void VmsGatewayProcess::stop()
-{
-    pleaseStop();
-    //TODO #ak wait for executeApplication to return?
-}
-
-bool VmsGatewayProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
-{
-    if (m_timerID != -1)
-    {
-        application()->killTimer(m_timerID);
-        m_timerID = -1;
-    }
-
-    if (m_terminated)
-        application()->quit();
-    return false;
-}
-#endif
-
 void VmsGatewayProcess::registerApiHandlers(
     const conf::Settings& settings,
     const conf::RunTimeOptions& runTimeOptions,
     nx_http::MessageDispatcher* const msgDispatcher)
 {
-    msgDispatcher->setDefaultProcessor<ProxyHandler>(
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler> {
+    msgDispatcher->registerRequestProcessor<ProxyHandler>(
+        nx_http::kAnyPath,
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
+        {
             return std::make_unique<ProxyHandler>(settings, runTimeOptions);
         });
 
@@ -293,6 +231,8 @@ void VmsGatewayProcess::registerApiHandlers(
             },
             nx_http::StringType("CONNECT"));
     }
+
+    msgDispatcher->addModRewriteRule(lit("/gateway/"), lit("/"));
 }
 
 void VmsGatewayProcess::publicAddressFetched(

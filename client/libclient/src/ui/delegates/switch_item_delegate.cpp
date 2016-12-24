@@ -30,13 +30,13 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
 
-        /* Hide disabled, if needed: */
-        if (m_hideDisabledItems && !opt.state.testFlag(QStyle::State_Enabled))
-            return;
-
         /* Draw background and focus marker: */
         opt.features &= ~(QStyleOptionViewItem::HasDisplay | QStyleOptionViewItem::HasDecoration | QStyleOptionViewItem::HasCheckIndicator);
         nxStyle->drawControl(QStyle::CE_ItemViewItem, &opt, painter, opt.widget);
+
+        /* Hide disabled, if needed: */
+        if (m_hideDisabledItems && !opt.state.testFlag(QStyle::State_Enabled))
+            return;
 
         /* Draw switch without its own focus marker: */
         opt.state &= ~QStyle::State_HasFocus;

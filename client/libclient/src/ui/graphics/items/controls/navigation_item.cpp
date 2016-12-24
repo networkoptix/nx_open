@@ -148,6 +148,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
         {
             bool reset = m_timeSlider->isVisible() != isRelevant;
             m_timeSlider->setVisible(isRelevant);
+            m_timeSlider->toolTipItem()->setVisible(isRelevant);
             m_timeScrollBar->setVisible(isRelevant);
             timelinePlaceholder->setVisible(!isRelevant);
             m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
@@ -228,9 +229,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Set up handlers. */
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::runningChanged,     this,           &QnNavigationItem::updateSyncButtonChecked);
-    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,   this,           &QnNavigationItem::updateSyncButtonChecked);
-    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,   this,           &QnNavigationItem::updateSyncButtonEnabled);
+    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::runningChanged,     this,           &QnNavigationItem::updateSyncButtonState);
+    connect(streamSynchronizer, &QnWorkbenchStreamSynchronizer::effectiveChanged,   this,           &QnNavigationItem::updateSyncButtonState);
 
     connect(m_speedSlider,      &QnSpeedSlider::roundedSpeedChanged,                this,           &QnNavigationItem::updateNavigatorSpeedFromSpeedSlider);
     connect(m_volumeSlider,     &QnVolumeSlider::valueChanged,                      this,           &QnNavigationItem::updateMuteButtonChecked);
@@ -265,13 +265,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged, m_speedSlider, &QnSpeedSlider::finishAnimations);
 
-    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonState);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateJumpButtonsTooltips);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateBookButtonEnabled);
     connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
-    connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonChecked);
+    connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonState);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
-    connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonState);
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,    this,   &QnNavigationItem::updateVolumeButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::speedChanged,               this,   &QnNavigationItem::updateSpeedSliderSpeedFromNavigator);
@@ -318,9 +318,8 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Run handlers */
     updateMuteButtonChecked();
-    updateSyncButtonChecked();
-    updateLiveButtonChecked();
-    updateLiveButtonEnabled();
+    updateSyncButtonState();
+    updateLiveButtonState();
     updatePlaybackButtonsEnabled();
     updateVolumeButtonsEnabled();
 
@@ -524,30 +523,22 @@ void QnNavigationItem::updateMuteButtonChecked()
     m_muteButton->setChecked(m_volumeSlider->isMute());
 }
 
-void QnNavigationItem::updateLiveButtonChecked()
+void QnNavigationItem::updateLiveButtonState()
 {
-    m_liveButton->setChecked(navigator()->isLive());
-
-    /* This is needed as button's enabled state will be updated from its action. */ // TODO
-    updateLiveButtonEnabled();
-}
-
-void QnNavigationItem::updateLiveButtonEnabled()
-{
+    /* setEnabled must be called last to avoid update from button's action enabled state. */
     bool enabled = navigator()->isLiveSupported();
+    m_liveButton->setChecked(enabled && navigator()->isLive());
     m_liveButton->setEnabled(enabled);
 }
 
-void QnNavigationItem::updateSyncButtonChecked()
+void QnNavigationItem::updateSyncButtonState()
 {
-    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-    m_syncButton->setChecked(streamSynchronizer->isEffective() && streamSynchronizer->isRunning());
-}
-
-void QnNavigationItem::updateSyncButtonEnabled()
-{
-    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
-    m_syncButton->setEnabled(streamSynchronizer->isEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync));
+    /* setEnabled must be called last to avoid update from button's action enabled state. */
+    QnWorkbenchStreamSynchronizer* streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    bool enabled = streamSynchronizer->isEffective()
+        && navigator()->currentWidgetFlags().testFlag(QnWorkbenchNavigator::WidgetSupportsSync);
+    m_syncButton->setChecked(enabled && streamSynchronizer->isRunning());
+    m_syncButton->setEnabled(enabled);
 }
 
 void QnNavigationItem::updatePlayButtonChecked()
@@ -602,6 +593,7 @@ void QnNavigationItem::at_liveButton_clicked()
     /* Reset speed. It MUST be done before setLive(true) is called. */
     navigator()->setSpeed(1.0);
     navigator()->setLive(true);
+    action(QnActions::PlayPauseAction)->setChecked(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
@@ -668,4 +660,18 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 bool QnNavigationItem::isTimelineRelevant() const
 {
     return this->navigator() && this->navigator()->isTimelineRelevant();
+}
+
+void QnNavigationItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    /* Time slider and time scrollbar has own backgrounds.
+     * Subtract them for proper semi-transparency: */
+    QRegion clipRegion(rect().toRect());
+    if (m_timeSlider->isVisible())
+        clipRegion -= m_timeSlider->geometry().toRect();
+    if (m_timeScrollBar->isVisible())
+        clipRegion -= m_timeScrollBar->geometry().toRect();
+
+    QnScopedPainterClipRegionRollback clipRollback(painter, clipRegion);
+    base_type::paint(painter, option, widget);
 }

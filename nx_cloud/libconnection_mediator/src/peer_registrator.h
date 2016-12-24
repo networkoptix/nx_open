@@ -1,8 +1,3 @@
-/**********************************************************
-* 9 sep 2014
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -15,20 +10,20 @@
 #include <nx/network/cloud/data/resolve_peer_data.h>
 #include <nx/network/cloud/data/result_code.h>
 
+#include "data/listening_peer.h"
 #include "request_processor.h"
 #include "settings.h"
 
+namespace nx { namespace stun { class MessageDispatcher; } }
+namespace nx { namespace hpm { namespace data { struct ListeningPeers; } } }
+
 namespace nx {
-
-namespace stun {
-class MessageDispatcher;
-}
-
 namespace hpm {
 
 class ListeningPeerPool;
 
-/** Registers peers which desire to accept cloud connections, resolves such peers address.
+/**
+ * Registers peers which desire to accept cloud connections, resolves such peers address.
  */
 class PeerRegistrator
 :
@@ -41,6 +36,8 @@ public:
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);
 
+    data::ListeningPeers getListeningPeers() const;
+
 private:
     void bind(
         const ConnectionStrongRef& connection,
@@ -50,7 +47,7 @@ private:
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
         stun::Message requestMessage,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode, api::ListenResponse)> completionHandler);
 
     void resolveDomain(
         const ConnectionStrongRef& connection,
@@ -70,7 +67,7 @@ private:
         const ConnectionStrongRef& connection,
         api::ClientBindRequest requestData,
         stun::Message requestMessage,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler);
 
 private:
     struct ClientBindInfo

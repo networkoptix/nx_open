@@ -20,6 +20,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include <nx/fusion/model_functions.h>
+#include <api/global_settings.h>
 
 namespace {
 
@@ -307,6 +308,10 @@ QnServerDb::QnServerDb():
     {
         qWarning() << "Cannot initialize sqlLite database. Actions log is not created.";
     }
+
+    if (!execSQLScript("vacuum;", m_sdb))
+        qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
+
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
@@ -402,53 +407,49 @@ bool QnServerDb::createDatabase()
     return true;
 }
 
-int QnServerDb::addAuditRecord(const QnAuditRecord& data)
+int QnServerDb::auditRecordMaxId() const
 {
     QnWriteLocker lock(&m_mutex);
 
-    NX_ASSERT(data.eventType != Qn::AR_NotDefined);
-    NX_ASSERT((data.eventType & (data.eventType-1)) == 0);
+    if (!m_sdb.isOpen())
+        return -1;
+
+    QSqlQuery query(m_sdb);
+    query.prepare("select max(id) from audit_log");
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return -1;
+    query.next();
+    return query.value(0).toInt();
+}
+
+bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
+{
+    QnDbTransactionLocker tran(getTransaction());
 
     if (!m_sdb.isOpen())
         return false;
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO audit_log"
-        "(createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, authSession)"
+    insQuery.prepare("INSERT OR REPLACE INTO audit_log"
+        "(id, createdTimeSec, rangeStartSec, rangeEndSec, eventType, resources, params, authSession)"
         "VALUES"
-        "(:createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :authSession)"
+        "(:id, :createdTimeSec, :rangeStartSec, :rangeEndSec, :eventType, :resources, :params, :authSession)"
     );
-    QnSql::bind(data, &insQuery);
 
-    if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
-        return -1;
+    for (auto itr = records.begin(); itr != records.end(); ++itr)
+    {
+        const auto& data = itr->second;
+        NX_ASSERT(data.eventType != Qn::AR_NotDefined);
+        NX_ASSERT((data.eventType & (data.eventType - 1)) == 0);
 
-    int result = insQuery.lastInsertId().toInt();
+        insQuery.bindValue("id", itr->first);
+        QnSql::bind(data, &insQuery);
+        if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
+            return false;
+    }
     cleanupAuditLog();
-    return result;
-}
-
-int QnServerDb::updateAuditRecord(int internalId, const QnAuditRecord& data)
-{
-    QnWriteLocker lock(&m_mutex);
-
-    if (!m_sdb.isOpen())
-        return false;
-    NX_ASSERT(data.eventType != Qn::AR_NotDefined);
-    NX_ASSERT((data.eventType & (data.eventType-1)) == 0);
-
-    QSqlQuery updQuery(m_sdb);
-    updQuery.prepare("UPDATE audit_log SET "
-        "createdTimeSec = :createdTimeSec, rangeStartSec = :rangeStartSec, rangeEndSec = :rangeEndSec, eventType = :eventType, resources = :resources, "
-        "params = :params, authSession = :authSession WHERE id = :id"
-    );
-    QnSql::bind(data, &updQuery);
-    updQuery.bindValue(":id", internalId);
-
-    if (!execSQLQuery(&updQuery, Q_FUNC_INFO))
-        return -1;
-
-    return internalId;
+    tran.commit();
+    return true;
 }
 
 QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnUuid& sessionId)
@@ -683,7 +684,7 @@ bool QnServerDb::cleanupAuditLog()
         m_auditCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
-        int utc = (currentTime - m_eventKeepPeriod) / 1000000ll;
+        int utc = currentTime / 1000000ll - qnGlobalSettings->auditTrailPeriodDays() * 3600 * 24;
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }

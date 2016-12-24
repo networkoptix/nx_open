@@ -33,21 +33,21 @@ void TransactionLogReader::stopWhileInAioThread()
 }
 
 void TransactionLogReader::readTransactions(
-    const ::ec2::QnTranState& from,
-    const ::ec2::QnTranState& to,
+    boost::optional<::ec2::QnTranState> from,
+    boost::optional<::ec2::QnTranState> to,
     int maxTransactionsToReturn,
     TransactionsReadHandler completionHandler)
 {
     m_transactionLog->readTransactions(
         m_systemId,
-        from,
-        to,
+        std::move(from),
+        std::move(to),
         maxTransactionsToReturn,
         [this, 
             sharedGuard = m_asyncOperationGuard.sharedGuard(),
             completionHandler = std::move(completionHandler)](
                 api::ResultCode resultCode,
-                std::vector<TransactionData> serializedTransactions,
+                std::vector<dao::TransactionLogRecord> serializedTransactions,
                 ::ec2::QnTranState readedUpTo) mutable
         {
             const auto locker = sharedGuard->lock();
@@ -74,7 +74,7 @@ void TransactionLogReader::readTransactions(
 
 void TransactionLogReader::onTransactionsRead(
     api::ResultCode resultCode,
-    std::vector<TransactionData> serializedTransactions,
+    std::vector<dao::TransactionLogRecord> serializedTransactions,
     ::ec2::QnTranState readedUpTo,
     TransactionsReadHandler completionHandler)
 {

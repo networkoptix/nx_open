@@ -14,7 +14,6 @@
 #include <utils/color_space/image_correction.h>
 
 class QPainter;
-class QnResourceDisplay;
 class QnProgressDialog;
 
 struct QnScreenshotParameters

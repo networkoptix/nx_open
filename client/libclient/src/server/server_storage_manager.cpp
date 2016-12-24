@@ -198,7 +198,15 @@ QnBackupStatusData QnServerStorageManager::backupStatus( const QnMediaServerReso
 
 bool QnServerStorageManager::rebuildServerStorages( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool )
 {
-    return sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start);
+    if (!sendArchiveRebuildRequest(server, pool, Qn::RebuildAction_Start))
+        return false;
+
+    ServerInfo &serverInfo = m_serverInfo[server];
+    ServerPoolInfo &poolInfo = serverInfo.storages[static_cast<int>(pool)];
+    poolInfo.rebuildStatus.state = Qn::RebuildState_FullScan;
+    emit serverRebuildStatusChanged(server, pool, poolInfo.rebuildStatus);
+
+    return true;
 }
 
 bool QnServerStorageManager::cancelServerStoragesRebuild( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool )
@@ -296,10 +304,18 @@ void QnServerStorageManager::at_archiveRebuildReply( int status, const QnStorage
     ServerInfo &serverInfo = m_serverInfo[requestKey.server];
     ServerPoolInfo &poolInfo = serverInfo.storages[static_cast<int>(requestKey.pool)];
 
-    if (reply.state > Qn::RebuildState_None || status != 0)
-        executeDelayed([this, requestKey]{ sendArchiveRebuildRequest(requestKey.server, requestKey.pool); }, updateRebuildStatusDelayMs);
+    Callback timerCallback;
+    if ((reply.state > Qn::RebuildState_None) || (status != 0))
+    {
+        timerCallback =
+            [this, requestKey]() { sendArchiveRebuildRequest(requestKey.server, requestKey.pool); };
+    }
     else
-        executeDelayed([this, requestKey]{ sendStorageSpaceRequest(requestKey.server); }, updateRebuildStatusDelayMs);
+    {
+        timerCallback =
+            [this, requestKey]() { sendStorageSpaceRequest(requestKey.server); };
+    }
+    executeDelayedParented(timerCallback, updateRebuildStatusDelayMs, this);
 
     if(status != 0)
         return;
@@ -350,7 +366,10 @@ void QnServerStorageManager::at_backupStatusReply( int status, const QnBackupSta
 
     ServerInfo &serverInfo = m_serverInfo[requestKey.server];
     if (reply.state == Qn::BackupState_InProgress || status != 0)
-        executeDelayed([this, requestKey]{ sendBackupRequest(requestKey.server); }, updateBackupStatusDelayMs);
+    {
+        const auto timerCallback = [this, requestKey]() { sendBackupRequest(requestKey.server); };
+        executeDelayedParented(timerCallback, updateBackupStatusDelayMs, this);
+    }
 
     if(status != 0)
         return;

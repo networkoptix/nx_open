@@ -82,14 +82,14 @@ void ConnectionManager::createTransactionConnection(
     stree::ResourceContainer authInfo,
     nx_http::Request request,
     nx_http::Response* const response,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
     // GET ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
     // TODO: #ak
 
     std::string systemId;
-    if (!authInfo.get(attr::authSystemID, &systemId))
+    if (!authInfo.get(attr::authSystemId, &systemId))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
@@ -157,10 +157,13 @@ void ConnectionManager::pushTransaction(
     stree::ResourceContainer /*authInfo*/,
     nx_http::Request request,
     nx_http::Response* const /*response*/,
-    nx_http::HttpRequestProcessedHandler completionHandler)
+    nx_http::RequestProcessedHandler completionHandler)
 {
-    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
+    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath) &&
+        !request.requestLine.url.path().startsWith(kPushEc2TransactionDeprecatedPath)) // TODO: #ak remove after 3.0 release
+    {
         return completionHandler(nx_http::StatusCode::notFound);
+    }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
@@ -208,7 +211,7 @@ void ConnectionManager::pushTransaction(
 
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
-    std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     NX_LOGX(QnLog::EC2_TRAN_LOG, 
         lm("systemId %1. Dispatching transaction %2")
@@ -457,13 +460,13 @@ void ConnectionManager::removeConnection(const nx::String& connectionId)
 void ConnectionManager::onGotTransaction(
     const nx::String& connectionId,
     Qn::SerializationFormat tranFormat,
-    const QByteArray& data,
+    QByteArray serializedTransaction,
     TransactionTransportHeader transportHeader)
 {
     m_transactionDispatcher->dispatchTransaction(
         std::move(transportHeader),
         tranFormat,
-        std::move(data),
+        std::move(serializedTransaction),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             api::ResultCode resultCode)
         {
@@ -579,9 +582,8 @@ nx_http::RequestResult
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
-    nx_http::RequestResult requestResult;
+    nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
 
-    requestResult.statusCode = nx_http::StatusCode::ok;
     requestResult.connectionEvents.onResponseHasBeenSent =
         [this, connectionId](
             nx_http::HttpServerConnection* connection)

@@ -30,7 +30,7 @@ public:
     ~TransactionConnectionHelper();
 
     /**
-     * @return new connection id
+     * @return New connection id.
      */
     ConnectionId establishTransactionConnection(
         const SocketAddress& appserver2Endpoint,

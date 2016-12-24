@@ -61,6 +61,11 @@ public:
 
     void setChannelScreenSize(const QSize &screenSize);
 
+    /**
+     * Set blur in range [0..1]
+     */
+    void setBlurFactor(qreal value);
+
     Qn::RenderStatus paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity);
     void skip(int channel); // TODO: #Elric replace with setEnabled
 
@@ -150,6 +155,7 @@ private:
     std::vector<bool> m_renderingEnabled;
     ScreenshotInterface* m_screenshotInterface;
     int m_panoFactor;
+    qreal m_blurFactor;
 #ifdef TEST_FISHEYE_CALIBRATOR
     bool m_isCircleDetected;
 #endif

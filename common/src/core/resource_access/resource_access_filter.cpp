@@ -30,7 +30,7 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
     {
         case QnResourceAccessFilter::MediaFilter:
             return flags.testFlag(Qn::web_page)
-                || flags.testFlag(Qn::server_live_cam)
+                || flags.testFlag(Qn::live_cam)
                 || (flags.testFlag(Qn::remote_server) && !flags.testFlag(Qn::fake));
 
         case QnResourceAccessFilter::LayoutsFilter:

@@ -1,6 +1,7 @@
 #include "system_hosts_model.h"
 
 #include <utils/math/math.h>
+#include <utils/common/util.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
 
@@ -86,7 +87,12 @@ QVariant QnSystemHostsModel::data(const QModelIndex &index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
+        {
+            if (hostData.second.port() != DEFAULT_APPSERVER_PORT)
+                return lit("%1:%2").arg(hostData.second.host(), QString::number(hostData.second.port()));
+
             return hostData.second.host();
+        }
         case kUrlRole:
             return hostData.second.toString();
         default:
@@ -138,12 +144,13 @@ void QnSystemHostsModel::reloadHosts()
             connect(system, &QnBaseSystemDescription::serverChanged, this
                 , [this, system](const QnUuid &id, QnServerFields fields)
         {
-            if (fields.testFlag(QnServerField::HostField))
+            if (fields.testFlag(QnServerField::Host))
                 updateServerHost(system, id);
         });
 
         m_disconnectHelper->add(serverAddedConnection);
         m_disconnectHelper->add(serverRemovedConnection);
+        m_disconnectHelper->add(changedConnection);
     };
 
     const auto system = qnSystemsFinder->getSystem(m_systemId);
@@ -216,7 +223,7 @@ bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterat
     it->second = host;
     const auto row = (it - m_hosts.begin());
     const auto modelIndex = index(row);
-    dataChanged(modelIndex, modelIndex);
+    emit dataChanged(modelIndex, modelIndex);
 
     if (row == 0)
         emit firstHostChanged();

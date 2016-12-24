@@ -7,6 +7,34 @@ uint qHash(const QColor &color)
     return qHash(color.name());
 }
 
+QnColorList::QnColorList():
+    base_type(),
+    m_core(),
+    m_contrast()
+{
+}
+
+void QnColorList::setCoreColor(const QColor& color)
+{
+    m_core = color;
+}
+
+QColor QnColorList::coreColor() const
+{
+    return m_core;
+}
+
+void QnColorList::setContrastColor(const QColor& color)
+{
+    m_contrast = color;
+}
+
+QColor QnColorList::contrastColor() const
+{
+    return m_contrast;
+}
+
+
 QnPaletteColor::QnPaletteColor(QColor fallbackColor)
     : m_index(-1)
     , m_alpha(kMaxAlpha)

@@ -8,7 +8,9 @@
 #include <QtCore/QFile>
 
 #include <nx/network/http/buffer_source.h>
-
+#include <nx/network/http/server/handler/http_server_handler_redirect.h>
+#include <nx/network/http/server/handler/http_server_handler_static_data.h>
+#include <nx/utils/random.h>
 
 TestHttpServer::TestHttpServer()
 {
@@ -17,7 +19,7 @@ TestHttpServer::TestHttpServer()
             nullptr,
             &m_httpMessageDispatcher,
             true,
-            SocketFactory::NatTraversalType::nttDisabled ) );
+            nx::network::NatTraversalSupport::disabled));
 }
 
 TestHttpServer::~TestHttpServer()
@@ -27,7 +29,7 @@ TestHttpServer::~TestHttpServer()
 
 bool TestHttpServer::bindAndListen()
 {
-    return m_httpServer->bind( SocketAddress( HostAddress::localhost, 0 ) )
+    return m_httpServer->bind(SocketAddress(HostAddress::localhost, 0))
         && m_httpServer->listen();
 }
 
@@ -36,39 +38,14 @@ SocketAddress TestHttpServer::serverAddress() const
     return m_httpServer->address();
 }
 
-class StaticHandler
-:
-    public nx_http::AbstractHttpRequestHandler
+void TestHttpServer::setPersistentConnectionEnabled(bool value)
 {
-public:
-    StaticHandler(const nx_http::StringType& mimeType, QByteArray response)
-    :
-        m_mimeType(mimeType),
-        m_response(std::move(response))
-    {
-    }
+    m_httpServer->setPersistentConnectionEnabled(value);
+}
 
-    virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler )
-    {
-        completionHandler(
-            nx_http::RequestResult(
-                nx_http::StatusCode::ok,
-                std::make_unique< nx_http::BufferSource >(m_mimeType, m_response)));
-    }
-
-private:
-    const nx_http::StringType m_mimeType;
-    const QByteArray m_response;
-};
-
-void TestHttpServer::setForceConnectionClose(bool value)
+void TestHttpServer::addModRewriteRule(QString oldPrefix, QString newPrefix)
 {
-    m_httpServer->setForceConnectionClose(value);
+    m_httpMessageDispatcher.addModRewriteRule(std::move(oldPrefix), std::move(newPrefix));
 }
 
 bool TestHttpServer::registerStaticProcessor(
@@ -76,13 +53,13 @@ bool TestHttpServer::registerStaticProcessor(
     QByteArray msgBody,
     const nx_http::StringType& mimeType)
 {
-    return registerRequestProcessor< StaticHandler >(
-        path, [ = ]() -> std::unique_ptr< StaticHandler >
+    return registerRequestProcessor<nx_http::server::handler::StaticData>(
+        path, [=]() -> std::unique_ptr<nx_http::server::handler::StaticData>
         {
-            return std::make_unique< StaticHandler >(
+            return std::make_unique<nx_http::server::handler::StaticData>(
                 mimeType,
-                std::move(msgBody) );
-        } );
+                std::move(msgBody));
+        });
 }
 
 bool TestHttpServer::registerFileProvider(
@@ -98,4 +75,92 @@ bool TestHttpServer::registerFileProvider(
         httpPath,
         std::move(fileContents),
         mimeType);
+}
+
+bool TestHttpServer::registerRedirectHandler(
+    const QString& resourcePath,
+    const QUrl& location)
+{
+    return registerRequestProcessor<nx_http::server::handler::Redirect>(
+        resourcePath,
+        [location]() -> std::unique_ptr<nx_http::server::handler::Redirect>
+        {
+            return std::make_unique<nx_http::server::handler::Redirect>(location);
+        });
+}
+
+//-------------------------------------------------------------------------------------------------
+// class RandomlyFailingHttpConnection
+
+RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
+    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    std::unique_ptr<AbstractCommunicatingSocket> sock)
+    :
+    BaseType(socketServer, std::move(sock)),
+    m_requestsToAnswer(nx::utils::random::number<int>(0, 3))
+{
+}
+
+RandomlyFailingHttpConnection::~RandomlyFailingHttpConnection()
+{
+}
+
+void RandomlyFailingHttpConnection::setResponseBuffer(const QByteArray& buf)
+{
+    m_responseBuffer = buf;
+}
+
+void RandomlyFailingHttpConnection::processMessage(nx_http::Message /*request*/)
+{
+    using namespace std::placeholders;
+
+    QByteArray dataToSend;
+    if (m_requestsToAnswer > 0)
+    {
+        dataToSend = m_responseBuffer;
+        --m_requestsToAnswer;
+    }
+    else
+    {
+        const auto bytesToSend = nx::utils::random::number<int>(0, m_responseBuffer.size());
+        if (bytesToSend == 0)
+            return closeConnection(SystemError::noError);
+        dataToSend = m_responseBuffer.left(bytesToSend);
+    }
+
+    sendData(
+        dataToSend,
+        std::bind(&RandomlyFailingHttpConnection::onResponseSent, this, _1));
+}
+
+void RandomlyFailingHttpConnection::onResponseSent(
+    SystemError::ErrorCode /*sysErrorCode*/)
+{
+    //closeConnection(sysErrorCode);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class RandomlyFailingHttpServer
+
+RandomlyFailingHttpServer::RandomlyFailingHttpServer(
+    bool sslRequired,
+    nx::network::NatTraversalSupport natTraversalSupport)
+    :
+    BaseType(sslRequired, natTraversalSupport)
+{
+}
+
+void RandomlyFailingHttpServer::setResponseBuffer(const QByteArray& buf)
+{
+    m_responseBuffer = buf;
+}
+
+std::shared_ptr<RandomlyFailingHttpConnection> RandomlyFailingHttpServer::createConnection(
+    std::unique_ptr<AbstractStreamSocket> _socket)
+{
+    auto result = std::make_shared<RandomlyFailingHttpConnection>(
+        this,
+        std::move(_socket));
+    result->setResponseBuffer(m_responseBuffer);
+    return result;
 }

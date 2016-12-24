@@ -2,25 +2,41 @@
 #include "system_description.h"
 
 #include <nx/utils/log/log.h>
+#include <network/system_helpers.h>
 
 namespace
 {
 
 // TODO: #ynikitenkov Add fusion functions
-#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(     \
+#define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(                \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
 
-    QnServerFields getChanges(const QnModuleInformation &before
-        , const QnModuleInformation &after)
-    {
-        auto result =
-            (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemNameField)
-            | EXTRACT_CHANGE_FLAG(name, QnServerField::NameField)
-            | EXTRACT_CHANGE_FLAG(serverFlags, QnServerField::FlagsField)
-            | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudIdField));
+QnServerField testServerFlag(
+    const QnModuleInformation& before,
+    const QnModuleInformation& after,
+    Qn::ServerFlag value,
+    QnServerField flag)
+{
+    if (before.serverFlags.testFlag(value) != after.serverFlags.testFlag(value))
+        return flag;
 
-        return result;
-    }
+    return QnServerField::NoField;
+}
+
+QnServerFields getChanges(const QnModuleInformation& before
+    , const QnModuleInformation& after)
+{
+    const auto fieldsResult =
+        (EXTRACT_CHANGE_FLAG(systemName, QnServerField::SystemName)
+        | EXTRACT_CHANGE_FLAG(name, QnServerField::Name)
+        | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId)
+        | EXTRACT_CHANGE_FLAG(ecDbReadOnly, QnServerField::SafeMode));
+
+    const auto flagsResult =
+        testServerFlag(before, after, Qn::SF_HasPublicIP, QnServerField::HasInternet);
+
+    return (fieldsResult | flagsResult);
+}
 #undef EXTRACT_CHANGE_FLAG
 }
 
@@ -31,7 +47,7 @@ QnSystemDescription::PointerType QnSystemDescription::createFactorySystem(const 
 
 QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName)
 {
     return PointerType(new QnSystemDescription(systemId, localId, systemName));
@@ -39,7 +55,7 @@ QnSystemDescription::PointerType QnSystemDescription::createLocalSystem(
 
 QnSystemDescription::PointerType QnSystemDescription::createCloudSystem(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName,
     const QString& ownerAccountEmail,
     const QString& ownerFullName)
@@ -60,12 +76,16 @@ QnSystemDescription::QnSystemDescription(const QString& systemId) :
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
-
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false),
+    m_safeMode(false)
+{
+    init();
+}
 
 QnSystemDescription::QnSystemDescription(const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName)
     :
     m_id(systemId),
@@ -78,12 +98,17 @@ QnSystemDescription::QnSystemDescription(const QString& systemId,
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false),
+    m_safeMode(false)
+{
+    init();
+}
 
 QnSystemDescription::QnSystemDescription(
     const QString& systemId,
-    const QnUuid &localId,
+    const QnUuid& localId,
     const QString& systemName,
     const QString& cloudOwnerAccountEmail,
     const QString& ownerFullName)
@@ -98,8 +123,13 @@ QnSystemDescription::QnSystemDescription(
     m_serverTimestamps(),
     m_servers(),
     m_prioritized(),
-    m_hosts()
-{}
+    m_hosts(),
+    m_onlineServers(),
+    m_hasInternet(false),
+    m_safeMode(false)
+{
+    init();
+}
 
 QnSystemDescription::~QnSystemDescription()
 {}
@@ -144,10 +174,20 @@ bool QnSystemDescription::isNewSystem() const
     return m_isNewSystem;
 }
 
+bool QnSystemDescription::isOnline() const
+{
+    return !m_onlineServers.isEmpty();
+}
+
+bool QnSystemDescription::isOnlineServer(const QnUuid& serverId) const
+{
+    return m_onlineServers.contains(serverId);
+}
+
 QnSystemDescription::ServersList QnSystemDescription::servers() const
 {
     ServersList result;
-    for (const auto id: m_prioritized)
+    for (const auto& id: m_prioritized)
     {
         const auto it = m_servers.find(id);
         if (it != m_servers.end())
@@ -156,7 +196,8 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
     return result;
 }
 
-void QnSystemDescription::addServer(const QnModuleInformation& serverInfo, int priority)
+void QnSystemDescription::addServer(const QnModuleInformation& serverInfo,
+    int priority, bool online)
 {
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, Q_FUNC_INFO, "System contains specified server");
@@ -167,9 +208,13 @@ void QnSystemDescription::addServer(const QnModuleInformation& serverInfo, int p
         return;
     }
 
+    if (online)
+        handleOnlineServerAdded(serverInfo.id);
+
     m_prioritized.insertMulti(priority, serverInfo.id);
     m_servers.insert(serverInfo.id, serverInfo);
     m_serverTimestamps[serverInfo.id].restart();
+    setName(serverInfo.systemName);
     emit serverAdded(serverInfo.id);
 }
 
@@ -205,8 +250,30 @@ QnServerFields QnSystemDescription::updateServer(const QnModuleInformation& serv
     if (!changes)
         return QnServerField::NoField;
 
+    setName(serverInfo.systemName);
     emit serverChanged(serverInfo.id, changes);
     return changes;
+}
+
+void QnSystemDescription::handleOnlineServerAdded(const QnUuid& serverId)
+{
+    const bool wasOnline = isOnline();
+
+    const bool containsAlready = m_onlineServers.contains(serverId);
+    NX_ASSERT(!containsAlready, "Server is supposed as online already");
+    if (containsAlready)
+        return;
+
+    m_onlineServers.insert(serverId);
+    if (wasOnline != isOnline())
+        emit onlineStateChanged();
+}
+
+void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
+{
+    const bool wasOnline = isOnline();
+    if (m_onlineServers.remove(serverId) && (wasOnline != isOnline()))
+        emit onlineStateChanged();
 }
 
 void QnSystemDescription::removeServer(const QnUuid& serverId)
@@ -217,7 +284,8 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
     if (!containsServer)
         return;
 
-    const auto priorityPred = [serverId](const QnUuid &id) { return (serverId == id); };
+    handleServerRemoved(serverId);
+    const auto priorityPred = [serverId](const QnUuid& id) { return (serverId == id); };
     const auto it = std::find_if(m_prioritized.begin(), m_prioritized.end(), priorityPred);
     if (it != m_prioritized.end())
         m_prioritized.erase(it);
@@ -231,10 +299,11 @@ void QnSystemDescription::removeServer(const QnUuid& serverId)
 
 void QnSystemDescription::setName(const QString& value)
 {
-    if (m_systemName == value)
+    const auto newValue = extractSystemName(value);
+    if (m_systemName == newValue)
         return;
 
-    m_systemName = value;
+    m_systemName = newValue;
     emit systemNameChanged();
 }
 
@@ -256,7 +325,7 @@ void QnSystemDescription::setServerHost(const QnUuid& serverId, const QUrl& host
     if (!changed)
         return;
     m_hosts[serverId] = host;
-    emit serverChanged(serverId, QnServerField::HostField);
+    emit serverChanged(serverId, QnServerField::Host);
 }
 
 QUrl QnSystemDescription::getServerHost(const QnUuid& serverId) const
@@ -275,3 +344,77 @@ qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
     return m_serverTimestamps.value(serverId).elapsed();
 }
 
+bool QnSystemDescription::hasInternet() const
+{
+    return m_hasInternet;
+}
+
+bool QnSystemDescription::safeMode() const
+{
+    return m_safeMode;
+}
+
+void QnSystemDescription::updateHasInternetState()
+{
+    const bool newHasInternet = std::any_of(m_servers.begin(), m_servers.end(),
+        [](const QnModuleInformation& info)
+        {
+            return info.serverFlags.testFlag(Qn::SF_HasPublicIP);
+        });
+
+    if (newHasInternet == m_hasInternet)
+        return;
+
+    m_hasInternet = newHasInternet;
+    emit hasInternetChanged();
+}
+
+void QnSystemDescription::updateSafeModeState()
+{
+    const bool newSafeModeState = std::any_of(m_servers.begin(), m_servers.end(),
+        [](const QnModuleInformation& info) { return helpers::isSafeMode(info); });
+
+    if (newSafeModeState == m_safeMode)
+        return;
+
+    m_safeMode = newSafeModeState;
+    emit safeModeStateChanged();
+}
+
+void QnSystemDescription::updateNewSystemState()
+{
+    const bool newSystemState = std::any_of(m_servers.begin(), m_servers.end(),
+        [](const QnModuleInformation& info) { return helpers::isNewSystem(info); });
+
+    if (newSystemState == m_isNewSystem)
+        return;
+
+    m_isNewSystem = newSystemState;
+    emit newSystemStateChanged();
+}
+
+
+void QnSystemDescription::init()
+{
+    const auto updateData =
+        [this]()
+        {
+            updateHasInternetState();
+            updateSafeModeState();
+        };
+
+    connect(this, &QnBaseSystemDescription::serverAdded, this, updateData);
+    connect(this, &QnBaseSystemDescription::serverRemoved, this, updateData);
+
+    connect(this, &QnBaseSystemDescription::serverChanged, this,
+        [this](const QnUuid& /*id*/, QnServerFields fields)
+        {
+            if (fields.testFlag(QnServerField::HasInternet))
+                updateHasInternetState();
+            else if (fields.testFlag(QnServerField::SafeMode))
+                updateSafeModeState();
+        });
+
+    connect(this, &QnBaseSystemDescription::safeModeStateChanged, this,
+        [this]() { updateNewSystemState(); });
+}

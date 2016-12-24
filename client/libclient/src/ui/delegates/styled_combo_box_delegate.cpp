@@ -49,6 +49,12 @@ void QnStyledComboBoxDelegate::initStyleOption(QStyleOptionViewItem* option, con
     base_type::initStyleOption(option, index);
     option->state &= ~QStyle::State_HasFocus;
 
+    auto style = option->widget ? option->widget->style() : QApplication::style();
+    bool noHover = style->styleHint(QStyle::SH_ComboBox_ListMouseTracking, option, option->widget)
+                || style->styleHint(QStyle::SH_ComboBox_Popup, option, option->widget);
+    if (noHover)
+        option->state &= ~QStyle::State_MouseOver;
+
     if (option->widget && option->widget->parentWidget())
         option->palette = option->widget->parentWidget()->palette();
 }

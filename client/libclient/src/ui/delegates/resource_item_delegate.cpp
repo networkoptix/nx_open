@@ -11,6 +11,10 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item_index.h>
+
+#include <core/resource_management/resource_runtime_data.h>
 
 #include <client/client_meta_types.h>
 #include <client/client_settings.h>
@@ -29,7 +33,8 @@
 
 namespace {
 
-const int kSeparatorItemHeight = 16;
+constexpr int kSeparatorItemHeight = 16;
+constexpr int kExtraTextMargin = 5;
 
 } // namespace
 
@@ -158,6 +163,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             NX_ASSERT(false); // Should never get here
     }
 
+    /* Try to consider model's foreground color override: */
+    QVariant modelColorOverride = index.data(Qt::ForegroundRole);
+    if (modelColorOverride.canConvert<QBrush>())
+        mainColor = modelColorOverride.value<QBrush>().color();
+
     // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     /* Check indicators in this implementation are handled elsewhere: */
     if (option.features.testFlag(QStyleOptionViewItem::HasCheckIndicator))
@@ -198,11 +208,11 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QnScopedPainterFontRollback fontRollback(painter, option.font);
         QnScopedPainterPenRollback penRollback(painter, mainColor);
 
-        const int textFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | option.displayAlignment;
+        const int textFlags = Qt::TextSingleLine | option.displayAlignment;
         const int textPadding = style->pixelMetric(QStyle::PM_FocusFrameHMargin) + 1; /* As in Qt */
         textRect.adjust(textPadding, 0, -textPadding, 0);
 
-        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width(), textFlags);
+        QString elidedName = option.fontMetrics.elidedText(baseName, option.textElideMode, textRect.width());
 
         QRect actualRect;
         painter->drawText(textRect, textFlags, elidedName, &actualRect);
@@ -215,8 +225,8 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             /* If name was empty, actualRect will be invalid: */
             int startPos = actualRect.isValid() ? actualRect.right() : textRect.left();
 
-            textRect.setLeft(startPos + textPadding * 2);
-            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width(), textFlags);
+            textRect.setLeft(startPos + kExtraTextMargin);
+            QString elidedHost = extraMetrics.elidedText(extraInfo, option.textElideMode, textRect.width());
 
             painter->setFont(option.font);
             painter->setPen(extraColor);
@@ -265,12 +275,14 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
 
     QStyle* style = option.widget ? option.widget->style() : QApplication::style();
 
-    /* Let the style calculate text offset: */
-    option.rect.setSize(QSize(10000, 20)); // any nonzero height and some really big width
+    /* Let the style calculate text rect so we can determine side paddings dictated by it: */
+    option.rect.setSize(QSize(10000, 20)); // some really big width and any nonzero height
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
 
+    int paddingsFromStyle = textRect.left() + (option.rect.right() - textRect.right());
+
     /* Initial size: */
-    int width = textRect.left();
+    int width = paddingsFromStyle;
     int height = option.decorationSize.height();
 
     /* Adjust size to text: */
@@ -279,21 +291,20 @@ QSize QnResourceItemDelegate::sizeHint(const QStyleOptionViewItem& styleOption, 
         QString extraInfo;
         getDisplayInfo(index, baseName, extraInfo);
 
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic;
         int leftRightPadding = (style->pixelMetric(QStyle::PM_FocusFrameHMargin, &option, option.widget) + 1) * 2; // As in Qt
 
         /* Adjust height to text: */
         height = qMax(height, option.fontMetrics.height());
 
         /* Width of the main text: */
-        width += option.fontMetrics.width(baseName, -1, kTextFlags);
+        width += option.fontMetrics.width(baseName);
 
         if (!extraInfo.isEmpty())
         {
             /* Width of the extra text: */
             option.font.setWeight(QFont::Normal);
             QFontMetrics metrics(option.font);
-            width += option.fontMetrics.width(extraInfo, -1, kTextFlags) + leftRightPadding;
+            width += option.fontMetrics.width(extraInfo) + leftRightPadding;
         }
 
         /* Add paddings: */
@@ -397,50 +408,220 @@ bool QnResourceItemDelegate::eventFilter(QObject* object, QEvent* event)
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
+    /* Fetch information from model first. */
+    QVariant disabled = index.data(Qn::DisabledRole); // in accordance with QnResourceListModel
+    if (disabled.canConvert<bool>() && !disabled.toBool())
+        return ItemState::Selected;
+
+    if (!workbench())
+        return ItemState::Normal;
+
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if (nodeType == Qn::CurrentSystemNode)
-        return ItemState::Selected;
 
-    /* Fetch information from model: */
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (workbench() && resource == workbench()->context()->user())
-        return ItemState::Selected;
-
-    QVariant isNotSelected = index.data(Qn::DisabledRole); // in accordance with QnResourceListModel
-    if (isNotSelected.canConvert<bool>() && !isNotSelected.toBool())
-        return ItemState::Selected;
-
-    QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
-    QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
-
-    /* Determine central workbench item: */
-    QnWorkbenchItem* centralItem = workbench() ? workbench()->item(Qn::CentralRole) : nullptr;
-
-    if (centralItem && (centralItem->uuid() == uuid || (resource && uuid.isNull() && centralItem->resourceUid() == resource->getUniqueId())))
+    switch (nodeType)
     {
-        /* Central item: */
-        return ItemState::Accented;
-    }
-    else if (!resource.isNull() && !currentLayoutResource.isNull())
-    {
-        bool videoWallControlMode = workbench() ? !workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QnUuid>().isNull() : false;
-        if (resource == currentLayoutResource)
-        {
-            /* Current layout if we aren't in videowall control mode or current videowall if we are: */
-            if (videoWallControlMode != uuid.isNull())
-                return ItemState::Selected;
-        }
-        else if (parentResource == currentLayoutResource ||
-            (uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()))
-        {
-            /* Item on current layout. */
+        case Qn::CurrentSystemNode:
+        case Qn::CurrentUserNode:
             return ItemState::Selected;
+
+        /*
+         * Media resources are Selected when they are placed on the scene, Active - when chosen
+         * as current central item.
+         * Layouts are Selected when they are opened on the scene.
+         * Videowall items are Selected if we are in videowall review mode, Active - when chosen
+         * as current central item.
+         * Videowall is Selected when we are in videowall review or control mode.
+        */
+
+        case Qn::ResourceNode:
+        case Qn::SharedLayoutNode:
+        case Qn::EdgeNode:
+        case Qn::SharedResourceNode:
+        {
+            QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            NX_ASSERT(resource);
+            if (!resource)
+                return ItemState::Normal;
+
+            if (resource->hasFlags(Qn::videowall))
+                return itemStateForVideoWall(index);
+
+            if (resource->hasFlags(Qn::layout))
+                return itemStateForLayout(index);
+
+            return itemStateForMediaResource(index);
         }
+
+        case Qn::RecorderNode:
+            return itemStateForRecorder(index);
+
+        case Qn::LayoutItemNode:
+            return itemStateForLayoutItem(index);
+
+        case Qn::VideoWallItemNode:
+            return itemStateForVideoWallItem(index);
+
+        default:
+            break;
+    }
+    return ItemState::Normal;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResource(
+    const QModelIndex& index) const
+{
+    /*
+     * Media resources are Selected when they are placed on the scene, Active - when chosen as
+     * current central item.
+     */
+    const auto currentLayout = workbench()->currentLayout()->resource();
+    if (!currentLayout)
+        return ItemState::Normal;
+
+    const auto centralItem = workbench()->item(Qn::CentralRole);
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    if (centralItem && centralItem->resourceUid() == resource->getUniqueId())
+        return ItemState::Accented;
+
+    if (currentLayout->layoutResourceIds().contains(resource->getId()))
+        return ItemState::Selected;
+
+    return ItemState::Normal;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayout(
+    const QModelIndex& index) const
+{
+    /* Layouts are Selected when they are opened on the scene. */
+
+    const auto currentLayout = workbench()->currentLayout()->resource();
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    if (currentLayout && currentLayout == resource)
+        return ItemState::Selected;
+    return ItemState::Normal;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForRecorder(
+    const QModelIndex& index) const
+{
+    /* Recorders have the max state of all its children. */
+
+    const auto model = index.model();
+    NX_EXPECT(model);
+    if (!model)
+        return ItemState::Normal;
+
+    bool hasSelectedChild = false;
+    for (int i = 0; i < model->rowCount(index); ++i)
+    {
+        const auto child = index.child(i, 0);
+        const auto childState = itemStateForMediaResource(child);
+        if (childState == ItemState::Accented)
+            return ItemState::Accented;
+
+        hasSelectedChild |= (childState == ItemState::Selected);
     }
 
-    /* Normal item: */
-    return ItemState::Normal;
+    return hasSelectedChild
+        ? ItemState::Selected
+        : ItemState::Normal;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutItem(
+    const QModelIndex& index) const
+{
+    /*
+    * Layout items are Selected when layout is placed on the scene, Active - when chosen as current
+    * central item.
+    */
+    const auto currentLayout = workbench()->currentLayout()->resource();
+    if (!currentLayout)
+        return ItemState::Normal;
+
+    const auto owningLayout = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (!owningLayout || owningLayout != currentLayout)
+        return ItemState::Normal;
+
+    const auto uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+    const auto centralItem = workbench()->item(Qn::CentralRole);
+
+    if (centralItem && centralItem->uuid() == uuid)
+        return ItemState::Accented;
+
+    return ItemState::Selected;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
+    const QModelIndex& index) const
+{
+    /* Videowall is Selected when we are in videowall review or control mode. */
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto videowall = resource.dynamicCast<QnVideoWallResource>();
+    NX_EXPECT(videowall);
+    if (!videowall)
+        return ItemState::Normal;
+
+    auto layout = workbench()->currentLayout();
+    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    if (!videoWallControlModeUuid.isNull())
+    {
+        return videowall->items()->hasItem(videoWallControlModeUuid)
+            ? ItemState::Selected
+            : ItemState::Normal;
+    }
+
+    auto videoWallReview = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
+    return (videoWallReview == videowall)
+        ? ItemState::Selected
+        : ItemState::Normal;
+}
+
+QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallItem(
+    const QModelIndex& index) const
+{
+    /*
+     * Videowall items are Selected if we are in videowall review mode AND item belongs to current
+     * videowall. Active - when chosen as current central item OR in videowall review mode.
+     */
+    const auto owningVideoWall = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>()
+        .dynamicCast<QnVideoWallResource>();
+    NX_EXPECT(owningVideoWall);
+    if (!owningVideoWall)
+        return ItemState::Normal;
+
+    QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
+    NX_EXPECT(!uuid.isNull());
+
+    auto layout = workbench()->currentLayout();
+    auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    if (!videoWallControlModeUuid.isNull())
+    {
+        return videoWallControlModeUuid == uuid
+            ? ItemState::Accented
+            : ItemState::Normal;
+    }
+
+    auto videoWall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
+    if (videoWall != owningVideoWall)
+        return ItemState::Normal;
+
+    auto centralItem = workbench()->item(Qn::CentralRole);
+    if (!centralItem || uuid.isNull())
+        return ItemState::Selected;
+
+    auto indices = qnResourceRuntimeDataManager->layoutItemData(centralItem->uuid(),
+        Qn::VideoWallItemIndicesRole).value<QnVideoWallItemIndexList>();
+
+    for (const auto& itemIndex: indices)
+    {
+        NX_EXPECT(itemIndex.videowall() == videoWall);
+        if (itemIndex.uuid() == uuid)
+            return ItemState::Accented;
+    }
+    return ItemState::Selected;
 }
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
@@ -448,7 +629,8 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
     baseName = index.data(Qt::DisplayRole).toString();
     extInfo = QString();
 
-    static const QString kCustomExtInfoTemplate = lit(" - %1");
+    static const QString kCustomExtInfoTemplate = //< "- %1" with en-dash
+        QString::fromWCharArray(L"\x2013 %1");
 
     /* Two-component text from resource information: */
     auto infoLevel = m_customInfoLevel;
@@ -462,9 +644,7 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
 
     if (nodeType == Qn::VideoWallItemNode)
     {
-        if (!resource)
-            return;
-        extInfo = kCustomExtInfoTemplate.arg(resource->getName());
+        // skip videowall screens
     }
     else if (nodeType == Qn::RecorderNode)
     {

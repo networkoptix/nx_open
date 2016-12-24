@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import NetworkOptix.Qml 1.0;
 
 import ".."
 
@@ -6,10 +7,11 @@ Item
 {
     id: control;
 
-    property bool isOnline: false;
     property bool isExpandedTile: false;
     property real expandedOpacity: 0;
+    property alias factorySystem: expandedArea.factorySystem;
 
+    property string localId;
     property string selectedHost: hostChooseItem.value;
     property string selectedUser: (control.impl.hasRecentConnections ?
         userChooseItem.value : expandedArea.loginTextField.text);
@@ -96,7 +98,6 @@ Item
 
             KeyNavigation.tab: userChooseItem;
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
-            visible: control.isOnline;
 
             onAccepted: control.connectRequested();
 
@@ -108,8 +109,15 @@ Item
 
             model: control.recentLocalConnectionsModel;
 
+            Connections
+            {
+                target: userChooseItem.model;
+                ignoreUnknownSignals: true;
+                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+            }
+
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections && control.isOnline;
+            visible: control.impl.hasRecentConnections;
 
             comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
@@ -151,6 +159,16 @@ Item
         nextTabObject: control.prevTabObject;
 
         onConnectButtonClicked: { control.connectRequested(); }
+        Connections
+        {
+            target: expandedArea.savePasswordCheckbox;
+            onClicked:
+            {
+                var previosStateIsChecked = expandedArea.savePasswordCheckbox.checked;
+                if (previosStateIsChecked) //< It means next state after click or "space" is "unchecked"
+                    context.forgetPassword(control.localId, control.selectedUser);
+            }
+        }
     }
 
     property QtObject impl: QtObject

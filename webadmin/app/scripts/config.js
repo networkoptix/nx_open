@@ -7,13 +7,16 @@ var Config = {
     defaultPassword: 'admin',
     newServerFlag: 'SF_NewSystem',
     publicIpFlag: 'SF_HasPublicIP',
+    iflistFlag: 'SF_IfListCtrl',
+    timeCtrlFlag: 'SF_timeCtrl',
 
     globalEditServersPermissions: 'GlobalAdminPermission',
     globalViewArchivePermission: 'GlobalViewArchivePermission',
+    globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
 
-    productName: 'Nx Witness',
+    productName: 'VMS NAME',
     cloud: {
-        productName: 'Nx Cloud',
+        productName: 'CLOUD NAME',
         webadminSetupContext: '?from=webadmin&context=setup',
         clientSetupContext: '?from=client&context=setup',
         webadminContext: '?from=webadmin&context=settings',
@@ -23,6 +26,9 @@ var Config = {
         portalSystemUrl: '/systems/{systemId}'
     },
 
+    dateSettingsFormat:'dd MMMM yyyy',
+
+    visualLog: false,
     allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick

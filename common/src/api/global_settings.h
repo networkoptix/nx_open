@@ -31,6 +31,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
+const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
@@ -91,7 +92,17 @@ public:
     bool isInitialized() const;
 
     void synchronizeNow();
+
+    /**
+     * Save all settings to database
+     */
+    bool resynchronizeNowSync();
+
+    /**
+    * Save modified settings to database
+    */
     bool synchronizeNowSync();
+
     bool takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer);
 
     QSet<QString> disabledVendorsSet() const;
@@ -103,6 +114,7 @@ public:
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
+    int auditTrailPeriodDays() const;
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -197,6 +209,9 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    int maxRtpRetryCount() const;
+    void setMaxRtpRetryCount(int newVal);
+
     std::chrono::seconds proxyConnectTimeout() const;
 
     /*!
@@ -217,6 +232,7 @@ signals:
     void localSystemIdChanged();
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
+    void auditTrailPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -243,6 +259,8 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
+    QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
+
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
@@ -302,6 +320,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
+
+    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     AdaptorList m_allAdaptors;
 

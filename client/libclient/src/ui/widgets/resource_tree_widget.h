@@ -58,6 +58,9 @@ public:
 
     void expandAll();
 
+    /** Expands checked and partially checked nodes. */
+    void expandChecked();
+
     QPoint selectionPos() const;
 
     /**
@@ -123,7 +126,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event) override;
 
 signals:
-    void activated(const QnResourcePtr &resource);
+    void activated(const QModelIndex& index, bool withMouse);
 
     /**
      * This signal is emitted when the tree prepares to start a recursive operation
@@ -144,6 +147,8 @@ private slots:
 
     void updateColumns();
     void updateFilter();
+
+    void expandCheckedRecursively(const QModelIndex& from);
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;

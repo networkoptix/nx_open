@@ -47,6 +47,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
         for (const auto& storage: storages)
         {
             QnStorageSpaceData data(storage, fastRequest);
+            data.url = QnStorageResource::urlWithoutCredentials(data.url);
             if (!fastRequest)
                 data.isWritable = writableStorages.contains(storage);
             reply.storages.push_back(data);

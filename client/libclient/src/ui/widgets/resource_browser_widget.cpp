@@ -30,6 +30,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/animation/opacity_animator.h>
@@ -55,11 +57,13 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
-#include <utils/common/scoped_value_rollback.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
@@ -71,7 +75,9 @@ const char* kFilterPropertyName = "_qn_filter";
 const int kNoDataFontPixelSize = 32;
 const int kNoDataFontWeight = QFont::Light;
 
-const auto kHtmlLabelFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
+const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
+const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -98,10 +104,12 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     /* And specify maximum width and height for the widget: */
     m_previewWidget->setMaximumSize(kMaxThumbnailSize);
 
-    m_previewWidget->busyIndicator()->setDotRadius(style::Metrics::kStandardPadding / 2.0);
-    m_previewWidget->busyIndicator()->setDotSpacing(style::Metrics::kStandardPadding);
+    auto dots = m_previewWidget->busyIndicator()->dots();
+    dots->setDotRadius(style::Metrics::kStandardPadding / 2.0);
+    dots->setDotSpacing(style::Metrics::kStandardPadding);
 
     auto layout = new QVBoxLayout(m_embeddedWidget);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_previewWidget);
     layout->addWidget(m_textLabel);
@@ -116,7 +124,7 @@ QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* pa
     font.setWeight(kNoDataFontWeight);
     m_previewWidget->setFont(font);
 
-    updateTailPos();
+    setThumbnailVisible(false);
 }
 
 bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
@@ -131,9 +139,15 @@ bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QE
     return base_type::sceneEventFilter(watched, event);
 }
 
+void QnResourceBrowserToolTipWidget::forceLayoutUpdate()
+{
+    m_embeddedWidget->layout()->activate();
+}
+
 void QnResourceBrowserToolTipWidget::setText(const QString& text)
 {
     m_textLabel->setText(text);
+    forceLayoutUpdate();
 }
 
 void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
@@ -141,8 +155,16 @@ void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
     if (m_previewWidget->isHidden() != visible)
         return;
 
+    m_textLabel->setSizePolicy(
+        visible ? QSizePolicy::Ignored : QSizePolicy::Preferred,
+        QSizePolicy::Preferred);
+
+    m_textLabel->setWordWrapMode(visible
+        ? QTextOption::WrapAtWordBoundaryOrAnywhere
+        : QTextOption::ManualWrap);
+
     m_previewWidget->setVisible(visible);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 
     updateTailPos();
 }
@@ -153,7 +175,7 @@ void QnResourceBrowserToolTipWidget::setResource(const QnResourcePtr& resource)
         return;
 
     m_previewWidget->setTargetResource(resource);
-    m_embeddedWidget->layout()->activate();
+    forceLayoutUpdate();
 }
 
 const QnResourcePtr& QnResourceBrowserToolTipWidget::resource() const
@@ -229,30 +251,22 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
 
-    connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFilter()));
-    connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
-    connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(forceUpdateFilter()));
+    connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
+        this, [this]() { updateFilter(false); });
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
+        this, [this]() { updateFilter(false); });
+    connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
+        this, [this]() { updateFilter(true); });
 
-    auto dropResource =
-        [this](const QnResourcePtr& resource)
-        {
-            // handle resources that should not be dropped on the scene
-            if (!resource
-                || resource->hasFlags(Qn::user)
-                || resource->hasFlags(Qn::server)
-                )
-            {
-                return;
-            }
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
+        this, &QnResourceBrowserWidget::handleItemActivated);
+    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
+        this, &QnResourceBrowserWidget::handleItemActivated);
 
-            menu()->trigger(QnActions::DropResourcesAction, resource);
-        };
-
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
-    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this, dropResource);
-
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
-    connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SIGNAL(selectionChanged()));
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
+    connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+        this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -262,12 +276,22 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
 
-    connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
-    connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
+        this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
+    connect(workbench(), &QnWorkbench::currentLayoutChanged,
+        this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
+    connect(workbench(), &QnWorkbench::itemChanged,
+        this, &QnResourceBrowserWidget::at_workbench_itemChanged);
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        &QnResourceBrowserWidget::updateIcons);
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+        this, &QnResourceBrowserWidget::updateIcons);
+
+    connect(this->context(), &QnWorkbenchContext::userChanged,
+        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
+
+    installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
+        ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
+        this, &QnResourceBrowserWidget::scrollBarVisibleChanged);
 
     /* Run handlers. */
     updateFilter();
@@ -560,7 +584,15 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF& pos)
         auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
 
-        m_tooltipWidget->setText(kHtmlLabelFormat.arg(toolTipText).arg(extraInfo));
+        QString text;
+        if (extraInfo.isEmpty())
+            text = kHtmlLabelNoInfoFormat.arg(toolTipText);
+        else if (resource && resource->hasFlags(Qn::user))
+            text = kHtmlLabelUserFormat.arg(toolTipText).arg(extraInfo);
+        else
+            text = kHtmlLabelDefaultFormat.arg(toolTipText).arg(extraInfo);
+
+        m_tooltipWidget->setText(text);
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         auto camera = resource.dynamicCast<QnVirtualCameraResource>();
@@ -598,6 +630,11 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     connect(m_hoverProcessor, SIGNAL(hoverLeft()), this, SLOT(hideToolTip()));
 
     updateToolTipPosition();
+}
+
+bool QnResourceBrowserWidget::isScrollBarVisible() const
+{
+    return currentTreeWidget()->treeView()->verticalScrollBar()->isVisible();
 }
 
 QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope scope) const
@@ -710,14 +747,24 @@ void QnResourceBrowserWidget::hideToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(0.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipHide);
+    animator->animateTo(0.0);
 }
 
 void QnResourceBrowserWidget::showToolTip()
 {
     if (!m_tooltipWidget)
         return;
-    opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
+
+    using namespace nx::client::ui::workbench;
+
+    auto animator = opacityAnimator(m_tooltipWidget);
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipShow);
+    animator->animateTo(1.0);
 }
 
 void QnResourceBrowserWidget::updateIcons()
@@ -807,6 +854,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
+            model->setFilterWildcard(L'*' + filter + L'*');
             if (filter.isEmpty())
             {
                 model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
@@ -855,7 +903,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
     ui->searchTreeWidget->setModel(nullptr);
-    ui->filterLineEdit->setText(QString());
+    ui->filterLineEdit->lineEdit()->setText(QString());
     killSearchTimer();
 }
 
@@ -870,7 +918,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
-    ui->filterLineEdit->setText(layoutFilter(layout));
+    ui->filterLineEdit->lineEdit()->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
     currentTreeWidget()->update();
@@ -922,6 +970,7 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)
     }
 
     emit currentTabChanged();
+    emit scrollBarVisibleChanged();
 }
 
 void QnResourceBrowserWidget::at_thumbnailClicked()
@@ -947,4 +996,35 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
         model->addCriterion(QnResourceCriterion(Qn::user));
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }
+}
+
+void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
+{
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    if (nodeType == Qn::CloudSystemNode)
+    {
+        menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
+            .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        return;
+    }
+
+    if (nodeType == Qn::VideoWallItemNode)
+    {
+        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
+            QnVideoWallItemIndexList() << item);
+        return;
+    }
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    /* Do not open users or fake servers. */
+    if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
+        return;
+
+    /* Do not open servers of admin.  */
+    if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
+        return;
+
+    menu()->trigger(QnActions::DropResourcesAction, resource);
 }

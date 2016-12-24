@@ -254,7 +254,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
-    m_resizingInstrument->setEffectRadius(8);
+    m_resizingInstrument->setInnerEffectRadius(4);
+    m_resizingInstrument->setOuterEffectRadius(8);
 
     m_moveInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
     m_resizingInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
@@ -1070,6 +1071,8 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
             : qnSettings->maxSceneVideoItems();
 
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+    if (!layout)
+        return;
     if (layout->getItems().size() >= maxItems)
         return;
     layout->addItem(data);

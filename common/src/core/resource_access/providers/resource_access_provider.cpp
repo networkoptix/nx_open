@@ -1,5 +1,9 @@
 #include "resource_access_provider.h"
 
+#include <core/resource_access/resource_access_subjects_cache.h>
+
+#include <core/resource_management/resource_pool.h>
+
 #include <nx/utils/log/assert.h>
 
 QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
@@ -26,16 +30,28 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
-    for (auto provider : m_providers)
+    if (providers)
+        providers->clear();
+
+    QnAbstractResourceAccessProvider::Source accessSource = Source::none;
+    for (auto provider: m_providers)
     {
-        if (providers)
-            providers->clear();
-        auto result = provider->accessibleVia(subject, resource, providers);
-        if (result != Source::none)
-            return result;
+        const auto result = provider->accessibleVia(subject, resource, providers);
+        if (accessSource == Source::none)
+            accessSource = result;
+
+        /* If we need provider resources, we must check all child providers. */
+        if (!providers && result != Source::none)
+            break;
     }
 
-    return Source::none;
+    /* Make sure if there is at least one provider then access is granted. */
+    if (providers && !providers->isEmpty())
+    {
+        NX_ASSERT(accessSource != Source::none);
+    }
+
+    return accessSource;
 }
 
 void QnResourceAccessProvider::addBaseProvider(QnAbstractResourceAccessProvider* provider)
@@ -74,9 +90,37 @@ QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() c
     return m_providers;
 }
 
+void QnResourceAccessProvider::beginUpdateInternal()
+{
+    for (auto p: m_providers)
+        p->beginUpdate();
+}
+
+void QnResourceAccessProvider::endUpdateInternal()
+{
+    for (auto p: m_providers)
+        p->endUpdate();
+}
+
+void QnResourceAccessProvider::afterUpdate()
+{
+    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    {
+        for (const QnResourcePtr& resource: qnResPool->getResources())
+        {
+            auto value = accessibleVia(subject, resource);
+            if (value != QnAbstractResourceAccessProvider::Source::none)
+                emit accessChanged(subject, resource, value);
+        }
+    }
+}
+
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
+    if (isUpdating())
+        return;
+
     auto source = qobject_cast<QnAbstractResourceAccessProvider*>(sender());
 
     auto sourceIt = std::find(m_providers.cbegin(), m_providers.cend(), source);

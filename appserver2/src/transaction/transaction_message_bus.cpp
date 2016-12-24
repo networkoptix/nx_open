@@ -558,7 +558,8 @@ void QnTransactionMessageBus::at_gotTransaction(
         return;
     }
 
-    NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
+    if (!transportHeader.isNull())
+        NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
     using namespace std::placeholders;
     if (!handleTransaction(
@@ -1109,21 +1110,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         tranCameras.command = ApiCommand::getCamerasEx;
         tranCameras.peerID = qnCommon->moduleGUID();
 
-        // filter out desktop cameras
-        auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
-        QnUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QnUuid();
-        if (desktopCameraTypeId.isNull())
-        {
-            tranCameras.params = cameras;
-        }
-        else
-        {
-            tranCameras.params.reserve(cameras.size());  //usually, there are only a few desktop cameras relatively to total cameras count
-            std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params), [&desktopCameraTypeId](const ec2::ApiCameraData &camera)
+        // Filter out desktop cameras.
+        // Usually, there are only a few desktop cameras relatively to total cameras count.
+        tranCameras.params.reserve(cameras.size());
+        std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params),
+            [](const ec2::ApiCameraData& camera)
             {
-                return camera.typeId != desktopCameraTypeId;
+                return camera.typeId != QnResourceTypePool::kDesktopCameraTypeUuid;
             });
-        }
 
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
@@ -1515,7 +1509,8 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
             {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
-                if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server)
+                if (transport->remotePeer().id == itr.key() &&
+                    ec2::ApiPeerData::isServer(transport->remotePeer().peerType))
                 {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -1590,6 +1585,7 @@ bool QnTransactionMessageBus::moveConnectionToReadyForStreaming(const QnUuid& co
     {
         if (connection->connectionGuid() == connectionGuid)
         {
+            connection->monitorConnectionForClosure();
             connection->setState(QnTransactionTransport::Connected);
             return true;
         }
@@ -1818,10 +1814,8 @@ QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveServerPeers
     AlivePeersMap result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
-        if (itr->peer.isClient())
-            continue;
-
-        result.insert(itr.key(), itr.value());
+        if (itr->peer.isServer())
+            result.insert(itr.key(), itr.value());
     }
 
     return result;

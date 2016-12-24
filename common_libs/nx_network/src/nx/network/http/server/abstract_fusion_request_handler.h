@@ -75,7 +75,7 @@ private:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const /*response*/,
-        nx_http::HttpRequestProcessedHandler completionHandler ) override
+        nx_http::RequestProcessedHandler completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;

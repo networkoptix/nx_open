@@ -20,4 +20,4 @@ FOR /F %%G IN ('dir /b /AD') DO (
   echo pack errorlevel is %ERRORLEVEL%
   rem del /F /S /Q %%G
   )
-cd %CURRENTDIR%  
+cd %CURRENTDIR%

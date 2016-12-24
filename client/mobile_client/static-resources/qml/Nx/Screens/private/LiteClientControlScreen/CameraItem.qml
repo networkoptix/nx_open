@@ -124,7 +124,7 @@ Rectangle
 
         interval: 60 * 1000
         repeat: true
-        running: connectionManager.connectionState == QnConnectionManager.Connected
+        running: connectionManager.connectionState === QnConnectionManager.Ready
         triggeredOnStart: true
 
         onTriggered: thumbnailCacheAccessor.refreshThumbnail()

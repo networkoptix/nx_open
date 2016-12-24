@@ -10,7 +10,6 @@
 #include <mutex>
 #include <vector>
 
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
@@ -310,15 +309,15 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
         const int pos = nx::utils::random::number<int>(0, (int)clients.size() - 1);
         auto client = clients[pos].second;
         lk.unlock();
-        
+
         client->pleaseStop();
         client.reset();
-        
+
         lk.lock();
         clients[pos].second = std::make_shared<nx_http::HttpClient>();
         clients[pos].first = false;
         lk.unlock();
-        
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 

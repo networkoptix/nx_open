@@ -740,11 +740,15 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 }
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
-{
-    return isH264() &&
-           QnGlobalSettings::instance()->arecontRtspEnabled() &&
-           qnCommon->dataPool()->data(toSharedPointer(this)).
-               value<bool>(lit("isRTSPSupported"), true);
+{   
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
+    auto cameraSupportsH264 = isH264();
+    auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
+    auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);
+
+    return arecontRtspIsAllowed 
+        && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)

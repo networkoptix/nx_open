@@ -30,7 +30,7 @@ struct QnCheckForUpdateResult
     Value result;
     QSet<QnSystemInformation> systems; /**< Set of supported system, for which updates were found. */
     QnSoftwareVersion version;
-    bool clientInstallerRequired;
+    bool clientInstallerRequired = false;
     QUrl releaseNotesUrl;
     QString cloudHost;
 };
@@ -108,7 +108,7 @@ struct QnUpdateFileInformation
 {
     QnSoftwareVersion version;
     QString fileName;
-    qint64 fileSize;
+    qint64 fileSize = 0;
     QString baseFileName;
     QUrl url;
     QString md5;

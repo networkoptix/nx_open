@@ -315,8 +315,6 @@ TEST_F(StunUDP, client_cancellation)
     }
 
     client.pleaseStopSync();
-
-    ASSERT_EQ(REQUESTS_TO_SEND, errorsReported);
 }
 
 /** testing that client accepts response from server endpoint only */
@@ -342,7 +340,7 @@ TEST_F(StunUDP, client_response_injection)
     UDPClient client;
     ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
     client.sendRequestTo(
-        SocketAddress("localhost", serverEndpoint.port),
+        SocketAddress(HostAddress::localhost, serverEndpoint.port),
         //serverEndpoint,
         requestMessage,
         [&mtx, &cond, &response, &responseErrorCode](

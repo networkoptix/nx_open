@@ -90,15 +90,16 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
     return server;
 }
 
-QnStorageResourcePtr QnResourcePoolTestHelper::addStorage()
+QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerResourcePtr& server)
 {
     QnStorageResourcePtr storage(new QnStorageResourceStub());
+    storage->setParentId(server->getId());
     qnResPool->addResource(storage);
     return storage;
 }
 
-ec2::ApiUserGroupData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
+ec2::ApiUserRoleData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
 {
-    return ec2::ApiUserGroupData(QnUuid::createUuid(), QStringLiteral("test_role"),
+    return ec2::ApiUserRoleData(QnUuid::createUuid(), QStringLiteral("test_role"),
         permissions);
 }

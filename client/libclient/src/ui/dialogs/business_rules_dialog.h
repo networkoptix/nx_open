@@ -1,5 +1,4 @@
-#ifndef QN_BUSINESS_RULES_DIALOG_H
-#define QN_BUSINESS_RULES_DIALOG_H
+#pragma once
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QModelIndex>
@@ -57,7 +56,6 @@ private slots:
     void at_newRuleButton_clicked();
     void at_deleteButton_clicked();
     void at_resetDefaultsButton_clicked();
-    void at_clearFilterButton_clicked();
 
     void at_beforeModelChanged();
     void at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
@@ -68,9 +66,6 @@ private slots:
     void at_tableViewport_resizeEvent();
     void at_model_dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
-
-    void toggleAdvancedMode();
-    void updateAdvancedAction();
     void updateControlButtons();
 
     void updateFilter();
@@ -86,9 +81,6 @@ private:
 
     void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
 
-    bool advancedMode() const;
-    void setAdvancedMode(bool value);
-
     QScopedPointer<Ui::BusinessRulesDialog> ui;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
@@ -103,11 +95,6 @@ private:
 
     QAction* m_newAction;
     QAction* m_deleteAction;
-    QAction* m_advancedAction;
 
     QPushButton* m_resetDefaultsButton;
-
-    bool m_advancedMode;
 };
-
-#endif // QN_BUSINESS_RULES_DIALOG_H

@@ -8,6 +8,7 @@ Column
 
     property bool isConnecting: false;
     property bool hasRecentConnections: false;
+    property bool factorySystem: false;
 
     property alias loginTextField: loginTextItem;
     property alias passwordTextField: passwordTextItem;
@@ -94,20 +95,26 @@ Column
             id: savePasswordCheckBoxControl;
             text: qsTr("Save password");
 
-            enabled: !control.isConnecting;
+            enabled: !control.isConnecting && !control.factorySystem;
             onAccepted: control.connectButtonClicked();
 
             onCheckedChanged:
             {
                 if (!checked)
+                {
+                    passwordTextItem.text = "";
                     autoLoginCheckBoxItem.checked = false;
+                }
             }
         }
 
         NxCheckBox
         {
             id: autoLoginCheckBoxItem;
-            enabled: savePasswordCheckBoxControl.checked && !control.isConnecting;
+            enabled: savePasswordCheckBoxControl.enabled
+                && savePasswordCheckBoxControl.checked
+                && !control.isConnecting;
+
             text: qsTr("Auto-login");
 
             onAccepted: control.connectButtonClicked();

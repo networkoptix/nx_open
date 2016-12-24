@@ -4,10 +4,11 @@
 #include <QtCore/QSharedPointer>
 
 #include <network/base_system_description.h>
+#include <utils/common/connective.h>
 
-class QnSystemDescriptionAggregator : public QnBaseSystemDescription
+class QnSystemDescriptionAggregator : public Connective<QnBaseSystemDescription>
 {
-    typedef QnBaseSystemDescription base_type;
+    typedef Connective<QnBaseSystemDescription> base_type;
 
 public:
     QnSystemDescriptionAggregator(int priority,
@@ -38,7 +39,11 @@ public: // overrides
 
     bool isNewSystem() const override;
 
+    bool isOnline() const override;
+
     ServersList servers() const override;
+
+    bool isOnlineServer(const QnUuid& serverId) const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 
@@ -48,8 +53,12 @@ public: // overrides
 
     qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
+    bool hasInternet() const override;
+
+    bool safeMode() const override;
+
 private:
-    void emitHeadChanged();
+    void emitSystemChanged();
 
     void onSystemNameChanged(const QnSystemDescriptionPtr& system);
 
@@ -58,6 +67,8 @@ private:
     void updateServers();
 
     void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
+
+    bool invalidSystem() const;
 
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;

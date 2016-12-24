@@ -21,6 +21,7 @@
 #include <ui/graphics/items/resource/videowall_item_widget.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -72,7 +73,8 @@ Qn::RenderStatus QnVideowallScreenWidget::paintChannelBackground(QPainter *paint
         return Qn::NothingRendered;
 
     updateLayout();
-    return base_type::paintChannelBackground(painter, channel, channelRect, paintRect);
+    painter->fillRect(paintRect, palette().color(QPalette::Mid));
+    return Qn::NewFrameRendered;
 }
 
 int QnVideowallScreenWidget::calculateButtonsVisibility() const {
@@ -93,17 +95,25 @@ QString QnVideowallScreenWidget::calculateTitleText() const {
     if (idx < 0)
         idx = 0;
 
-    QString base = tr("Pc %1").arg(idx + 1);
+    int pcVisualIdx = idx + 1;
+    QString base = tr("PC %1").arg(pcVisualIdx);
 
     QSet<int> screens = m_items.first().screenSnaps.screens();
     if (screens.isEmpty())
         return base;
 
     QStringList screenIndices;
-    foreach (int screen, screens)
+    for (int screen: screens)
         screenIndices.append(QString::number(screen + 1));
 
-    return tr("Pc %1 - Screens %2", "", screens.size()).arg(idx + 1).arg(screenIndices.join(lit(" ,")));
+    if (screenIndices.size() == 1)
+        return tr("PC %1 - Display %2").arg(pcVisualIdx).arg(screenIndices.first());
+
+    return tr("PC %1 - Displays %2",
+        "%2 will be substituted by _list_ of displays",
+        screens.size())
+        .arg(pcVisualIdx)
+        .arg(screenIndices.join(lit(" ,")));
 }
 
 Qn::ResourceStatusOverlay QnVideowallScreenWidget::calculateStatusOverlay() const {
@@ -140,6 +150,14 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
 
     auto createItem = [this, &state](const QnUuid &id) {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
+        connect(itemWidget, &QnClickableWidget::clicked, this,
+            [this](Qt::MouseButton button)
+            {
+                if (button != Qt::LeftButton)
+                    return;
+                workbench()->setItem(Qn::SingleSelectedRole, item());
+            });
+
         if (state.contains(id))
             itemWidget->setInfoVisible(state[id] > 0, false);
 
@@ -210,7 +228,10 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     if (idx < 0)
         return; // item on another widget
 
-    NX_ASSERT(oldItem == m_items[idx]);
+    /* Item is already updated from another call. */
+    if (m_items[idx] == oldItem)
+        return;
+
     if (oldItem.screenSnaps.screens() != item.screenSnaps.screens())
     {
          // if there are more than one item on the widget, this one will be updated from outside

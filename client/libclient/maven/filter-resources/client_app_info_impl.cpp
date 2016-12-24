@@ -40,9 +40,14 @@ int QnClientAppInfo::videoWallIconId()
     return IDI_ICON_VIDEOWALL;
 }
 
-QString QnClientAppInfo::macOsBundleName()
+QString QnClientAppInfo::protocolHandlerBundleName()
 {
-    return QStringLiteral("${mac.bundle.identifier}");
+    return QStringLiteral("protocol_handler.app");
+}
+
+QString QnClientAppInfo::protocolHandlerBundleIdBase()
+{
+    return QStringLiteral("${mac.protocol_handler_bundle.identifier}");
 }
 
 QString QnClientAppInfo::launcherVersionFile()
@@ -66,7 +71,7 @@ QString QnClientAppInfo::libDirSuffix()
     #if defined(Q_OS_LINUX)
         return QStringLiteral("lib");
     #elif defined(Q_OS_MACX)
-        return QStringLiteral("Frameworks");
+        return QStringLiteral("Contents/Frameworks");
     #else
         return QString();
     #endif

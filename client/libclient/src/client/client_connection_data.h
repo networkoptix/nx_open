@@ -9,17 +9,18 @@
 struct QnConnectionData
 {
     QnConnectionData();
-    QnConnectionData(const QString &name, const QUrl &url, bool isCustom);
+    QnConnectionData(const QString &name, const QUrl &url,
+        const QnUuid& localId);
 
     bool isValid() const;
+    bool isCustom() const;
 
     bool operator==(const QnConnectionData &other) const;
     bool operator!=(const QnConnectionData &other) const;
 
-
     QString name;
     QUrl url;
-    bool isCustom;
+    QnUuid localId;
 };
 
 Q_DECLARE_METATYPE(QnConnectionData)

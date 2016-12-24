@@ -37,7 +37,7 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
-    ui->manageAccountLabel->setText(makeHref(tr("Manage account..."),
+    ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
         urlHelper.accountManagementUrl()));
 
     connect(ui->enabledButton, &QPushButton::toggled, this, &QnCloudUserPanelWidget::enabledChanged);

@@ -1,53 +1,109 @@
-/**********************************************************
-* Feb, 1 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <chrono>
 
 #include <gtest/gtest.h>
 
-#include <nx/utils/std/cpp14.h>
-
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
-#include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
-
+#include <nx/network/test_support/socket_test_helper.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
 NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
-    TEST, CloudStreamSocketTcp,
+    TEST, CloudStreamSocketTcpByIp,
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
-class CloudStreamSocketTest
-:
+TEST(CloudStreamSocketTcpByIp, SimpleSyncSsl)
+{
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), false); },
+        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); });
+}
+
+class TestTcpServerSocket:
+    public TCPServerSocket
+{
+public:
+    TestTcpServerSocket(HostAddress host):
+        TCPServerSocket(AF_INET),
+        m_host(std::move(host))
+    {
+    }
+
+    ~TestTcpServerSocket()
+    {
+        if (m_socketAddress)
+            SocketGlobals::addressResolver().removeFixedAddress(m_host, *m_socketAddress);
+    }
+
+    virtual bool bind(const SocketAddress& localAddress) override
+    {
+        if (!TCPServerSocket::bind(localAddress))
+            return false;
+
+        m_socketAddress = TCPServerSocket::getLocalAddress();
+        SocketGlobals::addressResolver().addFixedAddress(m_host, *m_socketAddress);
+        return true;
+    }
+
+    virtual SocketAddress getLocalAddress() const override
+    {
+        return m_socketAddress ? *m_socketAddress : SocketAddress();
+    }
+
+private:
+    const HostAddress m_host;
+    boost::optional<SocketAddress> m_socketAddress;
+};
+
+struct CloudStreamSocketTcpByHost:
+    public ::testing::Test
+{
+    const HostAddress testHost;
+    CloudStreamSocketTcpByHost(): testHost(id() + lit(".") + id()) {}
+    static QString id() { return QnUuid::createUuid().toSimpleString(); }
+};
+
+NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
+    TEST_F, CloudStreamSocketTcpByHost,
+    [&]() { return std::make_unique<TestTcpServerSocket>(testHost); },
+    [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
+    SocketAddress(testHost));
+
+TEST_F(CloudStreamSocketTcpByHost, SimpleSyncSsl)
+{
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(new TestTcpServerSocket(testHost), false); },
+        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        SocketAddress(testHost));
+}
+
+class CloudStreamSocketTest:
     public ::testing::Test
 {
 public:
     ~CloudStreamSocketTest()
     {
         if (m_oldCreateStreamSocketFunc)
-            SocketFactory::setCreateStreamSocketFunc(
-                std::move(*m_oldCreateStreamSocketFunc));
+            SocketFactory::setCreateStreamSocketFunc(std::move(*m_oldCreateStreamSocketFunc));
     }
 
     void setCreateStreamSocketFunc(
         SocketFactory::CreateStreamSocketFuncType newFactoryFunc)
     {
-        auto oldFunc = 
-            SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
+        auto oldFunc = SocketFactory::setCreateStreamSocketFunc(std::move(newFactoryFunc));
         if (!m_oldCreateStreamSocketFunc)
             m_oldCreateStreamSocketFunc = std::move(oldFunc);
     }
 
 private:
-    boost::optional<SocketFactory::CreateStreamSocketFuncType> 
-        m_oldCreateStreamSocketFunc;
+    boost::optional<SocketFactory::CreateStreamSocketFuncType> m_oldCreateStreamSocketFunc;
 };
 
 TEST_F(CloudStreamSocketTest, simple)
@@ -57,10 +113,10 @@ TEST_F(CloudStreamSocketTest, simple)
     const size_t repeatCount = 100;
 
     //starting local tcp server
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::outgoing,
+    network::test::RandomDataTcpServer server(
+        network::test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        test::TestTransmissionMode::spam);
+        network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -106,17 +162,17 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
 
     setCreateStreamSocketFunc(
         []( bool /*sslRequired*/,
-            SocketFactory::NatTraversalType /*natTraversalRequired*/) ->
+            nx::network::NatTraversalSupport /*natTraversalRequired*/) ->
                 std::unique_ptr< AbstractStreamSocket >
         {
             return std::make_unique<CloudStreamSocket>(AF_INET);
         });
 
     //starting local tcp server
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::outgoing,
+    network::test::RandomDataTcpServer server(
+        network::test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        test::TestTransmissionMode::spam);
+        network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -126,13 +182,13 @@ TEST_F(CloudStreamSocketTest, multiple_connections_random_data)
         tempHostName,
         serverAddress);
 
-    test::ConnectionsGenerator connectionsGenerator(
+    network::test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(tempHostName),
         maxSimultaneousConnections,
-        test::TestTrafficLimitType::outgoing,
+        network::test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        test::ConnectionsGenerator::kInfiniteConnectionCount,
-        test::TestTransmissionMode::spam);
+        network::test::ConnectionsGenerator::kInfiniteConnectionCount,
+        network::test::TestTransmissionMode::spam);
     connectionsGenerator.start();
 
     std::this_thread::sleep_for(testDuration);
@@ -156,92 +212,6 @@ const auto createClientSocketFunc =
         return std::make_unique<CloudStreamSocket>(AF_INET);
     };
 
-TEST_F(CloudStreamSocketTest, simple_socket_test)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketSimpleSync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    test::socketSimpleAsync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    test::socketSimpleSync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress("bla"));
-
-    test::socketSimpleAsync(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        serverAddress,
-        SocketAddress("bla"));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
-
-TEST_F(CloudStreamSocketTest, Shutdown)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketShutdown(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        false,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
-
-TEST_F(CloudStreamSocketTest, ShutdownAfterAsync)
-{
-    const char* tempHostName = "bla.bla";
-    SocketAddress serverAddress(
-        HostAddress::localhost,
-        nx::utils::random::number<quint16>(20000, 50000));
-
-    nx::network::SocketGlobals::addressResolver().addFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    test::socketShutdown(
-        createServerSocketFunc,
-        createClientSocketFunc,
-        true,
-        serverAddress,
-        SocketAddress(tempHostName));
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-}
-
 TEST_F(CloudStreamSocketTest, cancellation)
 {
     const char* tempHostName = "bla.bla";
@@ -249,10 +219,10 @@ TEST_F(CloudStreamSocketTest, cancellation)
     const size_t repeatCount = 100;
 
     //starting local tcp server
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::outgoing,
+    network::test::RandomDataTcpServer server(
+        network::test::TestTrafficLimitType::outgoing,
         bytesToSendThroughConnection,
-        test::TestTransmissionMode::spam);
+        network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
 
     const auto serverAddress = server.addressBeingListened();
@@ -262,11 +232,22 @@ TEST_F(CloudStreamSocketTest, cancellation)
         tempHostName,
         serverAddress);
 
+    const auto scopedGuard = makeScopedGuard(
+        [&]()
+        {
+            nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+                tempHostName,
+                serverAddress);
+            server.pleaseStopSync();
+        });
+
     //cancelling connect
     for (size_t i = 0; i < repeatCount; ++i)
     {
         //connecting with CloudStreamSocket to the local server
         CloudStreamSocket cloudSocket(AF_INET);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.connectAsync(
             SocketAddress(tempHostName),
             [](SystemError::ErrorCode /*code*/){});
@@ -280,9 +261,12 @@ TEST_F(CloudStreamSocketTest, cancellation)
         CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()));
+            std::chrono::milliseconds(1000).count()))
+            << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.reserve(bytesToSendThroughConnection);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.readSomeAsync(
             &data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesRead*/) {});
@@ -296,20 +280,17 @@ TEST_F(CloudStreamSocketTest, cancellation)
         CloudStreamSocket cloudSocket(AF_INET);
         ASSERT_TRUE(cloudSocket.connect(
             SocketAddress(tempHostName),
-            std::chrono::milliseconds(1000).count()));
+            std::chrono::milliseconds(1000).count()))
+            << SystemError::getLastOSErrorText().toStdString();
         QByteArray data;
         data.resize(bytesToSendThroughConnection);
+        ASSERT_TRUE(cloudSocket.setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
         cloudSocket.sendAsync(
             data,
             [](SystemError::ErrorCode /*errorCode*/, size_t /*bytesSent*/) {});
         cloudSocket.cancelIOSync(aio::etNone);
     }
-
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
-
-    server.pleaseStopSync();
 }
 
 TEST_F(CloudStreamSocketTest, syncModeCancellation)
@@ -319,34 +300,33 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
     constexpr const int kTestRuns = 10;
 
     //launching some server
-    test::RandomDataTcpServer tcpServer(
-        test::TestTrafficLimitType::none,
+    network::test::RandomDataTcpServer tcpServer(
+        network::test::TestTrafficLimitType::none,
         0,
-        test::TestTransmissionMode::spam);
+        network::test::TestTransmissionMode::spam);
     tcpServer.setLocalAddress(SocketAddress(HostAddress::localhost, 0));
     ASSERT_TRUE(tcpServer.start());
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto sock = std::make_unique<CloudStreamSocket>(AF_INET);
-
+        auto socket = SocketFactory::createStreamSocket();
         enum class SocketState {init, connected, closed};
         std::atomic<SocketState> socketState(SocketState::init);
 
         nx::utils::thread sendThread(
-            [&sock, targetAddress = tcpServer.addressBeingListened(), &socketState]
+            [&socket, targetAddress = tcpServer.addressBeingListened(), &socketState]
             {
                 char testBuffer[16*1024];
 
-                if (!sock->isConnected())
+                if (!socket->isConnected())
                 {
-                    ASSERT_TRUE(sock->connect(targetAddress, 3000));
+                    ASSERT_TRUE(socket->connect(targetAddress, 3000));
                     socketState = SocketState::connected;
                 }
 
-                while (!sock->isClosed() && sock->isConnected())
+                while (!socket->isClosed() && socket->isConnected())
                 {
-                    int bytesSent = sock->send(testBuffer, sizeof(testBuffer));
+                    int bytesSent = socket->send(testBuffer, sizeof(testBuffer));
                     if (bytesSent == -1)
                         continue;
                 }
@@ -354,7 +334,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
         //read thread
         nx::utils::thread recvThread(
-            [&sock, &socketState]
+            [&socket, &socketState]
             {
                 char readBuffer[16 * 1024];
                 for (;;)
@@ -365,10 +345,10 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
                         continue;
                     }
 
-                    if (!sock->isConnected() || sock->isClosed())
+                    if (!socket->isConnected() || socket->isClosed())
                         break;
 
-                    int bytesReceived = sock->recv(readBuffer, sizeof(readBuffer));
+                    int bytesReceived = socket->recv(readBuffer, sizeof(readBuffer));
                     if (bytesReceived == -1)
                         continue;
                 }
@@ -378,19 +358,20 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
         //cancelling
         if (i & 1)
-            sock->close();
+            socket->close();
         else
-            sock->shutdown();
+            socket->shutdown();
 
         recvThread.join();
         sendThread.join();
 
-        sock.reset();
+        socket.reset();
     }
 
     tcpServer.pleaseStopSync();
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

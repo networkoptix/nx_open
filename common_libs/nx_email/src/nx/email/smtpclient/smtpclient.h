@@ -23,6 +23,7 @@
 
 #include <nx/network/socket.h>
 #include <nx/network/http/linesplitter.h>
+#include <utils/email/email_fwd.h>
 
 #include "mimemessage.h"
 
@@ -40,22 +41,13 @@ public:
         AuthLogin
     };
 
-    enum SmtpError
-    {
-        ConnectionTimeoutError,
-        ResponseTimeoutError,
-        SendDataTimeoutError,
-        AuthenticationFailedError,
-        ServerError,    // 4xx smtp error
-        ClientError     // 5xx smtp error
-    };
-
     enum ConnectionType
     {
         TcpConnection,
         SslConnection,
         TlsConnection       // STARTTLS
     };
+
 
     static QString toString( ConnectionType connectionType );
 
@@ -95,14 +87,14 @@ public:
     void setAuthMethod(AuthMethod method);
 
     const QString & getResponseText() const;
-    int getResponseCode() const;
+    SmtpReplyCode getResponseCode() const;
 
     int getConnectionTimeout() const;
     void setConnectionTimeout(int msec);
 
     int getResponseTimeout() const;
     void setResponseTimeout(int msec);
-    
+
     int getSendMessageTimeout() const;
     void setSendMessageTimeout(int msec);
 
@@ -112,12 +104,12 @@ public:
 
     /* [3] Public methods */
 
-    bool connectToHost();
+    SmtpOperationResult connectToHost();
 
-    bool login();
-    bool login(const QString &user, const QString &password, AuthMethod method = AuthLogin);
+    SmtpOperationResult login();
+    SmtpOperationResult login(const QString &user, const QString &password, AuthMethod method = AuthLogin);
 
-    bool sendMail(const MimeMessage& email);
+    SmtpOperationResult sendMail(const MimeMessage& email);
 
     void quit();
 
@@ -142,13 +134,13 @@ protected:
     int connectionTimeout;
     int responseTimeout;
     int sendMessageTimeout;
-    
-    
+
+
     QString responseText;
-    int responseCode;
+    SmtpReplyCode responseCode;
 
     nx_http::LineSplitter m_lineSpliter;
-    
+
     class ResponseTimeoutException {};
     class SendMessageTimeoutException {};
 
@@ -162,26 +154,6 @@ protected:
     void sendMessage(QString text);
 
     /* [5] --- */
-
-protected slots:
-
-    /* [6] Protected slots */
-
-    //void socketStateChanged(QAbstractSocket::SocketState state);
-    //void socketError(QAbstractSocket::SocketError error);
-    //void socketReadyRead();
-
-    /* [6] --- */
-
-
-signals:
-
-    /* [7] Signals */
-
-    void smtpError(SmtpError e);
-
-    /* [7] --- */
-
 };
 
 #endif // SMTPCLIENT_H

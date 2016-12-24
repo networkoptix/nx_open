@@ -556,12 +556,13 @@ public:
 class QnTreeNodeTypeCondition: public QnActionCondition
 {
 public:
-    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent): QnActionCondition(parent), m_nodeType(nodeType) {}
+    QnTreeNodeTypeCondition(Qn::NodeType nodeType, QObject *parent);
+    QnTreeNodeTypeCondition(QList<Qn::NodeType> nodeTypes, QObject *parent);
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
 private:
-    Qn::NodeType m_nodeType;
+    QSet<Qn::NodeType> m_nodeTypes;
 };
 
 class QnResourceStatusActionCondition: public QnActionCondition
@@ -708,13 +709,6 @@ public:
 class QnIdentifyVideoWallActionCondition: public QnRunningVideowallActionCondition {
 public:
     QnIdentifyVideoWallActionCondition(QObject* parent): QnRunningVideowallActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
-class QnResetVideoWallLayoutActionCondition: public QnActionCondition
-{
-public:
-    QnResetVideoWallLayoutActionCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 

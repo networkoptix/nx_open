@@ -15,9 +15,13 @@
 #include "core/resource/network_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
 
+namespace {
+
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int USEC_IN_MSEC = 1000;
+
+} // namespace
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
@@ -133,12 +137,12 @@ bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
     setCatalogs();
 
     m_currentChunkCatalog[QnServer::StoragePool::Normal] = 
-        m_quality == MEDIA_Quality_Low ? 
+        isLowMediaQuality(m_quality) ? 
                 m_catalogLow[QnServer::StoragePool::Normal] : 
                 m_catalogHi[QnServer::StoragePool::Normal];
 
     m_currentChunkCatalog[QnServer::StoragePool::Backup] = 
-        m_quality == MEDIA_Quality_Low ? 
+        isLowMediaQuality(m_quality) ?
                 m_catalogLow[QnServer::StoragePool::Backup] : 
                 m_catalogHi[QnServer::StoragePool::Backup];
 

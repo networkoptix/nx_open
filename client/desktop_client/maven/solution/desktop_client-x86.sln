@@ -37,6 +37,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient_core-x86", "${roo
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
 		${nx_vms_utils.guid} = ${nx_vms_utils.guid}
+		${nx_media.guid} = ${nx_media.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x86", "${root.dir}\common\src\common-x86.vcxproj", "${common.guid}"
@@ -66,6 +67,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_speech_synthesizer-x86",
 	ProjectSection(ProjectDependencies) = postProject
 		${common.guid} = ${common.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x86", "${root.dir}\common_libs\nx_media\src\nx_media-x86.vcxproj", "${nx_media.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${common.guid} = ${common.guid}
+		${nx_streaming.guid} = ${nx_streaming.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x86", "${root.dir}\common_libs\nx_network\src\nx_network-x86.vcxproj", "${nx_network.guid}"
@@ -138,6 +145,10 @@ Global
 		${nx_audio.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_audio.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${nx_audio.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_media.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_media.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_media.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_media.guid}.Release|Win32.Build.0 = Release|Win32
 		${nx_network.guid}.Debug|Win32.ActiveCfg = Debug|Win32
 		${nx_network.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${nx_network.guid}.Release|Win32.ActiveCfg = Release|Win32

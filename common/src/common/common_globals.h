@@ -370,6 +370,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
+	    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,
@@ -549,6 +557,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_OldMobileClient = 3,
         PT_MobileClient = 4,
         PT_CloudServer = 5,
+        PT_OldServer = 6, //< 2.6 or below
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -613,6 +622,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
          * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid.
          */
         LC_Start,
+
+        /**
+          * Camera with Free license can be recorded without license activation. It always available to use
+          */
+        LC_Free,
 
         /**
          * Invalid license. Required when the correct license type is not known in current version.
@@ -730,6 +744,16 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
 
+        /**
+         * Permission to view resource content.
+         * Currently used for server's health monitor access.
+         * Automatically granted for cameras and web pages if user has ReadPermission for them.
+         */
+        ViewContentPermission           = 0x0020,
+
+        /** Full set of permissions which can be available for server resource. */
+        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+
         /* Layout-specific permissions. */
         AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
         EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
@@ -754,7 +778,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Mode-specific permissions. */
         VideoWallLayoutPermissions      = ModifyLayoutPermission,
-        VideoWallMediaPermissions       = ReadPermission,
+        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
 
         AllPermissions = 0xFFFFFFFF
     };
@@ -830,7 +854,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     */
     enum class UserRole
     {
-        CustomUserGroup = -2,
+        CustomUserRole = -2,
         CustomPermissions = -1,
         Owner = 0,
         Administrator,
@@ -866,6 +890,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 

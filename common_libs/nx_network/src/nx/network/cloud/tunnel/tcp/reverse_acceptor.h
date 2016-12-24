@@ -22,7 +22,7 @@ public:
         String remoteHostName,
         std::unique_ptr<AbstractStreamSocket> socket)> ConnectHandler;
 
-    ReverseAcceptor(String selfHostName, ConnectHandler clientHandler);
+    ReverseAcceptor(ConnectHandler clientHandler);
     ~ReverseAcceptor();
 
     ReverseAcceptor(const ReverseAcceptor&) = delete;
@@ -34,7 +34,10 @@ public:
      * Starts accepting connections.
      * @param aioThread is used to call handler, also removal from this thread will be nonblocking
      */
-    bool start(const SocketAddress& address, aio::AbstractAioThread* aioThread = nullptr);
+    bool start(
+        String selfHostName,
+        const SocketAddress& address,
+        aio::AbstractAioThread* aioThread = nullptr);
 
     /** Stops accepting new connections (shall be called from AIO thread) */
     void pleaseStop();
@@ -60,13 +63,13 @@ private:
             stree::ResourceContainer authInfo,
             nx_http::Request request,
             nx_http::Response* const response,
-            nx_http::HttpRequestProcessedHandler handler) override;
+            nx_http::RequestProcessedHandler handler) override;
 
     private:
         const ReverseAcceptor* m_acceptor;
     };
 
-    const String m_selfHostName;
+    String m_selfHostName;
     ConnectHandler m_connectHandler;
 
     mutable QnMutex m_dataMutex;

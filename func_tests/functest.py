@@ -16,21 +16,29 @@ import random
 import os.path
 import signal
 import traceback
+import argparse
+from collections import OrderedDict
 
 from functest_util import *
-from testbase import RunTests as RunBoxTests, LegacyTestWrapper, getTestMaster, UnitTestRollback
+from testbase import RunTests, FuncTestCase, getTestMaster, UnitTestRollback, FuncTestError
 testMaster = getTestMaster()
 
 from generator import *
 import legacy_main
 from rtsptests import RtspPerf, RtspTestSuit, RtspStreamTest
-from sysname_test import SystemNameTest
+from sysname_test import SystemIdTest
 from timetest import TimeSyncTest, TimeSyncNoInetTest, TimeSyncWithInetTest
 from stortest import BackupStorageTest, MultiserverArchiveTest
 from streaming_test import StreamingTest, HlsOnlyTest
 from natcon_test import NatConnectionTest
 from dbtest import DBTest
-from proxytest import ProxyTest
+from proxytest import ServerProxyTest
+from mergetest import MergeSystemTest
+from cameratest import VirtualCameraTest
+from instancetest import InstanceTest
+from stresst import HTTPStressTest
+from pycommons.Logger import initLog, log, LOGLEVEL
+from pycommons.Config import config
 
 
 #class AuthH(urllib2.HTTPDigestAuthHandler):
@@ -75,7 +83,7 @@ class MergeTestBase:
     # the clusters
     def _storeClusterOldSystemName(self):
         for s in testMaster.clusterTestServerList:
-            print "Connection to http://%s/ec2/testConnection" % (s)
+            log(LOGLEVEL.DEBUG + 9, "Connection to http://%s/ec2/testConnection" % (s))
             response = urllib2.urlopen("http://%s/ec2/testConnection" % (s))
             if response.getcode() != 200:
                 return False
@@ -87,12 +95,14 @@ class MergeTestBase:
         return True
 
     def _setSystemName(self,addr,name):
-        print "Connection to http://%s/api/configure" % (addr)
-        response = urllib2.urlopen("http://%s/api/configure?%s" % (addr,urllib.urlencode({"systemName":name})))
-        if response.getcode() != 200 :
-            return (False,"Cannot issue changeSystemName with HTTP code:%d to server:%s" % (response.getcode()),addr)
-        response.close()
-        return (True,"")
+        url = "http://%s/api/configure?%s" % (addr, urllib.urlencode({"systemName":name}))
+        log(LOGLEVEL.DEBUG + 9, "Performing " + url)
+        try:
+            response = urllib2.urlopen(url)
+            assert response.getcode() == 200, \
+                "Cannot issue changeSystemName with HTTP code: %d on %s" % (response.getcode(), addr)
+        except Exception as err:
+            assert False, "Failed to change system name on %s: %s" % (addr, err.message)
 
     # This function is used to set the system name to random
     def _setClusterSystemRandom(self):
@@ -104,7 +114,7 @@ class MergeTestBase:
 
     def _setClusterToMerge(self):
         for s in testMaster.clusterTestServerList:
-            self._setSystemName(s,self._mergeTestSystemName)
+            self._setSystemName(s, self._mergeTestSystemName)
 
     def _rollbackSystemName(self):
         for i in xrange(len(testMaster.clusterTestServerList)):
@@ -115,7 +125,8 @@ class PrepareServerStatus(BasicGenerator):
     """ Represents a single server with an UNIQUE system name.
     After we initialize this server, we will make it executes certain
     type of random data generation, after such generation, the server
-    will have different states with other servers
+    will have different states with other servers.
+    Used in MergeTest_Resource.
     """
     _minData = 10
     _maxData = 20
@@ -140,18 +151,10 @@ class PrepareServerStatus(BasicGenerator):
     # Function to generate method and class matching
     def _generateDataAndAPIList(self,addr):
 
-        def cameraFunc(num):
-            return CameraDataGenerator().generateCameraData(num, addr)
-
-        def userFunc(num):
-            return UserDataGenerator().generateUserData(num)
-
-        def mediaServerFunc(num):
-            return MediaServerGenerator().generateMediaServerData(num)
-
-        return [("saveCameras",cameraFunc),
-                ("saveUser",userFunc),
-                ("saveMediaServer",mediaServerFunc)]
+        return [("saveCameras", lambda num: CameraDataGenerator().generateCameraData(num, addr)),
+                ("saveUser", lambda num: UserDataGenerator().generateUserData(num)),
+                ("saveMediaServer", lambda num: MediaServerGenerator().generateMediaServerData(num))
+                ]
 
     def _sendRequest(self,addr,method,d):
         url = "http://%s/ec2/%s" % (addr, method)
@@ -162,15 +165,12 @@ class PrepareServerStatus(BasicGenerator):
         return (True,"")
 
     def _generateRandomStates(self,addr):
-        api_list = self._generateDataAndAPIList(addr)
-        for api in api_list:
-            num = random.randint(self._minData,self._maxData)
-            data_list = api[1](num)
-            for data in data_list:
-                ret, reason = self._sendRequest(addr,api[0],data[0])
+        for apiName, apiGen in self._generateDataAndAPIList(addr):
+            for data in apiGen(random.randint(self._minData,self._maxData)):
+                ret, reason = self._sendRequest(addr, apiName, data[0])
                 if ret == False:
                     return (ret, reason)
-                testMaster.unittestRollback.addOperations(api[0], addr, data[1])
+                testMaster.unittestRollback.addOperations(apiName, addr, data[1])
         return (True,"")
 
     def main(self,addr):
@@ -184,45 +184,41 @@ class MergeTest_Resource(MergeTestBase):
     _lock = threading.Lock()
 
     def _prolog(self):
-        print "Merge test prolog : Test whether all servers you specify has the identical system name"
+        log(LOGLEVEL.INFO, "Merge test prolog : Test whether all servers you specify has the identical system name")
         oldSystemName = None
         oldSystemNameAddr = None
 
         # Testing whether all the cluster server has identical system name
         for s in testMaster.clusterTestServerList:
-            print "Connection to http://%s/ec2/testConnection" % (s)
-            response = urllib2.urlopen("http://%s/ec2/testConnection" % (s))
-            if response.getcode() != 200:
-                return False
+            log(LOGLEVEL.DEBUG + 9,  "Connection to http://%s/ec2/testConnection" % (s,))
+            response = urllib2.urlopen("http://%s/ec2/testConnection" % (s,))
+            assert response.getcode() == 200, "ec2/testConnection failed on " + s
             jobj = SafeJsonLoads(response.read(), s, 'testConnection')
-            if jobj is None:
-                return False
+            assert jobj is not None, "Bad data returned by ec2/testConnection from " + s
             if oldSystemName == None:
                 oldSystemName = jobj["systemName"]
                 oldSystemNameAddr = s
             else:
                 systemName = jobj["systemName"]
                 if systemName != oldSystemName:
-                    print "The merge test cannot start: different system names!"
-                    print "Server %s - '%s'; server %s - '%s'" % (
-                        oldSystemName, oldSystemNameAddr, s, jobj["systemName"])
-                    print "Please make all the server has identical system name before running merge test"
-                    return False
+                    log(LOGLEVEL.ERROR, "The merge test cannot start: different system names!")
+                    log(LOGLEVEL.ERROR,"Server %s - '%s'; server %s - '%s'" % (
+                        oldSystemName, oldSystemNameAddr, s, jobj["systemName"]))
+                    log(LOGLEVEL.ERROR, "Please make all the server has identical system name before running merge test")
+                    assert False, "Different system names before merge"
             response.close()
-
-        print "Merge test prolog pass"
-        return True
+        log(LOGLEVEL.INFO, "Merge test prolog pass")
 
     def _epilog(self):
-        print "Merge test epilog, change all servers system name back to its original one"
+        log(LOGLEVEL.INFO, "Merge test epilog, change all servers system name back to its original one")
         self._rollbackSystemName()
-        print "Merge test epilog done"
+        log(LOGLEVEL.INFO, "Merge test epilog done")
 
     # First phase will make each server has its own status
     # and also its unique system name there
 
     def _phase1(self):
-        print "Merge test phase1: generate UNIQUE system name for each server and do modification"
+        log(LOGLEVEL.INFO, "Merge test phase1: generate UNIQUE system name for each server and do modification")
         # 1.  Set cluster system name to random name
         self._setClusterSystemRandom()
 
@@ -230,41 +226,32 @@ class MergeTest_Resource(MergeTestBase):
         worker = ClusterWorker(testMaster.threadNumber, len(testMaster.clusterTestServerList))
 
         for s in testMaster.clusterTestServerList:
-            worker.enqueue(PrepareServerStatus(self).main,(s,))
+            worker.enqueue(PrepareServerStatus(self).main, (s,))
 
         worker.join()
-        print "Merge test phase1 done, now sleep %s seconds and wait for sync" % self._mergeTestTimeout
+        log(LOGLEVEL.INFO, "Merge test phase1 done, now sleep %s seconds and wait for sync" % self._mergeTestTimeout)
         time.sleep(self._mergeTestTimeout)
 
     def _phase2(self):
-        print "Merge test phase2: set ALL the servers with system name: %s" % self._mergeTestSystemName
+        log(LOGLEVEL.INFO, "Merge test phase2: set ALL the servers with system name: %s" % self._mergeTestSystemName)
         self._setClusterToMerge()
-        print "Merge test phase2: wait %s seconds for sync" % self._mergeTestTimeout
+        log(LOGLEVEL.INFO, "Merge test phase2: wait %s seconds for sync" % self._mergeTestTimeout)
         # Wait until the synchronization time out expires
         time.sleep(self._mergeTestTimeout)
         # Do the status checking of _ALL_ API
         testMaster.checkMethodStatusConsistent(PrepareServerStatus.getterAPI)  # raises on errors
-        print "Merge test phase2 done"
-        return (True,"")
+        log(LOGLEVEL.INFO, "Merge test phase2 done")
 
     def test(self):
-        print "================================\n"
-        print "Server Merge Test: Resource Start\n"
         try:
-            if not self._prolog():
-                print "FAIL: Merge Test: Resource prolog failed!"
-                return False
+            self._prolog()
             self._phase1()
-            ret,reason = self._phase2()
-            if not ret:
-                print "FAIL: %s" % reason
+            self._phase2()
             self._epilog()
+        except AssertionError:
+            raise
         except Exception as err:
-            print "FAIL: %s" % (err,)
-            ret = False
-        print "Server Merge Test: Resource End%s\n" % ('' if ret else ": test FAILED")
-        print "================================\n"
-        return ret
+            assert False, "FAIL: %s" % (err,)
 
 # This merge test is used to test admin's password
 # Steps:
@@ -312,13 +299,13 @@ class MergeTest_AdminPassword(MergeTestBase):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for entry in pwdlist:
             ManagerAddPassword(passman, entry[0], self._username, entry[1])
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+        urllib2.install_opener(urllib2.build_opener(TestDigestAuthHandler(passman)))
 
     def _setUpClusterAuthentication(self, password):
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         for s in testMaster.clusterTestServerList:
             ManagerAddPassword(passman, s, self._username, password)
-        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPDigestAuthHandler(passman)))
+        urllib2.install_opener(urllib2.build_opener(TestDigestAuthHandler(passman)))
 
     def _restoreAuthentication(self):
         self._setUpClusterAuthentication(self._oldClusterPassword)
@@ -328,9 +315,9 @@ class MergeTest_AdminPassword(MergeTestBase):
         time.sleep(self._mergeTestTimeout)
 
     def _checkPassword(self,pwd,old_server,login_server):
-        print "Password:%s that initially modified on server:%s can log on to server:%s in new cluster"%(pwd,old_server,login_server)
-        print "Notes,the above server can be the same one, however since this test is after merge, it still makes sense"
-        print "Now test whether it works on the cluster"
+        log(LOGLEVEL.INFO, """Password:%s that initially modified on server:%s can log on to server:%s in new cluster
+            Notes,the above server can be the same one, however since this test is after merge, it still makes sense
+            Now test whether it works on the cluster""" % (pwd,old_server,login_server))
         for s in testMaster.clusterTestServerList:
             if s == login_server:
                 continue
@@ -339,13 +326,13 @@ class MergeTest_AdminPassword(MergeTestBase):
                 try:
                     response = urllib2.urlopen("http://%s/ec2/testConnection"%(s))
                 except urllib2.URLError,e:
-                    print "This password cannot log on server:%s"%(s)
-                    print "This means this password can be used partially on cluster which is not supposed to happen"
-                    print "The cluster is not synchronized after merge"
-                    print "Error:%s"%(e)
+                    log(LOGLEVEL.ERROR, """This password cannot log on server:%s
+                      This means this password can be used partially on cluster which is not supposed to happen
+                      The cluster is not synchronized after merge
+                      Error:%s""" % (s, e))
                     return False
 
-        print "This password can be used on the whole cluster"
+        log(LOGLEVEL.INFO, "This password can be used on the whole cluster")
         return True
 
     # This function is used to probe the correct password that _CAN_ be used to log on each server
@@ -376,9 +363,9 @@ class MergeTest_AdminPassword(MergeTestBase):
                     return True
                 else:
                     return False
-        print "No password is found while probing the cluster"
-        print "This means after the merge,all the password originally on each server CANNOT be used to log on any server after merge"
-        print "This means cluster is not synchronized"
+        log(LOGLEVEL.ERROR, """No password is found while probing the cluster
+        This means after the merge,all the password originally on each server CANNOT be used to log on any server after merge
+        This means cluster is not synchronized""")
         return False
 
     # This function is used to test whether all the server gets the exactly same status
@@ -390,7 +377,7 @@ class MergeTest_AdminPassword(MergeTestBase):
         try:
             testMaster.checkMethodStatusConsistent(["getMediaServersEx"])
         except Exception as err:
-            print "Fail: " + str(err)
+            log(LOGLEVEL.ERROR, "Fail: " + str(err))
             return False
         return True
 
@@ -401,12 +388,12 @@ class MergeTest_AdminPassword(MergeTestBase):
             if ele["id"] in uidset:
                 if ele["status"] != "Online":
                     # report the status
-                    print "Login at server:%s"%(serverAddr)
-                    print "The server:(%s) with name:%s and id:%s status is Offline"%(ele["networkAddresses"],ele["name"],ele["id"])
-                    print "It should be Online after the merge"
-                    print "Status check failed"
+                    log(LOGLEVEL.ERROR, """Login at server:%s
+                      The server:(%s) with name:%s and id:%s status is Offline
+                      It should be Online after the merge
+                      Status check failed""" % (serverAddr, ele["networkAddresses"],ele["name"],ele["id"]))
                     return False
-        print "Status check for server:%s pass!"%(serverAddr)
+        log(LOGLEVEL.INFO, "Status check for server:%s pass!" % (serverAddr))
         return True
 
     def _checkAllOnline(self):
@@ -417,10 +404,10 @@ class MergeTest_AdminPassword(MergeTestBase):
 
         # For each server test whether they work or not
         for s in testMaster.clusterTestServerList:
-            print "Connection to http://%s/ec2/getMediaServersEx?format=json"%(s)
+            log(LOGLEVEL.DEBUG + 9, "Connection to http://%s/ec2/getMediaServersEx?format=json"% (s))
             response = urllib2.urlopen("http://%s/ec2/getMediaServersEx?format=json"%(s))
             if response.getcode() != 200:
-                print "Connection failed with HTTP code:%d"%(response.getcode())
+                log(LOGLEVEL.ERROR, "Connection failed with HTTP code:%d"%(response.getcode()))
                 return False
             if not self._checkOnline(uidSet, SafeJsonLoads(response.read(), s, 'getMediaServersEx'),s):
                 return False
@@ -447,15 +434,15 @@ class MergeTest_AdminPassword(MergeTestBase):
             response =urllib2.urlopen(req)
         except:
             if verbose:
-                print "Connection http://%s/ec2/saveUsers failed"%(ser)
-                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+                log(LOGLEVEL.ERROR, "Connection http://%s/ec2/saveUsers failed"%(ser))
+                log(LOGLEVEL.ERROR, "Cannot set admin password:%s to server:%s"%(pwd,ser))
             return False
 
         if response.getcode() != 200:
             response.close()
             if verbose:
-                print "Connection http://%s/ec2/saveUsers failed"%(ser)
-                print "Cannot set admin password:%s to server:%s"%(pwd,ser)
+                log(LOGLEVEL.ERROR, "Connection http://%s/ec2/saveUsers failed"%(ser))
+                log(LOGLEVEL.ERROR, "Cannot set admin password:%s to server:%s"%(pwd,ser))
             return False
         else:
             response.close()
@@ -466,12 +453,13 @@ class MergeTest_AdminPassword(MergeTestBase):
         # Now rollback the newAuth part of the list
         for entry in pwdlist:
             if not self._setAdminPassword(entry[0],self._oldClusterPassword):
-                print "----------------------------------------------------------------------------------"
-                print "+++++++++++++++++++++++++++++++++++ IMPORTANT ++++++++++++++++++++++++++++++++++++"
-                print "Server:%s admin password cannot rollback,please set it back manually!"%(entry[0])
-                print "It's current password is:%s"%(entry[1])
-                print "It's old password is:%s"(self._oldClusterPassword)
-                print "----------------------------------------------------------------------------------"
+                log(LOGLEVEL.ERROR, """----------------------------------------------------------------------------------
+                  +++++++++++++++++++++++++++++++++++ IMPORTANT ++++++++++++++++++++++++++++++++++++
+                  Server:%s admin password cannot rollback,please set it back manually!
+                  It's current password is:%s
+                  It's old password is:%s
+                  ----------------------------------------------------------------------------------""" % \
+                    (entry[0], entry[1], self._oldClusterPassword))
         # Now set back the authentcation
         self._restoreAuthentication()
 
@@ -530,90 +518,94 @@ class MergeTest_AdminPassword(MergeTestBase):
                 return True
 
         if len(addrSet) != len(testMaster.clusterTestServerList):
-            print "There're some server's admin password I cannot prob and rollback"
-            print "Since it is a failover rollback,I cannot guarantee that I can rollback the whole cluster"
-            print "There're possible bugs in the cluster that make the automatic rollback impossible"
-            print "The following server has _UNKNOWN_ password now"
+            log(LOGLEVEL.ERROR,"""There're some server's admin password I cannot prob and rollback
+                Since it is a failover rollback,I cannot guarantee that I can rollback the whole cluster
+                There're possible bugs in the cluster that make the automatic rollback impossible
+                The following server has _UNKNOWN_ password now""")
             for ser in testMaster.clusterTestServerList:
                 if ser not in addrSet:
-                    print "The server:%s has _UNKNOWN_ password for admin"%(ser)
+                    log(LOGLEVEL.ERROR, "The server:%s has _UNKNOWN_ password for admin" % (ser))
             return False
         else:
             return True
 
     def _failRollback(self):
-        print "==========================================="
-        print "Start Failover Rollback"
-        print "This rollback will _ONLY_ happen when the merge test failed"
-        print "This rollback cannot guarantee that it will rollback everything"
-        print "Detail information will be reported during the rollback"
+        log(LOGLEVEL.INFO,"""===========================================
+            Start Failover Rollback
+            This rollback will _ONLY_ happen when the merge test failed
+            This rollback cannot guarantee that it will rollback everything
+            Detail information will be reported during the rollback""")
         if self._failRollbackPassword():
             self._restoreAuthentication()
             self._rollbackSystemName()
-            print "Failover Rollback Done!"
+            log(LOGLEVEL.INFO, "Failover Rollback Done!")
         else:
-            print "Failover Rollback Failed!"
-        print "==========================================="
+            log(LOGLEVEL.ERROR, "Failover Rollback Failed!")
+        log(LOGLEVEL.INFO, "===========================================")
 
     def test(self):
-        print "==========================================="
-        print "Merge Test:Admin Password Test Start!"
+        log(LOGLEVEL.INFO, "===========================================")
+        log(LOGLEVEL.INFO, "Merge Test:Admin Password Test Start!")
         # At first, we fetch each system's admin information
         if self._fetchAdmin() is None:
-            print "Merge Test:Fetch Admins list failed"
+            log(LOGLEVEL.ERROR, "Merge Test:Fetch Admins list failed")
             return False
         # Change each system into different system name
-        print "Now set each server node into different and UNIQUE system name\n"
+        log(LOGLEVEL.INFO, "Now set each server node into different and UNIQUE system name\n")
         self._setClusterSystemRandom()
         # Change the password of _EACH_ servers
-        print "Now change each server node's admin password to a UNIQUE password\n"
+        log(LOGLEVEL.INFO, "Now change each server node's admin password to a UNIQUE password\n")
         if not self._changePassword():
-            print "Merge Test:Admin Password Test Failed"
+            log(LOGLEVEL.ERROR, "Merge Test:Admin Password Test Failed")
             return False
-        print "Now set the system name back to mergeTest and wait for the merge\n"
+        log(LOGLEVEL.INFO, "Now set the system name back to mergeTest and wait for the merge\n")
         self._merge()
         # Now start to probing the password
-        print "Start to prob one of the possible password that can be used to LOG to the cluster\n"
+        log(LOGLEVEL.INFO, "Start to prob one of the possible password that can be used to LOG to the cluster\n")
         if not self._probePassword():
-            print "Merge Test:Admin Password Test Failed"
+            log(LOGLEVEL.ERROR, "Merge Test:Admin Password Test Failed")
             self._failRollback()
             return False
-        print "Check all the server status\n"
+        log(LOGLEVEL.INFO, "Check all the server status\n")
         # Now start to check the status
         if not self._checkAllServerStatus():
-            print "Merge Test:Admin Password Test Failed"
+            log(LOGLEVEL.ERROR, "Merge Test:Admin Password Test Failed")
             self._failRollback()
             return False
-        print "Check all server is Online or not"
+        log(LOGLEVEL.INFO, "Check all server is Online or not")
         if not self._checkAllOnline():
-            print "Merge Test:Admin Password Test Failed"
+            log(LOGLEVEL.ERROR, "Merge Test:Admin Password Test Failed")
             self._failRollback()
             return False
 
-        print "Lastly we do rollback\n"
+        log(LOGLEVEL.INFO, "Lastly we do rollback\n")
         self._rollback()
 
-        print "Merge Test:Admin Password Test Pass!"
-        print "==========================================="
+        log(LOGLEVEL.INFO, "Merge Test:Admin Password Test Pass!")
+        log(LOGLEVEL.INFO, "===========================================")
         return True
 
 
-class MergeTest(object):
-
-    def __init__(self, needCleanUp=False):
-        self._CleanUp = needCleanUp
-
-    def run(self):
-        try:
-            if not MergeTest_Resource().test():
-                return False
-            # The following merge test ALWAYS fail and I don't know it is my problem or not
-            # Current it is disabled and you could use a seperate command line to run it
-            #MergeTest_AdminPassword().test()
-            return True
-        finally:
-            if self._CleanUp:
-                doCleanUp()
+def MergeTestRun(needCleanUp=False):
+    cleanUp = needCleanUp
+    ok = False
+    try:
+        log(LOGLEVEL.INFO, "================================")
+        print "Server Merge Test: Resource Start\n"
+        MergeTest_Resource().test()
+        # The following merge test ALWAYS fail and I don't know it is my problem or not
+        # Current it is disabled and you could use a seperate command line to run it
+        #MergeTest_AdminPassword().test()
+        ok = True
+        return True
+    except AssertionError as err:
+        log(LOGLEVEL.ERROR, "FAIL: " + err.message)
+        return False
+    finally:
+        log(LOGLEVEL.INFO, "Server Merge Test: Resource End%s" % ('' if ok else ": test FAILED"))
+        log(LOGLEVEL.INFO, "================================\n")
+        if cleanUp:
+            doCleanUp()
 
 
 
@@ -636,9 +628,9 @@ class PerformanceOperation():
         try:
             sendRequest(self._lock, url, d)
         except TestRequestError as err:
-            print "%s failed: %s" % (methodName, err.message)
+            log(LOGLEVEL.ERROR, "%s failed: %s" % (methodName, err.message))
         else:
-            print "%s OK" % (methodName)
+            log(LOGLEVEL.DEBUG + 9, "%s OK" % (methodName))
 
     def _getUUIDList(self,methodName):
         ret = []
@@ -806,25 +798,26 @@ def doClearAll(fake=False):
 
 
 def runMiscFunction(argc, argv):
-    if argc not in (2, 3):
+    log(LOGLEVEL.INFO, "runMiscFunction(%s, %s)" % (argc, argv))
+    if argc not in (1, 2):
         return (False,"2/1 parameters are needed")
 
-    l = argv[1].split('=')
+    l = argv[0].split('=')
 
     if l[0] != '--add' and l[0] != '--remove':
-        return (False,"Unknown first parameter options")
+        return (False,"Unknown first parameter option %s" % (l[0],))
 
     t = globals()["%sOperation" % (l[1])]
 
     if t == None:
-        return (False,"Unknown target operations:%s" % (l[1]))
+        return (False,"Unknown target operations: %s" % (l[1]))
     else:
         t = t()
 
     if l[0] == '--add':
-        if argc != 3 :
+        if argc != 2:
             return (False,"--add must have --count option")
-        l = argv[2].split('=')
+        l = argv[1].split('=')
         if l[0] == '--count':
             num = int(l[1])
             if num <= 0 :
@@ -834,8 +827,8 @@ def runMiscFunction(argc, argv):
         else:
             return (False,"--add can only have --count options")
     elif l[0] == '--remove':
-        if argc == 3:
-            l = argv[2].split('=')
+        if argc == 2:
+            l = argv[1].split('=')
             if l[0] == '--id':
                 if t.remove(l[1]) == False:
                     return (False,"cannot perform remove UID operation")
@@ -844,7 +837,7 @@ def runMiscFunction(argc, argv):
                     return (False,"cannot perform remove UID operation")
             else:
                 return (False,"--remove can only have --id options")
-        elif argc == 2:
+        elif argc == 1:
             if t.removeAll() == False:
                 return (False,"cannot perform remove all operation")
     else:
@@ -1062,7 +1055,7 @@ class PerfTest:
 
     def _initPerfList(self,type):
         for s in testMaster.clusterTestServerList:
-            if type[0] :
+            if type[0]:
                 self._perfList.append((s,SingleResourcePerfTest(self._globalLock,UserPerfResourceGen(),s)))
 
             if type[1]:
@@ -1121,13 +1114,13 @@ class PerfTest:
         if not ret[0] and not ret[1] and not ret[2]:
             return False
         # initialize the performance test list object
-        print "Start to prepare performance data"
-        print "Please wait patiently"
+        log(LOGLEVEL.INFO, "Start to prepare performance data")
+        log(LOGLEVEL.INFO, "Please wait patiently")
         self._initPerfList(ret)
         # start the thread pool to run the performance test
-        print "======================================"
-        print "Performance Test Start"
-        print "Hit CTRL+C to interrupt it"
+        log(LOGLEVEL.INFO, "======================================")
+        log(LOGLEVEL.INFO, "Performance Test Start")
+        log(LOGLEVEL.INFO, "Hit CTRL+C to interrupt it")
         self._initThreadPool(testMaster.threadNumber)
         # Waiting for the user to stop us
         signal.signal(signal.SIGINT,self._onInterrupt)
@@ -1139,41 +1132,43 @@ class PerfTest:
         # Join the thread now
         self._joinThreadPool()
         # Print statistics now
-        print "==================================="
-        print "Performance Test Done"
+        log(LOGLEVEL.INFO, "===================================")
+        log(LOGLEVEL.INFO, "Performance Test Done")
         for key,value in self._statics.iteritems():
-            print "---------------------------------"
-            print "Server:%s" % (key)
-            print "Resource Create Success: %d" % (value.createOK)
-            print "Resource Create Fail:    %d" % (value.createFail)
-            print "Resource Update Success: %d" % (value.updateOK)
-            print "Resource Update Fail:    %d" % (value.updateFail)
-            print "Resource Remove Success: %d" % (value.removeOK)
-            print "Resource Remove Fail:    %d" % (value.removeFail)
-            print "---------------------------------"
-        print "===================================="
+            log(LOGLEVEL.INFO,"---------------------------------")
+            log(LOGLEVEL.INFO, "Server:%s" % (key))
+            log(LOGLEVEL.INFO, "Resource Create Success: %d" % (value.createOK))
+            log(LOGLEVEL.INFO, "Resource Create Fail:    %d" % (value.createFail))
+            log(LOGLEVEL.INFO, "Resource Update Success: %d" % (value.updateOK))
+            log(LOGLEVEL.INFO, "Resource Update Fail:    %d" % (value.updateFail))
+            log(LOGLEVEL.INFO, "Resource Remove Success: %d" % (value.removeOK))
+            log(LOGLEVEL.INFO, "Resource Remove Fail:    %d" % (value.removeFail))
+            log(LOGLEVEL.INFO, "---------------------------------")
+        log(LOGLEVEL.INFO, "====================================")
+        return True
 
 
 def runPerfTest(argv):
     l = argv[2].split('=')
-    PerfTest().run(l[1])
+    rc = PerfTest().run(l[1])
     doCleanUp()
+    return rc
 
 
 def doCleanUp(reinit=False):
-    selection = '' if testMaster.auto_rollback else 'x'
-    if not testMaster.auto_rollback:
+    selection = '' if testMaster.args.autorollback else 'x'
+    if not testMaster.args.autorollback:
         try :
             selection = raw_input("Press Enter to continue ROLLBACK or press x to SKIP it...")
         except:
             pass
 
     if not selection.startswith('x'):
-        print "Starting rollback, do not interrupt!"
+        log(LOGLEVEL.INFO, "Starting rollback, do not interrupt!")
         testMaster.unittestRollback.doRollback()
-        print "ROLLBACK DONE"
+        log(LOGLEVEL.INFO, "ROLLBACK DONE")
     else:
-        print "Rollback skipped, you could use --recover to perform rollback later"
+        log(LOGLEVEL.INFO, "Rollback skipped, you could use --recover to perform rollback later")
     if reinit:
         testMaster.init_rollback()
 
@@ -1182,215 +1177,373 @@ def doCleanUp(reinit=False):
 def print_tests(suit, shift='    '):
     for test in suit:
         if isinstance(test, unittest.TestSuite):
-            print "DEBUG:%s[%s]:" % (shift, type(test))
+            log(LOGLEVEL.DEBUG + 9, "DEBUG:%s[%s]:" % (shift, type(test)))
             print_tests(test, shift+'    ')
         else:
-            print "DEBUG:%s%s" % (shift, test)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG:%s%s" % (shift, test))
 
 
 def CallTest(testClass):
     ###if not testMaster.openerReady:
     ###    testMaster.setUpPassword()
     # this print is used by FunctestParser.parse_timesync_start
-    print "%s suits: %s" % (testClass.__name__, ', '.join(testClass.iter_suites()))
-    return RunBoxTests(testClass, testMaster.getConfig())
+    log(LOGLEVEL.INFO, "%s suites: %s" % (testClass.__name__, ', '.join(testClass.iter_suites())))
+    return RunTests(testClass)
 
 
+class MainFunctests(FuncTestCase):
+    """
+    Provides an object to use virtual box control methods
+    """
+    helpStr = "The main minimal functional tests set"
+    _test_name = "Main functests"
+    _test_key = "legacy"
+    _suites = (("Main", [
+        "ConnectionTest",
+        "InitialClusterTest",
+        "BasicClusterTest",
+        "MergeTest",
+        "SysnameTest",
+        "ProxyTest"
+    ]),)
+    _need_rollback = True
+    _basicTestOk = False
+
+    @classmethod
+    def globalInit(cls, config):
+        super(MainFunctests, cls).globalInit(config)
+        testMaster.args.autorollback = True
+
+    #@classmethod
+    #def tearDownClass(cls):
+    #    if cls._need_rollback and testMaster.unittestRollback:
+    #        doCleanUp()
+    #    super(MainFunctests, cls).tearDownClass()
+
+    ########
+
+    def ConnectionTest(self):
+        self._servers_th_ctl('safe-start')
+        self._wait_servers_up()
+        self.assertTrue(testMaster.testConnection(frame=False), "Connection Test failed")
+
+    def _checkSkipLegacy(self):
+        if testMaster.args.skiplegacy:
+            self.skipTest("Disabled by --skiplegacy option")
+
+    def InitialClusterTest(self):
+        self._checkSkipLegacy()
+        testMaster.initial_tests()
+
+    def BasicClusterTest(self):
+        self._checkSkipLegacy()
+        try:
+            the_test = unittest.main(module=legacy_main, exit=False, argv=[sys.argv[0]],
+                                     testRunner=unittest.TextTestRunner(
+                                         stream=sys.stdout,
+                                     ))
+            assert the_test.result.wasSuccessful(), "Basic functional test FAILED"
+            type(self)._basicTestOk = True
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
+
+    def _skipIfBasicFailed(self):
+        if not self._basicTestOk:
+            self.skipTest("Basic tests failed")
+
+    def MergeTest(self):
+        self._checkSkipLegacy()
+        self._skipIfBasicFailed()
+        if testMaster.unittestRollback:
+            testMaster.init_rollback()
+        try:
+            MergeTest_Resource().test()
+        finally:
+            if testMaster.unittestRollback:
+                doCleanUp()
+
+    def SysnameTest(self):
+        self._checkSkipLegacy()
+        self._skipIfBasicFailed()
+        SystemIdTest(testMaster.getConfig()).run()
+        testMaster.checkServerListStates()
+
+    def ProxyTest(self):
+        ""
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+
+
+def RunByAutotest():
+    """
+    Used when this script is called by the autotesting script auto.py
+    """
+    testMaster.init(notest=True)
+    CallTest(MainFunctests)
+    if not testMaster.args.mainonly:
+        if not testMaster.args.skiptime:
+            CallTest(TimeSyncTest)
+        if not testMaster.args.skipbak:
+            CallTest(BackupStorageTest)
+        if not testMaster.args.skipmsa:
+            CallTest(MultiserverArchiveTest)
+        if not testMaster.args.skipstrm:
+            CallTest(StreamingTest)
+        if not testMaster.args.skipdbup:
+            CallTest(DBTest)
+        if not testMaster.args.skipmerge:
+          CallTest(MergeSystemTest)
+        if not testMaster.args.skipinstance:
+          CallTest(InstanceTest)
+        if not testMaster.args.skipcamera:
+          CallTest(VirtualCameraTest)
+        CallTest(HTTPStressTest)
+    #FIXME: acureate test result processing required!!!
+    log(LOGLEVEL.INFO, "\nALL AUTOMATIC TEST ARE DONE\n")
+    return True
+
+
+# These are the old legasy tests, just organized a bit
 SimpleTestKeys = {
-    '--sys-name': SystemNameTest,
+    '--sys-id': SystemIdTest,
+    '--sysid': SystemIdTest,
     '--rtsp-test': RtspTestSuit,
     '--rtsp-perf': RtspPerf,
     '--rtsp-stream': RtspStreamTest,
 }
-# These are the old legasy tests, just organized a bit
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
-BoxTestKeys = {
-    '--timesync': TimeSyncTest,
-    '--ts-noinet': TimeSyncNoInetTest,
-    '--ts-inet': TimeSyncWithInetTest,
-    '--bstorage': BackupStorageTest,
-    '--msarch': MultiserverArchiveTest,
-    '--natcon': NatConnectionTest,
-    '--stream': StreamingTest,
-    '--hlso': HlsOnlyTest,
-    '--dbup': DBTest,
-    '--boxtests': None,
-}
+BoxTestKeys = OrderedDict([
+    ('--mainonly', MainFunctests),
+    ('--timesync', TimeSyncTest),
+    ('--ts-noinet', TimeSyncNoInetTest),
+    ('--ts-inet', TimeSyncWithInetTest),
+    ('--bstorage', BackupStorageTest),
+    ('--msarch', MultiserverArchiveTest),
+    ('--stream', StreamingTest),
+    ('--hlso', HlsOnlyTest),
+    ('--dbup', DBTest),
+    ('--camera', VirtualCameraTest),
+    ('--htstress', HTTPStressTest),
+    ('--natcon', NatConnectionTest),
+    ('--instance', InstanceTest),
+    ('--merge', MergeSystemTest),
+    ('--boxtests', None),
+])
+KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
 
 
-def RunByAutotest(arg0):
-    """
-    Used when this script is called by the autotesting script sauto.py
-    :param arg0: str
-    It is passed to unittest.main() to avoid automatical usage of sys.argv
-    """
-    testMaster.auto_rollback = True
-    #config = testMaster.getConfig()
-    need_rollback = True
-    try:
-        print "" # FIXME add startup message
-        ret, reason = testMaster.init(notest=True)
-        if not ret:
-            print "Failed to initialize the cluster test object: %s" % (reason)
-            return False
-        config = testMaster.getConfig()
-        with LegacyTestWrapper(config):
-            if not testMaster.testConnection():
-                print "Connection test failed"
-                return False
-            ret, reason = testMaster.initial_tests()
-            if ret == False:
-                print "The initial cluster test failed: %s" % (reason)
-                return False
-            print "Basic functional tests start"
-            the_test = unittest.main(module=legacy_main, exit=False, argv=[arg0])
-            if the_test.result.wasSuccessful():
-                print "Basic functional tests end"
-                if testMaster.unittestRollback:
-                    doCleanUp(reinit=True)
-                MergeTest().run()
-                SystemNameTest(config).run()
-            else:
-                print "Basic functional test FAILED"
-            if testMaster.unittestRollback:
-                doCleanUp()
-                need_rollback = False
-            time.sleep(4)
-            ProxyTest(*config.rtget('ServerList')[0:2]).run()
-    except Exception as err:
-        print "FAIL: the main functests failed with error: %s" % (err,)
-    finally:
-        if need_rollback and testMaster.unittestRollback:
-            doCleanUp()
-    if not testMaster.do_main_only:
-        if not testMaster.skip_timesync:
-            CallTest(TimeSyncTest)
-        if not testMaster.skip_backup:
-            CallTest(BackupStorageTest)
-        if not testMaster.skip_mservarc:
-            CallTest(MultiserverArchiveTest)
-        if not testMaster.skip_streming:
-            CallTest(StreamingTest)
-        if not testMaster.skip_dbup:
-            CallTest(DBTest)
-    print "\nALL AUTOMATIC TEST ARE DONE\n"
-
-
-def BoxTestsRun(key):
+def BoxTestsRun(name):
     testMaster.init(notest=True)
-    if key == '--boxtests':
+    if name == 'boxtests':
         ok = True
+        if not CallTest(MainFunctests): ok = False
         if not CallTest(TimeSyncTest): ok = False
         if not CallTest(BackupStorageTest): ok = False
         if not CallTest(MultiserverArchiveTest): ok = False
         if not CallTest(StreamingTest): ok = False
         if not CallTest(DBTest): ok = False
+        if not CallTest(MergeSystemTest): ok = False
+        if not CallTest(InstanceTest): ok = False
+        if not CallTest(VirtualCameraTest): ok = False
+        if not CallTest(HTTPStressTest): ok = False
         return ok
     else:
-        return CallTest(BoxTestKeys[key])
+        return CallTest(BoxTestKeys['--' + name])
 
 
-def LegacyTests(only = False):
+def LegacyTestsRun(only = False, argv=[]):
     _argv = argv[:]
+    _argv.insert(0, sys.argv[0])
     del _argv[1:(3 if only else 2)]
     with testMaster.unittestRollback:
         the_test = unittest.main(module=legacy_main, exit=False, argv=_argv)
     #doCleanUp(reinit=True)
 
     if the_test.result.wasSuccessful():
-        print "Main tests passed OK"
+        log(LOGLEVEL.INFO, "Main tests passed OK")
         if (not only):
             with testMaster.unittestRollback:
-                mergeOk = MergeTest().run()
+                mergeOk = MergeTestRun()
             if mergeOk:
                 with testMaster.unittestRollback:
-                    SystemNameTest(testMaster.getConfig()).run()
+                    try:
+                        SystemIdTest(testMaster.getConfig()).run()
+                    except AssertionError as err:
+                        log(LOGLEVEL.ERROR, "SystemNIdTest FAILED: " + err.message)
     #doCleanUp()
 
 
 def DoTests(argv):
-    print "The automatic test starts, please wait for checking cluster status, test connection and APIs and do proper rollback..."
+    log(LOGLEVEL.INFO, "The automatic test starts, please wait for checking cluster status, test connection and APIs and do proper rollback...")
     # initialize cluster test environment
-
     argc = len(argv)
+    testMaster.init()
 
-    if argc == 2 and argv[1] in BoxTestKeys:
-        # box-tests can run without complete testMaster.init(), since they reinitialize mediaserver
-        return BoxTestsRun(argv[1])
+    if argc == 1 and argv[0] in SimpleTestKeys:
+        try:
+            return SimpleTestKeys[argv[0]](testMaster.getConfig()).run()
+        except AssertionError as err:
+            log(LOGLEVEL.ERROR, "%s FAILED: %s" % (argv[0], err.message))
+            return False
 
-    ret, reason = testMaster.init()
-    if not ret:
-        print "Failed to initialize the cluster test object: %s" % (reason)
+    try:
+        testMaster.initial_tests()
+    except AssertionError, err:
+        print "FAIL: initial cluster test: " + err.message
         return False
 
-    if argc == 2 and argv[1] in SimpleTestKeys:
-        return SimpleTestKeys[argv[1]](testMaster.getConfig()).run()
-
-    ret, reason = testMaster.initial_tests()
-    if ret == False:
-        print "The initial cluster test failed: %s" % (reason)
-        return False
-
-    if argc == 2 and argv[1] == '--sync':
+    if argc == 1 and argv[0] == '--sync':
         return True # done here, since we just need to test whether
                # all the servers are on the same page
 
-    if argc == 2 and argv[1] == '--proxy':
-        ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+    if argc == 1 and argv[0] == '--proxy':
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
         #FIXME no result code returning!
 
-    if argc >= 2 and argv[1] == '--legacy':
-        LegacyTests(argv[2] == '--only' if argc >= 3 else False)
+    elif argc >= 1 and argv[0] == '--legacy':
+        LegacyTestsRun(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 
-    elif argc == 2 and argv[1] == '--main':
-        rc = LegacyTests()
+    elif argc == 1 and argv[0] == '--main':
+        rc = LegacyTestsRun()
         time.sleep(3)
-        ProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
+        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
 
-        print "\nALL AUTOMATIC TEST ARE DONE\n"
+        log(LOGLEVEL.INFO, "\nALL AUTOMATIC TEST ARE DONE\n")
         #FIXME no result code returning!
 
-    elif (argc == 2 or argc == 3) and argv[1] == '--clear':
-        if argc == 3:
-            if argv[2] == '--fake':
+    elif (argc == 1 or argc == 2) and argv[0] == '--clear':
+        if argc == 2:
+            if argv[1] == '--fake':
                 doClearAll(True)
             else:
-                print "Unknown option: %s in --clear" % (argv[2])
+                print "Unknown option: %s in --clear" % (argv[1])
         else:
             doClearAll(False)
         testMaster.unittestRollback.removeRollbackDB()
         #FIXME no result code returning!
 
-    elif argc == 2 and argv[1] == '--perf':
+    elif argc == 1 and argv[0] == '--perf':
         PerfTest().start()
         doCleanUp()
         #FIXME no result code returning!
 
     else:
-        if argv[1] == '--merge-test':
-            MergeTest(True).run()
-        elif argv[1] == '--merge-admin':
-            MergeTest_AdminPassword().test()
+        if argv[0] == '--merge-test':
+            return MergeTestRun(needCleanUp=True)
+        elif argv[0] == '--merge-admin':
+            rc = MergeTest_AdminPassword().test()
             testMaster.unittestRollback.removeRollbackDB()
-        elif argc == 3 and argv[1] == '--perf':
-            runPerfTest()
+            return rc
+        elif argc == 2 and argv[0] == '--perf':
+            return runPerfTest()
         else:
-            runMiscFunction(argc, argv)
+            res = runMiscFunction(argc, argv)
+            if not res[0]:
+                log(LOGLEVEL.ERROR, "ERROR: " + res[1])
+            return res[0]
         #FIXME no result code returning!
 
+
+class BoxTestAction(argparse.Action):
+    def __init__(self, option_strings, dest, help=None):
+        super(BoxTestAction, self).__init__(
+            option_strings=option_strings, nargs=0, dest=dest, help=help)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        namespace.BoxTest = self.dest
+
+
+CommonArgs = ('config', 'autorollback', 'log')
+
+
+def parseArgs():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--help-arg', metavar="ARG", nargs="?", const="", help="Additional help for some (legacy) options. Without argument print the list of that options.")
+    parser.add_argument('-c', '--config', metavar="FILE", help="Use alternative configuration file")
+    parser.add_argument('--recover', action="store_true", help=getHelpDesc('recover'))
+    parser.add_argument('--log', metavar="FILE", nargs="?", const="", help="Suppress direct output, storing it into a file. See '--help-arg log' for details ")
+    parser.add_argument('--loglevel', type=int, default=15, help="Log level for the functest logger" )
+
+    parser.add_argument('--list-auto-test', action="store_true", help="List options for tests, used in auto-testing system" )
+
+    parser.add_argument('--autorollback', '--arb', action="store_true", help="Automativally rollback changes done by the legacy tests")
+    parser.add_argument('--skiplegacy', action="store_true", help="Skip 'legacy' functional tests")
+    parser.add_argument('--skiptime', action="store_true", help="Skip time synchronization tests")
+    parser.add_argument('--skipbak', action="store_true", help="Skip backup storage tests")
+    parser.add_argument('--skipmsa', action="store_true", help="Skip multi-server archive tests")
+    parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
+    parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
+    parser.add_argument('--skipmerge', action="store_true", help="Skip merge system test")
+    parser.add_argument('--skipcamera', action="store_true", help="Skip virtual camera test")
+    parser.add_argument('--skipinstance', action="store_true", help="Skip instance test")
+#    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
+    parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
+
+
+    group = parser.add_argument_group("Functional test selection").add_mutually_exclusive_group()
+    boxKey = None
+    for key, klass in BoxTestKeys.iteritems():
+        if klass is None:
+            if boxKey is not None:
+                raise Exception("Two or more options in BoxTestKeys have 'None' value!")
+            boxKey = key
+        else:
+            group.add_argument(key, action=BoxTestAction, help="Run only: " + klass.helpStr)
+    else:
+        group.add_argument(boxKey, action=BoxTestAction, help="Run all vm-using functional tests")
+
+    #TODO: if I do two steps of argparsing I should think about --help to pring the second step args too!!!
+
+    #parser.add_argument()
+
+    args, other = parser.parse_known_args()
+    #args.natcon = '--natcon' in other # we need it as a flag
+    #if args.log is not None and getattr(args, 'BoxTest', None) is None:
+    #    print "WARNING: --log is used only with one of 'Functional test selection' arguments!"
+    return args, other
+
+
+def ListAutoTests():
+    for key, klass in BoxTestKeys.iteritems():
+        if key not in KeysSkipList:
+            print "%s %s" % (key, klass.helpStr)
+
+
+def main(args, other):
+    #print "Args: %s" % (args,)
+    #print "Remaining argv: %s" % (other,)
+    config.read(args.config)
+    if args.help_arg is not None:
+        showHelp(args.help_arg)
+        return True
+    if args.list_auto_test:
+        ListAutoTests()
+        return True
+    initLog(args.loglevel, args.log, rewrite=True)
+    if args.recover:
+        UnitTestRollback(autorollback=True, nocreate=True)
+        return True
+    testMaster.applyArgs(args)
+    try:
+        if other:
+            return DoTests(other)
+        elif getattr(args, 'BoxTest', False):
+            # box-tests can run without complete testMaster.init(), since they reinitialize mediaserver
+            return BoxTestsRun(args.BoxTest)
+        else: # called from auto.py, using boxes which are created, but servers not started
+            return RunByAutotest()
+    except FuncTestError as err:
+        print "FAIL: functional test failed: %s, %s" % err.args
+        return False
+    finally:
+        if testMaster.log:
+            testMaster.log.unbind()
 
 if __name__ == '__main__':
     reload(sys)
     sys.setdefaultencoding('utf8')
-    argv = testMaster.preparseArgs(sys.argv)
-    if len(argv) == 1:  # called from auto.py, using boxes which are created, but servers not started
-        RunByAutotest(argv[0])
-    elif len(argv) >= 2 and argv[1] in ('--help', '-h'):
-        showHelp(argv)
-    elif len(argv) == 2 and argv[1] == '--recover':
-        UnitTestRollback(autorollback=True, nocreate=True)
-    else:
-        if not DoTests(argv):
-            sys.exit(1)
+    if not main(*parseArgs()):
+        sys.exit(1)

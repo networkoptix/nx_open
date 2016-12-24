@@ -1,5 +1,7 @@
 #include "resources_workbench_panel.h"
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
@@ -15,6 +17,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/workbench/workbench_ui_globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_pane_settings.h>
 #include <ui/workbench/panels/buttons.h>
 
@@ -22,8 +25,7 @@
 
 namespace {
 
-static const int kShowAnimationDurationMs = 300;
-static const int kHideAnimationDurationMs = 300;
+static const int kResizerWidth = 8;
 
 }
 
@@ -38,11 +40,10 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget(new QnResourceBrowserWidget(nullptr, context())),
     item(new QnMaskedProxyWidget(parentWidget)),
     xAnimator(new VariantAnimator(widget)),
-
     m_ignoreClickEvent(false),
-    m_ignoreResizerGeometryChanges(false),
-    m_updateResizerGeometryLater(false),
     m_visible(false),
+    m_resizing(false),
+    m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
     m_backgroundItem(new QnControlBackgroundWidget(Qn::LeftBorder, parentWidget)),
     m_showButton(newShowHideButton(parentWidget, context(), action(QnActions::ToggleTreeAction))),
@@ -55,6 +56,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     widget->setAttribute(Qt::WA_TranslucentBackground);
     connect(widget, &QnResourceBrowserWidget::selectionChanged,
         action(QnActions::SelectionChangeAction), &QAction::trigger);
+    connect(widget, &QnResourceBrowserWidget::scrollBarVisibleChanged, this,
+        &ResourceTreeWorkbenchPanel::updateControlsGeometry);
 
     QPalette defaultPalette = widget->palette();
     setPaletteColor(widget, QPalette::Window, Qt::transparent);
@@ -98,12 +101,13 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         });
 
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
-    connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
-        &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged, Qt::QueuedConnection);
     m_resizerWidget->setZValue(ResizerItemZOrder);
+    connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
+        &ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged);
 
     m_opacityProcessor->addTargetItem(item);
     m_opacityProcessor->addTargetItem(m_showButton);
+    m_opacityProcessor->addTargetItem(m_resizerWidget);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverEntered, this,
         &AbstractWorkbenchPanel::hoverEntered);
     connect(m_opacityProcessor, &HoverFocusProcessor::hoverLeft, this,
@@ -156,6 +160,8 @@ bool ResourceTreeWorkbenchPanel::isOpened() const
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 {
+    using namespace nx::client::ui::workbench;
+
     ensureAnimationAllowed(&animate);
 
     if (!item)
@@ -167,14 +173,11 @@ void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
     action(QnActions::ToggleTreeAction)->setChecked(opened);
 
     xAnimator->stop();
-    if (opened)
-        xAnimator->setEasingCurve(QEasingCurve::InOutQuad);
-    else
-        xAnimator->setEasingCurve(QEasingCurve::OutQuad);
+    qnWorkbenchAnimations->setupAnimator(xAnimator, opened
+        ? Animations::Id::ResourcesPanelExpand
+        : Animations::Id::ResourcesPanelCollapse);
 
     qreal width = item->size().width();
-    xAnimator->setTimeLimit(opened ? kShowAnimationDurationMs : kHideAnimationDurationMs);
-
     qreal newX = opened ? 0.0 : - width - kHidePanelOffset;
     if (animate)
         xAnimator->animateTo(newX);
@@ -247,6 +250,15 @@ QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void ResourceTreeWorkbenchPanel::stopAnimations()
+{
+    if (!xAnimator->isRunning())
+        return;
+
+    xAnimator->stop();
+    item->setX(xAnimator->targetValue().toDouble());
+}
+
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 {
     if (m_updateResizerGeometryLater)
@@ -257,21 +269,25 @@ void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 
     QRectF treeRect = item->rect();
 
-    QRectF treeResizerGeometry = QRectF(
+    QRectF resizerGeometry = QRectF(
         m_parentWidget->mapFromItem(item, treeRect.topRight()),
         m_parentWidget->mapFromItem(item, treeRect.bottomRight()));
 
-    treeResizerGeometry.moveTo(treeResizerGeometry.topRight());
-    treeResizerGeometry.setWidth(8);
+    qreal offset = kResizerWidth;
+    if (widget->isScrollBarVisible())
+        offset += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
-    if (!qFuzzyEquals(treeResizerGeometry, m_resizerWidget->geometry()))
+    resizerGeometry.moveLeft(resizerGeometry.left() - offset);
+    resizerGeometry.setWidth(kResizerWidth);
+
+    if (!qFuzzyEquals(resizerGeometry, m_resizerWidget->geometry()))
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updateResizerGeometryLater, true);
 
-        m_resizerWidget->setGeometry(treeResizerGeometry);
+        m_resizerWidget->setGeometry(resizerGeometry);
 
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
-        m_resizerWidget->setPos(treeResizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
+        m_resizerWidget->setPos(resizerGeometry.topLeft());  // TODO: #Elric remove this ugly hack.
     }
 }
 
@@ -288,7 +304,7 @@ void ResourceTreeWorkbenchPanel::setShowButtonUsed(bool used)
 
 void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
 {
-    if (m_ignoreResizerGeometryChanges)
+    if (m_resizing)
         return;
 
     QRectF resizerGeometry = m_resizerWidget->geometry();
@@ -298,25 +314,27 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
         return;
     }
 
-    QRectF treeGeometry = item->geometry();
+    qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
 
-    qreal targetWidth = m_resizerWidget->geometry().left() - treeGeometry.left();
-    qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
+    /* Calculating real border position. */
+    x += 0.5 + kResizerWidth;
+    if (widget->isScrollBarVisible())
+        x += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    const qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 
     //TODO #vkutin Think how to do it differently.
     // At application startup m_controlsWidget has default (not maximized) size, so we cannot use its width here.
-    qreal maxWidth = mainWindow()->width() / 2;
+    const qreal maxWidth = mainWindow()->width() / 2;
 
-    targetWidth = qBound(minWidth, targetWidth, maxWidth);
+    const qreal targetWidth = qBound(minWidth, x, maxWidth);
 
-    if (!qFuzzyCompare(treeGeometry.width(), targetWidth))
+    QRectF geometry = item->geometry();
+    if (!qFuzzyEquals(geometry.width(), targetWidth))
     {
-        treeGeometry.setWidth(targetWidth);
-        treeGeometry.setLeft(0);
-
-        QN_SCOPED_VALUE_ROLLBACK(&m_ignoreResizerGeometryChanges, true);
-        widget->resize(targetWidth, widget->height());
-        item->setPaintGeometry(treeGeometry);
+        geometry.setWidth(targetWidth);
+        geometry.setLeft(0);
+        item->setGeometry(geometry);
     }
 
     updateResizerGeometry();
@@ -343,20 +361,30 @@ void ResourceTreeWorkbenchPanel::at_showingProcessor_hoverEntered()
 
 void ResourceTreeWorkbenchPanel::updateControlsGeometry()
 {
-    QRectF paintGeometry = item->paintGeometry();
+    if (m_resizing)
+        return;
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_resizing, true);
+
+    QRectF geometry = item->geometry();
     auto parentWidgetRect = m_parentWidget->rect();
+    QRectF paintGeometry = geometry;
+    paintGeometry.setLeft(0.0);
+    item->setPaintGeometry(paintGeometry);
 
     m_backgroundItem->setGeometry(paintGeometry);
 
     m_showButton->setPos(QPointF(
-        qMax(parentWidgetRect.left(), paintGeometry.right()),
+        qMax(parentWidgetRect.left(), geometry.right()),
         (parentWidgetRect.top() + parentWidgetRect.bottom() - m_showButton->size().height())/2.0));
 
     m_pinButton->setPos(QPointF(
-        paintGeometry.right() - m_pinButton->size().width() - 1.0,
-        paintGeometry.top() + 1.0));
+        geometry.right() - m_pinButton->size().width() - 1.0,
+        geometry.top() + 1.0));
 
     updateResizerGeometry();
+
+    emit geometryChanged();
 }
 
 }

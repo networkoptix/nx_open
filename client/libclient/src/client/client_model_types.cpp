@@ -13,10 +13,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS
     (Qn::ImageBehaviour::Tile,      "Tile")
 )
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState, (datastream), (currentLayoutIndex)(layoutUuids));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash), (serverUuid)(storagePath));
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnLicenseWarningState, (datastream), (lastWarningTime));
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBackgroundImage, (json), QnBackgroundImage_Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBackgroundImage, (json)(eq), QnBackgroundImage_Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzHotkey, (json), (id)(hotkey))
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
@@ -49,3 +48,16 @@ qreal QnBackgroundImage::actualImageOpacity() const
 {
     return enabled ? opacity : 0.0;
 }
+
+QnWorkbenchState::QnWorkbenchState()
+{
+
+}
+
+bool QnWorkbenchState::isValid() const
+{
+    return !userId.isNull()
+        && !localSystemId.isNull();
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnWorkbenchState, (json), QnWorkbenchState_Fields);

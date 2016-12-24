@@ -11,24 +11,23 @@
 
 namespace nx_http {
 
-class NX_NETWORK_API RequestResult
+struct NX_NETWORK_API RequestResult
 {
-public:
     nx_http::StatusCode::Value statusCode;
     std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource;
     ConnectionEvents connectionEvents;
 
-    RequestResult(StatusCode::Value _statusCode = StatusCode::notImplemented);
+    RequestResult(StatusCode::Value statusCode);
     RequestResult(
-        nx_http::StatusCode::Value _statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource);
+        nx_http::StatusCode::Value statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource);
     RequestResult(
-        nx_http::StatusCode::Value _statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> _dataSource,
-        ConnectionEvents _connectionEvents);
+        nx_http::StatusCode::Value statusCode,
+        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+        ConnectionEvents connectionEvents);
 };
 
-typedef nx::utils::MoveOnlyFunc<void(RequestResult)> HttpRequestProcessedHandler;
+typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 
 /**
  * Base class for all HTTP request processors
@@ -56,14 +55,14 @@ protected:
     /**
      * Implement this method to handle request
      * @param response Implementation is allowed to modify response as it wishes
-     * @warning This object can be removed in \a completionHandler 
+     * @warning This object can be removed in completionHandler 
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::HttpRequestProcessedHandler completionHandler ) = 0;
+        nx_http::RequestProcessedHandler completionHandler ) = 0;
 
     nx_http::Response* response();
 

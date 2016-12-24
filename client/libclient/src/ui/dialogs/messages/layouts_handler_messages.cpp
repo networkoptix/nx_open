@@ -25,7 +25,8 @@ QDialogButtonBox::StandardButton QnLayoutsHandlerMessages::askOverrideLayout(
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBox::Icon::Warning);
     messageBox.setWindowTitle(tr("Layout already exists."));
-    messageBox.setText(tr("A layout with the same name already exists. "
+    messageBox.setText(tr("Layout already exists."));
+    messageBox.setInformativeText(tr("A layout with the same name already exists. "
         "Would you like to overwrite it?"));
     messageBox.setStandardButtons(buttons);
     messageBox.setDefaultButton(defaultButton);
@@ -59,6 +60,7 @@ bool QnLayoutsHandlerMessages::changeUserLocalLayout(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::ChangeUserLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -80,7 +82,7 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
         toShare.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("To remove access go to User Settings."));
+    messageBox.setInformativeText(tr("To remove access go to User Roles Settings."));
     messageBox.setCheckBoxText(tr("Do not show this message anymore"));
     messageBox.addCustomWidget(new QnResourceListView(toShare, true));
 
@@ -90,6 +92,7 @@ bool QnLayoutsHandlerMessages::addToRoleLocalLayout(QWidget* parent, const QnRes
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::AddToRoleLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -122,6 +125,7 @@ bool QnLayoutsHandlerMessages::removeFromRoleLocalLayout(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::RemoveFromRoleLocalLayout;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -149,6 +153,7 @@ bool QnLayoutsHandlerMessages::sharedLayoutEdit(QWidget* parent)
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::SharedLayoutEdit;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
@@ -220,7 +225,24 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
         messagesFilter |= Qn::ShowOnceMessage::DeleteLocalLayouts;
         qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
     }
 
     return result == QDialogButtonBox::Ok;
+}
+
+bool QnLayoutsHandlerMessages::replaceVideoWallResources(QWidget* parent,
+    const QnResourceList& inaccessible)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBox::Icon::Warning);
+    messageBox.setWindowTitle(tr("Update Screen..."));
+    messageBox.setText(tr("You will lose access to following resources:"));
+    messageBox.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.setInformativeText(tr("You are going to delete some resources to which you have "
+        "access from videowall only. You won't see them in your resource list after it and won't "
+        "be able to add them to videowall again."));
+    messageBox.addCustomWidget(new QnResourceListView(inaccessible, true));
+    return messageBox.exec() == QDialogButtonBox::Ok;
 }

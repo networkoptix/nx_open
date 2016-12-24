@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/cc/custom_stun.h>
@@ -10,6 +9,9 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/sync_queue.h>
+
+#include <common/common_globals.h>
+#include <utils/common/guard.h>
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
@@ -32,13 +34,13 @@ protected:
         , server(
             &stunMessageDispatcher,
             false,
-            SocketFactory::NatTraversalType::nttDisabled)
+            nx::network::NatTraversalSupport::disabled)
     {
         EXPECT_TRUE(server.bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server.listen());
 
         EXPECT_TRUE(server.endpoints().size());
-        address = server.endpoints().front();
+        address = SocketAddress(HostAddress::localhost, server.endpoints().front().port);
     }
 
     SocketAddress address;
@@ -62,6 +64,8 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 TEST_F( StunCustomTest, Ping )
 {
     AsyncClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     client.connect( address );
 
     stun::Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
@@ -98,6 +102,8 @@ TEST_F( StunCustomTest, Ping )
 TEST_F( StunCustomTest, BindResolve )
 {
     AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect( address );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
@@ -118,6 +124,8 @@ TEST_F( StunCustomTest, BindResolve )
     }
 
     AsyncClient connectClient;
+    auto connectClientGuard = makeScopedGuard([&connectClient]() { connectClient.pleaseStopSync(); });
+
     connectClient.connect( address );
     {
         stun::Message request( Header(
@@ -269,21 +277,27 @@ TEST_F(StunCustomTest, ClientBind)
     cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
 
     AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect(address);
     const auto msIndications = listenForClientBind(&msClient, SERVER_ID, settings);
 
-    auto bindClient = std::make_unique<AsyncClient>();
-    bindClient->connect(address);
-    bindClientSync(bindClient.get(), "VmsGateway", GOOD_ADDRESS);
+    AsyncClient bindClient;
+    auto bindClientGuard = makeScopedGuard([&bindClient]() { bindClient.pleaseStopSync(); });
+
+    bindClient.connect(address);
+    bindClientSync(&bindClient, "VmsGateway", GOOD_ADDRESS);
 
     AsyncClient msClient2;
+    auto msClient2Guard = makeScopedGuard([&msClient2]() { msClient2.pleaseStopSync(); });
+
     msClient2.connect(address);
     const auto msIndications2 = listenForClientBind(&msClient2, SERVER_ID2, settings);
 
     // Both servers get just one indication:
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", GOOD_ADDRESS);
 
-    bindClientSync(bindClient.get(), "VmsGateway", BAD_ADDRESS);
+    bindClientSync(&bindClient, "VmsGateway", BAD_ADDRESS);
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", BAD_ADDRESS);
 
     auto bindClient2 = std::make_unique<AsyncClient>();;
@@ -294,11 +308,14 @@ TEST_F(StunCustomTest, ClientBind)
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway2", GOOD_ADDRESS);
 
     // Disconnect one gateway:
+    bindClient2->pleaseStopSync();
     bindClient2.reset();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // The next server gets only one indication:
     AsyncClient msClient3;
+    auto msClient3Guard = makeScopedGuard([&msClient3]() { msClient3.pleaseStopSync(); });
+
     msClient3.connect(address);
     const auto msIndications3 = listenForClientBind(&msClient3, SERVER_ID, settings);
     expectIndicationForEach({msIndications3.get()}, "VmsGateway", BAD_ADDRESS);

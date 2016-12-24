@@ -1,31 +1,36 @@
-/**********************************************************
-* Jan 13, 2016
-* akolesnikov
-***********************************************************/
-
 #include "hole_punching_processor.h"
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/time.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
 #include "settings.h"
-
+#include "statistics/collector.h"
 
 namespace nx {
 namespace hpm {
+
+static QString logRequest(const ConnectionStrongRef& connection, const api::ConnectRequest& request)
+{
+    return lm("from %1(%2) to %3, session id %4")
+        .strs(request.originatingPeerId, connection->getSourceAddress(),
+            request.destinationHostName, request.connectSessionId);
+}
 
 HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
-    ListeningPeerPool* const listeningPeerPool)
+    ListeningPeerPool* listeningPeerPool,
+    stats::Collector* statisticsCollector)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
-    m_listeningPeerPool(listeningPeerPool)
+    m_listeningPeerPool(listeningPeerPool),
+    m_statisticsCollector(statisticsCollector)
 {
     dispatcher->registerRequestProcessor(
         stun::cc::methods::connect,
@@ -90,11 +95,6 @@ void HolePunchingProcessor::connect(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
-    NX_LOGX(lm("connect request. from %1 to host %2, connection id %3").
-        arg(connection->getSourceAddress().toString()).
-        arg(request.destinationHostName).arg(request.connectSessionId),
-        cl_logDEBUG2);
-
     api::ResultCode validationResult = api::ResultCode::ok;
     boost::optional<ListeningPeerPool::ConstDataLocker> targetPeerDataLocker;
     std::tie(validationResult, targetPeerDataLocker) = validateConnectRequest(
@@ -109,12 +109,15 @@ void HolePunchingProcessor::connect(
     const auto connectionFsmIterAndFlag = m_activeConnectSessions.emplace(
         request.connectSessionId,
         nullptr);
-    if (!connectionFsmIterAndFlag.second)
+    if (connectionFsmIterAndFlag.second)
     {
-        NX_LOGX(lm("connect request retransmit: from %1, to %2, connection id %3").
-            arg(connection->getSourceAddress().toString()).
-            arg(request.destinationHostName).arg(request.connectSessionId),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Connect request %1").str(logRequest(connection, request)), cl_logDEBUG2);
+    }
+    else
+    {
+        NX_LOGX(lm("Connect request retransmit %1")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         //ignoring request, response will be sent by fsm
         return;
     }
@@ -143,18 +146,19 @@ void HolePunchingProcessor::onConnectionAckRequest(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("connect ack. from %1, connection id %2").
-        arg(connection->getSourceAddress().toString()).
-        arg(request.connectSessionId),
-        cl_logDEBUG2);
-
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
-        completionHandler(api::ResultCode::notFound);
-        return;
+        NX_LOGX(lm("Connect ACK from %1, connection id %2 is unknown")
+            .strs(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+
+        return completionHandler(api::ResultCode::notFound);
     }
+
+    NX_LOGX(lm("Connect ACK from %1, connection id %2")
+        .strs(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+
     connectionIter->second->onConnectionAckRequest(
         connection,
         std::move(request),
@@ -167,18 +171,25 @@ void HolePunchingProcessor::connectionResult(
     stun::Message /*requestMessage*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    NX_LOGX(lm("connect result. from %1, connection id %2. result: %3").
-        arg(connection->getSourceAddress().toString()).
-        arg(request.connectSessionId).arg(QnLexical::serialized(request.resultCode)),
-        cl_logDEBUG2);
-
     QnMutexLocker lk(&m_mutex);
     auto connectionIter = m_activeConnectSessions.find(request.connectSessionId);
     if (connectionIter == m_activeConnectSessions.end())
     {
-        completionHandler(api::ResultCode::notFound);
-        return;
+        NX_LOGX(lm("Connect result from %1, connection id %2 is unknown")
+            .strs(connection->getSourceAddress(), request.connectSessionId), cl_logDEBUG1);
+
+        return completionHandler(api::ResultCode::notFound);
     }
+
+    NX_LOGX(lm("Connect result from %1, connection id %2, result: %3")
+        .strs(connection->getSourceAddress(), request.connectSessionId,
+            QnLexical::serialized(request.resultCode)), cl_logDEBUG2);
+
+    auto statisticsInfo = connectionIter->second->statisticsInfo();
+    statisticsInfo.resultCode = request.resultCode;
+    statisticsInfo.endTime = nx::utils::utcTime();
+    m_statisticsCollector->saveConnectSessionStatistics(std::move(statisticsInfo));
+
     connectionIter->second->onConnectionResultRequest(
         std::move(request),
         std::move(completionHandler));
@@ -191,9 +202,9 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::udp)
     {
-        NX_LOGX(lm("connect request from %1: only UDP hole punching is supported for now").
-            arg(connection->getSourceAddress().toString()),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Failed connect request %1: only UDP hole punching is supported for now")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         return std::make_tuple(api::ResultCode::badRequest, boost::none);
     }
 
@@ -201,38 +212,36 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
         findAndLockPeerDataByHostName(request.destinationHostName);
     if (!targetPeerDataLocker)
     {
-        NX_LOGX(lm("connect request from %1 to unknown host %2").
-            arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Failed connect request %1: host is unknown")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
     const auto& targetPeerData = targetPeerDataLocker->value();
 
     if (!targetPeerData.isListening)
     {
-        NX_LOGX(lm("connect request from %1 to host %2 not listening for connections").
-            arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Failed connect request %1: host is not listening")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
     if (((targetPeerData.connectionMethods & request.connectionMethods) &
         api::ConnectionMethod::udpHolePunching) == 0)
     {
-        NX_LOGX(lm("connect request from %1 (connection methods %2) to host %3 "
-            "(connection methods %4). No suitable connection method").
-            arg(connection->getSourceAddress().toString()).arg(request.connectionMethods).
-            arg(request.destinationHostName).arg(targetPeerData.connectionMethods),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Failed connect request %1: no suitable connection method")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
     const auto peerConnectionStrongRef = targetPeerData.peerConnection.lock();
     if (!peerConnectionStrongRef)
     {
-        NX_LOGX(lm("connect request from %1 to host %2. No connection to the target peer...").
-            arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Failed connect request %1: no connection to the target peer")
+            .str(logRequest(connection, request)), cl_logDEBUG1);
+
         return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
@@ -248,7 +257,7 @@ void HolePunchingProcessor::connectSessionFinished(
     if (m_activeConnectSessions.empty())
         return; //HolePunchingProcessor is being stopped currently?
 
-    NX_LOGX(lm("connect session %1 finished with result %2").
+    NX_LOGX(lm("Connect session %1 finished with result %2").
         arg(sessionIter->first).arg(QnLexical::serialized(connectionResult)),
         cl_logDEBUG2);
 

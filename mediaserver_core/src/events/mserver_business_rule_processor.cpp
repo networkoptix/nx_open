@@ -619,11 +619,13 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         }
     }
 
+    QnEmailAddress supportEmail(emailSettings.supportEmail);
+
 //    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
-    contextMap[tpSupportLink] = QnEmailAddress::isValid(emailSettings.supportEmail)
-        ? lit("mailto:%1").arg(emailSettings.supportEmail)
+    contextMap[tpSupportLink] = supportEmail.isValid()
+        ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
     contextMap[tpSystemName] = qnGlobalSettings->systemName();
@@ -647,7 +649,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         attachments
         );
 
-    if (!m_emailManager->sendEmail(data))
+    if (!m_emailManager->sendEmail(emailSettings, data))
     {
         QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
         broadcastBusinessAction(action);
@@ -929,41 +931,43 @@ QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusine
     return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
 }
 
-void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
+void QnMServerBusinessRuleProcessor::updateRecipientsList(
+    const QnSendMailBusinessActionPtr& action) const
 {
     QStringList unfiltered = getRecipients(action);
     auto allUsers = qnResPool->getResources<QnUserResource>();
 
-    QMap<QnUuid, QnUserResourceList> groups;
-    for (const auto& user : allUsers)
-        groups[user->userGroup()].push_back(user);
+    QMap<QnUuid, QnUserResourceList> userRoles;
+    for (const auto& user: allUsers)
+        userRoles[user->userRoleId()].push_back(user);
 
-    auto addUserToList = [&unfiltered](const QnUuid& id)
-    {
-        if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+    auto addUserToList =
+        [&unfiltered](const QnUuid& id)
         {
-            unfiltered << user->getEmail();
-            return true;
-        }
-        return false;
-    };
+            if (auto user = qnResPool->getResourceById<QnUserResource>(id))
+            {
+                unfiltered << user->getEmail();
+                return true;
+            }
+            return false;
+        };
 
-    for (const QnUuid& id : action->getResources())
+    for (const QnUuid& id: action->getResources())
     {
-        if (!addUserToList(id)) //< add user by id
+        if (!addUserToList(id)) //< Try to add the given user.
         {
-            for (const auto& nestedUser : groups.value(id))
-                addUserToList(nestedUser->getId());  //< add user by group id
+            // Add all users with the given role.
+            for (const auto& nestedUser: userRoles.value(id))
+                addUserToList(nestedUser->getId());
         }
     }
 
-    auto recipientsFilter = [](const QString& email)
-    {
-        QString trimmed = email.trimmed();
-        return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
-    };
-
     QStringList recipients;
-    std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
+    for (const auto &addr: unfiltered)
+    {
+        QnEmailAddress email(addr);
+        if (email.isValid())
+            recipients << email.value();
+    }
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }

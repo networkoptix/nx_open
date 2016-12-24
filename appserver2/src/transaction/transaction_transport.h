@@ -102,11 +102,17 @@ protected:
 
 private:
     const Qn::UserAccessData m_userAccessData;
-    std::function<void()> m_ttFinishCallback;
+    std::function<void()> m_beforeDestructionHandler;
 
     template<class T>
     bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)
     {
+        if (remotePeer().peerType == Qn::PT_OldServer)
+            return false;
+
+        if (transaction.isLocal() && !remotePeer().isClient())
+            return false;
+
         if (remotePeer().peerType == Qn::PT_CloudServer)
         {
             if (transaction.transactionType != TransactionType::Cloud &&

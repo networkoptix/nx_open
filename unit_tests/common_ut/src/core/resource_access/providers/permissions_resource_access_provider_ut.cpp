@@ -40,8 +40,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserGroupData role;
-    QnResourceAccessSubject subject(role);
+    ec2::ApiUserRoleData userRole;
+    QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
@@ -104,7 +104,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessServer)
 TEST_F(QnPermissionsResourceAccessProviderTest, checkAdminAccessStorage)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
-    auto target = addStorage();
+    auto server = addServer();
+    auto target = addStorage(server);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -170,7 +171,8 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkServerAccess)
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkStorageAccess)
 {
-    auto target = addStorage();
+    auto server = addServer();
+    auto target = addStorage(server);
 
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
@@ -209,7 +211,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkVideoWallAccess)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnPermissionsResourceAccessProviderTest, checkUserGroupChangeAccess)
+TEST_F(QnPermissionsResourceAccessProviderTest, checkUserRoleChangeAccess)
 {
     auto target = addCamera();
 
@@ -217,7 +219,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkUserGroupChangeAccess)
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     qnUserRolesManager->addOrUpdateUserRole(role);
 
-    user->setUserGroup(role.id);
+    user->setUserRoleId(role.id);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -378,7 +380,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermi
     qnUserRolesManager->addOrUpdateUserRole(role);
 
     auto user = addUser(Qn::GlobalAdminPermission);
-    user->setUserGroup(role.id);
+    user->setUserRoleId(role.id);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 
     awaitAccess(user, target, true);

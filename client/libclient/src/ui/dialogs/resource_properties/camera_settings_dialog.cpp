@@ -26,7 +26,7 @@
 
 namespace {
 
-static const QSize kMinimumSize(900, 560);
+static const int kMinimumWidth = 900; //< do not set minimum height
 static const QSize kOptimalSize(900, 880);
 
 /* Initial dialog height - 40px less than screen height. */
@@ -38,7 +38,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
     m_ignoreAccept(false)
 {
-    setMinimumSize(kMinimumSize);
+    setMinimumWidth(kMinimumWidth);
 
     int maximumHeight = mainWindow()->geometry().height();
     if (auto windowHandle = mainWindow()->windowHandle())
@@ -48,7 +48,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     }
     int optimalHeight = std::min(kOptimalSize.height(),
         maximumHeight - kSizeOffset);
-    optimalHeight = std::max(optimalHeight, kMinimumSize.height());
 
     QSize optimalSize(kOptimalSize.width(), optimalHeight);
     QRect targetGeometry(QPoint(0, 0), optimalSize);
@@ -139,10 +138,12 @@ void QnCameraSettingsDialog::retranslateUi()
 
 bool QnCameraSettingsDialog::tryClose(bool force)
 {
-    setCameras(QnVirtualCameraResourceList(), force);
-    if (force)
+    auto result = setCameras(QnVirtualCameraResourceList(), force);
+    result |= force;
+    if (result)
         hide();
-    return true;
+
+    return result;
 }
 
 
@@ -215,7 +216,7 @@ void QnCameraSettingsDialog::updateReadOnly()
     m_settingsWidget->setReadOnly(!permissions.testFlag(Qn::WritePermission));
 }
 
-void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
+bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras, bool force)
 {
     bool askConfirmation =
         !force
@@ -254,13 +255,14 @@ void QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
                 break;
             default:
                 /* Cancel changes. */
-                return;
+                return false;
         }
 
     }
 
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
+    return true;
 }
 
 Qn::CameraSettingsTab QnCameraSettingsDialog::currentTab() const
@@ -298,20 +300,13 @@ void QnCameraSettingsDialog::submitToResources()
         return;
     }
 
-    //checking if showing Licenses limit exceeded is appropriate
-    if (m_settingsWidget->licensedParametersModified())
-    {
-        QnCamLicenseUsageHelper helper(cameras, m_settingsWidget->isScheduleEnabled());
-        if (!helper.isValid())
-        {
-            QString message = tr("License limit exceeded. Changes have been saved, but will not be applied.");
-            QnMessageBox::warning(this, tr("Could not apply changes."), message);
-            m_settingsWidget->setScheduleEnabled(false);
-        }
-    }
-
     /* Submit and save it. */
     saveCameras(cameras);
+}
+
+void QnCameraSettingsDialog::updateFromResources()
+{
+    m_settingsWidget->updateFromResources();
 }
 
 void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &cameras)

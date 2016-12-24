@@ -45,6 +45,9 @@ public:
         auto socket = std::make_unique<network::cloud::CloudServerSocket>(
             currentContext.mediatorConnector->systemConnection());
 
+        if (connectionMethonds)
+            socket->setSupportedConnectionMethods(*connectionMethonds);
+
         currentContext.socket = socket.get();
         return std::move(socket);
     }
@@ -147,6 +150,7 @@ public:
 
     std::vector<SocketContext> socketContexts;
     boost::optional<SocketAddress> forwardedAddress;
+    boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
 };
 
 int runInListenMode(const nx::utils::ArgumentParser& args)
@@ -196,6 +200,9 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     if (const auto address = args.get("forward-address"))
     {
+        // TODO: uncoment when CLOUD-730 is fixed
+        // cloudServerSocketGenerator.connectionMethonds = hpm::api::ConnectionMethod::none;
+
         cloudServerSocketGenerator.forwardedAddress =
             address->isEmpty() ? localAddress : SocketAddress(*address);
 
@@ -283,7 +290,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     const auto passed = std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::steady_clock::now() - beginTime);
-    std::cout << "Sever has started in: " << passed.count() << "s." << std::endl;
+    std::cout << "Sever has started in: " << passed.count() << " s." << std::endl;
 
     const int result = printStatsAndWaitForCompletion(
         &server,

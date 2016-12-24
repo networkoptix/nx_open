@@ -98,7 +98,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_tcpKeepAliveTimeout(tcpKeepAliveTimeout),
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
-    m_timer(std::make_unique<nx::network::aio::Timer>())
+    m_timer(std::make_unique<nx::network::aio::Timer>()),
+    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION)
 {
     m_timer->bindToAioThread(getAioThread());
 
@@ -149,6 +150,14 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_connectionGuid = connectionGuid;
     m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
         std::move(connectionLockGuard));
+
+    nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
+        request.headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
+
+    m_remotePeerEcProtoVersion =
+        ec2ProtoVersionIter == request.headers.end()
+        ? nx_ec::INITIAL_EC2_PROTO_VERSION
+        : ec2ProtoVersionIter->second.toInt();
 
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
@@ -292,7 +301,6 @@ void QnTransactionTransportBase::setOutgoingConnection(
     QSharedPointer<AbstractCommunicatingSocket> socket)
 {
     using namespace std::chrono;
-    using namespace std::placeholders;
 
     m_outgoingDataSocket = std::move(socket);
     m_outgoingDataSocket->bindToAioThread(getAioThread());
@@ -310,14 +318,25 @@ void QnTransactionTransportBase::setOutgoingConnection(
 
     if (m_connectionType == ConnectionType::bidirectional)
         m_incomingDataSocket = m_outgoingDataSocket;
+}
 
+void QnTransactionTransportBase::monitorConnectionForClosure()
+{
     startSendKeepAliveTimerNonSafe();
 
-    //monitoring m_outgoingDataSocket for connection close
     m_dummyReadBuffer.reserve(DEFAULT_READ_BUFFER_SIZE);
+    if (!m_outgoingDataSocket->setNonBlockingMode(true))
+    {
+        return m_outgoingDataSocket->post(
+            [this, error = SystemError::getLastOSErrorCode()]()
+        {
+            onMonitorConnectionForClosure(error, (size_t) -1);
+        });
+    }
+
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2));
+        [this](SystemError::ErrorCode c, size_t s){ onMonitorConnectionForClosure(c, s); });
 }
 
 std::chrono::milliseconds QnTransactionTransportBase::connectionKeepAliveTimeout() const
@@ -345,7 +364,7 @@ void QnTransactionTransportBase::addData(QByteArray data)
             dataWithSize.data()+sizeof(dataSize),
             data.constData(),
             data.size() );
-        data.clear();   //cause I can!
+        data.clear();
         m_dataToSend.push_back( std::move(dataWithSize) );
     }
     else
@@ -433,6 +452,11 @@ SocketAddress QnTransactionTransportBase::remoteSocketAddr() const
     );
 
     return addr;
+}
+
+int QnTransactionTransportBase::remotePeerProtocolVersion() const
+{
+    return m_remotePeerEcProtoVersion;
 }
 
 nx_http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
@@ -545,9 +569,15 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
     m_httpClient->addAdditionalHeader(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
         m_localPeer.instanceId.toByteArray() );
-
+    m_httpClient->addAdditionalHeader(
+        Qn::EC2_PROTO_VERSION_HEADER_NAME,
+        QByteArray::number(nx_ec::EC2_PROTO_VERSION));
 
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
+
+    // add deprecated query item 'isClient' for compatibility with old server version <= 2.6
+    if (m_localPeer.peerType == Qn::PT_MobileClient)
+        q.addQueryItem("isClient", QString());
 
     // Client reconnects to the server
     if( m_localPeer.isClient() )
@@ -689,9 +719,12 @@ void QnTransactionTransportBase::receivedTransactionNonSafe( const QnByteArrayCo
             return;
     }
 
-    NX_ASSERT( !transportHeader.processedPeers.empty() );
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
-        arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+    if (!transportHeader.isNull())
+    {
+        NX_ASSERT(!transportHeader.processedPeers.empty());
+        NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::receivedTransactionNonSafe. Got transaction with seq %1 from %2").
+            arg(transportHeader.sequence).arg(m_remotePeer.id.toString()), cl_logDEBUG1);
+    }
 
     nx::utils::ObjectDestructionFlag::Watcher watcher(
         &m_connectionFreedFlag);
@@ -875,7 +908,7 @@ void QnTransactionTransportBase::startSendKeepAliveTimerNonSafe()
     }
 }
 
-void QnTransactionTransportBase::monitorConnectionForClosure(
+void QnTransactionTransportBase::onMonitorConnectionForClosure(
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
 {
@@ -906,7 +939,7 @@ void QnTransactionTransportBase::monitorConnectionForClosure(
     m_dummyReadBuffer.resize( 0 );
     m_outgoingDataSocket->readSomeAsync(
         &m_dummyReadBuffer,
-        std::bind(&QnTransactionTransportBase::monitorConnectionForClosure, this, _1, _2) );
+        std::bind(&QnTransactionTransportBase::onMonitorConnectionForClosure, this, _1, _2) );
 }
 
 QUrl QnTransactionTransportBase::generatePostTranUrl()
@@ -1155,28 +1188,30 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         return;
     }
 
+    nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
+        client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
+
     if (!m_localPeer.isMobileClient())
     {
         //checking remote server protocol version
         nx_http::HttpHeaders::const_iterator ec2ProtoVersionIter =
             client->response()->headers.find(Qn::EC2_PROTO_VERSION_HEADER_NAME);
 
-        const int remotePeerEcProtoVersion = ec2ProtoVersionIter == client->response()->headers.end()
-             ? nx_ec::INITIAL_EC2_PROTO_VERSION
-             : ec2ProtoVersionIter->second.toInt();
+        m_remotePeerEcProtoVersion =
+            ec2ProtoVersionIter == client->response()->headers.end()
+            ? nx_ec::INITIAL_EC2_PROTO_VERSION
+            : ec2ProtoVersionIter->second.toInt();
 
-        if (nx_ec::EC2_PROTO_VERSION != remotePeerEcProtoVersion)
+        if (nx_ec::EC2_PROTO_VERSION != m_remotePeerEcProtoVersion)
         {
             NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
-                "Local peer version: %2, remote peer version: %3").
-                arg(client->url().toString(QUrl::RemovePassword)).arg(nx_ec::EC2_PROTO_VERSION).arg(remotePeerEcProtoVersion),
+                "Local peer version: %2, remote peer version: %3")
+                .arg(client->url().toString(QUrl::RemovePassword))
+                .arg(nx_ec::EC2_PROTO_VERSION).arg(m_remotePeerEcProtoVersion),
                 cl_logWARNING );
             cancelConnecting();
             return;
         }
-
-        nx_http::HttpHeaders::const_iterator ec2CloudHostItr =
-            client->response()->headers.find(Qn::EC2_CLOUD_HOST_HEADER_NAME);
 
         const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
             ? QnAppInfo::defaultCloudHost()
@@ -1200,6 +1235,8 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
     if (m_remotePeer.id == kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
+    else if (ec2CloudHostItr == client->response()->headers.end())
+        m_remotePeer.peerType = Qn::PT_OldServer; // outgoing connections for server or cloud peers only
     else
         m_remotePeer.peerType = Qn::PT_Server; // outgoing connections for server or cloud peers only
     #ifdef USE_JSON

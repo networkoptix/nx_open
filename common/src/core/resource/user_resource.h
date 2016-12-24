@@ -30,7 +30,7 @@ public:
     bool isCloud() const { return userType() == QnUserType::Cloud; }
     bool isLocal() const { return userType() == QnUserType::Local; }
 
-    Qn::UserRole role() const;
+    Qn::UserRole userRole() const;
 
     QByteArray getHash() const;
     void setHash(const QByteArray& hash);
@@ -68,8 +68,8 @@ public:
      */
     bool isBuiltInAdmin() const;
 
-    QnUuid userGroup() const;
-    void setUserGroup(const QnUuid& group);
+    QnUuid userRoleId() const;
+    void setUserRoleId(const QnUuid& userRoleId);
 
     bool isEnabled() const;
     void setEnabled(bool isEnabled);
@@ -79,6 +79,8 @@ public:
 
     QString fullName() const;
     void setFullName(const QString& value);
+
+    ec2::ApiResourceParamWithRefDataList params() const;
 
     virtual Qn::ResourceStatus getStatus() const override;
 
@@ -96,7 +98,7 @@ public:
     void fillId();
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
-    void userGroupChanged(const QnUserResourcePtr& user);
+    void userRoleChanged(const QnUserResourcePtr& user);
     void enabledChanged(const QnUserResourcePtr& user);
 
     void hashChanged(const QnResourcePtr& user);
@@ -118,7 +120,7 @@ private:
     QByteArray m_cryptSha512Hash;
     QString m_realm;
     Qn::GlobalPermissions m_permissions;
-    QnUuid m_userGroup;
+    QnUuid m_userRoleId;
     bool m_isOwner;
     bool m_isEnabled;
     QString m_email;

@@ -42,8 +42,6 @@ public:
         , qint64 positionMs);
 
 private:
-    void onResourceAdded(const QnResourcePtr &resource);
-
     void onResourceRemoved(const QnResourcePtr &resource);
 
 private:
@@ -55,6 +53,7 @@ private:
 
 private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
+    void ensureQueryForCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
     typedef QScopedPointer<QTimer> TimerPtr;

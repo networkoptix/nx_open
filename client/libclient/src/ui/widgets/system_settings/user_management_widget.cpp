@@ -113,7 +113,7 @@ public:
         QString linkText = tr("Edit");
 
         /* Measure link width: */
-        const int kTextFlags = Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignVCenter;
+        const int kTextFlags = Qt::TextSingleLine | Qt::AlignVCenter;
         int linkWidth = option.fontMetrics.width(linkText, -1, kTextFlags);
 
         int lineHeight = option.rect.height();
@@ -123,7 +123,7 @@ public:
 
         /* Draw original text elided: */
         int newTextWidth = textRect.width() - linkWidth - style::Metrics::kStandardPadding;
-        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth, kTextFlags);
+        newOption.text = newOption.fontMetrics.elidedText(newOption.text, newOption.textElideMode, newTextWidth);
         style->drawControl(QStyle::CE_ItemViewItem, &newOption, painter, newOption.widget);
 
         opacityRollback.rollback();
@@ -213,29 +213,27 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     });
 
     /* By [Left] disable user, by [Right] enable user: */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->usersTable->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        int key = static_cast<QKeyEvent*>(event)->key();
-        switch (key)
+    installEventHandler(ui->usersTable, QEvent::KeyPress, this,
+        [this](QObject* object, QEvent* event)
         {
-            case Qt::Key_Left:
-            case Qt::Key_Right:
+            Q_UNUSED(object);
+            int key = static_cast<QKeyEvent*>(event)->key();
+            switch (key)
             {
-                if (!ui->usersTable->currentIndex().isValid())
+                case Qt::Key_Left:
+                case Qt::Key_Right:
+                {
+                    if (!ui->usersTable->currentIndex().isValid())
+                        return;
+                    QnUserResourcePtr user = ui->usersTable->currentIndex().data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+                    if (!user)
+                        return;
+                    enableUser(user, key == Qt::Key_Right);
+                }
+                default:
                     return;
-                QnUserResourcePtr user = ui->usersTable->currentIndex().data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-                if (!user)
-                    return;
-                enableUser(user, key == Qt::Key_Right);
             }
-            default:
-                return;
-        }
-    });
+        });
 
     setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
@@ -354,24 +352,25 @@ void QnUserManagementWidget::updateSelection()
 
     using boost::algorithm::any_of;
 
-    ui->enableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
-            && !user->isEnabled();
-    }));
+    ui->enableSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
+                && !m_usersModel->isUserEnabled(user);
+        }));
 
-    ui->disableSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
-            && user->isEnabled()
-            && !user->isOwner();
-    }));
+    ui->disableSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission | Qn::SavePermission)
+                && m_usersModel->isUserEnabled(user);
+        }));
 
-    ui->deleteSelectedButton->setEnabled(any_of(users, [this] (const QnUserResourcePtr& user)
-    {
-        return accessController()->hasPermissions(user, Qn::RemovePermission)
-            && !user->isOwner();
-    }));
+    ui->deleteSelectedButton->setEnabled(any_of(users,
+        [this](const QnUserResourcePtr& user)
+        {
+            return accessController()->hasPermissions(user, Qn::RemovePermission);
+        }));
 
     update();
 }
@@ -441,7 +440,7 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
             break;
 
         case QnUserListModel::EnabledColumn:
-            enableUser(user, !user->isEnabled());
+            enableUser(user, !m_usersModel->isUserEnabled(user));
             break;
 
         default:
@@ -457,9 +456,6 @@ void QnUserManagementWidget::clearSelection()
 
 bool QnUserManagementWidget::enableUser(const QnUserResourcePtr& user, bool enabled)
 {
-    if (user->isOwner())
-        return false;
-
     if (!accessController()->hasPermissions(user, Qn::WriteAccessRightsPermission))
         return false;
 
@@ -490,9 +486,6 @@ void QnUserManagementWidget::deleteSelected()
     QnUserResourceList usersToDelete;
     for (QnUserResourcePtr user : visibleSelectedUsers())
     {
-        if (user->isOwner())
-            continue;
-
         if (!accessController()->hasPermissions(user, Qn::RemovePermission))
             continue;
 

@@ -12,11 +12,6 @@
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
-#ifndef INFINITE
-#define INFINITE            0xFFFFFFFF  // Infinite timeout
-#endif
-
-
 template <typename T>
 class QnSafeQueue
 {
@@ -52,7 +47,7 @@ public:
             m_q.removeAtUnsafe(index);
         }
 
-        void pop_front()
+        void popFront()
         {
             m_q.m_buffer[m_q.m_headIndex++] = T();
             if (m_q.m_headIndex >= (int) m_q.m_buffer.size())
@@ -80,7 +75,6 @@ public:
         QnSafeQueue& m_q;
     };
 
-
     QnSafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_headIndex(0),
         m_bufferLen(0),
@@ -90,7 +84,8 @@ public:
         reallocateBufferUnsafe(maxSize);
     }
 
-    ~QnSafeQueue() {
+    ~QnSafeQueue()
+    {
         clear();
     }
 
@@ -130,7 +125,7 @@ public:
         return true;
     }
 
-    bool pop(T& val, quint32 time = INFINITE)
+    bool pop(T& val, unsigned long time = ULONG_MAX)
     {
         QnMutexLocker mutex(&m_mutex);
         if (!m_terminated && m_bufferLen == 0)
@@ -188,6 +183,7 @@ public:
         }
         m_bufferLen = 0;
         m_headIndex = 0;
+        m_waitCond.wakeOne();
     }
 
     /**

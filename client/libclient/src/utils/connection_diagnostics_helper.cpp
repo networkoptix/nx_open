@@ -141,20 +141,13 @@ QnConnectionDiagnosticsHelper::validateConnectionTest(
 bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     QList<QnSoftwareVersion>* versions)
 {
-    qDebug() << "checkApplaucherRunning";
-
+    /* Try to run applauncher if it is not running. */
     if (!applauncher::checkOnline())
         return false;
 
-    /* Try to run applauncher if it is not running. */
     const auto result = applauncher::getInstalledVersions(versions);
     if (result == applauncher::api::ResultType::ok)
-    {
-        qDebug() << "getInstalledVersions success";
         return true;
-    }
-
-    qDebug() << "unknown applaucher error" << result;
 
     static const int kMaxTries = 5;
     for (int i = 0; i < kMaxTries; ++i)
@@ -164,7 +157,6 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
         if (applauncher::getInstalledVersions(versions) == applauncher::api::ResultType::ok)
             return true;
     }
-    qDebug() << "still cannot get running applaucher";
     return false;
 }
 

@@ -29,7 +29,7 @@ public:
     virtual bool processPacket(
         const QHostAddress& localInterfaceAddress,
         const SocketAddress& discoveredDevAddress,
-        const DeviceInfo& devInfo,
+        const DeviceInfo& /*devInfo*/,
         const QByteArray& xmlDevInfo ) override
     {
         std::cout << localInterfaceAddress.toString().toStdString()

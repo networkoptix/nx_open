@@ -11,7 +11,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/models/resource/resource_tree_model_node.h>
@@ -19,13 +19,13 @@
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
+
 
 QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     QObject* parent)
     :
     base_type(parent),
-    QnWorkbenchContextAware(parent, true),
+    QnWorkbenchContextAware(parent),
     m_model(nullptr),
     m_rootNode(),
     m_allNodes(),
@@ -38,39 +38,38 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
 
+    connect(context(), &QnWorkbenchContext::userChanged, this,
+        &QnResourceTreeModelUserNodes::handleUserChanged);
+
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            if (auto user = resource.dynamicCast<QnUserResource>())
-            {
-                connect(user, &QnUserResource::enabledChanged, this,
-                    &QnResourceTreeModelUserNodes::rebuildSubjectTree);
-            }
-        });
+        &QnResourceTreeModelUserNodes::handleResourceAdded);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
-            disconnect(resource, nullptr, this, nullptr);
+            resource->disconnect(this);
             if (auto user = resource.dynamicCast<QnUserResource>())
+            {
                 removeUserNode(user);
+            }
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        [this](const ec2::ApiUserGroupData& role)
+        [this](const ec2::ApiUserRoleData& role)
         {
             ensureRoleNode(role)->update();
         });
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
-        [this](const ec2::ApiUserGroupData& role)
+        [this](const ec2::ApiUserRoleData& role)
         {
             if (m_roles.contains(role.id))
                 removeNode(m_roles.take(role.id));
         });
+
 }
 
 QnResourceTreeModelUserNodes::~QnResourceTreeModelUserNodes()
@@ -87,7 +86,6 @@ QnResourceTreeModel* QnResourceTreeModelUserNodes::model() const
 void QnResourceTreeModelUserNodes::setModel(QnResourceTreeModel* value)
 {
     m_model = value;
-    initializeContext(m_model);
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::rootNode() const
@@ -100,12 +98,17 @@ void QnResourceTreeModelUserNodes::setRootNode(const QnResourceTreeModelNodePtr&
     m_rootNode = node;
 }
 
+void QnResourceTreeModelUserNodes::initialize(QnResourceTreeModel* model,
+    const QnResourceTreeModelNodePtr& rootNode)
+{
+    setModel(model);
+    setRootNode(rootNode);
+    handleUserChanged(context()->user());
+}
+
 void QnResourceTreeModelUserNodes::rebuild()
 {
-    clean();
-
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
+    NX_ASSERT(m_valid);
 
     for (const auto& role : qnUserRolesManager->userRoles())
         rebuildSubjectTree(role);
@@ -160,8 +163,8 @@ bool QnResourceTreeModelUserNodes::placeholderAllowedForSubject(
     if (m_model->scope() != QnResourceTreeModel::FullScope)
         return false;
 
-    /* Do not show user placeholders under groups. */
-    if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+    /* Do not show user placeholders under roles. */
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
         return false;
 
     bool isRole = !subject.user();
@@ -227,8 +230,8 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
                 return false;
         }
 
-        /* Shared layouts are displayed under group node. */
-        if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+        /* Shared layouts are displayed under role node. */
+        if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
             return false;
 
         return qnResourceAccessProvider->hasAccess(subject, layout);
@@ -253,8 +256,8 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
         Qn::GlobalAccessAllMediaPermission))
             return false;
 
-    /* Shared resources are displayed under group node. */
-    if (subject.user() && subject.user()->role() == Qn::UserRole::CustomUserGroup)
+    /* Shared resources are displayed under role node. */
+    if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
         return false;
 
     return qnResourceAccessProvider->hasAccess(subject, media);
@@ -272,7 +275,7 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRoleNode(
-    const ec2::ApiUserGroupData& role)
+    const ec2::ApiUserRoleData& role)
 {
     auto pos = m_roles.find(role.id);
     if (pos == m_roles.end())
@@ -303,9 +306,9 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureUserNode(
             Qn::ResourceNode));
         node->initialize();
         auto parent = m_rootNode;
-        if (user->role() == Qn::UserRole::CustomUserGroup)
+        if (user->userRole() == Qn::UserRole::CustomUserRole)
         {
-            auto role = qnUserRolesManager->userRole(user->userGroup());
+            auto role = qnUserRolesManager->userRole(user->userRoleId());
             if (!role.isNull())
                 parent = ensureRoleNode(role);
         }
@@ -441,13 +444,20 @@ QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureRecorderNode(
 
 void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubject& subject)
 {
-    if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+    if (!m_valid)
         return;
 
-    if (subject.user() && !subject.user()->isEnabled())
+    if (auto user = subject.user())
     {
-        removeUserNode(subject.user());
-        return;
+        bool skipUser = !user->isEnabled()
+            || (m_model->scope() != QnResourceTreeModel::FullScope
+                && user->userRole() == Qn::UserRole::CustomUserRole);
+
+        if (skipUser)
+        {
+            removeUserNode(subject.user());
+            return;
+        }
     }
 
     ensureSubjectNode(subject);
@@ -548,39 +558,90 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
         removeNode(node);
 }
 
+void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& resource)
+{
+    if (auto user = resource.dynamicCast<QnUserResource>())
+    {
+        connect(user, &QnUserResource::enabledChanged, this,
+            &QnResourceTreeModelUserNodes::rebuildSubjectTree);
+
+        connect(user, &QnUserResource::userRoleChanged, this,
+            [this](const QnUserResourcePtr& user)
+            {
+                removeUserNode(user);
+                rebuildSubjectTree(user);
+            });
+
+        rebuildSubjectTree(user);
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        /* Here we must handle if common user's layout become shared. */
+        auto owner = layout->getParentResource().dynamicCast<QnUserResource>();
+        if (!owner)
+            return;
+
+        connect(layout, &QnResource::parentIdChanged, this,
+            [this, layout, owner]
+            {
+                handleAccessChanged(owner, layout);
+            });
+    }
+}
+
+void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
+{
+    m_valid = !user.isNull()
+        && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+
+    clean();
+    if (m_valid)
+        rebuild();
+}
+
 void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
+    if (!m_valid)
+        return;
+
     if (qnResourceAccessProvider->hasAccess(subject, resource))
     {
-        auto node = ensureResourceNode(subject, resource);
-        if (node)
-            node->update();
-    }
-    else
-    {
-        auto id = subject.id();
-        if (!m_shared.contains(id))
-            return;
-        for (auto node : m_shared[id])
+        if (auto node = ensureResourceNode(subject, resource))
         {
-            if (node->resource() != resource)
-                continue;
-
-            removeNode(node);
-            cleanupRecorders();
-            break;
+            node->update();
+            return;
         }
     }
+
+    /* In some cases we should remove nodes under user even if he has access. For example, when
+     * user's own layout become shared. */
+
+    auto id = subject.id();
+    if (!m_shared.contains(id))
+        return;
+
+    for (auto node : m_shared[id])
+    {
+        if (node->resource() != resource)
+            continue;
+
+        removeNode(node);
+        cleanupRecorders();
+        break;
+    }
+
 }
 
 void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
     const QnResourceAccessSubject& subject)
 {
-    /* Full rebuild on current user permissions change. */
-    if (subject.user() && subject.user() == context()->user())
+    if (!m_valid)
+        return;
+
+    if (subject.user() == context()->user())
     {
-        rebuild();
+        /* Rebuild will occur on context user change. */
         return;
     }
 

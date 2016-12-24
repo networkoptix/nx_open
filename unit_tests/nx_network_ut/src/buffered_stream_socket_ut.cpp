@@ -14,7 +14,7 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     []()
     {
         return std::make_unique<BufferedStreamSocket>(
-            std::make_unique<TCPSocket>(false, AF_INET));
+            std::make_unique<TCPSocket>(AF_INET));
     })
 
 class BufferedStreamSocketTest:
@@ -32,13 +32,13 @@ protected:
     {
         server = std::make_unique<TCPServerSocket>(AF_INET);
         ASSERT_TRUE(server->setReuseAddrFlag(true));
-        ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+        ASSERT_TRUE(server->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(server->listen(10));;
 
         const auto serverAddress = server->getLocalAddress();
         NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
 
-        client = std::make_unique<TCPSocket>(false, AF_INET);
+        client = std::make_unique<TCPSocket>(AF_INET);
         ASSERT_TRUE(client->setSendTimeout(500));
         ASSERT_TRUE(client->connect(serverAddress, 500));
 
@@ -56,18 +56,19 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
     accepted->catchRecvEvent(acceptedResults.pusher());
     ASSERT_EQ(acceptedResults.pop(), SystemError::timedOut);
 
-    buffer.reserve(kTestMessage.size() * kClientCount);
+    const auto clientCount = testClientCount();
+    buffer.reserve(kTestMessage.size() * clientCount);
     accepted->catchRecvEvent(acceptedResults.pusher());
-    for (int i = 0; i < kClientCount; ++i)
+    for (size_t i = 0; i < clientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
     accepted->readAsyncAtLeast(
-        &buffer, kTestMessage.size() * kClientCount,
+        &buffer, kTestMessage.size() * clientCount,
         [&](SystemError::ErrorCode code, size_t size)
         {
             ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(size, kTestMessage.size() * kClientCount);
+            ASSERT_EQ(size, kTestMessage.size() * clientCount);
             ASSERT_EQ(buffer.size(), size);
             ASSERT_TRUE(buffer.startsWith(kTestMessage));
             ASSERT_TRUE(buffer.endsWith(kTestMessage));
@@ -75,17 +76,18 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
         });
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
 
-    buffer = Buffer(kTestMessage.size() * kClientCount, '\0');
+    buffer = Buffer(kTestMessage.size() * clientCount, '\0');
     accepted->catchRecvEvent(acceptedResults.pusher());
-    for (int i = 0; i < kClientCount; ++i)
+    for (size_t i = 0; i < clientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
     ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
-    accepted->setNonBlockingMode(false);
+    ASSERT_TRUE(accepted->setNonBlockingMode(false));
     ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL), buffer.size());
     ASSERT_TRUE(buffer.startsWith(kTestMessage));
     ASSERT_TRUE(buffer.endsWith(kTestMessage));
 
+    ASSERT_TRUE(accepted->setNonBlockingMode(true));
     accepted->catchRecvEvent(acceptedResults.pusher());
     client.reset();
     ASSERT_EQ(acceptedResults.pop(), SystemError::connectionReset);

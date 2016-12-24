@@ -20,7 +20,7 @@ QnEmailSettings QnSimpleSmtpSettings::toSettings(const QnEmailSettings &base) co
     else
     {
         result = address.settings();
-        result.user = email;
+        result.user = address.value();
     }
     result.email = email;
     result.password = password;
@@ -50,7 +50,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->emailInputField->setTitle(tr("Email"));
     ui->emailInputField->setValidator([](const QString& text)
     {
-        if (text.trimmed().isEmpty() || !QnEmailAddress::isValid(text))
+        if (!nx::email::isValidAddress(text))
             return Qn::ValidationResult(tr("Email is not valid."));
 
         QnEmailAddress email(text);

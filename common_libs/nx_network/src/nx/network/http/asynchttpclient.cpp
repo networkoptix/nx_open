@@ -10,14 +10,16 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
-#include <nx/utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
-#include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/systemerror.h>
+#include <utils/common/util.h>
 
 #include "auth_tools.h"
 
@@ -33,6 +35,8 @@ namespace nx_http
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
+    
+    constexpr int kMaxNumberOfRedirects = 5;
 
     AsyncHttpClient::Timeouts::Timeouts(
         std::chrono::milliseconds send,
@@ -53,8 +57,7 @@ namespace nx_http
             && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
     }
 
-    AsyncHttpClient::AsyncHttpClient()
-        :
+    AsyncHttpClient::AsyncHttpClient():
         m_state(sInit),
         m_connectionClosed(false),
         m_requestBytesSent(0),
@@ -73,14 +76,15 @@ namespace nx_http
         m_lastSysErrorCode(SystemError::noError),
         m_requestSequence(0),
         m_forcedEof(false),
-        m_precalculatedAuthorizationDisabled(false)
+        m_precalculatedAuthorizationDisabled(false),
+        m_numberOfRedirectsTried(0)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        pleaseStopSync();
+        pleaseStopSync(false);
     }
 
     const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()
@@ -116,9 +120,14 @@ namespace nx_http
     void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
     {
         if (m_aioThreadBinder.isInSelfAioThread())
+        {
             stopWhileInAioThread();
+        }
         else
+        {
+            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
             QnStoppableAsync::pleaseStopSync(checkForLocks);
+        }
     }
 
     void AsyncHttpClient::stopWhileInAioThread()
@@ -157,7 +166,7 @@ namespace nx_http
 
     bool AsyncHttpClient::failed() const
     {
-        return m_state == sFailed;
+        return m_state == sFailed || response() == nullptr;
     }
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
@@ -429,6 +438,9 @@ namespace nx_http
 
     void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     {
+        NX_LOGX(lm("Opened connection to url %1. Result code %2")
+            .str(m_url).str(errorCode), cl_logDEBUG2);
+
         std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
         if (m_terminated)
@@ -443,11 +455,13 @@ namespace nx_http
         if (errorCode == SystemError::noError)
         {
             //connect successful
-            m_remoteEndpoint = SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
+            m_remoteEndpointWithProtocol = endpointWithProtocol(m_url);
             serializeRequest();
             m_state = sSendingRequest;
             emit tcpConnectionEstablished(sharedThis);
             using namespace std::placeholders;
+            NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
+
             m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
@@ -455,8 +469,6 @@ namespace nx_http
         NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
             arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
-        if (reconnectIfAppropriate())
-            return;
 
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;
@@ -580,6 +592,7 @@ namespace nx_http
         ++m_requestSequence;
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
+        m_numberOfRedirectsTried = 0;
         m_request = nx_http::Request();
     }
 
@@ -595,13 +608,11 @@ namespace nx_http
         }
 
         m_url = url;
-        const SocketAddress remoteEndpoint(url.host(), url.port(nx_http::DEFAULT_HTTP_PORT));
-
         canUseExistingConnection =
             m_socket &&
             !m_connectionClosed &&
             canUseExistingConnection &&
-            (m_remoteEndpoint == remoteEndpoint) &&
+            (m_remoteEndpointWithProtocol == endpointWithProtocol(url)) &&
             m_lastSysErrorCode == SystemError::noError;
 
         if (!canUseExistingConnection)
@@ -627,6 +638,7 @@ namespace nx_http
 
                     serializeRequest();
                     m_state = sSendingRequest;
+                    NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
                     m_socket->sendAsync(
                         m_requestBuffer,
                         std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
@@ -644,11 +656,16 @@ namespace nx_http
         const SocketAddress remoteAddress =
             m_proxyEndpoint
             ? m_proxyEndpoint.get()
-            : SocketAddress(m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT));
+            : SocketAddress(
+                m_url.host(),
+                m_url.port(nx_http::defaultPortForScheme(m_url.scheme().toLatin1())));
 
         m_state = sInit;
 
-        m_socket = SocketFactory::createStreamSocket(/*m_url.scheme() == lit("https")*/);
+        m_socket = SocketFactory::createStreamSocket(m_url.scheme() == lit("https"));
+
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_url).arg(m_socket->handle()), cl_logDEBUG2);
+
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
         if (!m_socket->setNonBlockingMode(true) ||
@@ -838,32 +855,8 @@ namespace nx_http
             arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
             arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
 
-        const Response* response = m_httpStreamReader.message().response;
-        if (response->statusLine.statusCode == StatusCode::unauthorized)
-        {
-            //TODO #ak following block should be moved somewhere
-            if (!m_ha1RecalcTried &&
-                response->headers.find(Qn::REALM_HEADER_NAME) != response->headers.cend())
-            {
-                m_authorizationTried = false;
-                m_ha1RecalcTried = true;
-            }
-
-            if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
-            {
-                //trying authorization
-                if (resendRequestWithAuthorization(*response))
-                    return;
-            }
-        }
-        else if (response->statusLine.statusCode == StatusCode::proxyAuthenticationRequired)
-        {
-            if (!m_proxyAuthorizationTried && (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
-            {
-                if (resendRequestWithAuthorization(*response, true))
-                    return;
-            }
-        }
+        if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
+            return;
 
         const bool messageHasMessageBody =
             (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
@@ -926,10 +919,74 @@ namespace nx_http
         }
 
         //message body has been received with request
-        NX_ASSERT(m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError);
+        NX_ASSERT(
+            m_httpStreamReader.state() == HttpStreamReader::messageDone ||
+            m_httpStreamReader.state() == HttpStreamReader::parseError);
 
         m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
         emit done(sharedThis);
+    }
+
+    bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
+    {
+        switch (response.statusLine.statusCode)
+        {
+            case StatusCode::unauthorized:
+            {
+                if (!m_ha1RecalcTried &&
+                    response.headers.find(Qn::REALM_HEADER_NAME) != response.headers.cend())
+                {
+                    m_authorizationTried = false;
+                    m_ha1RecalcTried = true;
+                }
+
+                if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
+                {
+                    //trying authorization
+                    if (resendRequestWithAuthorization(response))
+                        return true;
+                }
+
+                break;
+            }
+            
+            case StatusCode::proxyAuthenticationRequired:
+            {
+                if (!m_proxyAuthorizationTried &&
+                    (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
+                {
+                    if (resendRequestWithAuthorization(response, true))
+                        return true;
+                }
+                break;
+            }
+            
+            case StatusCode::movedPermanently:
+                return sendRequestToNewLocation(response);
+
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
+    {
+        if (m_numberOfRedirectsTried >= kMaxNumberOfRedirects)
+            return false;
+        ++m_numberOfRedirectsTried;
+
+        // For now, using first Location if many have been provided in response.
+        const auto locationIter = response.headers.find("Location");
+        if (locationIter == response.headers.end())
+            return false;
+
+        m_authorizationTried = false;
+        m_ha1RecalcTried = false;
+
+        initiateHttpMessageDelivery(QUrl(QLatin1String(locationIter->second)));
+        return true;
     }
 
     void AsyncHttpClient::processResponseMessageBodyBytes(
@@ -1030,8 +1087,21 @@ namespace nx_http
                 &m_request,
                 &m_authCacheItem))
         {
-            //not using Basic authentication by default, since it is not secure
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            if (m_authType == AuthType::authBasic)
+            {
+                header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        header::Authorization::NAME,
+                        basicAuthorization.serialized()));
+            }
+            else
+            {
+                //not using Basic authentication by default, since it is not secure
+                nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            }
+            
         }
     }
 
@@ -1077,6 +1147,14 @@ namespace nx_http
     AsyncHttpClientPtr AsyncHttpClient::create()
     {
         return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
+    }
+
+    QString AsyncHttpClient::endpointWithProtocol(const QUrl& url)
+    {
+        return lit("%1://%2:%3")
+            .arg(url.scheme())
+            .arg(url.host())
+            .arg(url.port(nx_http::defaultPortForScheme(url.scheme().toLatin1())));
     }
 
     bool AsyncHttpClient::resendRequestWithAuthorization(
@@ -1271,7 +1349,6 @@ namespace nx_http
         m_forcedEof = true;
         m_httpStreamReader.forceEndOfMsgBody();
     }
-
 
     /**********************************************************
     * utils

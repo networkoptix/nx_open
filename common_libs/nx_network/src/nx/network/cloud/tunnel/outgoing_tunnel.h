@@ -14,37 +14,35 @@
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 
 /**
-    \note \a OutgoingTunnel instance can be safely freed only after 
-        \a OutgoingTunnel::pleaseStop completion. It is allowed 
-        to free object in \a closed handler itself.
-        It is needed to guarantee that all clients receive response.
-    \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
-*/
-class NX_NETWORK_API OutgoingTunnel
-:
+ * @note OutgoingTunnel instance can be safely freed only after 
+ *       OutgoingTunnel::pleaseStop completion. It is allowed 
+ *       to free object in "on closed" handler itself.
+ *       It is needed to guarantee that all clients receive response.
+ * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call
+ */
+class NX_NETWORK_API OutgoingTunnel:
     public aio::BasicPollable
 {
     typedef aio::BasicPollable BaseType;
 
 public:
-    typedef std::function<void(SystemError::ErrorCode,
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
 
     enum class State
     {
-        kInit,
-        kConnecting,
-        kConnected,
-        kClosed
+        init,
+        connecting,
+        connected,
+        closed
     };
 
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 
@@ -53,22 +51,24 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     /**
-       \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
+     * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
      */
     virtual void stopWhileInAioThread() override;
 
-    void setStateHandler(nx::utils::MoveOnlyFunc<void(State)> handler);
+    void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
 
-    /** Establish new connection.
-    * @param timeout Zero means no timeout
-    * @param socketAttributes attribute values to apply to a newly-created socket
-    * \note This method is re-enterable. So, it can be called in
-    *        different threads simultaneously */
+    /**
+     * Establish new connection.
+     * @param timeout Zero means no timeout
+     * @param socketAttributes attribute values to apply to a newly-created socket
+     * @note This method is re-enterable. So, it can be called in
+     *       different threads simultaneously
+     */
     void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
-    /** same as above, but no timeout */
+    /** Same as above, but no timeout. */
     void establishNewConnection(
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
@@ -97,7 +97,7 @@ private:
     SystemError::ErrorCode m_lastErrorCode;
     QnMutex m_mutex;
     State m_state;
-    nx::utils::MoveOnlyFunc<void(State)> m_stateHandler;
+    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -114,6 +114,7 @@ private:
     void onConnectorFinished(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
+    void setTunnelConnection(std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 };
 
 } // namespace cloud

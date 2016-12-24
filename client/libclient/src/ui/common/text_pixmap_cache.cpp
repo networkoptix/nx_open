@@ -10,14 +10,14 @@
 #include <utils/common/hash.h>
 
 namespace {
-    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font) 
+    QPixmap renderText(const QString &text, const QPen &pen, const QFont &font)
     {
         QFontMetrics metrics(font);
         QSize textSize = metrics.size(Qt::TextSingleLine, text);
         if(textSize.isEmpty())
             return QPixmap();
 
-        static const auto ratio = qApp->desktop()->devicePixelRatio();
+        static const auto ratio = qApp->devicePixelRatio();
 
         const auto baseSize = QSize(textSize.width(), metrics.height());
         const auto pixmapSize = baseSize * ratio;
@@ -39,8 +39,8 @@ namespace {
 
 class QnTextPixmapCachePrivate {
 public:
-    QnTextPixmapCachePrivate(): 
-        pixmapByKey(64 * 1024 * 1024) /* 64 Megabytes. */ 
+    QnTextPixmapCachePrivate():
+        pixmapByKey(64 * 1024 * 1024) /* 64 Megabytes. */
     {}
 
     virtual ~QnTextPixmapCachePrivate() {
@@ -57,7 +57,7 @@ public:
         friend uint qHash(const Key &key) {
             using ::qHash;
 
-            return 
+            return
                 (929 * qHash(key.text)) ^
                 (883 * qHash(key.font)) ^
                 (547 * qHash(key.color));
@@ -72,7 +72,7 @@ public:
 };
 
 
-QnTextPixmapCache::QnTextPixmapCache(QObject *parent): 
+QnTextPixmapCache::QnTextPixmapCache(QObject *parent):
     QObject(parent),
     d(new QnTextPixmapCachePrivate())
 {}
@@ -99,7 +99,7 @@ const QPixmap &QnTextPixmapCache::pixmap(const QString &text, const QFont &font,
 
     result = new QPixmap(renderText(
         text,
-        QPen(localColor, 0), 
+        QPen(localColor, 0),
         font
     ));
     d->pixmapByKey.insert(key, result, result->height() * result->width() * result->depth() / 8);

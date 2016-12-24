@@ -2,6 +2,7 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
     <?include BuildVars.wxi ?>
+
     <Fragment Id='FragmentClient'>
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="$(var.customization)ClientDir" Name="Client">
@@ -14,6 +15,9 @@
                             <Shortcut Id="StartmenuAppLauncher" Directory="ProgramMenuDir" Name="$(var.productName)"
                               WorkingDirectory='$(var.clientDirId)' Advertise="yes" Icon="icon_menu.exe" >
                             </Shortcut>
+                            <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(var.productName)"
+                                 WorkingDirectory='$(var.clientDirId)' Icon="icon_desktop.exe">
+                            </Shortcut>
                         </File>
                     </Component>
 
@@ -21,11 +25,13 @@
                         <File Id="applauncher.exe" Name="applauncher.exe" Source="$(var.SourceDir)/applauncher.exe" KeyPath="yes" DiskId="14"/>
                     </Component>
 
-                    <Component Id="AppLauncherConfiguration">
+                    <Component Id="AppLauncherConfigurationUser">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\$(var.applauncherName)">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="$(var.releaseVersionMajor).$(var.releaseVersionMinor)"/>
                         </RegistryKey>
+                    </Component>
+                    <Component Id="AppLauncherConfigurationSystem">
                         <RegistryKey Root="HKLM"
                                  Key="Software\[Manufacturer]\$(var.applauncherName)">
                             <RegistryValue Type="string" Name="mirrorListUrl" Value="$(var.mirrorListUrl)"/>
@@ -56,16 +62,6 @@
                                 </RegistryKey>
                             </RegistryKey>
                         </RegistryKey>
-                    </Component>
-
-                    <Component Id="clientShortcutDesktop">
-                        <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
-
-                        <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\$(var.applauncherName)" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
-
-                        <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="$(var.productName)"
-                          WorkingDirectory='$(var.clientDirId)' Target="[#minilauncher.exe]" Icon="icon_desktop.exe">
-                        </Shortcut>
                     </Component>
 
                     <Directory Id="ImageFormats" Name="imageformats">
@@ -107,10 +103,6 @@
 
                     <Component Id="ClientSigar">
                         <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
-                    </Component>
-
-                    <Component Id="ClientVsRedistributable">
-                        <File Id="VcRedist.exe" Name="vcredist_$(var.arch).exe" Source="$(var.SourceDir)\vcredist_$(var.arch).exe" DiskId="15" />
                     </Component>
                 </Directory>
             </Directory>
@@ -221,6 +213,9 @@
                 <File Id="Qt5MultimediaWidgets.dll" Name="Qt5MultimediaWidgets.dll" Source="$(var.QtDir)\Qt5MultimediaWidgets.dll" DiskId="10"  />
             </Component>
             <Component>
+                <File Id="Qt5MultimediaQuick_p.dll" Name="Qt5MultimediaQuick_p.dll" Source="$(var.QtDir)\Qt5MultimediaQuick_p.dll" DiskId="10"  />
+            </Component>
+            <Component>
                 <File Id="Qt5Qml.dll" Name="Qt5Qml.dll" Source="$(var.QtDir)\Qt5Qml.dll" DiskId="10"  />
             </Component>
             <Component>
@@ -239,13 +234,13 @@
                 <File Id="Qt5WebKitWidgets.dll" Name="Qt5WebKitWidgets.dll" Source="$(var.QtDir)\Qt5WebKitWidgets.dll" DiskId="11"  />
             </Component>
             <Component>
-                <File Id="icudt53.dll" Name="icudt53.dll" Source="$(var.QtDir)\icudt53.dll" DiskId="5"  />
+                <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5"  />
             </Component>
             <Component>
-                <File Id="icuin53.dll" Name="icuin53.dll" Source="$(var.QtDir)\icuin53.dll" DiskId="5"  />
+                <File Id="icuin58.dll" Name="icuin58.dll" Source="$(var.QtDir)\icuin58.dll" DiskId="5"  />
             </Component>
             <Component>
-                <File Id="icuuc53.dll" Name="icuuc53.dll" Source="$(var.QtDir)\icuuc53.dll" DiskId="5"  />
+                <File Id="icuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5"  />
             </Component>
         </ComponentGroup>
 
@@ -295,17 +290,16 @@
 
             <ComponentRef Id="MiniLauncherExecutable" />
             <ComponentRef Id="AppLauncherExecutable" />
-            <ComponentRef Id="AppLauncherConfiguration" />
+            <ComponentRef Id="AppLauncherConfigurationUser" />
+            <ComponentRef Id="AppLauncherConfigurationSystem" />
             <ComponentRef Id="DefaultLanguage" />
             <ComponentRef Id="ClientExecutable" />
-            <ComponentRef Id="clientShortcutDesktop"/>
             <ComponentRef Id="ClientUriHandler"/>
             <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentGroupRef Id="ClientVoxComponent"/>
             <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
-            <ComponentGroupRef Id="Vs2015crtComponent"/>
             <ComponentGroupRef Id="ClientLibs"/>
             <ComponentRef Id="ClientConfiguration" />
             <?if $(var.quicksync) = true ?>
@@ -320,7 +314,7 @@
             <ComponentGroupRef Id="ClientOpenAL" />
             <ComponentGroupRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientSigar"/>
-            <ComponentRef Id="ClientVsRedistributable"/>
+            <ComponentGroupRef Id="ClientVcrt14ComponentGroup"/>
         </Feature>
     </Fragment>
 </Wix>

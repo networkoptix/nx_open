@@ -62,8 +62,20 @@ bool QnDialog::event(QEvent* event)
 {
     bool res = base_type::event(event);
 
-    if (event->type() == QEvent::LayoutRequest)
-        afterLayout();
+    switch (event->type())
+    {
+        case QEvent::LayoutRequest:
+            afterLayout();
+            break;
+
+        case QEvent::Show:
+            if (layout())
+                layout()->activate();
+            break;
+
+        default:
+            break;
+    }
 
     return res;
 }

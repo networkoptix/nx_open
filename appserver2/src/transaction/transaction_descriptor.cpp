@@ -14,6 +14,7 @@
 #include <nx_ec/data/api_tran_state_data.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/storage_resource.h>
 
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
@@ -28,6 +29,7 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/webpage_manager.h"
+#include <database/db_manager.h>
 
 namespace ec2 {
 namespace access_helpers {
@@ -206,8 +208,20 @@ struct CreateHashByUserIdHelper
 
 struct CreateHashByIdRfc4122Helper
 {
+    CreateHashByIdRfc4122Helper(const QByteArray additionalData = QByteArray()) :
+        m_additionalData(additionalData)
+    {}
+
     template<typename Param>
-    QnUuid operator ()(const Param &param) { return QnTransactionLog::makeHash(param.id.toRfc4122()); }
+    QnUuid operator ()(const Param &param) \
+    {
+        if (m_additionalData.isNull())
+            return QnTransactionLog::makeHash(param.id.toRfc4122());
+        return QnTransactionLog::makeHash(param.id.toRfc4122(), m_additionalData);
+    }
+
+private:
+    QByteArray m_additionalData;
 };
 
 struct CreateHashForResourceParamWithRefDataHelper
@@ -236,7 +250,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeStorage:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran);
         case ApiCommand::removeUser:
-        case ApiCommand::removeUserGroup:
+        case ApiCommand::removeUserRole:
             return notificationParams.userNotificationManager->triggerNotification(tran);
         case ApiCommand::removeEventRule:
             return notificationParams.businessEventNotificationManager->triggerNotification(tran);
@@ -496,7 +510,18 @@ bool resourceAccessHelper(const Qn::UserAccessData& accessData, const QnUuid& re
         && accessData.access == Qn::UserAccessData::Access::ReadAllResources)
             return true;
 
-    return qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    bool result = qnResourceAccessManager->hasPermission(userResource, target, permissions);
+    if (!result)
+        NX_LOG(
+            lit("%1 \n\tuser %2 with %3 permissions is asking for \
+                \n\t%4 resource with %5 permissions and fails...")
+                .arg(Q_FUNC_INFO)
+                .arg(accessData.userId.toString())
+                .arg((int)accessData.access)
+                .arg(resourceId.toString())
+                .arg(permissions), cl_logDEBUG1);
+
+    return result;
 }
 
 struct ModifyResourceAccess
@@ -541,6 +566,16 @@ void applyColumnFilter(const Qn::UserAccessData& accessData, ApiMediaServerData&
 {
     if (accessData != Qn::kSystemAccess)
         data.authKey.clear();
+}
+
+void applyColumnFilter(const Qn::UserAccessData& accessData, ApiStorageData& data)
+{
+    if (!hasSystemAccess(accessData) && !qnResourceAccessManager->hasGlobalPermission(
+            accessData,
+            Qn::GlobalPermission::GlobalAdminPermission))
+    {
+        data.url = QnStorageResource::urlWithoutCredentials(data.url);
+    }
 }
 
 struct ReadResourceAccess
@@ -698,13 +733,17 @@ struct ModifyCameraAttributesAccess
             return false;
         }
 
-        licenseUsageHelper.propose(camera, param.scheduleEnabled);
-        if (licenseUsageHelper.isOverflowForCamera(camera))
+        // Check the license if and only if recording goes from 'off' to 'on' state
+        const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+        if (prevScheduleEnabled != param.scheduleEnabled)
         {
-            qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
-            return false;
+            licenseUsageHelper.propose(camera, param.scheduleEnabled);
+            if (licenseUsageHelper.isOverflowForCamera(camera))
+            {
+                qWarning() << "save ApiCameraAttributesData forbidden because no license to enable recording. id=" << param.cameraId;
+                return false;
+            }
         }
-
         return true;
     }
 };
@@ -735,7 +774,9 @@ struct ModifyCameraAttributesListAccess
                 return;
             }
             cameras.push_back(camera);
-            licenseUsageHelper.propose(camera, p.scheduleEnabled);
+            const bool prevScheduleEnabled = !camera->isScheduleDisabled();
+            if (prevScheduleEnabled != p.scheduleEnabled)
+                licenseUsageHelper.propose(camera, p.scheduleEnabled);
         }
 
         for (const auto& camera : cameras)
@@ -817,21 +858,21 @@ struct AdminOnlyAccessOut
     }
 };
 
-struct RemoveUserGroupAccess
+struct RemoveUserRoleAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiIdData& param)
     {
         if (!AdminOnlyAccess()(accessData, param))
         {
-            qWarning() << "Remove user group forbidden because user has no admin access";
+            qWarning() << "Removing user role is forbidden because the user has no admin access";
             return false;
         }
 
         for (const auto& user : qnResPool->getResources<QnUserResource>())
         {
-            if (user->userGroup() == param.id)
+            if (user->userRoleId() == param.id)
             {
-                qWarning() << "Remove user group forbidden because group is still using by user " << user->getName();
+                qWarning() << "Removing user role is forbidden because the role is still used by the user " << user->getName();
                 return false;
             }
         }
@@ -986,13 +1027,24 @@ struct LocalTransactionType
     }
 };
 
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiMediaServerDataList serverDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
+
+    if (errorCode != ErrorCode::ok || serverDataList.empty())
+        return ec2::TransactionType::Unknown;
+
+    return TransactionType::Local;
+}
+
 struct SetStatusTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
     {
         QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
         if (!resource)
-            return TransactionType::Unknown;
+            return getStatusTransactionTypeFromDb(params.id);
         if(resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
@@ -1023,13 +1075,24 @@ struct SetResourceParamTransactionType
     }
 };
 
+ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
+{
+    ApiUserDataList userDataList;
+    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
+
+    if (errorCode != ErrorCode::ok || userDataList.empty())
+        return ec2::TransactionType::Unknown;
+
+    return userDataList[0].isCloud ? TransactionType::Cloud : TransactionType::Regular;
+}
+
 struct RemoveUserTransactionType
 {
     ec2::TransactionType::Value operator()(const ApiIdData& params)
     {
         auto user = qnResPool->getResourceById<QnUserResource>(params.id);
         if (!user)
-            return TransactionType::Unknown;
+            return getRemoveUserTransactionTypeFromDb(params.id);
         return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };

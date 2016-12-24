@@ -31,23 +31,21 @@
 #include "mediaserver_api.h"
 #include "server/hole_punching_processor.h"
 #include "settings.h"
-
+#include "statistics/stats_manager.h"
 
 namespace nx {
 namespace hpm {
 
 MediatorProcess::MediatorProcess( int argc, char **argv )
 :
-    QtService<QCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
     m_argc( argc ),
     m_argv( argv )
 {
-    setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
 }
 
 void MediatorProcess::pleaseStop()
 {
-    application()->quit();
+    m_processTerminationEvent.set_value();
 }
 
 void MediatorProcess::setOnStartedEventHandler(
@@ -66,7 +64,7 @@ const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
     return m_stunEndpoints;
 }
 
-int MediatorProcess::executeApplication()
+int MediatorProcess::exec()
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -85,7 +83,7 @@ int MediatorProcess::executeApplication()
         return 0;
     }
 
-    initializeQnLog(
+    nx::utils::log::initialize(
         settings.logging(), settings.general().dataDir,
         QnLibConnectionMediatorAppInfo::applicationDisplayName());
 
@@ -110,6 +108,8 @@ int MediatorProcess::executeApplication()
         NX_LOGX( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
     }
 
+    stats::StatsManager statsManager(settings);
+
     //STUN handlers
     nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
@@ -123,21 +123,29 @@ int MediatorProcess::executeApplication()
         settings,
         cloudDataProvider.get(),
         &stunMessageDispatcher,
-        &listeningPeerPool);
+        &listeningPeerPool,
+        &statsManager.collector());
 
     //accepting STUN requests by both tcp and udt
     MultiAddressServer<stun::SocketServer> tcpStunServer(
         &stunMessageDispatcher,
         false,
-        SocketFactory::NatTraversalType::nttDisabled);
+        nx::network::NatTraversalSupport::disabled);
+
     if (!tcpStunServer.bind(settings.stun().addrToListenList))
     {
         NX_LOGX(lit("Can not bind to TCP addresses: %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
         return 3;
     }
+
     m_stunEndpoints = tcpStunServer.endpoints();
-    
+    tcpStunServer.forEachListener(
+        [&settings](stun::SocketServer* server)
+        {
+            server->setConnectionKeepAliveOptions(settings.stun().keepAliveOptions);
+        });
+
     MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
     if (!udpStunServer.bind(m_stunEndpoints /*settings.stun().addrToListenList*/))
     {
@@ -149,10 +157,10 @@ int MediatorProcess::executeApplication()
     std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
         multiAddressHttpServer;
-    
+
     launchHttpServerIfNeeded(
         settings,
-        listeningPeerPool,
+        listeningPeerRegistrator,
         &httpMessageDispatcher,
         &multiAddressHttpServer);
 
@@ -180,40 +188,22 @@ int MediatorProcess::executeApplication()
     }
 
     NX_LOGX(lit("STUN Server is listening on %1")
-        .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+        .arg(containerString(settings.stun().addrToListenList)), cl_logALWAYS);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
 
-    //TODO #ak remove qt event loop
-    //application's main loop
-    const int result = application()->exec();
+    // This is actually the main loop.
+    m_processTerminationEvent.get_future().wait();
 
     //stopping accepting incoming connections
 
-    return result;
-}
-
-void MediatorProcess::start()
-{
-    //QtSingleCoreApplication* application = this->application();
-
-    //if( application->isRunning() )
-    //{
-    //    NX_LOGX( "Server already started", cl_logERROR );
-    //    application->quit();
-    //    return;
-    //}
-}
-
-void MediatorProcess::stop()
-{
-    application()->quit();
+    return 0;
 }
 
 bool MediatorProcess::launchHttpServerIfNeeded(
     const conf::Settings& settings,
-    const ListeningPeerPool& listeningPeerPool,
+    const PeerRegistrator& peerRegistrator,
     std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
     std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
         multiAddressHttpServer)
@@ -228,27 +218,30 @@ bool MediatorProcess::launchHttpServerIfNeeded(
     //registering HTTP handlers
     (*httpMessageDispatcher)->registerRequestProcessor<http::GetListeningPeerListHandler>(
         http::GetListeningPeerListHandler::kHandlerPath,
-        [&listeningPeerPool]() -> std::unique_ptr<http::GetListeningPeerListHandler>
-        {
-            return std::make_unique<http::GetListeningPeerListHandler>(
-                listeningPeerPool);
-        });
+        [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
     
     *multiAddressHttpServer =
         std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
             nullptr,    //TODO #ak add authentication 
             httpMessageDispatcher->get(),
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
-    if (!(*multiAddressHttpServer)->bind(settings.http().addrToListenList))
+    auto& httpServer = *multiAddressHttpServer;
+    if (!httpServer->bind(settings.http().addrToListenList))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
             .arg(SystemError::toString(osErrorCode)), cl_logERROR);
         return false;
     }
-    m_httpEndpoints = (*multiAddressHttpServer)->endpoints();
+
+    m_httpEndpoints = httpServer->endpoints();
+    httpServer->forEachListener(
+        [&settings](nx_http::HttpStreamSocketServer* server)
+        {
+            server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
+        });
 
     return true;
 }

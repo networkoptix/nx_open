@@ -11,79 +11,85 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <libvms_gateway_app_info.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 
+#include "libvms_gateway_app_info.h"
 
-namespace
-{
-    const QString kModuleName = lit("vms_gateway");
+namespace {
 
+const QString kModuleName = lit("vms_gateway");
 
-    //general
-    const QLatin1String kGeneralEndpointsToListen("general/listenOn");
-    const QLatin1String kDefaultGeneralEndpointsToListen("0.0.0.0:3347");
+//general
+const QLatin1String kGeneralEndpointsToListen("general/listenOn");
+const QLatin1String kDefaultGeneralEndpointsToListen("0.0.0.0:3347");
 
-    const QLatin1String kGeneralDataDir("general/dataDir");
+const QLatin1String kGeneralDataDir("general/dataDir");
 
-    const QLatin1String kGeneralChangeUser("general/changeUser");
+const QLatin1String kGeneralChangeUser("general/changeUser");
 
-    const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
+const QLatin1String kGeneralMediatorEndpoint("general/mediatorEndpoint");
 
-    //auth
-    const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
-    const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
+//auth
+const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
+const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
 
-    //tcp
-    const QLatin1String kTcpRecvTimeout("tcp/recvTimeout");
-    const std::chrono::milliseconds kDefaultTcpRecvTimeout = std::chrono::seconds(17);
+//tcp
+const QLatin1String kTcpRecvTimeout("tcp/recvTimeout");
+const std::chrono::milliseconds kDefaultTcpRecvTimeout = std::chrono::seconds(17);
 
-    const QLatin1String kTcpSendTimeout("tcp/sendTimeout");
-    const std::chrono::milliseconds kDefaultTcpSendTimeout = std::chrono::seconds(17);
+const QLatin1String kTcpSendTimeout("tcp/sendTimeout");
+const std::chrono::milliseconds kDefaultTcpSendTimeout = std::chrono::seconds(17);
 
-    //http
-    const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
-    const int kDefaultHttpProxyTargetPort = nx_http::DEFAULT_HTTP_PORT;
+//http
+const QLatin1String kHttpProxyTargetPort("http/proxyTargetPort");
+const int kDefaultHttpProxyTargetPort = nx_http::DEFAULT_HTTP_PORT;
 
-    const QLatin1String kHttpConnectSupport("http/connectSupport");
-    const int kDefaultHttpConnectSupport = 0;
+const QLatin1String kHttpConnectSupport("http/connectSupport");
+const int kDefaultHttpConnectSupport = 0;
 
-    const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
-    const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
+const QLatin1String kHttpAllowTargetEndpointInUrl("http/allowTargetEndpointInUrl");
+const QLatin1String kDefaultHttpAllowTargetEndpointInUrl("false");
 
-    const QLatin1String kHttpSslSupport("http/sslSupport");
-    const QLatin1String kDefaultHttpSslSupport("true");
+const QLatin1String kHttpSslSupport("http/sslSupport");
+const QLatin1String kDefaultHttpSslSupport("true");
 
-    const QLatin1String kHttpSslCertPath("http/sslCertPath");
-    const QLatin1String kDefaultHttpSslCertPath("");
+const QLatin1String kHttpSslCertPath("http/sslCertPath");
+const QLatin1String kDefaultHttpSslCertPath("");
 
-    //cloudConnect
-    const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
-    const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
+//cloudConnect
+const QLatin1String kReplaceHostAddressWithPublicAddress("cloudConnect/replaceHostAddressWithPublicAddress");
+const QLatin1String kDefaultReplaceHostAddressWithPublicAddress("true");
 
-    const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
-    const QLatin1String kDefaultAllowIpTarget("false");
+const QLatin1String kAllowIpTarget("cloudConnect/allowIpTarget");
+const QLatin1String kDefaultAllowIpTarget("false");
 
-    const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
-    const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
+const QLatin1String kFetchPublicIpUrl("cloudConnect/fetchPublicIpUrl");
+const QLatin1String kDefaultFetchPublicIpUrl("http://networkoptix.com/myip");
 
-    const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
-    const QLatin1String kDefaultPublicIpAddress("");
+const QLatin1String kPublicIpAddress("cloudConnect/publicIpAddress");
+const QLatin1String kDefaultPublicIpAddress("");
 
-    namespace tcp_reverse {
-    const QLatin1String kPort("cloudConnect/tcpReversePort");
-    const uint32_t kDefaultPort(0);
+namespace tcp_reverse {
 
-    const QLatin1String kPoolSize("cloudConnect/tcpReversePoolSize");
-    const size_t kDefaultPoolSize(1);
+const QLatin1String kPort("cloudConnect/tcpReversePort");
+const uint32_t kDefaultPort(0);
 
-    const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
-    const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
-    } // namespace tcp_reverse
-}
+const QLatin1String kPoolSize("cloudConnect/tcpReversePoolSize");
+const size_t kDefaultPoolSize(1);
+
+const QLatin1String kKeepAlive("cloudConnect/tcpReverseKeepAlive");
+const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
+
+} // namespace tcp_reverse
+
+const QLatin1String kPreferedSslMode("cloudConnect/preferedSslMode");
+const QLatin1String kDefaultPreferedSslMode("enabled");
+
+} // namespace
 
 
 namespace nx {
@@ -100,17 +106,12 @@ Http::Http()
 {
 }
 
-CloudConnect::CloudConnect()
-:
-    replaceHostAddressWithPublicAddress(false),
-    allowIpTarget(false)
-{
-}
-
-
 Settings::Settings()
 :
-    m_settings(QnLibVmsGatewayAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibVmsGatewayAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
@@ -126,7 +127,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }
@@ -266,6 +267,14 @@ void Settings::loadConfiguration()
     m_cloudConnect.tcpReverse.keepAlive =
         KeepAliveOptions::fromString(m_settings.value(
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
+
+    auto preferedSslMode = m_settings.value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
+    if (preferedSslMode == "enabled" || preferedSslMode == "true")
+        m_cloudConnect.preferedSslMode = SslMode::enabled;
+    else if (preferedSslMode == "disabled" || preferedSslMode == "false")
+        m_cloudConnect.preferedSslMode = SslMode::disabled;
+    else
+        m_cloudConnect.preferedSslMode = SslMode::undefined;
 }
 
 }   //namespace conf

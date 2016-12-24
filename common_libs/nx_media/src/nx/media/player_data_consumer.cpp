@@ -1,8 +1,11 @@
 #include "player_data_consumer.h"
 
+#include <algorithm>
+
 #include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/debug_utils.h>
+#include <nx/utils/log/log.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -21,6 +24,13 @@ static const int kMaxMediaQueueLen = 90;
 // Max queue length for decoded video which is awaiting to be rendered.
 static const int kMaxDecodedVideoQueueSize = 2;
 
+/**
+ * Player will emit EOF if and only if it gets several empty packets in a row
+ * Sometime single empty packet can be received in case of Multi server archive server1->server2 switching
+ * or network issue/reconnect.
+ */
+static const int kEmptyPacketThreshold = 3;
+
 QSize qMax(const QSize& size1, const QSize& size2)
 {
     return size1.height() > size2.height() ? size1 : size2;
@@ -35,8 +45,10 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_noDelayState(NoDelayState::Disabled),
+    m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
-    m_lastDisplayedTimeUs(AV_NOPTS_VALUE)
+    m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
+    m_emptyPacketCounter(0)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
@@ -109,6 +121,7 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
+    m_emptyPacketCounter = 0;
 
     auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (videoFrame)
@@ -123,7 +136,8 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 
 bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/)
 {
-    emit onEOF();
+    if(++m_emptyPacketCounter > kEmptyPacketThreshold)
+        emit onEOF();
     return true;
 }
 
@@ -154,6 +168,12 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
+    if (!checkSequence(videoFrame->opaque))
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): Ignoring old frame"), cl_logDEBUG2);
+        return true; //< No error. Just ignore the old frame.
+    }
+
     quint32 videoChannel = videoFrame->channelNumber;
     auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
     if (archiveReader)
@@ -183,7 +203,10 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
 
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
-        return true; //< Frame is processed.
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
+        return true; //< The frame is processed.
+    }
 
     // First packet after a jump.
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
@@ -210,15 +233,33 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
-        qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
+        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
         // False result means we want to repeat this frame later, thus, returning true.
     }
     else
     {
         if (decodedFrame)
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
             enqueueVideoFrame(std::move(decodedFrame));
+        }
+        else
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+        }
     }
 
+    return true;
+}
+
+bool PlayerDataConsumer::checkSequence(int sequence)
+{
+    m_sequence = std::max(m_sequence, sequence);
+    if (sequence && m_sequence && sequence != m_sequence)
+    {
+        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
+        return false;
+    }
     return true;
 }
 
@@ -230,9 +271,20 @@ void PlayerDataConsumer::enqueueVideoFrame(QVideoFramePtr decodedFrame)
         m_queueWaitCond.wait(&m_queueMutex);
     if (needToStop())
         return;
+    FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
+    if (!checkSequence(metadata.sequence))
+        return; //< ignore old frame
     m_decodedVideo.push_back(std::move(decodedFrame));
     lock.unlock();
     emit gotVideoFrame();
+}
+
+void PlayerDataConsumer::clearUnprocessedData()
+{
+    base_type::clearUnprocessedData();
+    QnMutexLocker lock(&m_queueMutex);
+    m_decodedVideo.clear();
+    m_queueWaitCond.wakeAll();
 }
 
 QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
@@ -321,21 +373,27 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
     NX_ASSERT(m_awaitJumpCounter >= 0);
 }
 
-void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)
+void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/, int sequence)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
-    clearUnprocessedData(); //< Clear input (undecoded) data queue.
-
-    QnMutexLocker lock(&m_dataProviderMutex);
-
-    --m_awaitJumpCounter;
-    if (m_awaitJumpCounter == 0)
     {
-        // This function is called from dataProvider thread. PlayerConsumer may still process the
-        // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
-        // received.
-        m_noDelayState = NoDelayState::WaitForNextBOF;
+        QnMutexLocker lock(&m_dataProviderMutex);
+        --m_awaitJumpCounter;
+        if (m_awaitJumpCounter == 0)
+        {
+            // This function is called from dataProvider thread. PlayerConsumer may still process the
+            // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
+            // received.
+            m_noDelayState = NoDelayState::WaitForNextBOF;
+            m_sequence = sequence;
+        }
     }
+
+    clearUnprocessedData(); //< Clear input (undecoded) data queue.
+    if (m_awaitJumpCounter == 0)
+        emit jumpOccurred(m_sequence);
+    else
+        emit hurryUp();
 }
 
 void PlayerDataConsumer::endOfRun()

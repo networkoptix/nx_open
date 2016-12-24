@@ -88,10 +88,12 @@ signals:
     /** End of archive reached. */
     void onEOF();
 
+    /** Jump to new position. */
+    void jumpOccurred(int sequence);
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);
-    void onJumpOccurred(qint64 timeUsec);
+    void onJumpOccurred(qint64 timeUsec, int sequence);
 
 protected:
     virtual bool canAcceptData() const override;
@@ -99,7 +101,7 @@ protected:
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     virtual void endOfRun() override;
-
+    virtual void clearUnprocessedData() override;
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
     bool processVideoFrame(const QnCompressedVideoDataPtr& data);
@@ -108,7 +110,7 @@ private:
     void enqueueVideoFrame(QVideoFramePtr decodedFrame);
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
-
+    bool checkSequence(int sequence);
 private:
     /**
      * In case of multi-sensor video camera this class is used to calculate
@@ -174,12 +176,14 @@ private:
         WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
     };
     NoDelayState m_noDelayState;
+    int m_sequence;
 
     VideoGeometryAccessor m_videoGeometryAccessor;
 
     std::atomic<qint64> m_lastFrameTimeUs;
     std::atomic<qint64> m_lastDisplayedTimeUs;
     MultiSensorHelper m_awaitingFramesMask;
+    int m_emptyPacketCounter;
 };
 
 } // namespace media

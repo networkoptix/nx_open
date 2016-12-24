@@ -76,7 +76,8 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     ASSERT_TRUE(
         m_transactionConnectionHelper.waitForState(
-            {::ec2::QnTransactionTransportBase::Connected},
+            {::ec2::QnTransactionTransportBase::Connected,
+                ::ec2::QnTransactionTransportBase::ReadyForStreaming},
             m_connectionId,
             timeForConnectionToChangeState));
 }

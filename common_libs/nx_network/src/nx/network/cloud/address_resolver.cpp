@@ -14,7 +14,7 @@
 } while (0)
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
-static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
+static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
@@ -116,8 +116,8 @@ AddressResolver::AddressResolver(
 void AddressResolver::addFixedAddress(
     const HostAddress& hostName, const SocketAddress& hostAddress)
 {
-    NX_ASSERT(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
-    NX_ASSERT(hostAddress.address.isResolved());
+    NX_ASSERT(!hostName.isIpAddress(), Q_FUNC_INFO, "Hostname should be unresolved");
+    NX_ASSERT(hostAddress.address.isIpAddress());
     DEBUG_LOG(lm("Added fixed address for %1: %2").strs(hostName, hostAddress));
 
     QnMutexLocker lk(&m_mutex);
@@ -193,14 +193,33 @@ void AddressResolver::resolveDomain(
 }
 
 void AddressResolver::resolveAsync(
-    const HostAddress& hostName, ResolveHandler handler,
-    bool natTraversal, int ipVersion, void* requestId)
+    const HostAddress& hostName,
+    ResolveHandler handler,
+    NatTraversalSupport natTraversalSupport,
+    int ipVersion,
+    void* requestId)
 {
-    if (hostName.isResolved())
+    if (hostName.isIpAddress())
     {
         AddressEntry entry(AddressType::direct, hostName);
-        return handler(SystemError::noError, {std::move(entry)});
+        return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
+
+    // Checking if hostName is fixed address.
+    const auto hostStr = hostName.toString().toStdString();
+    const auto ipv4Address = inet_addr(hostStr.c_str());
+    if (ipv4Address != INADDR_NONE)
+    {
+        // Resolved.
+        struct in_addr resolvedAddress;
+        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+        resolvedAddress.s_addr = ipv4Address;
+        AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
+        return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+    }
+
+    if (SocketGlobals::config().isHostDisabled(hostName))
+        return handler(SystemError::noPermission, {});
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
@@ -208,38 +227,45 @@ void AddressResolver::resolveAsync(
         HostAddressInfo(isCloudHostName(&lk, hostName.toString()))).first;
     info->second.checkExpirations();
     tryFastDomainResolve(info);
-    if (info->second.isResolved(natTraversal))
+    if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
         lk.unlock();
 
         DEBUG_LOG(lm("Address %1 resolved from cache: %2").str(hostName).container(entries));
-        return handler(SystemError::noError, std::move(entries));
+        const auto code = entries.size() ? SystemError::noError : SystemError::hostNotFound;
+        return handler(code, std::move(entries));
     }
 
     info->second.pendingRequests.insert(requestId);
-    m_requests.insert(std::make_pair(requestId,
-        RequestInfo(info->first, natTraversal, std::move(handler))));
+    m_requests.insert(
+        std::make_pair(
+            requestId,
+            RequestInfo(info->first, natTraversalSupport, std::move(handler))));
 
     DEBUG_LOG(lm("Address %1 will be resolved later by request %2").strs(hostName, requestId));
-    if (info->second.isLikelyCloudAddress && natTraversal)
+    if (info->second.isLikelyCloudAddress && natTraversalSupport == NatTraversalSupport::enabled)
         mediatorResolve(info, &lk, true, ipVersion);
     else
-        dnsResolve(info, &lk, natTraversal, ipVersion);
+        dnsResolve(info, &lk, natTraversalSupport == NatTraversalSupport::enabled, ipVersion);
 }
 
-std::vector<AddressEntry> AddressResolver::resolveSync(
-     const HostAddress& hostName, bool natTraversal, int ipVersion)
+std::deque<AddressEntry> AddressResolver::resolveSync(
+    const HostAddress& hostName,
+    NatTraversalSupport natTraversalSupport,
+    int ipVersion)
 {
-    utils::promise<std::vector<AddressEntry>> promise;
-    auto handler = [&](
-        SystemError::ErrorCode /*code*/, std::vector<AddressEntry> entries)
-    {
-        promise.set_value(std::move(entries));
-    };
+    utils::promise<std::pair<SystemError::ErrorCode, std::deque<AddressEntry>>> promise;
+    auto handler = 
+        [&](SystemError::ErrorCode code, std::deque<AddressEntry> entries)
+        {
+            promise.set_value({code, std::move(entries)});
+        };
 
-    resolveAsync(hostName, std::move(handler), natTraversal, ipVersion);
-    return promise.get_future().get();
+    resolveAsync(hostName, std::move(handler), natTraversalSupport, ipVersion);
+    const auto result = promise.get_future().get();
+    SystemError::setLastErrorCode(result.first);
+    return result.second;
 }
 
 void AddressResolver::cancel(
@@ -309,7 +335,7 @@ void AddressResolver::HostAddressInfo::setDnsEntries(
     std::vector<AddressEntry> entries)
 {
     m_dnsState = State::resolved;
-    m_dnsResolveTime = std::chrono::system_clock::now();
+    m_dnsResolveTime = std::chrono::steady_clock::now();
     m_dnsEntries = std::move(entries);
 }
 
@@ -317,70 +343,78 @@ void AddressResolver::HostAddressInfo::setMediatorEntries(
         std::vector<AddressEntry> entries)
 {
     m_mediatorState = State::resolved;
-    m_mediatorResolveTime = std::chrono::system_clock::now();
+    m_mediatorResolveTime = std::chrono::steady_clock::now();
     m_mediatorEntries = std::move(entries);
 }
 
 void AddressResolver::HostAddressInfo::checkExpirations()
 {
     if (m_dnsState == State::resolved &&
-        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::system_clock::now())
+        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::steady_clock::now())
     {
         m_dnsState = State::unresolved;
         m_dnsEntries.clear();
     }
 
-    if (!kResolveOnMediator)
-        return; // just a short cut
-
     if (m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::system_clock::now())
+        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::steady_clock::now())
     {
         m_mediatorState = State::unresolved;
         m_mediatorEntries.clear();
     }
 }
 
-bool AddressResolver::HostAddressInfo::isResolved(bool natTraversal) const
+bool AddressResolver::HostAddressInfo::isResolved(
+    NatTraversalSupport natTraversalSupport) const
 {
-    if(!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
+    if (!fixedEntries.empty() || !m_dnsEntries.empty() || !m_mediatorEntries.empty())
         return true; // any address is better than nothing
 
-    return (m_dnsState == State::resolved) &&
-        (!natTraversal || m_mediatorState == State::resolved);
+    return (m_dnsState == State::resolved)
+        && (natTraversalSupport == NatTraversalSupport::disabled
+            || m_mediatorState == State::resolved);
 }
 
-template<typename Container>
-void containerAppend(Container& c1, const Container& c2)
+std::deque<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
 {
-    c1.insert(c1.end(), c2.begin(), c2.end());
-}
+    std::deque<AddressEntry> entries;
+    const auto endeque =
+        [&entries](const std::vector<AddressEntry>& v)
+        {
+            for (const auto i: v)
+                entries.push_back(i);
+        };
 
-std::vector<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
-{
-    std::vector<AddressEntry> entries(fixedEntries);
+    endeque(fixedEntries);
     if (isLikelyCloudAddress)
     {
-        containerAppend(entries, m_mediatorEntries);
-        containerAppend(entries, m_dnsEntries);
+        endeque(m_mediatorEntries);
+        endeque(m_dnsEntries);
     }
     else
     {
-        containerAppend(entries, m_dnsEntries);
-        containerAppend(entries, m_mediatorEntries);
+        endeque(m_dnsEntries);
+        endeque(m_mediatorEntries);
     }
 
     return entries;
 }
 
 AddressResolver::RequestInfo::RequestInfo(
-    HostAddress _address, bool _natTraversal, ResolveHandler _handler)
+    HostAddress address,
+    NatTraversalSupport natTraversalSupport,
+    ResolveHandler handler)
 :
-    address(std::move(_address)),
+    address(std::move(address)),
     inProgress(false),
-    natTraversal(_natTraversal),
-    handler(std::move(_handler))
+    natTraversalSupport(natTraversalSupport),
+    handler(std::move(handler))
 {
+}
+
+bool AddressResolver::isMediatorAvailable() const
+{
+    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
 }
 
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
@@ -403,6 +437,8 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
+    NX_LOGX(lm("dnsResolve. %1. %2").str(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
+
     switch (info->second.dnsState())
     {
         case HostAddressInfo::State::resolved:
@@ -414,26 +450,34 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
+    NX_LOGX(lm("dnsResolve async. %1").str(info->first), cl_logDEBUG2);
+
     info->second.dnsProgress();
-    lk->unlock();
-    m_dnsResolver.resolveAddressAsync(
-        info->first,
+    QnMutexUnlocker ulk(lk);
+    m_dnsResolver.resolveAsync(
+        info->first.toString(),
         [this, info, needMediator, ipVersion](
-            SystemError::ErrorCode code, const HostAddress& host)
+            SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
+            NX_LOGX(lm("dnsResolve async done. %1, %2").str(code).str(ips.size()), cl_logDEBUG2);
+
             std::vector<Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
             std::vector<AddressEntry> entries;
-            if(code == SystemError::noError)
-                entries.push_back(AddressEntry(AddressType::direct, host));
+            while (!ips.empty())
+            {
+                entries.emplace_back(AddressType::direct, std::move(ips.front()));
+                ips.pop_front();
+            }
 
             DEBUG_LOG(lm("Address %1 is resolved by DNS to %2")
                 .str(info->first).container(entries));
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            if (needMediator && !info->second.isResolved(true))
+            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").str(guards.size()), cl_logDEBUG2);
+            if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
         ipVersion,
@@ -458,8 +502,7 @@ void AddressResolver::mediatorResolve(
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress
-        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    if (info->second.isLikelyCloudAddress && isMediatorAvailable())
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
         resolveResult = SystemError::noError;
@@ -470,18 +513,22 @@ void AddressResolver::mediatorResolve(
         resolveResult = SystemError::hostNotFound;
     }
 
-    const auto guards = grabHandlers(resolveResult, info);
-    if (needDns && !info->second.isResolved(true))
-        return dnsResolve(info, lk, false, ipVersion);
+    const auto unlockedGuard = makeScopedGuard(
+        [lk, guards = grabHandlers(resolveResult, info)]() mutable
+        {
+            QnMutexUnlocker ulk(lk);
+            guards.clear();
+        });
 
-    lk->unlock(); //< Fire guards away from mutex scope.
+    if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
+        return dnsResolve(info, lk, false, ipVersion);
 }
 
 void AddressResolver::mediatorResolveImpl(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion)
 {
     info->second.mediatorProgress();
-    lk->unlock();
+    QnMutexUnlocker ulk(lk);
     m_mediatorConnection->resolvePeer(
         nx::hpm::api::ResolvePeerRequest(info->first.toString().toUtf8()),
         [this, info, needDns, ipVersion](
@@ -517,7 +564,7 @@ void AddressResolver::mediatorResolveImpl(
 
             info->second.setMediatorEntries(std::move(entries));
             guards = grabHandlers(code, info);
-            if (needDns && !info->second.isResolved(true))
+            if (needDns && !info->second.isResolved(NatTraversalSupport::enabled))
                 dnsResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         });
 }
@@ -537,7 +584,7 @@ std::vector<Guard> AddressResolver::grabHandlers(
         {
             if (it->second.address != info->first ||
                 it->second.inProgress ||
-                !info->second.isResolved(it->second.natTraversal))
+                !info->second.isResolved(it->second.natTraversalSupport))
             {
                 noPending = false;
                 continue;

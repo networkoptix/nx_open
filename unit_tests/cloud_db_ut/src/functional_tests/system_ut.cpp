@@ -10,28 +10,130 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
+#include <nx/utils/system_utils.h>
 #include <nx/utils/time.h>
+#include <nx/utils/test_support/utils.h>
 
 #include "test_setup.h"
-
 
 namespace nx {
 namespace cdb {
 
 namespace {
 
-class System
-:
+class FtSystem:
     public CdbFunctionalTest
 {
+public:
+    virtual void SetUp() override
+    {
+        CdbFunctionalTest::SetUp();
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+protected:
+    api::SystemData givenSystem()
+    {
+        auto owner = addActivatedAccount2();
+        m_registeredAccounts.emplace(owner.email, owner);
+        auto system = addRandomSystemToAccount(owner);
+        return system;
+    }
+
+    AccountWithPassword givenUserOfSystem(const api::SystemData& system)
+    {
+        const auto newAccount = addActivatedAccount2();
+        const auto owner = m_registeredAccounts.find(system.ownerAccountEmail)->second;
+        shareSystemEx(owner, system, newAccount, api::SystemAccessRole::cloudAdmin);
+        return newAccount;
+    }
+
+    void havingDisabledUserInSystem(
+        const api::SystemData& system,
+        const api::AccountData& user)
+    {
+        updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, false));
+    }
+
+    void havingEnabledUserInSystem(
+        const api::SystemData& system,
+        const api::AccountData& user)
+    {
+        updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, true));
+    }
+
+    void assertIfUserCanSeeSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        ASSERT_FALSE(isUserHasAccessToSystem(user, systemToCheck));
+    }
+
+    void assertIfUserCannotSeeSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        ASSERT_TRUE(isUserHasAccessToSystem(user, systemToCheck));
+    }
+
+private:
+    std::map<std::string, AccountWithPassword> m_registeredAccounts;
+
+    bool isUserHasAccessToSystem(
+        const AccountWithPassword& user,
+        const api::SystemData& systemToCheck)
+    {
+        std::vector<api::SystemDataEx> systems;
+        NX_GTEST_ASSERT_EQ(api::ResultCode::ok, getSystems(user.email, user.password, &systems));
+        const auto systemToCheckIter = std::find_if(
+            systems.begin(),
+            systems.end(),
+            [&systemToCheck](const api::SystemDataEx& system)
+            {
+                return system.id == systemToCheck.id;
+            });
+        return systemToCheckIter != systems.end();
+    }
+
+    template<typename Name, typename Value>
+    struct Field
+    {
+        Name name;
+        Value value; 
+    };
+
+    template<typename Name, typename Value>
+    Field<Name, Value> makeField(Name name, Value value)
+    {
+        Field<Name, Value> f;
+        f.name = name;
+        f.value = value;
+        return f;
+    }
+
+    template<typename FieldType>
+    void updateSharing(
+        const api::SystemData& system,
+        const api::AccountData& user,
+        FieldType field)
+    {
+        api::SystemSharing sharing;
+        sharing.accountEmail = user.email;
+        sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+        sharing.isEnabled = true;
+        sharing.systemId = system.id;
+        const auto owner = m_registeredAccounts.find(system.ownerAccountEmail)->second;
+
+        sharing.*field.name = field.value;
+
+        ASSERT_EQ(api::ResultCode::ok, shareSystem(owner.email, owner.password, sharing));
+    }
 };
 
 }
 
-TEST_F(System, unbind)
+TEST_F(FtSystem, unbind)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -62,7 +164,7 @@ TEST_F(System, unbind)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 2);
+            ASSERT_EQ(systems.size(), 2U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
@@ -121,7 +223,7 @@ TEST_F(System, unbind)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         }
@@ -155,7 +257,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
         ASSERT_EQ(
             api::ResultCode::ok,
             testSetup->getSystem(account1.email, account1Password, system1.id, &systems));
-        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(1U, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
     }
@@ -179,7 +281,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=1").arg(testSetup->endpoint().port));
+        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=1").arg(testSetup->endpoint().port));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
@@ -187,7 +289,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 
     {
         nx_http::HttpClient client;
-        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
+        QUrl url(lit("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
             arg(testSetup->endpoint().port).arg(QString::fromStdString(system1.id)));
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
@@ -199,7 +301,7 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     {
         nx_http::HttpClient client;
         QString urlStr(
-            lm("http://127.0.0.1:%1/cdb/system/get?systemID=%2").
+            lm("http://127.0.0.1:%1/cdb/system/get?systemId=%2").
                 arg(testSetup->endpoint().port).arg(QUrl::toPercentEncoding(QString::fromStdString(system1.id))));
         urlStr.replace(lit("{"), lit("%7B"));
         urlStr.replace(lit("}"), lit("%7D"));
@@ -212,16 +314,13 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
     }
 }
 
-TEST_F(System, get)
+TEST_F(FtSystem, get)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
     cdbFunctionalTestSystemGet(this);
 }
 
-TEST_F(System, activation)
+TEST_F(FtSystem, activation)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -240,7 +339,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 0);   //only activated systems are provided
+            ASSERT_EQ(systems.size(), 0U);   //only activated systems are provided
             //ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             //ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             //ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
@@ -270,7 +369,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
@@ -282,7 +381,7 @@ TEST_F(System, activation)
         {
             std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 1U);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
             ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
@@ -294,22 +393,26 @@ TEST_F(System, activation)
     }
 }
 
-TEST_F(System, notification_of_system_removal)
+constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
+constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
+
+class FtSystemNotification:
+    public FtSystem
 {
-    constexpr const std::chrono::seconds kSystemGoneForeverPeriod =
-        std::chrono::seconds(5);
-    constexpr const std::chrono::seconds kDropExpiredSystemsPeriodSec =
-        std::chrono::seconds(1);
+public:
+    FtSystemNotification()
+    {
+        addArg("-systemManager/reportRemovedSystemPeriod");
+        addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
+        addArg("-systemManager/controlSystemStatusByDb");
+        addArg("true");
+        addArg("-systemManager/dropExpiredSystemsPeriod");
+        addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
+    }
+};
 
-    addArg("-systemManager/reportRemovedSystemPeriod");
-    addArg(QByteArray::number((unsigned int)kSystemGoneForeverPeriod.count()).constData());
-    addArg("-systemManager/controlSystemStatusByDb");
-    addArg("true");
-    addArg("-systemManager/dropExpiredSystemsPeriod");
-    addArg(QByteArray::number((unsigned int)kDropExpiredSystemsPeriodSec.count()).constData());
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
+TEST_F(FtSystemNotification, notification_of_system_removal)
+{
     enum class TestOption
     {
         withRestart,
@@ -381,10 +484,8 @@ TEST_F(System, notification_of_system_removal)
     }
 }
 
-TEST_F(System, rename)
+TEST_F(FtSystem, rename)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     // Adding system1 to account1.
     const auto system1 = addRandomSystemToAccount(account1);
@@ -392,12 +493,18 @@ TEST_F(System, rename)
     const auto account2 = addActivatedAccount2();
     shareSystemEx(account1, system1, account2, api::SystemAccessRole::cloudAdmin);
 
-    const std::string actualSystemName = "new system name";
+    const auto account3 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account3, api::SystemAccessRole::localAdmin);
+
+    const auto account4 = addActivatedAccount2();
+    shareSystemEx(account1, system1, account4, api::SystemAccessRole::advancedViewer);
+
+    std::string actualSystemName = "new system name";
     // Owner is allowed to rename his system.
     ASSERT_EQ(
         api::ResultCode::ok,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, actualSystemName));
 
     for (int j = 0; j < 2; ++j)
@@ -411,43 +518,51 @@ TEST_F(System, rename)
         api::SystemDataEx systemData;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystem(account1.data.email, account1.password, system1.id, &systemData));
+            getSystem(account1.email, account1.password, system1.id, &systemData));
         ASSERT_EQ(actualSystemName, systemData.name);
     }
 
-    // Only owner can rename system.
+    // Owner and admin can rename system.
+    actualSystemName = "sdfn[rtsdh";
     ASSERT_EQ(
-        api::ResultCode::forbidden,
-        renameSystem(system1.id, system1.authKey, system1.id, "aaa"));
+        api::ResultCode::ok,
+        renameSystem(account2.email, account2.password, system1.id, actualSystemName));
+
+    actualSystemName = "sdfn[rtsdh111";
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        renameSystem(account3.email, account3.password, system1.id, actualSystemName));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        renameSystem(account2.data.email, account2.password, system1.id, "xxx"));
+        renameSystem(account4.email, account4.password, system1.id, "xxx"));
+
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        renameSystem(system1.id, system1.authKey, system1.id, "aaa"));
 
     // Trying bad system names.
     ASSERT_EQ(
         api::ResultCode::badRequest,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, std::string()));
     ASSERT_EQ(
         api::ResultCode::badRequest,
         renameSystem(
-            account1.data.email, account1.password,
+            account1.email, account1.password,
             system1.id, std::string(4096, 'z')));
 
     // Checking system1 name.
     api::SystemDataEx systemData;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystem(account1.data.email, account1.password, system1.id, &systemData));
+        getSystem(account1.email, account1.password, system1.id, &systemData));
     ASSERT_EQ(actualSystemName, systemData.name);
 }
 
-TEST_F(System, persistent_sequence)
+TEST_F(FtSystem, persistent_sequence)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     api::AccountData account1;
     std::string account1Password;
     ASSERT_EQ(
@@ -508,22 +623,28 @@ static void validateSystemsOrder(
     }
 }
 
-template<typename Container>
-void bringToTop(
-    Container& container,
-    typename Container::value_type value)
+class FtSystemSortingOrder:
+    public FtSystem
 {
-    const auto it = std::find(container.begin(), container.end(), value);
-    if (it != container.end())
-        container.erase(it);
-    container.push_front(std::move(value));
-}
+protected:
+    template<typename Container>
+    void bringToTop(
+        Container& container,
+        typename Container::value_type value)
+    {
+        const auto it = std::find(container.begin(), container.end(), value);
+        if (it != container.end())
+            container.erase(it);
+        container.push_front(std::move(value));
+    }
+};
 
-TEST_F(System, sorting_order_weight_expiration)
+//constexpr float nx::utils::kSystemAccessBurnPeriodFullDays = 5.0;
+
+TEST_F(FtSystemSortingOrder, weight_expiration)
 {
-    nx::utils::test::ScopedTimeShift timeShift;
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
@@ -535,9 +656,8 @@ TEST_F(System, sorting_order_weight_expiration)
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency1 = systems[0].usageFrequency;
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
 
     // Second access.
     ASSERT_EQ(
@@ -547,33 +667,32 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency2 = systems[0].usageFrequency;
-    const auto lastLoginTime2 = systems[0].lastLoginTime;
 
     ASSERT_GT(usageFrequency2, usageFrequency1);
 
-    // A week has passed. No access.
-    timeShift.applyRelativeShift(7 * std::chrono::hours(24));
+    timeShift.applyRelativeShift(
+        static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.25) *
+        std::chrono::hours(24));
 
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency3 = systems[0].usageFrequency;
-    const auto lastLoginTime3 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency3, usageFrequency2);
 
-    // Half year passed. Still no access.
-    timeShift.applyRelativeShift(6 * 30 * std::chrono::hours(24));
+    timeShift.applyRelativeShift(
+        static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 6) *
+        std::chrono::hours(24));
 
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency4 = systems[0].usageFrequency;
-    const auto lastLoginTime4 = systems[0].lastLoginTime;
 
     ASSERT_LT(usageFrequency4, usageFrequency3);
 
@@ -583,17 +702,14 @@ TEST_F(System, sorting_order_weight_expiration)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto usageFrequency5 = systems[0].usageFrequency;
-    const auto lastLoginTime5 = systems[0].lastLoginTime;
 
     ASSERT_EQ(usageFrequency4, usageFrequency5);
 }
 
-TEST_F(System, sorting_order_multiple_systems)
+TEST_F(FtSystemSortingOrder, multiple_systems)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
     const auto system2 = addRandomSystemToAccount(account);
@@ -612,14 +728,15 @@ TEST_F(System, sorting_order_multiple_systems)
     systemIdsInSortOrder.push_back(system2.id);
     systemIdsInSortOrder.push_back(system1.id);
 
-    nx::utils::test::ScopedTimeShift timeShift;
+    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
 
     for (int i = 0; i < 3; ++i)
     {
         if (i == 1)
         {
             // Shifting time and testing for access history expiration.
-            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+            timeShift.applyAbsoluteShift(
+                static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.66) * std::chrono::hours(24));
 
             for (int j = 0; j < 2; ++j)
                 ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
@@ -633,9 +750,9 @@ TEST_F(System, sorting_order_multiple_systems)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account.data.email, account.password, &systems));
+            getSystems(account.email, account.password, &systems));
 
-        ASSERT_EQ(3, systems.size());
+        ASSERT_EQ(3U, systems.size());
         std::sort(
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
@@ -648,17 +765,15 @@ TEST_F(System, sorting_order_multiple_systems)
     }
 }
 
-TEST_F(System, sorting_order_last_login_time)
+TEST_F(FtSystemSortingOrder, last_login_time)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime1 = systems[0].lastLoginTime;
     // Initial value for lastLoginTime is current time.
     ASSERT_GT(systems[0].lastLoginTime, nx::utils::utcTime() - std::chrono::seconds(10));
@@ -669,7 +784,7 @@ TEST_F(System, sorting_order_last_login_time)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime2 = systems[0].lastLoginTime;
     ASSERT_GT(lastLoginTime2, lastLoginTime1);
 
@@ -680,7 +795,7 @@ TEST_F(System, sorting_order_last_login_time)
     systems.clear();
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
+        getSystems(account.email, account.password, &systems));
     const auto lastLoginTime3 = systems[0].lastLoginTime;
 
     ASSERT_GT(lastLoginTime3, lastLoginTime2);
@@ -691,10 +806,8 @@ TEST_F(System, sorting_order_last_login_time)
     ASSERT_LT(lastLoginTime3, nx::utils::utcTime() + std::chrono::seconds(10));
 }
 
-TEST_F(System, sorting_order_new_system_is_on_top)
+TEST_F(FtSystemSortingOrder, new_system_is_on_top)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account);
 
@@ -702,9 +815,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     std::vector<api::SystemDataEx> systems;
     ASSERT_EQ(
         api::ResultCode::ok,
-        getSystems(account.data.email, account.password, &systems));
-    const auto lastLoginTime1 = systems[0].lastLoginTime;
-    const auto usageFrequency1 = systems[0].usageFrequency;
+        getSystems(account.email, account.password, &systems));
 
     const auto system2 = addRandomSystemToAccount(account);
 
@@ -726,10 +837,11 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         {
             ASSERT_TRUE(restart());
         }
-        nx::utils::test::ScopedTimeShift timeShift;
+        nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::system);
         if (bringNewSystemDown)
         {
-            timeShift.applyAbsoluteShift(21 * std::chrono::hours(24));
+            timeShift.applyAbsoluteShift(
+                static_cast<int>(nx::utils::kSystemAccessBurnPeriodFullDays * 0.66) * std::chrono::hours(24));
             ASSERT_EQ(api::ResultCode::ok, recordUserSessionStart(account, system1.id));
 
             bringToTop(systemIdsInSortOrder, system1.id);
@@ -738,7 +850,7 @@ TEST_F(System, sorting_order_new_system_is_on_top)
         systems.clear();
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account.data.email, account.password, &systems));
+            getSystems(account.email, account.password, &systems));
 
         std::sort(
             systems.begin(), systems.end(),
@@ -751,10 +863,8 @@ TEST_F(System, sorting_order_new_system_is_on_top)
     }
 }
 
-TEST_F(System, sorting_order_persistence_after_sharing_update)
+TEST_F(FtSystemSortingOrder, persistence_after_sharing_update)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
     const auto account2 = addActivatedAccount2();
@@ -778,7 +888,7 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account2.data.email, account2.password, &systems));
+            getSystems(account2.email, account2.password, &systems));
         std::sort(
             systems.begin(), systems.end(),
             [](const api::SystemDataEx& one, const api::SystemDataEx& two)
@@ -789,10 +899,8 @@ TEST_F(System, sorting_order_persistence_after_sharing_update)
     }
 }
 
-TEST_F(System, sorting_order_unknown_system)
+TEST_F(FtSystemSortingOrder, unknown_system)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     const auto system1 = addRandomSystemToAccount(account1);
 
@@ -804,19 +912,17 @@ TEST_F(System, sorting_order_unknown_system)
         recordUserSessionStart(account1, "{"+system1.id+"}"));
 }
 
-TEST_F(System, update)
+TEST_F(FtSystem, update)
 {
     constexpr const char kOpaqueValue[] = 
         "SELECT * FROM account WHERE email like 'test@example.com'\r\n "
         "OR email like '\\slashed_test@example.com'\n";
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
     const auto account1 = addActivatedAccount2();
     auto system1 = addRandomSystemToAccount(account1);
 
     api::SystemAttributesUpdate updatedData;
-    updatedData.systemID = system1.id;
+    updatedData.systemId = system1.id;
     updatedData.opaque = kOpaqueValue;
     ASSERT_EQ(
         api::ResultCode::ok,
@@ -832,11 +938,28 @@ TEST_F(System, update)
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystems(account1.data.email, account1.password, &systems));
-        ASSERT_EQ(1, systems.size());
+            getSystems(account1.email, account1.password, &systems));
+        ASSERT_EQ(1U, systems.size());
         ASSERT_EQ(system1, systems[0]);
         ASSERT_EQ(system1.opaque, systems[0].opaque);
     }
+}
+
+TEST_F(FtSystem, disabled_user_does_not_see_system)
+{
+    const auto system = givenSystem();
+    const auto user = givenUserOfSystem(system);
+    havingDisabledUserInSystem(system, user);
+    assertIfUserCanSeeSystem(user, system);
+}
+
+TEST_F(FtSystem, reenabled_user_can_see_system)
+{
+    const auto system = givenSystem();
+    const auto user = givenUserOfSystem(system);
+    havingDisabledUserInSystem(system, user);
+    havingEnabledUserInSystem(system, user);
+    assertIfUserCannotSeeSystem(user, system);
 }
 
 } // namespace cdb

@@ -11,95 +11,103 @@
 using namespace nx::network;
 
 namespace {
+
 SocketFactory::CreateStreamSocketFuncType createStreamSocketFunc;
 SocketFactory::CreateStreamServerSocketFuncType createStreamServerSocketFunc;
-}
+
+} // namespace
 
 std::unique_ptr<AbstractDatagramSocket> SocketFactory::createDatagramSocket()
 {
-    return std::make_unique<UDPSocket>(false, s_tcpClientIpVersion.load());
+    return std::make_unique<UDPSocket>(s_udpIpVersion.load());
 }
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::createStreamSocket(
     bool sslRequired,
-    SocketFactory::NatTraversalType natTraversalRequired )
+    NatTraversalSupport natTraversalSupport)
 {
     if (createStreamSocketFunc)
-        return createStreamSocketFunc(sslRequired, natTraversalRequired);
+        return createStreamSocketFunc(sslRequired, natTraversalSupport);
 
     auto result = defaultStreamSocketFactoryFunc(
-        natTraversalRequired,
+        natTraversalSupport,
         s_enforcedStreamSocketType);
 
     if (!result)
         return std::unique_ptr<AbstractStreamSocket>();
 
-    #ifdef ENABLE_SSL
-        if (sslRequired || s_isSslEnforced)
-            result.reset(new SslSocket(result.release(), false));
-    #endif // ENABLE_SSL
+#ifdef ENABLE_SSL
+    if (sslRequired || s_isSslEnforced)
+        result.reset(new SslSocket(result.release(), false));
+#endif // ENABLE_SSL
 
     return std::move(result);
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
     bool sslRequired,
-    SocketFactory::NatTraversalType natTraversalRequired )
+    NatTraversalSupport natTraversalSupport)
 {
     if (createStreamServerSocketFunc)
-        return createStreamServerSocketFunc(sslRequired, natTraversalRequired);
+        return createStreamServerSocketFunc(sslRequired, natTraversalSupport);
 
     auto result = defaultStreamServerSocketFactoryFunc(
-        natTraversalRequired,
+        natTraversalSupport,
         s_enforcedStreamSocketType);
 
     if (!result)
         return std::unique_ptr<AbstractStreamServerSocket>();
 
-    #ifdef ENABLE_SSL
-        if (s_isSslEnforced)
-            result.reset(new SslServerSocket(result.release(), false));
-        else
+#ifdef ENABLE_SSL
+    if (s_isSslEnforced)
+        result.reset(new SslServerSocket(result.release(), false));
+    else
         if (sslRequired)
             result.reset(new SslServerSocket(result.release(), true));
-    #endif // ENABLE_SSL
+#endif // ENABLE_SSL
 
-    return std::move( result );
+    return std::move(result);
 }
 
-QString SocketFactory::toString( SocketType type )
+QString SocketFactory::toString(SocketType type)
 {
-    switch ( type )
+    switch (type)
     {
-        case SocketType::cloud: return lit( "cloud" );
-        case SocketType::tcp: return lit( "tcp" );
-        case SocketType::udt: return lit( "udt" );
+        case SocketType::cloud:
+            return lit("cloud");
+        case SocketType::tcp:
+            return lit("tcp");
+        case SocketType::udt:
+            return lit("udt");
     }
 
-    NX_ASSERT( false, lm("Unrecognized socket type: ").arg(static_cast<int>(type)) );
+    NX_ASSERT(false, lm("Unrecognized socket type: ").arg(static_cast<int>(type)));
     return QString();
 }
 
-SocketFactory::SocketType SocketFactory::stringToSocketType( QString type )
+SocketFactory::SocketType SocketFactory::stringToSocketType(QString type)
 {
-    if( type.toLower() == lit("cloud") ) return SocketType::cloud;
-    if( type.toLower() == lit("tcp") ) return SocketType::tcp;
-    if( type.toLower() == lit("udt") ) return SocketType::udt;
+    if (type.toLower() == lit("cloud"))
+        return SocketType::cloud;
+    if (type.toLower() == lit("tcp"))
+        return SocketType::tcp;
+    if (type.toLower() == lit("udt"))
+        return SocketType::udt;
 
-    NX_ASSERT( false, lm("Unrecognized socket type: ").arg(type) );
+    NX_ASSERT(false, lm("Unrecognized socket type: ").arg(type));
     return SocketType::cloud;
 }
 
-void SocketFactory::enforceStreamSocketType( SocketType type )
+void SocketFactory::enforceStreamSocketType(SocketType type)
 {
     s_enforcedStreamSocketType = type;
     qWarning() << ">>> SocketFactory::enforceStreamSocketType("
-               << toString( type ) << ") <<<";
+        << toString(type) << ") <<<";
 }
 
-void SocketFactory::enforceStreamSocketType( QString type )
+void SocketFactory::enforceStreamSocketType(QString type)
 {
-    enforceStreamSocketType( stringToSocketType( type ) );
+    enforceStreamSocketType(stringToSocketType(type));
 }
 
 bool SocketFactory::isStreamSocketTypeEnforced()
@@ -107,7 +115,7 @@ bool SocketFactory::isStreamSocketTypeEnforced()
     return s_enforcedStreamSocketType != SocketType::cloud;
 }
 
-void SocketFactory::enforceSsl( bool isEnforced )
+void SocketFactory::enforceSsl(bool isEnforced)
 {
     s_isSslEnforced = isEnforced;
     qWarning() << ">>> SocketFactory::enforceSsl(" << isEnforced << ") <<<";
@@ -119,8 +127,8 @@ bool SocketFactory::isSslEnforced()
 }
 
 SocketFactory::CreateStreamSocketFuncType
-    SocketFactory::setCreateStreamSocketFunc(
-        CreateStreamSocketFuncType newFactoryFunc)
+SocketFactory::setCreateStreamSocketFunc(
+    CreateStreamSocketFuncType newFactoryFunc)
 {
     auto bak = std::move(createStreamSocketFunc);
     createStreamSocketFunc = std::move(newFactoryFunc);
@@ -128,22 +136,22 @@ SocketFactory::CreateStreamSocketFuncType
 }
 
 SocketFactory::CreateStreamServerSocketFuncType
-    SocketFactory::setCreateStreamServerSocketFunc(
-        CreateStreamServerSocketFuncType newFactoryFunc)
+SocketFactory::setCreateStreamServerSocketFunc(
+    CreateStreamServerSocketFuncType newFactoryFunc)
 {
     auto bak = std::move(createStreamServerSocketFunc);
     createStreamServerSocketFunc = std::move(newFactoryFunc);
     return bak;
 }
 
-void SocketFactory::setIpVersion( const QString& ipVersion )
+void SocketFactory::setIpVersion(const QString& ipVersion)
 {
-    if( ipVersion.isEmpty() )
+    if (ipVersion.isEmpty())
         return;
 
-    NX_LOG( lit("SocketFactory::setIpVersion( %1 )").arg(ipVersion), cl_logALWAYS );
+    NX_LOG(lit("SocketFactory::setIpVersion( %1 )").arg(ipVersion), cl_logALWAYS);
 
-    if( ipVersion == QLatin1String("4") )
+    if (ipVersion == QLatin1String("4"))
     {
         s_udpIpVersion = AF_INET;
         s_tcpClientIpVersion = AF_INET;
@@ -151,7 +159,7 @@ void SocketFactory::setIpVersion( const QString& ipVersion )
         return;
     }
 
-    if( ipVersion == QLatin1String("6") )
+    if (ipVersion == QLatin1String("6"))
     {
         s_udpIpVersion = AF_INET6;
         s_tcpClientIpVersion = AF_INET6;
@@ -159,7 +167,7 @@ void SocketFactory::setIpVersion( const QString& ipVersion )
         return;
     }
 
-    if( ipVersion == QLatin1String("6tcp") ) /** TCP only */
+    if (ipVersion == QLatin1String("6tcp")) /** TCP only */
     {
         s_udpIpVersion = AF_INET;
         s_tcpClientIpVersion = AF_INET6;
@@ -167,7 +175,7 @@ void SocketFactory::setIpVersion( const QString& ipVersion )
         return;
     }
 
-    if( ipVersion == QLatin1String("6server") ) /** Server only */
+    if (ipVersion == QLatin1String("6server")) /** Server only */
     {
         s_udpIpVersion = AF_INET;
         s_tcpClientIpVersion = AF_INET;
@@ -180,23 +188,24 @@ void SocketFactory::setIpVersion( const QString& ipVersion )
 }
 
 std::atomic< SocketFactory::SocketType >
-    SocketFactory::s_enforcedStreamSocketType(
-        SocketFactory::SocketType::cloud );
+SocketFactory::s_enforcedStreamSocketType(
+    SocketFactory::SocketType::cloud);
 
-std::atomic< bool > SocketFactory::s_isSslEnforced( false );
+std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 
 #if defined(__APPLE__) && defined(TARGET_OS_IPHONE)
-    std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
-    std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
-    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
+std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
+std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
+std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
 #else
-    std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET);
-    std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET);
-    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET);
+std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET);
+std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET);
+std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET);
 #endif
 
 std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryFunc(
-    NatTraversalType nttType, SocketType forcedSocketType)
+    NatTraversalSupport nttType,
+    SocketType forcedSocketType)
 {
     auto ipVersion = s_tcpClientIpVersion.load();
     switch (forcedSocketType)
@@ -204,19 +213,17 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
         case SocketFactory::SocketType::cloud:
             switch (nttType)
             {
-                case SocketFactory::NatTraversalType::nttAuto:
-                case SocketFactory::NatTraversalType::nttEnabled:
+                case NatTraversalSupport::enabled:
                     if (SocketGlobals::config().disableCloudSockets)
-                        return std::make_unique<TCPSocket>(false, ipVersion);
+                        return std::make_unique<TCPSocket>(ipVersion);
                     return std::make_unique<cloud::CloudStreamSocket>(ipVersion);
 
-                case SocketFactory::NatTraversalType::nttDisabled:
-                    return std::make_unique<TCPSocket>(false, ipVersion);
+                case NatTraversalSupport::disabled:
+                    return std::make_unique<TCPSocket>(ipVersion);
             }
 
         case SocketFactory::SocketType::tcp:
-            return std::make_unique<TCPSocket>(
-                nttType != SocketFactory::NatTraversalType::nttDisabled, ipVersion);
+            return std::make_unique<TCPSocket>(ipVersion);
 
         case SocketFactory::SocketType::udt:
             return std::make_unique<UdtStreamSocket>(ipVersion);
@@ -227,7 +234,8 @@ std::unique_ptr<AbstractStreamSocket> SocketFactory::defaultStreamSocketFactoryF
 }
 
 std::unique_ptr<AbstractStreamServerSocket> SocketFactory::defaultStreamServerSocketFactoryFunc(
-    NatTraversalType nttType, SocketType socketType)
+    NatTraversalSupport nttType,
+    SocketType socketType)
 {
     auto ipVersion = s_tcpServerIpVersion.load();
     static_cast<void>(nttType);

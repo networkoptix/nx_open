@@ -2,16 +2,9 @@
 
 #include <nx/network/stun/cc/custom_stun.h>
 
-
 namespace nx {
 namespace hpm {
 namespace api {
-
-ResolvePeerRequest::ResolvePeerRequest()
-:
-    ResolvePeerRequest(nx::String())
-{
-}
 
 ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
 :
@@ -30,9 +23,7 @@ bool ResolvePeerRequest::parseAttributes(const nx::stun::Message& message)
     return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName);
 }
 
-
-ResolvePeerResponse::ResolvePeerResponse()
-:
+ResolvePeerResponse::ResolvePeerResponse():
     StunResponseData(kMethod),
     connectionMethods(0)
 {

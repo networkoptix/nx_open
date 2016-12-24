@@ -18,7 +18,10 @@ public slots:
 
     QString getCredentials() const;
 
-    void updateCredentials(const QString& login, const QString& password, bool isCloud);
+    void updateCredentials(const QString& login,
+        const QString& password,
+        bool isCloud,
+        bool savePassword);
 
     void cancel();
 public:
@@ -28,9 +31,10 @@ public:
         QString cloudPassword;
         QString localLogin;
         QString localPassword;
+        bool savePassword;
     };
 
-#define LoginInfo_Fields (cloudEmail)(cloudPassword)(localLogin)(localPassword)
+#define LoginInfo_Fields (cloudEmail)(cloudPassword)(localLogin)(localPassword)(savePassword)
 
     QWebView *webView;
     QUrl url;

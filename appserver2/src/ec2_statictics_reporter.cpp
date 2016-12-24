@@ -8,14 +8,15 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
+#include <network/system_helpers.h>
 
 #include "ec2_connection.h"
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
-static const bool DEFAULT_SERVER_AUTH = true;
 
 static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
@@ -36,16 +37,12 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
-    Ec2StaticticsReporter::Ec2StaticticsReporter(
-            const AbstractResourceManagerPtr& resourceManager,
-            const AbstractMediaServerManagerPtr& msManager)
-        :
-         m_desktopCameraTypeId(getDesktopCameraTypeId(resourceManager))
-        , m_msManager(msManager)
-        , m_firstTime(true)
-        , m_timerCycle(TIMER_CYCLE)
-        , m_timerDisabled(false)
-        , m_timerId(boost::none)
+    Ec2StaticticsReporter::Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager):
+        m_msManager(msManager),
+        m_firstTime(true),
+        m_timerCycle(TIMER_CYCLE),
+        m_timerDisabled(false),
+        m_timerId(boost::none)
     {
         NX_CRITICAL(MAX_DELAY_RATIO <= 100);
         setupTimer();
@@ -77,7 +74,7 @@ namespace ec2
 
         dbManager_queryOrReturn_uuid(ApiCameraDataExList, cameras);
         for (ApiCameraDataEx& cam : cameras)
-            if (cam.typeId != m_desktopCameraTypeId)
+            if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
 
         if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->clients)) != ErrorCode::ok)
@@ -104,29 +101,16 @@ namespace ec2
         #undef dbManager_queryOrReturn
         #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = qnGlobalSettings->localSystemId();
+        outData->systemId = helpers::currentSystemLocalId();
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = qnGlobalSettings->localSystemId();
+        outData->systemId = helpers::currentSystemLocalId();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
-    }
-
-    QnUuid Ec2StaticticsReporter::getDesktopCameraTypeId(const AbstractResourceManagerPtr& manager)
-    {
-        QnResourceTypeList typesList;
-        manager->getResourceTypesSync(&typesList);
-        for (auto& rType : typesList)
-            if (rType->getName() == QnResourceTypePool::kDesktopCameraTypeName)
-                return rType->getId();
-
-        NX_LOG(lm("Can not get %1 resource type, using null")
-               .arg(QnResourceTypePool::kDesktopCameraTypeName), cl_logWARNING);
-        return QnUuid();
     }
 
     void Ec2StaticticsReporter::setupTimer()
@@ -201,7 +185,7 @@ namespace ec2
         {
             m_firstTime = false;
             const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
-            const auto currentVersion = QnAppInfo::applicationFullVersion();
+            const auto currentVersion = nx::utils::AppInfo::applicationFullVersion();
 
             QCollator collator;
             collator.setNumericMode(true);
@@ -291,7 +275,7 @@ namespace ec2
             const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
             qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
             qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->setStatisticsReportLastVersion(QnAppInfo::applicationFullVersion());
+            qnGlobalSettings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
             qnGlobalSettings->synchronizeNow();
         }
         else

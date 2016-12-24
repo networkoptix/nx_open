@@ -11,6 +11,7 @@
 #include <core/resource/user_resource.h>
 
 #include <cloud/cloud_connection.h>
+#include <cloud/cloud_result_info.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -103,7 +104,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->indicatorButton->setText(okButton->text()); // Title from OS theme
     d->indicatorButton->setIcon(okButton->icon()); // Icon from OS theme
     d->indicatorButton->setDefault(true);
-    d->indicatorButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(d->indicatorButton);
     ui->buttonBox->removeButton(okButton.data());
     ui->buttonBox->addButton(d->indicatorButton, QDialogButtonBox::AcceptRole);
 
@@ -222,7 +223,6 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 {
     Q_Q(QnConnectToCloudDialog);
 
-    lockUi(true);
     q->ui->invalidCredentialsLabel->hide();
 
     auto serverConnection = getPublicServerConnection();
@@ -232,6 +232,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
         return;
     }
 
+    lockUi(true);
     indicatorButton->setEnabled(false);
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
@@ -243,42 +244,47 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
-    cloudConnection->systemManager()->bindSystem(
-                sysRegistrationData,
-                [this, serverConnection](api::ResultCode result, api::SystemData systemData)
-    {
-        Q_Q(QnConnectToCloudDialog);
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
+    const auto completionHandler =
+        [this, serverConnection, guard, thread](api::ResultCode result, api::SystemData systemData)
+        {
+            if (!guard)
+                return;
 
-        executeDelayed(
-                [this, result, systemData, serverConnection]()
+            const auto timerCallback =
+                [this, guard, result, systemData, serverConnection]()
                 {
-                    at_bindFinished(result, systemData, serverConnection);
-                },
-                0, q->thread()
-        );
-    });
+                    if (guard)
+                        at_bindFinished(result, systemData, serverConnection);
+                };
+
+            executeDelayed(timerCallback, 0, thread);
+        };
+
+    cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
 {
     Q_Q(QnConnectToCloudDialog);
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::Success,
         helpTopic(q),
         q->windowTitle(),
         tr("The system is successfully connected to %1").arg(cloudLogin),
         QDialogButtonBox::Ok,
         q->parentWidget());
 
-    messageBox.exec();
     linkedSuccessfully = true;
     q->accept();
+    messageBox.exec();
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnConnectToCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
+    QnMessageBox messageBox(QnMessageBox::Warning,
         helpTopic(q),
         tr("Error"),
         tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
@@ -289,6 +295,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
+    lockUi(false);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(
@@ -307,7 +314,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             showCredentialsError(true);
             break;
         default:
-            showFailure(QString()); // TODO: #dklychkov More detailed diagnostics
+            showFailure(QnCloudResultInfo(result));
             break;
         }
         lockUi(false);
@@ -341,7 +348,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             {
                 qnClientCoreSettings->setCloudLogin(cloudLogin);
                 qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
+                qnCloudStatusWatcher->setCredentials(QnCredentials(cloudLogin, cloudPassword));
             }
 
             if (guard && parentGuard)

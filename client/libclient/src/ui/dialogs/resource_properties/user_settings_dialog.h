@@ -40,13 +40,12 @@ public:
     QnUserResourcePtr user() const;
     void setUser(const QnUserResourcePtr &user);
 
+    virtual void forcedUpdate() override;
+
 protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
-
     virtual void applyChanges() override;
-
-    virtual void showEvent(QShowEvent* event) override;
 
 private:
     void applyChangesInternal();
@@ -68,7 +67,7 @@ private:
     QnPermissionsWidget* m_permissionsPage;
     QnAccessibleResourcesWidget* m_camerasPage;
     QnAccessibleResourcesWidget* m_layoutsPage;
-    QPushButton* m_editGroupsButton;
+    QPushButton* m_editRolesButton;
 
 };
 

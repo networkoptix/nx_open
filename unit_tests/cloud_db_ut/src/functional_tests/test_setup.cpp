@@ -7,29 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "email_manager_mocked.h"
+#include <nx/utils/test_support/utils.h>
 
-/**
- * Analogue of gtest's ASSERT_EQ but supports placing in non-void methods (throws on failure).
- */
-#define NX_GTEST_ASSERT_EQ(expected, actual) \
-    do \
-    { \
-        bool result = false; \
-        auto x = [&]() -> void \
-        { \
-            ASSERT_EQ(expected, actual); \
-            result = true; \
-        }; \
-        x(); \
-        if (!result) \
-        { \
-            throw std::runtime_error( \
-                "This is work around ASSERT_* inability to be used " \
-                "in non-void method. Just ignore..."); \
-        } \
-    } \
-    while (0)
+#include "email_manager_mocked.h"
 
 namespace nx {
 namespace cdb {
@@ -46,13 +26,11 @@ CdbFunctionalTest::~CdbFunctionalTest()
 AccountWithPassword CdbFunctionalTest::addActivatedAccount2()
 {
     //creating two accounts
-    api::AccountData account1;
-    std::string account1Password;
+    AccountWithPassword account;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
-        CdbLauncher::addActivatedAccount(&account1, &account1Password));
-
-    return AccountWithPassword{ std::move(account1), std::move(account1Password) };
+        CdbLauncher::addActivatedAccount(&account, &account.password));
+    return account;
 }
 
 api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
@@ -62,7 +40,7 @@ api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
     api::SystemData system1;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
-        CdbLauncher::bindRandomSystem(account.data.email, account.password, &system1));
+        CdbLauncher::bindRandomSystem(account.email, account.password, &system1));
     return system1;
 }
 
@@ -75,10 +53,10 @@ void CdbFunctionalTest::shareSystemEx(
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::shareSystem(
-            from.data.email,
+            from.email,
             from.password,
             what.id,
-            to.data.email,
+            to.email,
             targetRole));
 }
 
@@ -91,11 +69,45 @@ void CdbFunctionalTest::shareSystemEx(
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::shareSystem(
-            from.data.email,
+            from.email,
             from.password,
             what.id,
             emailToShareWith,
             targetRole));
+}
+
+void CdbFunctionalTest::enableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, true);
+}
+
+void CdbFunctionalTest::disableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, false);
+}
+
+void CdbFunctionalTest::setUserEnabledFlag(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom,
+    bool isEnabled)
+{
+    api::SystemSharingEx userData;
+    NX_GTEST_ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystemSharing(who.email, who.password, what.id, whom.email, &userData));
+
+    userData.isEnabled = isEnabled;
+
+    NX_GTEST_ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(who.email, who.password, userData));
 }
 
 } // namespace cdb

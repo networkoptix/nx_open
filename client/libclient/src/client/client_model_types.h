@@ -1,5 +1,4 @@
-#ifndef QN_CLIENT_MODEL_TYPES_H
-#define QN_CLIENT_MODEL_TYPES_H
+#pragma once
 
 #include <nx/utils/uuid.h>
 #include <QtCore/QList>
@@ -49,22 +48,22 @@ Q_DECLARE_METATYPE(QnThumbnailsSearchState)
  * Serialized workbench state. Does not contain the actual layout data, so
  * suitable for restoring the state once layouts are loaded.
  */
-class QnWorkbenchState {
+class QnWorkbenchState
+{
 public:
-    QnWorkbenchState(): currentLayoutIndex(-1) {}
-
-    int currentLayoutIndex;
+    QnWorkbenchState();
+    QnUuid userId;          /*< Id of the user. Works as first part of the key. */
+    QnUuid localSystemId;   /*< Id of the system. Works as second part of the key. */
+    QnUuid currentLayoutId;
     QList<QnUuid> layoutUuids;
+
+    bool isValid() const;
 };
+#define QnWorkbenchState_Fields (userId)(localSystemId)(currentLayoutId)(layoutUuids)
 
-/**
- * Mapping from user name to workbench state.
- */
-typedef QHash<QString, QnWorkbenchState> QnWorkbenchStateHash;
+using QnWorkbenchStateList = QList<QnWorkbenchState>;
 
-Q_DECLARE_METATYPE(QnWorkbenchStateHash);
-QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream)(metatype));
-
+QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (json)(metatype));
 
 // -------------------------------------------------------------------------- //
 // QnServerStorageState
@@ -96,14 +95,6 @@ typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
 QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
-
-
-/**
- * Mapping from resource physical id to aspect ratio.
- */
-typedef QHash<QString, qreal> QnAspectRatioHash;
-Q_DECLARE_METATYPE(QnAspectRatioHash)
-
 
 // -------------------------------------------------------------------------- //
 // QnPtzHotkey
@@ -154,6 +145,4 @@ struct QnBackgroundImage
 };
 #define QnBackgroundImage_Fields (enabled)(name)(originalName)(mode)(opacity)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype));
-
-#endif // QN_CLIENT_MODEL_TYPES_H
+QN_FUSION_DECLARE_FUNCTIONS(QnBackgroundImage, (json)(metatype)(eq));

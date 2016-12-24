@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 25, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -10,9 +5,10 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/std/future.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <utils/common/stoppable.h>
-
 
 //namespace nx {
 namespace ec2 {
@@ -20,8 +16,7 @@ namespace ec2 {
 class AbstractECConnection;
 class QnSimpleHttpConnectionListener;
 
-class Appserver2Process
-    :
+class Appserver2Process:
     public QnStoppable
 {
 public:
@@ -46,13 +41,12 @@ private:
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_onStartedEventHandler;
     std::atomic<AbstractECConnection*> m_ecConnection;
     QnSimpleHttpConnectionListener* m_tcpListener;
-    QCoreApplication* m_application;
+    QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
 };
 
 
-class Appserver2ProcessPublic
-    :
+class Appserver2ProcessPublic:
     public QnStoppable
 {
 public:

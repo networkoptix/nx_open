@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>249</height>
+    <width>311</width>
+    <height>156</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,46 +30,79 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="labelLayout">
+    <layout class="QVBoxLayout" name="contentLayout">
      <property name="spacing">
       <number>16</number>
      </property>
      <property name="leftMargin">
-      <number>16</number>
+      <number>8</number>
      </property>
      <property name="topMargin">
       <number>16</number>
      </property>
      <property name="rightMargin">
-      <number>16</number>
+      <number>8</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>16</number>
      </property>
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string notr="true"/>
+        <string>License issues:</string>
+       </property>
+       <property name="indent">
+        <number>8</number>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QTreeView" name="treeView">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>520</height>
+        </size>
+       </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
        <property name="rootIsDecorated">
         <bool>false</bool>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
        </property>
        <property name="itemsExpandable">
         <bool>false</bool>
        </property>
+       <property name="allColumnsShowFocus">
+        <bool>true</bool>
+       </property>
        <property name="expandsOnDoubleClick">
         <bool>false</bool>
        </property>
+       <attribute name="headerStretchLastSection">
+        <bool>false</bool>
+       </attribute>
       </widget>
      </item>
     </layout>

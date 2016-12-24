@@ -133,9 +133,7 @@
         <box>none</box>
         <modification/>
         <beta>true</beta>
-        <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-cloud_${cloud.group}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile/>
@@ -203,8 +201,8 @@
         <toolchain.version>none</toolchain.version>       
 
         <additional.defines/>
-        <customization.defines/>
-
+        <customization.defines/>    
+        
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
@@ -228,11 +226,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <projectType>generic</projectType>
+
+        <final.artifact.name>${installer.name}-${release.version}.${buildNumber}-${platform}${arch.suffix}${cloud.instance}${release.configuration}${beta.status}</final.artifact.name>
+        <cloud.instance>-${cloud.group}</cloud.instance>
+        <arch.suffix>-${arch}</arch.suffix>
+        <release.configuration>-${build.configuration}</release.configuration>
+        <beta.status>-beta</beta.status>         
     </properties>
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${final.artifact.name}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -341,16 +345,12 @@
                                     <directory>${parent.customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
-                                        <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/_unused/**</exclude>
-                                    </excludes>
                                 </resource>
                                 <resource>
                                     <directory>${customization.dir}/icons/${platform}</directory>
@@ -489,13 +489,27 @@
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
-                <module>client/mobile_client</module>
                 <module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
+            <id>desktop-nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>
+                <module>client/mobile_client</module>
+            </modules>
+        </profile>        
+        <profile>
             <id>windows</id>
-
             <activation>
                 <os>
                     <family>Windows</family>
@@ -526,6 +540,7 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <qt.version>5.6.1-1</qt.version>
             </properties>
 
         </profile>
@@ -697,6 +712,8 @@
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>macsetup/client-dmg</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
             </modules>
         </profile>
 
@@ -748,6 +765,7 @@
                 </property>
             </activation>
             <properties>
+                <arch.suffix>-${box}</arch.suffix>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
@@ -861,6 +879,7 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.2</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
@@ -1019,11 +1038,35 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-cloud_${cloud.group}</finalName>
+                <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>
+        <profile>
+            <id>build-release</id>
+            <activation>
+                <property>
+                    <name>build.configuration</name>
+                    <value>release</value>
+                </property>
+            </activation>
+            <properties>
+                <release.configuration />
+            </properties>
+        </profile>
+        <profile>
+            <id>cloud-production</id>
+            <activation>
+                <property>
+                    <name>cloud.host</name>
+                    <value>prod</value>
+                </property>
+            </activation>
+            <properties>
+                <cloud.instance />
+            </properties>
+        </profile>         
 
         <!-- Mobile client profiles -->
         <profile>
@@ -1041,6 +1084,9 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
             </modules>
+            <properties>
+                <arch.suffix />            
+            </properties>    
         </profile>
         <profile>
             <id>mobile-android</id>
@@ -1065,6 +1111,7 @@
                 <android.toolchain.version>4.9</android.toolchain.version>
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
@@ -1092,6 +1139,7 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>

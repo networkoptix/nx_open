@@ -188,8 +188,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         returnCodes << lm("%2 [%1 time(s)]").arg(code.second)
             .arg(SystemError::toString(code.first));
 
-    std::cout << "\n\nConnect summary: \n"
-        "  total time: " << testDuration.count() << "s\n"
+    std::cout << "\n\nConnect summary:\n"
+        "  total time: " << testDuration.count() << " s\n"
         "  total connections: " <<
             connectionsGenerator.totalConnectionsEstablished() << "\n"
         "  total bytes sent: " <<
@@ -222,6 +222,8 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cloud_connectivity_test_util", QnUuid::createUuid());
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 
@@ -247,7 +249,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
     }
 
     std::cout << std::endl;
-    NX_LOG(lm("Rompleted request to %1").arg(urlStr), cl_logALWAYS);
+    NX_LOG(lm("Completed request to %1").arg(urlStr), cl_logALWAYS);
     return 0;
 }
 

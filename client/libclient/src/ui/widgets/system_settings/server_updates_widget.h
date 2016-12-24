@@ -4,7 +4,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui_server_updates_widget.h>
 
@@ -17,13 +17,16 @@ class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 struct QnLowFreeSpaceWarning;
 
-class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
+class QnServerUpdatesWidget: public QnAbstractPreferencesWidget, public QnSessionAwareDelegate
 {
     Q_OBJECT
     using base_type = QnAbstractPreferencesWidget;
 
 public:
     QnServerUpdatesWidget(QWidget* parent = nullptr);
+
+    virtual bool tryClose(bool force) override;
+    virtual void forcedUpdate() override;
 
     bool cancelUpdate();
     bool canCancelUpdate() const;
@@ -45,33 +48,53 @@ private slots:
     void at_tool_stageChanged(QnFullUpdateStage stage);
     void at_tool_stageProgressChanged(QnFullUpdateStage stage, int progress);
     void at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning);
+    void at_tool_updatesCheckCanceled();
 
 private:
+    enum class Mode
+    {
+        LatestVersion,
+        SpecificBuild,
+        LocalFile
+    };
+    void setMode(Mode mode);
+
     void initDropdownActions();
     void initDownloadActions();
 
+    void updateButtonText();
+    void updateButtonAccent();
+    void updateDownloadButton();
+
     void autoCheckForUpdates();
     void checkForUpdates(bool fromInternet);
+    void refresh();
 
     QString serverNamesString(const QnMediaServerResourceList& servers);
 
     bool beginChecking();
     void endChecking(const QnCheckForUpdateResult& result);
 
+    bool restartClient(const QnSoftwareVersion& version);
+
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
 
-    QnServerUpdatesModel* m_updatesModel;
-    QnMediaServerUpdateTool* m_updateTool;
+
+    Mode m_mode = Mode::LatestVersion;
+
+    QnServerUpdatesModel* m_updatesModel = nullptr;
+    QnMediaServerUpdateTool* m_updateTool = nullptr;
 
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
     QString m_localFileName;
-    bool m_checking;
+    bool m_checking = false;
+    QnCheckForUpdateResult m_lastUpdateCheckResult;
 
     QUrl m_releaseNotesUrl;
 
-    QTimer* m_longUpdateWarningTimer;
+    QTimer* m_longUpdateWarningTimer = nullptr;
 
-    qint64 m_lastAutoUpdateCheck;
+    qint64 m_lastAutoUpdateCheck = 0;
 };

@@ -1,22 +1,54 @@
 #!/bin/bash
 
-echo $*
+CUSTOMIZATION=${deb.customization.company.name}
+BIN_NAME="mobile_client"
+BIN_PATH="/opt/$CUSTOMIZATION/lite_client/bin/$BIN_NAME"
+LIBS_PATH="/opt/$CUSTOMIZATION/lib"
+LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
+LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
+MOBILE_CLIENT_INI="/tmp/mobile_client.ini"
+
 export LESS_TERMCAP_ue=
 export vcs_info_msg_1_=
-export PAGER=less
+export PAGER="less"
 export LESS_TERMCAP_us=
 export VDPAU_OSD=1
 export vcs_info_msg_0_=
-export LANG=en_US.UTF-8
+export LANG="en_US.UTF-8"
 export SHLVL=3
 export LESS_TERMCAP_so=
-export DISPLAY=:0
-export VDPAU_DRIVER=sunxi
-export COLORTERM=yes
+export DISPLAY=":0"
+export VDPAU_DRIVER="sunxi"
+export COLORTERM="yes"
 export LESS_TERMCAP_se=
-export CUSTOMIZATION=${deb.customization.company.name}
+
 killall gpm
-export LD_LIBRARY_PATH=/opt/$CUSTOMIZATION/lib
-LD_PRELOAD="/opt/$CUSTOMIZATION/lib/ldpreloadhook.so"
-/opt/$CUSTOMIZATION/lite_client/bin/mobile_client $*
-echo 1>/sys/class/graphics/fb0/blank
+
+# Failed to determine EDID on some TVs, so commenting this section
+#if ! (get-edid | parse-edid | grep -Fxq 'Section "Monitor"') 2>/dev/null; then
+#    AUTO_LOGIN_MODE="--auto-login=disabled"
+#fi
+
+cd "/opt/$CUSTOMIZATION/lite_client/bin"
+
+if [ -f "$LOG_OUTPUT_FLAG" ]; then
+    REDIRECT_OUTPUT="$LOGS_PATH/mobile_client-out.log"
+    
+    # Turn on NX_LOG for mobile_client via .ini-file, if it does not exist.
+    if [ ! -f "$MOBILE_CLIENT_INI" ]; then
+        echo "enableLog=true" >>"$MOBILE_CLIENT_INI"
+        echo "logFile=$LOGS_PATH/mobile_client" >>"$MOBILE_CLIENT_INI"
+    fi
+else
+    REDIRECT_OUTPUT="/dev/null"
+fi
+
+echo "$(basename $0): Starting Lite Client, outputting to $REDIRECT_OUTPUT, with command:"
+set -x
+LD_PRELOAD="$LIBS_PATH/ldpreloadhook.so" "$BIN_PATH" "$@" "$AUTO_LOGIN_MODE" >>$REDIRECT_OUTPUT 2>&1
+{ set +x; } 2>/dev/null
+
+if ! pgrep mobile_client >/dev/null; then
+    echo "Turning the screen blank because Lite Client is terminated"
+    echo "1" >/sys/class/graphics/fb0/blank
+fi    

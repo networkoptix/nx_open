@@ -105,7 +105,7 @@ protected:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
     void beforeJump(qint64 mksec);
-    void jumpOccured(qint64 mksec);
+    void jumpOccured(qint64 mksec, int sequence);
     void jumpCanceled(qint64 mksec);
     void streamPaused();
     void streamResumed();

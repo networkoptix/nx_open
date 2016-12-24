@@ -9,6 +9,7 @@
 #include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_ec/ec_api.h>
+#include <nx/network/socket_global.h>
 
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
@@ -56,9 +57,30 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
-        trace(lit("Connection established to %1").arg(connection->connectionInfo().ecsGuid));
-        qnCommon->setRemoteGUID(connection->connectionInfo().serverId());
-        //TODO: #GDM #3.0 in case of cloud sockets we need to modify QnAppServerConnectionFactory::url() - add server id before cloud id
+        const auto& info = connection->connectionInfo();
+        const auto serverId = info.serverId();
+        trace(lit("Connection established to %1").arg(serverId.toString()));
+
+        /*
+         * For cloud connections we can get here url, containing only system id.
+         * In that case each request may potentially be sent to another server, which may lead
+         * to undefined behavior. So we are fixing server which we were connected to in the url.
+         */
+        auto currentUrl = QnAppServerConnectionFactory::url();
+        QString host = currentUrl.host();
+        if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
+        {
+            const auto fullHost = serverId.toSimpleString() + L'.' + info.cloudSystemId;
+            NX_EXPECT(nx::network::SocketGlobals::addressResolver().isCloudHostName(fullHost));
+            if (host != fullHost)
+            {
+                trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
+                currentUrl.setHost(fullHost);
+                QnAppServerConnectionFactory::setUrl(currentUrl);
+            }
+        }
+
+        qnCommon->setRemoteGUID(serverId);
     }
     else if (m_connected)
     { // double init by null is allowed

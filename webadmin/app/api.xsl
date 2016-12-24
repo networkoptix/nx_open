@@ -139,9 +139,15 @@
                                                     </xsl:if>
 
 
-                                                </h4> <div class="well">
+                                                </h4>
+                                                <div class="well">
                                                     <xsl:copy-of select="description"/>
-                                                </div> <dl>
+                                                    <xsl:if test="permissions">
+                                                        <p><b>Permissions: </b><xsl:copy-of select="permissions"/></p>
+                                                    </xsl:if>
+                                                </div>
+
+                                                <dl>
                                                     <dt>Parameters</dt>
                                                     <dd><xsl:apply-templates select="params"/></dd>
                                                     <dt>Result</dt>
@@ -202,37 +208,39 @@
                         </xsl:if>
                     </tr>
                     <xsl:for-each select="param">
-                        <tr>
-                            <td>
-                                <xsl:value-of select="name"/>
-                            </td>
-                            <td>
-                                <xsl:copy-of select="description"/>
-                            </td>
+                        <xsl:if test="not(@proprietary)">
+                            <tr>
+                                <td>
+                                    <xsl:value-of select="name"/>
+                                </td>
+                                <td>
+                                    <xsl:copy-of select="description"/>
+                                </td>
 
-                            <xsl:if test="../../params/param/optional">
-                                <td>
-                                    <xsl:value-of select="optional"/>
-                                </td>
-                            </xsl:if>
-                            <xsl:if test="../../params/param/values/value">
-                                <td>
-                                    <ul class="list-unstyled">
-                                        <xsl:for-each select="values/value">
-                                            <li>
-                                                <xsl:value-of select="name"/>
-                                                <a style="cursor: pointer;" data-toggle="tooltip"
-                                                   data-placement="right"
-                                                   data-trigger="hover focus click">
-                                                    <xsl:attribute name="title">
-                                                        <xsl:copy-of select="description"/>
-                                                    </xsl:attribute> (?) </a>
-                                            </li>
-                                        </xsl:for-each>
-                                    </ul>
-                                </td>
-                            </xsl:if>
-                        </tr>
+                                <xsl:if test="../../params/param/optional">
+                                    <td>
+                                        <xsl:value-of select="optional"/>
+                                    </td>
+                                </xsl:if>
+                                <xsl:if test="../../params/param/values/value">
+                                    <td>
+                                        <ul class="list-unstyled">
+                                            <xsl:for-each select="values/value">
+                                                <li>
+                                                    <xsl:value-of select="name"/>
+                                                    <a style="cursor: pointer;" data-toggle="tooltip"
+                                                       data-placement="right"
+                                                       data-trigger="hover focus click">
+                                                        <xsl:attribute name="title">
+                                                            <xsl:copy-of select="description"/>
+                                                        </xsl:attribute> (?) </a>
+                                                </li>
+                                            </xsl:for-each>
+                                        </ul>
+                                    </td>
+                                </xsl:if>
+                            </tr>
+                        </xsl:if>
                     </xsl:for-each>
                 </table>
             </xsl:when>

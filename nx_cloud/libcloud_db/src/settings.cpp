@@ -13,9 +13,10 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/timer_manager.h>
-#include <libcloud_db_app_info.h>
+
 #include <utils/common/app_info.h>
 
+#include "libcloud_db_app_info.h"
 
 namespace {
 
@@ -24,44 +25,10 @@ const QLatin1String kDefaultEndpointsToListen("0.0.0.0:3346");
 
 const QLatin1String kDataDir("dataDir");
 
-//DB options
-const QLatin1String kDbDriverName("db/driverName");
-const QLatin1String kDefaultDbDriverName("QMYSQL");
-
-const QLatin1String kDbHostName("db/hostName");
-const QLatin1String kDefaultDbHostName("127.0.0.1");
-
-const QLatin1String kDbPort("db/port");
-const int kDefaultDbPort = 3306;
-
-const QLatin1String kDbName("db/name");
-const QLatin1String kDefaultDbName("nx_cloud");
-
-const QLatin1String kDbUserName("db/userName");
-const QLatin1String kDefaultDbUserName("root");
-
-const QLatin1String kDbPassword("db/password");
-const QLatin1String kDefaultDbPassword("");
-
-const QLatin1String kDbConnectOptions("db/connectOptions");
-const QLatin1String kDefaultDbConnectOptions("");
-
-const QLatin1String kDbMaxConnections("db/maxConnections");
-const QLatin1String kDefaultDbMaxConnections("1");
-
-const QLatin1String kDbInactivityTimeout("db/inactivityTimeout");
-const std::chrono::seconds kDefaultDbInactivityTimeout = std::chrono::minutes(10);
-
-const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
-    "db/maxPeriodQueryWaitsForAvailableConnection");
-const std::chrono::seconds kDefaultDbMaxPeriodQueryWaitsForAvailableConnection =
-std::chrono::minutes(1);
-
 const QLatin1String kChangeUser("changeUser");
 
 //notification settings
-const QLatin1String kNotificationServiceEndpoint("notification/serviceEndpoint");
-const QLatin1String kNotificationSecret("notification/secret");
+const QLatin1String kNotificationUrl("notification/url");
 
 const QLatin1String kNotificationEnabled("notification/enabled");
 const bool kDefaultNotificationEnabled = true;
@@ -131,10 +98,23 @@ EventManager::EventManager()
 
 Settings::Settings()
 :
-    m_settings(QnLibCloudDbAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibCloudDbAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
+
+    m_dbConnectionOptions.driverType = nx::db::RdbmsDriverType::mysql;
+    m_dbConnectionOptions.hostName = "127.0.0.1";
+    m_dbConnectionOptions.port = 3306;
+    m_dbConnectionOptions.dbName = "nx_cloud";
+    m_dbConnectionOptions.userName = "root";
+    m_dbConnectionOptions.encoding = "utf8";
+    m_dbConnectionOptions.maxConnectionCount = 1;
+    m_dbConnectionOptions.inactivityTimeout = std::chrono::minutes(10);
+    m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = std::chrono::minutes(1);
 }
 
 bool Settings::showHelp() const
@@ -142,12 +122,12 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }
 
-const QnLogSettings& Settings::vmsSynchronizationLogging() const
+const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
 {
     return m_vmsSynchronizationLogging;
 }
@@ -252,39 +232,12 @@ void Settings::loadConfiguration()
     m_vmsSynchronizationLogging.load(m_settings, QLatin1String("syncroLog"));
 
     //DB
-    m_dbConnectionOptions.driverType =
-        QnLexical::deserialized<nx::db::RdbmsDriverType>(
-            m_settings.value(kDbDriverName, kDefaultDbDriverName).toString(),
-            nx::db::RdbmsDriverType::unknown);
-    //< Ignoring error here since connection to DB will not be established anyway.
-    m_dbConnectionOptions.hostName = m_settings.value(kDbHostName, kDefaultDbHostName).toString();
-    m_dbConnectionOptions.port = m_settings.value(kDbPort, kDefaultDbPort).toInt();
-    m_dbConnectionOptions.dbName = m_settings.value(kDbName, kDefaultDbName).toString();
-    m_dbConnectionOptions.userName = m_settings.value(kDbUserName, kDefaultDbUserName).toString();
-    m_dbConnectionOptions.password = m_settings.value(kDbPassword, kDefaultDbPassword).toString();
-    m_dbConnectionOptions.connectOptions = m_settings.value(kDbConnectOptions, kDefaultDbConnectOptions).toString();
-    m_dbConnectionOptions.maxConnectionCount = m_settings.value(kDbMaxConnections, kDefaultDbMaxConnections).toUInt();
-    if (m_dbConnectionOptions.maxConnectionCount == 0)
-        m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
-    m_dbConnectionOptions.inactivityTimeout = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            m_settings.value(kDbInactivityTimeout).toString(),
-            kDefaultDbInactivityTimeout));
-    m_dbConnectionOptions.maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            m_settings.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString(),
-            kDefaultDbMaxPeriodQueryWaitsForAvailableConnection));
-    
+    m_dbConnectionOptions.loadFromSettings(&m_settings);
 
     m_changeUser = m_settings.value(kChangeUser).toString();
 
     //email
-    m_notification.serviceEndpoint =
-        m_settings.value(kNotificationServiceEndpoint).toString();
-
-    m_notification.secret =
-        m_settings.value(kNotificationSecret).toString();
-
+    m_notification.url = m_settings.value(kNotificationUrl).toString();
     m_notification.enabled =
         m_settings.value(
             kNotificationEnabled,

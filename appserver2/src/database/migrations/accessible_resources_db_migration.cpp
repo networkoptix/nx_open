@@ -50,37 +50,9 @@ namespace ec2
             return true;
         }
 
-        bool getDesktopCameraTypeId(const QSqlDatabase& database, QnUuid& result)
-        {
-            QSqlQuery query(database);
-            query.setForwardOnly(true);
-            const QString queryStr = R"(
-                SELECT guid
-                FROM vms_resourcetype
-                WHERE name = ?
-            )";
-            if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
-                return false;
-
-            query.addBindValue(QnResourceTypePool::kDesktopCameraTypeName);
-
-            if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
-                return false;
-
-            /* If there is no desktop camera type in DB, it is strange but not critical. */
-            if (query.next())
-                result = QnUuid::fromRfc4122(query.value("guid").toByteArray());
-
-            return true;
-        }
-
         bool getAllCameras(const QSqlDatabase& database, ResourcesSet& allCameras)
         {
             /* Desktop cameras must be ignored. */
-            QnUuid desktopCameraTypeId;
-            if (!getDesktopCameraTypeId(database, desktopCameraTypeId))
-                return false;
-
             QSqlQuery query(database);
             query.setForwardOnly(true);
             const QString queryStr = R"(
@@ -97,7 +69,7 @@ namespace ec2
             while (query.next())
             {
                 QnUuid typeId = QnUuid::fromRfc4122(query.value("typeId").toByteArray());
-                if (typeId == desktopCameraTypeId)
+                if (typeId == QnResourceTypePool::kDesktopCameraTypeUuid)
                     continue;
 
                 QnUuid resourceId = QnUuid::fromRfc4122(query.value("guid").toByteArray());

@@ -73,6 +73,9 @@ namespace detail
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
+
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -228,8 +231,8 @@ namespace detail
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
-        //getUserGroupList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
+        //getUserRoleList
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
 
         //getPredefinedRoles
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
@@ -304,7 +307,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
@@ -507,18 +510,16 @@ namespace detail
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
-        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
-        ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
-        ErrorCode removeUserGroup( const QnUuid& guid );
+        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
-        ErrorCode cleanAccessRights(const QnUuid& userOrGroupId);
+        ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
@@ -578,7 +579,7 @@ namespace detail
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class ObjectType, class ObjectListType>
+        template <class FilterType, class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
 
         template <class ObjectListType>
@@ -637,6 +638,7 @@ namespace detail
         bool m_needResyncUsers;
         bool m_needResyncStorages;
         bool m_needResyncClientInfoData;
+        bool m_needResyncVideoWall = false;
 
         bool m_dbReadOnly;
     };
@@ -666,8 +668,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->videowalls);
@@ -695,8 +697,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->cameraHistory);

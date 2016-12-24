@@ -65,7 +65,8 @@ void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
     switch (message.operation)
     {
         case QnVideoWallControlMessage::Exit:
-            qApp->quit();
+            if (uiController)
+                uiController->disconnectFromSystem();
             break;
 
         default:
@@ -77,7 +78,12 @@ void QnLiteClientHandlerPrivate::at_initialResourcesReceived()
 {
     layout = QnLiteClientLayoutHelper::findLayoutForServer(videowallGuid);
     if (!layout)
-        return;
+    {
+        layout = QnLiteClientLayoutHelper::createLayoutForServer(videowallGuid);
+
+        if (!layout)
+            return;
+    }
 
     if (uiController)
         uiController->setLayoutId(layout->getId().toString());

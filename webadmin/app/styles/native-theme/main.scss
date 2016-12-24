@@ -19,12 +19,12 @@ body {
 }
 
 /* add beta-symbol after product name everywhere */
-.product-name.add-version:after{
+/* .product-name.add-version:after{
   content: "\03B2";
   font-style: italic;
   opacity: 0.5;
   font-size: 90%;
-}
+} */
 
 
 .inline-block{
@@ -52,7 +52,7 @@ body {
   background-image: url('../images/native-theme/preloader.gif');
 
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/native-theme/preloader@2x.png');
+    background-image: url('../images/native-theme/preloader@2x.gif');
   }
 }
 
@@ -103,4 +103,3 @@ body {
 .ui-select-choices-row.active {
   background-color: $brand_core !important;
 }
-

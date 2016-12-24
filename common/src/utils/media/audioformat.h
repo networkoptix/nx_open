@@ -112,6 +112,8 @@ private:
     QSharedDataPointer<QnAudioFormatPrivate> d;
 };
 
+QDebug operator<<(QDebug, QnAudioFormat::SampleType type);
+QDebug operator<<(QDebug, const QnAudioFormat&);
 
 QT_END_NAMESPACE
 

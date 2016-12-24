@@ -35,7 +35,10 @@ public:
 
     int rowForUser(const QnUserResourcePtr& user) const;
 
-    void setUserRoles(const ec2::ApiUserGroupDataList& roles);
+    void setUserRoles(const ec2::ApiUserRoleDataList& roles);
+
+    /* If we want to override "Custom" role name and tooltip: */
+    void setCustomRoleStrings(const QString& name, const QString& description);
 
     /* QAbstractItemModel implementation: */
 
@@ -51,3 +54,5 @@ private:
     QScopedPointer<QnUserRolesModelPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnUserRolesModel)
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserRolesModel::DisplayRoleFlags);

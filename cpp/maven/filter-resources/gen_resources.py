@@ -2,8 +2,10 @@ import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 from os import listdir
+from sets import Set
 
 template_file='template.pro'
+skip_template_file = 'template.skip'
 specifics_file='${project.artifactId}-specifics.pro'
 output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
@@ -40,7 +42,7 @@ def fileIsAllowed(file, exclusions):
             return False
     return True
 
-def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
+def genqrc(qrcname, qrcprefix, pathes, exclusions):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -49,14 +51,18 @@ def genqrc(qrcname, qrcprefix, pathes, exclusions, additions=''):
     print >> qrcfile, '<RCC version="1.0">'
     print >> qrcfile, '<qresource prefix="%s">' % (qrcprefix)
 
+    aliases = Set()
+
     for path in pathes:
         for root, dirs, files in os.walk(path):
             parent = root[len(path) + 1:]
             for f in files:
                 if fileIsAllowed(f, exclusions):
-                    print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
+                    alias = os.path.join(parent, f)
+                    if not alias in aliases:
+                        aliases.add(alias)
+                        print >> qrcfile, '<file alias="%s">%s</file>' % (alias, os.path.join(root, f))
 
-    print >> qrcfile, additions
     print >> qrcfile, '</qresource>'
     print >> qrcfile, '</RCC>'
 
@@ -127,6 +133,17 @@ def gen_includepath(file, path):
         else:
             print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
 
+def append_file(source_file, dest_file):
+    print 'Appending file {0} to file {1}'.format(source_file, dest_file)
+    if not os.path.exists(source_file):
+        print 'File {0} was not found!'
+        return
+
+    with open(source_file, 'r') as src:
+        with open(dest_file, 'a') as dst:
+            dst.write(src.read())
+            print >> dst, '\n'
+
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):
         os.makedirs('${project.build.directory}/build')
@@ -148,61 +165,63 @@ if __name__ == '__main__':
     exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
     if "${noQmlInQrc}" == "true":
         exceptions += qml_files
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons/all'], exceptions)
+
+    genqrc(
+        'build/${project.artifactId}.qrc',
+        '/',
+        ['${customization.dir}/icons/all',
+            '${project.build.directory}/resources',
+            '${project.basedir}/static-resources'],
+        exceptions)
+
     if os.path.exists('${project.build.directory}/additional-resources'):
         genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
         pro_file = open('${project.artifactId}-specifics.pro', 'a')
         print >> pro_file, 'RESOURCES += ${project.build.directory}/build/${project.artifactId}_additional.qrc'
         pro_file.close()
 
-    if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
-        f = open(output_pro_file, "w")
-        for file in [template_file, specifics_file]:
-            if os.path.exists(file):
-                fo = open(file, "r")
-                f.write(fo.read())
-                print >> f, '\n'
-                fo.close()
+    output_pro_path = os.path.join(r'${project.build.directory}', output_pro_file)
+
+    # Rewrite file
+    open(output_pro_file, 'w').close()
+
+    skip_template = os.path.exists(os.path.join(r'${project.build.directory}', skip_template_file))
+    if not skip_template:
+        append_file(template_file, output_pro_file)
+
+    append_file(specifics_file, output_pro_file)
+
+    with open(output_pro_file, "a") as f:
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
         if "${noQmlInQrc}" == "true":
             gentext(f, '${project.basedir}/static-resources', qml_files, 'OTHER_FILES += ')
         gen_includepath(f, '${libdir}/include')
-        f.close()
 
-    if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
-        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
-        execute([r'${qt.dir}/bin/qmake', '-query'])
-        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
-        if '${platform}' == 'windows':
-            vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
-            os.environ["path"] += os.pathsep + vc_path
-            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
-            if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.opt'):
-                if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.bk'):
-                    os.remove('${project.build.Directory}/build/release/generated/mocinclude.bk')
-                shutil.move(r'${project.build.Directory}/build/release/generated/mocinclude.opt', r'${project.build.Directory}/build/release/generated/mocinclude.bk')
-            execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
-            if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.opt'):
-                os.remove('${project.build.Directory}/build/release/generated/mocinclude.opt')
-            if os.path.exists(r'${project.build.Directory}/build/release/generated/mocinclude.bk'):            
-                shutil.move(r'${project.build.Directory}/build/release/generated/mocinclude.bk', r'${project.build.Directory}/build/release/generated/mocinclude.opt')
-        elif '${platform}' in [ 'ios', 'macosx' ]:
-            os.environ["DYLD_FRAMEWORK_PATH"] = ldpath
-            os.environ["DYLD_LIBRARY_PATH"] = ldpath
-            makefile = "Makefile.${build.configuration}"
-            config = ""
-            if "${platform}" == "ios":
-                config = "CONFIG+=${iosTarget}"
-                if "${iosTarget}" != "iphonesimulator":
-                    config += " CONFIG-=iphonesimulator"
-            qmake = "${qt.dir}/bin/qmake {0} -o {1} CONFIG+=${build.configuration} {2}".format(output_pro_file, makefile, config)
-            print qmake
-            os.system(qmake)
-        else:
-            qt_spec = "${qt.spec}"
-            if qt_spec:
-                qt_spec = "-spec {0}".format(qt_spec)
-            os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake %s CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, qt_spec,  output_pro_file))
+    print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
+    execute([r'${qt.dir}/bin/qmake', '-query'])
+    print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
+    if '${platform}' == 'windows':
+        vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
+        os.environ["path"] += os.pathsep + vc_path
+        execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
+        execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
+    elif '${platform}' in [ 'ios', 'macosx' ]:
+        os.environ["DYLD_FRAMEWORK_PATH"] = ldpath
+        os.environ["DYLD_LIBRARY_PATH"] = ldpath
+        makefile = "Makefile.${build.configuration}"
+        config = ""
+        if "${platform}" == "ios":
+            config = "CONFIG+=${iosTarget}"
+            if "${iosTarget}" != "iphonesimulator":
+                config += " CONFIG-=iphonesimulator"
+        qmake = "${qt.dir}/bin/qmake {0} -o {1} CONFIG+=${build.configuration} {2}".format(output_pro_file, makefile, config)
+        print qmake
+        os.system(qmake)
+    else:
+        qt_spec = "${qt.spec}"
+        if qt_spec:
+            qt_spec = "-spec {0}".format(qt_spec)
+        os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake %s CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, qt_spec,  output_pro_file))
 

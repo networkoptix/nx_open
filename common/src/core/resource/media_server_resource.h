@@ -46,6 +46,8 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    boost::optional<SocketAddress> getCloudAddress() const;
+
     virtual QString getUrl() const override;
     virtual void setUrl(const QString& url) override;
     // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
@@ -107,7 +109,7 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
@@ -124,6 +126,7 @@ private slots:
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+    void at_cloudSettingsChanged();
 
 signals:
     void portChanged(const QnResourcePtr &resource);

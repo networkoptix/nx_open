@@ -27,8 +27,9 @@ int QnStartLiteClientRestHandler::executeGet(
     const QnRestConnectionProcessor* connectionProcessor)
 {
     Q_UNUSED(path);
-    Q_UNUSED(params);
     Q_UNUSED(connectionProcessor);
+
+    const bool startCamerasMode = params.contains(lit("startCamerasMode"));
 
     QString fileName = getDataDirectory() + "/scripts/" + kScriptName;
     if (!QFile::exists(fileName))
@@ -40,12 +41,20 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const int port = connectionProcessor->owner()->getPort();
 
-    auto user = qnResPool->getResourceById<QnUserResource>(connectionProcessor->accessRights().userId);
-    if (!user)
+    QString effectiveUserName;
+    if (!connectionProcessor->accessRights().isNull())
     {
-        NX_ASSERT(false);
-        result.setError(QnRestResult::CantProcessRequest);
-        return nx_http::StatusCode::ok;
+        auto user = qnResPool->getResourceById<QnUserResource>(
+            connectionProcessor->accessRights().userId);
+        if (!user)
+        {
+            NX_ASSERT(false);
+            result.setError(QnRestResult::CantProcessRequest);
+            return nx_http::StatusCode::ok;
+        }
+#if 0 // Currently it is decided not to pass effectiveUserName in the URL, so, keep it empty.
+        effectiveUserName = user->getName();
+#endif // 0
     }
 
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
@@ -58,16 +67,23 @@ int QnStartLiteClientRestHandler::executeGet(
 
     const QString userName = server->getId().toString();
     const QString password = server->getAuthKey();
-    const QString effectiveUserName = user->getName();
 
-    const QUrl url(lit("liteclient://%1:%2@127.0.0.1:%3?effectiveUserName=%4")
-       .arg(userName).arg(password).arg(port).arg(effectiveUserName));
+    const QString urlParams = effectiveUserName.isEmpty()
+        ? ""
+        : lit("?effectiveUserName=%1").arg(effectiveUserName);
+
+    const QUrl url(lit("liteclient://%1:%2@127.0.0.1:%3%4")
+        .arg(userName).arg(password).arg(port).arg(urlParams));
 
     const QnUuid videowallInstanceGuid = server->getId();
 
     QStringList args{
         "--url", url.toString(),
-        "--videowall-instance-guid", videowallInstanceGuid.toString()};
+        "--videowall-instance-guid", videowallInstanceGuid.toString(),
+        "--log-level", QnLog::logLevelToString(QnLog::instance()->logLevel())};
+
+    if (startCamerasMode)
+        args.append(QStringList{"--auto-login", "enabled"});
 
     NX_LOG(lit("startLiteClient: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
 

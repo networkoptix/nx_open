@@ -1,5 +1,4 @@
-#ifndef ASYNC_OPERATION_GUARD_H
-#define ASYNC_OPERATION_GUARD_H
+#pragma once
 
 #include <memory>
 
@@ -8,7 +7,7 @@
 namespace nx {
 namespace utils {
 
-/** Async Operation Guard helps to syncronize async opertions
+/** Async Operation Guard helps to synchronize async operations
  *  \code
  *      const auto sharedGuard = m_asyncOperationGuard.sharedGuard();
  *      doAsyncOperation([sharedGuard]() {
@@ -22,11 +21,15 @@ class NX_UTILS_API AsyncOperationGuard
 {
 public:
     AsyncOperationGuard();
-    /** Blocks while \a SharedGuard::Lock instance is alive. */
+    /**
+     * Blocks while SharedGuard::Lock instance is alive.
+     */
     ~AsyncOperationGuard();
 
-    /** The guard shall be passed in every async operation handler to be able to
-     *  find out if master object has been deleted */
+    /**
+     * The guard shall be passed in every async operation handler to be able to
+     * find out if master object has been deleted.
+     */
     class NX_UTILS_API SharedGuard
     {
         SharedGuard();
@@ -36,9 +39,11 @@ public:
         SharedGuard& operator=(const AsyncOperationGuard::SharedGuard&);
 
     public:
-        /** This lock is supposed to be held as long as operation is in progress
-         *  \note the lock must be verified right after obtaining to find
-         *        out if operation has been canceled */
+        /**
+         * This lock is supposed to be held as long as operation is in progress
+         * @note the lock must be verified right after obtaining to find
+         * out if operation has been canceled.
+         */
         class NX_UTILS_API Lock
         {
             Lock(SharedGuard* sharedGuard);
@@ -62,7 +67,9 @@ public:
 
         Lock lock();
 
-        /** Causes all further created lock be invalid */
+        /**
+         * Causes all further created lock be invalid.
+         */
         void terminate();
 
     private:
@@ -75,10 +82,14 @@ public:
 
     const std::shared_ptr<SharedGuard>& sharedGuard();
 
-    /** Terminates current async guard and creates a new one */
+    /**
+     * Terminates current async guard and creates a new one.
+     */
     void reset();
 
-    /** Forward all of the sharedGuard public methods */
+    /**
+     * Forward all of the sharedGuard public methods.
+     */
     SharedGuard* operator->() const;
 
 private:
@@ -87,5 +98,3 @@ private:
 
 } // namespace utils
 } // namespace nx
-
-#endif // ASYNC_OPERATION_GUARD_H

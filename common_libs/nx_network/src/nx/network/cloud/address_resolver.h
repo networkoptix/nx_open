@@ -1,7 +1,7 @@
-#ifndef NX_CC_DNS_TABLE_H
-#define NX_CC_DNS_TABLE_H
+#pragma once
 
 #include <set>
+#include <deque>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
@@ -122,10 +122,10 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler);
 
     typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;
+        SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
 
     //!Resolves hostName like DNS server does
     /*!
@@ -140,11 +140,16 @@ public:
         \a natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync(
-        const HostAddress& hostName, ResolveHandler handler,
-        bool natTraversal, int ipVersion, void* requestId = nullptr);
+        const HostAddress& hostName,
+        ResolveHandler handler,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion,
+        void* requestId = nullptr);
 
-    std::vector<AddressEntry> resolveSync(
-        const HostAddress& hostName, bool natTraversal, int ipVersion);
+    std::deque<AddressEntry> resolveSync(
+        const HostAddress& hostName,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion);
 
     //!Cancels request
     /*!
@@ -191,16 +196,16 @@ protected:
         void setMediatorEntries(std::vector< AddressEntry > entries = {});
 
         void checkExpirations();
-        bool isResolved(bool natTraversal = false) const;
-        std::vector<AddressEntry> getAll() const;
+        bool isResolved(NatTraversalSupport natTraversalSupport) const;
+        std::deque<AddressEntry> getAll() const;
 
     private:
         State m_dnsState;
-        std::chrono::system_clock::time_point m_dnsResolveTime;
+        std::chrono::steady_clock::time_point m_dnsResolveTime;
         std::vector<AddressEntry> m_dnsEntries;
 
         State m_mediatorState;
-        std::chrono::system_clock::time_point m_mediatorResolveTime;
+        std::chrono::steady_clock::time_point m_mediatorResolveTime;
         std::vector<AddressEntry> m_mediatorEntries;
     };
 
@@ -211,13 +216,17 @@ protected:
     {
         const HostAddress address;
         bool inProgress;
-        bool natTraversal;
+        NatTraversalSupport natTraversalSupport;
         ResolveHandler handler;
         Guard guard;
 
         RequestInfo(
-            HostAddress _address, bool _natTraversal, ResolveHandler _handler);
+            HostAddress address,
+            NatTraversalSupport natTraversalSupport,
+            ResolveHandler handler);
     };
+
+    virtual bool isMediatorAvailable() const;
 
     void tryFastDomainResolve(HaInfoIterator info);
 
@@ -269,5 +278,3 @@ protected:
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif // NX_CC_DNS_TABLE_H

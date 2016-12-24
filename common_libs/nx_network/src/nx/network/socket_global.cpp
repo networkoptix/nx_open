@@ -1,6 +1,7 @@
 
 #include "socket_global.h"
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
 const std::chrono::seconds kReloadDebugConfigurationInterval(10);
@@ -8,13 +9,37 @@ const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 namespace nx {
 namespace network {
 
-SocketGlobals::SocketGlobals():
-    m_log(QnLog::logs()),
-    m_mediatorConnector(new hpm::api::MediatorConnector),
-    m_addressPublisher(m_mediatorConnector->systemConnection()),
-    m_tcpReversePool(m_mediatorConnector->clientConnection())
+bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
 {
-    m_addressResolver.reset(new cloud::AddressResolver(m_mediatorConnector->clientConnection()));
+    if (SocketGlobals::s_initState != InitState::done)
+        return false;
+
+    // Here 'static const' is an optimization as reload is called only on start.
+    static const auto disabledHostPatterns =
+        [this]()
+        {
+            std::list<QRegExp> regExps;
+            for (const auto& s: QString::fromUtf8(disableHosts).split(QChar(',')))
+            {
+                if (!s.isEmpty())
+                    regExps.push_back(QRegExp(s, Qt::CaseInsensitive, QRegExp::Wildcard));
+            }
+
+            return regExps;
+        }();
+
+    for (const auto& p: disabledHostPatterns)
+    {
+        if (p.exactMatch(host.toString()))
+            return true;
+    }
+
+    return false;
+}
+
+SocketGlobals::SocketGlobals():
+    m_log(QnLog::logs())
+{
 }
 
 SocketGlobals::~SocketGlobals()
@@ -25,16 +50,21 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        m_debugConfigurationTimer.pleaseStop(barrier.fork());
+        m_debugConfigurationTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
-        m_addressPublisher.pleaseStop(barrier.fork());
-        m_mediatorConnector->pleaseStop(barrier.fork());
-        m_outgoingTunnelPool.pleaseStop(barrier.fork());
-        m_tcpReversePool.pleaseStop(barrier.fork());
+        m_addressPublisher->pleaseStop(barrier.fork());
+        //m_mediatorConnector->pleaseStop(barrier.fork());
+        m_outgoingTunnelPool->pleaseStop(barrier.fork());
+        m_tcpReversePool->pleaseStop(barrier.fork());
     }
 
     promise.get_future().wait();
-    m_mediatorConnector.reset();
+    //m_mediatorConnector.reset();
+    //auto mediatorConnectorGuard = makeScopedGuard(
+    //    [this]()
+    //    {
+    //        m_mediatorConnector->pleaseStopSync(false);
+    //    });
 
     for (const auto& init: m_customInits)
     {
@@ -46,10 +76,14 @@ SocketGlobals::~SocketGlobals()
 void SocketGlobals::init()
 {
     QnMutexLocker lock(&s_mutex);
-    if (++s_counter == 1) // first in
+    if (++s_counter == 1) //< First in.
     {
-        s_isInitialized = true; // allow creating Pollable(s) in constructor
+        s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
         s_instance = new SocketGlobals;
+        
+        s_instance->initializeCloudConnectivity();
+
+        s_initState = InitState::done;
 
         lock.unlock();
         s_instance->setDebugConfigurationTimer();
@@ -59,19 +93,25 @@ void SocketGlobals::init()
 void SocketGlobals::deinit()
 {
     QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) // last out
+    if (--s_counter == 0) //< Last out.
     {
         delete s_instance;
+        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
         s_instance = nullptr;
-        s_isInitialized = false; // allow creating Pollable(s) in destructor
+        s_initState = InitState::none;
     }
 }
 
 void SocketGlobals::verifyInitialization()
 {
     NX_CRITICAL(
-        s_isInitialized,
+        s_initState != InitState::none,
         "SocketGlobals::InitGuard must be initialized before using Sockets");
+}
+
+bool SocketGlobals::isInitialized()
+{
+    return s_instance != nullptr;
 }
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
@@ -95,7 +135,8 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer.start(
+    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
+    m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
         {
@@ -104,8 +145,20 @@ void SocketGlobals::setDebugConfigurationTimer()
         });
 }
 
+void SocketGlobals::initializeCloudConnectivity()
+{
+    m_mediatorConnector = std::make_unique<hpm::api::MediatorConnector>();
+    m_addressPublisher = std::make_unique<cloud::MediatorAddressPublisher>(
+        m_mediatorConnector->systemConnection());
+    m_outgoingTunnelPool = std::make_unique<cloud::OutgoingTunnelPool>();
+    m_tcpReversePool = std::make_unique<cloud::tcp::ReverseConnectionPool>(
+        m_mediatorConnector->clientConnection());
+    m_addressResolver = std::make_unique<cloud::AddressResolver>(
+        m_mediatorConnector->clientConnection());
+}
+
 QnMutex SocketGlobals::s_mutex;
-std::atomic<bool> SocketGlobals::s_isInitialized(false);
+std::atomic<SocketGlobals::InitState> SocketGlobals::s_initState(SocketGlobals::InitState::none);
 size_t SocketGlobals::s_counter(0);
 SocketGlobals* SocketGlobals::s_instance(nullptr);
 

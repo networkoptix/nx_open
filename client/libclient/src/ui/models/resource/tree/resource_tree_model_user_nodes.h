@@ -14,17 +14,20 @@
 class QnResourceTreeModelUserNodes: public Connective<QObject>, public QnWorkbenchContextAware
 {
     using base_type = Connective<QObject>;
+
 public:
     QnResourceTreeModelUserNodes(QObject* parent = nullptr);
     virtual ~QnResourceTreeModelUserNodes();
 
     QnResourceTreeModel* model() const;
-    void setModel(QnResourceTreeModel* value);
-
     QnResourceTreeModelNodePtr rootNode() const;
+
+    void initialize(QnResourceTreeModel* model, const QnResourceTreeModelNodePtr& rootNode);
+
+protected:
+    void setModel(QnResourceTreeModel* value);
     void setRootNode(const QnResourceTreeModelNodePtr& node);
 
-    void rebuild();
 private:
     /** Calculate real children as node's children() method does not return bastard nodes. */
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
@@ -44,7 +47,7 @@ private:
     QnResourceTreeModelNodePtr ensureSubjectNode(const QnResourceAccessSubject& subject);
 
     /** Get or create user role node. */
-    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserGroupData& role);
+    QnResourceTreeModelNodePtr ensureRoleNode(const ec2::ApiUserRoleData& role);
 
     /** Get or create user node. */
     QnResourceTreeModelNodePtr ensureUserNode(const QnUserResourcePtr& user);
@@ -69,6 +72,8 @@ private:
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
 
+    void rebuild();
+
     void rebuildSubjectTree(const QnResourceAccessSubject& subject);
 
     void removeUserNode(const QnUserResourcePtr& user);
@@ -82,10 +87,14 @@ private:
     /** Remove recorder nodes that are not in use. */
     void cleanupRecorders();
 
+    void handleResourceAdded(const QnResourcePtr& resource);
+    void handleUserChanged(const QnUserResourcePtr& user);
     void handleAccessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource);
     void handleGlobalPermissionsChanged(const QnResourceAccessSubject& subject);
 
 private:
+    bool m_valid = false;
+
     QnResourceTreeModel* m_model;
 
     /** Root node for all users and roles. */

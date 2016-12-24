@@ -1,6 +1,8 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <limits>
+
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
 
@@ -33,6 +35,38 @@ void paintLabelIcon(
         labelRect->setRight(iconRect.left() - padding - 1);
 }
 
+/* Workaround while Qt's QWidget::mapFromGlobal is broken: */
+
+QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos);
+QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos)
+{
+    if (auto proxied = QnNxStylePrivate::graphicsProxiedWidget(to))
+    {
+        return to->mapFrom(proxied, mapFromGlobal(
+            proxied->graphicsProxyWidget(), globalPos));
+    }
+
+    return to->mapFromGlobal(globalPos);
+}
+
+QPoint mapFromGlobal(const QGraphicsProxyWidget* to, const QPoint& globalPos)
+{
+    static const QPoint kInvalidPos(
+        std::numeric_limits<int>::max(),
+        std::numeric_limits<int>::max());
+
+    auto scene = to->scene();
+    if (!scene)
+        return kInvalidPos;
+
+    auto views = scene->views();
+    if (views.empty())
+        return kInvalidPos;
+
+    auto viewPos = mapFromGlobal(views[0], globalPos);
+    return to->mapFromScene(views[0]->mapToScene(viewPos)).toPoint();
+}
+
 } // namespace
 
 QnPaletteColor QnNxStylePrivate::findColor(const QColor &color) const
@@ -50,18 +84,18 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
         index = 6;
         break;
     case QnNxStyle::Colors::kContrast:
+    case QnNxStyle::Colors::kBrand:
         index = 7;
         break;
     case QnNxStyle::Colors::kRed:
     case QnNxStyle::Colors::kBlue:
-    case QnNxStyle::Colors::kBrand:
         index = 4;
         break;
     case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
     case QnNxStyle::Colors::kYellow:
-        index = 0;
+        index = 2;
         break;
     }
 
@@ -163,7 +197,7 @@ void QnNxStylePrivate::drawSwitch(
     QRectF indicatorsRect = QnGeometry::eroded(rect, 3.5);
 
     /* Set clip path with excluded grip circle: */
-    QRectF gripRect = QnGeometry::eroded(rect, dp(1));
+    QRectF gripRect = QnGeometry::eroded(rect, 1);
     gripRect.moveLeft(gripRect.left() + (gripRect.width() - gripRect.height()) * animationProgress);
     gripRect.setWidth(gripRect.height());
     QPainterPath wholeRect;
@@ -188,7 +222,7 @@ void QnNxStylePrivate::drawSwitch(
         QRectF zeroRect = indicatorsRect;
         zeroRect.setLeft(indicatorsRect.right() - indicatorsRect.height());
         painter->setOpacity(baseOpacity * (kSideTransition - animationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOff, dp(2)));
+        painter->setPen(QPen(signColorOff, 2));
         painter->drawRoundedRect(zeroRect, zeroRect.width() / 2, zeroRect.height() / 2);
     }
 
@@ -201,11 +235,11 @@ void QnNxStylePrivate::drawSwitch(
 
     if (oneMinusAnimationProgress < kSideTransition)
     {
-        int x = indicatorsRect.left() + indicatorsRect.height() / 2 + dp(1);
-        int h = indicatorsRect.height() - dp(3);
+        int x = indicatorsRect.left() + indicatorsRect.height() / 2 + 1;
+        int h = indicatorsRect.height() - 3;
         int y = rect.center().y() - h / 2;
         painter->setOpacity(baseOpacity * (kSideTransition - oneMinusAnimationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOn, dp(2)));
+        painter->setPen(QPen(signColorOn, 2));
         painter->drawLine(x, y, x, y + h + 1);
     }
 
@@ -232,7 +266,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
     QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
-    const int size = Metrics::kCheckIndicatorSize - dp(5);
+    const int size = Metrics::kCheckIndicatorSize - 5;
     QRect rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
     QRectF aaAlignedRect(rect);
@@ -255,7 +289,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         path.lineTo(rc.x(0.55), rc.y(0.70));
         path.lineTo(rc.x(1.12), rc.y(0.13));
 
-        pen.setWidthF(dp(2));
+        pen.setWidthF(2);
         painter->setPen(pen);
 
         painter->drawPath(path);
@@ -266,7 +300,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
 
         if (option->state.testFlag(QStyle::State_NoChange))
         {
-            pen.setWidthF(dp(2));
+            pen.setWidthF(2);
             painter->setPen(pen);
             painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
         }
@@ -318,12 +352,12 @@ void QnNxStylePrivate::drawSortIndicator(QPainter *painter, const QStyleOption *
 
     QColor color = option->palette.brightText().color();
 
-    int w = dp(4);
-    int h = dp(2);
-    int y = option->rect.top() + dp(3);
-    int x = option->rect.x() + dp(1);
-    int wstep = dp(4);
-    int ystep = dp(4);
+    int w = 4;
+    int h = 2;
+    int y = option->rect.top() + 3;
+    int x = option->rect.x() + 1;
+    int wstep = 4;
+    int ystep = 4;
 
     if (!down)
     {
@@ -415,7 +449,8 @@ void QnNxStylePrivate::drawTextButton(
     QString text = option->fontMetrics.elidedText(
         option->text,
         Qt::ElideRight,
-        textRect.width());
+        textRect.width(),
+        Qt::TextShowMnemonic);
 
     QnScopedPainterPenRollback penRollback(painter, QPen(brush.color()));
     painter->drawText(textRect, kTextFlags, text);
@@ -461,4 +496,47 @@ bool QnNxStylePrivate::polishInputDialog(QInputDialog* inputDialog) const
     newLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
     return true;
+}
+
+const QWidget* QnNxStylePrivate::graphicsProxiedWidget(const QWidget* widget)
+{
+    while (widget && !widget->graphicsProxyWidget())
+        widget = widget->parentWidget();
+
+    return widget;
+}
+
+QGraphicsProxyWidget* QnNxStylePrivate::graphicsProxyWidget(const QWidget* widget)
+{
+    if (auto proxied = graphicsProxiedWidget(widget))
+        return proxied->graphicsProxyWidget();
+
+    return nullptr;
+}
+
+void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
+{
+    QAbstractScrollArea* area = nullptr;
+    for (auto parent = scrollBar->parent(); parent && !area; parent = parent->parent())
+        area = qobject_cast<QAbstractScrollArea*>(parent);
+
+    if (!area)
+        return;
+
+    auto viewport = area->viewport();
+    if (!viewport->underMouse())
+        return;
+
+    auto globalPos = QCursor::pos(); //< relative to the primary screen
+    auto localPos = mapFromGlobal(viewport, globalPos);
+
+    QMouseEvent mouseMove(
+        QEvent::MouseMove,
+        localPos,
+        globalPos,
+        Qt::NoButton,
+        qApp->mouseButtons(),
+        qApp->keyboardModifiers());
+
+    qApp->notify(viewport, &mouseMove);
 }

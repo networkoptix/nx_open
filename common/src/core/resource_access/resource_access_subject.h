@@ -13,14 +13,16 @@ class QnResourceAccessSubject
 public:
     QnResourceAccessSubject();
     QnResourceAccessSubject(const QnUserResourcePtr& user);
-    QnResourceAccessSubject(const ec2::ApiUserGroupData& role);
+    QnResourceAccessSubject(const ec2::ApiUserRoleData& role);
     QnResourceAccessSubject(const QnResourceAccessSubject& other);
     virtual ~QnResourceAccessSubject();
 
     const QnUserResourcePtr& user() const;
-    const ec2::ApiUserGroupData& role() const;
+    const ec2::ApiUserRoleData& role() const;
 
     bool isValid() const;
+    bool isUser() const;
+    bool isRole() const;
 
     QnUuid id() const;
 

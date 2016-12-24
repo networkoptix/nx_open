@@ -27,10 +27,13 @@
 #include <api/global_settings.h>
 
 #include <nx/utils/string.h>
+#include <network/system_helpers.h>
 
 namespace {
 
 static const int kMaxSystemNameLength = 20;
+static const QString kFactorySystemUser = lit("admin");
+static const QString kFactorySystemPassword = lit("admin");
 
 }
 
@@ -64,6 +67,15 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     QButtonGroup *buttonGroup = new QButtonGroup(this);
     buttonGroup->addButton(ui->currentSystemRadioButton);
     buttonGroup->addButton(ui->remoteSystemRadioButton);
+
+    auto enableCredentialsControls = [this]
+        {
+            ui->passwordEdit->setEnabled(true);
+            ui->loginEdit->setEnabled(true);
+        };
+
+    connect(ui->urlComboBox,    &QComboBox::editTextChanged, this, enableCredentialsControls);
+
 
     connect(ui->urlComboBox,            SIGNAL(activated(int)),             this,   SLOT(at_urlComboBox_activated(int)));
     connect(ui->urlComboBox->lineEdit(),&QLineEdit::editingFinished,        this,   &QnMergeSystemsDialog::at_urlComboBox_editingFinished);
@@ -124,7 +136,13 @@ void QnMergeSystemsDialog::updateKnownSystems()
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
-        QString systemName = server->getModuleInformation().systemName;
+
+        const auto moduleInformation = server->getModuleInformation();
+
+        QString systemName = helpers::isNewSystem(moduleInformation)
+            ? tr("New System")
+            : moduleInformation.systemName;
+
         if (!systemName.isEmpty())
             label += lit(" (%1)").arg(systemName);
 
@@ -199,16 +217,11 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
         return;
     }
 
-    if (password.isEmpty()) {
-        updateErrorLabel(tr("The password cannot be empty."));
-        updateConfigurationBlock();
-        return;
-    }
-
     m_url = url;
     m_remoteOwnerCredentials.setUser(login);
-    m_remoteOwnerCredentials.setPassword(password);
+    m_remoteOwnerCredentials.setPassword(password.isEmpty() ? kFactorySystemPassword : password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
+    ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -236,6 +249,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const QnMediaServerResourcePtr& discoverer)
 {
     ui->buttonBox->hideProgress();
+    ui->credentialsGroupBox->setEnabled(true);
 
     if (mergeStatus != utils::MergeSystemsStatus::ok
         && mergeStatus != utils::MergeSystemsStatus::starterLicense)
@@ -249,7 +263,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const auto server = qnResPool->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
-        && moduleInformation.localSystemId == qnGlobalSettings->localSystemId())
+        && helpers::serverBelongsToCurrentSystem(moduleInformation))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {
@@ -265,16 +279,35 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     }
 
     m_discoverer = discoverer;
-    ui->remoteSystemLabel->setText(moduleInformation.systemName);
-    m_mergeButton->setText(tr("Merge with %1").arg(moduleInformation.systemName));
+
+    bool isNewSystem = helpers::isNewSystem(moduleInformation);
+    if (isNewSystem)
+    {
+        ui->currentSystemRadioButton->setChecked(true);
+        ui->loginEdit->setText(kFactorySystemUser);
+        ui->passwordEdit->clear();
+    }
+
+    ui->remoteSystemRadioButton->setEnabled(!isNewSystem);
+    ui->loginEdit->setEnabled(!isNewSystem);
+    ui->passwordEdit->setEnabled(!isNewSystem);
+    const QString systemName = isNewSystem
+        ? tr("New System")
+        : moduleInformation.systemName;
+
+    ui->remoteSystemLabel->setText(systemName);
+    ui->remoteSystemRadioButton->setText(systemName);
+    m_mergeButton->setText(tr("Merge with %1").arg(systemName));
     m_mergeButton->show();
-    ui->remoteSystemRadioButton->setText(moduleInformation.systemName);
-    updateErrorLabel(QString());
 
     if (mergeStatus == utils::MergeSystemsStatus::starterLicense)
     {
         updateErrorLabel(
             utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));
+    }
+    else
+    {
+        updateErrorLabel(QString());
     }
 
     updateConfigurationBlock();

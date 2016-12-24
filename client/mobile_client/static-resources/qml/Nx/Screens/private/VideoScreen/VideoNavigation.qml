@@ -117,307 +117,310 @@ Item
                         drag.target.y = drag.maximumY
                 }
             }
+        }
 
-            Image
+        Image
+        {
+            width: timeline.width
+            height: sourceSize.height
+            anchors.bottom: timeline.bottom
+            anchors.bottomMargin: timeline.chunkBarHeight
+            sourceSize.height: 150 - timeline.chunkBarHeight
+            source: lp("/images/timeline_gradient.png")
+        }
+
+        Timeline
+        {
+            id: timeline
+
+            property bool resumeWhenDragFinished: false
+
+            enabled: startBound > 0
+
+            anchors.bottom: parent.bottom
+            width: parent.width
+            height: 104
+
+            stickToEnd: mediaPlayer.liveMode && !paused
+
+            chunkBarHeight: 32
+            textY: height - chunkBarHeight - 16 - 24
+
+            chunkProvider: cameraChunkProvider
+            startBound: cameraChunkProvider.bottomBound
+
+            onMovingChanged:
             {
-                width: timeline.width
-                height: sourceSize.height
-                anchors.bottom: timeline.bottom
-                anchors.bottomMargin: timeline.chunkBarHeight
-                sourceSize.height: 150 - timeline.chunkBarHeight
-                source: lp("/images/timeline_gradient.png")
-            }
-
-            Timeline
-            {
-                id: timeline
-
-                property bool resumeWhenDragFinished: false
-
-                enabled: startBound > 0
-
-                anchors.bottom: parent.bottom
-                width: parent.width
-                height: 104
-
-                stickToEnd: mediaPlayer.liveMode && !paused
-
-                chunkBarHeight: 32
-                textY: height - chunkBarHeight - 16 - 24
-
-                chunkProvider: cameraChunkProvider
-                startBound: cameraChunkProvider.bottomBound
-
-                onMoveFinished:
+                if (!moving)
                 {
                     mediaPlayer.position = position
                     if (resumeWhenDragFinished)
                         mediaPlayer.play()
                 }
-                onPositionTapped: mediaPlayer.position = position
-                onPositionChanged:
-                {
-                    if (!dragging)
-                        return
+            }
+            onPositionTapped: mediaPlayer.position = position
+            onPositionChanged:
+            {
+                if (!dragging)
+                    return
 
-                    mediaPlayer.position = position
-                }
+                mediaPlayer.position = position
+            }
 
-                onDraggingChanged:
+            onDraggingChanged:
+            {
+                if (dragging)
                 {
-                    if (dragging)
-                    {
-                        resumeWhenDragFinished = !videoNavigation.paused
-                        mediaPlayer.pause()
-                    }
-                }
-
-                Binding
-                {
-                    target: timeline
-                    property: "position"
-                    value: mediaPlayer.position
-                    when: !timeline.moving && !mediaPlayer.liveMode
+                    resumeWhenDragFinished = !videoNavigation.paused
+                    mediaPlayer.pause()
                 }
             }
 
-            Item
+            Binding
             {
-                id: timelineMask
+                target: timeline
+                property: "position"
+                value: mediaPlayer.position
+                when: !timeline.moving && !mediaPlayer.liveMode
+            }
+        }
 
-                anchors.fill: timeline
-                visible: false
+        Item
+        {
+            id: timelineMask
 
-                Rectangle
+            anchors.fill: timeline
+            visible: false
+
+            Rectangle
+            {
+                id: blurRectangle
+
+                readonly property real blurWidth: 36
+                readonly property real margin: 18
+
+                width: timeline.height - timeline.chunkBarHeight
+                height: timeline.width
+                rotation: 90
+                anchors.centerIn: parent
+                anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
+                gradient: Gradient
                 {
-                    id: blurRectangle
-
-                    readonly property real blurWidth: 36
-                    readonly property real margin: 18
-
-                    width: timeline.height - timeline.chunkBarHeight
-                    height: timeline.width
-                    rotation: 90
-                    anchors.centerIn: parent
-                    anchors.verticalCenterOffset: -timeline.chunkBarHeight / 2
-                    gradient: Gradient
-                    {
-                        GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                        GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                        GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                        GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
-                        GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                        GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
-                    }
+                    GradientStop { position: 0.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: (timeLiveLabel.x - blurRectangle.blurWidth - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: (timeLiveLabel.x - blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: 0.5; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 0.0) }
+                    GradientStop { position: (timeLiveLabel.x + timeLiveLabel.width + blurRectangle.blurWidth + blurRectangle.margin) / timeline.width; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
+                    GradientStop { position: 1.0; color: Qt.rgba(1.0, 1.0, 1.0, 1.0) }
                 }
+            }
 
-                Rectangle
+            Rectangle
+            {
+                width: timeline.width
+                height: timeline.chunkBarHeight
+                anchors.bottom: parent.bottom
+                color: "#ffffffff"
+            }
+        }
+
+        OpacityMask
+        {
+            anchors.fill: timeline
+            source: timeline.timelineView
+            maskSource: timelineMask
+
+            Component.onCompleted: timeline.timelineView.visible = false
+        }
+
+        Text
+        {
+            anchors.horizontalCenter: timeline.horizontalCenter
+            text: qsTr("No Archive")
+            font.capitalization: Font.AllUppercase
+            font.pixelSize: 12
+            anchors.bottom: timeline.bottom
+            anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+            color: ColorTheme.windowText
+            visible: timeline.startBound <= 0
+            opacity: 0.5
+        }
+
+        Pane
+        {
+            id: navigationPanel
+
+            width: parent.width
+            height: 64
+            anchors.top: timeline.bottom
+            background: Rectangle { color: ColorTheme.base3 }
+            padding: 4
+
+            IconButton
+            {
+                anchors.verticalCenter: parent.verticalCenter
+                icon: lp("/images/calendar.png")
+                enabled: d.hasArchive
+                onClicked:
                 {
-                    width: timeline.width
-                    height: timeline.chunkBarHeight
-                    anchors.bottom: parent.bottom
-                    color: "#ffffffff"
+                    calendarPanelLoader.active = true
+                    calendarPanelLoader.item.date = timeline.positionDate
+                    calendarPanelLoader.item.open()
                 }
             }
 
-            OpacityMask
+            Row
             {
-                anchors.fill: timeline
-                source: timeline.timelineView
-                maskSource: timelineMask
-
-                Component.onCompleted: timeline.timelineView.visible = false
-            }
-
-            Text
-            {
-                anchors.horizontalCenter: timeline.horizontalCenter
-                text: qsTr("No Archive")
-                font.capitalization: Font.AllUppercase
-                font.pixelSize: 12
-                anchors.bottom: timeline.bottom
-                anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
-                color: ColorTheme.windowText
-                visible: timeline.startBound <= 0
-                opacity: 0.5
-            }
-
-            Pane
-            {
-                id: navigationPanel
-
-                width: parent.width
-                height: 64
-                anchors.top: timeline.bottom
-                background: Rectangle { color: ColorTheme.base3 }
-                padding: 4
+                anchors.centerIn: parent
 
                 IconButton
                 {
-                    anchors.verticalCenter: parent.verticalCenter
-                    icon: lp("/images/calendar.png")
+                    id: zoomOutButton
+
+                    icon: lp("/images/minus.png")
                     enabled: d.hasArchive
-                    onClicked:
-                    {
-                        calendarPanelLoader.active = true
-                        calendarPanelLoader.item.date = timeline.positionDate
-                        calendarPanelLoader.item.open()
-                    }
+                    onClicked: timeline.zoomOut()
                 }
 
-                Row
+                IconButton
                 {
-                    anchors.centerIn: parent
+                    id: zoomInButton
 
-                    IconButton
-                    {
-                        id: zoomOutButton
-
-                        icon: lp("/images/minus.png")
-                        enabled: d.hasArchive
-                        onClicked: timeline.zoomOut()
-                    }
-
-                    IconButton
-                    {
-                        id: zoomInButton
-
-                        icon: lp("/images/plus.png")
-                        enabled: d.hasArchive
-                        onClicked: timeline.zoomIn()
-                    }
+                    icon: lp("/images/plus.png")
+                    enabled: d.hasArchive
+                    onClicked: timeline.zoomIn()
                 }
+            }
 
-                Button
+            Button
+            {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr("LIVE")
+                flat: true
+                onClicked:
                 {
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("LIVE")
-                    flat: true
-                    onClicked:
-                    {
-                        playbackController.checked = false
-                        mediaPlayer.playLive()
-                    }
-                    opacity: mediaPlayer.liveMode ? 0.0 : 1.0
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
+                    playbackController.checked = false
+                    mediaPlayer.playLive()
                 }
+                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                Behavior on opacity { NumberAnimation { duration: 200 } }
+            }
 
-                Timer
+            Timer
+            {
+                interval: 100
+                repeat: true
+                running: zoomInButton.pressed || zoomOutButton.pressed
+                triggeredOnStart: true
+                onTriggered:
                 {
-                    interval: 100
-                    repeat: true
-                    running: zoomInButton.pressed || zoomOutButton.pressed
-                    triggeredOnStart: true
-                    onTriggered:
-                    {
-                        if (zoomInButton.pressed)
-                            timeline.zoomIn()
-                        else
-                            timeline.zoomOut()
-                    }
+                    if (zoomInButton.pressed)
+                        timeline.zoomIn()
+                    else
+                        timeline.zoomOut()
                 }
+            }
+        }
+
+        Item
+        {
+            id: dateTimeLabel
+
+            height: 56
+            width: parent.width
+            anchors.bottom: timeline.bottom
+            anchors.bottomMargin: timeline.chunkBarHeight + 16
+
+            Text
+            {
+                id: dateLabel
+
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                height: 24
+                font.pixelSize: 14
+                font.weight: Font.Normal
+                verticalAlignment: Text.AlignVCenter
+
+                // TODO: Remove qsTr from this string!
+                text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
+                color: ColorTheme.windowText
+
+                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
             Item
             {
-                id: dateTimeLabel
+                id: timeLiveLabel
 
-                height: 56
-                width: parent.width
-                anchors.bottom: timeline.bottom
-                anchors.bottomMargin: timeline.chunkBarHeight + 16
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
+                Behavior on y { NumberAnimation { duration: 200 } }
+
+                width: timeLabel.visible ? timeLabel.width : liveLabel.width
+                height: timeLabel.height
+
+                TimeLabel
+                {
+                    id: timeLabel
+                    dateTime: timeline.positionDate
+                    visible: !mediaPlayer.liveMode
+                }
 
                 Text
                 {
-                    id: dateLabel
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    height: 24
-                    font.pixelSize: 14
+                    id: liveLabel
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 32
                     font.weight: Font.Normal
-                    verticalAlignment: Text.AlignVCenter
-
-                    // TODO: Remove qsTr from this string!
-                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                     color: ColorTheme.windowText
-
-                    opacity: mediaPlayer.liveMode ? 0.0 : 1.0
-                    Behavior on opacity { NumberAnimation { duration: 200 } }
-                }
-
-                Item
-                {
-                    id: timeLiveLabel
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
-                    Behavior on y { NumberAnimation { duration: 200 } }
-
-                    width: timeLabel.visible ? timeLabel.width : liveLabel.width
-                    height: timeLabel.height
-
-                    TimeLabel
-                    {
-                        id: timeLabel
-                        dateTime: timeline.positionDate
-                        visible: !mediaPlayer.liveMode
-                    }
-
-                    Text
-                    {
-                        id: liveLabel
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: 32
-                        font.weight: Font.Normal
-                        color: ColorTheme.windowText
-                        text: qsTr("LIVE")
-                        visible: mediaPlayer.liveMode
-                    }
+                    text: qsTr("LIVE")
+                    visible: mediaPlayer.liveMode
                 }
             }
+        }
 
-            PlaybackController
+        PlaybackController
+        {
+            id: playbackController
+
+            anchors.verticalCenter: timeline.bottom
+            anchors.verticalCenterOffset: -150
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            loading: !paused && (mediaPlayer.loading || timeline.dragging)
+            paused: videoNavigation.paused
+            onClicked:
             {
-                id: playbackController
-
-                anchors.verticalCenter: timeline.bottom
-                anchors.verticalCenterOffset: -150
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                loading: !paused && (mediaPlayer.loading || timeline.dragging)
-                paused: videoNavigation.paused
-                onClicked:
-                {
-                    if (paused)
-                        mediaPlayer.play()
-                    else
-                        mediaPlayer.pause()
-                }
+                if (paused)
+                    mediaPlayer.play()
+                else
+                    mediaPlayer.pause()
             }
+        }
 
-            Rectangle
-            {
-                color: ColorTheme.windowText
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: playbackController.bottom
-                width: 2
-                height: 8
-                visible: timeline.startBound > 0
-            }
+        Rectangle
+        {
+            color: ColorTheme.windowText
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: playbackController.bottom
+            width: 2
+            height: 8
+            visible: timeline.startBound > 0
+        }
 
-            Rectangle
-            {
-                color: ColorTheme.windowText
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.bottom: parent.bottom
-                width: 2
-                height: timeline.chunkBarHeight + 8
-                visible: timeline.startBound > 0
-            }
+        Rectangle
+        {
+            color: ColorTheme.windowText
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            width: 2
+            height: timeline.chunkBarHeight + 8
+            visible: timeline.startBound > 0
         }
     }
 

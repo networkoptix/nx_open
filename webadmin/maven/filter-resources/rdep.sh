@@ -1,12 +1,24 @@
 #!/bin/bash
-mkdir -p ${environment.dir}/packages/any/server-external-${branch}-${release.version}/bin
-cp -f ${basedir}/external.dat ${environment.dir}/packages/any/server-external-${branch}-${release.version}/bin
-if [[ $? -ne 0 ]]; then exit $?; fi
-python ${root.dir}/build_utils/python/rdep.py -u -f -t any server-external-${branch}-${release.version} --root ${environment.dir}/packages
-if [[ $? -ne 0 ]]; then exit $?; fi
-if [[ $branch == prod_${release.version} ]]; then 
-    mkdir -p ${environment.dir}/packages/any/server-external-${release.version}/bin
-    cp -f ${basedir}/external.dat ${environment.dir}/packages/any/server-external-${release.version}/bin
-    python ${root.dir}/build_utils/python/rdep.py -u -f -t any server-external-${release.version} --root ${environment.dir}/packages
-    if [[ $? -ne 0 ]]; then exit $?; fi
+
+set -e
+
+ROOT="$environment/packages"
+
+function upload() {
+    PACKAGE=$1
+    PACKAGE_DIR="$ROOT/any/$PACKAGE"
+
+    if [ -d "$PACKAGE_DIR" ]; then
+        rm -rf "$PACKAGE_DIR"
+    fi
+
+    mkdir -p "$PACKAGE_DIR"/bin
+    cp -f ${basedir}/external.dat "$PACKAGE_DIR"/bin
+    cp -f ${basedir}/qbs/server-external.qbs "$PACKAGE_DIR"
+    ${root.dir}/build_utils/python/rdep.py -u -f -t any $PACKAGE --root $ROOT
+}
+
+upload "server-external-${branch}"
+if [[ "${branch}" == "prod_${release.version}" ]]; then
+    upload "server-external-${release.version}"
 fi

@@ -402,7 +402,7 @@ bool ApplauncherProcess::startApplication(
     if (ProcessUtils::startProcessDetached(
         binPath,
         arguments,
-        QString(),
+        QFileInfo(binPath).canonicalPath(),
         environment))
     {
         NX_LOG(QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1);

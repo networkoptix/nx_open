@@ -27,13 +27,25 @@ namespace cdb {
 
 namespace {
 
-class Account
-:
+class Account:
     public CdbFunctionalTest
 {
 };
 
 } // namespace
+
+// TODO: #ak following test should be broke into something like
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingReceivalOfActiveAccountNotification();
+//    expectingAccountActivationCodeWorks();
+//}
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingFailureToBindSystemToAccount();
+//}
 
 TEST_F(Account, activation)
 {
@@ -227,7 +239,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account1.email, account1Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
+        ASSERT_EQ(1U, systems.size());
         ASSERT_TRUE(system1 == systems[0]);
     }
 
@@ -236,7 +248,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 0);
+        ASSERT_EQ(systems.size(), 0U);
     }
 
     {
@@ -255,7 +267,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
+        ASSERT_EQ(systems.size(), 1U);
         ASSERT_TRUE(system1 == systems[0]);
     }
 
@@ -392,18 +404,10 @@ TEST_F(Account, update)
 {
     ASSERT_TRUE(startAndWaitUntilStarted());
 
-    api::AccountData account1;
-    std::string account1Password;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        addActivatedAccount(&account1, &account1Password));
-
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getAccount(account1.email, account1Password, &account1));
+    auto account1 = addActivatedAccount2();
 
     //changing password
-    std::string account1NewPassword = account1Password + "new";
+    std::string account1NewPassword = account1.password + "new";
     api::AccountUpdateData update;
     update.passwordHa1 = nx_http::calcHa1(
         account1.email.c_str(),
@@ -419,23 +423,27 @@ TEST_F(Account, update)
 
     ASSERT_EQ(
         api::ResultCode::ok,
-        updateAccount(account1.email, account1Password, update));
-
+        updateAccount(account1.email, account1.password, update));
+    
+    account1.password = account1NewPassword;
     account1.fullName = update.fullName.get();
     account1.customization = update.customization.get();
 
-    api::AccountData newAccount;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getAccount(account1.email, account1NewPassword, &newAccount));
-    ASSERT_EQ(newAccount, account1);
+    bool restarted = false;
+    for (;;)
+    {
+        api::AccountData newAccount;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getAccount(account1.email, account1.password, &newAccount));
+        ASSERT_EQ(account1, newAccount);
 
-    ASSERT_TRUE(restart());
+        if (restarted)
+            break;
 
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        getAccount(account1.email, account1NewPassword, &newAccount));
-    ASSERT_EQ(newAccount, account1);
+        ASSERT_TRUE(restart());
+        restarted = true;
+    }
 }
 
 TEST_F(Account, reset_password_general)
@@ -578,12 +586,12 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
     std::string confirmationCode1;
     ASSERT_EQ(
         api::ResultCode::ok,
-        resetAccountPassword(account1.data.email, &confirmationCode1));
+        resetAccountPassword(account1.email, &confirmationCode1));
 
     std::string confirmationCode2;
     ASSERT_EQ(
         api::ResultCode::ok,
-        resetAccountPassword(account1.data.email, &confirmationCode2));
+        resetAccountPassword(account1.email, &confirmationCode2));
 
     for (int i = 0; i < 3; ++i)
     {
@@ -603,10 +611,10 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
 
         api::AccountUpdateData update;
         update.passwordHa1 = nx_http::calcHa1(
-            account1.data.email.c_str(),
+            account1.email.c_str(),
             moduleInfo().realm.c_str(),
             account1.password.c_str()).constData();
-        const auto result = updateAccount(account1.data.email, tmpPassword, update);
+        const auto result = updateAccount(account1.email, tmpPassword, update);
         if (i == 0)
         {
             ASSERT_EQ(api::ResultCode::ok, result);
@@ -614,7 +622,7 @@ TEST_F(Account, reset_password_links_expiration_after_changing_password)
             api::AccountData accountData;
             ASSERT_EQ(
                 api::ResultCode::ok,
-                getAccount(account1.data.email, account1.password, &accountData));
+                getAccount(account1.email, account1.password, &accountData));
         }
         else
         {
@@ -908,7 +916,7 @@ TEST_F(Account, temporary_credentials_login_to_system)
     ASSERT_EQ(
         api::ResultCode::ok,
         createTemporaryCredentials(
-            account.data.email,
+            account.email,
             account.password,
             params,
             &temporaryCredentials));
@@ -930,7 +938,49 @@ TEST_F(Account, temporary_credentials_login_to_system)
                 authRequest,
                 std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(account.data.email, authResponse.authenticatedAccountData.accountEmail);
+    ASSERT_EQ(account.email, authResponse.authenticatedAccountData.accountEmail);
+}
+
+TEST_F(Account, temporary_credentials_removed_on_password_change)
+{
+    constexpr const auto expirationPeriod = std::chrono::seconds(50);
+
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    auto account = addActivatedAccount2();
+    const auto system = addRandomSystemToAccount(account);
+
+    api::TemporaryCredentialsParams params;
+    params.timeouts.expirationPeriod = expirationPeriod;
+    api::TemporaryCredentials temporaryCredentials;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        createTemporaryCredentials(
+            account.email,
+            account.password,
+            params,
+            &temporaryCredentials));
+
+    std::string account1NewPassword = account.password + "new";
+    api::AccountUpdateData accountUpdateData;
+    accountUpdateData.passwordHa1 = nx_http::calcHa1(
+        account.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str()).constData();
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        updateAccount(account.email, account.password, accountUpdateData));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        api::AccountData accountData;
+        ASSERT_EQ(
+            api::ResultCode::notAuthorized,
+            getAccount(temporaryCredentials.login, temporaryCredentials.password, &accountData));
+    }
 }
 
 TEST_F(Account, created_while_sharing)
@@ -957,7 +1007,7 @@ TEST_F(Account, created_while_sharing)
     api::SystemData system1;
     ASSERT_EQ(
         api::ResultCode::ok,
-        bindRandomSystem(account1.data.email, account1.password, &system1));
+        bindRandomSystem(account1.email, account1.password, &system1));
 
     const std::string newAccountEmail = generateRandomEmailAddress();
     std::string newAccountPassword;
@@ -995,7 +1045,7 @@ TEST_F(Account, created_while_sharing)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(newAccountEmail, newAccountPassword, &systems));
-    ASSERT_EQ(1, systems.size());
+    ASSERT_EQ(1U, systems.size());
     ASSERT_EQ(system1.id, systems[0].id);
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }

@@ -60,10 +60,20 @@ QnMediaServerResource::QnMediaServerResource():
     if (!resList.isEmpty())
         m_firstCamera = resList.first();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
-    connect(this, &QnResource::resourceChanged, this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
-    connect(this, &QnResource::propertyChanged, this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+
+    connect(this, &QnResource::resourceChanged,
+        this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+
+    connect(this, &QnResource::propertyChanged,
+        this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -77,6 +87,14 @@ void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, co
 {
     if (key == QnMediaResource::panicRecordingKey())
         m_panicModeCache.update();
+}
+
+void QnMediaServerResource::at_cloudSettingsChanged()
+{
+    if (hasFlags(Qn::fake_server))
+        return;
+
+    emit auxUrlsChanged(toSharedPointer(this));
 }
 
 void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
@@ -196,6 +214,15 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
     return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
 }
 
+boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
+{
+    const auto cloudId = getModuleInformation().cloudId();
+    if (cloudId.isEmpty())
+        return boost::none;
+    else
+        return SocketAddress(cloudId);
+}
+
 quint16 QnMediaServerResource::getPort() const
 {
     return getPrimaryAddress().port;
@@ -205,11 +232,11 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
 {
     auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
 
-    QSet<SocketAddress> result;
     QSet<SocketAddress> ignored;
     for (const QUrl &url : getIgnoredUrls())
         ignored.insert(toAddress(url));
 
+    QSet<SocketAddress> result;
     for (const auto& address : getNetAddrList())
     {
         if (ignored.contains(address))
@@ -224,6 +251,9 @@ QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
             continue;
         result.insert(address);
     }
+
+    if (auto cloudAddress = getCloudAddress())
+        result.insert(std::move(*cloudAddress));
 
     return result.toList();
 }
@@ -540,7 +570,7 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (getStatus() != newStatus)
     {
@@ -549,15 +579,12 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
             m_statusTimer.restart();
         }
 
-        QnResource::setStatus(newStatus, silenceMode);
-        if (!silenceMode)
+        QnResource::setStatus(newStatus, reason);
+        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        for(const QnResourcePtr& res: childList)
         {
-            QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-            for(const QnResourcePtr& res: childList)
-            {
-                if (res->hasFlags(Qn::depend_on_parent_status))
-                    emit res->statusChanged(res);
-            }
+            if (res->hasFlags(Qn::depend_on_parent_status))
+                emit res->statusChanged(res, Qn::StatusChangeReason::Default);
         }
     }
 }

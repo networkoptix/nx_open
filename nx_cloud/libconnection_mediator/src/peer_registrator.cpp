@@ -1,4 +1,3 @@
-
 #include "peer_registrator.h"
 
 #include <functional>
@@ -9,7 +8,7 @@
 #include <nx/network/stun/cc/custom_stun.h>
 
 #include "listening_peer_pool.h"
-
+#include "data/listening_peer.h"
 
 namespace nx {
 namespace hpm {
@@ -35,7 +34,7 @@ PeerRegistrator::PeerRegistrator(
             stun::cc::methods::listen,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
-                processRequestWithNoOutput(
+                processRequestWithOutput(
                     &PeerRegistrator::listen,
                     this,
                     std::move(connection),
@@ -68,7 +67,7 @@ PeerRegistrator::PeerRegistrator(
             stun::cc::methods::clientBind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
-                processRequestWithNoOutput(
+                processRequestWithOutput(
                     &PeerRegistrator::clientBind,
                     this,
                     std::move(connection),
@@ -77,6 +76,27 @@ PeerRegistrator::PeerRegistrator(
 
     // TODO: NX_LOG
     NX_ASSERT(result, Q_FUNC_INFO, "Could not register one of processors");
+}
+
+data::ListeningPeers PeerRegistrator::getListeningPeers() const
+{
+    data::ListeningPeers result;
+    result.systems = m_listeningPeerPool->getListeningPeers();
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& client: m_boundClients)
+    {
+        data::BoundClient info;
+        if (const auto connetion = client.second.connection.lock())
+            info.connectionEndpoint = connetion->getSourceAddress().toString();
+
+        for (const auto& endpoint: client.second.tcpReverseEndpoints)
+            info.tcpReverseEndpoints.push_back(endpoint.toString());
+
+        result.clients.emplace(QString::fromUtf8(client.first), std::move(info));
+    }
+
+    return result;
 }
 
 void PeerRegistrator::bind(
@@ -128,10 +148,10 @@ void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
     stun::Message requestMessage,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::ListenResponse)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
-        return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
+        return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -167,7 +187,10 @@ void PeerRegistrator::listen(
             cl_logDEBUG1);
     }
 
-    completionHandler(api::ResultCode::ok);
+    api::ListenResponse response;
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    completionHandler(api::ResultCode::ok, std::move(response));
+
     for (auto& indication: clientBindIndications)
         connection->sendMessage(std::move(indication));
 }
@@ -243,14 +266,14 @@ void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
     stun::Message /*requestMessage*/,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)
     {
         NX_LOGX(lm("Reject client bind (requested from %1): %2")
             .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
 
-        completionHandler(code);
+        completionHandler(code, {});
     };
 
     // Only local peers are alowed while auth is not avaliable for clients:
@@ -289,7 +312,10 @@ void PeerRegistrator::clientBind(
             m_boundClients.erase(it);
         });
 
-    completionHandler(api::ResultCode::ok);
+    api::ClientBindResponse response;
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    completionHandler(api::ResultCode::ok, std::move(response));
+
     for (const auto& connectionRef: listeningPeerConnections)
         if (const auto connection = connectionRef.lock())
             connection->sendMessage(indication);

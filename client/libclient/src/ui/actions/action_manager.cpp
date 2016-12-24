@@ -147,6 +147,13 @@ public:
         return *this;
     }
 
+    QnActionBuilder iconVisibleInMenu(bool visible)
+    {
+        m_action->setIconVisibleInMenu(visible);
+
+        return *this;
+    }
+
     QnActionBuilder role(QAction::MenuRole role)
     {
         m_action->setMenuRole(role);
@@ -517,9 +524,11 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ConnectAction).
         flags(Qn::NoTarget);
 
+    factory(QnActions::ConnectToCloudSystemAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::ReconnectAction).
-        flags(Qn::NoTarget).
-        text(tr("Reconnect to Server"));
+        flags(Qn::NoTarget);
 
     factory(QnActions::FreespaceAction).
         flags(Qn::GlobalHotkey).
@@ -638,13 +647,12 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Connect to Server...")).
         shortcut(lit("Ctrl+Shift+C")).
-        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(QnActions::DisconnectAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Logout")).
+        text(tr("Disconnect from Server")).
         autoRepeat(false).
         shortcut(lit("Ctrl+Shift+D")).
         condition(new QnLoggedInCondition(this));
@@ -757,7 +765,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory().
-        flags(Qn::Main | Qn::Scene).
+        flags(Qn::Main | Qn::Tree | Qn::Scene).
         mode(QnActionTypes::DesktopMode).
         text(tr("Open..."));
 
@@ -769,8 +777,7 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("File(s)...")).
             shortcut(lit("Ctrl+O")).
-            autoRepeat(false).
-            icon(qnSkin->icon("folder.png"));
+            autoRepeat(false);
 
         factory(QnActions::OpenFolderAction).
             flags(Qn::Main | Qn::Scene).
@@ -780,11 +787,15 @@ QnActionManager::QnActionManager(QObject *parent):
         factory().separator().
             flags(Qn::Main);
 
-        factory(QnActions::WebClientActionSubMenu).
-            flags(Qn::Main).
+        factory(QnActions::WebClientAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
             text(tr("Web Client...")).
+            pulledText(tr("Open Web Client...")).
             autoRepeat(false).
-            requiredGlobalPermission(Qn::GlobalAdminPermission);
+            condition(new QnConjunctionActionCondition(
+                new QnLoggedInCondition(this),
+                new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
+                this));
 
     } factory.endSubMenu();
 
@@ -900,11 +911,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+F"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut);
 
-
-    factory(QnActions::MessageBoxAction).
-        flags(Qn::NoTarget).
-        text(lit("Show Message"));
-
     factory(QnActions::VersionMismatchMessageAction).
         flags(Qn::NoTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
@@ -932,14 +938,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration...")).
         shortcut(lit("Ctrl+Alt+A")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
-
-    factory(QnActions::WebClientAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::NoTarget).
-        text(tr("Open Web Client...")).
-        autoRepeat(false).
-        requiredGlobalPermission(Qn::GlobalAdminPermission).
-        condition(new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this));
+        condition(new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this));
 
     factory(QnActions::SystemUpdateAction).
         flags(Qn::NoTarget).
@@ -973,11 +972,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::LoginToCloud).
         flags(Qn::NoTarget).
-        text(tr("Login to %1...").arg(QnAppInfo::cloudName()));
+        text(tr("Log in to %1...", "Log in to Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::LogoutFromCloud).
         flags(Qn::NoTarget).
-        text(tr("Logout"));
+        text(tr("Log out from %1", "Log out from Nx Cloud").arg(QnAppInfo::cloudName()));
 
     factory(QnActions::OpenCloudMainUrl).
         flags(Qn::NoTarget).
@@ -985,11 +984,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::OpenCloudManagementUrl).
         flags(Qn::NoTarget).
-        text(tr("Manage account..."));
+        text(tr("Account Settings..."));
 
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
-        text(tr("Create account..."));
+        text(tr("Create Account..."));
 
     factory().
         flags(Qn::Main).
@@ -1019,7 +1018,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
         condition(new QnConjunctionActionCondition(
-            new QnTreeNodeTypeCondition(Qn::CurrentSystemNode, this),
+            new QnTreeNodeTypeCondition({Qn::CurrentSystemNode, Qn::ServersNode}, this),
             new QnForbiddenInSafeModeCondition(this),
             new QnRequiresOwnerCondition(this),
             this)
@@ -1051,10 +1050,12 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("Exit")).
         shortcut(lit("Alt+F4")).
+        shortcut(lit("Ctrl+Q"), QnActionBuilder::Mac, true).
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/window_close.png"));
+        icon(qnSkin->icon("titlebar/window_close.png")).
+        iconVisibleInMenu(false);
 
     factory(QnActions::DelayedForcedExitAction).
         flags(Qn::NoTarget);
@@ -1210,15 +1211,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
-    factory(QnActions::ResetVideoWallLayoutAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        text(tr("Update Layout")).
-        autoRepeat(false).
-        condition(new QnConjunctionActionCondition(
-            new QnResetVideoWallLayoutActionCondition(this),
-            new QnForbiddenInSafeModeCondition(this),
-            this));
-
     factory().
         flags(Qn::Scene | Qn::Tree).
         separator();
@@ -1260,7 +1252,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::DeleteVideoWallItemAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget | Qn::IntentionallyAmbiguous).
-        requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Delete")).
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
@@ -1526,6 +1518,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::UserSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("User Settings...")).
+        requiredTargetPermissions(Qn::ReadPermission).
         condition(hasFlags(Qn::user));
 
     factory(QnActions::UserRolesAction).
@@ -1645,6 +1638,15 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::ServerIssuesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Diagnostics...")).
+        requiredGlobalPermission(Qn::GlobalViewLogsPermission).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
+            new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+            this));
+
+    factory(QnActions::WebAdminAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Server Web Page...")).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
@@ -1852,12 +1854,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     factory(QnActions::DebugIncrementCounterAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(lit("Ctrl+Alt+Shift++")).
         text(lit("Increment Debug Counter"));
 
     factory(QnActions::DebugDecrementCounterAction).
-        flags(Qn::GlobalHotkey).
+        flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(lit("Ctrl+Alt+Shift+-")).
         text(lit("Decrement Debug Counter"));
 
@@ -2338,11 +2340,10 @@ void QnActionManager::redirectAction(QMenu *menu, QnActions::IDType sourceId, QA
 
 bool QnActionManager::isMenuVisible() const
 {
-    for (auto menuObject : m_parametersByMenu.keys())
+    for (auto menu: m_parametersByMenu.keys())
     {
-        if (!menuObject)
-            continue;
-        return true;
+        if (menu && menu->isVisible())
+            return true;
     }
     return false;
 }
@@ -2385,8 +2386,9 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, QnActions::IDType sou
     return false;
 }
 
-void QnActionManager::at_menu_destroyed(QObject *menu)
+void QnActionManager::at_menu_destroyed(QObject* menuObj)
 {
+    auto menu = static_cast<QMenu*>(menuObj);
     m_parametersByMenu.remove(menu);
     if (m_lastClickedMenu == menu)
         m_lastClickedMenu = NULL;
@@ -2403,10 +2405,11 @@ bool QnActionManager::eventFilter(QObject *watched, QEvent *event)
             return false;
     }
 
-    if (!qobject_cast<QMenu*>(watched))
+    auto menu = qobject_cast<QMenu*>(watched);
+    if (!menu)
         return false;
 
-    m_lastClickedMenu = watched;
+    m_lastClickedMenu = menu;
     return false;
 }
 

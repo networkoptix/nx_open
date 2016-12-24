@@ -10,10 +10,11 @@ import unittest
 
 import urllib2 # FIXME remove it
 
-from functest_util import checkResultsEqual #, HttpRequest
+from functest_util import checkResultsEqual, generateKey
 from testbase import *
 from stortest import StorageBasedTest, TEST_CAMERA_ATTR, TEST_CAMERA_DATA, STORAGE_INIT_TIMEOUT
 from rtsptests import SingleServerRtspPerf, RtspStreamTest, SingleServerHlsTest, HlsStreamingTest #, Camera
+from pycommons.Logger import log, LOGLEVEL
 
 NUM_NAT_SERV = 2  # 2 mediaservers are used: 1st before NAT, 2rd - behind NAT
                   # there is no mediaserver on the box with NAT
@@ -58,9 +59,10 @@ class NatHlsStreamingTest(HlsStreamingTest):
 
 class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
 
+    helpStr = "Connection behind NAT test"
     _test_name = "NAT Connection"
     _test_key = "natcon"
-    _suits = (
+    _suites = (
         ('NatConnectionTests', [
             'VMPreparation',
             'TestDataSynchronization',
@@ -85,19 +87,31 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
     def isFailFast(cls, suit_name=""):
         return False
 
-    ################################################################
+    def _prepareKeys(self, srv_index):
+        passwd = self.config.get("General","password")
+        user = self.config.get("General","username")
+        answer = self._server_request(srv_index, "api/getNonce")
+        if answer is not None and answer.get("error", '') not in ['', '0', 0]:
+            self.fail("api/getNonce request returned API error %s: %s" % \
+                      (answer["error"], answer.get("errorString","")))
+        nonce = answer["reply"]["nonce"]
+        realm = answer["reply"]["realm"]
+        getKey =  generateKey('GET', user, passwd, nonce, realm)
+        postKey =  generateKey('POST', user, passwd, nonce, realm)
+        return getKey, postKey
 
     def VMPreparation(self):
         "Join servers into one system"
+        log(LOGLEVEL.INFO, "Server list: %s" % self.sl)
         self._prepare_test_phase(self._stop_and_init)
-        passwd = self.config.get("General","password")
+        getKey, postKey = self._prepareKeys(HOST_BEHIND_NAT)
         func = ("api/mergeSystems?url=http://%s&"
-               "password=%s&currentPassword=%s&takeRemoteSetting=false&oneServer=false&ignoreIncompatible=false" %
-                (self.sl[0], passwd, passwd))
+               "getKey=%s&postKey=%s" %
+                (self.sl[0], getKey, postKey))
         answer = self._server_request(HOST_BEHIND_NAT, func)
         #print "Answer: %s" % (answer,)
         if answer is not None and answer.get("error", '') not in ['', '0', 0]:
-            self.fail("mergeSystems request returned API error %s: %s" % (answer["error"], answer.get("errorString","")))
+            self.fail("mergeSystems request returned API error %s: %s\nRequest was: %s" % (answer["error"], answer.get("errorString",""), func))
         #print "mergeSystems sent, waiting"
         time.sleep(1)
         # get server's IDs
@@ -112,7 +126,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         for method in self._sync_test_requests:
             responseList = []
             for server in self.sl:
-                print "Request http://%s/ec2/%s" % (server, method)
+                log(LOGLEVEL.DEBUG + 9, "Request http://%s/ec2/%s" % (server, method))
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
             # checking the last response validation
             checkResultsEqual(responseList, method)
@@ -145,6 +159,4 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
                 "Multi-proto streaming test failed")
         self.assertTrue(NatHlsStreamingTest(self.config).run(),
                 "HLS streaming test failed")
-
-
 

@@ -27,13 +27,8 @@ QnPtzTourWidget::QnPtzTourWidget(QWidget *parent):
     ui->tableView->setItemDelegate(new QnPtzTourItemDelegate(this));
     ui->tableView->setCurrentIndex(QModelIndex());
 
-    // TODO: #Elric replace with a single connect call
-    auto resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, &QnSingleEventSignalizer::activated, this,
+    installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
         &QnPtzTourWidget::at_tableViewport_resizeEvent, Qt::QueuedConnection);
-
 
     connect(m_model, &QnPtzTourSpotsModel::spotsChanged, this, &QnPtzTourWidget::tourSpotsChanged);
 

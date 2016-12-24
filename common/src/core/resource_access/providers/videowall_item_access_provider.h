@@ -2,6 +2,8 @@
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
+class QnLayoutItemAggregator;
+
 /** Handles access to layouts, cameras and web pages, placed on videowall. */
 class QnVideoWallItemAccessProvider: public QnBaseResourceAccessProvider
 {
@@ -25,16 +27,15 @@ protected:
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
     virtual void handleResourceRemoved(const QnResourcePtr& resource) override;
 
+    virtual void afterUpdate() override;
+
 private:
-    void handleVideoWallItemAdded(const QnVideoWallResourcePtr& resource,
-        const QnVideoWallItem& item);
-    void handleVideoWallItemChanged(const QnVideoWallResourcePtr& resource,
-        const QnVideoWallItem& oldItem, const QnVideoWallItem& item);
-    void handleVideoWallItemRemoved(const QnVideoWallResourcePtr& resource,
-        const QnVideoWallItem& item);
+    void handleVideoWallAdded(const QnVideoWallResourcePtr& videoWall);
+    void updateAccessToLayout(const QnLayoutResourcePtr& layout);
+    void handleItemAdded(const QnUuid& resourceId);
+    void handleItemRemoved(const QnUuid& resourceId);
 
-    void updateByLayoutId(const QnUuid& id);
-    void updateAccessToVideoWallItems(const QnVideoWallResourcePtr& videoWall);
-
-    QSet<QnUuid> accessibleLayouts() const;
+private:
+    /* Only resources with valid id can be accessible through layouts. */
+    QScopedPointer<QnLayoutItemAggregator> m_itemAggregator;
 };

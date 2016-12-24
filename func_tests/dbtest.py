@@ -8,21 +8,23 @@ __author__ = 'Danil Lavrentyuk'
 
 import os, time
 from functest_util import compareJson, textdiff
+from testbase import FuncTestCase
 from stortest import StorageBasedTest
+from pycommons.Logger import log, LOGLEVEL
 
 NUM_SERV=2
 SERVERS_MERGE_WAIT=20
 BACKUP_RESTORE_TIMEOUT=40
 REALM_FIX_TIMEOUT=10
-#BACKUP_DB_FILE="BackupRestoreTest.db.sqlite"
-BACKUP_DB_FILE=""
+BACKUP_DB_FILE="" # "data-backup"
+DUMP_BEGIN="" # "data-begin"
 DUMP_BEFORE="" # "data-before"
 DUMP_AFTER="" # "data-after"
 
 EXPECTED_REALM="networkoptix"
 
 def _sleep(n):
-    print "Sleep %s..." % n
+    log(LOGLEVEL.INFO, "Sleep %s..." % n)
     time.sleep(n)
 
 
@@ -41,16 +43,17 @@ def _saveDump(name, data, mode = "t"):
             with open(name, "w"+mode) as f:
                 print >>f, data
         except Exception as err:
-            print "WARNING: failed to store FullInfo dump into file %s: %r" % (name, err)
+            log(LOGLEVEL.WARNING, "WARNING: failed to store FullInfo dump into file %s: %r" % (name, err))
 
 
 class DBTest(StorageBasedTest):
 
+    helpStr = "DB upgrade and backup/restore tests"
     num_serv = NUM_SERV
     _test_name = "Database"
     _test_key = 'db'
 
-    _suits = (
+    _suites = (
         ('DBTest', [
             'DBUpgradeTest',
             'BackupRestoreTest',
@@ -74,12 +77,16 @@ class DBTest(StorageBasedTest):
     def _global_clear_extra_args(cls, num):
         return ()
 
+    @classmethod
+    def _need_clear_box(cls, num):
+        return super(StorageBasedTest, cls)._need_clear_box(num)
+
     def _init_script_args(self, boxnum):
-        print "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum])
+        log(LOGLEVEL.DEBUG + 9, "DEBUG: box %s, set id %s" % (boxnum, self._ids[boxnum]))
         return (self._dbfiles[boxnum], self._ids[boxnum])
 
     def _ensureRealm(self):
-        print "Ensure the old realm used..."
+        log(LOGLEVEL.INFO, "Ensure the old realm used...")
         realmNotReady = set(xrange(self.num_serv))
         until = time.time() + REALM_FIX_TIMEOUT
         func = "api/moduleInformation" if self.before_3_0 else "api/getNonce?userName=admin"
@@ -104,10 +111,10 @@ class DBTest(StorageBasedTest):
     def DBUpgradeTest(self):
         """ Start both servers and check that their data are synchronized. """
         self._prepare_test_phase(self._stop_and_init)
-        print "Wait %s seconds for server to upgrade DB and merge data..." % SERVERS_MERGE_WAIT
+        log(LOGLEVEL.INFO, "Wait %s seconds for server to upgrade DB and merge data..." % SERVERS_MERGE_WAIT)
         time.sleep(SERVERS_MERGE_WAIT)
         self._ensureRealm()
-        print "Now check the data"
+        log(LOGLEVEL.INFO, "Now check the data")
         func = 'ec2/getFullInfo?extraFormatting'
         answers = [self._server_request(n, func, unparsed=True) for n in xrange(self.num_serv)]
         diff = compareJson(answers[0][0], answers[1][0])
@@ -121,11 +128,40 @@ class DBTest(StorageBasedTest):
         elif sleep > 0:
             _sleep(sleep)
 
+    def _get_db_copy(self, suffix):
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-stop')
+        for num, box in enumerate(self.hosts):
+            self._call_box(box, '/vagrant/cpdb.sh', suffix, str(num+1))
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-start')
+        self._wait_servers_up()
+
+    def _restartServers(self):
+        log(LOGLEVEL.INFO, "Restarting servers. Srop...")
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-stop')
+        time.sleep(1)
+        log(LOGLEVEL.INFO, "Start...")
+        for box in self.hosts:
+            self._mediaserver_ctl(box, 'safe-start')
+        self._wait_servers_up()
+
     def BackupRestoreTest(self):
         """ Check if backup/restore preserve all necessary data. """
+        #self._mediaserver_ctl(self.hosts[1], 'safe-stop')
+        #
+        #self._prepare_test_phase(self._stop_and_init)
+        #time.sleep(0.5)
+        #
         _clearDumps()
         WORK_HOST = 0  # which server do we check with backup/restore
+        #self._get_db_copy('before')
         getInfoFunc = 'ec2/getFullInfo?extraFormatting'
+        if 0:
+            fulldataBegin = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
+            _saveDump(DUMP_BEGIN, fulldataBegin[1])
+            self._restartServers()
         self._waitOrInput("Before dump")
         fulldataBefore = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
         _saveDump(DUMP_BEFORE, fulldataBefore[1])
@@ -137,11 +173,12 @@ class DBTest(StorageBasedTest):
         # Now change DB data -- add a camera
         self._add_test_camera(0, nodump=True)
         #
-        self._waitOrInput("Before restore", 10)
+        #self._get_db_copy('middle')
+        self._waitOrInput("Before restore", 15)
         self._server_request(WORK_HOST, 'ec2/restoreDatabase', data={'data': backup}, nodump=True)
         save_guids = self.guids[:]
-        self._waitOrInput("After restore", 10)
-        self._wait_servers_up()
+        self._waitOrInput("After restore", 15)
+        self._wait_servers_up() # servers=set([0, 1]))
         self.assertSequenceEqual(save_guids, self.guids,
             "Server guids have changed after restore: %s -> %s" % (save_guids, self.guids))
         _sleep(5)
@@ -152,15 +189,16 @@ class DBTest(StorageBasedTest):
             fulldataAfter = self._server_request(WORK_HOST, getInfoFunc, unparsed=True)
             diff = compareJson(fulldataBefore[0], fulldataAfter[0])
             if diff.hasDiff() and time.time() < stop:
-                print "Try %d failed" % cnt
+                log(LOGLEVEL.INFO, "Try %d failed" % cnt)
                 cnt += 1
                 time.sleep(1.5)
                 continue
             break
+        #self._get_db_copy('after')
         _saveDump(DUMP_AFTER, fulldataAfter[1])
         if diff.hasDiff():
-            print "DEBUG: compareJson has found differences: %s" % (diff.errorInfo(),)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG: compareJson has found differences: %s" % (diff.errorInfo(),))
             diffresult = textdiff(fulldataBefore[1], fulldataAfter[1], "Before", "After")
             self.fail("Servers responses on %s are different:\n%s" % (getInfoFunc, diffresult))
         else:
-            print "Success after %.1f seconds" % (time.time() - start,)
+            log(LOGLEVEL.INFO, "Success after %.1f seconds" % (time.time() - start,))

@@ -1,6 +1,7 @@
 'use strict';
 
 var SettingsPage = function () {
+    var p = this;
     var Helper = require('../helper.js');
     this.helper = new Helper();
 
@@ -26,18 +27,23 @@ var SettingsPage = function () {
     this.createCloudAccButton = element(by.linkText('Create Nx Cloud Account'));
     this.goToCloudAccButton = element(by.linkText('Go to Nx Cloud Portal'));
     this.cloudEmailInput = this.dialog.element(by.model('settings.cloudEmail'));
-    this.cloudPasswordInput = this.dialog.element(by.model('settings.oldPassword'));
+    this.cloudPasswordInput = this.dialog.element(by.model('settings.cloudPassword'));
+    this.oldCloudPasswordInput = this.dialog.element(by.model('settings.oldPassword'));
     this.dialogConnectButton = this.dialog.element(by.buttonText('Connect System'));
     this.dialogDisconnectButton = this.dialog.element(by.buttonText('Disconnect'));
     this.dialogCancelButton = this.dialog.element(by.buttonText('Cancel'));
     this.cloudDialogCloseButton = this.dialog.element(by.css('.close'));
-    this.dialogMessage = this.dialog.element(by.css('.alert'));
 
     this.disconnectFromCloudButton = element(by.buttonText('Disconnect from Nx Cloud'));
-    this.cloudSection = element(by.cssContainingText('h2', 'Cloud Connect')).element(by.xpath('..'));
+    this.cloudSection = element(by.cssContainingText('h3', 'Cloud')).element(by.xpath('..'));
 
     this.get = function () {
         browser.get('/#/settings');
+        browser.waitForAngular();
+    };
+    this.getSysTab = function () {
+        p.get();
+        p.helper.getTab("System").click();
     };
 
     this.setPort = function (port) {
@@ -63,22 +69,36 @@ var SettingsPage = function () {
         this.cloudEmailInput.sendKeys(cloudEmail);
         this.cloudPasswordInput.sendKeys(cloudPassword);
         this.dialogConnectButton.click();
-        expect(this.dialogMessage.getText()).toContain('System is connected to ');
-        this.cloudDialogCloseButton.click();
+        browser.sleep(4000);
+        // expect(this.dialog.getText()).toContain('System is connected to ');
+        // this.cloudDialogCloseButton.click();
     };
 
     this.disconnectFromCloud = function (password) {
         var cloudPassword = password || this.password;
+        p.helper.checkPresent(p.disconnectFromCloudButton).then(null, function () {
+            p.get();
+            p.helper.getTab('System').click();
+            p.helper.checkPresent(p.disconnectFromCloudButton).then(null, function () {
+                p.connectToCloud();
+            });
+        });
+        p.disconnectFromCloudButton.click();
+        p.oldCloudPasswordInput.sendKeys(cloudPassword);
+        p.dialogDisconnectButton.click();
+        //expect(p.dialogMessage.getText()).toContain('System was disconnected from ');
 
-        this.disconnectFromCloudButton.click();
-        this.cloudPasswordInput.sendKeys(cloudPassword);
-        this.dialogDisconnectButton.click();
-        expect(this.dialog.getText()).toContain('Create local administrator');
-        this.dialog.element(by.css('[name=password]')).sendKeys(cloudPassword);
-        this.dialog.element(by.css('[name=localPasswordConfirmation]')).sendKeys(cloudPassword);
+        browser.sleep(4000);
+        //  If no local admin existed, add one
+        p.helper.checkPresent(p.dialog).then( function() {
+            p.helper.checkContainsString(p.dialog, 'Create local administrator').then( function () {
+                p.dialog.element(by.css('[name=password]')).sendKeys(cloudPassword);
+                p.dialog.element(by.css('[name=localPasswordConfirmation]')).sendKeys(cloudPassword);
+            }, function() {});
+        }, function () { // if dialog is not present
+            p.helper.login(p.helper.admin, p.helper.password)
+        });
         browser.refresh();
-        //expect(this.dialogMessage.getText()).toContain('System was disconnected from ');
-        //this.cloudDialogCloseButton.click();
     }
 };
 

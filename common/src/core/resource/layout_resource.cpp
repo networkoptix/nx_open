@@ -240,7 +240,7 @@ void QnLayoutResource::setCellAspectRatio(float cellAspectRatio)
 {
     {
         QnMutexLocker locker(&m_mutex);
-        if (qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+        if (qFuzzyEquals(m_cellAspectRatio, cellAspectRatio))
             return;
         m_cellAspectRatio = cellAspectRatio;
     }
@@ -319,7 +319,7 @@ void QnLayoutResource::setBackgroundOpacity(qreal value)
     {
         qreal bound = qBound<qreal>(0.0, value, 1.0);
         QnMutexLocker locker(&m_mutex);
-        if (qFuzzyCompare(m_backgroundOpacity, bound))
+        if (qFuzzyEquals(m_backgroundOpacity, bound))
             return;
         m_backgroundOpacity = bound;
     }
@@ -353,6 +353,14 @@ bool QnLayoutResource::isFile() const
 bool QnLayoutResource::isShared() const
 {
     return getParentId().isNull() && !isFile();
+}
+
+QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
+{
+    QSet<QnUuid> result;
+    for (const auto& item: m_items->getItems())
+        result << item.resource.id;
+    return result;
 }
 
 QSet<QnResourcePtr> QnLayoutResource::layoutResources() const

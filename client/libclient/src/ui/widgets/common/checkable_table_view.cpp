@@ -45,7 +45,7 @@ void QnCheckableTableView::reset()
         if (syncRequired)
         {
             /* Defer synchronization past all further handing of modelReset signal: */
-            executeDelayed(
+            const auto callback =
                 [this]()
                 {
                     /* Synchronize selection with model: */
@@ -54,7 +54,8 @@ void QnCheckableTableView::reset()
                     /* Re-enable visual updates and mark entire widget for update: */
                     setUpdatesEnabled(true);
                     update();
-                });
+                };
+            executeDelayedParented(callback, kDefaultDelay, this);
         }
 
         /* Connect to model's dataChanged: */

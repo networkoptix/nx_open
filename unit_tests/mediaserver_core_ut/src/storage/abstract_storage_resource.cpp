@@ -38,10 +38,10 @@
 
 extern nx::ut::cfg::Config config;
 
-namespace 
+namespace
 {
 
-class AbstractStorageResourceTest : public ::testing::Test
+class AbstractStorageResourceTest: public ::testing::Test
 {
 protected:
 
@@ -87,9 +87,7 @@ protected:
         fileDeletor = std::unique_ptr<QnFileDeletor>(new QnFileDeletor);
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-#ifndef _WIN32
         platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
-#endif
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         PluginManager::instance()->loadPlugins(MSSettings::roSettings());
@@ -104,8 +102,8 @@ protected:
                     storagePlugin
                 ),
                 false
-            );                    
-        }  
+            );
+        }
     }
 
     QString                             ftpStorageUrl;
@@ -120,9 +118,7 @@ protected:
 
     nx::ut::utils::WorkDirResource workDirResource;
 
-#ifndef _WIN32
     std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
-#endif
 };
 } // namespace <anonymous>
 
@@ -165,7 +161,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 
         for (size_t i = 0; i < 16; ++i)
             randomStringStream << std::hex << nameDistribution(gen);
-        
+
         return randomStringStream.str();
     };
 
@@ -189,18 +185,18 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         fileNames.clear();
         // create many files
         for (size_t i = 0; i < fileCount; ++i)
-        {   
+        {
             QString fileName = closeDirPath(storage->getUrl()) + QString::fromStdString(randomFilePath());
             fileNames.push_back(fileName);
             std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
                 storage->open(
-                    fileName.toLatin1().constData(), 
+                    fileName.toLatin1().constData(),
                     QIODevice::WriteOnly
                 )
             );
             ASSERT_TRUE((bool)ioDevice)
-                << "ioDevice creation failed: " 
-                << fileName.toStdString() 
+                << "ioDevice creation failed: "
+                << fileName.toStdString()
                 << std::endl;
 
             ASSERT_EQ(ioDevice->write(dummyData, dummyDataLen), (int)dummyDataLen);
@@ -208,7 +204,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
 
         // check if newly created files exist and their sizes are correct
         for (const auto &fname : fileNames)
-        {   
+        {
             ASSERT_TRUE(storage->isFileExists(fname));
             ASSERT_EQ(storage->getFileSize(fname), (int)dummyDataLen);
         }
@@ -227,7 +223,7 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
                     if (entry.isDir())
                     {
                         ASSERT_TRUE(storage->isDirExists(entry.absoluteFilePath()));
-                        QnAbstractStorageResource::FileInfoList dirFileList = 
+                        QnAbstractStorageResource::FileInfoList dirFileList =
                             storage->getFileList(
                                 entry.absoluteFilePath()
                             );
@@ -264,8 +260,8 @@ TEST_F(AbstractStorageResourceTest, StorageCommonOperations)
         );
 
         ASSERT_TRUE((bool)ioDevice)
-            << "ioDevice creation failed: " 
-            << fileName.toStdString() 
+            << "ioDevice creation failed: "
+            << fileName.toStdString()
             << std::endl;
 
         ASSERT_EQ(ioDevice->write(dummyData, dummyDataLen), (int)dummyDataLen);
@@ -285,7 +281,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         QString fileName = closeDirPath(storage->getUrl()) + lit("test.tmp");
         std::unique_ptr<QIODevice> ioDevice = std::unique_ptr<QIODevice>(
             storage->open(
-                fileName.toLatin1().constData(), 
+                fileName.toLatin1().constData(),
                 QIODevice::WriteOnly
             )
         );
@@ -326,7 +322,7 @@ TEST_F(AbstractStorageResourceTest, IODevice)
         // read, check written before data
         ioDevice = std::unique_ptr<QIODevice>(
             storage->open(
-                fileName.toLatin1().constData(), 
+                fileName.toLatin1().constData(),
                 QIODevice::ReadOnly
             )
         );
@@ -418,8 +414,8 @@ public:
     }
 
     virtual int getCapabilities() const override {
-        return QnAbstractStorageResource::cap::DBReady || QnAbstractStorageResource::cap::ReadFile || 
-            QnAbstractStorageResource::cap::WriteFile || QnAbstractStorageResource::cap::RemoveFile || 
+        return QnAbstractStorageResource::cap::DBReady || QnAbstractStorageResource::cap::ReadFile ||
+            QnAbstractStorageResource::cap::WriteFile || QnAbstractStorageResource::cap::RemoveFile ||
             QnAbstractStorageResource::cap::ListFile;
     }
 
@@ -453,7 +449,7 @@ public:
 
 class MockStorageResource2 : public AbstractMockStorageResource {
 public:
-	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {} 
+	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {}
 
     virtual qint64 getTotalSpace() const override {
         return (qint64)20 * 1024 * 1024 * 1024;
@@ -498,14 +494,14 @@ struct OccupiedSpaceAccess
 	{
 		storageManager->setSpaceInfoUsageCoeff(storageIndex, coeff);
 	}
-	
+
 	static double getSpaceInfoUsageCoeff(QnStorageManager* storageManager, int storageIndex)
 	{
 		return storageManager->getSpaceInfoUsageCoeff(storageIndex);
 	}
 };
 
-TEST(Storage_load_balancing_algorithm_test, Main) 
+TEST(Storage_load_balancing_algorithm_test, Main)
 {
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
@@ -566,9 +562,9 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     qnNormalStorageMan->addStorage(storage2);
     qnNormalStorageMan->addStorage(storage3);
 
-    storage1->setStatus(Qn::Online, true);
-    storage2->setStatus(Qn::Online, true);
-    storage3->setStatus(Qn::Online, true);
+    storage1->setStatus(Qn::Online);
+    storage2->setStatus(Qn::Online);
+    storage3->setStatus(Qn::Online);
 
     QnUuid currentStorageId;
 
@@ -596,7 +592,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 		recorders.emplace_back(std::thread(
 		[&]
 		{
-			for (int i = 0; i < kWriteCount; ++i) 
+			for (int i = 0; i < kWriteCount; ++i)
 			{
 				auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
 				storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= kWrittenBlock;
@@ -607,14 +603,14 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 				++storagesUsageData[storageIndex].selected;
 				storagesUsageData[storageIndex].written += kWrittenBlock;
 
-				if (currentStorageId != storage->getId()) 
+				if (currentStorageId != storage->getId())
 				{
 					currentStorageId = storage->getId();
 					if (currentStorageUseCount > kMaxStorageUseInARow)
 						++useInARowOverflowCount;
 					currentStorageUseCount = 0;
 				}
-				else 
+				else
 				{
 					++currentStorageUseCount;
 				}
@@ -635,7 +631,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 
 	/*	Storages are of 10, 20, and 30 gb size accordingly.
 	*	So we should've recorded on the second storage twice as much as on the first
-	*	and on the third - roughly the same amount as the first + the second. 
+	*	and on the third - roughly the same amount as the first + the second.
 	*
 	*	As for deltas.
 	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
@@ -643,11 +639,11 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 	*		- 1st - 170mb
 	*		- 2nd - 330mb
 	*		- 3rd - 500mb
-	*	Hence, a fair delta amount would be around dozen(s) of megabytes. 
+	*	Hence, a fair delta amount would be around dozen(s) of megabytes.
 	*	Let it be 10mb in the first check and 20mb in the second check.
 	*/
 	ASSERT_TRUE(std::abs(storagesUsageData[0].written*2 - storagesUsageData[1].written) <= 10 * 1024 * 1024);
-	ASSERT_TRUE(std::abs(storagesUsageData[0].written + 
+	ASSERT_TRUE(std::abs(storagesUsageData[0].written +
 						 storagesUsageData[1].written -
 						 storagesUsageData[2].written) <= 20 * 1024 * 1024);
 }

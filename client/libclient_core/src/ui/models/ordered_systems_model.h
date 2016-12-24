@@ -1,12 +1,10 @@
 #pragma once
 
 #include <QtCore/QSortFilterProxyModel>
-#include <watchers/cloud_status_watcher.h>
-#include <client_core/local_connection_data.h>
+#include <client/system_weights_manager.h>
 
-class QTimer;
-
-class QnOrderedSystemsModel : public QSortFilterProxyModel
+class QnSystemsModel;
+class QnOrderedSystemsModel: public QSortFilterProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)
@@ -17,6 +15,13 @@ public:
 
     virtual ~QnOrderedSystemsModel() = default;
 
+    QString minimalVersion() const;
+
+    void setMinimalVersion(const QString& minimalVersion);
+
+signals:
+    void minimalVersionChanged();
+
 protected: // overrides
     virtual bool lessThan(const QModelIndex& left,
         const QModelIndex& right) const override;
@@ -24,35 +29,17 @@ protected: // overrides
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
-    void handleCloudSystemsChanged(const QnCloudSystemList& systems);
-
-    void handleLocalWeightsChanged();
-
-    void updateFinalWeights();
-
-    void updateMaxRealWeight();
+    void handleWeightsChanged();
 
     qreal getWeight(const QModelIndex& modelIndex) const;
 
-    typedef QHash<QString, QnWeightData> IdWeightDataHash;
     bool getWeightFromData(const QModelIndex& modelIndex,
-        const IdWeightDataHash& data,
         qreal& weight) const;
 
     void softInvalidate();
 
-    QString minimalVersion() const;
-    void setMinimalVersion(const QString& minimalVersion);
-
-signals:
-    void minimalVersionChanged();
-
 private:
-    QTimer* const m_updateTimer;
-    IdWeightDataHash m_cloudWeights;
-    IdWeightDataHash m_localWeights;
-    IdWeightDataHash m_finalWeights;
-    qreal m_maxRealWeight;
-    mutable IdWeightDataHash m_newSystemWeights;
-    mutable bool m_updatingWeights;
+    QnSystemsModel * const m_source;
+    QnWeightsDataHash m_weights;
+    qreal m_unknownSystemsWeight;
 };

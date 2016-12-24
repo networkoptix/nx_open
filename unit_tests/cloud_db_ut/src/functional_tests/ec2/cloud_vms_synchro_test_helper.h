@@ -11,8 +11,7 @@
 namespace nx {
 namespace cdb {
 
-class Ec2MserverCloudSynchronization
-    :
+class Ec2MserverCloudSynchronization:
     public ::testing::Test
 {
 public:
@@ -35,12 +34,14 @@ public:
     api::ResultCode saveCloudSystemCredentials(
         const std::string& id,
         const std::string& authKey);
-    const api::AccountData& ownerAccount() const;
-    const std::string& ownerAccountPassword() const;
+    const AccountWithPassword& ownerAccount() const;
     const api::SystemData& registeredSystemData() const;
     QUrl cdbEc2TransactionUrl() const;
 
 protected:
+    void establishConnectionBetweenVmsAndCloud();
+    void breakConnectionBetweenVmsAndCloud();
+
     void verifyTransactionConnection();
     void testSynchronizingCloudOwner();
     void testSynchronizingUserFromCloudToMediaServer();
@@ -80,8 +81,7 @@ protected:
 private:
     utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic> m_appserver2;
     CdbLauncher m_cdb;
-    api::AccountData m_account;
-    std::string m_accountPassword;
+    AccountWithPassword m_account;
     api::SystemData m_system;
 
     api::ResultCode fetchTransactionLog(

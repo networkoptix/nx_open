@@ -31,3 +31,6 @@ Config.helpLinks.push({
     title: 'Mobile Apps',
     target: 'new' // new|frame
 });
+
+Config.productName = 'Nx Witness';
+Config.cloud.productName = 'Nx Cloud';

@@ -307,31 +307,93 @@ private:
 // -------------------------------------------------------------------------- //
 // Palette extraction
 // -------------------------------------------------------------------------- //
-namespace
-{
-    QnColorList extractColors(const QString &group, const QnCustomizationSerializer &serializer)
-    {
-        QnColorList colors;
+namespace {
 
-        auto colorLess = [](const QColor &c1, const QColor &c2)
+static const QString kCorePattern = lit("_core");
+static const QString kDarkerPattern = lit("_d%1");
+static const QString kLighterPattern = lit("_l%1");
+static const QString kContrastPattern = lit("_contrast");
+
+QnColorList extractCoreBasedColors(const QString &group, const QnCustomizationSerializer &serializer)
+{
+    QnColorList colors;
+
+    enum class ColorType
+    {
+        NonMandatory,
+        Mandatory,
+    };
+
+    const auto extractColor =
+        [&serializer, group](const QString& suffix, ColorType type, QColor& result) -> bool
         {
-            return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
+            const auto key = lit("%1%2").arg(group, suffix);
+            if (!serializer.globals().contains(key))
+                return false;
+
+            const auto color = serializer.globalConstant(key).value<QColor>();
+            if ((type == ColorType::Mandatory) && !color.isValid())
+                NX_ASSERT(false, "Can't deserialize color");
+
+            result = color;
+            return true;
         };
 
-        for (const QString &constant: serializer.globals().keys())
-        {
-            if (!constant.startsWith(group))
-                continue;
+    QColor resultColor;
+    if (extractColor(kCorePattern, ColorType::NonMandatory, resultColor))
+        colors.setCoreColor(resultColor);
 
-            QColor color = serializer.globalConstant(constant).value<QColor>();
-            if (!color.isValid())
-                continue;
+    if (extractColor(kContrastPattern, ColorType::NonMandatory, resultColor))
+        colors.setContrastColor(resultColor);
 
-            colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
-        }
+    // For Compatibility. TODO: #ynikitenkov remove color with this index from everywhere in future
+    colors.append(colors.coreColor());
 
-        return colors;
+    for (int idx = 1;; ++idx)
+    {
+        if (extractColor(kDarkerPattern.arg(idx), ColorType::Mandatory, resultColor))
+            colors.prepend(resultColor);
+        else
+            break;
     }
+
+    for (int idx = 1;; ++idx)
+    {
+        if (extractColor(kLighterPattern.arg(idx), ColorType::Mandatory, resultColor))
+            colors.append(resultColor);
+        else
+            break;
+    }
+
+    return colors;
+}
+
+QnColorList extractColors(const QString &group, const QnCustomizationSerializer &serializer)
+{
+    if (serializer.globals().contains(group + kCorePattern))
+        return extractCoreBasedColors(group, serializer);
+
+    QnColorList colors;
+
+    auto colorLess = [](const QColor &c1, const QColor &c2)
+    {
+        return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
+    };
+
+    for (const QString &constant : serializer.globals().keys())
+    {
+        if (!constant.startsWith(group))
+            continue;
+
+        QColor color = serializer.globalConstant(constant).value<QColor>();
+        if (!color.isValid())
+            continue;
+
+        colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
+    }
+
+    return colors;
+}
 }
 
 

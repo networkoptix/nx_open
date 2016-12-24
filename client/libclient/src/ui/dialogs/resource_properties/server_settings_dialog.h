@@ -35,6 +35,7 @@ public:
 
 protected:
     virtual void retranslateUi() override;
+    virtual void showEvent(QShowEvent* event) override;
 
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
 

@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 13, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -16,26 +11,35 @@
 #include "udp_hole_punching_connection_initiation_fsm.h"
 #include "../request_processor.h"
 
-
 namespace nx {
 
 namespace stun {
+
 class MessageDispatcher;
-}
+
+} // namespace stun
 
 namespace hpm {
 
 namespace conf {
-    class Settings;
-}
+
+class Settings;
+
+} // namespace hpm
 
 class ListeningPeerPool;
 
-/** Handles requests used to establish hole punching connection. 
-    Implements hole punching connection mediation techniques
-*/
-class HolePunchingProcessor
-:
+namespace stats {
+
+class Collector;
+
+} // namespace stats
+
+/**
+ * Handles requests used to establish hole punching connection.
+ * Implements hole punching connection mediation techniques.
+ */
+class HolePunchingProcessor:
     protected RequestProcessor
 {
 public:
@@ -43,7 +47,8 @@ public:
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
-        ListeningPeerPool* const listeningPeerPool);
+        ListeningPeerPool* listeningPeerPool,
+        stats::Collector* statisticsCollector);
     virtual ~HolePunchingProcessor();
 
     void connect(
@@ -69,7 +74,8 @@ private:
     > ConnectSessionsDictionary;
 
     const conf::Settings& m_settings;
-    ListeningPeerPool* const m_listeningPeerPool;
+    ListeningPeerPool* m_listeningPeerPool;
+    stats::Collector* m_statisticsCollector;
     QnMutex m_mutex;
     //map<id, connection initiation>
     ConnectSessionsDictionary m_activeConnectSessions;

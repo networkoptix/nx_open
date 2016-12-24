@@ -14,7 +14,7 @@ public:
     virtual ~AnimatorGroup();
 
     void addAnimator(AbstractAnimator *animator);
-    
+
     AbstractAnimator *animatorAt(int index) const;
 
     int animatorCount() const;
@@ -29,6 +29,7 @@ public:
 
     AbstractAnimator *takeAnimator(int index);
 
+    QList<AbstractAnimator*> animators() const;
 protected:
     virtual bool event(QEvent *event) override;
 

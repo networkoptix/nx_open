@@ -8,6 +8,7 @@ After=network.target local-fs.target remote-fs.target
 ExecStart=/opt/${deb.customization.company.name}/mediaserver/bin/mediaserver
 Restart=on-failure
 TimeoutStopSec=120
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target

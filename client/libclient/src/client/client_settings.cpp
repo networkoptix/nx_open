@@ -29,7 +29,7 @@ static const QString kXorKey = lit("ItIsAGoodDayToDie");
 
 static const auto kNameTag = lit("name");
 static const auto kUrlTag = lit("url");
-static const auto kIsCustomTag = lit("isCustom");
+static const auto kLocalId = lit("localId");
 static const auto kPasswordTag = lit("pwd");
 
 QnConnectionData readConnectionData(QSettings *settings)
@@ -40,8 +40,7 @@ QnConnectionData readConnectionData(QSettings *settings)
     connection.url = settings->value(kUrlTag).toString();
     connection.url.setScheme(useHttps ? lit("https") : lit("http"));
     connection.name = settings->value(kNameTag).toString();
-    connection.isCustom = settings->value(kIsCustomTag, true).toBool();
-
+    connection.localId = settings->value(kLocalId).toUuid();
     const auto password = settings->value(kPasswordTag).toString();
     if (!password.isEmpty())
         connection.url.setPassword(nx::utils::xorDecrypt(password, kXorKey));
@@ -60,9 +59,9 @@ void writeConnectionData(QSettings *settings, const QnConnectionData &connection
     url.setPassword(QString()); /* Don't store password in plain text. */
 
     settings->setValue(kNameTag, connection.name);
-    settings->setValue(kIsCustomTag, connection.isCustom);
     settings->setValue(kPasswordTag, password);
     settings->setValue(kUrlTag, url.toString());
+    settings->setValue(kLocalId, connection.localId.toQUuid());
 }
 
 } // anonymous namespace
@@ -179,12 +178,39 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultValue.value<QnPaneSettingsMap>()));
         }
 
+        case WORKBENCH_STATES:
+        {
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+            return QVariant::fromValue(QJson::deserialized<QnWorkbenchStateList>(asJson,
+                defaultValue.value<QnWorkbenchStateList>()));
+        }
+
         case BACKGROUND_IMAGE:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
                 .value<QString>().toUtf8();
             return QVariant::fromValue(QJson::deserialized<QnBackgroundImage>(asJson,
                 defaultValue.value<QnBackgroundImage>()));
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel defaultLevel = defaultValue.value<Qn::ResourceInfoLevel>();
+
+            QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
+                .value<QString>().toUtf8();
+
+            if (asJson.isEmpty())
+            {
+                /* Compatibility with 2.5 and older versions. */
+                bool result = settings->value(lit("isIpShownInTree"), false).toBool();
+                if (result)
+                    return QVariant::fromValue(Qn::RI_FullInfo);
+            }
+
+            return QVariant::fromValue(QJson::deserialized<Qn::ResourceInfoLevel>(asJson,
+                defaultLevel));
         }
 
         default:
@@ -255,10 +281,26 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
+        case WORKBENCH_STATES:
+        {
+            QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnWorkbenchStateList>()));
+            base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
         case BACKGROUND_IMAGE:
         {
             QString asJson = QString::fromUtf8(QJson::serialized(value.value<QnBackgroundImage>()));
             base_type::writeValueToSettings(settings, id, asJson);
+            break;
+        }
+
+        case EXTRA_INFO_IN_TREE:
+        {
+            Qn::ResourceInfoLevel level = value.value<Qn::ResourceInfoLevel>();
+            QString asJson = QString::fromUtf8(QJson::serialized(level));
+            base_type::writeValueToSettings(settings, id, asJson);
+            settings->setValue(lit("isIpShownInTree"), (level != Qn::RI_NameOnly));
             break;
         }
 
@@ -284,16 +326,24 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
     return status;
 }
 
-void QnClientSettings::load() {
+void QnClientSettings::load()
+{
+    m_settings->sync();
     updateFromSettings(m_settings);
 }
 
-void QnClientSettings::save() {
+void QnClientSettings::save()
+{
     submitToSettings(m_settings);
+    if (!isWritable())
+        return;
+
     m_settings->sync();
+    emit saved();
 }
 
-bool QnClientSettings::isWritable() const {
+bool QnClientSettings::isWritable() const
+{
     return m_settings->isWritable();
 }
 

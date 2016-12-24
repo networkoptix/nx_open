@@ -57,7 +57,7 @@ TransactionConnectionHelper::ConnectionId
     m_connections.emplace(
         connectionId,
         std::move(connectionContext));
-    const QUrl url(lit("http://%1/ec2/events").arg(appserver2Endpoint.toString()));
+    const QUrl url(lit("http://%1/cdb/ec2/events").arg(appserver2Endpoint.toString()));
     transactionConnectionPtr->doOutgoingConnect(url);
 
     return connectionId;

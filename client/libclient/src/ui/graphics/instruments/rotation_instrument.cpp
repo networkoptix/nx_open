@@ -398,7 +398,8 @@ void RotationInstrument::dragMove(DragInfo *info) {
         newRotation = std::floor(newRotation / 15.0 + 0.5) * 15.0;
 
     /* Rotate item if needed. */
-    if(!qFuzzyCompare(currentRotation, newRotation)) {
+    if (!qFuzzyEquals(currentRotation, newRotation))
+    {
         QSizeF itemSize = target()->size();
         QPointF itemCenter = target()->transformOriginPoint();
 

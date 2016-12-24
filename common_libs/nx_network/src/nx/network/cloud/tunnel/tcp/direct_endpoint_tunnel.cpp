@@ -5,9 +5,9 @@
 
 #include "direct_endpoint_tunnel.h"
 
+#include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx {
 namespace network {
@@ -101,7 +101,7 @@ void DirectTcpEndpointTunnel::startConnection(
         return;
     }
 
-    connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(false, AF_INET);
+    connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(AF_INET);
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
         !connectionContextIter->tcpSocket->setSendTimeout(timeout.count()))
@@ -149,7 +149,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         m_connections.erase(connectionContextIter);
     }
     
-    if (!context.socketAttributes.applyTo(tcpSocket.get()))
+    if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();
         stillValid = false;

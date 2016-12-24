@@ -149,7 +149,7 @@ void QnGridBackgroundItem::updateDefaultBackground() {
 #endif
         hasChanges = true;
     }
-    if (!qFuzzyCompare(d->imageOpacity, background.actualImageOpacity())) {
+    if (!qFuzzyEquals(d->imageOpacity, background.actualImageOpacity())) {
         d->imageOpacity = background.actualImageOpacity();
         hasChanges = true;
     }
@@ -238,7 +238,7 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
             (d->imageFilename != filename) ||
             (d->imageSize != imageSize) ||
             (d->imageMode != imageMode) ||
-            (!qFuzzyCompare(d->imageOpacity, opacity));
+            (!qFuzzyEquals(d->imageOpacity, opacity));
 
     if (hasChanges) {
         d->isDefaultBackground = isDefaultBackground;

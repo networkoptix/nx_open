@@ -123,6 +123,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         qnSettings->setUpdateDeliveryDate(releaseDate.addSecs(timeToDeliverMs).toMSecsSinceEpoch());
     }
     qnSettings->setLatestUpdateInfo(info);
+    qnSettings->save();
 
     /* Update is postponed */
     if (qnSettings->updateDeliveryDate() > QDateTime::currentMSecsSinceEpoch())
@@ -140,8 +141,6 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     QString title;
     QString message;
-    QString actionMessage = tr("Would you like to update?");
-    QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Yes | QDialogButtonBox::No;
 
     if (majorVersionChange)
     {
@@ -162,28 +161,10 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     QnMessageBox messageBox(mainWindow());
 
-    messageBox.setStandardButtons(buttons);
+    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     messageBox.setIcon(QnMessageBox::Question);
 
-#ifdef Q_OS_MAC
-    bool hasOutdatedServer = false;
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers(Qn::AnyStatus))
-    {
-        if (server->getVersion() < info.currentRelease)
-        {
-            hasOutdatedServer = true;
-            break;
-        }
-    }
-    if (!hasOutdatedServer)
-    {
-        actionMessage = tr("Please update %1 Client.").arg(QnAppInfo::productNameLong());
-        messageBox.setStandardButtons(QDialogButtonBox::Ok);
-        messageBox.setIcon(QnMessageBox::Information);
-    }
-#endif
-
-    message += actionMessage;
+    message += tr("Would you like to update?");;
 
     messageBox.setWindowTitle(title);
     messageBox.setTextFormat(Qt::RichText);
@@ -208,7 +189,12 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
     /* We check for 'Yes' button. 'No' and even 'Ok' buttons are considered negative. */
     if (result == QDialogButtonBox::Yes)
+    {
         action(QnActions::SystemUpdateAction)->trigger();
+    }
     else
+    {
         qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? info.currentRelease : QnSoftwareVersion());
+        qnSettings->save();
+    }
 }

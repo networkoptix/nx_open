@@ -16,11 +16,13 @@
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
-#include <utils/aspect_ratio.h>
+#include <utils/common/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
 #include <common/common_meta_types.h>
+
+#include <core/resource_access/resource_access_filter.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
@@ -34,6 +36,8 @@
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>
+
+#include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/animation/viewport_animator.h>
 #include <ui/animation/widget_animator.h>
@@ -122,9 +126,6 @@ const qreal focusExpansion = 100.0;
 /** Maximal expanded size of a raised widget, relative to viewport size. */
 const qreal maxExpandedSize = 0.5;
 
-static const int kWidgetAnimationDurationMs = 200;
-const int zoomAnimationDurationMsec = 500;
-
 /** The amount of z-space that one layer occupies. */
 const qreal layerZSize = 10000000.0;
 
@@ -151,7 +152,52 @@ QString dt(qint64 time)
 }
 #endif
 
-} // anonymous namespace
+
+void setWidgetScreen(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    const auto window = target->window();
+    if (!window)
+        return;
+
+    if (const auto handle = window->windowHandle())
+        handle->setScreen(screen);
+}
+
+void setScreenRecursive(QWidget* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->children())
+    {
+        if (const auto widget = qobject_cast<QWidget*>(child))
+            setScreenRecursive(widget, screen);
+    }
+
+    setWidgetScreen(target, screen);
+}
+
+void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
+{
+    if (!target)
+        return;
+
+    for (const auto& child : target->childItems())
+        setScreenRecursive(child, screen);
+
+    if (!target->isWidget())
+        return;
+
+    if (const auto proxy = dynamic_cast<QGraphicsProxyWidget*>(target))
+        setScreenRecursive(proxy->widget(), screen);
+};
+
+} // namespace
+
+using namespace nx::client::ui::workbench;
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),
@@ -242,8 +288,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
-    m_viewportAnimator->setScalingSpeed(4.0); /* Viewport scaling speed, scale factor per second. */
-    m_viewportAnimator->setTimeLimit(zoomAnimationDurationMsec);
+    m_viewportAnimator->setScalingSpeed(1.0); /* Viewport scaling speed, scale factor per second. */
     m_viewportAnimator->setTimer(animationTimer);
     connect(m_viewportAnimator, SIGNAL(started()), this, SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator, SIGNAL(started()), m_boundingInstrument, SLOT(recursiveDisable()));
@@ -471,10 +516,22 @@ void QnWorkbenchDisplay::initSceneView()
     {
         QGLWidget *viewport = newGlWidget(m_view);
 
+        if (const auto window = viewport->windowHandle())
+        {
+            connect(window, &QWindow::screenChanged, this,
+                [this](QScreen *screen)
+                {
+                    for (auto& item : m_view->items())
+                        setScreenRecursive(item, screen);
+                });
+        }
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
         QnGlHardwareChecker::checkCurrentContext(true);
+
+        /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */
+        QGLContext::currentContext()->setTextureCacheLimit(2 * 1024 * 1024);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
@@ -620,14 +677,11 @@ WidgetAnimator *QnWorkbenchDisplay::animator(QnResourceWidget *widget)
     /* Create if it's not there.
      *
      * Note that widget is set as animator's parent. */
-    animator = new WidgetAnimator(widget, "geometry", "rotation", widget); // ANIMATION: items.
-    animator->setAbsoluteMovementSpeed(0.0);
-    animator->setRelativeMovementSpeed(8.0);
-    animator->setScalingSpeed(128.0);
-    animator->setRotationSpeed(270.0);
-    animator->setEasingCurve(QEasingCurve::InOutQuad);
+    animator = new WidgetAnimator(widget, "geometry", "rotation", widget);
     animator->setTimer(m_instrumentManager->animationTimer());
-    animator->setTimeLimit(kWidgetAnimationDurationMs);
+
+    qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::SceneItemGeometryChange);
+
     widget->setData(ITEM_ANIMATOR_KEY, QVariant::fromValue<WidgetAnimator *>(animator));
     return animator;
 }
@@ -737,9 +791,11 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
 
                 if (canShowLayoutBackground())
                 {
+                    auto layout = workbench()->currentLayout()->resource();
+
                     ensureRaisedConeItem(newWidget);
                     setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-                    raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
+                    raisedConeItem(newWidget)->setEffectEnabled(layout && !layout->backgroundImageFilename().isEmpty());
                 }
 
                 synchronize(newWidget, true);
@@ -752,16 +808,19 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             if (oldWidget != NULL)
                 synchronize(oldWidget, true);
 
+            m_viewportAnimator->stop();
             if (newWidget != NULL)
             {
                 bringToFront(newWidget);
                 synchronize(newWidget, true);
 
+                qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomIn);
                 m_viewportAnimator->moveTo(itemGeometry(newWidget->item()));
                 m_curtainAnimator->curtain(newWidget);
             }
             else
             {
+                qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
                 m_viewportAnimator->moveTo(fitInViewGeometry());
                 m_curtainAnimator->uncurtain();
             }
@@ -858,7 +917,9 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
         gridBackgroundItem()->update(layout);
 
     synchronizeSceneBounds();
-    fitInView();
+
+    static const bool kDontAnimate = false;
+    fitInView(kDontAnimate);
 
     QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
     if (raisedWidget)
@@ -904,18 +965,18 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
     return m_widgetsByResource.value(resource);
 }
 
-QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
+QnResourceDisplayPtr QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
 {
     if (QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
-        return widget->display().data();
-    return NULL;
+        return widget->display();
+    return QnResourceDisplayPtr();
 }
 
 QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const
 {
-    QnResourceDisplay *display = this->display(item);
-    if (display == NULL)
-        return NULL;
+    auto display = this->display(item);
+    if (!display)
+        return nullptr;
 
     return display->camera();
 }
@@ -941,10 +1002,12 @@ void QnWorkbenchDisplay::fitInView(bool animate)
     if (zoomedWidget != NULL)
     {
         targetGeometry = itemGeometry(zoomedWidget->item());
+        qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomIn);
     }
     else
     {
         targetGeometry = fitInViewGeometry();
+        qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
     }
 
     if (animate)
@@ -1013,8 +1076,25 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
+    /* Invalid items may lead to very strange behavior bugs. */
+    if (item->uuid().isNull())
+    {
+        qnDeleteLater(item);
+        return false;
+    }
+
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    if (!resource || !accessController()->hasPermissions(resource, Qn::ReadPermission))
+    if (!resource)
+    {
+        qnDeleteLater(item);
+        return false;
+    }
+
+    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
+    if (!accessController()->hasPermissions(resource, requiredPermission))
     {
         qnDeleteLater(item);
         return false;
@@ -1337,7 +1417,7 @@ qreal QnWorkbenchDisplay::widgetsFrameOpacity() const
 
 void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
 {
-    if (qFuzzyCompare(m_frameOpacity, opacity))
+    if (qFuzzyEquals(m_frameOpacity, opacity))
         return;
 
     m_frameOpacity = opacity;
@@ -2272,6 +2352,10 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)
 {
+    const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
+        ? Qn::ViewContentPermission
+        : Qn::ReadPermission;
+
     if (QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
     {
         if (QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource))
@@ -2281,7 +2365,7 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
         }
     }
 
-    if (accessController()->hasPermissions(resource, Qn::ReadPermission))
+    if (accessController()->hasPermissions(resource, requiredPermission))
         return;
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
@@ -2343,11 +2427,14 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
 
     for (const QnResourcePtr &resource : targetResources)
     {
+        const auto callback =
+            [this, resource, businessAction]
+            {
+                showSplashOnResource(resource, businessAction);
+            };
+
         for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
-            executeDelayed([this, resource, businessAction]
-        {
-            showSplashOnResource(resource, businessAction);
-        }, timeMs);
+            executeDelayedParented(callback, timeMs, this);
     }
 }
 

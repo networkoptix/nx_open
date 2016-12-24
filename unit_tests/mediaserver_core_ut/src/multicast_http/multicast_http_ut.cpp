@@ -4,6 +4,7 @@
 #include "utils/common/long_runnable.h"
 #include "media_server/media_server_module.h"
 #include "core/multicast/multicast_http_client.h"
+#include "nx/network/socket_global.h"
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -40,7 +41,7 @@ public:
         StateStopping
     };
 
-    MulticastHttpTestWorker(MediaServerProcess& processor): 
+    MulticastHttpTestWorker(MediaServerProcess& processor):
         m_client("Server Unit Tests"),
         m_processor(processor),
         m_processorStarted(false),
@@ -137,7 +138,7 @@ public:
         m_runningRequestId = QUuid();
         if (++m_requests == 5)
             setState(StateParralelTest);
-        else 
+        else
         {
             QnMulticast::Request request;
             request.method = lit("GET");
@@ -147,14 +148,14 @@ public:
             request.auth.setPassword(lit("12345"));
             using namespace std::placeholders;
             m_runningRequestId = m_client.execRequest(
-                request, 
+                request,
                 std::bind(
                     &MulticastHttpTestWorker::callbackTimeout,
                     this,
                     std::placeholders::_1,
                     std::placeholders::_2,
                     std::placeholders::_3
-                ), 
+                ),
                 50
             );
         }
@@ -172,14 +173,14 @@ public:
 
         using namespace std::placeholders;
         m_runningRequestId = m_client.execRequest(
-            request, 
+            request,
             std::bind(
                 &MulticastHttpTestWorker::callbackTimeout,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2,
                 std::placeholders::_3
-            ), 
+            ),
             50
         );
     }
@@ -192,7 +193,7 @@ public:
         request.url = QUrl(lit("api/configure?password=%1&oldPassword=%2").arg(newPassword).arg(oldPassword));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(oldPassword);
-        
+
         auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
         {
             m_runningRequestId = QUuid();
@@ -203,7 +204,7 @@ public:
             QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
             ASSERT_TRUE(!d.isEmpty());
             oldPassword = newPassword;
-            if (++m_requests == MT_REQUESTS) 
+            if (++m_requests == MT_REQUESTS)
             {
                 ASSERT_EQ(m_firstRequest, MT_REQUESTS);
                 m_processor.stopAsync();
@@ -242,7 +243,7 @@ public:
                     ++m_firstRequest;
                 ++m_requests;
                 qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
-                if (m_requests == MT_REQUESTS * 2) 
+                if (m_requests == MT_REQUESTS * 2)
                 {
                     ASSERT_EQ(m_firstRequest, MT_REQUESTS);
                     //m_processor.stopAsync();
@@ -265,7 +266,7 @@ public:
 
         if (!m_runningRequestId.isNull())
             return;
-        
+
         if (m_state == StateSingleTest)
             doSingleTest();
         else if (m_state == StateAuthTest)
@@ -291,6 +292,8 @@ private:
 
 TEST(MulticastHttpTest, main)
 {
+    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+
     //QApplication::instance()->args();
     int argc = 2;
     char* argv[] = {"", "-e" };
@@ -299,8 +302,6 @@ TEST(MulticastHttpTest, main)
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
     MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
     MSSettings::roSettings()->setValue(lit("dataDir"), *workDirResource.getDirName());

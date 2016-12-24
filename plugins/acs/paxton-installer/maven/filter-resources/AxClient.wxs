@@ -28,13 +28,13 @@
         <File Id="filC90922A08D770646675BE1C2530CC94F" KeyPath="yes" Source="$(var.AxSourceDir)\avutil-55.dll" />
       </Component>
       <Component Id="cmp3E75C8C546EE33C88133ACEE3708447D">
-        <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="${qt.dir}/bin/icudt53.dll" />
+        <File Id="filC26B2049C5CAB0FACDB72A6218A10F71" KeyPath="yes" Source="${qt.dir}/bin/icudt58.dll" />
       </Component>
       <Component Id="cmp880E224056AF8AF4B659C54A55BC6825">
-        <File Id="filBE47A4EB21F6958D47A22DC0FE333643" KeyPath="yes" Source="${qt.dir}/bin/icuin53.dll" />
+        <File Id="filBE47A4EB21F6958D47A22DC0FE333643" KeyPath="yes" Source="${qt.dir}/bin/icuin58.dll" />
       </Component>
       <Component Id="cmpF6C4E8818A7BB450AEB4351BFC97B53F">
-        <File Id="fil57E27991E5A6C997720E4677A1221937" KeyPath="yes" Source="${qt.dir}/bin/icuuc53.dll" />
+        <File Id="fil57E27991E5A6C997720E4677A1221937" KeyPath="yes" Source="${qt.dir}/bin/icuuc58.dll" />
       </Component>
       <Component Id="cmp27388013FBAC92F7826F02F940C89D96">
         <File Id="filC7D0434DC8A22E54158D9499BABF351F" KeyPath="yes" Source="$(var.AxSourceDir)\libeay32.dll" />

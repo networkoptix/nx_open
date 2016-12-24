@@ -3,6 +3,7 @@
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
@@ -15,6 +16,7 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
 /**
  * Accepts usual TCP connections
@@ -36,7 +38,7 @@ public:
         m_server->bindToAioThread(thread);
         NX_CRITICAL(m_server->setNonBlockingMode(true));
         NX_CRITICAL(m_server->setReuseAddrFlag(true));
-        NX_CRITICAL(m_server->bind(network::test::kAnyPrivateAddress));
+        NX_CRITICAL(m_server->bind(SocketAddress::anyPrivateAddress));
         NX_CRITICAL(m_server->listen());
 
         auto address = m_server->getLocalAddress();
@@ -95,7 +97,7 @@ struct FakeTcpTunnelAcceptor
         size_t clientsLimit = 5)
     :
         m_designatedAioThread(designatedAioThread),
-        m_ioThreadSocket(new TCPSocket(false, AF_INET)),
+        m_ioThreadSocket(new TCPSocket(AF_INET)),
         m_addressManager(std::move(addressManager)),
         m_hasConnection(hasConnection),
         m_clientsLimit(clientsLimit)
@@ -147,13 +149,21 @@ struct FakeTcpTunnelAcceptor
     size_t m_clientsLimit;
 };
 
-class CloudServerSocketTest
-:
+class CloudServerSocketTest:
     public ::testing::Test
 {
 public:
     CloudServerSocketTest()
     {
+        stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.reconnectPolicy =
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(0),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1));
+        nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
+
         SocketGlobalsHolder::instance()->reinitialize();
         init();
     }
@@ -164,20 +174,12 @@ protected:
 private:
     void init()
     {
-        stun::AbstractAsyncClient::Settings stunClientSettings;
-        stunClientSettings.reconnectPolicy =
-            nx::network::RetryPolicy(
-                nx::network::RetryPolicy::kInfiniteRetries,
-                std::chrono::milliseconds(0),
-                nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1));
-        SocketGlobals::mediatorConnector().reinitializeStunClient(stunClientSettings);
-
         ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
         auto system = m_mediator.addRandomSystem();
-        auto server = m_mediator.addRandomServer(system, boost::none, false);
-        ASSERT_NE(nullptr, server);
+        auto server = m_mediator.addRandomServer(
+                system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
+        ASSERT_NE(nullptr, server);
         SocketGlobals::mediatorConnector().setSystemCredentials(
             nx::hpm::api::SystemCredentials(
                 system.id,
@@ -189,24 +191,23 @@ private:
     }
 };
 
-struct CloudServerSocketTcpTester
-:
+class CloudServerSocketTcpTester:
     public CloudServerSocket
 {
-    CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder)
-    :
+public:
+    CloudServerSocketTcpTester(network::test::AddressBinder* addressBinder):
         CloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection()),
         m_addressManager(addressBinder)
     {
     }
 
-    SocketAddress getLocalAddress() const override
+    virtual SocketAddress getLocalAddress() const override
     {
         return m_addressManager.key;
     }
 
-    bool listen(int queueLen) override
+    virtual bool listen(int queueLen) override
     {
         initTunnelPool(queueLen);
         moveToListeningState();
@@ -237,11 +238,11 @@ struct CloudServerSocketTcpTester
         return true;
     }
 
+private:
     network::test::AddressBinder::Manager m_addressManager;
 };
 
-class CloudServerSocketTcpTest
-:
+class CloudServerSocketTcpTest:
     public ::testing::Test
 {
 protected:
@@ -264,6 +265,13 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     TEST_F, CloudServerSocketTcpTest,
     [this](){ return makeServerTester(); },
     [this](){ return makeClientTester(); });
+
+TEST_F(CloudServerSocketTcpTest, SimpleSyncSsl)
+{
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(makeServerTester().release(), false); },
+        [&]() { return std::make_unique<SslSocket>(makeClientTester().release(), false); });
+}
 
 TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 {
@@ -312,7 +320,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     auto list = addressBinder.get(addressManager.key);
     ASSERT_EQ(list.size(), 1);
 
-    auto client = std::make_unique<TCPSocket>(false, AF_INET);
+    auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(500));
 
@@ -346,7 +354,6 @@ protected:
         SocketGlobals::mediatorConnector().setSystemCredentials(
             std::move(systemCredentials));
 
-        const auto addr = network::test::kAnyPrivateAddress;
         for (size_t i = 0; i < kPeerCount; i++)
             m_boundPeers.insert(m_addressBinder.bind());
 
@@ -385,6 +392,7 @@ protected:
             {
                 ASSERT_EQ(code, SystemError::noError);
                 acceptServerForever();
+                ASSERT_TRUE(socket->setNonBlockingMode(true));
                 socket->sendAsync(
                     network::test::kTestMessage,
                     [this, socket](SystemError::ErrorCode code, size_t size)
@@ -421,7 +429,7 @@ protected:
 
     void startClient(const SocketAddress& peer)
     {
-        auto socketPtr = std::make_unique<TCPSocket>(false, AF_INET);
+        auto socketPtr = std::make_unique<TCPSocket>(AF_INET);
         auto socket = socketPtr.get();
         const auto timeout = 3000 * utils::TestOptions::timeoutMultiplier();
         ASSERT_TRUE(socketPtr->setSendTimeout(timeout));
@@ -563,7 +571,8 @@ TEST_F(CloudServerSocketTest, reconnect)
         *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
 
     auto system = m_mediator.addRandomSystem();
-    auto server = m_mediator.addRandomServer(system, boost::none, false);
+    auto server = m_mediator.addRandomServer(
+        system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
     hpm::api::SystemCredentials otherCredentials;
     otherCredentials.systemId = system.id;
@@ -586,6 +595,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     }
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

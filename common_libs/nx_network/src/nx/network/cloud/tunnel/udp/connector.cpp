@@ -5,12 +5,12 @@
 
 #include "connector.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
-
-#include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"
@@ -37,6 +37,9 @@ TunnelConnector::TunnelConnector(
     NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
+
+    m_timer = std::make_unique<aio::Timer>();
+    m_timer->bindToAioThread(getAioThread());
 }
 
 TunnelConnector::~TunnelConnector()
@@ -45,11 +48,17 @@ TunnelConnector::~TunnelConnector()
     stopWhileInAioThread();
 }
 
-void TunnelConnector::stopWhileInAioThread()
+void TunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_rendezvousConnectors.clear();
-    m_udtConnection.reset();    //we do not use this connection so can just remove it here
-    m_chosenRendezvousConnector.reset();
+    AbstractTunnelConnector::bindToAioThread(aioThread);
+
+    for (auto& rendezvousConnector: m_rendezvousConnectors)
+        rendezvousConnector->bindToAioThread(aioThread);
+    if (m_udtConnection)
+        m_udtConnection->bindToAioThread(aioThread);
+    if (m_chosenRendezvousConnector)
+        m_chosenRendezvousConnector->bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 int TunnelConnector::getPriority() const
@@ -79,23 +88,8 @@ void TunnelConnector::connect(
 
     for (const SocketAddress& endpoint: response.udpEndpointList)
     {
-        std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector;
-        if (m_udpSocket)
-        {
-            rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
-                m_connectSessionId,
-                std::move(endpoint),
-                std::move(m_udpSocket));  //moving system socket handler from m_mediatorUdpClient to udt connection
-            m_udpSocket.reset();
-        }
-        else
-        {
-            rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
-                m_connectSessionId,
-                std::move(endpoint),
-                SocketAddress(HostAddress::anyHost, m_localAddress.port));
-        }
-        rendezvousConnector->bindToAioThread(getAioThread());
+        std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector =
+            createRendezvousConnector(std::move(endpoint));
 
         NX_LOGX(lm("cross-nat %1. Udt rendezvous connect to %2")
             .arg(m_connectSessionId).arg(rendezvousConnector->remoteAddress().toString()),
@@ -138,6 +132,14 @@ void TunnelConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //  and we will handle error there
 }
 
+void TunnelConnector::stopWhileInAioThread()
+{
+    m_rendezvousConnectors.clear();
+    m_udtConnection.reset();    //we do not use this connection so can just remove it here
+    m_chosenRendezvousConnector.reset();
+    m_timer.reset();
+}
+
 void TunnelConnector::onUdtConnectionEstablished(
     RendezvousConnectorWithVerification* rendezvousConnectorPtr,
     SystemError::ErrorCode errorCode)
@@ -151,7 +153,7 @@ void TunnelConnector::onUdtConnectionEstablished(
         {
             return val.get() == rendezvousConnectorPtr;
         });
-    NX_ASSERT(rendezvousConnectorIter != m_rendezvousConnectors.end());
+    NX_CRITICAL(rendezvousConnectorIter != m_rendezvousConnectors.end());
     auto rendezvousConnector = std::move(*rendezvousConnectorIter);
     m_rendezvousConnectors.erase(rendezvousConnectorIter);
 
@@ -217,7 +219,7 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
     rendezvousConnector.reset();
 
     //introducing delay to give server some time to call accept (work around udt bug)
-    timer()->start(
+    m_timer->start(
         std::chrono::milliseconds(200),
         [this]
         {
@@ -237,7 +239,7 @@ void TunnelConnector::holePunchingDone(
         cl_logDEBUG2);
 
     //we are in aio thread
-    timer()->cancelSync();
+    m_timer->cancelSync();
 
     std::unique_ptr<AbstractOutgoingTunnelConnection> tunnelConnection;
     if (resultCode == api::NatTraversalResultCode::ok)
@@ -253,6 +255,30 @@ void TunnelConnector::holePunchingDone(
         resultCode,
         sysErrorCode,
         std::move(tunnelConnection));
+}
+
+std::unique_ptr<RendezvousConnectorWithVerification>
+    TunnelConnector::createRendezvousConnector(SocketAddress endpoint)
+{
+    std::unique_ptr<RendezvousConnectorWithVerification> rendezvousConnector;
+    if (m_udpSocket)
+    {
+        rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
+            m_connectSessionId,
+            std::move(endpoint),
+            std::move(m_udpSocket));  //moving system socket handler from m_mediatorUdpClient to udt connection
+        m_udpSocket.reset();
+    }
+    else
+    {
+        rendezvousConnector = std::make_unique<RendezvousConnectorWithVerification>(
+            m_connectSessionId,
+            std::move(endpoint),
+            SocketAddress(HostAddress::anyHost, m_localAddress.port));
+    }
+    rendezvousConnector->bindToAioThread(getAioThread());
+
+    return rendezvousConnector;
 }
 
 } // namespace udp

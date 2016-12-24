@@ -16,6 +16,7 @@ class QnStorageResource: public QnAbstractStorageResource
     using base_type = QnAbstractStorageResource;
 public:
     static const qint64 kNasStorageLimit;
+    static const qint64 kThirdPartyStorageLimit;
 
     QnStorageResource();
     virtual ~QnStorageResource();
@@ -39,6 +40,7 @@ public:
 
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
+    static QString urlWithoutCredentials(const QString& url);
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
     bool isExternal() const;

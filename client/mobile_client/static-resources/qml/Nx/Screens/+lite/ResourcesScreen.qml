@@ -14,14 +14,14 @@ Page
 
     toolBar.visible: false
     warningText: qsTr("Server offline")
+    sideNavigationEnabled: false
 
     QtObject
     {
         id: d
 
         readonly property bool serverOffline:
-                connectionManager.connectionState === QnConnectionManager.Connecting &&
-                !loadingDummy.visible
+            connectionManager.connectionState === QnConnectionManager.Reconnecting
         readonly property bool enabled: !warningVisible && !loadingDummy.visible
 
         onServerOfflineChanged:
@@ -88,7 +88,7 @@ Page
         color: ColorTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
         visible: opacity > 0
-        opacity: 0.0
+        opacity: connectionManager.online ? 0.0 : 1.0
 
         Column
         {
@@ -117,37 +117,49 @@ Page
         }
     }
 
+    Rectangle
+    {
+        id: connectionFailureDummy
+
+        anchors.fill: parent
+        color: ColorTheme.windowBackground
+        visible: false
+
+        Text
+        {
+            anchors.centerIn: parent
+            text: qsTr("Cannot connect to server")
+            font.pixelSize: 32
+            color: ColorTheme.base13
+        }
+
+        Text
+        {
+            anchors.centerIn: parent
+            anchors.verticalCenterOffset: parent.height / 4
+            text: qsTr("Press %1 to exit").arg("Esc")
+            font.pixelSize: 28
+            color: ColorTheme.base11
+        }
+    }
+
     Connections
     {
         target: connectionManager
 
         onConnectionStateChanged:
         {
-            if (connectionManager.connectionState === QnConnectionManager.Disconnected)
-            {
-                loadingDummy.opacity = 1
-            }
+            if (connectionManager.connectionState !== QnConnectionManager.Disconnected)
+                connectionFailureDummy.visible = false
+            if (connectionManager.connectionState === QnConnectionManager.Ready)
+                autoLoginEnabled = true
         }
 
         onConnectionFailed:
         {
-            var systemName = title ? title : getLastUsedSystemId()
-            Workflow.openSessionsScreenWithWarning(
-                connectionManager.connectionType == QnConnectionManager.LiteClientConnection
-                    ? "" : systemName)
+            var systemName = title ? title : getLastUsedSystemName()
+            connectionFailureDummy.visible = true
         }
-
-        onInitialResourcesReceivedChanged:
-        {
-            if (connectionManager.initialResourcesReceived)
-                loadingDummy.opacity = 0
-        }
-    }
-
-    Component.onCompleted:
-    {
-        if (!connectionManager.online || !connectionManager.initialResourcesReceived)
-            loadingDummy.opacity = 1
     }
 
     Keys.onPressed:

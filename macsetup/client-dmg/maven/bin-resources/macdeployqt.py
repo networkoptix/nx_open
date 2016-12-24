@@ -64,8 +64,16 @@ def prepare(binary, sbindir, tlibdir):
     os.chmod(binary, 0755)
     os.chmod(applauncher_binary, 0755)
     os.chmod(applauncher_script, 0755)
+
     yield binary
     yield applauncher_binary
+
+    handler_bin_dir = join(tbindir, 'protocol_handler.app/Contents/MacOS')
+    handler_binary = join(handler_bin_dir, 'applet')
+    handler_script = join(handler_bin_dir, 'run')
+    
+    os.chmod(handler_binary, 0755)
+    os.chmod(handler_script, 0755)
 
     ignore = shutil.ignore_patterns('*debug*', '.*')
     for subfolder in 'platforms', 'imageformats', 'audio':

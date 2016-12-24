@@ -23,15 +23,16 @@ Rectangle
 
         Image
         {
-            id: statusImage;
-
-            width: 120;
+            width: 320;
             height: 120;
             y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
-
             source: "qrc:/skin/welcome_page/logo.png"
+            fillMode: ((sourceSize.height < height) && (sourceSize.width < width)
+                ? Image.Pad
+                : Image.PreserveAspectFit);
         }
+
 
         NxSearchEdit
         {
@@ -143,6 +144,7 @@ Rectangle
 
                 Connections
                 {
+                    // Handles outer signal that expands tile
                     id: openTileHandler;
 
                     property variant items: [];
@@ -199,6 +201,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
+
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -208,12 +211,14 @@ Rectangle
                         systemName: model.systemName
                         ownerDescription: model.ownerDescription
 
-                        isFactoryTile: model.isFactorySystem
+                        factorySystem: model.isFactorySystem
                         isCloudTile: model.isCloudSystem
+                        safeMode: model.safeMode;
 
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
+                        isOnline: model.isOnline;
 
                         Component.onCompleted:
                         {
@@ -265,7 +270,7 @@ Rectangle
                 anchors.top: gridHolder.bottom;
                 anchors.topMargin: 8;
 
-                pagesCount: grid.pagesCount;
+                pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
                 onCurrentPageChanged:
                 {
@@ -313,8 +318,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to another system")
-                : qsTr("Connect to system")
+                ? qsTr("Connect to Another System")
+                : qsTr("Connect to System")
 
             onClicked: context.connectToAnotherSystem();
         }
@@ -431,7 +436,9 @@ Rectangle
         target: context;
         onIsVisibleChanged:
         {
-            grid.watcher.resetCurrentItem();
+            if (grid.watcher.currentItem)
+                grid.watcher.currentItem.forceCollapsedState();
+
             pageSwitcher.setPage(0);
         }
     }

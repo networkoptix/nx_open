@@ -29,6 +29,7 @@ private:
     Q_SLOT void at_currentIndexChanged(int index);
 private:
     QTreeView* m_treeView;
+    mutable QSize m_minimumSizeHint;
 };
 
 #endif // TREE_COMBO_BOX_H

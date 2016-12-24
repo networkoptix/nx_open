@@ -19,48 +19,43 @@ QnLinkHoverProcessor::QnLinkHoverProcessor(QLabel* parent) :
     m_label->setAttribute(Qt::WA_Hover);
     m_originalText = m_label->text();
 
-    auto hoverSignalizer = new QnMultiEventSignalizer(this);
-    hoverSignalizer->addEventType(QEvent::HoverEnter);
-    hoverSignalizer->addEventType(QEvent::HoverLeave);
-    hoverSignalizer->addEventType(QEvent::HoverMove);
-    m_label->installEventFilter(hoverSignalizer);
+    installEventHandler(m_label, { QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove }, this,
+        [this](QObject* object, QEvent* event)
+        {
+            Q_UNUSED(object);
+            switch (event->type())
+            {
+                case QEvent::HoverEnter:
+                case QEvent::HoverMove:
+                {
+                    QString text = m_label->text();
+                    if (m_currentText != text)
+                        m_originalText = text;
+                    break;
+                }
+
+                case QEvent::HoverLeave:
+                {
+                    /*
+                    * QLabel and underlying QWidgetTextControl handle only MouseMove event.
+                    * So if the mouse leaves control, they don't emit linkHovered(L"").
+                    * Worse, they still consider last hovered link hovered, so if the mouse
+                    * enters control and hovers the link again, they don't emit linkHovered(link)
+                    * To fix that we send fake MouseMove upon leaving the control:
+                    */
+                    const int kFarFarAway = -1.0e8;
+                    QMouseEvent kFakeMouseMove(QEvent::MouseMove, QPointF(kFarFarAway, kFarFarAway), Qt::NoButton, 0, 0);
+                    QApplication::sendEvent(m_label, &kFakeMouseMove);
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        });
 
     auto tabstopListener = new QnLabelFocusListener(this);
     m_label->installEventFilter(tabstopListener);
-
-    connect(hoverSignalizer, &QnMultiEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        switch (event->type())
-        {
-            case QEvent::HoverEnter:
-            case QEvent::HoverMove:
-            {
-                QString text = m_label->text();
-                if (m_currentText != text)
-                    m_originalText = text;
-                break;
-            }
-
-            case QEvent::HoverLeave:
-            {
-                /*
-                 * QLabel and underlying QWidgetTextControl handle only MouseMove event.
-                 * So if the mouse leaves control, they don't emit linkHovered(L"").
-                 * Worse, they still consider last hovered link hovered, so if the mouse
-                 * enters control and hovers the link again, they don't emit linkHovered(link)
-                 * To fix that we send fake MouseMove upon leaving the control:
-                 */
-                const int kFarFarAway = -1.0e8;
-                QMouseEvent kFakeMouseMove(QEvent::MouseMove, QPointF(kFarFarAway, kFarFarAway), Qt::NoButton, 0, 0);
-                QApplication::sendEvent(m_label, &kFakeMouseMove);
-                break;
-            }
-
-            default:
-                break;
-        }
-    });
 
     connect(m_label, &QLabel::linkHovered, this, &QnLinkHoverProcessor::linkHovered);
 }
@@ -96,7 +91,7 @@ void QnLinkHoverProcessor::linkHovered(const QString& href)
     }
 
     /* Find anchor position: */
-    int pos = m_originalText.indexOf(href.toHtmlEscaped());
+    int pos = m_originalText.toHtmlEscaped().indexOf(href.toHtmlEscaped());
     if (pos == -1)
         return;
 

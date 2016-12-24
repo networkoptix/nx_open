@@ -19,9 +19,10 @@
         <product.title>${company.name} libcloud_db</product.title>
         <product.display.title>${company.name} Cloud Database</product.display.title>
         <template>lib</template>
+        <targetName>cloud_db</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email -lnx_streaming -lappserver2</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming -lappserver2 -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -54,15 +55,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>
-    
-         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_email</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
         </dependency>
         
         <dependency>

@@ -29,6 +29,11 @@ namespace ec2
         return lit("ttSeq=%1 sender=%2:%3").arg(header.sequence).arg(header.sender.toString()).arg(header.senderRuntimeID.toString());
     }
 
+    bool QnTransactionTransportHeader::isNull() const
+    {
+        return senderRuntimeID.isNull();
+    }
+
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
         (QnTransactionTransportHeader), (ubjson)(json), _Fields, (optional, false))
 }

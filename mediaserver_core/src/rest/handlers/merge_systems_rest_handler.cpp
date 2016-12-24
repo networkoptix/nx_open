@@ -44,6 +44,7 @@
 #include "api/model/password_data.h"
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
+#include <core/resource_management/resource_properties.h>
 
 namespace {
 
@@ -219,7 +220,8 @@ int QnMergeSystemsRestHandler::execute(
             return nx_http::StatusCode::ok;
         }
         /* if we've got it successfully we know system name and admin password */
-        moduleInformationData = client.fetchMessageBodyBuffer();
+        while (!client.eof())
+            moduleInformationData.append(client.fetchMessageBodyBuffer());
     }
 
     const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
@@ -371,10 +373,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return false;
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-
+    Q_ASSERT(!server->getAuthKey().isEmpty());
 
     ConfigureSystemData data;
     data.localSystemId = qnGlobalSettings->localSystemId();
@@ -390,9 +389,20 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     fromResourceToApi(server, data.foreignServer);
 
     /**
-    * Save current user to the foreign system
-    */
-    fromResourceToApi(admin, data.foreignUser);
+     * Save current admin and cloud users to the foreign system
+     */
+    for (const auto& user: qnResPool->getResources<QnUserResource>())
+    {
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            ec2::ApiUserData apiUser;
+            fromResourceToApi(user, apiUser);
+            data.foreignUsers.push_back(apiUser);
+
+            for (const auto& param: user->params())
+                data.additionParams.push_back(param);
+        }
+    }
 
     /**
      * Save current system settings to the foreign system.
@@ -404,6 +414,18 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
         data.foreignSettings.push_back(param);
     }
 
+    if (!executeRemoteConfigure(data, remoteUrl, postKey, owner))
+        return false;
+
+    return true;
+}
+
+bool QnMergeSystemsRestHandler::executeRemoteConfigure(
+    const ConfigureSystemData& data,
+    const QUrl &remoteUrl,
+    const QString& postKey,
+    const QnRestConnectionProcessor* owner)
+{
     QByteArray serializedData = QJson::serialized(data);
 
     nx_http::HttpClient client;
@@ -420,7 +442,6 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     {
         return false;
     }
-
     return true;
 }
 
@@ -448,7 +469,10 @@ bool executeRequest(
         return false;
     }
 
-    QByteArray response = client.fetchMessageBodyBuffer();
+    nx_http::BufferType response;
+    while (!client.eof())
+        response.append(client.fetchMessageBodyBuffer());
+
     return QJson::deserialize(response, &result);
 }
 
@@ -465,17 +489,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, users, lit("/ec2/getUsers")))
         return false;
 
-    ec2::ApiMediaServerDataList servers;
-    if (!executeRequest(remoteUrl, getKey, servers, lit("/ec2/getMediaServers")))
-        return false;
-
-    QnJsonRestResult settingsRestResult;
-    if (!executeRequest(remoteUrl, getKey, settingsRestResult, lit("/api/systemSettings")))
-        return false;
-
-    QnSystemSettingsReply settings;
-    if (!QJson::deserialize(settingsRestResult.reply, &settings))
-        return false;
 
     QnJsonRestResult pingRestResult;
     if (!executeRequest(remoteUrl, getKey, pingRestResult, lit("/api/ping")))
@@ -489,70 +502,43 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     if (!executeRequest(remoteUrl, getKey, backupDBRestResult, lit("/api/backupDatabase")))
         return false;
 
-    ec2::ApiUserData adminUserData;
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-    for (const auto& user: users)
-    {
-        if (user.id == admin->getId())
-        {
-            adminUserData = user;
-            break;
-        }
-    }
-    if (adminUserData.id.isNull())
-        return false; //< not admin user in remote data
 
-    ec2::ApiMediaServerData mediaServerData;
-    for (const auto& server: servers)
+    // 1. update settings in remove database to ensure they have priority while merge
     {
-        if (server.id == pingReply.moduleGuid)
-        {
-            mediaServerData = server;
-            break;
-        }
-    }
-    if (mediaServerData.id.isNull())
-        return false; //< no own media server in remote data
+        ConfigureSystemData data;
+        data.localSystemId = systemId;
+        data.wholeSystem = true;
+        data.sysIdTime = qnCommon->systemIdentityTime();
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        data.tranLogTime = ec2Connection->getTransactionLogTime();
+        data.rewriteLocalSettings = true;
 
-    auto userManager = ec2Connection()->getUserManager(owner->accessRights());
-    ec2::ErrorCode errorCode = userManager->saveSync(adminUserData);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save admin user: %1")
-            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-        return false;
+        if (!executeRemoteConfigure(data, remoteUrl, postKey, owner))
+            return false;
+
     }
 
-    // Users (include administrator) is not allowed to save media server directly via API.
-    // Exec this call with system super user permissions.
-    auto serverManager = ec2Connection()->getMediaServerManager(Qn::kSystemAccess);
-    errorCode = serverManager->saveSync(mediaServerData);
-    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-    if (errorCode != ec2::ErrorCode::ok)
-    {
-        NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to save media server: %1")
-            .arg(ec2::toString(errorCode)), cl_logDEBUG1);
-        return false;
-    }
-
-    QnSystemSettingsHandler settingsSubHandler;
-    const QnRequestParams settingsParams;
-    QnJsonRestResult restSubResult;
-    settingsSubHandler.executeGet(
-        QString() /*path*/,
-        settings.settings,
-        restSubResult,
-        owner);
-
-
+    // 2. update local data
     ConfigureSystemData data;
     data.localSystemId = systemId;
+    data.wholeSystem = true;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
-    data.wholeSystem = true;
+
+    //for (auto itr = settings.settings.begin(); itr != settings.settings.end(); ++itr)
+    //    data.foreignSettings.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
+    data.foreignUsers = users;
+
+    for (const auto& userData: users)
+    {
+        QnUserResourcePtr user = fromApiToResource(userData);
+        if (user->isCloud() || user->isBuiltInAdmin())
+        {
+            data.foreignUsers.push_back(userData);
+            for (const auto& param: user->params())
+                data.additionParams.push_back(param);
+        }
+    }
 
     if (!changeLocalSystemId(data))
     {
@@ -560,8 +546,33 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         return false;
     }
 
+    // put current server info to a foreign system to allow authorization via server key
+    {
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        if (!mServer)
+            return false;
+        ec2::ApiMediaServerData currentServer;
+        fromResourceToApi(mServer, currentServer);
+
+        nx_http::HttpClient client;
+        client.setResponseReadTimeoutMs(kRequestTimeout.count());
+        client.setSendTimeoutMs(kRequestTimeout.count());
+        client.setMessageBodyReadTimeoutMs(kRequestTimeout.count());
+        client.addAdditionalHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+
+        QByteArray serializedData = QJson::serialized(currentServer);
+        QUrl requestUrl(remoteUrl);
+        addAuthToRequest(requestUrl, postKey);
+        requestUrl.setPath(lit("/ec2/saveMediaServer"));
+        if (!client.doPost(requestUrl, "application/json", serializedData) ||
+            !isResponseOK(client))
+        {
+            return false;
+        }
+    }
+
     auto miscManager = ec2Connection()->getMiscManager(Qn::kSystemAccess);
-    errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
+    ec2::ErrorCode errorCode = miscManager->changeSystemIdSync(systemId, pingReply.sysIdTime, pingReply.tranLogTime);
     NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errorCode != ec2::ErrorCode::ok)
     {

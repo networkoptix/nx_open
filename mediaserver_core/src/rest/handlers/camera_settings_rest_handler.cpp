@@ -6,10 +6,13 @@
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_advanced_param.h>
+#include <core/resource_access/resource_access_manager.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/network/http/httptypes.h>
 #include <nx/fusion/model_functions.h>
 #include <network/tcp_connection_priv.h>
+#include <rest/server/rest_connection_processor.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
 #include "http/custom_headers.h"
@@ -44,7 +47,7 @@ QnCameraSettingsRestHandler::~QnCameraSettingsRestHandler()
 
 int QnCameraSettingsRestHandler::executeGet(
     const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
-    const QnRestConnectionProcessor* /*owner*/)
+    const QnRestConnectionProcessor* owner)
 {
     NX_LOG(lit("QnCameraSettingsRestHandler: received request %1").arg(path), cl_logDEBUG1);
 
@@ -58,6 +61,9 @@ int QnCameraSettingsRestHandler::executeGet(
         else
             return CODE_NOT_FOUND;
     }
+
+    if (!qnResourceAccessManager->hasPermission(owner->accessRights(), camera, Qn::Permission::ReadPermission))
+        return nx_http::StatusCode::forbidden;
 
     // Clean params that are not keys.
     QnRequestParams locParams = params;

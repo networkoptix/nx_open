@@ -39,7 +39,7 @@ public:
     {
         if (role == Qt::TextColorRole && m_delegate
             && !m_delegate->isValid(id(proxyIndex)))
-            return QBrush(QColor(qnGlobals->errorTextColor()));
+            return QBrush(qnGlobals->errorTextColor());
         return QIdentityProxyModel::data(proxyIndex, role);
     }
 
@@ -74,11 +74,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     scrollBar->setUseMaximumSpace(true);
     ui->resourcesWidget->treeView()->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    auto showHideSignalizer = new QnMultiEventSignalizer(this);
-    showHideSignalizer->addEventType(QEvent::Show);
-    showHideSignalizer->addEventType(QEvent::Hide);
-    scrollBar->installEventFilter(showHideSignalizer);
-    connect(showHideSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(scrollBar, { QEvent::Show, QEvent::Hide }, this,
         [this](QObject* watched, QEvent* event)
         {
             Q_UNUSED(watched);
@@ -183,6 +179,7 @@ void QnResourceSelectionDialog::setSelectedResources(const QSet<QnUuid>& selecte
         setSelectedResourcesInternal(selected);
     }
     at_resourceModel_dataChanged();
+    ui->resourcesWidget->expandChecked();
 }
 
 QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIndex& parent) const
@@ -222,37 +219,31 @@ QSet<QnUuid> QnResourceSelectionDialog::selectedResourcesInternal(const QModelIn
     return result;
 }
 
-int QnResourceSelectionDialog::setSelectedResourcesInternal(const QSet<QnUuid>& selected,
+void QnResourceSelectionDialog::setSelectedResourcesInternal(
+    const QSet<QnUuid>& selected,
     const QModelIndex& parent)
 {
-    int count = 0;
     for (int i = 0; i < m_resourceModel->rowCount(parent); ++i)
     {
         QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn, parent);
-        QModelIndex checkedIdx = idx.sibling(i, Qn::CheckColumn);
-        bool checked = false;
 
         int childCount = m_resourceModel->rowCount(idx);
         if (childCount > 0)
         {
-            checked = (setSelectedResourcesInternal(selected, idx) == childCount);
+            setSelectedResourcesInternal(selected, idx);
         }
         else
         {
             auto resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>();
-            auto id = idx.data(Qn::UuidRole).value<QnUuid>();
-            if (resource)
-                checked = selected.contains(resource->getId());
-            else
-                checked = selected.contains(id);
-        }
+            bool checked = selected.contains(resource
+                ? resource->getId()
+                : idx.data(Qn::UuidRole).value<QnUuid>());
 
-        if (checked)
-            count++;
-        m_resourceModel->setData(checkedIdx,
-            checked ? Qt::Checked : Qt::Unchecked, Qt::CheckStateRole);
+            m_resourceModel->setData(idx.sibling(i, Qn::CheckColumn),
+                checked ? Qt::Checked : Qt::Unchecked,
+                Qt::CheckStateRole);
+        }
     }
-    return count;
 }
 
 void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event)

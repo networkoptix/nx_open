@@ -51,6 +51,7 @@ protected:
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
@@ -97,10 +98,11 @@ private:
     PtzOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
     PtzOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
 
+    bool processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event);
+
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
     void ptzUnzoom(QnMediaResourceWidget *widget);
-    void ptzUpdate(QnMediaResourceWidget *widget);
     void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
     void focusMove(QnMediaResourceWidget *widget, qreal speed);
     void focusAuto(QnMediaResourceWidget *widget);
@@ -156,14 +158,14 @@ private:
     Movement m_movement;
     Qt::Orientations m_movementOrientations;
 
-    bool m_isClick;
-    bool m_isDoubleClick;
-    bool m_ptzStartedEmitted;
-    bool m_skipNextAction;
+    bool m_isClick = false;
+    bool m_isDoubleClick = false;
+    bool m_ptzStartedEmitted = false;
+    bool m_skipNextAction = false;
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
-    bool m_pendingMouseReturn;
+    bool m_pendingMouseReturn = false;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

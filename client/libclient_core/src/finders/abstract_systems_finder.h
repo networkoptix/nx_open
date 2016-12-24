@@ -25,4 +25,6 @@ signals:
     void systemDiscovered(const QnSystemDescriptionPtr &system);
 
     void systemLost(const QString &id);
+
+    void systemLostInternal(const QString &id, const QnUuid& localId);
 };

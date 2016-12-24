@@ -13,6 +13,7 @@
 class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QPushButton;
 
 class QnLicenseListModel;
 
@@ -42,15 +43,15 @@ private slots:
 
     void at_downloadError();
     void at_licensesReceived(const QByteArray& licenseKey, ec2::ErrorCode errorCode, const QnLicenseList& licenses);
-    void at_licenseDetailsButton_clicked();
-    void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();
 
-    void showMessage(const QString &title, const QString &message, bool warning);
+    void licenseDetailsRequested(const QModelIndex& index);
+
+    void showMessage(const QString &title, const QString &message);
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
 signals:
-    void showMessageLater(const QString &title, const QString &message, bool warning);
+    void showMessageLater(const QString &title, const QString &message);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
@@ -68,7 +69,8 @@ private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
-    QnLicenseListModel *m_model;
-    QNetworkAccessManager *m_httpClient;
+    QnLicenseListModel* m_model;
+    QNetworkAccessManager* m_httpClient;
+    QPushButton* m_exportLicensesButton;
     QnLicenseList m_licenses;
 };

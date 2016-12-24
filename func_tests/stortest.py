@@ -8,13 +8,14 @@ Their common base class StorageBasedTest also used in other tests.
 """
 __author__ = 'Danil Lavrentyuk'
 import os, os.path, copy, sys, time
-import hashlib
+import hashlib, urllib
 #import urllib2
 import subprocess
 #import traceback
 import uuid
 from pipes import quote as shquote
 from functools import wraps
+from pycommons.Logger import log, LOGLEVEL
 #import pprint
 
 from functest_util import ClusterLongWorker, get_server_guid, unquote_guid, CAMERA_ATTR_EMPTY
@@ -175,7 +176,7 @@ class StorageBasedTest(FuncTestCase):
         self._server_request(boxnum, 'ec2/saveCamera', camera, nodump=nodump)
         answer = self._server_request(boxnum, 'ec2/getCameras')
         if log_response:
-            print "_add_test_camera: getCameras(%s) response: '%s'" % (boxnum, answer)
+            log(LOGLEVEL.INFO,  "_add_test_camera: getCameras(%s) response: '%s'" % (boxnum, answer))
         for c in answer:
             if c['parentId'] == self.guids[boxnum]:
                 self.assertEquals(unquote_guid(c['id']), self.test_camera_id[boxnum], "Failed to assign a test camera to to a server")
@@ -184,11 +185,11 @@ class StorageBasedTest(FuncTestCase):
         self._server_request(boxnum, 'ec2/saveCameraUserAttributesList', attr_data, nodump=nodump) # return None
         answer = self._server_request(boxnum, 'ec2/getCamerasEx')
         if log_response:
-            print "_add_test_camera: getCamerasEx(%s) response: '%s'" % (boxnum, answer)
+            log(LOGLEVEL.INFO, "_add_test_camera: getCamerasEx(%s) response: '%s'" % (boxnum, answer))
 
 
     def _fill_storage(self, mode, boxnum, arg):
-        print "Server %s: Filling the main storage with the test data." % boxnum
+        log(LOGLEVEL.INFO, "Server %s: Filling the main storage with the test data." % boxnum)
         self._call_box(self.hosts[boxnum], "python", shquote("/vagrant/" + self._fill_storage_script), mode,
                        shquote(self._storages[boxnum][0]['url']), self.test_camera_physical_id[boxnum], arg)
         time.sleep(0.5)
@@ -201,7 +202,7 @@ class StorageBasedTest(FuncTestCase):
         while state != 'RebuildState_None':
             time.sleep(0.8)
             answer = self._server_request(boxnum, 'api/rebuildArchive?mainPool=1')
-            print "rebuildArchive: %s" %(answer,)
+            log(LOGLEVEL.DEBUG + 9, "rebuildArchive: %s" %(answer,))
             try:
                 state = answer["reply"]["state"]
             except Exception:
@@ -262,13 +263,14 @@ class BackupStorageTest(StorageBasedTest):
     The test for backup storage functionality.
     Creates a backup storage and tries to start the backup procedure both manually and scheduled.
     """
+    helpStr = "Backup storage test"
     _test_name = "Backup Storage"
     _test_key = 'bstorage'
     num_serv = _NUM_SERV_BAK
     _fill_storage_script = 'fill_stor.py'
 
-    _suits = (
-        ('BackupStartTests', [
+    _suites = (
+        ('BackupTests', [
             'Initialization',
             'ScheduledBackupTest',
             'BackupByRequestTest',
@@ -305,7 +307,7 @@ class BackupStorageTest(StorageBasedTest):
                 #print "DEBUG: data = %s" % (data,)
                 if data and data[0] and data[0]["id"] == new_id:
                     if data[0]["status"] == "Online":
-                        print "Backup storage is ready for backup."
+                        log(LOGLEVEL.INFO, "Backup storage is ready for backup.")
                         return
                     #else:
                     #    print "Backup storage status: %s" % data[0]["status"]
@@ -316,7 +318,7 @@ class BackupStorageTest(StorageBasedTest):
         end = time.time() + BACKUP_START_TIMEOUT
         while time.time() < end:
             data = self._server_request(_WORK_HOST, 'api/backupControl/')
-            print "DEBUG0: backupControl reply: %s" % (data,)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG0: backupControl reply: %s" % (data,))
             try:
                 if data['reply']['state'] != "BackupState_None":
                     return
@@ -330,7 +332,7 @@ class BackupStorageTest(StorageBasedTest):
         while time.time() < end:
             time.sleep(1)
             data = self._server_request(_WORK_HOST, 'api/backupControl/')
-            print "DEBUG0: backupControl reply: %s" % (data,)
+            log(LOGLEVEL.DEBUG + 9, "DEBUG0: backupControl reply: %s" % (data,))
             try:
                 if data['reply']['state'] == "BackupState_None":
                     return
@@ -348,10 +350,10 @@ class BackupStorageTest(StorageBasedTest):
                 if err.output.strip() == DIFF_FAIL_MSG:
                     self.fail("The main storage and the backup storage contents are different")
                 else:
-                    print "ERROR: Backup content check returned code %s. It's output:\n%s" % (err.returncode, err.output)
+                    log(LOGLEVEL.ERROR, "ERROR: Backup content check returned code %s. It's output:\n%s" % (err.returncode, err.output))
                     self.fail("The main storage and the backup storage contents are possibly different")
             else:
-                print "ERROR: Backup content check returned code %s. It's output:\n%s" % (err.returncode, err.output)
+                log(LOGLEVEL.ERROR, "ERROR: Backup content check returned code %s. It's output:\n%s" % (err.returncode, err.output))
                 self.fail("Backup content check failed with code %s and output:\n%s" % (err.returncode, err.output))
 
     ################################################################
@@ -392,7 +394,7 @@ class BackupStorageTest(StorageBasedTest):
         time.sleep(1)
         #print "DEBUG0: StorageSpace: %s" % (self._server_request(_WORK_HOST, 'api/storageSpace'))
         data = self._server_request(_WORK_HOST, 'api/backupControl/?action=start')
-        print "backupControl start: %s" % data
+        log(LOGLEVEL.INFO, "backupControl start: %s" % data)
         self._wait_backup_end()
         #raw_input("Press ENTER to continue...")
         time.sleep(0.1)
@@ -400,6 +402,7 @@ class BackupStorageTest(StorageBasedTest):
 
 
 class MultiserverArchiveTest(StorageBasedTest):
+    helpStr = "Multiserver archive test"
     _test_name = "Multiserver Archive"
     _test_key = "msarch"
     num_serv = _NUM_SERV_MSARCH
@@ -407,7 +410,7 @@ class MultiserverArchiveTest(StorageBasedTest):
     time_periods_single = []
     time_periods_joined = []
 
-    _suits = (
+    _suites = (
         ('MultiserverArchiveTest', [
             'Initialization',
             'CheckArchiveMultiserv',
@@ -438,35 +441,43 @@ class MultiserverArchiveTest(StorageBasedTest):
         serv_str = "" if boxnum is None else (' (%d)' % boxnum)
         for chunk in server:
             if i >= len(prepared):
-                print "FAIL: Extra data in server%s answer at position %s: %s" % (serv_str, i, chunk)
+                log(LOGLEVEL.ERROR, "FAIL: Extra data in server%s answer at position %s: %s" % (serv_str, i, chunk))
                 fail_count += 1
             elif int(chunk['startTimeMs']) != prepared[i]['start'] + self.base_time:
-                print "FAIL: Chunk %s start time differs: server%s %s, prepared %s" % (
-                    i, serv_str, int(chunk['startTimeMs']), prepared[i]['start'] + self.base_time)
+                log(LOGLEVEL.ERROR,"FAIL: Chunk %s start time differs: server%s %s, prepared %s" % (
+                    i, serv_str, int(chunk['startTimeMs']), prepared[i]['start'] + self.base_time))
                 fail_count += 1
             elif int(chunk['durationMs']) != prepared[i]['duration']:
-                print "FAIL: Chunk %s duration differs: server%s %s, prepared %s" % (
-                    i, serv_str, chunk['durationMs'], prepared[i]['duration'])
+                log(LOGLEVEL.ERROR, "FAIL: Chunk %s duration differs: server%s %s, prepared %s" % (
+                    i, serv_str, chunk['durationMs'], prepared[i]['duration']))
                 fail_count += 1
             if fail_count >= 10:
                 break
             i += 1
         if fail_count < 10 and i < len(prepared):
-            print "FAIL: Server%s anser shorter then prepared data (%s vs %s)" % (serv_str, i, len(prepared))
+            log(LOGLEVEL.ERROR, "FAIL: Server%s anser shorter then prepared data (%s vs %s)" % (serv_str, i, len(prepared)))
         self.assertEqual(fail_count, 0, "Server%s reports chunk list different from the prepared one." % serv_str)
 
     ################################################################
 
     def _other_inits(self):
-        print "Filling archives with data..."
+        log(LOGLEVEL.INFO, "Filling archives with data...")
         for num in xrange(_NUM_SERV_MSARCH):
             self._fill_storage('multiserv', num, str(num))
-        print "Done. Wait a bit..."
+        log(LOGLEVEL.INFO, "Done. Wait a bit...")
         tmp = {}
         execfile(multiserv_interfals_fname, tmp)
         type(self).time_periods_single = tmp['time_periods_single']
         type(self).time_periods_joined = tmp['time_periods_joined']
         time.sleep(20)
+
+    
+    def _changeSystemId(self, host, new_guid):
+        res = self._server_request(host, "api/configure?%s" % \
+                                   urllib.urlencode({"localSystemId": new_guid}))
+        self.assertEqual(res['error'], "0",
+            "api/configure failed to set a new localSystemId %s for the server %s: %s" % (new_guid, host, res['errorString']))
+        
 
     @checkInit
     def CheckArchiveMultiserv(self):
@@ -484,14 +495,14 @@ class MultiserverArchiveTest(StorageBasedTest):
         self._compare_chunks(None, answer[0]['reply'], self.time_periods_joined)
 
     def _splitSystems(self):
-        print "Split servers into two systems"
-        newname = "anothername"
-        self._change_system_name(1, newname)
+        log(LOGLEVEL.INFO, "Split servers into two systems")
+        guid =  '{%s}' % uuid.uuid4()
+        self._changeSystemId(1, guid)
         time.sleep(1)
-        info0 = self._server_request(0, 'api/moduleInformation')
-        info1 = self._server_request(1, 'api/moduleInformation')
-        self.assertEqual(info1['reply']['systemName'], newname, "Failed to give server 1 new system name")
-        self.assertNotEqual(info0['reply']['systemName'], newname, "Server 0 system name also has changed")
+        info0 = self._server_request(0, 'ec2/testConnection')
+        info1 = self._server_request(1, 'ec2/testConnection')
+        self.assertEqual(info1['localSystemId'], guid, "Failed to give server 1 new system id")
+        self.assertNotEqual(info0['localSystemId'], guid, "Server 0 system id also has changed")
 
     @checkInit
     def CheckArchivesSeparated(self):
@@ -506,11 +517,11 @@ class MultiserverArchiveTest(StorageBasedTest):
             #print "1: %s, %s..." % (id(answer[1]), answer[1][:10])
             if answer[0] != answer[1]:
                 break
-            print "Attempt %s failed!" % atempt_count
+            log(LOGLEVEL.ERROR, "Attempt %s failed!" % atempt_count)
             time.sleep(1)
         for i in xrange(min(len(answer[0]), len(answer[1]))):
             if answer[0][i] == answer[1][i]:
-                print "Separated servers report the same chunk: %s, %s" % (answer[0][i], answer[1][i])
+                log(LOGLEVEL.INFO, "Separated servers report the same chunk: %s, %s" % (answer[0][i], answer[1][i]))
         self.assertFalse(answer[0] == answer[1], "Separated servers report the same chunk list")
         #print "Server 0\n" + "\n".join(str(chunk) for chunk in answer[0][:4])
         self._compare_chunks(0, answer[0], self.time_periods_single[0])

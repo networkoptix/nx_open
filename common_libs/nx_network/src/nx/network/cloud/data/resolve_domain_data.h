@@ -9,7 +9,6 @@
 #include "connection_method.h"
 #include "stun_message_data.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {

@@ -32,10 +32,8 @@ public:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-    void updateSyncButtonChecked();
-    void updateSyncButtonEnabled();
-    void updateLiveButtonChecked();
-    void updateLiveButtonEnabled();
+    void updateSyncButtonState();
+    void updateLiveButtonState();
     void updatePlaybackButtonsIcons();
     void updatePlaybackButtonsEnabled();
     void updateVolumeButtonsEnabled();
@@ -57,6 +55,7 @@ private slots:
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
     QnImageButtonWidget* newActionButton(QnActions::IDType id);

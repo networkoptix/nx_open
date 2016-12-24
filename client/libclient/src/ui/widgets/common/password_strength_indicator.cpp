@@ -34,16 +34,11 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
         textMargins(kDefaultTextMargins),
         anchor(new QnWidgetAnchor(q)),
         lineEditContentsMargins(lineEdit->contentsMargins()),
-        eventSignalizer(new QnMultiEventSignalizer(q)),
+        eventSignalizer(nullptr),
         q_ptr(q)
     {
-        eventSignalizer->addEventType(QEvent::ContentsRectChange);
-        eventSignalizer->addEventType(QEvent::LayoutDirectionChange);
-        lineEdit->installEventFilter(eventSignalizer);
-
-        anchor->setEdges(anchorEdges());
-
-        connect(eventSignalizer, &QnMultiEventSignalizer::activated, q,
+        eventSignalizer = installEventHandler(lineEdit,
+            { QEvent::ContentsRectChange, QEvent::LayoutDirectionChange }, q,
             [this](QObject* object, QEvent* event)
             {
                 Q_UNUSED(object);
@@ -67,6 +62,10 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
                 }
             });
 
+        NX_ASSERT(eventSignalizer);
+
+        anchor->setEdges(anchorEdges());
+
         connect(lineEdit, &QLineEdit::textChanged, q,
             [this](const QString& text)
             {
@@ -85,7 +84,7 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
             return;
 
         Q_Q(QnPasswordStrengthIndicator);
-        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine | Qt::TextHideMnemonic, currentInformation.text());
+        QSize textSize = q->fontMetrics().size(Qt::TextSingleLine, currentInformation.text());
         q->resize(qMax(textSize.width() + textMargins, q->minimumWidth()), q->height());
 
         int extraContentMargin = q->width() + q->indicatorMargins().right() * 2;
@@ -122,7 +121,7 @@ class QnPasswordStrengthIndicatorPrivate: public ConnectiveBase
 
     QnWidgetAnchor* anchor;
     QMargins lineEditContentsMargins;
-    QnMultiEventSignalizer* eventSignalizer;
+    QnAbstractEventSignalizer* eventSignalizer;
 
     QnPasswordStrengthIndicator* q_ptr;
     Q_DECLARE_PUBLIC(QnPasswordStrengthIndicator)
@@ -248,5 +247,5 @@ void QnPasswordStrengthIndicator::paintEvent(QPaintEvent* event)
     painter.drawRoundedRect(rect().adjusted(0.5, 0.5, -0.5, -0.5), d->roundingRadius, d->roundingRadius);
 
     painter.setPen(palette().color(QPalette::Shadow));
-    painter.drawText(rect(), Qt::TextSingleLine | Qt::TextHideMnemonic | Qt::AlignCenter, d->currentInformation.text());
+    painter.drawText(rect(), Qt::TextSingleLine | Qt::AlignCenter, d->currentInformation.text());
 }

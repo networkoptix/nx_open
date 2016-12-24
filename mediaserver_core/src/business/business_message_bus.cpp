@@ -24,8 +24,14 @@ QnBusinessMessageBus::QnBusinessMessageBus()
 
 QnBusinessMessageBus::~QnBusinessMessageBus()
 {
+    const int kStopTimeoutMs = 5000;
+
     quit();
-    wait();
+    if (!wait(kStopTimeoutMs))
+    {
+        terminate();
+        wait();
+    }
 }
 
 /*

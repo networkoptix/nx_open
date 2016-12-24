@@ -8,8 +8,8 @@
 #include <utils/common/counter.h>
 
 #include "data/system_data.h"
+#include "ec2/serialization/transaction_serializer.h"
 #include "ec2/transaction_log.h"
-#include "ec2/transaction_serializer.h"
 
 namespace nx {
 namespace cdb {
@@ -40,7 +40,7 @@ public:
      */
     void getTransactionLog(
         const AuthorizationInfo& authzInfo,
-        data::SystemID systemID,
+        data::SystemId systemId,
         std::function<void(
             api::ResultCode,
             ::ec2::ApiTransactionDataList)> completionHandler);
@@ -55,7 +55,7 @@ private:
         QnCounter::ScopedIncrement /*asyncCallLocker*/,
         const std::string& systemId,
         api::ResultCode resultCode,
-        std::vector<ec2::TransactionData> serializedTransactions,
+        std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,
         ::ec2::QnTranState readedUpTo,
         std::function<void(
             api::ResultCode,

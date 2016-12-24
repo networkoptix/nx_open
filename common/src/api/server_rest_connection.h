@@ -49,7 +49,18 @@ namespace rest
         */
         Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
-        Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
+        /**
+        * Get camera thumbnail for specified time.
+        *
+        * Returns immediately. On request completion callback is called.
+        *
+        * @param targetThread Callback thread. If not specified, callback is called in IO thread.
+        * @return Request handle.
+        */
+        Handle cameraThumbnailAsync(
+            const QnThumbnailRequestData& request,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = 0);
 
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
@@ -130,6 +141,8 @@ namespace rest
         Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
 
         QnMediaServerResourcePtr getServerWithInternetAccess() const;
+
+        void trace(int handle, const QString& message) const;
     private:
         QnUuid m_serverId;
         QMap<Handle, HttpCompletionFunc> m_runningRequests;

@@ -16,7 +16,7 @@ namespace ec2
     {
         QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
-        Value fromString(const QString& val) 
+        Value fromString(const QString& val)
 		{
             auto descriptor = getTransactionDescriptorByName(val);
             return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
@@ -47,13 +47,13 @@ namespace ec2
         QnAbstractTransaction::PersistentInfo,
         (json)(ubjson)(xml)(csv_record),
         QnAbstractTransaction_PERSISTENT_Fields,
-        (optional, false))
+        (optional, true))
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
         (HistoryAttributes)(QnAbstractTransaction)(ApiTransactionData),
         (json)(ubjson)(xml)(csv_record),
         _Fields,
-        (optional, false))
+        (optional, true))
 
 } // namespace ec2
 

@@ -9,6 +9,7 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
+#include <utils/common/aspect_ratio.h>
 
 #include "security_cam_resource.h"
 
@@ -54,12 +55,15 @@ public:
     void cleanCameraIssues();
 
     CameraMediaStreams mediaStreams() const;
+    QnAspectRatio aspectRatio() const;
+
 protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
+    std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
 };
 
 

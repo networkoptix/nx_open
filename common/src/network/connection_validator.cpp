@@ -12,6 +12,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <api/global_settings.h>
+#include <network/system_helpers.h>
 
 namespace {
 
@@ -85,9 +86,9 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 
 bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
 {
-    return !info.localSystemId.isNull() &&
-        info.localSystemId == qnGlobalSettings->localSystemId() &&
-        validateConnection(info) == Qn::SuccessConnectionResult;
+    return !info.localSystemId.isNull()
+        && helpers::serverBelongsToCurrentSystem(info)
+        && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
@@ -97,9 +98,6 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost)
 {
-    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return Qn::IncompatibleCloudHostConnectionResult;
-
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
 
@@ -108,6 +106,9 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
 
     if (!compatibleCustomization(customization, localInfo.customization, isMobile))
         return Qn::IncompatibleInternalConnectionResult;
+
+    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
+        return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
         return Qn::IncompatibleVersionConnectionResult;

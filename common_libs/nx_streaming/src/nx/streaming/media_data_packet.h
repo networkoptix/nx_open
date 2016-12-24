@@ -25,29 +25,32 @@ class QIODevice;
 
 struct AVCodecContext;
 
-// TODO: #Elric #enum
-enum MediaQuality {
-    MEDIA_Quality_High = 1,  // high quality
-    MEDIA_Quality_Low = 2,   // low quality
+enum MediaQuality
+{
+    MEDIA_Quality_High = 1, //< high quality
+    MEDIA_Quality_Low = 2, //< low quality
     // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'.
     // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
     MEDIA_Quality_ForceHigh,
     MEDIA_Quality_Auto,
     MEDIA_Quality_CustomResolution,
+    MEDIA_Quality_LowIframesOnly, //< low quality stream (no transcoding), I-frames only
     MEDIA_Quality_None
 };
 
-const char* mediaQualityToString(MediaQuality value);
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
+
+bool isLowMediaQuality(MediaQuality q);
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
     enum MediaFlag {
         MediaFlags_None                 = 0x00000,
-        MediaFlags_AVKey                = 0x00001,  /**< KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h, checked via static_assert below. */
+        MediaFlags_AVKey                = 0x00001, /**< KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h, checked via static_assert below. */
         MediaFlags_AfterEOF             = 0x00002,
         MediaFlags_BOF                  = 0x00004,
         MediaFlags_LIVE                 = 0x00008,
-        MediaFlags_Ignore               = 0x00010,
+        MediaFlags_Ignore               = 0x00010, /**< The frame should not be displayed. */
 
         MediaFlags_ReverseReordered     = 0x00020,
         MediaFlags_ReverseBlockStart    = 0x00040,

@@ -12,7 +12,8 @@ PageBase
     objectName: "videoScreen"
 
     property alias resourceId: videoScreenController.resourceId
-    property string initialScreenshot
+    property alias initialScreenshot: screenshot.source
+    property QnCameraListModel camerasModel: null
 
     VideoScreenController
     {
@@ -21,7 +22,7 @@ PageBase
         mediaPlayer.onPlayingChanged:
         {
             if (mediaPlayer.playing)
-                video.screenshotSource = ""
+                screenshot.source = ""
         }
 
         onOfflineChanged:
@@ -158,15 +159,21 @@ PageBase
         width: mainWindow.width
         height: mainWindow.height
 
-        visible: dummyLoader.status != Loader.Ready
+        visible: dummyLoader.status != Loader.Ready && !screenshot.visible
 
-        source: videoScreenController.mediaPlayer
-        screenshotSource: initialScreenshot
-        customAspectRatio: (videoScreenController.resourceHelper.customAspectRatio
-            || videoScreenController.mediaPlayer.aspectRatio)
-        videoRotation: videoScreenController.resourceHelper.customRotation
+        mediaPlayer: videoScreenController.mediaPlayer
+        resourceHelper: videoScreenController.resourceHelper
 
         onClicked: toggleUi()
+    }
+
+    Image
+    {
+        id: screenshot
+        width: parent.width
+        height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
+        y: (mainWindow.height - height) / 3 - header.height
+        visible: status == Image.Ready
     }
 
     Loader
@@ -186,14 +193,13 @@ PageBase
         {
             width: videoScreen.width
             state: videoScreenController.dummyState
-        }
-    }
 
-    MouseArea
-    {
-        enabled: dummyLoader.visible
-        anchors.fill: parent
-        onClicked: toggleUi()
+            MouseArea
+            {
+                anchors.fill: parent
+                onClicked: toggleUi()
+            }
+        }
     }
 
     Loader
@@ -208,6 +214,55 @@ PageBase
 
         sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
             ? navigationComponent : liveNavigationComponent)
+
+        Button
+        {
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -150 - 64
+            x: 8
+            padding: 0
+            leftPadding: 0
+            rightPadding: 0
+            width: 40
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+            icon: lp("/images/previous.png")
+            radius: width / 2
+            z: 1
+            onClicked:
+            {
+                if (!camerasModel)
+                    return
+
+                videoScreen.resourceId = camerasModel.previousResourceId(videoScreen.resourceId)
+                    || camerasModel.previousResourceId("")
+            }
+        }
+
+        Button
+        {
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -150 - 64
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+            padding: 0
+            leftPadding: 0
+            rightPadding: 0
+            width: 40
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+            icon: lp("/images/next.png")
+            radius: width / 2
+            z: 1
+            onClicked:
+            {
+                if (!camerasModel)
+                    return
+
+                videoScreen.resourceId = camerasModel.nextResourceId(videoScreen.resourceId)
+                    || camerasModel.nextResourceId("")
+            }
+        }
     }
 
     Component

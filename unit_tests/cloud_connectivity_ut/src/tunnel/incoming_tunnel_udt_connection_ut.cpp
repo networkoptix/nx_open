@@ -18,7 +18,7 @@ namespace test {
 
 static const size_t kTestConnections = 10;
 static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
-static const std::chrono::milliseconds kSocketTimeout(1000);
+static const std::chrono::milliseconds kSocketTimeout(3000);
 static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
 class IncomingTunnelConnectionTest
@@ -33,11 +33,11 @@ protected:
         auto tmpSocket = makeSocket(true);
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));
-        connectionAddress = tmpSocket->getLocalAddress();
+        m_connectionAddress = tmpSocket->getLocalAddress();
 
-        freeSocket = makeSocket(true);
-        tmpSocket->connectAsync(freeSocket->getLocalAddress(), results.pusher());
-        freeSocket->connectAsync(tmpSocket->getLocalAddress(), results.pusher());
+        m_freeSocket = makeSocket(true);
+        tmpSocket->connectAsync(m_freeSocket->getLocalAddress(), results.pusher());
+        m_freeSocket->connectAsync(tmpSocket->getLocalAddress(), results.pusher());
 
         ASSERT_EQ(results.pop(), SystemError::noError);
         ASSERT_EQ(results.pop(), SystemError::noError);
@@ -54,13 +54,23 @@ protected:
                     kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
 
                 cc->start(nullptr /* do not wait for select in test */);
-                connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
+                m_connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
                 
                 acceptForever();
                 startedPromise.set_value();
             });
             
         startedPromise.get_future().wait();
+    }
+
+    void TearDown() override
+    {
+        if (const auto connection = takeConnection())
+            connection->pleaseStopSync();
+
+        m_freeSocket->pleaseStopSync();
+        for (auto& socket : m_connectSockets)
+            socket->pleaseStopSync();
     }
 
     std::unique_ptr<UdtStreamSocket> makeSocket(bool randevous = false)
@@ -76,21 +86,21 @@ protected:
 
     void acceptForever()
     {
-        connection->accept(
+        m_connection->accept(
             [this](
                 SystemError::ErrorCode code,
                 std::unique_ptr<AbstractStreamSocket> socket)
             {
                 {
                     QnMutexLocker lock(&m_mutex);
-                    acceptedSockets.push_back(std::move(socket));
+                    m_acceptedSockets.push_back(std::move(socket));
+                    m_acceptResults.push(code);
+
+                    if (code == SystemError::noError && m_connection)
+                        return acceptForever();
                 }
 
-                acceptResults.push(code);
-                if (code == SystemError::noError)
-                    acceptForever();
-                else
-                    connection.reset();
+                takeConnection().reset();
             });
     }
 
@@ -101,48 +111,42 @@ protected:
 
         auto socket = makeSocket();
         socket->connectAsync(
-            connectionAddress,
+            m_connectionAddress,
             [this, count](SystemError::ErrorCode code)
             {
                 NX_LOGX(lm("Connect result: %1")
                     .arg(SystemError::toString(code)), cl_logDEBUG2);
 
-                connectResults.push(code);
+                m_connectResults.push(code);
                 if (code == SystemError::noError)
                     runConnectingSockets(count - 1);
             });
 
         QnMutexLocker lock(&m_mutex);
-        connectSockets.push_back(std::move(socket));
+        m_connectSockets.push_back(std::move(socket));
     }
 
-    void TearDown() override
+    std::unique_ptr<IncomingTunnelConnection> takeConnection()
     {
-        if (connection)
-            connection->pleaseStopSync();
-
-        if (freeSocket)
-            freeSocket->pleaseStopSync();
-
-        for (auto& socket : connectSockets)
-            socket->pleaseStopSync();
+        QnMutexLocker lock(&m_mutex);
+        auto localConection = std::move(m_connection);
+        m_connection = nullptr;
+        return localConection;
     }
-
-    SocketAddress connectionAddress;
-    std::unique_ptr<IncomingTunnelConnection> connection;
-    utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
-
-    std::unique_ptr<UdtStreamSocket> freeSocket;
-    utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
 
     QnMutex m_mutex;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
+    SocketAddress m_connectionAddress;
+    std::unique_ptr<IncomingTunnelConnection> m_connection;
+    std::unique_ptr<UdtStreamSocket> m_freeSocket;
+    utils::TestSyncQueue<SystemError::ErrorCode> m_acceptResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> m_connectResults;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
 };
 
 TEST_F(IncomingTunnelConnectionTest, Timeout)
 {
-    ASSERT_EQ(acceptResults.pop(), SystemError::timedOut);
+    ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
 TEST_F(IncomingTunnelConnectionTest, Connections)
@@ -150,23 +154,23 @@ TEST_F(IncomingTunnelConnectionTest, Connections)
     runConnectingSockets(kTestConnections);
     for (size_t i = 0; i < kTestConnections; ++i)
     {
-        ASSERT_EQ(connectResults.pop(), SystemError::noError) << "i = " << i;
-        ASSERT_EQ(acceptResults.pop(), SystemError::noError) << "i = " << i;
+        ASSERT_EQ(m_connectResults.pop(), SystemError::noError) << "i = " << i;
+        ASSERT_EQ(m_acceptResults.pop(), SystemError::noError) << "i = " << i;
     }
 
-    EXPECT_TRUE(connectResults.isEmpty());
-    EXPECT_TRUE(acceptResults.isEmpty());
+    EXPECT_TRUE(m_connectResults.isEmpty());
+    EXPECT_TRUE(m_acceptResults.isEmpty());
 
     // then connection closes by timeout
-    ASSERT_EQ(acceptResults.pop(), SystemError::timedOut);
+    ASSERT_EQ(m_acceptResults.pop(), SystemError::timedOut);
 }
 
 TEST_F(IncomingTunnelConnectionTest, SynAck)
 {
     // we can connect right after start
     runConnectingSockets();
-    ASSERT_EQ(connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(acceptResults.pop(), SystemError::noError);
+    ASSERT_EQ(m_connectResults.pop(), SystemError::noError);
+    ASSERT_EQ(m_acceptResults.pop(), SystemError::noError);
 
     {
         hpm::api::UdpHolePunchingSynRequest syn;
@@ -181,7 +185,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
         serializer.serialize(&buffer, &processed);
 
         nx::utils::promise<void> promise;
-        freeSocket->sendAsync(
+        m_freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
             {
@@ -189,7 +193,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
                 ASSERT_EQ(size, buffer.size());
 
                 buffer.resize(0);
-                freeSocket->readSomeAsync(
+                m_freeSocket->readSomeAsync(
                     &buffer,
                     [&buffer, &promise](SystemError::ErrorCode code, size_t)
                     {
@@ -220,13 +224,13 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
     // we still can connect
     runConnectingSockets();
-    ASSERT_EQ(connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(acceptResults.pop(), SystemError::noError);
+    ASSERT_EQ(m_connectResults.pop(), SystemError::noError);
+    ASSERT_EQ(m_acceptResults.pop(), SystemError::noError);
 
     {
         Buffer buffer("someTrash");
         nx::utils::promise<void> promise;
-        freeSocket->sendAsync(
+        m_freeSocket->sendAsync(
             buffer,
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
             {
@@ -235,7 +239,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
                 buffer.resize(0);
                 buffer.reserve(1);
-                freeSocket->readSomeAsync(
+                m_freeSocket->readSomeAsync(
                     &buffer,
                     [&buffer, &promise](SystemError::ErrorCode code, size_t size)
                     {
@@ -249,12 +253,13 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
 
     // connection was broken by wrong packet
     runConnectingSockets();
-    ASSERT_NE(connectResults.pop(), SystemError::noError);
-    ASSERT_EQ(acceptResults.pop(), SystemError::invalidData);
+    ASSERT_NE(m_connectResults.pop(), SystemError::noError);
+    ASSERT_EQ(m_acceptResults.pop(), SystemError::invalidData);
 }
 
 TEST_F(IncomingTunnelConnectionTest, PleaseStop)
 {
+    // Tests if TearDown() works fine right after SetUp()
 }
 
 TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
@@ -269,21 +274,15 @@ TEST_F(IncomingTunnelConnectionTest, PleaseStopOnRun)
                 {
                     auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
                     ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
-                    if (!socket->connect(connectionAddress))
+                    if (!socket->connect(m_connectionAddress))
                         return;
                 }
             }));
     }
 
-    nx::utils::promise<void> promise;
-    connection->pleaseStop(
-        [this, &promise]()
-        {
-            connection.reset();
-            promise.set_value();
-        });
+    if (const auto connection = takeConnection())
+        connection->pleaseStopSync();
 
-    promise.get_future().wait();
     for (auto& thread : threads)
         thread.join();
 }

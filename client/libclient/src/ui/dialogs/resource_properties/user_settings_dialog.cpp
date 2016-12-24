@@ -46,7 +46,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_editGroupsButton(new QPushButton(tr("Edit Roles..."), this))
+    m_editRolesButton(new QPushButton(tr("Edit Roles..."), this))
 {
     ui->setupUi(this);
 
@@ -115,18 +115,18 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
         tryClose(true);
     });
 
-    ui->buttonBox->addButton(m_editGroupsButton, QDialogButtonBox::HelpRole);
-    connect(m_editGroupsButton, &QPushButton::clicked, this,
+    ui->buttonBox->addButton(m_editRolesButton, QDialogButtonBox::HelpRole);
+    connect(m_editRolesButton, &QPushButton::clicked, this,
         [this]
         {
-            QnUuid groupId = isPageVisible(ProfilePage)
-                ? m_user->userGroup()
-                : m_settingsPage->selectedUserGroup();
+            QnUuid roleId = isPageVisible(ProfilePage)
+                ? m_user->userRoleId()
+                : m_settingsPage->selectedUserRoleId();
             menu()->trigger(QnActions::UserRolesAction,
-                QnActionParameters().withArgument(Qn::UuidRole, groupId));
+                QnActionParameters().withArgument(Qn::UuidRole, roleId));
         });
 
-    m_editGroupsButton->setVisible(false);
+    m_editRolesButton->setVisible(false);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -169,7 +169,7 @@ void QnUserSettingsDialog::updatePermissions()
                 return kHtmlRowTemplate1.arg(tr("All")).arg(name);
             }
 
-            if (counts.second < 0)
+            if (filter == QnResourceAccessFilter::LayoutsFilter || counts.second < 0)
                 return kHtmlRowTemplate1.arg(counts.first).arg(name);
 
             return kHtmlRowTemplate2.arg(counts.first).arg(counts.second).arg(name);
@@ -209,28 +209,35 @@ void QnUserSettingsDialog::updatePermissions()
 
     if (isPageVisible(ProfilePage))
     {
-        Qn::UserRole roleType = m_user->role();
-        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
-        QnResourceAccessSubject subject(m_user);
+        Qn::UserRole role = m_user->userRole();
+        QString permissionsText;
 
-        permissionsText += kHtmlTableTemplate.arg(
-            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
-            kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
+        if (role == Qn::UserRole::CustomUserRole || role == Qn::UserRole::CustomPermissions)
+        {
+            QnResourceAccessSubject subject(m_user);
+            permissionsText = kHtmlTableTemplate.arg(
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, false)) +
+                kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, false)));
+        }
+        else
+        {
+            permissionsText = QnUserRolesManager::userRoleDescription(role);
+        }
 
         m_profilePage->updatePermissionsLabel(permissionsText);
     }
     else
     {
         Qn::UserRole roleType = m_settingsPage->selectedRole();
-        QString permissionsText = QnUserRolesManager::userRoleDescription(roleType);
+        QString permissionsText;
 
-        if (roleType == Qn::UserRole::CustomUserGroup)
+        if (roleType == Qn::UserRole::CustomUserRole)
         {
             /* Handle custom user role: */
-            QnUuid groupId = m_settingsPage->selectedUserGroup();
-            QnResourceAccessSubject subject(qnUserRolesManager->userRole(groupId));
+            QnUuid roleId = m_settingsPage->selectedUserRoleId();
+            QnResourceAccessSubject subject(qnUserRolesManager->userRole(roleId));
 
-            permissionsText += kHtmlTableTemplate.arg(
+            permissionsText = kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::MediaFilter, subject, true)) +
                 kHtmlTableRowTemplate.arg(descriptionById(QnResourceAccessFilter::LayoutsFilter, subject, true)));
         }
@@ -242,9 +249,13 @@ void QnUserSettingsDialog::updatePermissions()
                 return descriptionHtml(widget->filter(), widget->isAll(), widget->selected());
             };
 
-            permissionsText += kHtmlTableTemplate.arg(
+            permissionsText = kHtmlTableTemplate.arg(
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_camerasPage)) +
                 kHtmlTableRowTemplate.arg(descriptionFromWidget(m_layoutsPage)));
+        }
+        else
+        {
+            permissionsText = QnUserRolesManager::userRoleDescription(roleType);
         }
 
         m_settingsPage->updatePermissionsLabel(permissionsText);
@@ -275,8 +286,14 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
-    loadDataToUi();
+    forcedUpdate();
+}
+
+void QnUserSettingsDialog::forcedUpdate()
+{
+    base_type::forcedUpdate();
     updatePermissions();
+    updateButtonBox();
 }
 
 QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
@@ -340,7 +357,7 @@ void QnUserSettingsDialog::applyChanges()
                 m_user->fillId();
         });
 
-    if (m_user->role() == Qn::UserRole::CustomPermissions)
+    if (m_user->userRole() == Qn::UserRole::CustomPermissions)
     {
         auto accessibleResources = m_model->accessibleResources();
 
@@ -367,15 +384,7 @@ void QnUserSettingsDialog::applyChanges()
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         setUser(QnUserResourcePtr());
 
-    updateButtonBox();
-    loadDataToUi();
-}
-
-void QnUserSettingsDialog::showEvent(QShowEvent* event)
-{
-    loadDataToUi();
-    updatePermissions();
-    base_type::showEvent(event);
+    forcedUpdate();
 }
 
 void QnUserSettingsDialog::applyChangesInternal()
@@ -404,7 +413,7 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    m_editGroupsButton->setVisible(settingsPageVisible);
+    m_editRolesButton->setVisible(settingsPageVisible);
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

@@ -8,6 +8,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <api/global_settings.h>
 #include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -135,8 +136,12 @@ bool QnCheckForUpdatesPeerTask::checkCloudHost()
     if (m_cloudHost == QnAppInfo::defaultCloudHost())
         return true;
 
-    const auto serversLnkedToCloud = QnUpdateUtils::getServersLinkedToCloud(peers());
-    return serversLnkedToCloud.isEmpty();
+    const bool isBoundToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
+    if (isBoundToCloud)
+        return false;
+
+    const auto serversLinkedToCloud = QnUpdateUtils::getServersLinkedToCloud(peers());
+    return serversLinkedToCloud.isEmpty();
 }
 
 QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
@@ -268,6 +273,7 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
         if (it != json.end())
         {
             qnSettings->setAlternativeUpdateServers(it.value().toArray().toVariantList());
+            qnSettings->save();
             loadServersFromSettings();
         }
     }
@@ -461,7 +467,7 @@ void QnCheckForUpdatesPeerTask::at_zipExtractor_finished(int error)
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
         QString cloudHost;
-        bool isClient;
+        bool isClient = false;
 
         if (!verifyUpdatePackage(fileName, &version, &sysInfo, &cloudHost, &isClient))
             continue;
@@ -586,4 +592,9 @@ void QnCheckForUpdatesPeerTask::start()
 QnUpdateTarget QnCheckForUpdatesPeerTask::target() const
 {
     return m_target;
+}
+
+void QnCheckForUpdatesPeerTask::doCancel()
+{
+    m_runningRequests.clear();
 }

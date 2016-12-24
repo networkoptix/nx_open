@@ -47,22 +47,7 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="searchLayout">
-       <item>
-        <widget class="QLineEdit" name="filterLineEdit">
-         <property name="placeholderText">
-          <string notr="true">&lt; filter by camera... &gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="clearFilterButton">
-         <property name="text">
-          <string>X</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QnSearchLineEdit" name="filterLineEdit" native="true"/>
      </item>
      <item>
       <layout class="QHBoxLayout" name="topLayout">
@@ -100,30 +85,21 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="advancedButton">
-         <property name="text">
-          <string>Advanced...</string>
-         </property>
-         <property name="icon">
-          <iconset>
-           <normalon></normalon>
-          </iconset>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item>
       <widget class="QnTableView" name="tableView">
+       <property name="minimumSize">
+        <size>
+         <width>800</width>
+         <height>200</height>
+        </size>
+       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::AllEditTriggers</set>
        </property>
        <property name="showDropIndicator" stdset="0">
         <bool>false</bool>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
        </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
@@ -179,11 +155,18 @@
    <header location="global">ui/widgets/common/table_view.h</header>
   </customwidget>
   <customwidget>
+   <class>QnSearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QnBusinessRuleWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/business/business_rule_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <resources/>
  <connections/>
 </ui>

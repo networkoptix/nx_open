@@ -128,7 +128,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
                 if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
                     return true;
 
-                auto roleId = user->userGroup();
+                auto roleId = user->userRoleId();
                 return !roleId.isNull()
                     && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
             };

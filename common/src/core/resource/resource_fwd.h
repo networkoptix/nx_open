@@ -78,6 +78,7 @@ typedef QnSharedResourcePointerList<QnDesktopCameraResource> QnDesktopCameraReso
 class QnLayoutResource;
 typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QnSharedResourcePointerList<QnLayoutResource> QnLayoutResourceList;
+typedef QSet<QnLayoutResourcePtr> QnLayoutResourceSet;
 
 class QnLayoutItemIndex;
 typedef QList<QnLayoutItemIndex> QnLayoutItemIndexList;
@@ -118,6 +119,9 @@ typedef QnSharedResourcePointerList<QnUserResource> QnUserResourceList;
 class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
 typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
+
+class QnFakeMediaServerResource;
+typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
 
 class QnMediaServerUserAttributes;
 typedef QSharedPointer<QnMediaServerUserAttributes> QnMediaServerUserAttributesPtr;

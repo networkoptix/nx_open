@@ -22,6 +22,18 @@
 
 namespace ec2 {
 
+template<typename RequestData>
+void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+{
+}
+
+template<>
+void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+{
+    if (userData->isCloud && userData->name.isEmpty())
+        userData->name = userData->email;
+}
+
 /**
  * RestAPI request handler for update requests.
  */
@@ -130,6 +142,9 @@ private:
                     lit("Unsupported Content Type: \"%1\".").arg(QString(requestContentType)));
                 return nx_http::StatusCode::unsupportedMediaType;
         }
+
+        fixRequestDataIfNeeded(requestData);
+
         return nx_http::StatusCode::ok;
     }
 

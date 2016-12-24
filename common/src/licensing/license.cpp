@@ -98,7 +98,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
     LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
+    LicenseTypeInfo(Qn::LC_Free,            "free",          1),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1)
 };
 } // anonymous namespace
 
@@ -186,6 +187,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall");
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
+    case Qn::LC_Free:           return tr("Free");
     case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
@@ -208,6 +210,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
+    case Qn::LC_Free:           return tr("Free license");
     case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;
@@ -425,15 +428,15 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalid Signature");
+        return tr("Invalid signature");
     case InvalidHardwareID:
         return tr("Server with matching hardware ID not found");
     case InvalidBrand:
-        return tr("Invalid Customization");
+        return tr("Invalid customization");
     case Expired:
-        return tr("Expired"); // license is out of date
+        return tr("License is expired"); // license is out of date
     case InvalidType:
-        return tr("Invalid Type");
+        return tr("Invalid type");
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
     case FutureLicense:
@@ -564,6 +567,9 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
 
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
 {
+    if (licenseType == Qn::LC_Free)
+        return std::numeric_limits<int>::max();
+
     int result = 0;
 
     for (const QnLicensePtr& license: m_licenseDict.values())

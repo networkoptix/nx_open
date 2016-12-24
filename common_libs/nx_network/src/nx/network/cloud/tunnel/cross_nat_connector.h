@@ -11,6 +11,7 @@
 #include <tuple>
 #include <type_traits>
 
+#include <nx/network/aio/timer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
@@ -24,22 +25,18 @@
 #include "nx/network/cloud/data/connect_data.h"
 #include "nx/network/cloud/mediator_connections.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 
-class NX_NETWORK_API CrossNatConnector
-    :
+class NX_NETWORK_API CrossNatConnector:
     public AbstractCrossNatConnector,
     public stun::UnreliableMessagePipelineEventHandler
 {
-    typedef aio::BasicPollable BaseType;
-
 public:
     /**
-        @param mediatorAddress Overrides mediator address. Introduced for testing purposes only
-    */
+     * @param mediatorAddress Overrides mediator address. Introduced for testing purposes only.
+     */
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
         boost::optional<SocketAddress> mediatorAddress = boost::none);
@@ -75,12 +72,18 @@ private:
     std::unique_ptr<stun::UnreliableMessagePipeline> m_connectResultReportSender;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     bool m_done;
+    nx::hpm::api::ConnectionParameters m_connectionParameters;
+    std::unique_ptr<aio::Timer> m_timer;
 
     void issueConnectRequestToMediator(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
     void onConnectResponse(
         nx::hpm::api::ResultCode resultCode,
+        nx::hpm::api::ConnectResponse response);
+    std::chrono::milliseconds calculateTimeLeftForConnect();
+    void startNatTraversing(
+        std::chrono::milliseconds connectTimeout,
         nx::hpm::api::ConnectResponse response);
     void onConnectorFinished(
         ConnectorFactory::CloudConnectors::iterator connectorIter,
@@ -92,19 +95,9 @@ private:
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode sysErrorCode);
     void connectSessionReportSent(SystemError::ErrorCode errorCode);
-
-    //template<typename FuncType, typename ...Args>
-    //void invokeInAioThread(FuncType&& func, Args&& ...args)
-    //{
-    //    auto argsTuple = std::make_tuple(std::forward<Args>(args)...);
-    //    post(
-    //        [func = std::forward<FuncType>(func), argsTuple = std::move(argsTuple)]() mutable
-    //        {
-    //            nx::utils::expandTupleIntoArgs(std::move(func), std::move(argsTuple));
-    //        });
-    //}
+    hpm::api::ConnectRequest prepareConnectRequest() const;
 };
 
-}   //namespace cloud
-}   //namespace network
-}   //namespace nx
+} // namespace cloud
+} // namespace network
+} // namespace nx

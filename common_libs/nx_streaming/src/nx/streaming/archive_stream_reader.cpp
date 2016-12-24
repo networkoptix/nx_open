@@ -12,6 +12,7 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/abstract_data_consumer.h>
 #include <utils/media/frame_type_extractor.h>
+#include <nx/utils/log/log.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
@@ -80,9 +81,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
             && !dev->hasFlags(Qn::local))
        )
         m_cycleMode = false;
-
-    // Should init packets here as some times destroy (av_free_packet) could be called before init
-    //connect(dev.data(), SIGNAL(statusChanged(Qn::ResourceStatus, Qn::ResourceStatus)), this, SLOT(onStatusChanged(Qn::ResourceStatus, Qn::ResourceStatus)));
 
 }
 
@@ -232,44 +230,35 @@ bool QnArchiveStreamReader::init()
     qint64 requiredJumpTime = m_requiredJumpTime;
     MediaQuality quality = m_quality;
     QSize resolution = m_customResolution;
-    m_jumpMtx.unlock();
+    qint64 jumpTime = qint64(AV_NOPTS_VALUE);
     bool imSeek = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
-    if (imSeek && (requiredJumpTime != qint64(AV_NOPTS_VALUE) || m_reverseMode))
+    if (imSeek)
     {
-        // It is optimization: open and jump at same time
-        while (1)
+        if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
         {
-            m_delegate->setQuality(quality, true, m_customResolution);
-            qint64 jumpTime = requiredJumpTime != qint64(AV_NOPTS_VALUE) ? requiredJumpTime : qnSyncTime->currentUSecsSinceEpoch();
-            bool seekOk = m_delegate->seek(jumpTime, true) >= 0;
-            Q_UNUSED(seekOk)
-                m_jumpMtx.lock();
-            if (m_requiredJumpTime == requiredJumpTime) {
-                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
-                    m_requiredJumpTime = AV_NOPTS_VALUE;
-                m_jumpMtx.unlock();
-                if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
-                    emit jumpOccured(requiredJumpTime);
-                break;
-            }
-            requiredJumpTime = m_requiredJumpTime; // race condition. jump again
-            quality = m_quality;
-            resolution = m_customResolution;
-            m_jumpMtx.unlock();
+            jumpTime = requiredJumpTime;
+            m_requiredJumpTime = AV_NOPTS_VALUE;
+        }
+        else if (m_reverseMode)
+        {
+            jumpTime = qnSyncTime->currentUSecsSinceEpoch();
         }
     }
 
+    m_jumpMtx.unlock();
+
+    // It is optimization: open and jump at same time
+    if (jumpTime != qint64(AV_NOPTS_VALUE))
+        m_delegate->seek(jumpTime, true);
+
     m_delegate->setQuality(quality, true, resolution);
-    if (!m_delegate->open(m_resource)) {
-        if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) {
-            emit jumpOccured(requiredJumpTime);
-            m_jumpMtx.lock();
-            if (m_requiredJumpTime == requiredJumpTime)
-                m_requiredJumpTime = AV_NOPTS_VALUE;
-            m_jumpMtx.unlock();
-        }
+    bool opened = m_delegate->open(m_resource);
+
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE))
+        emit jumpOccured(requiredJumpTime, m_delegate->getSequence());
+
+    if (!opened)
         return false;
-    }
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     m_jumpMtx.lock();
@@ -353,7 +342,10 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
         rez->flags |= QnAbstractMediaData::MediaFlags_BOF;
     if (isReverseMode)
         rez->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-    rez->opaque = m_dataMarker;
+    if (m_dataMarker)
+        rez->opaque = m_dataMarker;
+    else
+        rez->opaque = m_delegate->getSequence();
     QnSleep::msleep(50);
     return rez;
 }
@@ -383,6 +375,8 @@ bool QnArchiveStreamReader::isCompatiblePacketForMask(const QnAbstractMediaDataP
 
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
+    //NX_LOG(lit("QnArchiveStreamReader::getNextData()"), cl_logDEBUG2);
+
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
 
@@ -479,7 +473,7 @@ begin_label:
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
-                emit jumpOccured(displayTime);
+                emit jumpOccured(displayTime, m_delegate->getSequence());
                 m_BOF = true;
             }
         }
@@ -505,7 +499,7 @@ begin_label:
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
-        emit jumpOccured(jumpTime);
+        emit jumpOccured(jumpTime, m_delegate->getSequence());
         m_BOF = true;
     }
 
@@ -554,7 +548,7 @@ begin_label:
         m_BOF = true;
         m_afterBOFCounter = 0;
         if (jumpTime != qint64(AV_NOPTS_VALUE))
-            emit jumpOccured(displayTime);
+            emit jumpOccured(displayTime, m_delegate->getSequence());
     }
 
     if (m_outOfPlaybackMask)
@@ -811,7 +805,7 @@ begin_label:
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
-    if (m_currentData)
+    if (m_currentData && m_dataMarker)
         m_currentData->opaque = m_dataMarker;
 
     //if (m_currentData)
@@ -1336,4 +1330,11 @@ void QnArchiveStreamReader::resume()
 bool QnArchiveStreamReader::isRealTimeSource() const
 {
     return m_delegate && m_delegate->isRealTimeSource() && (m_requiredJumpTime == (qint64)AV_NOPTS_VALUE || m_requiredJumpTime == DATETIME_NOW);
+}
+
+bool QnArchiveStreamReader::needKeyData(int channel) const
+{
+    if (m_quality == MEDIA_Quality_LowIframesOnly)
+        return true;
+    return base_type::needKeyData(channel);
 }

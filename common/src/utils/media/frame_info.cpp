@@ -374,8 +374,16 @@ void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
     channel = other->channel;
 }
 
+bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
+{
+    return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
+}
+
 CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
 {
+    if (invalidScaleParameters(newSize))
+        return nullptr;
+
     if (newFormat == AV_PIX_FMT_NONE)
         newFormat = (AVPixelFormat) format;
     CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
@@ -387,6 +395,9 @@ CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixel
         width, height, (AVPixelFormat) format,
         newSize.width(), newSize.height(), newFormat,
         SWS_BICUBIC, NULL, NULL, NULL);
+
+    if (!scaleContext)
+        return nullptr;
 
     sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
     sws_freeContext(scaleContext);

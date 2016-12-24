@@ -423,9 +423,14 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     item.addresses.insert(endpoint);
     m_idByAddress[endpoint] = moduleInformation.id;
     const auto cloudModuleId = moduleInformation.cloudId();
-    if (!cloudModuleId.isEmpty() && endpoint.address.isResolved())
-        nx::network::SocketGlobals::addressResolver().addFixedAddress(
-            cloudModuleId, endpoint);
+    if (!cloudModuleId.isEmpty())
+    {
+        auto& resolver = nx::network::SocketGlobals::addressResolver();
+        if (const auto ipV4 = endpoint.address.ipV4())
+            resolver.addFixedAddress(cloudModuleId, SocketAddress(*ipV4, endpoint.port));
+        else if (const auto ipV6 = endpoint.address.ipV6())
+            resolver.addFixedAddress(cloudModuleId, SocketAddress(*ipV6, endpoint.port));
+    }
 
     if (count < item.addresses.size()) {
         if (!ignoredAddress && isBetterAddress(endpoint.address, item.primaryAddress.address)) {

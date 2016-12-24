@@ -3,7 +3,6 @@
 
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <utils/aspect_ratio.h>
 
 #include <business/actions/abstract_business_action.h>
 
@@ -39,7 +38,6 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <nx/streaming/archive_stream_reader.h>
-#include <utils/aspect_ratio.h>
 #include <utils/common/delayed.h>
 
 namespace {
@@ -75,7 +73,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
         {
             QnActionParameters parameters = menu()->currentParameters(sender());
             auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-            cameras = accessController()->filtered(cameras, Qn::ReadPermission);
+            cameras = accessController()->filtered(cameras, Qn::ViewContentPermission);
             openCamerasInAlarmLayout(cameras, true);
         });
 
@@ -94,7 +92,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
                 return true;
 
-            auto roleId = user->userGroup();
+            auto roleId = user->userRoleId();
             return !roleId.isNull()
                 && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
         };
@@ -117,7 +115,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             auto targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
             if (businessAction->getParams().useSource)
                 targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
-            targetCameras = accessController()->filtered(targetCameras, Qn::ReadPermission);
+            targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
 
             if (targetCameras.isEmpty())
                 return;
@@ -286,7 +284,7 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
 
 bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
 {
-    auto clientInstanceManager = qnCommon->instance<QnClientInstanceManager>();
+    auto clientInstanceManager = qnClientInstanceManager;
     NX_ASSERT(clientInstanceManager, Q_FUNC_INFO, "Instance Manager must exist here");
     if (!clientInstanceManager)
         return true;

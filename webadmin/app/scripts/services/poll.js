@@ -13,16 +13,18 @@
 angular.module('webadminApp')
     .factory('$poll', ['$q', '$interval', function ($q, $interval) {
 
-        function poll(fn, delay){
+        function poll(fn, delay, initialDelay){
             var deferred = $q.defer();
             var promise = deferred.promise;
 
             var activeFnPromise = null;
             var activeInterval = null;
             var cancelledPoll = false;
+            initialDelay = initialDelay || 0;
 
             function runPoll(){
                 activeInterval = $interval(function(){
+                    initialDelay = 0;
                     activeFnPromise = fn(); // Call function
                     activeFnPromise.finally(function(result){
                         activeFnPromise = null;
@@ -31,7 +33,7 @@ angular.module('webadminApp')
                             runPoll();
                         }
                     });
-                }, delay, 1); // Call interval to be executed only once
+                }, delay + initialDelay, 1); // Call interval to be executed only once
             }
 
 

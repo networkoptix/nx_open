@@ -94,13 +94,9 @@ bool QnDesktopCameraResourceSearcher::isCameraConnected(const QnVirtualCameraRes
 
 QnSecurityCamResourcePtr QnDesktopCameraResourceSearcher::cameraFromConnection(const ClientConnectionInfo& info)
 {
-    auto rt = qnResTypePool->desktopCameraResourceType();
-    if (rt->getId().isNull())
-        return QnSecurityCamResourcePtr();
-
     QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(info.userName));
     cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
-    cam->setTypeId(rt->getId());
+    cam->setTypeId(QnResourceTypePool::kDesktopCameraTypeUuid);
     cam->setPhysicalId(info.userId);
     return cam;
 }
@@ -141,7 +137,6 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnUuid &reso
     result = QnVirtualCameraResourcePtr( new QnDesktopCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString();
     return result;
 }
 

@@ -2,7 +2,7 @@
 
 #include <nx_ec/data/api_access_rights_data.h>
 
-#include <core/resource_access/providers/abstract_resource_access_provider.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -42,15 +42,15 @@ void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessi
         QnMutexLocker lk(&m_mutex);
         oldValuesMap = m_sharedResources;
         m_sharedResources.clear();
-        for (const auto& item : accessibleResourcesList)
+        for (const auto& item: accessibleResourcesList)
         {
             auto& resources = m_sharedResources[item.userId];
-            for (const auto& id : item.resourceIds)
+            for (const auto& id: item.resourceIds)
                 resources << id;
         }
     }
 
-    for (const auto& subject : QnAbstractResourceAccessProvider::allSubjects())
+    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
@@ -114,17 +114,17 @@ void QnSharedResourcesManager::handleResourceRemoved(const QnResourcePtr& resour
         handleSubjectRemoved(user);
 }
 
-void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
+void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole)
 {
     auto resources = sharedResources(userRole);
     if (!resources.isEmpty())
         emit sharedResourcesChanged(userRole, kEmpty, resources);
 }
 
-void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
+void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : QnAbstractResourceAccessProvider::dependentSubjects(userRole))
+    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 

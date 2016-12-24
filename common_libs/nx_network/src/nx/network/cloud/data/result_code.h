@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_API_RESULT_CODE_H
-#define NX_MEDIATOR_API_RESULT_CODE_H
+#pragma once
 
 #include <nx/network/stun/message.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -44,5 +38,3 @@ QString NX_NETWORK_API toString(ResultCode code);
 
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 void NX_NETWORK_API serialize(const nx::hpm::api::ResultCode&, QString*);
-
-#endif  //NX_MEDIATOR_API_RESULT_CODE_H

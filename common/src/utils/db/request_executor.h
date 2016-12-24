@@ -271,15 +271,13 @@ private:
 
 
 //!Executor of SELECT requests
-template<typename OutputData>
-class SelectExecutor
-:
+class SelectExecutor:
     public BaseExecutor
 {
 public:
     SelectExecutor(
-        nx::utils::MoveOnlyFunc<DBResult(QueryContext*, OutputData* const)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, OutputData)> completionHandler)
+        nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler)
     :
         m_dbSelectFunc(std::move(dbSelectFunc)),
         m_completionHandler(std::move(completionHandler))
@@ -288,23 +286,22 @@ public:
 
     virtual DBResult execute(QSqlDatabase* const connection) override
     {
-        OutputData output;
         auto completionHandler = std::move(m_completionHandler);
         QueryContext queryContext(connection, nullptr);
-        auto result = m_dbSelectFunc(&queryContext, &output);
+        auto result = m_dbSelectFunc(&queryContext);
         result = detailResultCode(connection, result);
-        completionHandler(&queryContext, result, std::move(output));
+        completionHandler(&queryContext, result);
         return result;
     }
 
     virtual void reportErrorWithoutExecution(DBResult errorCode) override
     {
-        m_completionHandler(nullptr, errorCode, OutputData());
+        m_completionHandler(nullptr, errorCode);
     }
 
 private:
-    nx::utils::MoveOnlyFunc<DBResult(QueryContext*, OutputData* const)> m_dbSelectFunc;
-    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, OutputData)> m_completionHandler;
+    nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> m_dbSelectFunc;
+    nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
 
 } // namespace db

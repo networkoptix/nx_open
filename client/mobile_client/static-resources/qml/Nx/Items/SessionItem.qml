@@ -52,6 +52,7 @@ Pane
     {
         id: mouseArea
 
+        parent: control
         anchors.fill: parent
         onClicked: open()
     }
@@ -60,7 +61,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: LoginUtils.extractHost(hostsModel.firstHost)
+        address: Nx.url(hostsModel.firstHost).address()
         user: connectionsModel.firstUser
     }
 
@@ -86,6 +87,12 @@ Pane
 
     function open()
     {
+        if (!compatible)
+        {
+            Workflow.openOldClientDownloadSuggestion()
+            return
+        }
+
         if (!contentItem.enabled)
             return
 
@@ -95,8 +102,8 @@ Pane
             {
                 connectionManager.connectToServer(
                     hostsModel.firstHost,
-                    cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword())
+                    cloudStatusWatcher.credentials.user,
+                    cloudStatusWatcher.credentials.password)
                 Workflow.openResourcesScreen(systemName)
             }
         }
