@@ -54,8 +54,8 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
-// Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 15;
+// Player will go to the invalid state if no data is received within this timeout.
+static const int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
@@ -262,11 +262,23 @@ void PlayerPrivate::setState(Player::State state)
 void PlayerPrivate::doPeriodicTasks()
 {
     Q_Q(Player);
-    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+
+    if (state == Player::State::Playing)
     {
-        log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
-        setMediaStatus(Player::MediaStatus::NoMedia);
-        q->stop();
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        {
+            gotDataTimer.restart();
+            return;
+        }
+
+        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
+        {
+            log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+        }
     }
 }
 
@@ -766,6 +778,8 @@ void Player::setPosition(qint64 value)
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
+
+    emit positionChanged();
 }
 
 int Player::maxTextureSize() const

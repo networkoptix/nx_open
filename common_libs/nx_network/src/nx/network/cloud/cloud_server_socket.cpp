@@ -19,7 +19,8 @@ namespace cloud {
 
 namespace {
 const int kDefaultAcceptQueueSize = 128;
-}
+const KeepAliveOptions kDefaultKeepAlive(60, 10, 5);
+} // namespace
 
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
 {
@@ -409,8 +410,10 @@ void CloudServerSocket::onListenRequestCompleted(
         m_mediatorConnection->setOnReconnectedHandler(
             std::bind(&CloudServerSocket::onMediatorConnectionRestored, this));
 
-        if (response.tcpConnectionKeepAlive)
-            m_mediatorConnection->client()->setKeepAliveOptions(*response.tcpConnectionKeepAlive);
+        // This is important to know if connection is lost, so server will use some keep alive even
+        // even if mediator does not ask it to use any.
+        m_mediatorConnection->client()->setKeepAliveOptions(
+            response.tcpConnectionKeepAlive ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive);
 
         NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         auto acceptHandler = std::move(m_savedAcceptHandler);

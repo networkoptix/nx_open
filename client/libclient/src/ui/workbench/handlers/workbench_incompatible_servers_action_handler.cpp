@@ -25,6 +25,13 @@
 #include <utils/merge_systems_common.h>
 #include <network/system_helpers.h>
 
+namespace {
+
+static const QString kFactorySystemUser = lit("admin");
+static const QString kFactorySystemPassword = lit("admin");
+
+}
+
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
     :
@@ -65,6 +72,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
         return;
 
     const auto serverResource = resource.dynamicCast<QnFakeMediaServerResource>();
+    NX_ASSERT(serverResource);
+    if (!serverResource)
+        return;
+
     const auto moduleInformation = serverResource->getModuleInformation();
 
     if (helpers::isCloudSystem(moduleInformation))
@@ -77,45 +88,30 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
         return;
     }
 
-    connectToCurrentSystem(resource->getId());
+    connectToCurrentSystem(serverResource);
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
-    const QnUuid& target,
-    const QString& initialPassword)
+    const QnFakeMediaServerResourcePtr& server)
 {
-    if (m_connectTool)
+    NX_ASSERT(server);
+    NX_ASSERT(!m_connectTool);
+    if (m_connectTool || !server)
         return;
 
+    const auto moduleInformation = server->getModuleInformation();
+    QnUuid target = server->getId();
     if (target.isNull())
         return;
 
-    auto password = initialPassword;
+    auto password = helpers::isNewSystem(moduleInformation)
+        ? kFactorySystemPassword
+        : requestPassword();
 
-    for (;;)
-    {
-        QInputDialog dialog(mainWindow());
-        dialog.setWindowTitle(tr("Enter Password..."));
-        dialog.setLabelText(tr("Administrator Password"));
-        dialog.setTextEchoMode(QLineEdit::Password);
-        dialog.setTextValue(password);
-        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+    if (password.isEmpty())
+        return;
 
-        if (dialog.exec() != QDialog::Accepted)
-            return;
-
-        password = dialog.textValue();
-
-        if (password.isEmpty())
-        {
-            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
-            continue;
-        }
-
-        break;
-    }
-
-    if (!validateStartLicenses(target, password))
+    if (!validateStartLicenses(server, password))
         return;
 
     m_connectTool = new QnConnectToCurrentSystemTool(this);
@@ -189,22 +185,16 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
-    const QnUuid& target,
+    const QnFakeMediaServerResourcePtr& server,
     const QString& adminPassword)
 {
+    NX_ASSERT(server);
+    if (!server)
+        return true;
 
     const auto licenseHelper = QnLicenseListHelper(qnLicensePool->getLicenses());
     if (licenseHelper.totalLicenseByType(Qn::LC_Start) == 0)
         return true; /* We have no start licenses so all is OK. */
-
-    QnMediaServerResourceList aliveServers;
-
-    const auto server =
-        qnResPool->getIncompatibleResourceById(target, true).dynamicCast<QnMediaServerResource>();
-
-    /* Handle this error elsewhere */
-    if (!server)
-        return true;
 
     if (!serverHasStartLicenses(server, adminPassword))
         return true;
@@ -234,4 +224,33 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
 
     /* Warn that some of the licenses will be deactivated. */
     return QnLicenseListHelper(remoteLicensesList).totalLicenseByType(Qn::LC_Start, true) > 0;
+}
+
+QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
+{
+    QString password;
+    for (;;)
+    {
+        QInputDialog dialog(mainWindow());
+        dialog.setWindowTitle(tr("Enter Password..."));
+        dialog.setLabelText(tr("Administrator Password"));
+        dialog.setTextEchoMode(QLineEdit::Password);
+        dialog.setTextValue(password);
+        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+
+        if (dialog.exec() != QDialog::Accepted)
+            return QString();
+
+        password = dialog.textValue();
+
+        if (password.isEmpty())
+        {
+            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
+            continue;
+        }
+
+        break;
+    }
+
+    return password;
 }

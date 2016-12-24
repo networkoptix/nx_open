@@ -241,10 +241,8 @@
             <ComponentGroupRef Id="TrayToolLibs"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
             <ComponentGroupRef Id="ServerVcrt14ComponentGroup"/>
-            <ComponentGroupRef Id="ServerVcrt12ComponentGroup"/>
             <ComponentGroupRef Id="TraytoolPlatforms" />
             <ComponentGroupRef Id="TraytoolVcrt14ComponentGroup"/>
-            <ComponentGroupRef Id="TraytoolVcrt12ComponentGroup"/>
         </Feature>
 
     </Fragment>

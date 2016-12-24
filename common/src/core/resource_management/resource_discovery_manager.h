@@ -138,8 +138,6 @@ public:
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:
-    QnMutex m_discoveryMutex;
-
     unsigned int m_runNumber;
 
     virtual void run();

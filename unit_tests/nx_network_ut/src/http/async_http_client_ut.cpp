@@ -15,6 +15,7 @@
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/system_socket.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/sync_queue.h>
@@ -83,14 +84,35 @@ protected:
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
         std::promise<void> promise;
-        NX_LOGX(lit("httpsTest: %1").arg(url.toString()), cl_logINFO);
+        NX_LOGX(lm("httpsTest: %1").str(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
-        client->doGet(url, [&promise](AsyncHttpClientPtr ptr)
-        {
-             EXPECT_TRUE(ptr->hasRequestSuccesed());
-             promise.set_value();
-        });
+        client->doGet(url,
+            [&promise](AsyncHttpClientPtr ptr)
+            {
+                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 promise.set_value();
+            });
+
+        promise.get_future().wait();
+    }
+
+    void testResult(const QString& path, const nx_http::BufferType& expectedResult)
+    {
+        const QUrl url(lit("http://%1%2")
+            .arg(m_testHttpServer->serverAddress().toString()).arg(path));
+
+        std::promise<void> promise;
+        NX_LOGX(lm("testResult: %1").str(url), cl_logINFO);
+
+        const auto client = nx_http::AsyncHttpClient::create();
+        client->doGet(url,
+            [&promise, &expectedResult](AsyncHttpClientPtr ptr)
+            {
+                 EXPECT_TRUE(ptr->hasRequestSuccesed());
+                 EXPECT_EQ(expectedResult, ptr->fetchMessageBodyBuffer());
+                 promise.set_value();
+            });
 
         promise.get_future().wait();
     }
@@ -101,6 +123,41 @@ TEST_F(AsyncHttpClientTest, Https)
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
     httpsTest(lit("http"), lit("httpOnly"));
     httpsTest(lit("https"), lit("httpsOnly"));
+}
+
+// TODO: #mux Better create HttpServer test and move it there.
+TEST_F(AsyncHttpClientTest, ServerModRewrite)
+{
+    m_testHttpServer->registerStaticProcessor(
+        nx_http::kAnyPath, "root", "text/plain");
+    m_testHttpServer->registerStaticProcessor(
+        lit("/somePath1/longerPath"), "someData1", "text/plain");
+    m_testHttpServer->registerStaticProcessor(
+        lit("/somePath2/longerPath"), "someData2", "text/plain");
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+
+    testResult(lit("/"), "root");
+    testResult(lit("/somePath1/longerPath"), "someData1");
+    testResult(lit("/somePath2/longerPath"), "someData2");
+    testResult(lit("/somePath3/longerPath"), "root");
+    testResult(lit("/suffix/somePath1/longerPath"), "root");
+
+    m_testHttpServer->addModRewriteRule(lit("/somePath2/longerPath"), lit("/"));
+    m_testHttpServer->addModRewriteRule(lit("/somePath3/"), lit("/somePath1/"));
+
+    testResult(lit("/"), "root");
+    testResult(lit("/somePath1/longerPath"), "someData1");
+    testResult(lit("/somePath2/longerPath"), "root");
+    testResult(lit("/somePath3/longerPath"), "someData1");
+    testResult(lit("/suffix/somePath1/longerPath"), "root");
+
+    m_testHttpServer->addModRewriteRule(lit("/suffix/"), lit("/"));
+
+    testResult(lit("/"), "root");
+    testResult(lit("/somePath1/longerPath"), "someData1");
+    testResult(lit("/somePath2/longerPath"), "root");
+    testResult(lit("/somePath3/longerPath"), "someData1");
+    testResult(lit("/suffix/somePath1/longerPath"), "someData1");
 }
 
 //TODO #ak introduce built-in http server to automate AsyncHttpClient tests
@@ -319,7 +376,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
     std::thread serverThread(
         [&]()
         {
-            const auto server = std::make_unique<nx::network::TCPServerSocket>(AF_INET);
+            const auto server = SocketFactory::createStreamServerSocket();
             ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverPort.set_value(server->getLocalAddress().port);
@@ -417,6 +474,140 @@ TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
     ASSERT_FALSE(httpClient.doGet(testUrl));
     ASSERT_NE(SystemError::noError, httpClient.lastSysErrorCode());
 }
+
+//-------------------------------------------------------------------------------------------------
+
+class AsyncHttpClientReliability:
+    public ::testing::Test
+{
+public:
+    constexpr static int kNumberOfClients = 100;
+
+    AsyncHttpClientReliability():
+        m_testServer(false, nx::network::NatTraversalSupport::disabled)
+    {
+    }
+
+    virtual ~AsyncHttpClientReliability() override
+    {
+        for (auto& clientContext: m_clients)
+            clientContext.client->pleaseStopSync();
+
+        m_testServer.pleaseStop();
+    }
+
+protected:
+    void givenRandomlyFailingServer()
+    {
+        static const char httpResponse[] = R"http(
+            HTTP/1.1 200 OK
+            Date: Wed, 19 Oct 2016 13:24:10 +0000
+            Server: Nx Witness/3.0.0.13295 (Network Optix) Apache/2.4.16 (Unix)
+            Content-Type: text/plain
+            Content-Length: 12
+
+            Hello, world
+        )http";
+
+        m_testServer.setResponseBuffer(httpResponse);
+
+        ASSERT_TRUE(m_testServer.bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(m_testServer.listen());
+        m_serverEndpoint = m_testServer.address();
+    }
+
+    void givenMultipleHttpClients()
+    {
+        m_clients.resize(kNumberOfClients);
+        for (auto& clientContext: m_clients)
+        {
+            clientContext.client = nx_http::AsyncHttpClient::create();
+            clientContext.client->setResponseReadTimeoutMs(500);
+            clientContext.client->setMessageBodyReadTimeoutMs(500);
+            clientContext.requestsToSend = nx::utils::random::number<int>(1, 3);
+        }
+    }
+
+    void whenEachClientHasPerformedRequestToTheServer()
+    {
+        issueRequests();
+        waitForEachRequestCompletion();
+    }
+
+    void thenEachClientShouldHaveCorrectState()
+    {
+        for (auto& clientContext: m_clients)
+        {
+            if (!clientContext.client->failed())
+            {
+                ASSERT_NE(nullptr, clientContext.client->response());
+            }
+            else
+            {
+                ASSERT_EQ(nullptr, clientContext.client->response());
+            }
+        }
+    }
+
+private:
+    struct ClientContext
+    {
+        nx_http::AsyncHttpClientPtr client;
+        nx::utils::promise<void> requestDonePromise;
+        int requestsToSend;
+    };
+
+    RandomlyFailingHttpServer m_testServer;
+    SocketAddress m_serverEndpoint;
+    std::vector<ClientContext> m_clients;
+
+    QUrl serverUrl() const
+    {
+        return QUrl(lit("http://%1/tst").arg(m_serverEndpoint.toString()));
+    }
+
+    void issueRequests()
+    {
+        for (auto& clientContext: m_clients)
+            issueRequest(&clientContext);
+    }
+
+    void issueRequest(ClientContext* clientContext)
+    {
+        using namespace std::placeholders;
+
+        clientContext->client->doGet(
+            serverUrl(),
+            std::bind(&AsyncHttpClientReliability::onRequestDone, this, _1, clientContext));
+    }
+
+    void waitForEachRequestCompletion()
+    {
+        for (auto& clientContext: m_clients)
+            clientContext.requestDonePromise.get_future().wait();
+    }
+
+    void onRequestDone(nx_http::AsyncHttpClientPtr /*client*/, ClientContext* clientContext)
+    {
+        --clientContext->requestsToSend;
+        if (clientContext->requestsToSend == 0)
+        {
+            clientContext->requestDonePromise.set_value();
+            return;
+        }
+        issueRequest(clientContext);
+    }
+};
+
+TEST_F(AsyncHttpClientReliability, BreakingConnectionAtRandomPoint)
+{
+    givenRandomlyFailingServer();
+    givenMultipleHttpClients();
+    whenEachClientHasPerformedRequestToTheServer();
+    thenEachClientShouldHaveCorrectState();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
 {

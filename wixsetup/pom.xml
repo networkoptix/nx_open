@@ -19,7 +19,6 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <nxtool>false</nxtool>
-        <final.artifact.name>${installer.name}</final.artifact.name>
         <NxtoolQuickControlsDir>${libdir}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>

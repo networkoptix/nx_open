@@ -104,7 +104,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(hostName))
+            if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
                 return handler(
@@ -276,10 +276,12 @@ void CrossNatConnector::onConnectorFinished(
     m_connectors.clear();   // Cancelling other connectors.
     if (connection)
     {
-        m_connection = std::make_unique<OutgoingTunnelConnectionWatcher>(
+        auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
             std::move(m_connectionParameters),
             std::move(connection));
-        m_connection->bindToAioThread(getAioThread());
+        tunnelWatcher->bindToAioThread(getAioThread());
+        tunnelWatcher->start();
+        m_connection = std::move(tunnelWatcher);
     }
     holePunchingDone(resultCode, sysErrorCode);
 }

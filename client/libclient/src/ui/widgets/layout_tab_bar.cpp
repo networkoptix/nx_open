@@ -142,10 +142,21 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     if (!layout)
         return QString();
 
+    QString baseName = layout->name();
+
+    // videowall control mode
+    QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    if (!videoWallInstanceGuid.isNull())
+    {
+        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        if (!idx.isNull())
+            baseName = idx.item().name;
+    }
+
     QnLayoutResourcePtr resource = layout->resource();
     return snapshotManager()->isModified(resource)
-        ? layout->name() + L'*'
-        : layout->name();
+        ? baseName + L'*'
+        : baseName;
 }
 
 QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const

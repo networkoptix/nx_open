@@ -2,7 +2,7 @@
 # Artem V. Nikitin
 # common python utilities
 
-import time, string, types, os
+import time, string, types, os, uuid
 
 # standard exception with unicode support
 class UException(Exception):
@@ -334,3 +334,7 @@ def importClassByName(path, name):
         mod = getattr(mod, comp)
     cls = getattr(mod, name)
     return cls
+
+def generateGuid(quoted=True):
+    guid = str(uuid.uuid4())
+    return quoted and "{%s}" % guid or guid

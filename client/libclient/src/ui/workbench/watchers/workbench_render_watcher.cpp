@@ -120,7 +120,7 @@ void QnWorkbenchRenderWatcher::unregisterWidget(QnResourceWidget *widget)
     widget->disconnect(this);
 
     auto data = m_dataByWidget.take(widget);
-    if (data.display)
+    if (data.display && data.displaying)
         m_countByDisplay.remove(data.display);
 }
 

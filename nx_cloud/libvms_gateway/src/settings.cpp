@@ -11,12 +11,13 @@
 #include <QtCore/QStandardPaths>
 #include <QtCore/QString>
 
-#include <libvms_gateway_app_info.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 
+#include "libvms_gateway_app_info.h"
 
 namespace {
 
@@ -85,8 +86,8 @@ const QLatin1String kDefaultKeepAlive("{ 60, 10, 3 }");
 
 } // namespace tcp_reverse
 
-const QLatin1String kSslAllowed("cloudConnect/sslAllowed");
-const QLatin1String kDefaultSslAllowed("true");
+const QLatin1String kPreferedSslMode("cloudConnect/preferedSslMode");
+const QLatin1String kDefaultPreferedSslMode("enabled");
 
 } // namespace
 
@@ -105,18 +106,12 @@ Http::Http()
 {
 }
 
-CloudConnect::CloudConnect()
-:
-    replaceHostAddressWithPublicAddress(false),
-    allowIpTarget(false),
-    sslAllowed(false)
-{
-}
-
-
 Settings::Settings()
 :
-    m_settings(QnLibVmsGatewayAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibVmsGatewayAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
@@ -132,7 +127,7 @@ const General& Settings::general() const
     return m_general;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }
@@ -273,10 +268,13 @@ void Settings::loadConfiguration()
         KeepAliveOptions::fromString(m_settings.value(
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
 
-    m_cloudConnect.sslAllowed = 
-        m_settings.value(
-            kSslAllowed,
-            kDefaultSslAllowed).toString() == "true";
+    auto preferedSslMode = m_settings.value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
+    if (preferedSslMode == "enabled" || preferedSslMode == "true")
+        m_cloudConnect.preferedSslMode = SslMode::enabled;
+    else if (preferedSslMode == "disabled" || preferedSslMode == "false")
+        m_cloudConnect.preferedSslMode = SslMode::disabled;
+    else
+        m_cloudConnect.preferedSslMode = SslMode::undefined;
 }
 
 }   //namespace conf

@@ -41,6 +41,19 @@ namespace aux {
 void saveStoragesInfoToBeforeRestoreData(
     BeforeRestoreDbData* beforeRestoreDbData, 
     const QnStorageResourceList& storages);
+
+class UnmountedStoragesFilter
+{
+public:
+    UnmountedStoragesFilter(const QString& mediaFolderName);
+    QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allStorages, const QStringList& paths);
+
+private:
+    QString getStorageUrlWithoutMediaFolder(const QString& url);
+
+    QString m_mediaFolderName;
+};
+
 }
 
 struct CloudManagerGroup;

@@ -13,7 +13,23 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" /> 
+            <Payload SourceFile="installer_bg.png" /> 
+            <Payload SourceFile="logo_big.png" />
+            <Payload SourceFile="logo_small.png" />
+
+            <bal:WixExtendedBootstrapperApplication
+                SuppressOptionsUI="yes"
+                LicenseUrl="License.html" 
+                ShowFilesInUse="yes"
+                LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
+        </BootstrapperApplicationRef>
+
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+
+<!--        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
                 LogoFile="nxtool-logo-64x64.png"
@@ -22,9 +38,9 @@
                 ShowFilesInUse="yes"
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"
             />
-        </BootstrapperApplicationRef>
+        </BootstrapperApplicationRef> -->
 
-        <Chain>
+        <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="NxtoolPackageGroup"/>
         </Chain>
     </Bundle>

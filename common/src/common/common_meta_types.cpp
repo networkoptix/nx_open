@@ -349,6 +349,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnServerFields>();
 
+    qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
+
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
     QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();

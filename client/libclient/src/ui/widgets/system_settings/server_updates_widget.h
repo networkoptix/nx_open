@@ -51,8 +51,20 @@ private slots:
     void at_tool_updatesCheckCanceled();
 
 private:
+    enum class Mode
+    {
+        LatestVersion,
+        SpecificBuild,
+        LocalFile
+    };
+    void setMode(Mode mode);
+
     void initDropdownActions();
     void initDownloadActions();
+
+    void updateButtonText();
+    void updateButtonAccent();
+    void updateDownloadButton();
 
     void autoCheckForUpdates();
     void checkForUpdates(bool fromInternet);
@@ -68,18 +80,21 @@ private:
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
 
-    QnServerUpdatesModel* m_updatesModel;
-    QnMediaServerUpdateTool* m_updateTool;
+
+    Mode m_mode = Mode::LatestVersion;
+
+    QnServerUpdatesModel* m_updatesModel = nullptr;
+    QnMediaServerUpdateTool* m_updateTool = nullptr;
 
     QnSoftwareVersion m_targetVersion;
     QnSoftwareVersion m_latestVersion;
     QString m_localFileName;
-    bool m_checking;
+    bool m_checking = false;
     QnCheckForUpdateResult m_lastUpdateCheckResult;
 
     QUrl m_releaseNotesUrl;
 
-    QTimer* m_longUpdateWarningTimer;
+    QTimer* m_longUpdateWarningTimer = nullptr;
 
-    qint64 m_lastAutoUpdateCheck;
+    qint64 m_lastAutoUpdateCheck = 0;
 };

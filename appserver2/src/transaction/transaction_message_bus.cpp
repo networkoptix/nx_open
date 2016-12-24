@@ -558,7 +558,8 @@ void QnTransactionMessageBus::at_gotTransaction(
         return;
     }
 
-    NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
+    if (!transportHeader.isNull())
+        NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
     using namespace std::placeholders;
     if (!handleTransaction(
@@ -1508,7 +1509,8 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
             {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
-                if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server)
+                if (transport->remotePeer().id == itr.key() &&
+                    ec2::ApiPeerData::isServer(transport->remotePeer().peerType))
                 {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);

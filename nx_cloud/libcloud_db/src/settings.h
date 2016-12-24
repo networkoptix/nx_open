@@ -10,11 +10,14 @@
 #include <list>
 #include <map>
 
+#include <nx/network/socket_common.h>
+#include <nx/utils/log/log_initializer.h>
+#include <nx/utils/log/log_settings.h>
+#include <nx/utils/settings.h>
+
 #include <utils/common/command_line_parser.h>
-#include <utils/common/settings.h>
 #include <utils/db/types.h>
 #include <utils/email/email.h>
-#include <nx/network/socket_common.h>
 
 #include "ec2/p2p_sync_settings.h"
 
@@ -93,8 +96,8 @@ public:
     std::list<SocketAddress> endpointsToListen() const;
     QString dataDir() const;
     
-    const QnLogSettings& logging() const;
-    const QnLogSettings& vmsSynchronizationLogging() const;
+    const nx::utils::log::Settings& logging() const;
+    const nx::utils::log::Settings& vmsSynchronizationLogging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
@@ -113,8 +116,8 @@ private:
     QnSettings m_settings;
     bool m_showHelp;
 
-    QnLogSettings m_logging;
-    QnLogSettings m_vmsSynchronizationLogging;
+    nx::utils::log::Settings m_logging;
+    nx::utils::log::Settings m_vmsSynchronizationLogging;
     db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;

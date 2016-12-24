@@ -15,14 +15,8 @@ exec 1<>$NX1UPGRADELOG
 exec 2>&1
 
 echo "Starting upgrade ..."
-
 COMPANY_NAME=${deb.customization.company.name}
-BETA=
-
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-export DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
+export DISTRIB=${final.artifact.name}-server
 
 update () {
   cp $DISTRIB.tar.gz /tmp
@@ -76,12 +70,7 @@ update () {
 
 /etc/init.d/cron stop
 /etc/init.d/$COMPANY_NAME-mediaserver stop
-if [ "$1" != "" ]
-then
-  update >> $1 2>&1
-else
-  update 2>&1
-fi
+update
 if [[ "${box}" == "bpi" ]]; then reboot && exit 0; fi
 /etc/init.d/$COMPANY_NAME-mediaserver start
 /etc/init.d/cron start

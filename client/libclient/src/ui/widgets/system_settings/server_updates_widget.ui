@@ -256,7 +256,7 @@
           <item>
            <widget class="QPushButton" name="updateButton">
             <property name="text">
-             <string>Update System</string>
+             <string notr="true">&lt;Update System&gt;</string>
             </property>
            </widget>
           </item>

@@ -52,7 +52,7 @@ public:
             auto button = new QPushButton(lit("Applaucher control"), parent);
             connect(button, &QPushButton::clicked, this, [this]
             {
-                auto dialog(new QnApplauncherControlDialog(mainWindow()));
+                auto dialog(new QnApplauncherControlDialog(this));
                 dialog->show();
             });
             layout->addWidget(button);
@@ -62,7 +62,7 @@ public:
             auto button = new QPushButton(lit("Animations control"), parent);
             connect(button, &QPushButton::clicked, this, [this]
             {
-                auto dialog(new AnimationsControlDialog(mainWindow()));
+                auto dialog(new AnimationsControlDialog(this));
                 dialog->show();
             });
             layout->addWidget(button);

@@ -6,8 +6,8 @@
                 Id="ClientPackage"
                 Name="$(var.ClientMsiName)"
                 SourceFile="bin/strip/$(var.ClientMsiName)"
+                InstallCondition="InstallClientOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
-                Cache="no"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>

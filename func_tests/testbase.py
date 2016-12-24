@@ -11,6 +11,7 @@ from subprocess import CalledProcessError, check_output, STDOUT
 import urllib, urllib2, httplib
 import pycommons.Logger
 from pycommons.Logger import log, logger, LOGLEVEL
+from pycommons.FuncTest import FuncTestCaseBase
 
 from functest_util import ClusterLongWorker, unquote_guid, Version, FtConfigParser,\
     checkResultsEqual, TestDigestAuthHandler, ManagerAddPassword, \
@@ -156,11 +157,10 @@ class ServerApi(object):
             utilFixApi(cls)
 
 
-class FuncTestCase(unittest.TestCase):
+class FuncTestCase(FuncTestCaseBase):
     # TODO: describe this class logic!
     """A base class for mediaserver functional tests using virtual boxes.
     """
-    helpStr = "No help provided for this test"
     config = None
     num_serv = NUM_SERV
     testset = None
@@ -168,13 +168,9 @@ class FuncTestCase(unittest.TestCase):
     _configured = False
     _stopped = set()
     _worker = None
-    _suites = ()
-    _init_suites_done = False
     _serv_version = None  # here I suppose that all servers being created from the same image have the same version
     before_2_5 = False # TODO remove it!
     before_3_0 = False
-    _test_name = '<UNNAMED!>'
-    _test_key = 'NONE'  # a name to pass as an argument to commands
     _init_script = 'ctl.sh'  # clear it in a subclass to disable
     _clear_script = ''  # clear it in a subclass to disable
     _global_clear_script = 'ctl.sh'  # called only after all test suits of this class performed
@@ -186,10 +182,7 @@ class FuncTestCase(unittest.TestCase):
 
     @classmethod
     def globalInit(cls, config):
-        if config is None:
-            raise FuncTestError("%s can't be configured, config is None!" % cls.__name__)
-        cls.config = config
-        cls.init_suites()
+        super(FuncTestCase, cls).globalInit(config)
         if not cls.num_serv:
             raise FuncTestError("%s hasn't got a correct num_serv value" % cls.__name__)
         cls._worker = ClusterLongWorker(cls.num_serv)
@@ -236,36 +229,6 @@ class FuncTestCase(unittest.TestCase):
         cls._stopped.clear()
         log(LOGLEVEL.INFO, "%s Test End" % cls._test_name)
 
-    @classmethod
-    def isFailFast(cls, suit_name=""):
-        # it could depend on the specific suit
-        return True
-
-    ################################################################################
-    # These 3 methods used in a caller (see the RunTests and functest.CallTest funcions)
-    @classmethod
-    def _check_suites(cls):
-        if not cls._suites:
-            raise RuntimeError("%s's test suites list is empty!" % cls.__name__)
-
-    @classmethod
-    def iter_suites(cls):
-        cls._check_suites()
-        return (s[0] for s in cls._suites)
-
-    @classmethod
-    def init_suites(cls):
-        "Called by RunTests, prepares attributes with suits names contaning test cases names"
-        if cls._init_suites_done:
-            return
-        cls._check_suites()
-        for name, tests in cls._suites:
-            if hasattr(cls, name):
-                raise AssertionError("Test suite naming error: class %s already has attrinute %s" % (cls.__name__, name))
-            setattr(cls, name, tests)
-        cls._init_suites_done = True
-
-    ################################################################################
 
     def _call_box(self, box, *command):
         #sys.stdout.write("_call_box: %s: %s\n" % (box, ' '.join(command)))
@@ -487,10 +450,6 @@ class FuncTestCase(unittest.TestCase):
             #  so the first log message would be printed in the same line
     #    print "*** Setting up: %s" % self._testMethodName  # may be used for debug ;)
     ####################################################
-
-    @classmethod
-    def filterSuites(cls, *names):
-        return tuple(sw for sw in cls._suites if sw[0] in names)
 
 
 # Rollback support

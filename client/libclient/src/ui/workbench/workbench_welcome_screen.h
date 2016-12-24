@@ -88,6 +88,9 @@ public: // Properties
 
     QnAppInfo* appInfo() const;
 
+public:
+    void setupFactorySystem(const QString& serverUrl);
+
 public slots:
     bool isAcceptableDrag(const QList<QUrl>& urls);
 
@@ -105,8 +108,6 @@ public slots:
     void connectToCloudSystem(const QString& systemId, const QString& serverUrl);
 
     void connectToAnotherSystem();
-
-    void setupFactorySystem(const QString& serverUrl);
 
     void logoutFromCloud();
 

@@ -376,19 +376,22 @@ bool QnLog::initLog(QnLog *externalInstance, int logID )
 
 void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
 {
-    QnLogLevel logLevel(cl_logDEBUG1);
+    QnLogLevel logLevel(cl_logNONE);
 
-    if (const auto value = arguments.get("log-file"))
+    if (const auto value = arguments.get("log-file", "lf"))
+    {
+        logLevel = cl_logDEBUG1;
         instance()->create(*value, 1024 * 1024 * 10, 5, logLevel);
+    }
 
     if (const auto value = arguments.get("log-level", "ll"))
     {
         logLevel = logLevelFromString(*value);
         NX_CRITICAL(logLevel != cl_logUNKNOWN);
-
-        instance()->setLogLevel(logLevel);
-        s_disableLogConfiguration = true;
     }
+
+    instance()->setLogLevel(logLevel);
+    s_disableLogConfiguration = true;
 }
 
 QString QnLog::logFileName( int logID )

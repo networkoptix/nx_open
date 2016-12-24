@@ -14,7 +14,23 @@
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" />
+            <Payload SourceFile="installer_bg.png" />
+            <Payload SourceFile="logo_big.png" />
+            <Payload SourceFile="logo_small.png" />
+
+            <bal:WixExtendedBootstrapperApplication SuppressOptionsUI="no" LicenseUrl="License.html" />
+        </BootstrapperApplicationRef>
+
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+
+        <Variable Name="InstallClientAndServer" Type="numeric" Value="1" />
+        <Variable Name="InstallClientOnly" Type="numeric" Value="0" />
+        <Variable Name="InstallServerOnly" Type="numeric" Value="0" />
+
+<!--        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
             <bal:WixStandardBootstrapperApplication
                 LicenseFile="License.rtf"
                 LogoFile="logo-64x64.png"
@@ -23,10 +39,13 @@
                 ShowFilesInUse="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
             />
-        </BootstrapperApplicationRef>
+        </BootstrapperApplicationRef> -->
 
-        <Chain>
-            <MsiPackage
+        <Chain DisableSystemRestore="yes">
+            <PackageGroupRef Id="ClientPackageGroup"/>
+            <PackageGroupRef Id="ServerPackageGroup"/>
+
+<!--            <MsiPackage
                 Id="ClientPackage"
                 Name="$(var.ClientMsiName)"
                 SourceFile="bin/strip/$(var.ClientMsiName)"
@@ -44,7 +63,7 @@
                 Cache="no"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
-            </MsiPackage>
+            </MsiPackage> -->
         </Chain>
     </Bundle>
 </Wix>

@@ -23,8 +23,7 @@ void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECC
     connect(connection->getDiscoveryNotificationManager(),
         &ec2::AbstractDiscoveryNotificationManager::gotInitialDiscoveredServers,
         this,
-        &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers,
-        Qt::DirectConnection);
+        &QnDesktopClientMessageProcessor::at_gotInitialDiscoveredServers);
 }
 
 void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection)

@@ -222,5 +222,45 @@
             </params>
         </resource>
         <resource name = "AXISA8004VE" public = "AXIS_COMMON"/>
+        <resource name = "AXISM3104" public = "AXISM3004">
+            <params>
+                <param name = "MaxFPS"
+                    default_value ="30"/>
+            </params>               
+        </resource>
+        <resource name = "AXISM3105" public = "AXISM3104"/>
+        <resource name = "AXISM3106" public = "AXISM3104"/>
+        <resource name = "AXISQ3708" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="20"/>
+                <param name = "channelsAmount"
+                default_value = "3"/>                
+            </params>
+        </resource>
+        <resource name = "AXISP1264" public = "AXISM3104"/>
+        <resource name = "AXISP1254" public = "AXISM3104"/>
+        <resource name = "AXISM1065" public = "AXISM3104"/>
+        <resource name = "AXISP3707" public = "AXISF44"/>
+        <resource name = "AXISP1244" public = "AXISM3104"/>
+        <resource name = "AXISQ3615" public = "AXISQ3505"/>
+        <resource name = "AXISC2005" public = "AXISC3003E"/>
+        <resource name = "AXISM1054" public = "AXISM3104"/>
+        <resource name = "AXISQ1941" public = "AXISQ1921"/>
+        <resource name = "AXISQ6155" public = "AXISM3104"/>
+        <resource name = "AXISQ3617" public = "AXISM3104">
+            <params>
+                <param name = "MaxFPS"
+                default_value ="20"/>    
+            </params>
+        </resource>
+        <resource name = "AXISM3045" public = "AXISM3104"/>
+        <resource name = "AXISM3044" public = "AXISM3104"/>
+        <resource name = "AXISM3046" public = "AXISM3104"/>
+        <resource name = "AXISQ6055" public = "AXISM3104"/>
+        <resource name = "AXISM2025" public = "AXISM3104"/>
+        <resource name = "AXISM2026" public = "AXISM3104"/>
+        <resource name = "AXISQ6052" public = "AXISP1365"/>
+        <resource name = "AXISC1004" public = "AXISC3003E"/>
     </oem>
 </resources>

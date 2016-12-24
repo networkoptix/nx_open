@@ -13,7 +13,7 @@ static const std::chrono::minutes kCloseTunnelWhenInactive(10);
 
 OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
     aio::AbstractAioThread* aioThread,
-    std::shared_ptr<ReverseConnectionHolder> connectionHolder)
+    std::shared_ptr<ReverseConnectionSource> connectionHolder)
 :
     AbstractOutgoingTunnelConnection(aioThread),
     m_connectionHolder(std::move(connectionHolder)),

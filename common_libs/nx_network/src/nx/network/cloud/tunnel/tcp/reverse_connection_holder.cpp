@@ -25,15 +25,22 @@ void ReverseConnectionHolder::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     aio::BasicPollable::bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
+
+    NX_ASSERT(m_socketCount, "Thread can not be changed in working state");
+    for (auto& socket: m_sockets)
+        socket->bindToAioThread(aioThread);
 }
 
 void ReverseConnectionHolder::stopWhileInAioThread()
 {
     m_timer.reset();
+    m_socketCount = 0;
+    m_sockets.clear();
 }
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
+    NX_ASSERT(isInSelfAioThread());
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Use new socket(%1), %2 sockets left")
@@ -64,7 +71,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,
             handler = std::move(handler)]() mutable
         {
-            if (m_sockets.size())
+            if (!m_sockets.empty())
             {
                 auto socket = std::move(m_sockets.front());
                 --m_socketCount;

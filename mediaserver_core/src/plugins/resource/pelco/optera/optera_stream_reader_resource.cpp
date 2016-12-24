@@ -1,3 +1,5 @@
+#ifdef ENABLE_ONVIF
+
 #include "optera_stream_reader_resource.h"
 
 namespace nx {
@@ -46,3 +48,4 @@ bool OpteraStreamReaderResource::removeProperty(const QString& key)
 } // namespace pelco
 } // namespace plugins
 } // namespace nx
+#endif //ENABLE_ONVIF

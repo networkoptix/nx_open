@@ -599,8 +599,6 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType /*searchType*/)
 {
-    QnMutexLocker lock( &m_discoveryMutex );
-
     //excluding already existing resources
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())

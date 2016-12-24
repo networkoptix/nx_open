@@ -38,6 +38,7 @@
 namespace nx_http
 {
     const int DEFAULT_HTTP_PORT = 80;
+    const int DEFAULT_HTTPS_PORT = 443;
 
     /*!
         TODO consider using another container.
@@ -58,6 +59,8 @@ namespace nx_http
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
     */
     int NX_NETWORK_API strcasecmp( const StringType& one, const StringType& two );
+    
+    int NX_NETWORK_API defaultPortForScheme( const StringType& scheme );
 
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */

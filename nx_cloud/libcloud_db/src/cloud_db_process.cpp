@@ -118,11 +118,11 @@ int CloudDBProcess::exec()
             return 0;
         }
 
-        initializeQnLog(
+        nx::utils::log::initialize(
             settings.logging(), settings.dataDir(),
             QnLibCloudDbAppInfo::applicationDisplayName(), "log_file", QnLog::MAIN_LOG_ID);
 
-        initializeQnLog(
+        nx::utils::log::initialize(
             settings.vmsSynchronizationLogging(), settings.dataDir(),
             QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
 
@@ -415,6 +415,12 @@ void CloudDBProcess::registerApiHandlers(
 
     //---------------------------------------------------------------------------------------------
     // ec2::ConnectionManager
+    // TODO: #ak remove after 3.0 release.
+    registerHttpHandler(
+        kEstablishEc2TransactionConnectionDeprecatedPath,
+        &ec2::ConnectionManager::createTransactionConnection,
+        ec2ConnectionManager);
+
     registerHttpHandler(
         kEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,

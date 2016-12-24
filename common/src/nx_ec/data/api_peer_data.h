@@ -34,7 +34,7 @@ struct ApiPeerData: ApiIdData
 
     static bool isClient(Qn::PeerType peerType)
     {
-            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer;
+            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer && peerType != Qn::PT_OldServer;
     }
 
     bool isClient() const
@@ -44,7 +44,7 @@ struct ApiPeerData: ApiIdData
 
     static bool isServer(Qn::PeerType peerType)
     {
-        return peerType == Qn::PT_Server;
+        return peerType == Qn::PT_Server || peerType == Qn::PT_OldServer;
     }
 
     bool isServer() const

@@ -13,9 +13,10 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/timer_manager.h>
-#include <libcloud_db_app_info.h>
+
 #include <utils/common/app_info.h>
 
+#include "libcloud_db_app_info.h"
 
 namespace {
 
@@ -97,7 +98,10 @@ EventManager::EventManager()
 
 Settings::Settings()
 :
-    m_settings(QnLibCloudDbAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        QnLibCloudDbAppInfo::applicationName(),
+        kModuleName),
     m_showHelp(false)
 {
     fillSupportedCmdParameters();
@@ -118,12 +122,12 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-const QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }
 
-const QnLogSettings& Settings::vmsSynchronizationLogging() const
+const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
 {
     return m_vmsSynchronizationLogging;
 }

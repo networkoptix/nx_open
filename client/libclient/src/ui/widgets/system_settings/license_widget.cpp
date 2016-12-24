@@ -77,6 +77,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     connect(ui->onlineKeyEdit, &QLineEdit::textChanged, this, &QnLicenseWidget::updateControls);
     connect(ui->browseLicenseFileButton, &QPushButton::clicked, this, &QnLicenseWidget::at_browseLicenseFileButton_clicked);
 
+    setAccentStyle(ui->activateLicenseButton);
     connect(ui->activateLicenseButton, &QPushButton::clicked, this,
         [this]()
         {
@@ -84,6 +85,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
             setState(Waiting);
         });
 
+    setAccentStyle(ui->activateLicenseButtonCopy);
     connect(ui->activateLicenseButtonCopy, &QPushButton::clicked, this,
         [this]()
         {

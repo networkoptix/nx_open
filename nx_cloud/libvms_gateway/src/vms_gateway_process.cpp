@@ -99,7 +99,7 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        initializeQnLog(
+        nx::utils::log::initialize(
             settings.logging(), settings.general().dataDir,
             QnLibVmsGatewayAppInfo::applicationDisplayName());
 
@@ -212,8 +212,10 @@ void VmsGatewayProcess::registerApiHandlers(
     const conf::RunTimeOptions& runTimeOptions,
     nx_http::MessageDispatcher* const msgDispatcher)
 {
-    msgDispatcher->setDefaultProcessor<ProxyHandler>(
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler> {
+    msgDispatcher->registerRequestProcessor<ProxyHandler>(
+        nx_http::kAnyPath,
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
+        {
             return std::make_unique<ProxyHandler>(settings, runTimeOptions);
         });
 
@@ -229,6 +231,8 @@ void VmsGatewayProcess::registerApiHandlers(
             },
             nx_http::StringType("CONNECT"));
     }
+
+    msgDispatcher->addModRewriteRule(lit("/gateway/"), lit("/"));
 }
 
 void VmsGatewayProcess::publicAddressFetched(
