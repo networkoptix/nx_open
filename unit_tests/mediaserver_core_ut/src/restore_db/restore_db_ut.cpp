@@ -1,4 +1,5 @@
 #include <memory>
+#include <utility>
 #include <media_server_process.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
@@ -6,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
+#include <database/db_manager.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -18,9 +20,11 @@ namespace detail {
 class TestSystemNameProxy : public aux::SystemNameProxy
 {
 public:
+    static const QString kConfigValue;
+
     virtual void loadFromConfig() override
     {
-        m_systemName = m_configValue;
+        m_systemName = kConfigValue;
     }
 
     virtual void clearFromConfig() override
@@ -43,15 +47,11 @@ public:
         return m_systemName;
     }
 
-    void setConfigValue(const QString& value)
-    {
-        m_configValue = value;
-    }
-
 private:
     QString m_systemName;
-    QString m_configValue;
 };
+
+const QString TestSystemNameProxy::kConfigValue = lit("SYSTEM_NAME_CONFIG_VALUE");
 
 class TestSettingsProxy : public aux::SettingsProxy
 {
@@ -107,7 +107,7 @@ private:
 using TestSystemNameProxyPtr = std::unique_ptr<detail::TestSystemNameProxy>;
 using TestSettingsProxyPtr = std::unique_ptr<detail::TestSettingsProxy>;
 
-class RestoreDbTest : public testing::Test
+class BaseRestoreDbTest : public testing::Test
 {
     QByteArray kHash;
     QByteArray kDigest;
@@ -117,15 +117,7 @@ class RestoreDbTest : public testing::Test
     QString kSystemName;
     QnUuid kLocalSystemId;
 
-protected:
-    void fillAdminAuth()
-    {
-        admin->setHash(kHash);
-        admin->setDigest(kDigest);
-        admin->setCryptSha512Hash(kCryptHash);
-        admin->setRealm(kRealm);
-    }
-
+public:
     virtual void SetUp() override
     {
         kHash = QByteArray("HASH");
@@ -146,19 +138,34 @@ protected:
         mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource);
     }
 
-    void whenBackupIsPerformedWhileConnectedToCloudAndNowConnected()
+    void fillDefaultAdminAuth()
     {
-        settingsProxy->setCloudInstanceChanged(false);
-        settingsProxy->setConnectedToCloud(true);
+        admin->setHash(kHash);
+        admin->setDigest(kDigest);
+        admin->setCryptSha512Hash(kCryptHash);
+        admin->setRealm(kRealm);
+    }
+
+    void setDefaultSystemIdentity()
+    {
         settingsProxy->setSystemName(kSystemName);
         settingsProxy->setLocalSystemId(kLocalSystemId);
+    }
 
-        admin->setEnabled(false);
-        fillAdminAuth();
+    void shutdownBeforeRestore()
+    {
         restoreData = aux::savePersistentDataBeforeDbRestore(admin, mediaServer, settingsProxy.get());
     }
 
-    void thenNoUserAuthDataShouldHasBeenSaved()
+    void setConnectedToCloud()
+    {
+        settingsProxy->setCloudInstanceChanged(false);
+        settingsProxy->setConnectedToCloud(true);
+
+        admin->setEnabled(false);
+    }
+
+    void assertNoUserAuthDataHasBeenSaved()
     {
         ASSERT_TRUE(restoreData.cryptSha512Hash.isNull());
         ASSERT_TRUE(restoreData.digest.isNull());
@@ -166,10 +173,40 @@ protected:
         ASSERT_TRUE(restoreData.realm.isNull());
     }
 
-    void thenLocalSystemNameAndIdShouldHaveBeenSaved()
+    void assertLocalSystemNameAndIdHaveBeenSaved()
     {
         ASSERT_EQ(restoreData.localSystemId, kLocalSystemId.toByteArray());
         ASSERT_EQ(restoreData.localSystemName, kSystemName);
+    }
+
+    void restartServer()
+    {
+        settingsProxy.reset(new detail::TestSettingsProxy);
+        systemNameProxy.reset(new detail::TestSystemNameProxy);
+        admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
+    }
+
+    void useRestoreData()
+    {
+        ec2::aux::applyRestoreDbData(restoreData, admin);
+        aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+    }
+
+    void assertAdminIsDisabled()
+    {
+        ASSERT_EQ(admin->isEnabled(), false);
+    }
+
+    void assertLocalSystemIdAndSystemNameHaveBeenRestored()
+    {
+        ASSERT_EQ(restoreData.localSystemId, settingsProxy->localSystemId().toByteArray());
+        ASSERT_EQ(restoreData.localSystemName, settingsProxy->systemName());
+    }
+
+    void assertNeedToResetSystem(bool expectedValue)
+    {
+        bool isNewServerInstance = restoreData.localSystemId.isNull();
+        ASSERT_EQ(aux::needToResetSystem(isNewServerInstance, settingsProxy.get()), expectedValue);
     }
 
     QnUserResourcePtr admin;
@@ -182,10 +219,26 @@ protected:
     std::unique_ptr<QnCommonModule> commonModule;
 };
 
-TEST_F(RestoreDbTest, CleanStartNoRestore)
+class BackupWhenCloudAndRestoreWhenCloud : public BaseRestoreDbTest
 {
-    whenBackupIsPerformedWhileConnectedToCloudAndNowConnected();
-    thenNoUserAuthDataShouldHasBeenSaved();
-    thenLocalSystemNameAndIdShouldHaveBeenSaved();
-}
+protected:
+    virtual void SetUp() override
+    {
+        BaseRestoreDbTest::SetUp();
+        setConnectedToCloud();
+        fillDefaultAdminAuth();
+        setDefaultSystemIdentity();
+    }
+};
 
+TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
+{
+    shutdownBeforeRestore();
+    restartServer();
+    setConnectedToCloud();
+    useRestoreData();
+
+    assertAdminIsDisabled();
+    assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertNeedToResetSystem(false);
+}

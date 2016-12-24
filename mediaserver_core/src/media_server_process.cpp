@@ -464,6 +464,27 @@ bool isNewServerInstance(const BeforeRestoreDbData& restoreData)
     return !noSetupWizardFlag && restoreData.localSystemId.isNull();
 }
 
+bool setUpSystemIdentity(
+        const BeforeRestoreDbData& restoreData,
+        aux::SettingsProxy* settings,
+        aux::SystemNameProxyPtr systemNameProxy)
+{
+    aux::LocalSystemIndentityHelper systemIdentityHelper(restoreData, std::move(systemNameProxy));
+    if (systemIdentityHelper.getSystemNameString().isEmpty())
+    {
+        settings->setSystemName(systemIdentityHelper.getDefaultSystemNameString());
+        return false;
+    }
+
+    settings->setSystemName(systemIdentityHelper.getSystemNameString());
+    settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
+
+    systemIdentityHelper.clearMigrationInfo();
+
+    return true;
+}
+
+
 } // namespace aux
 
 
@@ -2190,26 +2211,6 @@ void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
     m_engineVersion = version;
 }
 
-bool MediaServerProcess::setUpSystemIdentity(
-        const BeforeRestoreDbData& restoreData,
-        aux::SettingsProxy* settings,
-        aux::SystemNameProxyPtr systemNameProxy)
-{
-    aux::LocalSystemIndentityHelper systemIdentityHelper(restoreData, std::move(systemNameProxy));
-    if (systemIdentityHelper.getSystemNameString().isEmpty())
-    {
-        settings->setSystemName(systemIdentityHelper.getDefaultSystemNameString());
-        return false;
-    }
-
-    settings->setSystemName(systemIdentityHelper.getSystemNameString());
-    settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
-
-    systemIdentityHelper.clearMigrationInfo();
-
-    return true;
-}
-
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
@@ -2810,7 +2811,7 @@ void MediaServerProcess::run()
     auto settingsProxy = aux::createServerSettingsProxy();
     auto systemNameProxy = aux::createServerSystemNameProxy();
 
-    setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
+    aux::setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
 
     BeforeRestoreDbData::clearSettings(settings);
 

@@ -103,7 +103,7 @@ public:
 using SettingsProxyPtr = std::unique_ptr<SettingsProxy>;
 SettingsProxyPtr createServerSettingsProxy();
 
-bool needToResetSystem(bool noSetupWizardFlag, const SettingsProxy* settings);
+bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings);
 
 bool isNewServerInstance(const BeforeRestoreDbData& restoreData);
 
@@ -111,6 +111,11 @@ BeforeRestoreDbData savePersistentDataBeforeDbRestore(
         const QnUserResourcePtr& admin,
         const QnMediaServerResourcePtr& mediaServer,
         SettingsProxy* settingsProxy);
+
+bool setUpSystemIdentity(
+        const BeforeRestoreDbData& restoreData,
+        aux::SettingsProxy* settings,
+        aux::SystemNameProxyPtr systemNameProxy);
 }
 
 struct CloudManagerGroup;
@@ -176,10 +181,6 @@ private:
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     bool isStopping() const;
-    bool setUpSystemIdentity(
-            const BeforeRestoreDbData& restoreData,
-            aux::SettingsProxy* settings,
-            aux::SystemNameProxyPtr systemNameProxy);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
 
