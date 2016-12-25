@@ -369,5 +369,5 @@ TEST_F(CloudInstanceChanged, main)
 {
     assertNoAdminAuthDataHasBeenSaved();
     assertAdminIsDisabled();
-    assertNeedToResetSystem(true, true);
+    assertNeedToResetSystem(false, true);
 }
