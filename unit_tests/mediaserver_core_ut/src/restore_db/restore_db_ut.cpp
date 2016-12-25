@@ -212,9 +212,8 @@ public:
         ASSERT_EQ(restoreData.localSystemName, settingsProxy->systemName());
     }
 
-    void assertNeedToResetSystem(bool expectedValue)
+    void assertNeedToResetSystem(bool isNewServerInstance, bool expectedValue)
     {
-        bool isNewServerInstance = restoreData.localSystemId.isNull();
         ASSERT_EQ(aux::needToResetSystem(isNewServerInstance, settingsProxy.get()), expectedValue);
     }
 
@@ -250,7 +249,7 @@ TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
     assertNoUserAuthDataHasBeenSaved();
     assertAdminIsDisabled();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
-    assertNeedToResetSystem(false);
+    assertNeedToResetSystem(false, false);
 }
 
 class BackupWhenLocalAndRestoreWhenLocal : public BaseRestoreDbTest
@@ -274,7 +273,7 @@ TEST_F(BackupWhenLocalAndRestoreWhenLocal, main)
 
     assertAdminIsEnabled();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
-    assertNeedToResetSystem(false);
+    assertNeedToResetSystem(false, false);
 }
 
 class BackupWhenLocalAndRestoreWhenCloud : public BaseRestoreDbTest
@@ -301,7 +300,7 @@ TEST_F(BackupWhenLocalAndRestoreWhenCloud, main)
     assertNoUserAuthDataHasBeenSaved();
     assertAdminIsDisabled();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
-    assertNeedToResetSystem(false);
+    assertNeedToResetSystem(false, false);
 }
 
 class BackupWhenCloudAndRestoreWhenLocal : public BaseRestoreDbTest
@@ -325,7 +324,7 @@ TEST_F(BackupWhenCloudAndRestoreWhenLocal, main)
 
     assertAdminIsEnabled();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
-    assertNeedToResetSystem(false);
+    assertNeedToResetSystem(false, false);
 }
 
 class CleanStart : public BaseRestoreDbTest
@@ -341,7 +340,7 @@ TEST_F(CleanStart, main)
 {
     assertNoUserAuthDataHasBeenSaved();
     assertAdminIsEnabled();
-    assertNeedToResetSystem(true);
+    assertNeedToResetSystem(true, true);
 }
 
 class CloudInstanceChanged : public BaseRestoreDbTest
@@ -361,5 +360,5 @@ TEST_F(CloudInstanceChanged, main)
 {
     assertNoUserAuthDataHasBeenSaved();
     assertAdminIsDisabled();
-    assertNeedToResetSystem(true);
+    assertNeedToResetSystem(true, true);
 }

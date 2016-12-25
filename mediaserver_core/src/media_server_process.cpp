@@ -458,8 +458,11 @@ bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
            (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
 }
 
-bool isNewServerInstance(const BeforeRestoreDbData& restoreData)
+bool isNewServerInstance(const BeforeRestoreDbData& restoreData, bool foundOwnServerInDb)
 {
+    if (foundOwnServerInDb)
+        return false;
+
     bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
     return !noSetupWizardFlag && restoreData.localSystemId.isNull();
 }
@@ -2587,6 +2590,7 @@ void MediaServerProcess::run()
             nx_ms_conf::ALLOW_SSL_CONNECTIONS,
             nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
 
+    bool foundOwnServerInDb = false;
     m_moduleFinder = new QnModuleFinder(false);
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
@@ -2596,6 +2600,7 @@ void MediaServerProcess::run()
         if (server)
         {
             fromResourceToApi(server, prevServerData);
+            foundOwnServerInDb = true;
         }
         else
         {
@@ -2650,7 +2655,7 @@ void MediaServerProcess::run()
             m_mediaServer = registerServer(
                         ec2Connection,
                         server,
-                        aux::isNewServerInstance(qnCommon->beforeRestoreDbData()));
+                        aux::isNewServerInstance(qnCommon->beforeRestoreDbData(), foundOwnServerInDb));
         else
             m_mediaServer = server;
 
@@ -2820,7 +2825,11 @@ void MediaServerProcess::run()
 
     if (!QnPermissionsHelper::isSafeMode())
     {
-        if (aux::needToResetSystem(aux::isNewServerInstance(qnCommon->beforeRestoreDbData()), settingsProxy.get()))
+        if (aux::needToResetSystem(
+                    aux::isNewServerInstance(
+                        qnCommon->beforeRestoreDbData(),
+                        foundOwnServerInDb),
+                    settingsProxy.get()))
         {
             if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
