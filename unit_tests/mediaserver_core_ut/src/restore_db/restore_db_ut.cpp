@@ -165,16 +165,30 @@ public:
     {
         settingsProxy->setCloudInstanceChanged(false);
         settingsProxy->setConnectedToCloud(true);
-
-        admin->setEnabled(false);
     }
 
-    void assertNoUserAuthDataHasBeenSaved()
+    void assertNoAdminAuthDataHasBeenSaved()
     {
         ASSERT_TRUE(restoreData.cryptSha512Hash.isNull());
         ASSERT_TRUE(restoreData.digest.isNull());
         ASSERT_TRUE(restoreData.hash.isNull());
         ASSERT_TRUE(restoreData.realm.isNull());
+    }
+
+    void assertAdminAuthDataHasBeenSaved()
+    {
+        ASSERT_EQ(restoreData.cryptSha512Hash, kCryptHash);
+        ASSERT_EQ(restoreData.digest, kDigest);
+        ASSERT_EQ(restoreData.hash, kHash);
+        ASSERT_EQ(restoreData.realm, kRealm);
+    }
+
+    void assertAdminAuthDataHasBeenRestored()
+    {
+        ASSERT_EQ(admin->getCryptSha512Hash(), restoreData.cryptSha512Hash);
+        ASSERT_EQ(restoreData.digest, admin->getDigest());
+        ASSERT_EQ(restoreData.hash, admin->getHash());
+        ASSERT_EQ(restoreData.realm, admin->getRealm());
     }
 
     void assertLocalSystemNameAndIdHaveBeenSaved()
@@ -233,6 +247,7 @@ protected:
     virtual void SetUp() override
     {
         BaseRestoreDbTest::SetUp();
+        admin->setEnabled(false);
         setConnectedToCloud();
         fillDefaultAdminAuth();
         setDefaultSystemIdentity();
@@ -246,8 +261,7 @@ TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
     setConnectedToCloud();
     useRestoreData();
 
-    assertNoUserAuthDataHasBeenSaved();
-    assertAdminIsDisabled();
+    assertNoAdminAuthDataHasBeenSaved();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
@@ -269,9 +283,12 @@ TEST_F(BackupWhenLocalAndRestoreWhenLocal, main)
 
     shutdownBeforeRestore();
     restartServer();
+    assertAdminAuthDataHasBeenSaved();
+
     useRestoreData();
 
     assertAdminIsEnabled();
+    assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
@@ -290,15 +307,15 @@ protected:
 TEST_F(BackupWhenLocalAndRestoreWhenCloud, main)
 {
     setConnectedToCloud();
-    assertAdminIsDisabled();
 
     shutdownBeforeRestore();
+    assertAdminAuthDataHasBeenSaved();
     restartServer();
     setConnectedToCloud();
     useRestoreData();
 
-    assertNoUserAuthDataHasBeenSaved();
-    assertAdminIsDisabled();
+    assertAdminIsEnabled();
+    assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
@@ -316,29 +333,21 @@ protected:
 
 TEST_F(BackupWhenCloudAndRestoreWhenLocal, main)
 {
-    assertAdminIsEnabled();
-
     shutdownBeforeRestore();
     restartServer();
     useRestoreData();
 
     assertAdminIsEnabled();
+    assertAdminAuthDataHasBeenRestored();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
     assertNeedToResetSystem(false, false);
 }
 
-class CleanStart : public BaseRestoreDbTest
-{
-protected:
-    virtual void SetUp() override
-    {
-        BaseRestoreDbTest::SetUp();
-    }
-};
+class CleanStart : public BaseRestoreDbTest {};
 
 TEST_F(CleanStart, main)
 {
-    assertNoUserAuthDataHasBeenSaved();
+    assertNoAdminAuthDataHasBeenSaved();
     assertAdminIsEnabled();
     assertNeedToResetSystem(true, true);
 }
@@ -358,7 +367,7 @@ protected:
 
 TEST_F(CloudInstanceChanged, main)
 {
-    assertNoUserAuthDataHasBeenSaved();
+    assertNoAdminAuthDataHasBeenSaved();
     assertAdminIsDisabled();
     assertNeedToResetSystem(true, true);
 }
