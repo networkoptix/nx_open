@@ -56,6 +56,11 @@ const QString TestSystemNameProxy::kConfigValue = lit("SYSTEM_NAME_CONFIG_VALUE"
 class TestSettingsProxy : public aux::SettingsProxy
 {
 public:
+    TestSettingsProxy() :
+        m_cloudInstanceChanged(false),
+        m_connectedToCloud(false)
+    {}
+
     virtual QString systemName() const override
     {
         return m_systemName;
@@ -129,7 +134,6 @@ public:
         kLocalSystemId = QnUuid::createUuid();
 
         settingsProxy.reset(new detail::TestSettingsProxy);
-        systemNameProxy.reset(new detail::TestSystemNameProxy);
 
         resourcePool = std::unique_ptr<QnResourcePool>(new QnResourcePool);
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
@@ -197,6 +201,11 @@ public:
         ASSERT_EQ(admin->isEnabled(), false);
     }
 
+    void assertAdminIsEnabled()
+    {
+        ASSERT_EQ(admin->isEnabled(), true);
+    }
+
     void assertLocalSystemIdAndSystemNameHaveBeenRestored()
     {
         ASSERT_EQ(restoreData.localSystemId, settingsProxy->localSystemId().toByteArray());
@@ -238,7 +247,119 @@ TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
     setConnectedToCloud();
     useRestoreData();
 
+    assertNoUserAuthDataHasBeenSaved();
     assertAdminIsDisabled();
     assertLocalSystemIdAndSystemNameHaveBeenRestored();
     assertNeedToResetSystem(false);
+}
+
+class BackupWhenLocalAndRestoreWhenLocal : public BaseRestoreDbTest
+{
+protected:
+    virtual void SetUp()
+    {
+        BaseRestoreDbTest::SetUp();
+        fillDefaultAdminAuth();
+        setDefaultSystemIdentity();
+    }
+};
+
+TEST_F(BackupWhenLocalAndRestoreWhenLocal, main)
+{
+    assertAdminIsEnabled();
+
+    shutdownBeforeRestore();
+    restartServer();
+    useRestoreData();
+
+    assertAdminIsEnabled();
+    assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertNeedToResetSystem(false);
+}
+
+class BackupWhenLocalAndRestoreWhenCloud : public BaseRestoreDbTest
+{
+protected:
+    virtual void SetUp() override
+    {
+        BaseRestoreDbTest::SetUp();
+        fillDefaultAdminAuth();
+        setDefaultSystemIdentity();
+    }
+};
+
+TEST_F(BackupWhenLocalAndRestoreWhenCloud, main)
+{
+    setConnectedToCloud();
+    assertAdminIsDisabled();
+
+    shutdownBeforeRestore();
+    restartServer();
+    setConnectedToCloud();
+    useRestoreData();
+
+    assertNoUserAuthDataHasBeenSaved();
+    assertAdminIsDisabled();
+    assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertNeedToResetSystem(false);
+}
+
+class BackupWhenCloudAndRestoreWhenLocal : public BaseRestoreDbTest
+{
+protected:
+    virtual void SetUp() override
+    {
+        BaseRestoreDbTest::SetUp();
+        setDefaultSystemIdentity();
+        fillDefaultAdminAuth();
+    }
+};
+
+TEST_F(BackupWhenCloudAndRestoreWhenLocal, main)
+{
+    assertAdminIsEnabled();
+
+    shutdownBeforeRestore();
+    restartServer();
+    useRestoreData();
+
+    assertAdminIsEnabled();
+    assertLocalSystemIdAndSystemNameHaveBeenRestored();
+    assertNeedToResetSystem(false);
+}
+
+class CleanStart : public BaseRestoreDbTest
+{
+protected:
+    virtual void SetUp() override
+    {
+        BaseRestoreDbTest::SetUp();
+    }
+};
+
+TEST_F(CleanStart, main)
+{
+    assertNoUserAuthDataHasBeenSaved();
+    assertAdminIsEnabled();
+    assertNeedToResetSystem(true);
+}
+
+class CloudInstanceChanged : public BaseRestoreDbTest
+{
+protected:
+    virtual void SetUp() override
+    {
+        BaseRestoreDbTest::SetUp();
+        settingsProxy->setCloudInstanceChanged(true);
+        settingsProxy->setConnectedToCloud(true);
+        admin->setEnabled(false);
+        setDefaultSystemIdentity();
+    }
+};
+
+TEST_F(CloudInstanceChanged, main)
+{
+    assertNoUserAuthDataHasBeenSaved();
+    assertAdminIsDisabled();
+    assertNeedToResetSystem(true);
 }
