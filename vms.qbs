@@ -30,8 +30,7 @@ Project
     property path buildenvDirectory: Environment.getEnv("environment")
 
     references: [
-        (qbs.versionMajor >= 1 && qbs.versionMinor >= 8
-            ? "qbs/dependencies.qbs" : "qbs/dependencies_17.qbs"),
+        "qbs/dependencies.qbs",
         "qbs/mercurial_info.qbs",
         "common_libs",
         "common",
