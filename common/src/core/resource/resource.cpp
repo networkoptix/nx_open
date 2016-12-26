@@ -610,7 +610,13 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
-    emit statusChanged(toSharedPointer(this), reason);
+    auto sharedThis = toSharedPointer(this);
+    NX_LOG(lit("%1 Emit statusChanged signal for resource %1, %2, %3")
+            .arg(sharedThis->getId().toString())
+            .arg(sharedThis->getName())
+            .arg(sharedThis->getUrl()), cl_logDEBUG2);
+
+    emit statusChanged(sharedThis, reason);
 }
 
 void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
