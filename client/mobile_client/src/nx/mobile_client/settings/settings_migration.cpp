@@ -1,6 +1,6 @@
 #include "settings_migration.h"
 
-#include <boost/range/algorithm/find_if.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <nx/utils/url_builder.h>
 #include <nx/utils/log/log.h>
@@ -8,6 +8,8 @@
 #include <client_core/client_core_settings.h>
 
 #include "login_session.h"
+
+using boost::algorithm::any_of;
 
 namespace nx {
 namespace mobile_client {
@@ -74,22 +76,40 @@ static void migrateFrom26To30()
         return;
 
     auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    auto weights = qnClientCoreSettings->localSystemWeightsData();
+
+    const auto dateTime = QDateTime::currentMSecsSinceEpoch();
 
     for (const QVariant& sessionVariant: sessions)
     {
         const auto session = QnLoginSession::fromVariant(sessionVariant.toMap());
 
-        auto it = boost::find_if(recentConnections,
-            [&session](const QnLocalConnectionData& data) { return data.localId == session.id; });
-
-        if (it != recentConnections.end())
+        if (any_of(recentConnections,
+            [&session](const QnLocalConnectionData& data)
+            {
+                return data.localId == session.id
+                        && data.url.userName().compare(
+                            session.url.userName(), Qt::CaseInsensitive) == 0;
+            }))
+        {
             continue;
+        }
 
         const QnLocalConnectionData connectionData(session.systemName, session.id, session.url);
         recentConnections.append(connectionData);
+
+        if (!any_of(weights,
+            [session](const QnWeightData& data) { return data.localId == session.id; }))
+        {
+            weights.append(QnWeightData{session.id, 1.0, dateTime, true});
+        }
     }
 
     qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    qnClientCoreSettings->setLocalSystemWeightsData(weights);
+    qnClientCoreSettings->save();
+    qnSettings->setSavedSessions(QVariantList());
+    qnSettings->save();
 }
 
 void migrateSettings()

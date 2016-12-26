@@ -16,17 +16,10 @@
 
 
 namespace nx {
-namespace cc {
-    class CloudModuleEndPointFetcher;
-}   //cc
-}   //nx
-
-namespace nx {
 namespace cdb {
 namespace cl {
 
-class Connection
-:
+class Connection:
     public api::Connection,
     public AsyncRequestsExecutor
 {

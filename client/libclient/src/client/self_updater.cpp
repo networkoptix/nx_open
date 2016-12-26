@@ -89,7 +89,7 @@ bool copyApplauncherInstance(const QDir& sourceDir, const QDir& targetDir)
     auto checkedCopy = [](const QString& src, const QString& dst)
         {
             auto result = copy(src, dst, OverwriteExisting);
-            if (!result.isOk())
+            if (!result)
             {
                 NX_LOG(lit("SelfUpdater: Cannot copy %1 to %2. Code: %3")
                     .arg(src)
@@ -202,7 +202,7 @@ bool SelfUpdater::updateApplauncher()
         [this]()
         {
             if (!runMinilaucher())
-                NX_LOGX(lit("Could not run applauncher again!"),cl_logERROR);
+                NX_LOGX(lit("Could not run applauncher again!"), cl_logERROR);
         });
 
 

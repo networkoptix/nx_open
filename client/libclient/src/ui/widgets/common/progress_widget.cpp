@@ -1,6 +1,7 @@
 #include "progress_widget.h"
 
 #include <ui/style/skin.h>
+#include <ui/workaround/hidpi_workarounds.h>
 
 QnProgressWidget::QnProgressWidget(QWidget *parent):
     QWidget(parent),
@@ -13,7 +14,8 @@ QnProgressWidget::QnProgressWidget(QWidget *parent):
 
     const char* gifName = devicePixelRatio() == 1 ? "legacy/loading.gif" : "legacy/loading@2x.gif";
     QMovie* movie = qnSkin->newMovie(gifName, this);
-    m_img->setMovie(movie);
+    QnHiDpiWorkarounds::setMovieToLabel(m_img, movie);
+
     if (movie->loopCount() >= 0)
         connect(movie, &QMovie::finished, movie, &QMovie::start);
     movie->start();

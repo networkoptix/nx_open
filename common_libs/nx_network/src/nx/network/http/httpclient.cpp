@@ -69,6 +69,24 @@ bool HttpClient::doPost(
         true));
 }
 
+bool HttpClient::doPut(
+    const QUrl& url,
+    const nx_http::StringType& contentType,
+    nx_http::StringType messageBody)
+{
+    typedef void(AsyncHttpClient::*FuncType)(
+        const QUrl& /*url*/,
+        const nx_http::StringType& /*contentType*/,
+        nx_http::StringType /*messageBody*/);
+
+    return doRequest(std::bind(
+        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPut),
+        std::placeholders::_1,
+        url,
+        contentType,
+        std::move(messageBody)));
+}
+
 const Response* HttpClient::response() const
 {
     return m_asyncHttpClient->response();
@@ -114,6 +132,11 @@ void HttpClient::addAdditionalHeader(const StringType& key, const StringType& va
 const QUrl& HttpClient::url() const
 {
     return m_asyncHttpClient->url();
+}
+
+const QUrl& HttpClient::contentLocationUrl() const
+{
+    return m_asyncHttpClient->contentLocationUrl();
 }
 
 StringType HttpClient::contentType() const

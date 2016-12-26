@@ -82,26 +82,13 @@ std::ostream& operator<<( std::ostream& os,
 const std::chrono::milliseconds CloudDataProvider::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 5 );
 
-static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string& address )
+static nx::cdb::api::ConnectionFactory* makeConnectionFactory( const std::string& cdbUrl )
 {
     auto factory = createConnectionFactory();
-    if( factory && !address.empty() )
+    if( factory && !cdbUrl.empty() )
     {
-        const auto colon = address.find( ":" );
-        if( colon != std::string::npos )
-        {
-            const auto host = address.substr( 0, colon );
-            const auto port = std::stoi( address.substr( colon + 1 ) );
-
-            factory->setCloudEndpoint(host, port);
-            NX_LOG( lm("nx::cdb::api::ConnectionFactory set address %1:%2")
-                    .arg(host).arg(port), cl_logALWAYS );
-        }
-        else
-        {
-            NX_LOG( lm("nx::cdb::api::ConnectionFactory can not parse address %1")
-                     .arg( address ), cl_logERROR );
-        }
+        NX_LOG(lm("nx::cdb::api::ConnectionFactory set url %1").arg(cdbUrl), cl_logALWAYS);
+        factory->setCloudUrl(cdbUrl);
     }
     return factory;
 }

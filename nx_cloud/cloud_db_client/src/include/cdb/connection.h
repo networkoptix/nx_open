@@ -141,9 +141,7 @@ public:
      * Explicitely specify endpoint of cloud module. If this method not called, endpoint is detected automatically.
      * \note Call this method only if you are sure about what you are doing.
      */
-    virtual void setCloudEndpoint(
-        const std::string& host,
-        unsigned short port) = 0;
+    virtual void setCloudUrl(const std::string& url) = 0;
 };
 
 } // namespace api

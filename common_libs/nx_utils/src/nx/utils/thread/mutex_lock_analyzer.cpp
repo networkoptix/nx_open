@@ -348,14 +348,14 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
         lockedThread = ::currentThreadSystemId();
     }
 
-    NX_CRITICAL( !threadContext.currentLockPath.empty() );
+    NX_ASSERT( !threadContext.currentLockPath.empty() );
     if( threadContext.currentLockPath.front().lockRecursionDepth > 0 )
     {
         --threadContext.currentLockPath.front().lockRecursionDepth;
         return;
     }
 
-    NX_CRITICAL( mutexLockPosition == threadContext.currentLockPath.front() );
+    NX_ASSERT( mutexLockPosition == threadContext.currentLockPath.front() );
     threadContext.currentLockPath.pop_front();
 }
 

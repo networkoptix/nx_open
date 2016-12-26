@@ -99,7 +99,7 @@ int VmsGatewayProcess::exec()
             return 0;
         }
 
-        initializeQnLog(
+        nx::utils::log::initialize(
             settings.logging(), settings.general().dataDir,
             QnLibVmsGatewayAppInfo::applicationDisplayName());
 

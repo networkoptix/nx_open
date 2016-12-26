@@ -156,7 +156,7 @@ static bool isReady(nx::utils::future<bool> const& f)
 void MediatorConnector::fetchEndpoint()
 {
     m_endpointFetcher->get(
-        [ this ]( nx_http::StatusCode::Value status, SocketAddress address )
+        [ this ]( nx_http::StatusCode::Value status, QUrl url )
     {
         if( status != nx_http::StatusCode::ok )
         {
@@ -172,7 +172,9 @@ void MediatorConnector::fetchEndpoint()
         else
         {
             NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logDEBUG1 );
+                     .arg(url.toString() ), cl_logDEBUG1 );
+
+            auto address = SocketAddress(url.host(), url.port());
 
             {
                 QnMutexLocker lk(&m_mutex);

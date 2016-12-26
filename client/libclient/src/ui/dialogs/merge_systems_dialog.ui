@@ -173,7 +173,7 @@
             <item>
              <widget class="QRadioButton" name="currentSystemRadioButton">
               <property name="text">
-               <string notr="true">current</string>
+               <string notr="true">&lt;current&gt;</string>
               </property>
               <property name="checked">
                <bool>true</bool>
@@ -183,7 +183,7 @@
             <item>
              <widget class="QRadioButton" name="remoteSystemRadioButton">
               <property name="text">
-               <string notr="true">remote</string>
+               <string notr="true">&lt;remote&gt;</string>
               </property>
              </widget>
             </item>

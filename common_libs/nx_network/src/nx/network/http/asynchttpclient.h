@@ -63,7 +63,8 @@ namespace nx_http
         enum AuthType {
             authBasicAndDigest,
             authDigest,
-            authDigestWithPasswordHash
+            authDigestWithPasswordHash,
+            authBasic,
         };
 
         enum State
@@ -196,6 +197,7 @@ namespace nx_http
         */
         BufferType fetchMessageBodyBuffer();
         const QUrl& url() const;
+        const QUrl& contentLocationUrl() const;
         /** Number of bytes read (including http request line and headers)
          *  via single HTTP request
          */
@@ -295,7 +297,8 @@ namespace nx_http
         bool m_connectionClosed;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
-        QUrl m_url;
+        QUrl m_requestUrl;
+        QUrl m_contentLocationUrl;
         HttpStreamReader m_httpStreamReader;
         BufferType m_responseBuffer;
         QString m_userAgent;
@@ -322,9 +325,10 @@ namespace nx_http
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
         bool m_forcedEof;
-        //TODO #ak remove this member
+        // TODO: #ak remove this member (replace with aio::BasicPollable inheritance).
         nx::network::aio::Timer m_aioThreadBinder;
         bool m_precalculatedAuthorizationDisabled;
+        int m_numberOfRedirectsTried;
 
         AsyncHttpClient();
 
@@ -333,7 +337,7 @@ namespace nx_http
         void onSomeBytesReadAsync(SystemError::ErrorCode errorCode, size_t bytesRead);
 
         void resetDataBeforeNewRequest();
-        void initiateHttpMessageDelivery(const QUrl& url);
+        void initiateHttpMessageDelivery();
         void initiateTcpConnection();
         /**
          * @return Bytes parsed or -1 in case of error.
@@ -345,6 +349,8 @@ namespace nx_http
         void processResponseHeadersBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             bool* const continueReceiving);
+        bool repeatRequestIfNeeded(const Response& response);
+        bool sendRequestToNewLocation(const Response& response);
         void processResponseMessageBodyBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             std::size_t bytesRead,
@@ -388,14 +394,12 @@ namespace nx_http
         {
         }
 
-        AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient> obj)
-            :
+        AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient> obj):
             m_obj(std::move(obj))
         {
         }
 
-        AsyncHttpClientPtr(const AsyncHttpClientPtr& right)
-            :
+        AsyncHttpClientPtr(const AsyncHttpClientPtr& right):
             m_obj(right.m_obj)
         {
         }

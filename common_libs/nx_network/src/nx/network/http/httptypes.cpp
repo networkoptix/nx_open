@@ -35,6 +35,14 @@ namespace nx_http
 #endif
     }
 
+    int defaultPortForScheme(const StringType& scheme)
+    {
+        if (strcasecmp(scheme, StringType("http")) == 0)
+            return DEFAULT_HTTP_PORT;
+        if (strcasecmp(scheme, StringType("https")) == 0)
+            return DEFAULT_HTTPS_PORT;
+        return -1;
+    }
 
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
     {
@@ -234,10 +242,12 @@ namespace nx_http
                     return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
-                case moved:
-                    return StringType("Moved");
                 case movedPermanently:
                     return StringType("Moved Permanently");
+                case found:
+                    return StringType("Found");
+                case seeOther:
+                    return StringType("See Other");
                 case notModified:
                     return StringType("Not Modified");
                 case badRequest:

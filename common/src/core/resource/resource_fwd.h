@@ -120,6 +120,9 @@ class QnMediaServerResource;
 typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
 typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
 
+class QnFakeMediaServerResource;
+typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;
+
 class QnMediaServerUserAttributes;
 typedef QSharedPointer<QnMediaServerUserAttributes> QnMediaServerUserAttributesPtr;
 typedef QList<QnMediaServerUserAttributesPtr> QnMediaServerUserAttributesList;

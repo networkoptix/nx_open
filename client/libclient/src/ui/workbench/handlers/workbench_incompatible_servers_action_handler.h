@@ -22,11 +22,13 @@ public:
     ~QnWorkbenchIncompatibleServersActionHandler();
 
 private:
-    void connectToCurrentSystem(const QnUuid& target, const QString& initialPassword = QString());
-    bool validateStartLicenses(const QnUuid& target, const QString& adminPassword);
+    void connectToCurrentSystem(const QnFakeMediaServerResourcePtr& server);
+    bool validateStartLicenses(const QnFakeMediaServerResourcePtr& server, const QString& adminPassword);
     bool serverHasStartLicenses(
         const QnMediaServerResourcePtr& server,
         const QString& adminPassword);
+
+    QString requestPassword() const;
 
     void at_connectToCurrentSystemAction_triggered();
     void at_mergeSystemsAction_triggered();

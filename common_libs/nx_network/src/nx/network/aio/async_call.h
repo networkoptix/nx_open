@@ -12,7 +12,7 @@ namespace aio {
 
 /**
  * Invokes functor asynchronously in a specific aio-thread.
- * Aio thread is selected randomly during instanciation.
+ * Aio thread is selected randomly during instantiation.
  */
 class NX_NETWORK_API AsyncCall
 {

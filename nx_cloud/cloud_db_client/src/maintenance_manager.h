@@ -9,8 +9,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-class MaintenanceManager
-    :
+class MaintenanceManager:
     public api::MaintenanceManager,
     public AsyncRequestsExecutor
 {

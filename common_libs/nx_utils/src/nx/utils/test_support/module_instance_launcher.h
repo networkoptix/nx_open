@@ -1,8 +1,3 @@
-/**********************************************************
-* May 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <vector>
@@ -13,12 +8,13 @@
 #include "nx/utils/std/future.h"
 #include "nx/utils/std/thread.h"
 
-
 namespace nx {
 namespace utils {
 namespace test {
 
-/** Added to help create functional tests when each test want to start process from scratch */
+/**
+ * Added to help create functional tests when each test want to start process from scratch.
+ */
 template<typename ModuleProcessType>
 class ModuleLauncher
 {

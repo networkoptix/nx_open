@@ -11,8 +11,34 @@
 #include <QtCore/QString>
 
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/http/server/http_server_base_authentication_manager.h>
+#include <nx/network/http/server/http_server_plain_text_credentials_provider.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
+
+//-------------------------------------------------------------------------------------------------
+
+class TestAuthenticationManager:
+    public nx_http::server::BaseAuthenticationManager
+{
+    typedef nx_http::server::BaseAuthenticationManager BaseType;
+
+public:
+    TestAuthenticationManager(
+        nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
+
+    virtual void authenticate(
+        const nx_http::HttpServerConnection& connection,
+        const nx_http::Request& request,
+        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
+
+    void setAuthenticationEnabled(bool value);
+
+private:
+    bool m_authenticationEnabled;
+};
+
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API TestHttpServer
 {
@@ -54,14 +80,23 @@ public:
         const QString& filePath,
         const nx_http::StringType& mimeType);
 
+    bool registerRedirectHandler(
+        const QString& resourcePath,
+        const QUrl& location);
+
     // used for test purpose
     void setPersistentConnectionEnabled(bool value);
     void addModRewriteRule(QString oldPrefix, QString newPrefix);
+
+    void setAuthenticationEnabled(bool value);
+    void registerUserCredentials(const nx::String& userName, const nx::String& password);
 
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
 private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
+    nx_http::server::PlainTextCredentialsProvider m_credentialsProvider;
+    TestAuthenticationManager m_authenticationManager;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
 };
 

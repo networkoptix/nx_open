@@ -30,14 +30,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-mediaserver-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${final.artifact.name}-server.tar.gz
+UPDATE_NAME=server-update-${box}-${arch}-$VERSION
 
 TEMP_DIR="`mktemp -d`"
 BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
@@ -185,6 +179,8 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
+  #creating symlink for rpath needed by mediaserver binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
 
   #creating symlink for rpath needed by mobile_client binary
   ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
@@ -210,10 +206,10 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
   cp -Rfv $UBOOT_DIR $BUILD_DIR/root
-  
+
   #copying additional binaries
   cp -Rfv $USR_DIR $BUILD_DIR/usr
-  
+
   #additional platform specific files
   cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
   mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
@@ -310,3 +306,4 @@ cd ..
 rm -Rf zip
 rm -Rf $BUILD_DIR
 rm -Rf $TEMP_DIR
+rm -Rf $DEBUG_DIR

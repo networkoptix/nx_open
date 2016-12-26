@@ -46,6 +46,12 @@ public:
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
+
+    bool doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody);
+
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
     bool isValid() const;
@@ -56,6 +62,7 @@ public:
     BufferType fetchMessageBodyBuffer();
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const QUrl& url() const;
+    const QUrl& contentLocationUrl() const;
     StringType contentType() const;
 
     /** See \a AsyncHttpClient::setSubsequentReconnectTries */

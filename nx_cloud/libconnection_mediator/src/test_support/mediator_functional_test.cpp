@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
 #include "mediator_functional_test.h"
 
 #include <chrono>
@@ -13,24 +8,46 @@
 #include <tuple>
 
 #include <common/common_globals.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
-#include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/socket.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/fusion/serialization/json.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
 #include "mediator_service.h"
 
-
 namespace nx {
 namespace hpm {
+
+static constexpr size_t kMaxBindRetryCount = 10;
+
+static SocketAddress findFreeTcpAndUdpLocalAddress()
+{
+    for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
+    {
+        const SocketAddress address("127.0.0.1", nx::utils::random::number<uint16_t>(5000, 50000));
+
+        network::TCPServerSocket tcpSocket(AF_INET);
+        if (!tcpSocket.bind(address))
+            continue;
+
+        network::UDPSocket udpSocket(AF_INET);
+        if (!udpSocket.bind(address))
+            continue;
+
+        return address;
+    }
+
+    return SocketAddress("127.0.0.1:0");
+}
 
 MediatorFunctionalTest::MediatorFunctionalTest():
     m_stunPort(0),
@@ -43,12 +60,15 @@ MediatorFunctionalTest::MediatorFunctionalTest():
     QDir(m_tmpDir).removeRecursively();
     QDir().mkpath(m_tmpDir);
 
+    const auto stunAddress = findFreeTcpAndUdpLocalAddress().toString().toStdString();
+    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").str(stunAddress), cl_logINFO);
+
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-stun/addrToListenList"); addArg("127.0.0.1:0");
-    addArg("-http/addrToListenList"); addArg("127.0.0.1:0");
-    addArg("-log/logLevel"); addArg("DEBUG2");
-    addArg("-general/dataDir"); addArg(m_tmpDir.toLatin1().constData());
+    addArg("-stun/addrToListenList", stunAddress.c_str());
+    addArg("-http/addrToListenList", "127.0.0.1:0");
+    addArg("-log/logLevel", "DEBUG2");
+    addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
 
     registerCloudDataProvider(&m_cloudDataProvider);
 }

@@ -122,12 +122,12 @@ bool Settings::showHelp() const
     return m_showHelp;
 }
 
-const nx::utils::log::QnLogSettings& Settings::logging() const
+const nx::utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }
 
-const nx::utils::log::QnLogSettings& Settings::vmsSynchronizationLogging() const
+const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
 {
     return m_vmsSynchronizationLogging;
 }

@@ -68,3 +68,8 @@ QnLogMessage::operator QString() const
 {
     return m_str;
 }
+
+std::string QnLogMessage::toStdString() const
+{
+    return m_str.toStdString();
+}

@@ -32,8 +32,6 @@ static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
-:
-    m_foundSmth(false)
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
@@ -74,8 +72,6 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType searchType)
 {
-    QnMutexLocker lock( &m_discoveryMutex );
-
     // fill camera's ID
 
     for (const auto& resource: resources)
@@ -87,47 +83,49 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
 
-    // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
-    for (auto itr = resources.begin(); itr != resources.end();)
     {
-        QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
-        if (!camRes) {
-            ++itr;
-            continue;
-        }
-        QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
-        if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
+        QnMutexLocker lock(&m_discoveryMutex);
+        // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
+        for (auto itr = resources.begin(); itr != resources.end();)
         {
-            m_tmpForeignResources.insert(camRes->getId(), camRes);
-            itr = resources.erase(itr);
+            QnSecurityCamResourcePtr camRes = (*itr).dynamicCast<QnSecurityCamResource>();
+            if (!camRes) {
+                ++itr;
+                continue;
+            }
+            QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
+            if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
+            {
+                m_tmpForeignResources.insert(camRes->getId(), camRes);
+                itr = resources.erase(itr);
+            }
+            else {
+                ++itr;
+            }
         }
-        else {
-            ++itr;
+        if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES)
+        {
+            m_foreignResourcesRetryCount = 0;
+
+            // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
+            auto foreignResources = m_tmpForeignResources.values();
+            const QnUuid ownGuid = qnCommon->moduleGUID();
+            std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
+            {
+                bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
+                bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
+                if (leftOwnServer != rightOwnServer)
+                    return leftOwnServer > rightOwnServer;
+
+                // arrange cameras by failover priority order
+                return leftCam->failoverPriority() > rightCam->failoverPriority();
+            });
+
+            for (const auto& res : foreignResources)
+                resources << res;
+            m_tmpForeignResources.clear();
         }
     }
-    if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES)
-    {
-        m_foreignResourcesRetryCount = 0;
-
-        // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
-        auto foreignResources = m_tmpForeignResources.values();
-        const QnUuid ownGuid = qnCommon->moduleGUID();
-        std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
-        {
-            bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
-            bool rightOwnServer = rightCam->preferredServerId() == ownGuid;
-            if (leftOwnServer != rightOwnServer)
-                return leftOwnServer > rightOwnServer;
-
-            // arrange cameras by failover priority order
-            return leftCam->failoverPriority() > rightCam->failoverPriority();
-        });
-
-        for (const auto& res: foreignResources)
-            resources << res;
-        m_tmpForeignResources.clear();
-    }
-
 
     QnResourceList extraResources;
 
@@ -274,8 +272,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         markOfflineIfNeeded(discoveredResources);
     // ======================
 
-    m_foundSmth = !resources.isEmpty();
-    if (m_foundSmth)
+    bool foundSmth = !resources.isEmpty();
+    if (foundSmth)
         NX_LOG( lit("Discovery----: after excluding existing resources we've got %1 new resources:").arg(resources.size()), cl_logINFO);
 
     printInLogNetResources(resources);

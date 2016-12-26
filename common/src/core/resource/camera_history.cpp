@@ -97,8 +97,9 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     m_historyCheckDelay(kDefaultHistoryCheckDelay),
     m_mutex(QnMutex::Recursive)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
-        QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(resource->getId());
+    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
+    {
+        QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
         if (cam)
             checkCameraHistoryDelayed(cam);
 

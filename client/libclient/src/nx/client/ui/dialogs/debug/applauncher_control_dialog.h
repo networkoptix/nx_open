@@ -2,6 +2,10 @@
 
 #include <ui/dialogs/common/dialog.h>
 
+namespace Ui {
+class ApplauncherControlDialog;
+}
+
 namespace nx {
 namespace client {
 namespace ui {
@@ -13,6 +17,8 @@ class QnApplauncherControlDialog: public QnDialog
 public:
     QnApplauncherControlDialog(QWidget* parent = nullptr);
 
+private:
+    QScopedPointer<Ui::ApplauncherControlDialog> ui;
 };
 
 } // namespace dialogs

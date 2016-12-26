@@ -68,11 +68,9 @@ std::string ConnectionFactory::toString(api::ResultCode resultCode) const
     return QnLexical::serialized(resultCode).toStdString();
 }
 
-void ConnectionFactory::setCloudEndpoint(
-    const std::string& host,
-    unsigned short port)
+void ConnectionFactory::setCloudUrl(const std::string& url)
 {
-    m_endPointFetcher.setEndpoint(SocketAddress(host.c_str(), port));
+    m_endPointFetcher.setUrl(QUrl(QString::fromStdString(url)));
 }
 
 }   //cl

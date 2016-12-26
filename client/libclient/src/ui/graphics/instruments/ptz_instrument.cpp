@@ -166,22 +166,25 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
         return false;
     }
 
-    QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
-    if (!(target->options() & QnResourceWidget::ControlPtz))
+    const auto target = checked_cast<QnMediaResourceWidget*>(item);
+    if (!target->options().testFlag(QnResourceWidget::ControlPtz))
         return false;
 
     if (!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
-    PtzManipulatorWidget *manipulator = NULL;
-    if (PtzOverlayWidget *overlay = overlayWidget(target))
+    PtzManipulatorWidget* manipulator = nullptr;
+    if (const auto overlay = overlayWidget(target))
     {
         manipulator = overlay->manipulatorWidget();
-        if (!manipulator->isVisible() || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
-            manipulator = NULL;
+        if (!manipulator->isVisible()
+            || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
+        {
+            manipulator = nullptr;
+        }
     }
 
-    const PtzData &data = m_dataByWidget[target];
+    const PtzData& data = m_dataByWidget[target];
     if (manipulator)
     {
         m_movement = ContinuousMovement;
@@ -194,7 +197,9 @@ bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEv
     }
     else
     {
-        if (data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability))
+        if (data.hasCapabilities(Qn::VirtualPtzCapability
+            | Qn::AbsolutePtzCapabilities
+            | Qn::LogicalPositioningPtzCapability))
         {
             m_movement = VirtualMovement;
         }

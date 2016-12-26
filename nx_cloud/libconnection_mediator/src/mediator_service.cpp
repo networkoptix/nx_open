@@ -36,10 +36,10 @@
 namespace nx {
 namespace hpm {
 
-MediatorProcess::MediatorProcess( int argc, char **argv )
-:
-    m_argc( argc ),
-    m_argv( argv )
+MediatorProcess::MediatorProcess(int argc, char **argv):
+    m_argc(argc),
+    m_argv(argv),
+    m_listeningPeerPool(nullptr)
 {
 }
 
@@ -83,7 +83,7 @@ int MediatorProcess::exec()
         return 0;
     }
 
-    initializeQnLog(
+    nx::utils::log::initialize(
         settings.logging(), settings.general().dataDir,
         QnLibConnectionMediatorAppInfo::applicationDisplayName());
 
@@ -114,6 +114,7 @@ int MediatorProcess::exec()
     nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
     ListeningPeerPool listeningPeerPool;
+    m_listeningPeerPool = &listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator(
         settings,
         cloudDataProvider.get(),
@@ -199,6 +200,11 @@ int MediatorProcess::exec()
     //stopping accepting incoming connections
 
     return 0;
+}
+
+ListeningPeerPool* MediatorProcess::listeningPeerPool() const
+{
+    return m_listeningPeerPool;
 }
 
 bool MediatorProcess::launchHttpServerIfNeeded(

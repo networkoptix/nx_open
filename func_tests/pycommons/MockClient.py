@@ -158,6 +158,8 @@ class ClientMixin(ComparisonMixin):
                             auth_password = None,
                             status = HTTP_OK,
                             **kw):
+        if data:
+            headers['Content-Type'] = 'application/json'
         response = self.client.httpRequest(
             address, method, data, headers,
             auth_user, auth_password, **kw)

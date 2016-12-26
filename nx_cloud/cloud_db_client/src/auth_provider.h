@@ -11,16 +11,10 @@
 
 
 namespace nx {
-
-namespace cc {
-class CloudModuleEndPointFetcher;
-}
-
 namespace cdb {
 namespace cl {
 
-class AuthProvider
-:
+class AuthProvider:
     public api::AuthProvider,
     public AsyncRequestsExecutor
 {

@@ -28,6 +28,8 @@ class Settings;
 
 } // namespace conf
 
+class ListeningPeerPool;
+
 class MediatorProcess:
     public QnStoppable
 {
@@ -44,6 +46,8 @@ public:
 
     int exec();
 
+    ListeningPeerPool* listeningPeerPool() const;
+
 private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
@@ -52,6 +56,7 @@ private:
     std::vector<SocketAddress> m_httpEndpoints;
     std::vector<SocketAddress> m_stunEndpoints;
     nx::utils::promise<void> m_processTerminationEvent;
+    ListeningPeerPool* m_listeningPeerPool;
 
     QString getDataDirectory();
     int printHelp();
