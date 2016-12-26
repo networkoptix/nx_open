@@ -21,6 +21,7 @@
 #endif
 
 #include <nx/network/buffer.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/systemerror.h>
@@ -258,6 +259,12 @@ namespace attrs
     };
 }
 
+struct TransportHeader
+{
+    SocketAddress requestedEndpoint;
+    SocketAddress locationEndpoint;
+};
+
 class NX_NETWORK_API Message
 {
 public:
@@ -266,6 +273,7 @@ public:
 
 	typedef std::map< int, AttributePtr > AttributesMap;
 
+    TransportHeader transportHeader;
     Header header;
     AttributesMap attributes;
 

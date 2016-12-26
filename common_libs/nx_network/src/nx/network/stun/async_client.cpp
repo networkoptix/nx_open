@@ -366,6 +366,9 @@ void AsyncClient::processMessage(Message message)
     if( m_state == State::terminated )
         return;
 
+    message.transportHeader.requestedEndpoint = m_baseConnection->socket()->getForeignAddress();
+    message.transportHeader.locationEndpoint = message.transportHeader.requestedEndpoint;
+
     switch( message.header.messageClass )
     {
         case MessageClass::request:

@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 29, 2015
-* akolesnikov
-***********************************************************/
-
 #include "udp_client.h"
-
 
 namespace nx {
 namespace stun {
@@ -16,15 +10,13 @@ const int UDPClient::kDefaultMaxRetransmissions = 7;
 /* UDPClient::RequestContext                */
 /********************************************/
 
-UDPClient::RequestContext::RequestContext()
-:
+UDPClient::RequestContext::RequestContext():
     currentRetransmitTimeout(0),
     retryNumber(0)
 {
 }
 
-UDPClient::RequestContext::RequestContext(RequestContext&& rhs)
-:
+UDPClient::RequestContext::RequestContext(RequestContext&& rhs):
     completionHandler(std::move(rhs.completionHandler)),
     currentRetransmitTimeout(std::move(rhs.currentRetransmitTimeout)),
     retryNumber(std::move(rhs.retryNumber)),
@@ -36,14 +28,12 @@ UDPClient::RequestContext::RequestContext(RequestContext&& rhs)
 /* UDPClient                                */
 /********************************************/
 
-UDPClient::UDPClient()
-:
+UDPClient::UDPClient():
     UDPClient(SocketAddress())
 {
 }
 
-UDPClient::UDPClient(SocketAddress serverAddress)
-:
+UDPClient::UDPClient(SocketAddress serverAddress):
     m_receivingMessages(false),
     m_messagePipeline(this),
     m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
@@ -143,6 +133,8 @@ void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
 
     auto completionHandler = std::move(requestContextIter->second.completionHandler);
     m_ongoingRequests.erase(requestContextIter);
+    message.transportHeader.requestedEndpoint = sourceAddress;   // TODO: #ak
+    message.transportHeader.locationEndpoint = sourceAddress;
     completionHandler(SystemError::noError, std::move(message));
 }
 
@@ -166,7 +158,7 @@ void UDPClient::sendRequestInternal(
 
     auto insertedValue = m_ongoingRequests.emplace(
         request.header.transactionId, RequestContext());
-    NX_ASSERT(insertedValue.second);   //asserting on non-unique transactionID
+    NX_ASSERT(insertedValue.second);   //< Asserting on non-unique transactionId.
     RequestContext& requestContext = insertedValue.first->second;
     requestContext.completionHandler = std::move(completionHandler);
     requestContext.currentRetransmitTimeout = m_retransmissionTimeout;
@@ -195,9 +187,8 @@ void UDPClient::sendRequestAndStartTimer(
             messageSent(code, std::move(transactionId), std::move(address));
         });
 
-    //TODO #ak we should start timer after request has actually been sent
+    // TODO: #ak we should start timer after request has actually been sent.
 
-    //starting timer
     requestContext->timer->start(
         requestContext->currentRetransmitTimeout,
         std::bind(&UDPClient::timedOut, this, request.header.transactionId));
@@ -210,7 +201,7 @@ void UDPClient::messageSent(
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     if (requestContextIter == m_ongoingRequests.end())
-        return; //operation may have already timedOut. E.g., network interface is loaded
+        return; //< Operation may have already timedOut. E.g., network interface is loaded.
 
     if (errorCode != SystemError::noError)
     {
@@ -261,5 +252,5 @@ void UDPClient::cleanupWhileInAioThread()
     m_ongoingRequests.clear();
 }
 
-}   //stun
-}   //nx
+} // namespace stun
+} // namespace nx

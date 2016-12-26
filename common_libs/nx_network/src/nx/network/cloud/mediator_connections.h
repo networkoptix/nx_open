@@ -67,6 +67,7 @@ public:
     void connect(
         nx::hpm::api::ConnectRequest connectData,
         utils::MoveOnlyFunc<void(
+            stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler)
     {
@@ -95,8 +96,7 @@ typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
  * @note All server requests MUST be authorized by cloudId and cloudAuthenticationKey.
  */
 template<class NetworkClientType>
-class MediatorServerConnection
-:
+class MediatorServerConnection:
     public BaseMediatorClient<NetworkClientType>
 {
 public:
@@ -204,8 +204,7 @@ private:
 typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
 
 
-class MediatorServerTcpConnection
-:
+class MediatorServerTcpConnection:
     public MediatorServerConnection<stun::AsyncClientUser>
 {
 public:
