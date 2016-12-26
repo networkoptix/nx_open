@@ -16,6 +16,5 @@ private slots:
     void at_debugControlPanelAction_triggered();
     void at_debugIncrementCounterAction_triggered();
     void at_debugDecrementCounterAction_triggered();
-    void at_debugShowResourcePoolAction_triggered();
 };
 
