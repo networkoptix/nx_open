@@ -7,6 +7,8 @@
 
 #include <client/client_globals.h>
 
+#include <text/time_strings.h>
+
 #include <ui/style/helper.h>
 #include <ui/models/ioports_view_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -124,9 +126,7 @@ QWidget* QnIoPortItemDelegate::createWidget(
 
             auto spinBox = new QSpinBox(parent);
             spinBox->setMinimum(1);
-
-            //TODO: #vkutin #gdm Move all time unit suffixes to one place
-            spinBox->setSuffix(L' ' + tr("s", "Seconds"));
+            spinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
             auto commit =
                 [model, spinBox](int value)

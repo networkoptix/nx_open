@@ -4,6 +4,8 @@
 
 #include <core/ptz/ptz_preset.h>
 
+#include <text/time_strings.h>
+
 #include <ui/style/globals.h>
 
 #include <nx/utils/collection.h>
@@ -87,7 +89,10 @@ QString QnPtzTourSpotsModel::speedToString(qreal speed) {
 QString QnPtzTourSpotsModel::stayTimeToString(quint64 time) {
     if (time == 0)
         return tr("Instant");
-    return tr("%n seconds", "", time / second);
+
+    const int sec = time / second;
+    return QString::number(sec) + L' '
+        + QnTimeStrings::fullSuffix(QnTimeStrings::Suffix::Seconds, sec);
 }
 
 const QnPtzTourSpotList& QnPtzTourSpotsModel::spots() const {
