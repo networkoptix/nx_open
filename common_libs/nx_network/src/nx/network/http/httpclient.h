@@ -62,6 +62,7 @@ public:
     BufferType fetchMessageBodyBuffer();
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const QUrl& url() const;
+    const QUrl& contentLocationUrl() const;
     StringType contentType() const;
 
     /** See \a AsyncHttpClient::setSubsequentReconnectTries */
