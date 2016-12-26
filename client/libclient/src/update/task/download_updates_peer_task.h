@@ -32,6 +32,8 @@ protected:
 private:
     void downloadNextUpdate();
 
+    void doCancelInternal(ErrorCode code);
+
 private slots:
     void continueDownload();
     void at_downloadReply_finished();

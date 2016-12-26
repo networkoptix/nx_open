@@ -54,10 +54,17 @@ void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnUui
     m_peersByUrl = peersByUrl;
 }
 
-void QnDownloadUpdatesPeerTask::doCancel() {
+void QnDownloadUpdatesPeerTask::doCancelInternal(ErrorCode code)
+{
     m_currentPeers.clear();
     m_pendingDownloads.clear();
     m_file.reset();
+    finish(code);
+}
+
+void QnDownloadUpdatesPeerTask::doCancel()
+{
+    doCancelInternal(NoError);
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
@@ -151,10 +158,10 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
         return;
     }
 
-    if (!readAllData(reply, m_file.data())) {
-        doCancel();
+    if (!readAllData(reply, m_file.data()))
+    {
         NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: No free space."), cl_logERROR);
-        finish(NoFreeSpaceError);
+        doCancelInternal(NoFreeSpaceError);
         return;
     }
 
@@ -202,9 +209,8 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
     if (bytesReceived > bytesTotal) {
         m_file->close();
         m_file->remove();
-        doCancel();
         NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: Wrong file size."), cl_logERROR);
-        finish(DownloadError);
+        doCancelInternal(DownloadError);
         return;
     }
 
@@ -231,8 +237,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     }
 
     if (!readAllData(reply, m_file.data())) {
-        doCancel();
         NX_LOG(lit("Update: QnDownloadUpdatesPeerTask: No free space."), cl_logERROR);
-        finish(NoFreeSpaceError);
+        doCancelInternal(NoFreeSpaceError);
     }
 }
