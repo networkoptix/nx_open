@@ -256,7 +256,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
         {
             fitInView(false);
             /**
-             * Since we don't animate fit in view we have to executing fitInView second time
+             * Since we don't animate fit in view we have to execute fitInView second time
              * after some delay, because some OS make resize call before move widget to correct
              * position while expanding it to fullscreen. #gdm
              */
