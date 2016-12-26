@@ -127,7 +127,7 @@ void QnGenericTabbedDialog::retranslateUi()
 void QnGenericTabbedDialog::applyChanges()
 {
     for(const Page &page: m_pages)
-        if (page.enabled && page.visible)
+        if (page.enabled && page.visible && page.widget->hasChanges())
             page.widget->applyChanges();
     updateButtonBox();
 }
