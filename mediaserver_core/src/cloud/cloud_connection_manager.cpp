@@ -23,23 +23,14 @@ namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
 }
 
-CloudConnectionManager::CloudConnectionManager()
-:
+CloudConnectionManager::CloudConnectionManager():
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
-    const auto cdbEndpoint = MSSettings::roSettings()->value(
+    const auto cdbUrl = MSSettings::roSettings()->value(
         nx_ms_conf::CDB_ENDPOINT,
         "").toString();
-    if (!cdbEndpoint.isEmpty())
-    {
-        const auto hostAndPort = cdbEndpoint.split(":");
-        if (hostAndPort.size() == 2)
-        {
-            m_cdbConnectionFactory->setCloudEndpoint(
-                hostAndPort[0].toStdString(),
-                hostAndPort[1].toInt());
-        }
-    }
+    if (!cdbUrl.isEmpty())
+        m_cdbConnectionFactory->setCloudUrl(cdbUrl.toStdString());
 
     Qn::directConnect(
         qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,

@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 8, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_endpoint_fetcher.h"
 
 #include <QtCore/QBuffer>
@@ -17,7 +12,6 @@
 
 #include "cloud_modules_xml_sax_handler.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -28,12 +22,18 @@ CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
 :
     m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
     m_endpointSelector(std::move(endpointSelector)),
-    m_requestIsRunning(false)
+    m_requestIsRunning(false),
+    m_modulesXmlUrl(QnAppInfo::defaultCloudModulesXmlUrl())
 {
     NX_ASSERT(
         m_moduleAttrName != stree::INVALID_RES_ID,
         Q_FUNC_INFO,
         lit("Given bad cloud module name %1").arg(moduleName));
+
+    // Preparing compatibility data.
+    m_moduleToDefaultUrlScheme.emplace("cdb", "http");
+    m_moduleToDefaultUrlScheme.emplace("hpm", "stun");
+    m_moduleToDefaultUrlScheme.emplace("notification_module", "http");
 }
 
 CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
@@ -49,7 +49,12 @@ void CloudModuleEndPointFetcher::stopWhileInAioThread()
     m_endpointSelector.reset();
 }
 
-void CloudModuleEndPointFetcher::setEndpoint(SocketAddress endpoint)
+void CloudModuleEndPointFetcher::setModulesXmlUrl(QUrl url)
+{
+    m_modulesXmlUrl = std::move(url);
+}
+
+void CloudModuleEndPointFetcher::setUrl(QUrl endpoint)
 {
     QnMutexLocker lk(&m_mutex);
     m_endpoint = std::move(endpoint);
@@ -87,12 +92,14 @@ void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient->bindToAioThread(getAioThread());
     QObject::connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client) {
-        onHttpClientDone(std::move(client));
-    },
+        m_httpClient.get(),
+        [this](nx_http::AsyncHttpClientPtr client)
+        {
+            onHttpClientDone(std::move(client));
+        },
         Qt::DirectConnection);
     m_requestIsRunning = true;
-    m_httpClient->doGet(QUrl(QnAppInfo::defaultCloudModulesXmlUrl()));
+    m_httpClient->doGet(QUrl(m_modulesXmlUrl));
 }
 
 void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
@@ -102,43 +109,51 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
     m_httpClient.reset();
 
     if (!client->response())
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::serviceUnavailable,
-            SocketAddress());
+            QUrl());
+    }
 
     if (client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
         return signalWaitingHandlers(
             &lk,
             static_cast<nx_http::StatusCode::Value>(
                 client->response()->statusLine.statusCode),
-            SocketAddress());
+            QUrl());
+    }
 
     QByteArray xmlData = client->fetchMessageBodyBuffer();
     QBuffer xmlDataSource(&xmlData);
     std::unique_ptr<stree::AbstractNode> stree =
         stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
     if (!stree)
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::serviceUnavailable,
-            SocketAddress());
+            QUrl());
+    }
 
     //selecting endpoint
-    SocketAddress moduleEndpoint;
-    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleEndpoint))
+    QUrl moduleUrl;
+    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleUrl))
+    {
         return signalWaitingHandlers(
             &lk,
             nx_http::StatusCode::notFound,
-            SocketAddress());
+            QUrl());
+    }
 
-    endpointSelected(&lk, nx_http::StatusCode::ok, moduleEndpoint);
+    endpointSelected(&lk, nx_http::StatusCode::ok, moduleUrl);
 }
 
 bool CloudModuleEndPointFetcher::findModuleEndpoint(
     const stree::AbstractNode& treeRoot,
     const int moduleAttrName,
-    SocketAddress* const moduleEndpoint)
+    QUrl* const moduleUrl)
 {
     stree::ResourceContainer inputData;
     const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
@@ -170,7 +185,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))
     {
-        *moduleEndpoint = SocketAddress(foundEndpointStr);
+        *moduleUrl = buildUrl(foundEndpointStr);
         return true;
     }
     return false;
@@ -179,7 +194,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
 void CloudModuleEndPointFetcher::signalWaitingHandlers(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value statusCode,
-    const SocketAddress& endpoint)
+    const QUrl& endpoint)
 {
     auto handlers = std::move(m_resolveHandlers);
     m_resolveHandlers = decltype(m_resolveHandlers)();
@@ -193,7 +208,7 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
 void CloudModuleEndPointFetcher::endpointSelected(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value result,
-    SocketAddress selectedEndpoint)
+    QUrl selectedEndpoint)
 {
     if (result != nx_http::StatusCode::ok)
         return signalWaitingHandlers(lk, result, std::move(selectedEndpoint));
@@ -203,6 +218,36 @@ void CloudModuleEndPointFetcher::endpointSelected(
     signalWaitingHandlers(lk, result, selectedEndpoint);
 }
 
+QUrl CloudModuleEndPointFetcher::buildUrl(const QString& str)
+{
+    QUrl url(str);
+    if (url.host().isEmpty())
+    {
+        // str could be host:port
+        const SocketAddress endpoint(str);
+        url = QUrl();
+        url.setHost(endpoint.address.toString());
+        if (endpoint.port > 0)
+            url.setPort(endpoint.port);
+    }
+
+    if (url.scheme().isEmpty())
+    {
+        const auto it = m_moduleToDefaultUrlScheme.find(
+            m_nameset.findResourceByID(m_moduleAttrName).name);
+        if (it != m_moduleToDefaultUrlScheme.end())
+            url.setScheme(it->second);
+        else
+            url.setScheme("http");
+
+        if ((url.scheme() == "http") && (url.port() == nx_http::DEFAULT_HTTPS_PORT))
+            url.setScheme("https");
+    }
+
+    return url;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 CloudModuleEndPointFetcher::ScopedOperation::ScopedOperation(
     CloudModuleEndPointFetcher* const fetcher)
@@ -226,7 +271,7 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Ha
     m_fetcher->get(
         auth,
         [sharedGuard = std::move(sharedGuard), handler = std::move(handler)](
-            nx_http::StatusCode::Value statusCode, SocketAddress result) mutable
+            nx_http::StatusCode::Value statusCode, QUrl result) mutable
         {
             if (auto lock = sharedGuard->lock())
                 handler(statusCode, result);

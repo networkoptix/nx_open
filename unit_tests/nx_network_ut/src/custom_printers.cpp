@@ -1,15 +1,7 @@
-/**********************************************************
-* 14 jan 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "custom_printers.h"
 
 #include <iostream>
 #include <string>
-
-#include <QByteArray>
-#include <QString>
 
 void PrintTo(const QByteArray& val, ::std::ostream* os)
 {

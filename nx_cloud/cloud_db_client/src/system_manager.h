@@ -16,8 +16,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-class SystemManager
-:
+class SystemManager:
     public api::SystemManager,
     public AsyncRequestsExecutor
 {
