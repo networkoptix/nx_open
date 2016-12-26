@@ -14,7 +14,8 @@ public:
         NoError = 0,
         DownloadError,
         NoFreeSpaceError,
-        FileError
+        FileError,
+        Cancelled
     };
 
     explicit QnDownloadUpdatesPeerTask(QObject *parent = 0);
@@ -32,7 +33,7 @@ protected:
 private:
     void downloadNextUpdate();
 
-    void doCancelInternal(ErrorCode code);
+    void finishTask(ErrorCode code);
 
 private slots:
     void continueDownload();
