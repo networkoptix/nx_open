@@ -873,7 +873,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
-        IncompatibleProtocolConnectionResult        /*< Ec2 protocol versions differs.*/
+        IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
+        ForbiddenConnectionResult                   /*< Connection is not allowed yet. Try again later*/
     };
 
     /**

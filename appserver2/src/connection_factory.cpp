@@ -1518,6 +1518,10 @@ void Ec2DirectConnectionFactory::connectToOldEC(const QUrl& ecUrl, Handler compl
             completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
             break;
 
+        case CL_HTTP_FORBIDDEN:
+            completionFunc(ErrorCode::forbidden, QnConnectionInfo());
+            break;
+
         default:
             completionFunc(ErrorCode::ioError, QnConnectionInfo());
             break;
@@ -1544,6 +1548,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     {
         case ec2::ErrorCode::ok:
         case ec2::ErrorCode::unauthorized:
+        case ec2::ErrorCode::forbidden:
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
             break;
@@ -1582,6 +1587,7 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
 {
     if (errorCode == ErrorCode::ok
         || errorCode == ErrorCode::unauthorized
+        || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
         || errorCode == ErrorCode::cloud_temporary_unauthorized)
     {

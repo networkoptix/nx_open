@@ -188,6 +188,8 @@ namespace ec2
                 }
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported, OutputData() );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden, OutputData());
                 default:
                     return handler( ErrorCode::serverError, OutputData() );
             }
@@ -235,6 +237,8 @@ namespace ec2
                     return handler( ErrorCode::ok );
                 case nx_http::StatusCode::unauthorized:
                     return handler( ErrorCode::unauthorized );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden);
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported );
                 default:
