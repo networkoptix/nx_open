@@ -1,6 +1,7 @@
 #include <memory>
 #include <utility>
 #include <media_server_process.h>
+#include <media_server_process_aux.h>
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -17,7 +18,7 @@
 
 
 namespace detail {
-class TestSystemNameProxy : public aux::SystemNameProxy
+class TestSystemNameProxy : public nx::mserver_aux::SystemNameProxy
 {
 public:
     static const QString kConfigValue;
@@ -53,7 +54,7 @@ private:
 
 const QString TestSystemNameProxy::kConfigValue = lit("SYSTEM_NAME_CONFIG_VALUE");
 
-class TestSettingsProxy : public aux::SettingsProxy
+class TestSettingsProxy : public nx::mserver_aux::SettingsProxy
 {
 public:
     TestSettingsProxy() :
@@ -158,7 +159,7 @@ public:
 
     void shutdownBeforeRestore()
     {
-        restoreData = aux::savePersistentDataBeforeDbRestore(admin, mediaServer, settingsProxy.get());
+        restoreData = nx::mserver_aux::savePersistentDataBeforeDbRestore(admin, mediaServer, settingsProxy.get());
     }
 
     void setConnectedToCloud()
@@ -207,7 +208,7 @@ public:
     void useRestoreData()
     {
         ec2::aux::applyRestoreDbData(restoreData, admin);
-        aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+        nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
     }
 
     void assertAdminIsDisabled()
@@ -228,7 +229,7 @@ public:
 
     void assertNeedToResetSystem(bool isNewServerInstance, bool expectedValue)
     {
-        ASSERT_EQ(aux::needToResetSystem(isNewServerInstance, settingsProxy.get()), expectedValue);
+        ASSERT_EQ(nx::mserver_aux::needToResetSystem(isNewServerInstance, settingsProxy.get()), expectedValue);
     }
 
     QnUserResourcePtr admin;
