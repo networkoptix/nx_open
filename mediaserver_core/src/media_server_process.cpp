@@ -82,6 +82,8 @@
 #include <network/authenticate_helper.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
+#include <network/system_helpers.h>
+
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
@@ -545,7 +547,7 @@ QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QStr
 {
     if (!url.endsWith(m_mediaFolderName))
         return url;
-    
+
     int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
     NX_ASSERT(indexBeforeMediaFolderName > 0);
     if (indexBeforeMediaFolderName <= 0)
@@ -802,7 +804,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
         auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
-                m_mediaServer->getStorages(), 
+                m_mediaServer->getStorages(),
                 listRecordFolders());
 
         storagesToRemove.append(unMountedStorages);
@@ -1049,8 +1051,8 @@ void initAppServerConnection(QSettings &settings)
             params.addQueryItem("cleanupDb", QString());
     }
 
-    // TODO: Actually appserverPassword is always empty. Remove?
-    QString userName = settings.value("appserverLogin", QnServer::kDefaultAdminPassword).toString();
+    // TODO: #rvasilenko Actually appserverPassword is always empty. Remove?
+    QString userName = settings.value("appserverLogin", helpers::kFactorySystemUser).toString();
     QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = nx::ServerSetting::getAuthKey();
     QString appserverHostString = settings.value("appserverHost").toString();
@@ -1853,7 +1855,7 @@ bool MediaServerProcess::initTcpListener(
 }
 
 void aux::saveStoragesInfoToBeforeRestoreData(
-    BeforeRestoreDbData* beforeRestoreDbData, 
+    BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages)
 {
     QByteArray result;

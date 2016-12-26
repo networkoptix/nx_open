@@ -32,8 +32,6 @@
 namespace {
 
 static const int kMaxSystemNameLength = 20;
-static const QString kFactorySystemUser = lit("admin");
-static const QString kFactorySystemPassword = lit("admin");
 
 }
 
@@ -219,7 +217,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
 
     m_url = url;
     m_remoteOwnerCredentials.setUser(login);
-    m_remoteOwnerCredentials.setPassword(password.isEmpty() ? kFactorySystemPassword : password);
+    m_remoteOwnerCredentials.setPassword(password.isEmpty()
+        ? helpers::kFactorySystemPassword
+        : password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
     ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
@@ -284,7 +284,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     if (isNewSystem)
     {
         ui->currentSystemRadioButton->setChecked(true);
-        ui->loginEdit->setText(kFactorySystemUser);
+        ui->loginEdit->setText(helpers::kFactorySystemUser);
         ui->passwordEdit->clear();
     }
 
