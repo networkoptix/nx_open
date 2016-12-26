@@ -1240,15 +1240,17 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
-    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
-    if (widgetsForResource.size() == 1)
+    const auto resource = widget->resource();
+    NX_ASSERT(m_widgetsByResource.contains(resource));
+    if (m_widgetsByResource.contains(resource))
     {
-        emit resourceAboutToBeRemoved(widget->resource());
-        m_widgetsByResource.remove(widget->resource());
-    }
-    else
-    {
+        QnResourceWidgetList& widgetsForResource = m_widgetsByResource[resource];
         widgetsForResource.removeOne(widget);
+        if (widgetsForResource.empty())
+        {
+            emit resourceAboutToBeRemoved(resource);
+            m_widgetsByResource.remove(resource);
+        }
     }
 
     m_widgets.removeOne(widget);
@@ -2368,8 +2370,11 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     if (accessController()->hasPermissions(resource, requiredPermission))
         return;
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);
@@ -2384,8 +2389,11 @@ void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& re
             workbench()->removeLayout(layout);
     }
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);
