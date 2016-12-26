@@ -215,7 +215,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
-        case NumberColumn:       return tr("#");
+        case NumberColumn:       return lit("#");
         case IdColumn:           return tr("ID");
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
