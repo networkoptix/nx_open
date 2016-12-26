@@ -254,7 +254,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument, QnSignalingInstrumentActivated, this,
         [this]()
         {
-            fitInView(false);
+            fitInView(false); //< Direct call to immediate reaction
             /**
              * Since we don't animate fit in view we have to execute fitInView second time
              * after some delay, because some OS make resize call before move widget to correct
