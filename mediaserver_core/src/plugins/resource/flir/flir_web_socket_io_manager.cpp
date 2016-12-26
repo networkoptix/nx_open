@@ -68,7 +68,6 @@ bool WebSocketIoManager::startIOMonitoring()
 {
     QnMutexLocker lock(&m_mutex);
 
-    qDebug() << "Flir, Starting IO monitoring";
     if (m_monitoringIsInProgress)
         return true;
 
@@ -92,7 +91,6 @@ void WebSocketIoManager::stopIOMonitoring()
 {
     QnMutexLocker lock(&m_mutex);
 
-    qDebug() << "Flir, Stopping IO monitoring";
     if (!m_monitoringIsInProgress)
         return;
 
@@ -107,12 +105,11 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     QString path;
     QUrl url;
 
-    qDebug() << "================> SETTING OUTPUT STATE" << portId << isActive;
     NX_LOGX(
         lm("Setting output port state. Port: %1, isActive: %2")
             .arg(portId)
             .arg(isActive),
-        cl_logINFO); //< TODO: #dmishin change log level to debug1;
+        cl_logDEBUG1);
 
     {
         QnMutexLocker lock(&m_mutex);
@@ -153,10 +150,9 @@ bool WebSocketIoManager::setOutputPortState(const QString& portId, bool isActive
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
 
-    qDebug() << "==================> RESPONSE MESSAGE BODY" << messageBody;
     NX_LOGX(
         lm("Set IO Port state response").arg(QString::fromUtf8(messageBody)),
-        cl_logINFO); //< TODO: #dmishin change log level to debug1;
+        cl_logDEBUG1);
 
     auto commandResponse = CommandResponse(QString::fromUtf8(messageBody));
     if (!commandResponse.isValid() || commandResponse.returnCode() != kNoError)
@@ -234,7 +230,6 @@ void WebSocketIoManager::routeIOMonitoringInitializationUnsafe(InitState newStat
     if (!m_monitoringIsInProgress)
         return;
 
-    qDebug() << "Routing IO Monitoring initialization" << (int)newState;
     m_initializationState = newState;
 
     switch (m_initializationState)
@@ -272,7 +267,6 @@ void WebSocketIoManager::at_controlWebSocketConnected()
         .arg(m_resource->getUrl());
 
     NX_LOGX(message, cl_logDEBUG2);
-    qDebug() << message;
     routeIOMonitoringInitializationUnsafe(InitState::controlSocketConnected);
 }
 
@@ -287,7 +281,6 @@ void WebSocketIoManager::at_controlWebSocketDisconnected()
 
     if (m_monitoringIsInProgress)
     {
-        qDebug() << message;
         NX_LOGX(message, cl_logWARNING);
         reinitMonitoringUnsafe();
     }
@@ -305,7 +298,6 @@ void WebSocketIoManager::at_controlWebSocketError(QAbstractSocket::SocketError e
 
     if (m_monitoringIsInProgress)
     {
-        qDebug() << message;
         NX_LOGX(message, cl_logWARNING);
         reinitMonitoringUnsafe();
     }
@@ -353,8 +345,7 @@ void WebSocketIoManager::at_notificationWebSocketConnected()
         .arg(m_resource->getModel())
         .arg(m_resource->getUrl());
 
-    NX_LOGX(message, cl_logDEBUG2);
-    qDebug() << message;
+    NX_LOGX(message, cl_logDEBUG2);    
 
     routeIOMonitoringInitializationUnsafe(InitState::subscribed);
 }
@@ -370,9 +361,8 @@ void WebSocketIoManager::at_notificationWebSocketDisconnected()
 
     if (m_monitoringIsInProgress)
     {
-        qDebug() << message;
         NX_LOGX(message, cl_logWARNING);
-            reinitMonitoringUnsafe();
+        reinitMonitoringUnsafe();
     }
 }
 
@@ -388,15 +378,13 @@ void WebSocketIoManager::at_notificationWebSocketError(QAbstractSocket::SocketEr
 
     if (m_monitoringIsInProgress)
     {
-        qDebug() << message;
         NX_LOGX(message, cl_logWARNING);
-            reinitMonitoringUnsafe();
+        reinitMonitoringUnsafe();
     }
 }
 
 void WebSocketIoManager::at_gotMessageOnNotificationWebSocket(const QString& message)
 {
-    qDebug() << "Got message from camera" << m_resource->getUrl() << message;
     auto notification = parseNotification(message);
 
     if (!notification)
@@ -423,7 +411,6 @@ void WebSocketIoManager::connectWebsocketUnsafe(
                 .arg(path);
 
             auto message = lm("Connecting socket to url %1").arg(kUrl);
-            qDebug() << message;
             NX_LOGX(message, cl_logDEBUG2);
 
             proxy->open(kUrl);
@@ -566,8 +553,6 @@ void WebSocketIoManager::sendKeepAliveUnsafe()
 
 void WebSocketIoManager::handleServerWhoAmIResponseUnsafe(const CommandResponse& response)
 {
-    qDebug() << "Got session id response";
-
     const auto sessionId = response.value<int>(kSessionIdParamName);
     if (!sessionId)
         return;
@@ -608,7 +593,7 @@ void WebSocketIoManager::handleRemoteControlReleaseResponseUnsafe(const CommandR
 
 void WebSocketIoManager::handleIoSensorOutputStateSetResponseUnsafe(const CommandResponse& response)
 {
-    
+    // Do nothing.
 }
 
 void WebSocketIoManager::checkAndNotifyIfNeeded(const Notification& notification)
@@ -695,7 +680,6 @@ void WebSocketIoManager::resetSocketProxiesUnsafe()
         &m_controlProxy,
         &m_notificationProxy};
 
-    qDebug() << "Flir, Resetting socket proxies";
     for (auto proxyPtr: proxies)
     {
         if (!*proxyPtr)
@@ -718,7 +702,6 @@ void WebSocketIoManager::reinitMonitoringUnsafe()
         .arg(m_resource->getUrl());
 
     NX_LOGX(message, cl_logWARNING);
-    qDebug() << message;
 
     QObject::disconnect();
     resetSocketProxiesUnsafe();

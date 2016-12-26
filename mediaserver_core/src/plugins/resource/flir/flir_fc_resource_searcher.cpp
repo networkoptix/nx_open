@@ -84,8 +84,6 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
     if (!deviceInfo)
         return QList<QnResourcePtr>();
 
-    qDebug() << "======> SERIAL NUMBER" << deviceInfo->serialNumber;
-
     QUrl deviceUrl;
     deviceUrl.setScheme(lit("http"));
     deviceUrl.setHost(url.host());
@@ -127,10 +125,7 @@ QnResourceList FcResourceSearcher::findResources()
 
         auto resource = makeResource(deviceInfo, auth);
         if (resource)
-        {
-            qDebug() << "======> SERIAL NUMBER (2)" << deviceInfo.serialNumber;
             result.push_back(resource);
-        }
 
         itr++;
     }
