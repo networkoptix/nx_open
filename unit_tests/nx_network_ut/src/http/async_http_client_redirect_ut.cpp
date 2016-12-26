@@ -84,6 +84,9 @@ protected:
         while (!m_httpClient.eof())
             msgBody += m_httpClient.fetchMessageBodyBuffer();
         ASSERT_EQ(QByteArray(testMessageBody), msgBody);
+
+        ASSERT_EQ(m_redirectUrl, m_httpClient.url());
+        ASSERT_EQ(m_actualUrl, m_httpClient.contentLocationUrl());
     }
 
     void thenClientShouldPerformFiniteNumberOfRedirectionAttempts()

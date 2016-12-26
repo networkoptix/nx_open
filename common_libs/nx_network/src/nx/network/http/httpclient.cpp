@@ -134,6 +134,11 @@ const QUrl& HttpClient::url() const
     return m_asyncHttpClient->url();
 }
 
+const QUrl& HttpClient::contentLocationUrl() const
+{
+    return m_asyncHttpClient->contentLocationUrl();
+}
+
 StringType HttpClient::contentType() const
 {
     return m_asyncHttpClient->contentType();
