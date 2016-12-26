@@ -3,7 +3,7 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QDoubleSpinBox>
 
 #include <client/client_globals.h>
 
@@ -13,10 +13,19 @@
 #include <ui/models/ioports_view_model.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+namespace {
+
+inline qreal secondsFromMs(int ms) { return ms / 1000.0; }
+inline int secondsToMs(int seconds) { return qRound(seconds * 1000.0); }
+
+} // namespace
 
 QWidget* QnIoPortItemDelegate::createWidget(
     QAbstractItemModel* model, const QModelIndex& index, QWidget* parent) const
 {
+    if (index.column() > QnIOPortsViewModel::TypeColumn && index.data(Qn::DisabledRole).toBool())
+        return nullptr;
+
     switch (index.column())
     {
         case QnIOPortsViewModel::NumberColumn:
@@ -124,20 +133,21 @@ QWidget* QnIoPortItemDelegate::createWidget(
             if (!index.flags().testFlag(Qt::ItemIsEditable))
                 return nullptr;
 
-            auto spinBox = new QSpinBox(parent);
-            spinBox->setMinimum(1);
+            auto spinBox = new QDoubleSpinBox(parent);
+            spinBox->setDecimals(1);
+            spinBox->setRange(0.1, 99999.9); //< some sensible range in seconds
             spinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
             auto commit =
-                [model, spinBox](int value)
+                [model, spinBox](double value)
                 {
                     const auto index = indexForWidget(spinBox);
 
                     if (index.isValid())
-                        model->setData(index, value, Qt::EditRole);
+                        model->setData(index, secondsToMs(value), Qt::EditRole);
                 };
 
-            connect(spinBox, QnSpinboxIntValueChanged, spinBox, commit);
+            connect(spinBox, QnSpinboxDoubleValueChanged, spinBox, commit);
             return spinBox;
         }
     }
@@ -147,6 +157,9 @@ QWidget* QnIoPortItemDelegate::createWidget(
 
 bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& index) const
 {
+    if (index.column() > QnIOPortsViewModel::TypeColumn && index.data(Qn::DisabledRole).toBool())
+        return false;
+
     if (base_type::updateWidget(widget, index))
         return true;
 
@@ -203,12 +216,12 @@ bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& inde
             if (!index.flags().testFlag(Qt::ItemIsEditable))
                 return !widget; //< should delete if widget exists
 
-            auto spinBox = qobject_cast<QSpinBox*>(widget);
+            auto spinBox = qobject_cast<QDoubleSpinBox*>(widget);
             if (!spinBox)
                 return false;
 
-            int newValue = index.data(Qt::EditRole).toInt();
-            if (spinBox->value() != newValue)
+            auto newValue = secondsFromMs(index.data(Qt::EditRole).toInt());
+            if (!qFuzzyIsNull(spinBox->value() - newValue))
                 spinBox->setValue(newValue);
 
             return true;
