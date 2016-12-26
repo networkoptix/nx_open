@@ -12,7 +12,8 @@ namespace nx {
 namespace network {
 namespace aio {
 
-Timer::Timer():
+Timer::Timer(aio::AbstractAioThread* aioThread):
+    BasicPollable(aioThread),
     m_aioService(SocketGlobals::aioService()),
     m_internalTimerId(0)
 {

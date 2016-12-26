@@ -75,13 +75,13 @@ CloudServerSocket::CloudServerSocket(
     std::vector<AcceptorMaker> acceptorMakers)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
-    m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
+    m_mediatorRegistrationRetryTimer(
+        std::move(mediatorRegistrationRetryPolicy),
+        m_mediatorConnection->getAioThread()),
     m_acceptorMakers(acceptorMakers),
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    NX_ASSERT(m_mediatorConnection);
-
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
     m_socketAttributes.nonBlockingMode = false;
