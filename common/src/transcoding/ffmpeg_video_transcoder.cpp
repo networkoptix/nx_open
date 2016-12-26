@@ -239,6 +239,12 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
         resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
     resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, m_outPacket->size); // todo: remove data copy here!
     resultVideoData->compressionType = updateCodec(m_codecId);
+
+    if (!m_ctxPtr)
+        m_ctxPtr.reset(new QnAvCodecMediaContext(m_encoderCtx));
+    resultVideoData->context = m_ctxPtr;
+    resultVideoData->width = m_encoderCtx->width;
+    resultVideoData->height = m_encoderCtx->height;
     *result = QnCompressedVideoDataPtr(resultVideoData);
 
     ++m_encodedFrames;
