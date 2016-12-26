@@ -320,6 +320,9 @@ void QnWidgetTablePrivate::layoutChanged(
     if (!parents.empty() && !parents.contains(m_rootIndex))
         return; //< nothing to do
 
+    if (rowCount() == 0 || columnCount() == 0)
+        return; //< nothing to do as well
+
     QVector<QWidget*> buffer; //< buffer for widgets relocation
 
     /* Copy widget pointer to the buffer and clear its source location: */
