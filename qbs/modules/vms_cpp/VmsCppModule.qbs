@@ -50,7 +50,7 @@ Module
     }
     Properties
     {
-        condition: project.target == "isd" || project.target == "isd_s2"
+        condition: project.box == "isd" || project.box == "isd_s2"
         enableAllVendors: false
         enableSoftwareMotionDetection: false
         enableDesktopCamera: false
@@ -103,7 +103,7 @@ Module
         if (qbs.targetOS.contains("unix"))
             defines.push("QN_EXPORT=")
 
-        if (project.target == "isd" || project.target == "isd_s2")
+        if (project.box == "isd" || project.box == "isd_s2")
             defines.push("EDGE_SERVER")
 
         return defines

@@ -4,6 +4,7 @@ import qbs.File
 import qbs.FileInfo
 import qbs.TextFile
 import qbs.Process
+import "qbs/imports/VmsUtils/vms_utils.js" as VmsUtils
 
 Project
 {
@@ -21,9 +22,10 @@ Project
         versionMajor + "." + versionMinor + "." + versionBugfix + "." + buildNumber
 
     property bool developerBuild: true
-    property string target: "linux-x64"
+    property string box
     property string customization: "default"
     property bool beta: true
+    property string target: VmsUtils.currentTarget(box)
 
     property bool withInstallers: false
 
