@@ -153,7 +153,7 @@
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>         
+        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.1</qt.version>
@@ -198,11 +198,11 @@
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
-        <toolchain.version>none</toolchain.version>       
+        <toolchain.version>none</toolchain.version>
 
         <additional.defines/>
-        <customization.defines/>    
-        
+        <customization.defines/>
+
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
@@ -231,7 +231,7 @@
         <cloud.instance>-${cloud.group}</cloud.instance>
         <arch.suffix>-${arch}</arch.suffix>
         <release.configuration>-${build.configuration}</release.configuration>
-        <beta.status>-beta</beta.status>         
+        <beta.status>-beta</beta.status>
     </properties>
 
     <build>
@@ -355,11 +355,11 @@
                                 <resource>
                                     <directory>${customization.dir}/icons/${platform}</directory>
                                     <filtering>false</filtering>
-                                </resource>                                
+                                </resource>
                                 <resource>
                                     <directory>${customization.dir}/icons/all</directory>
                                     <filtering>false</filtering>
-                                </resource>                                                                                                
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -507,7 +507,7 @@
             <modules>
                 <module>client/mobile_client</module>
             </modules>
-        </profile>        
+        </profile>
         <profile>
             <id>windows</id>
             <activation>
@@ -1066,7 +1066,7 @@
             <properties>
                 <cloud.instance />
             </properties>
-        </profile>         
+        </profile>
 
         <!-- Mobile client profiles -->
         <profile>
@@ -1085,8 +1085,8 @@
                 <module>client/mobile_client</module>
             </modules>
             <properties>
-                <arch.suffix />            
-            </properties>    
+                <arch.suffix />
+            </properties>
         </profile>
         <profile>
             <id>mobile-android</id>
@@ -1223,9 +1223,9 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>             
+                    </plugin>
                 </plugins>
-            </build> 
-        </profile>  
+            </build>
+        </profile>
     </profiles>
 </project>
