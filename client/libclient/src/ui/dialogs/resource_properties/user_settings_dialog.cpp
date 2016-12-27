@@ -46,7 +46,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_editRolesButton(new QPushButton(tr("Edit Roles..."), this))
+    m_userEnabledButton(new QPushButton(tr("Enabled"), this))
 {
     ui->setupUi(this);
 
@@ -115,18 +115,13 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
         tryClose(true);
     });
 
-    ui->buttonBox->addButton(m_editRolesButton, QDialogButtonBox::HelpRole);
-    connect(m_editRolesButton, &QPushButton::clicked, this,
-        [this]
-        {
-            QnUuid roleId = isPageVisible(ProfilePage)
-                ? m_user->userRoleId()
-                : m_settingsPage->selectedUserRoleId();
-            menu()->trigger(QnActions::UserRolesAction,
-                QnActionParameters().withArgument(Qn::UuidRole, roleId));
-        });
+    ui->buttonBox->addButton(m_userEnabledButton, QDialogButtonBox::HelpRole);
+    connect(m_userEnabledButton, &QPushButton::clicked, this, &QnUserSettingsDialog::updateButtonBox);
 
-    m_editRolesButton->setVisible(false);
+    m_userEnabledButton->setFlat(true);
+    m_userEnabledButton->setCheckable(true);
+    m_userEnabledButton->setVisible(false);
+    setHelpTopic(m_userEnabledButton, Qn::UserSettings_DisableUser_Help);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -286,6 +281,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
         || m_model->mode() == QnUserSettingsModel::OtherProfile);
 
+    m_userEnabledButton->setChecked(m_user && m_user->isEnabled());
     forcedUpdate();
 }
 
@@ -390,6 +386,20 @@ void QnUserSettingsDialog::applyChanges()
 void QnUserSettingsDialog::applyChangesInternal()
 {
     base_type::applyChanges();
+
+    if (accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+        m_user->setEnabled(m_userEnabledButton->isChecked());
+}
+
+bool QnUserSettingsDialog::hasChanges() const
+{
+    if (base_type::hasChanges())
+        return true;
+
+    if (m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+        return (m_user->isEnabled() != m_userEnabledButton->isChecked());
+
+    return false;
 }
 
 void QnUserSettingsDialog::updateControlsVisibility()
@@ -413,7 +423,8 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    m_editRolesButton->setVisible(settingsPageVisible);
+    m_userEnabledButton->setVisible(settingsPageVisible && m_user
+        && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission));
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

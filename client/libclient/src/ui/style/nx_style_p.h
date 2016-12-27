@@ -54,6 +54,9 @@ public:
             QPalette::ColorRole foregroundRole,
             const QWidget* widget = nullptr) const;
 
+    static bool isCheckableButton(const QStyleOption* option);
+    static bool isTextButton(const QStyleOption* option);
+
     /* Insert horizontal separator line into QInputDialog above its button box. */
     bool polishInputDialog(QInputDialog* inputDialog) const;
 

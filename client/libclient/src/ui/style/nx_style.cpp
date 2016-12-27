@@ -153,33 +153,6 @@ namespace
         return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
     }
 
-    bool isCheckableButton(const QStyleOption* option)
-    {
-        if (qstyleoption_cast<const QStyleOptionButton*>(option))
-        {
-            if (option->state.testFlag(QStyle::State_On) ||
-                option->state.testFlag(QStyle::State_Off) ||
-                option->state.testFlag(QStyle::State_NoChange))
-            {
-                return true;
-            }
-
-            const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
-            if (buttonWidget && buttonWidget->isCheckable())
-                return true;
-        }
-
-        return false;
-    }
-
-    bool isTextButton(const QStyleOption* option)
-    {
-        if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
-            return button->features.testFlag(QStyleOptionButton::Flat);
-
-        return false;
-    }
-
     bool isAccented(const QWidget* widget)
     {
         return widget && widget->property(Properties::kAccentStyleProperty).toBool();
@@ -2258,7 +2231,7 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonBevel:
         {
-            if (isTextButton(option))
+            if (QnNxStylePrivate::isTextButton(option))
                 return;
 
             break;
@@ -2275,7 +2248,7 @@ void QnNxStyle::drawControl(
                 const bool isDefaultForegroundRole = (foregroundRole == QPalette::ButtonText);
 
                 /* Draw text button: */
-                if (isTextButton(option))
+                if (QnNxStylePrivate::isTextButton(option))
                 {
                     /* Foreground role override: */
                     if (isDefaultForegroundRole)
@@ -2325,7 +2298,7 @@ void QnNxStyle::drawControl(
                 }
 
                 /* Draw switch right-aligned: */
-                if (isCheckableButton(option))
+                if (QnNxStylePrivate::isCheckableButton(option))
                 {
                     QStyleOptionButton newOpt(*buttonOption);
                     newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
@@ -2334,12 +2307,12 @@ void QnNxStyle::drawControl(
                     if (buttonOption->direction == Qt::RightToLeft)
                     {
                         newOpt.rect.moveLeft(option->rect.left() + Metrics::kSwitchMargin);
-                        textRect.setLeft(newOpt.rect.right() + Metrics::kSwitchMargin + 1);
+                        textRect.setLeft(newOpt.rect.right() + Metrics::kStandardPadding + 1);
                     }
                     else
                     {
                         newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
-                        textRect.setRight(newOpt.rect.left() - Metrics::kSwitchMargin - 1);
+                        textRect.setRight(newOpt.rect.left() - Metrics::kStandardPadding - 1);
                     }
 
                     drawSwitch(painter, &newOpt, widget);
@@ -2794,7 +2767,7 @@ QRect QnNxStyle::subElementRect(
 
         case SE_PushButtonFocusRect:
         {
-            return isTextButton(option)
+            return QnNxStylePrivate::isTextButton(option)
                 ? option->rect
                 : QnGeometry::eroded(option->rect, 1);
         }
@@ -3023,23 +2996,30 @@ QSize QnNxStyle::sizeFromContents(
             QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
             result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
 
+            bool hasIcon = false;
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
-                if (!button->icon.isNull())
+                hasIcon = !button->icon.isNull();
+                if (hasIcon)
                     result.rwidth() -= 4; // Compensate for QPushButton::sizeHint magic
             }
 
-            if (isTextButton(option))
-                result.rwidth() += Metrics::kTextButtonIconMargin;
+            const bool textButton = QnNxStylePrivate::isTextButton(option);
+            if (textButton)
+                result.rwidth() += (hasIcon ? Metrics::kTextButtonIconMargin : 0);
             else
                 result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
 
-            if (isCheckableButton(option))
+            if (QnNxStylePrivate::isCheckableButton(option))
             {
-                result.rwidth() += Metrics::kButtonSwitchSize.width() +
-                    Metrics::kStandardPadding * 2 - Metrics::kSwitchMargin;
+                const QSize switchSize = textButton
+                    ? Metrics::kStandaloneSwitchSize
+                    : Metrics::kButtonSwitchSize;
 
-                result.rheight() = qMax(result.rheight(), Metrics::kButtonSwitchSize.height());
+                result.rwidth() += switchSize.width() + Metrics::kStandardPadding * 2
+                    - Metrics::kSwitchMargin;
+
+                result.rheight() = qMax(result.rheight(), switchSize.height());
             }
 
             return result;
@@ -3231,10 +3211,10 @@ int QnNxStyle::pixelMetric(
             if (qobject_cast<const QAbstractItemView*>(widget))
                 return 0;
 
-            if (isCheckableButton(option))
+            if (QnNxStylePrivate::isCheckableButton(option))
                 return Metrics::kSwitchMargin * 2;
 
-            if (isTextButton(option))
+            if (QnNxStylePrivate::isTextButton(option))
                 return 0;
 
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
