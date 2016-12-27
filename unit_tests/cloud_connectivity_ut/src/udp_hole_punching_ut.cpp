@@ -15,8 +15,7 @@ namespace cloud {
 
 using nx::hpm::MediaServerEmulator;
 
-class UdpHolePunching
-:
+class UdpHolePunching:
     public ::testing::Test
 {
 public:
@@ -122,6 +121,73 @@ TEST_F(UdpHolePunching, loadTest)
     server.pleaseStopSync();
 }
 
-}   //cloud
-}   //network
-}   //nx
+class UdpHolePunchingCancellation:
+    public UdpHolePunching
+{
+public:
+    UdpHolePunchingCancellation()
+    {
+    }
+
+    ~UdpHolePunchingCancellation()
+    {
+    }
+
+protected:
+    SocketAddress serverAddress() const
+    {
+        return SocketAddress(QString::fromUtf8(m_server->fullName()), 0);
+    }
+
+    void initializeCloudServerSocket()
+    {
+        m_serverSocket = cloudServerSocket();
+        m_serverSocket->acceptAsync(
+            [](SystemError::ErrorCode /*errorCode*/, AbstractStreamSocket* newConnection)
+            {
+                delete newConnection;
+            });
+    }
+
+    void ensureOpenedTunnel()
+    {
+        auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
+        ASSERT_TRUE(clientSocket->connect(serverAddress(), 3000));
+        clientSocket.reset();
+    }
+
+    void destroyServerSocketwithinAioThread()
+    {
+        nx::utils::promise<void> removed;
+        m_serverSocket->post(
+            [this, &removed]()
+            {
+                m_serverSocket.reset();
+                removed.set_value();
+            });
+        removed.get_future().wait();
+    }
+
+private:
+    std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
+};
+
+TEST_F(UdpHolePunchingCancellation, simple)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        initializeCloudServerSocket();
+        ensureOpenedTunnel();
+
+        auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
+        clientSocket->connectAsync(serverAddress(), [](SystemError::ErrorCode) {});
+
+        destroyServerSocketwithinAioThread();
+
+        clientSocket->pleaseStopSync();
+    }
+}
+
+} // namespace cloud
+} // namespace network
+} // namespace nx
