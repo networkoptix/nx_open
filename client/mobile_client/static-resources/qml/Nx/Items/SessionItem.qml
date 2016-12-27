@@ -71,6 +71,7 @@ Pane
         parent: control
 
         y: 2
+        z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: connectionsModel.hasConnections && !cloudSystem
