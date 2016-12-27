@@ -5,6 +5,7 @@
 #include <nx/utils/random.h>
 
 #include <media_server_process.h>
+#include <nx/network/socket_global.h>
 
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir)
@@ -40,39 +41,39 @@ void MediaServerLauncher::addSetting(const QString& name, const QString& value)
 
 bool MediaServerLauncher::start()
 {
+    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
     char* argv[] = { "", "-e", configFileOption.data() };
     const int argc = 3;
 
     m_configFile.flush();
     m_configFile.close();
-    m_mediaServerProcessThread = nx::utils::thread(
-        [this, argc, argv = argv]() mutable
+
+    m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+
+    std::promise<bool> processStartedPromise;
+    auto future = processStartedPromise.get_future();
+
+    connect(
+        m_mediaServerProcess.get(),
+        &MediaServerProcess::started,
+        this,
+        [&processStartedPromise]()
         {
-            MediaServerProcess::main(argc, argv);
-        });
+            processStartedPromise.set_value(true);
+        }, Qt::DirectConnection);
+    m_mediaServerProcess->start();
 
     //waiting for server to come up
     const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
-    while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
-    {
-        nx_http::HttpClient httpClient;
-        if (httpClient.doGet(
-            lit("http://%1/api/moduleInformation").arg(m_serverEndpoint.toString())))
-            break;  //server is alive
-    }
-
-    return std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart;
+    auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
+    return result == std::future_status::ready;
 }
 
 bool MediaServerLauncher::stop()
 {
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(lit("admin"));
-    httpClient.setUserPassword(lit("admin"));
-    if (!httpClient.doGet(lit("http://%1/api/restart").arg(m_serverEndpoint.toString())))
-        return false;
-    m_mediaServerProcessThread.join();
+    m_mediaServerProcess->stopSync();
     return true;
 }

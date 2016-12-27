@@ -301,7 +301,6 @@ TEST(MulticastHttpTest, main)
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
     MSSettings::roSettings()->setValue(lit("dataDir"), *workDirResource.getDirName());

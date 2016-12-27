@@ -10,9 +10,10 @@
 #include <nx/utils/std/thread.h>
 
 #include "utils.h"
+#include "media_server_process.h"
 
 
-class MediaServerLauncher
+class MediaServerLauncher: public QObject
 {
 public:
     MediaServerLauncher(const QString& tmpDir = QString());
@@ -28,5 +29,6 @@ private:
     nx::ut::utils::WorkDirResource m_workDirResource;
     SocketAddress m_serverEndpoint;
     QString m_configFilePath;
-    nx::utils::thread m_mediaServerProcessThread;
+    //nx::utils::thread m_mediaServerProcessThread;
+    std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
 };

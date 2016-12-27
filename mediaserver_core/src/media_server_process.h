@@ -15,6 +15,7 @@
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
+#include <platform/platform_abstraction.h>
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
@@ -24,6 +25,7 @@
 #include <media_server/serverutil.h>
 
 #include "health/system_health.h"
+#include "platform/platform_abstraction.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -39,7 +41,7 @@ namespace ec2 {
 
 namespace aux {
 void saveStoragesInfoToBeforeRestoreData(
-    BeforeRestoreDbData* beforeRestoreDbData, 
+    BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages);
 
 class UnmountedStoragesFilter
@@ -154,6 +156,7 @@ private:
     QString m_enforcedMediatorEndpoint;
     QnSoftwareVersion m_engineVersion;
     nx::SystemName m_systemName;
+    std::unique_ptr<QnPlatformAbstraction> m_platform;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

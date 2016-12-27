@@ -32,7 +32,6 @@ private:
     std::unique_ptr<MediaServerProcess> m_serverProcess;
     MediaServerTestFuncTypeList m_testList;
     nx::ut::utils::WorkDirResource m_workDirResource;
-    std::unique_ptr<QnPlatformAbstraction> m_platform;
     std::thread m_thread;
     std::promise<void> m_testReadyPromise;
     std::future<void> m_testsReadyFuture;

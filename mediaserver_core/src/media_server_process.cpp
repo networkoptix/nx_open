@@ -94,8 +94,6 @@
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
 
-#include <platform/platform_abstraction.h>
-
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/avi/avi_resource.h>
@@ -545,7 +543,7 @@ QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QStr
 {
     if (!url.endsWith(m_mediaFolderName))
         return url;
-    
+
     int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
     NX_ASSERT(indexBeforeMediaFolderName > 0);
     if (indexBeforeMediaFolderName <= 0)
@@ -802,7 +800,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
         auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
-                m_mediaServer->getStorages(), 
+                m_mediaServer->getStorages(),
                 listRecordFolders());
 
         storagesToRemove.append(unMountedStorages);
@@ -1081,6 +1079,7 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
+    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
 }
 
@@ -1853,7 +1852,7 @@ bool MediaServerProcess::initTcpListener(
 }
 
 void aux::saveStoragesInfoToBeforeRestoreData(
-    BeforeRestoreDbData* beforeRestoreDbData, 
+    BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages)
 {
     QByteArray result;
@@ -2968,8 +2967,6 @@ public:
 protected:
     virtual int executeApplication() override
     {
-        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
         m_main->setEnforcedMediatorEndpoint(m_enforcedMediatorEndpoint);
         m_main->setEngineVersion(m_overrideVersion);
