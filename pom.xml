@@ -801,6 +801,7 @@
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
+                <artifact.name.platform>${box}</artifact.name.platform>
             </properties>
             <build>
                 <directory>target-${box}</directory>
@@ -828,8 +829,7 @@
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
-                <artifact.name.platform>isd</artifact.name.platform>
+                <rdep.target>isd</rdep.target>               
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -859,7 +859,6 @@
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <qt.spec/>
-                <artifact.name.platform>isd_s2</artifact.name.platform>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -890,7 +889,6 @@
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
                 <target.arch>armhf</target.arch>
-                <artifact.name.platform>rpi</artifact.name.platform>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
@@ -925,7 +923,6 @@
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
                 <target.arch>armhf</target.arch>
-                <artifact.name.platform>bpi</artifact.name.platform>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -963,7 +960,6 @@
                 <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
                 <target.arch>armhf</target.arch>
-                <artifact.name.platform>bananapi</artifact.name.platform>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
@@ -996,7 +992,6 @@
                 <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
                 <target.arch>armhf</target.arch>
-                <artifact.name.platform>tx1</artifact.name.platform>
             </properties>
             <modules>
                 <module>client/libclient_core</module>
