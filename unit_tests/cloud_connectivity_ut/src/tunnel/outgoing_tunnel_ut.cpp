@@ -749,7 +749,7 @@ public:
                     true,
                     true,
                     false);
-                return connector;
+                return std::move(connector);
             });
     }
 
