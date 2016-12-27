@@ -1,10 +1,8 @@
-
 #pragma once
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#include <platform/core_foundation_mac/cf_ref_holder.h>
-#include <utils/math/math.h>
+#include <nx/utils/platform/core_foundation_mac/cf_ref_holder.h>
 
 namespace cf {
 
@@ -60,7 +58,7 @@ template<typename CFArrayRefType>
 template<typename ReturnType>
 ReturnType QnCFBaseArray<CFArrayRefType>::at(int index) const
 {
-    return (!base_type::ref() || !qBetween(0, index, size())
+    return (!base_type::ref() || index < 0 || index >= size()
         ? nullptr
         : reinterpret_cast<ReturnType>(CFArrayGetValueAtIndex(base_type::ref(), index)));
 }

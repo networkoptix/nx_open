@@ -24,7 +24,6 @@ GenericProduct
     Depends { name: "openssl" }
     Depends { name: "ffmpeg" }
     Depends { name: "quazip" }
-    Depends { name: "sigarInfo" }
     Depends { name: "boost" }
 
     Depends { name: "nx_fusion" }
@@ -41,13 +40,13 @@ GenericProduct
 
     Properties
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         cpp.frameworks: ["Foundation", "AppKit"]
     }
 
     Group
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         files: ["src/utils/mac_utils.mm"]
     }
 
@@ -68,10 +67,10 @@ GenericProduct
             "platform": vms.platform,
             "arch": vms.arch,
             "modification": vms.modification,
-            "ffmpeg.version": ffmpeg.version,
-            "sigar.version": sigarInfo.version,
-            "boost.version": boost.version,
-            "box": vms.box,
+            "ffmpeg.version": project.ffmpegVersion,
+            "sigar.version": project.sigarVersion,
+            "boost.version": project.boostVersion,
+            "box": project.box || "none",
             "beta": project.beta,
             "product.name": customization.productName,
             "product.appName": customization.productNameShort,

@@ -1,5 +1,5 @@
  <assembly>
-	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
+	<id>server_update</id>
 	<formats>
 		<format>dir</format>
 	</formats>
@@ -9,7 +9,7 @@
 			<directory>${project.build.directory}/bin/exe</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>*-server-*.exe</include>
+				<include>${artifact.name.server}.exe</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

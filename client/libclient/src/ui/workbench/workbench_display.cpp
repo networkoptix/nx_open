@@ -36,8 +36,6 @@
 
 #include <ui/common/notification_levels.h>
 
-#include <ui/workaround/widgets_signals_workaround.h>
-
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -2350,11 +2348,12 @@ void QnWorkbenchDisplay::at_mapper_cellSizeChanged()
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged()
 {
-    synchronizeAllGeometries(true);
+    synchronizeAllGeometries(false);
 
     synchronizeSceneBounds();
 
-    fitInView();
+    fitInView(false);
+
 
     if (qFuzzyIsNull(workbench()->mapper()->spacing()))
         m_frameOpacityAnimator->animateTo(0.0);

@@ -187,8 +187,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     initDownloadActions();
     initDropdownActions();
 
-    updateButtonAccent();
     updateButtonText();
+    updateButtonAccent();
+    updateDownloadButton();
 }
 
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)

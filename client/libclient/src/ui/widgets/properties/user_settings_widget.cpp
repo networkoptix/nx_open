@@ -11,6 +11,7 @@
 
 #include <core/resource/user_resource.h>
 
+#include <ui/actions/action_manager.h>
 #include <ui/common/aligner.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -31,6 +32,8 @@ namespace {
 
 const int kCloudUserFontSizePixels = 18;
 const int kCloudUserFontWeight = QFont::Light;
+
+const int kUserTypeComboMinimumWidth = 120;
 
 enum
 {
@@ -60,37 +63,44 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 {
     ui->setupUi(this);
 
+    m_localInputFields = {
+        ui->loginInputField,
+        ui->nameInputField,
+        ui->passwordInputField,
+        ui->confirmPasswordInputField,
+        ui->emailInputField };
+
+    m_cloudInputFields = {
+        ui->cloudEmailInputField };
+
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
     ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
-    ui->cloudPanelWidget->setOptions(QnCloudUserPanelWidget::ShowEnableButtonOption);
+    ui->userTypeComboBox->setMinimumWidth(qMax(kUserTypeComboMinimumWidth,
+        ui->userTypeComboBox->minimumSizeHint().width()));
+
+    ui->cloudPanelWidget->setManageLinkShown(false);
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
     setHelpTopic(ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
-    setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 
     ui->roleComboBox->setModel(m_rolesModel);
 
-    connect(ui->enabledButton,          &QPushButton::toggled,          this,   &QnUserSettingsWidget::hasChangesChanged);
-    connect(ui->roleComboBox,           QnComboboxCurrentIndexChanged,  this,   &QnUserSettingsWidget::hasChangesChanged);
+    connect(ui->roleComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnUserSettingsWidget::hasChangesChanged);
 
-    connect(m_rolesModel,               &QnUserRolesModel::modelReset,  this,   &QnUserSettingsWidget::updateRoleComboBox);
-    connect(m_rolesModel,               &QnUserRolesModel::rowsRemoved, this,   &QnUserSettingsWidget::updateRoleComboBox);
+    connect(m_rolesModel, &QnUserRolesModel::modelReset,
+        this, &QnUserSettingsWidget::updateRoleComboBox);
+    connect(m_rolesModel, &QnUserRolesModel::rowsRemoved,
+        this, &QnUserSettingsWidget::updateRoleComboBox);
 
-    /* Synchronize controls for local and cloud users for convenience (local controls are master controls): */
-    connect(ui->enabledButton,          &QPushButton::toggled,          this,
-        [this](bool on) { ui->cloudPanelWidget->setEnabled(on); });
-
-    connect(ui->cloudPanelWidget, &QnCloudUserPanelWidget::enabledChanged, this,
-        [this](bool value) { ui->enabledButton->setChecked(value); });
-
-    connect(ui->loginInputField,        &QnInputField::textChanged,     this,
+    connect(ui->loginInputField, &QnInputField::textChanged, this,
         [this](const QString& text)
         {
             ui->cloudPanelWidget->setEmail(text);
             ui->cloudEmailInputField->setText(processedEmail(text));
         });
 
-    connect(ui->nameInputField,         &QnInputField::textChanged,     this,
+    connect(ui->nameInputField, &QnInputField::textChanged, this,
         [this](const QString& text)
         {
             ui->cloudPanelWidget->setFullName(text);
@@ -99,7 +109,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     emit ui->loginInputField->textChanged(QString());
     emit ui->nameInputField->textChanged(QString());
 
-    connect(ui->userTypeComboBox,       QnComboboxCurrentIndexChanged,  this,
+    connect(ui->userTypeComboBox, QnComboboxCurrentIndexChanged, this,
         [this](int index)
         {
             ui->secondaryStackedWidget->setCurrentIndex(index);
@@ -110,6 +120,13 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
             }
         });
 
+    connect(ui->editRolesButton, &QPushButton::clicked, this,
+        [this]
+        {
+            menu()->trigger(QnActions::UserRolesAction, QnActionParameters()
+                .withArgument(Qn::UuidRole, selectedUserRoleId()));
+        });
+
     autoResizePagesToContents(ui->mainStackedWidget,
         { QSizePolicy::Expanding, QSizePolicy::Maximum }, true);
     autoResizePagesToContents(ui->secondaryStackedWidget,
@@ -118,12 +135,7 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setupInputFields();
 
     m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
-    m_aligner->setSkipInvisible(true);
-
-    for (auto field: inputFields())
-        m_aligner->addWidget(field);
-
-    m_aligner->addWidget(ui->roleLabel);
+    m_aligner->setSkipInvisible(false);
 }
 
 void QnUserSettingsWidget::updatePermissionsLabel(const QString& text)
@@ -160,9 +172,6 @@ bool QnUserSettingsWidget::hasChanges() const
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        if (m_model->user()->isEnabled() != ui->enabledButton->isChecked())
-            return true;
-
         QnUuid userRoleId = selectedUserRoleId();
         if (m_model->user()->userRoleId() != userRoleId)
             return true;
@@ -225,12 +234,21 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
-    ui->enabledButton->setChecked(m_model->user()->isEnabled());
 
     ui->loginInputField->setFocus();
 
-    for (auto field : inputFields())
+    m_aligner->clear();
+
+    for (auto field: relevantInputFields())
+    {
         field->reset();
+        m_aligner->addWidget(field);
+    }
+
+    m_aligner->addWidget(ui->roleLabel);
+
+    if (m_model->mode() == QnUserSettingsModel::NewUser)
+        m_aligner->addWidget(ui->userTypeLabel);
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -288,9 +306,6 @@ void QnUserSettingsWidget::applyChanges()
         if (selectedRole() != Qn::UserRole::CustomPermissions)
             m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
-
-    if (permissions.testFlag(Qn::WriteAccessRightsPermission))
-        m_model->user()->setEnabled(ui->enabledButton->isChecked());
 }
 
 bool QnUserSettingsWidget::canApplyChanges() const
@@ -304,18 +319,6 @@ bool QnUserSettingsWidget::canApplyChanges() const
                  });
         };
 
-    const QList<QnInputField*> kLocalUserFields{
-        ui->loginInputField,
-        ui->nameInputField,
-        ui->passwordInputField,
-        ui->confirmPasswordInputField,
-        ui->emailInputField
-    };
-
-    const QList<QnInputField*> kCloudUserFields{
-        ui->cloudEmailInputField
-    };
-
     switch (m_model->mode())
     {
         case QnUserSettingsModel::NewUser:
@@ -323,9 +326,9 @@ bool QnUserSettingsWidget::canApplyChanges() const
             switch (ui->userTypeComboBox->currentIndex())
             {
                 case kCloudIndex:
-                    return checkFields(kCloudUserFields);
+                    return checkFields(cloudInputFields());
                 case kLocalIndex:
-                    return checkFields(kLocalUserFields);
+                    return checkFields(localInputFields());
                 default:
                     break;
             }
@@ -336,7 +339,7 @@ bool QnUserSettingsWidget::canApplyChanges() const
             if (m_model->user()->isCloud())
                 return true;
 
-            return checkFields(kLocalUserFields);
+            return checkFields(localInputFields());
         }
         default:
             break;
@@ -450,20 +453,34 @@ void QnUserSettingsWidget::setupInputFields()
         [this]() { return ui->passwordInputField->text(); },
         tr("Passwords do not match.")));
 
-    for (auto field : inputFields())
+    for (auto field: inputFields())
         connect(field, &QnInputField::textChanged, this, &QnUserSettingsWidget::hasChangesChanged);
 }
 
 QList<QnInputField*> QnUserSettingsWidget::inputFields() const
 {
-    return {
-        ui->loginInputField,
-        ui->nameInputField,
-        ui->passwordInputField,
-        ui->confirmPasswordInputField,
-        ui->emailInputField,
-        ui->cloudEmailInputField
-    };
+    return m_localInputFields + m_cloudInputFields;
+}
+
+QList<QnInputField*> QnUserSettingsWidget::localInputFields() const
+{
+    return m_localInputFields;
+}
+
+QList<QnInputField*> QnUserSettingsWidget::cloudInputFields() const
+{
+    return m_cloudInputFields;
+}
+
+QList<QnInputField*> QnUserSettingsWidget::relevantInputFields() const
+{
+    if (m_model->mode() == QnUserSettingsModel::NewUser)
+        return inputFields();
+
+    if (m_model->mode() == QnUserSettingsModel::OtherSettings)
+        return (m_model->user()->isCloud() ? cloudInputFields() : localInputFields());
+
+    return {};
 }
 
 void QnUserSettingsWidget::updateRoleComboBox()
@@ -485,7 +502,6 @@ void QnUserSettingsWidget::updateControlsAccess()
     ui->confirmPasswordInputField->setVisible(permissions.testFlag(Qn::WritePasswordPermission));
     ui->emailInputField->setReadOnly(!permissions.testFlag(Qn::WriteEmailPermission));
     ui->nameInputField->setReadOnly(!permissions.testFlag(Qn::WriteFullNamePermission));
-    ui->enabledButton->setVisible(permissions.testFlag(Qn::WriteAccessRightsPermission));
 }
 
 Qn::UserRole QnUserSettingsWidget::selectedRole() const

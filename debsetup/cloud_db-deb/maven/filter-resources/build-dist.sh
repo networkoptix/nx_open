@@ -2,7 +2,6 @@
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=$COMPANY_NAME-cloud-db
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
@@ -11,12 +10,8 @@ BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${artifact.name.cdb}
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
