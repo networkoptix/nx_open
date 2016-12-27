@@ -18,6 +18,7 @@ INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
 
 FINALNAME=${artifact.name.server}
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -127,6 +128,6 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
-mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
+(cd $STAGEBASE; zip -y ./$UPDATE_NAME ./* -i *.*)
+mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

@@ -1,5 +1,5 @@
  <assembly>
-    <id>${box}-${arch}-${release.version}.${buildNumber}</id>
+    <id>client_update</id>
     <formats>
         <format>dir</format>
     </formats>

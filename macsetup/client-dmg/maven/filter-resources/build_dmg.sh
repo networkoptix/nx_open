@@ -94,7 +94,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 mv update.json $SRC
 cd dmg-folder
-zip -y -r ../client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*.app *.json
+zip -y -r ../${artifact.name.client_update}.zip ./*.app *.json
 cd ..
 
 rm -rf $TMP

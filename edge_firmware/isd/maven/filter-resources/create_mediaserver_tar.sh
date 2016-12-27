@@ -21,7 +21,7 @@ MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 PACKAGE_NAME=${artifact.name.server}.tar.gz
-UPDATE_NAME=server-update-${box}-${arch}-$VERSION
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 BUILD_DIR="`mktemp -d`"
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -149,7 +149,7 @@ if [ ! -f $PACKAGE_NAME ]; then
   echo "Distribution is not created! Exiting"
   exit 1
 fi
-zip ./$UPDATE_NAME.zip ./*
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip

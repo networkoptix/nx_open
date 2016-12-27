@@ -229,7 +229,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>
+                            
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -243,7 +245,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>server-update</finalName>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_update}</finalName>
                         </configuration>
                     </execution>
                     <execution>
