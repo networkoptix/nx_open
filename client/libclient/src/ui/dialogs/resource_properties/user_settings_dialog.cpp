@@ -63,16 +63,16 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
                 updatePermissions();
         });
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_camerasPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
 
-    connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this,
+    connect(m_settingsPage, &QnUserSettingsWidget::userTypeChanged, this,
         [this](bool isCloud)
         {
             /* Kinda hack to change user type: we have to recreate user resource: */
@@ -271,18 +271,32 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     m_model->setUser(user);
 
     /* Hide Apply button if cannot apply changes. */
-    bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile || m_model->mode() == QnUserSettingsModel::OtherSettings;
+    bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile
+                           || m_model->mode() == QnUserSettingsModel::OtherSettings;
     ui->buttonBox->button(QDialogButtonBox::Apply)->setVisible(applyButtonVisible);
 
+    setReadOnly(!applyButtonVisible);
+
     /** Hide Cancel button if we cannot edit user. */
-    bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile && m_model->mode() != QnUserSettingsModel::Invalid;
+    bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile
+                            && m_model->mode() != QnUserSettingsModel::Invalid;
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(cancelButtonVisible);
 
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
-        || m_model->mode() == QnUserSettingsModel::OtherProfile);
-
-    m_userEnabledButton->setChecked(m_user && m_user->isEnabled());
+                                  || m_model->mode() == QnUserSettingsModel::OtherProfile);
     forcedUpdate();
+}
+
+void QnUserSettingsDialog::loadDataToUi()
+{
+    ui->alertBar->setText(QString());
+
+    base_type::loadDataToUi();
+
+    bool userIsEnabled = m_user && m_user->isEnabled();
+    m_userEnabledButton->setChecked(userIsEnabled);
+    if (!userIsEnabled)
+        ui->alertBar->setText(tr("User is disabled"));
 }
 
 void QnUserSettingsDialog::forcedUpdate()

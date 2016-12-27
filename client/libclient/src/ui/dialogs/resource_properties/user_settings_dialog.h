@@ -10,6 +10,7 @@ class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
 class QnAbstractPermissionsModel;
 class QnUserSettingsModel;
+class QnAlertBar;
 
 namespace Ui
 {
@@ -47,6 +48,7 @@ protected:
     virtual void retranslateUi() override;
     virtual void applyChanges() override;
     virtual bool hasChanges() const override;
+    virtual void loadDataToUi() override;
 
 private:
     void applyChangesInternal();

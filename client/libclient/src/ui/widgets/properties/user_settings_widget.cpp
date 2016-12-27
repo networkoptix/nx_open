@@ -33,6 +33,8 @@ namespace {
 const int kCloudUserFontSizePixels = 18;
 const int kCloudUserFontWeight = QFont::Light;
 
+const int kUserTypeComboMinimumWidth = 120;
+
 enum
 {
     kLocalIndex,
@@ -73,6 +75,9 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
 
     ui->userTypeComboBox->insertItem(kLocalIndex, tr("Local"));
     ui->userTypeComboBox->insertItem(kCloudIndex, tr("Cloud"));
+    ui->userTypeComboBox->setMinimumWidth(qMax(kUserTypeComboMinimumWidth,
+        ui->userTypeComboBox->minimumSizeHint().width()));
+
     ui->cloudPanelWidget->setManageLinkShown(false);
 
     setHelpTopic(ui->roleLabel, ui->roleComboBox, Qn::UserSettings_UserRoles_Help);
@@ -314,18 +319,6 @@ bool QnUserSettingsWidget::canApplyChanges() const
                  });
         };
 
-    const QList<QnInputField*> kLocalUserFields{
-        ui->loginInputField,
-        ui->nameInputField,
-        ui->passwordInputField,
-        ui->confirmPasswordInputField,
-        ui->emailInputField
-    };
-
-    const QList<QnInputField*> kCloudUserFields{
-        ui->cloudEmailInputField
-    };
-
     switch (m_model->mode())
     {
         case QnUserSettingsModel::NewUser:
@@ -333,9 +326,9 @@ bool QnUserSettingsWidget::canApplyChanges() const
             switch (ui->userTypeComboBox->currentIndex())
             {
                 case kCloudIndex:
-                    return checkFields(kCloudUserFields);
+                    return checkFields(cloudInputFields());
                 case kLocalIndex:
-                    return checkFields(kLocalUserFields);
+                    return checkFields(localInputFields());
                 default:
                     break;
             }
@@ -346,7 +339,7 @@ bool QnUserSettingsWidget::canApplyChanges() const
             if (m_model->user()->isCloud())
                 return true;
 
-            return checkFields(kLocalUserFields);
+            return checkFields(localInputFields());
         }
         default:
             break;
