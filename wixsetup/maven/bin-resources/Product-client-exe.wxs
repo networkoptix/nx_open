@@ -39,7 +39,7 @@
         </BootstrapperApplicationRef>
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeClient.wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>

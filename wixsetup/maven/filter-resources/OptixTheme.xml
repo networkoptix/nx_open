@@ -20,7 +20,7 @@
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">Nx Witness 3.0</Text>
-    <!-- <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">Client only</Text> -->
+    <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
     <Text X="12" Y="-64" Width="-12" Height="17" FontId="7" DisablePrefix="yes" Center="yes">By clicking "Accept and Install" you are agreeing to our</Text>
     <Hypertext Name="EulaHyperlink" X="180" Y="-40" Width="-11" Height="17" TabStop="no" FontId="7" HideWhenDisabled="yes" Center="yes">#(loc.InstallLicenseLinkText)</Hypertext>
     <Button Name="OptionsButton" X="11" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
