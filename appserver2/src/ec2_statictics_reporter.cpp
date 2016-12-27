@@ -132,9 +132,7 @@ namespace ec2
         {
             QnMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
-
-            if (timerId = m_timerId)
-                m_timerId = boost::none;
+            std::swap(timerId, m_timerId);
         }
 
         if (timerId)
