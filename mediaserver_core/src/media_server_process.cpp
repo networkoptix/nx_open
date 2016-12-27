@@ -1125,6 +1125,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         QTextStream stream(stdout);
         commandLineParser.print(stream);
     }
+    if (m_cmdLineArguments.showVersion)
+        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
 }
 
 void MediaServerProcess::addCommandLineParametersFromConfig()
@@ -2203,15 +2205,6 @@ void MediaServerProcess::updateAllowedInterfaces()
 
 void MediaServerProcess::run()
 {
-    if (m_cmdLineArguments.showVersion)
-    {
-        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
-        return;
-    }
-    if (m_cmdLineArguments.showHelp)
-        return;
-
-
     updateAllowedInterfaces();
 
 #ifdef __linux__
@@ -3055,6 +3048,10 @@ protected:
     virtual int executeApplication() override
     {
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
+
+        const auto cmdParams = m_main->cmdLineArguments();
+        if (cmdParams.showHelp || cmdParams.showVersion)
+            return 0;
 
         int res = application()->exec();
 
