@@ -95,6 +95,8 @@
 #include "camera/thumbnails_loader.h" // TODO: remove?
 #include "watchers/workbench_server_time_watcher.h"
 
+#include <utils/common/log.h>
+
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -918,12 +920,18 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             : qnSettings->maxSceneVideoItems();
 
     if (m_widgets.size() >= maxItems) {
+
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
+            .arg(maxItems), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
 
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if(resource.isNull()) {
+
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: invalid resource id %1")
+            .arg(item->resourceUid()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -942,6 +950,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
     else {
         // TODO: #Elric unsupported for now
+
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: unsupported resource type %1")
+            .arg(resource->flags()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
