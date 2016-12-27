@@ -50,8 +50,7 @@ public:
     \note \a OutgoingTunnelConnection instance 
         can be safely freed while in aio thread (e.g., in any handler)
 */
-class NX_NETWORK_API OutgoingTunnelConnection
-:
+class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
     public StreamConnectionHolder<
 		nx_api::BaseStreamProtocolConnectionEmbeddable<

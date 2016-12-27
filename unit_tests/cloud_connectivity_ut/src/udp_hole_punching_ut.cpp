@@ -125,12 +125,24 @@ class UdpHolePunchingCancellation:
     public UdpHolePunching
 {
 public:
-    UdpHolePunchingCancellation()
+    UdpHolePunchingCancellation():
+        m_onTunnelClosedSubscriptionId(nx::utils::kInvalidSubscriptionId)
     {
+        using namespace std::placeholders;
+
+        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
+            std::bind(&UdpHolePunchingCancellation::onTunnelClosed, this, _1),
+            &m_onTunnelClosedSubscriptionId);
     }
 
     ~UdpHolePunchingCancellation()
     {
+        SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
+            m_onTunnelClosedSubscriptionId);
+        m_onTunnelClosedSubscriptionId = nx::utils::kInvalidSubscriptionId;
+
+        if (m_serverSocket)
+            m_serverSocket->pleaseStopSync();
     }
 
 protected:
@@ -156,7 +168,7 @@ protected:
         clientSocket.reset();
     }
 
-    void destroyServerSocketwithinAioThread()
+    void destroyServerSocketWithinAioThread()
     {
         nx::utils::promise<void> removed;
         m_serverSocket->post(
@@ -168,24 +180,49 @@ protected:
         removed.get_future().wait();
     }
 
+    void waitForTunnelClosed()
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (;;)
+        {
+            auto it = m_closedTunnels.find(serverAddress().address.toString());
+            if (it != m_closedTunnels.end())
+            {
+                m_closedTunnels.erase(it);
+                return;
+            }
+            m_cond.wait(lock.mutex());
+        }
+    }
+
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
+    nx::utils::SubscriptionId m_onTunnelClosedSubscriptionId;
+    std::multiset<QString> m_closedTunnels;
+    QnMutex m_mutex;
+    QnWaitCondition m_cond;
+
+    void onTunnelClosed(const QString& hostName)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_closedTunnels.insert(hostName);
+        m_cond.wakeAll();
+    }
 };
 
 TEST_F(UdpHolePunchingCancellation, simple)
 {
-    for (int i = 0; i < 100; ++i)
-    {
-        initializeCloudServerSocket();
-        ensureOpenedTunnel();
+    initializeCloudServerSocket();
+    ensureOpenedTunnel();
 
-        auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        clientSocket->connectAsync(serverAddress(), [](SystemError::ErrorCode) {});
+    auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
+    clientSocket->connectAsync(serverAddress(), [](SystemError::ErrorCode) {});
 
-        destroyServerSocketwithinAioThread();
+    destroyServerSocketWithinAioThread();
 
-        clientSocket->pleaseStopSync();
-    }
+    clientSocket->pleaseStopSync();
+
+    waitForTunnelClosed();
 }
 
 } // namespace cloud

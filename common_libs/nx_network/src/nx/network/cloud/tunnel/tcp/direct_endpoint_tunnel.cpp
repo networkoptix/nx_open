@@ -41,14 +41,7 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
     auto connectionClosedHandler = std::move(m_connectionClosedHandler);
     m_connectionClosedHandler = nullptr;
 
-    auto connections = std::move(m_connections);
-    for (auto& connectionContext : connections)
-    {
-        connectionContext.handler(
-            SystemError::interrupted,
-            nullptr,
-            false);
-    }
+    m_connections.clear();
 
     if (connectionClosedHandler)
         connectionClosedHandler(SystemError::interrupted);

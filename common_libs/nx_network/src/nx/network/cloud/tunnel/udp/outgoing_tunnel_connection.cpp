@@ -74,19 +74,7 @@ void OutgoingTunnelConnection::stopWhileInAioThread()
     m_pleaseStopHasBeenCalled = true;
 
     //cancelling ongoing connects
-    QnMutexLocker lk(&m_mutex);
-    std::map<UdtStreamSocket*, ConnectionContext> ongoingConnections;
-    ongoingConnections.swap(m_ongoingConnections);
-    lk.unlock();
-
-    for (auto& connectionContext: ongoingConnections)
-    {
-        connectionContext.second.completionHandler(
-            SystemError::interrupted,
-            nullptr,
-            true);
-    }
-    ongoingConnections.clear();
+    m_ongoingConnections.clear();
     m_controlConnection.reset();
 
     m_pleaseStopCompleted = true;
