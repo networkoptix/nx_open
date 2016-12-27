@@ -11,7 +11,6 @@
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/cpp14.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -39,12 +38,6 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
-    m_controlConnection->startReadingConnection();
-
-    hpm::api::UdpHolePunchingSynRequest syn;
-    stun::Message message;
-    syn.serialize(&message);
-    m_controlConnection->sendMessage(std::move(message));
 }
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
@@ -84,6 +77,16 @@ void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread
 {
     AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
     m_controlConnection->bindToAioThread(aioThread);
+}
+
+void OutgoingTunnelConnection::start()
+{
+    hpm::api::UdpHolePunchingSynRequest syn;
+    stun::Message message;
+    syn.serialize(&message);
+    m_controlConnection->sendMessage(std::move(message));
+
+    m_controlConnection->startReadingConnection();
 }
 
 void OutgoingTunnelConnection::establishNewConnection(

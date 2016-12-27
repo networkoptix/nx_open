@@ -47,6 +47,10 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
         connectionClosedHandler(SystemError::interrupted);
 }
 
+void DirectTcpEndpointTunnel::start()
+{
+}
+
 void DirectTcpEndpointTunnel::establishNewConnection(
     std::chrono::milliseconds timeout,
     SocketAttributes socketAttributes,

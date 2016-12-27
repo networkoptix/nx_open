@@ -63,6 +63,10 @@ public:
     {
     }
 
+    virtual void start() override
+    {
+    }
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes /*socketAttributes*/,
