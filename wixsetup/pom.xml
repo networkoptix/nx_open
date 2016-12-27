@@ -257,6 +257,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_pdb}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -270,6 +273,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_pdb}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -283,6 +289,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.misc_pdb}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -296,6 +305,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.libs_pdb}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -309,6 +321,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.cloud_pdb}</finalName>
                         </configuration>
                     </execution>
                 </executions>

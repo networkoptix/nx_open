@@ -232,7 +232,7 @@
             {product}-{apptype}-{version}-{platform}-{optional:beta_status}-{optional:cloud_instance_group}.{extension}
         Where:
             product = { nxwitness | dwspectrum | qulu | <other customizations> }
-            apptype = { client | server | bundle | servertool | paxton | clouddb }
+            apptype = { client | server | bundle | <etc> }
             version = { major.minor.release.build }
             platform = { win64 | win86 | linux64 | linux86 | mac | android | ios | bpi | rpi | bananapi }
             beta_status = { beta | <empty> }
@@ -257,6 +257,11 @@
         <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
         <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
         <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
+        <artifact.name.client_pdb>${artifact.name.prefix}-client_pdb-${artifact.name.suffix}</artifact.name.client_pdb>
+        <artifact.name.server_pdb>${artifact.name.prefix}-server_pdb-${artifact.name.suffix}</artifact.name.server_pdb>
+        <artifact.name.misc_pdb>${artifact.name.prefix}-misc_pdb-${artifact.name.suffix}</artifact.name.misc_pdb>
+        <artifact.name.libs_pdb>${artifact.name.prefix}-libs_pdb-${artifact.name.suffix}</artifact.name.libs_pdb>
+        <artifact.name.cloud_pdb>${artifact.name.prefix}-cloud_pdb-${artifact.name.suffix}</artifact.name.cloud_pdb>
 
     </properties>
 
