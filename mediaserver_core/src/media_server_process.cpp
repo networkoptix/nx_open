@@ -2216,13 +2216,18 @@ void MediaServerProcess::run()
 {
     if (!cmdLineArguments.configFilePath.isEmpty())
         MSSettings::initializeROSettingsFromConfFile(cmdLineArguments.configFilePath);
+    else
+        MSSettings::initializeROSettings();
+
     if (!cmdLineArguments.rwConfigFilePath.isEmpty())
         MSSettings::initializeRunTimeSettingsFromConfFile(cmdLineArguments.rwConfigFilePath);
+    else
+        MSSettings::initializeRunTimeSettings();
 
     updateAllowedInterfaces(cmdLineArguments);
 
 #ifdef __linux__
-    if (!disableCrashHandler)
+    if (!cmdLineArguments.disableCrashHandler)
         linux_exception::installCrashSignalHandler();
 #endif
 

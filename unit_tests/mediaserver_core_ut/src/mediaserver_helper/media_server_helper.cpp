@@ -20,6 +20,9 @@ MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList
     int argc = 2;
     char* argv[] = { "", "-e" };
 
+    MSSettings::initializeROSettings();
+    MSSettings::initializeRunTimeSettings();
+
     MSSettings::roSettings()->clear();
     MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
