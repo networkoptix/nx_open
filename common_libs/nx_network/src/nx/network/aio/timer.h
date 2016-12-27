@@ -26,7 +26,7 @@ class NX_NETWORK_API Timer:
     private AIOEventHandler<Pollable>
 {
 public:
-    Timer();
+    Timer(aio::AbstractAioThread* aioThread = nullptr);
     virtual ~Timer() override;
 
     Timer(const Timer&) = delete;

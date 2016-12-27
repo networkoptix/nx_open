@@ -33,6 +33,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
+        case Qn::ForbiddenConnectionResult:
             return Qn::Login_Help;
         case Qn::IncompatibleVersionConnectionResult:
         case Qn::IncompatibleProtocolConnectionResult:
@@ -69,6 +70,9 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
         return tr("Connection to the %1 is not ready yet. Check media server internet connection or try again later.").
             arg(QnAppInfo::cloudName()) + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
+    case Qn::ForbiddenConnectionResult:
+        return tr("Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.")
+            + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::NetworkErrorConnectionResult:
         return tr("Connection to the Server could not be established.") + L'\n'
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'

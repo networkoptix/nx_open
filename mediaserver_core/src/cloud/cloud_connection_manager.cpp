@@ -33,6 +33,10 @@ CloudConnectionManager::CloudConnectionManager():
         m_cdbConnectionFactory->setCloudUrl(cdbUrl.toStdString());
 
     Qn::directConnect(
+        qnGlobalSettings, &QnGlobalSettings::initialized,
+        this, &CloudConnectionManager::cloudSettingsChanged);
+
+    Qn::directConnect(
         qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
         this, &CloudConnectionManager::cloudSettingsChanged);
 }
