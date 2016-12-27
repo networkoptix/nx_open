@@ -12,7 +12,7 @@ namespace nx {
 namespace stun {
 
 UDPMessageResponseSender::UDPMessageResponseSender(
-    UDPServer* udpServer,
+    UdpServer* udpServer,
     SocketAddress sourceAddress)
 :
     m_udpServer(udpServer),

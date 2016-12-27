@@ -3,20 +3,20 @@
 namespace nx {
 namespace stun {
 
-const std::chrono::milliseconds UDPClient::kDefaultRetransmissionTimeOut(500);
-const int UDPClient::kDefaultMaxRetransmissions = 7;
+const std::chrono::milliseconds UdpClient::kDefaultRetransmissionTimeOut(500);
+const int UdpClient::kDefaultMaxRetransmissions = 7;
 
 /********************************************/
-/* UDPClient::RequestContext                */
+/* UdpClient::RequestContext                */
 /********************************************/
 
-UDPClient::RequestContext::RequestContext():
+UdpClient::RequestContext::RequestContext():
     currentRetransmitTimeout(0),
     retryNumber(0)
 {
 }
 
-UDPClient::RequestContext::RequestContext(RequestContext&& rhs):
+UdpClient::RequestContext::RequestContext(RequestContext&& rhs):
     completionHandler(std::move(rhs.completionHandler)),
     currentRetransmitTimeout(std::move(rhs.currentRetransmitTimeout)),
     retryNumber(std::move(rhs.retryNumber)),
@@ -25,15 +25,15 @@ UDPClient::RequestContext::RequestContext(RequestContext&& rhs):
 }
 
 /********************************************/
-/* UDPClient                                */
+/* UdpClient                                */
 /********************************************/
 
-UDPClient::UDPClient():
-    UDPClient(SocketAddress())
+UdpClient::UdpClient():
+    UdpClient(SocketAddress())
 {
 }
 
-UDPClient::UDPClient(SocketAddress serverAddress):
+UdpClient::UdpClient(SocketAddress serverAddress):
     m_receivingMessages(false),
     m_messagePipeline(this),
     m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
@@ -42,12 +42,12 @@ UDPClient::UDPClient(SocketAddress serverAddress):
 {
 }
 
-UDPClient::~UDPClient()
+UdpClient::~UdpClient()
 {
     cleanupWhileInAioThread();
 }
 
-void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void UdpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(
         [handler = std::move(handler), this]()
@@ -57,17 +57,17 @@ void UDPClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-const std::unique_ptr<network::UDPSocket>& UDPClient::socket()
+const std::unique_ptr<network::UDPSocket>& UdpClient::socket()
 {
     return m_messagePipeline.socket();
 }
 
-std::unique_ptr<network::UDPSocket> UDPClient::takeSocket()
+std::unique_ptr<network::UDPSocket> UdpClient::takeSocket()
 {
     return m_messagePipeline.takeSocket();
 }
 
-void UDPClient::sendRequestTo(
+void UdpClient::sendRequestTo(
     SocketAddress serverAddress,
     Message request,
     RequestCompletionHandler completionHandler)
@@ -82,7 +82,7 @@ void UDPClient::sendRequestTo(
         });
 }
 
-void UDPClient::sendRequest(
+void UdpClient::sendRequest(
     Message request,
     RequestCompletionHandler completionHandler)
 {
@@ -92,28 +92,28 @@ void UDPClient::sendRequest(
         std::move(completionHandler));
 }
 
-bool UDPClient::bind(const SocketAddress& localAddress)
+bool UdpClient::bind(const SocketAddress& localAddress)
 {
     return m_messagePipeline.bind(localAddress);
 }
 
-SocketAddress UDPClient::localAddress() const
+SocketAddress UdpClient::localAddress() const
 {
     return m_messagePipeline.address();
 }
 
-void UDPClient::setRetransmissionTimeOut(
+void UdpClient::setRetransmissionTimeOut(
     std::chrono::milliseconds retransmissionTimeOut)
 {
     m_retransmissionTimeout = retransmissionTimeOut;
 }
 
-void UDPClient::setMaxRetransmissions(int maxRetransmissions)
+void UdpClient::setMaxRetransmissions(int maxRetransmissions)
 {
     m_maxRetransmissions = maxRetransmissions;
 }
 
-void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
+void UdpClient::messageReceived(SocketAddress sourceAddress, Message message)
 {
     auto requestContextIter = m_ongoingRequests.find(message.header.transactionId);
     if (requestContextIter == m_ongoingRequests.end())
@@ -138,14 +138,14 @@ void UDPClient::messageReceived(SocketAddress sourceAddress, Message message)
     completionHandler(SystemError::noError, std::move(message));
 }
 
-void UDPClient::ioFailure(SystemError::ErrorCode errorCode)
+void UdpClient::ioFailure(SystemError::ErrorCode errorCode)
 {
     //TODO #ak ???
     NX_LOGX(lm("I/O error on socket: %1").
         arg(SystemError::toString(errorCode)), cl_logDEBUG1);
 }
 
-void UDPClient::sendRequestInternal(
+void UdpClient::sendRequestInternal(
     SocketAddress serverAddress,
     Message request,
     RequestCompletionHandler completionHandler)
@@ -173,7 +173,7 @@ void UDPClient::sendRequestInternal(
         &requestContext);
 }
 
-void UDPClient::sendRequestAndStartTimer(
+void UdpClient::sendRequestAndStartTimer(
     SocketAddress serverAddress,
     const Message& request,
     RequestContext* const requestContext)
@@ -191,10 +191,10 @@ void UDPClient::sendRequestAndStartTimer(
 
     requestContext->timer->start(
         requestContext->currentRetransmitTimeout,
-        std::bind(&UDPClient::timedOut, this, request.header.transactionId));
+        std::bind(&UdpClient::timedOut, this, request.header.transactionId));
 }
 
-void UDPClient::messageSent(
+void UdpClient::messageSent(
     SystemError::ErrorCode errorCode,
     nx::Buffer transactionId,
     SocketAddress resolvedServerAddress)
@@ -226,7 +226,7 @@ void UDPClient::messageSent(
     requestContextIter->second.resolvedServerAddress = std::move(resolvedServerAddress);
 }
 
-void UDPClient::timedOut(nx::Buffer transactionId)
+void UdpClient::timedOut(nx::Buffer transactionId)
 {
     auto requestContextIter = m_ongoingRequests.find(transactionId);
     NX_ASSERT(requestContextIter != m_ongoingRequests.end());
@@ -246,7 +246,7 @@ void UDPClient::timedOut(nx::Buffer transactionId)
         &requestContextIter->second);
 }
 
-void UDPClient::cleanupWhileInAioThread()
+void UdpClient::cleanupWhileInAioThread()
 {
     // Timers can be safely removed since we are in aio thread.
     m_ongoingRequests.clear();

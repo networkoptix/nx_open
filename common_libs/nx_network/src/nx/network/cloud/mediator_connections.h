@@ -89,7 +89,7 @@ public:
 };
 
 typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;
-typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
+typedef MediatorClientConnection<stun::UdpClient> MediatorClientUdpConnection;
 
 /**
  * Provides access to mediator functions to be used by servers.
@@ -201,7 +201,7 @@ private:
     AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
+typedef MediatorServerConnection<stun::UdpClient> MediatorServerUdpConnection;
 
 
 class MediatorServerTcpConnection:

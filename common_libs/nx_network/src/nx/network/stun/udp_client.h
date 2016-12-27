@@ -23,13 +23,13 @@ typedef nx::network::UnreliableMessagePipelineEventHandler<Message>
  * STUN protocol UDP client.
  * Conforms to [rfc5389, 7.2.1]
  * @note Supports pipelining
- * @note UDPClient object can be safely deleted within request completion handler 
+ * @note UdpClient object can be safely deleted within request completion handler 
  *     (more generally, within internal socket's aio thread).
-       To delete it in another thread, cancel I/O with UDPClient::pleaseStop call
+       To delete it in another thread, cancel I/O with UdpClient::pleaseStop call
  * @note Notifies everyone who is waiting for response by reporting 
  *     SystemError::interrupted before destruction.
  */
-class NX_NETWORK_API UDPClient:
+class NX_NETWORK_API UdpClient:
     public QnStoppableAsync,
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
@@ -41,9 +41,9 @@ public:
     static const std::chrono::milliseconds kDefaultRetransmissionTimeOut;
     static const int kDefaultMaxRetransmissions;
 
-    UDPClient();
-    UDPClient(SocketAddress serverAddress);
-    virtual ~UDPClient();
+    UdpClient();
+    UdpClient(SocketAddress serverAddress);
+    virtual ~UdpClient();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
@@ -66,7 +66,7 @@ public:
     const std::unique_ptr<network::UDPSocket>& socket();
     /**
      * Move ownership of socket to the caller.
-     * UDPClient is in undefined state after this call and MUST be freed
+     * UdpClient is in undefined state after this call and MUST be freed
      * @note Can be called within send/recv completion handler 
      *     (more specifically, within socket's aio thread) only!
      */
@@ -77,12 +77,12 @@ public:
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;
     /**
-     * By default, UDPClient::kDefaultRetransmissionTimeOut (500ms).
+     * By default, UdpClient::kDefaultRetransmissionTimeOut (500ms).
      * Is doubled with each unsuccessful attempt
      */
     void setRetransmissionTimeOut(std::chrono::milliseconds retransmissionTimeOut);
     /**
-     * By default, UDPClient::kDefaultMaxRetransmissions (7).
+     * By default, UdpClient::kDefaultMaxRetransmissions (7).
      */
     void setMaxRetransmissions(int maxRetransmissions);
 
