@@ -8,20 +8,11 @@
 #include <nx/network/socket_global.h>
 
 
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir)
-    :
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000))
+    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000)),
+    m_firstStartup(true)
 {
-    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
-    m_configFile.open(m_configFilePath.toUtf8().constData());
-
-    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "removeDbOnStartup = 1" << std::endl;
-    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -39,8 +30,19 @@ void MediaServerLauncher::addSetting(const QString& name, const QString& value)
     m_configFile << name.toStdString() << " = " << value.toStdString() << std::endl;
 }
 
-bool MediaServerLauncher::start()
+void MediaServerLauncher::prepareToStart()
 {
+    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
+    m_configFile.open(m_configFilePath.toUtf8().constData());
+
+    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
+    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
+
+
     nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
 
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
@@ -50,7 +52,15 @@ bool MediaServerLauncher::start()
     m_configFile.flush();
     m_configFile.close();
 
+    m_mediaServerProcess.reset();
     m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+
+    m_firstStartup = false;
+}
+
+bool MediaServerLauncher::start()
+{
+    prepareToStart();
 
     std::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();
@@ -72,8 +82,20 @@ bool MediaServerLauncher::start()
     return result == std::future_status::ready;
 }
 
+bool MediaServerLauncher::startAsync()
+{
+    prepareToStart();
+    m_mediaServerProcess->start();
+    return true;
+}
+
 bool MediaServerLauncher::stop()
 {
     m_mediaServerProcess->stopSync();
     return true;
+}
+
+QUrl MediaServerLauncher::apiUrl() const
+{
+    return QUrl(lit("http://") + m_serverEndpoint.toString());
 }

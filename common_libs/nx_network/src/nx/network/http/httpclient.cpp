@@ -188,6 +188,13 @@ void HttpClient::setUserPassword(const QString& userPassword)
         m_asyncHttpClient->setUserPassword(userPassword);
 }
 
+void HttpClient::setAuthType(AsyncHttpClient::AuthType value)
+{
+    m_authType = value;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setAuthType(value);
+}
+
 void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
 {
     m_proxyEndpoint = proxyEndpoint;
@@ -269,6 +276,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setUserName(m_userName.get());
         if (m_userPassword)
             m_asyncHttpClient->setUserPassword(m_userPassword.get());
+        if (m_authType)
+            m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
 

@@ -19,8 +19,11 @@ namespace utils {
 
 using MediaServerTestFuncTypeList = std::vector<std::function<void()>>;
 
-// starts whole mediaserver for you
-// supply list of what you want to test as a constructor parameter
+/**
+ * This class is deprecated!
+ * Please use MediaServerLauncher instead.
+ */
+
 class MediaServerHelper
 {
 public:

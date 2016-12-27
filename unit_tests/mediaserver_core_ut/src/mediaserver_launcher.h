@@ -20,10 +20,30 @@ public:
     ~MediaServerLauncher();
 
     SocketAddress endpoint() const;
+
     void addSetting(const QString& name, const QString& value);
+
+    /**
+     * Start media server and wait while it's being started.
+     * MediaServerLauncher recreate media server do, so it starts with clean DB.
+     * In case of successive start/stop/start calls server will use same DB.
+     */
     bool start();
+
+    /**
+     * Start media server. Don't wait while it's being started.
+     */
+    bool startAsync();
+
+    /** Stop media server process */
     bool stop();
 
+    /**
+     * Return media server API url
+     */
+    QUrl apiUrl() const;
+private:
+    void prepareToStart();
 private:
     std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;
@@ -31,4 +51,5 @@ private:
     QString m_configFilePath;
     //nx::utils::thread m_mediaServerProcessThread;
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
+    bool m_firstStartup;
 };
