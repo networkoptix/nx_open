@@ -75,13 +75,13 @@ CloudServerSocket::CloudServerSocket(
     std::vector<AcceptorMaker> acceptorMakers)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
-    m_mediatorRegistrationRetryTimer(
-        std::move(mediatorRegistrationRetryPolicy),
-        m_mediatorConnection->getAioThread()),
+    m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
     m_acceptorMakers(acceptorMakers),
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
+    m_mediatorConnection->bindToAioThread(getAioThread());
+
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
     m_socketAttributes.nonBlockingMode = false;
@@ -90,29 +90,11 @@ CloudServerSocket::CloudServerSocket(
 
 CloudServerSocket::~CloudServerSocket()
 {
-    if (*m_socketAttributes.nonBlockingMode == false)
-    {
-        // Unfortunatelly we have to block here, cloud server socket uses
-        // nonblocking operations even if user uses blocking mode.
-        pleaseStopSync(true);
-    }
-    else if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
-    {
-        // Will not block as all delegates are in the same AIO thread
-        stopWhileInAioThread();
-    }
-    else
-    {
-        // pleaseStop(...) is expected to be called externally
+    pleaseStopSync();
 
-        if (m_tunnelPool)
-        {
-            // It looks like IO has been canceled, but it's not enought for CloudServerSocket
-            // because of acceptAsync (and accept) optimization.
-            // It's better to block here, then end up with SIGSEGV isnt it?
-            pleaseStopSync(true);
-        }
-    }
+    // TODO: #ak This method should be implemented in a following way:
+    //if (isInSelfAioThread())
+    //    stopWhileInAioThread();
 }
 
 bool CloudServerSocket::bind(const SocketAddress& localAddress)
@@ -213,7 +195,7 @@ void CloudServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
 void CloudServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
 {
-    if (m_mediatorRegistrationRetryTimer.isInSelfAioThread())
+    if (isInSelfAioThread())
     {
         stopWhileInAioThread();
     }
@@ -235,14 +217,12 @@ void CloudServerSocket::dispatch(nx::utils::MoveOnlyFunc<void()> handler)
 
 aio::AbstractAioThread* CloudServerSocket::getAioThread() const
 {
-    const auto thread = m_mediatorRegistrationRetryTimer.getAioThread();
-    m_mediatorConnection->bindToAioThread(thread);
-    return thread;
+    return m_mediatorRegistrationRetryTimer.getAioThread();
 }
 
 void CloudServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    NX_ASSERT(!m_tunnelPool);
+    NX_ASSERT(!m_tunnelPool && m_acceptors.empty());
     m_mediatorRegistrationRetryTimer.bindToAioThread(aioThread);
     m_mediatorConnection->bindToAioThread(aioThread);
 }
@@ -308,6 +288,11 @@ void CloudServerSocket::cancelIOSync()
             cancelledPromise.set_value();
         });
     cancelledPromise.get_future().wait();
+}
+
+bool CloudServerSocket::isInSelfAioThread()
+{
+    return m_mediatorRegistrationRetryTimer.isInSelfAioThread();
 }
 
 void CloudServerSocket::registerOnMediator(

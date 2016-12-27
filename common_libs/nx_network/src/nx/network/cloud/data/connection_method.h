@@ -15,6 +15,7 @@ namespace ConnectionMethod
         tcpHolePunching = 2,
         proxy = 4,
         reverseConnect = 8,
+        all = udpHolePunching | tcpHolePunching | proxy | reverseConnect,
     };
 
     inline QString toString(int value)

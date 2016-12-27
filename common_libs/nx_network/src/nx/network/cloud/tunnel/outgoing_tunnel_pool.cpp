@@ -47,13 +47,23 @@ void OutgoingTunnelPool::establishNewConnection(
     SocketAttributes socketAttributes,
     OutgoingTunnel::NewConnectionHandler handler)
 {
+    using namespace std::placeholders;
+
     QnMutexLocker lock(&m_mutex);
 
     const auto& tunnel = getTunnel(targetHostAddress);
+    auto& tunnelContext = m_connectionRequestsByTunnel[tunnel.get()];
+    tunnelContext.handlers.push_back(std::move(handler));
+    
     tunnel->establishNewConnection(
         std::move(timeout),
         std::move(socketAttributes),
-        std::move(handler));
+        [this, tunnelPtr = tunnel.get(), handlerIter = --tunnelContext.handlers.end()](
+            SystemError::ErrorCode sysErrorCode,
+            std::unique_ptr<AbstractStreamSocket> connection)
+        {
+            reportConnectionResult(sysErrorCode, std::move(connection), tunnelPtr, handlerIter);
+        });
 }
 
 String OutgoingTunnelPool::ownPeerId() const
@@ -82,6 +92,11 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
 
+OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
+{
+    return m_onTunnelClosedSubscription;
+}
+
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     const AddressEntry& targetHostAddress)
 {
@@ -104,29 +119,66 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     return iterAndInsertionResult.first->second;
 }
 
+void OutgoingTunnelPool::reportConnectionResult(
+    SystemError::ErrorCode sysErrorCode,
+    std::unique_ptr<AbstractStreamSocket> connection,
+    OutgoingTunnel* tunnel,
+    std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter)
+{
+    OutgoingTunnel::NewConnectionHandler userHandler;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        userHandler.swap(*handlerIter);
+        auto& tunnelContext = m_connectionRequestsByTunnel[tunnel];
+        tunnelContext.handlers.erase(handlerIter);
+    }
+
+    userHandler(sysErrorCode, std::move(connection));
+}
+
 void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 {
-    QnMutexLocker lk(&m_mutex);
-    TunnelDictionary::iterator tunnelIter = m_pool.end();
-    for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
+    std::list<OutgoingTunnel::NewConnectionHandler> userHandlers;
+    std::unique_ptr<OutgoingTunnel> tunnel;
+    QString remoteHostName;
+
     {
-        if (it->second.get() == tunnelPtr)
+        QnMutexLocker lk(&m_mutex);
+
+        TunnelDictionary::iterator tunnelIter = m_pool.end();
+        for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
         {
-            tunnelIter = it;
-            break;
+            if (it->second.get() == tunnelPtr)
+            {
+                tunnelIter = it;
+                break;
+            }
+        }
+
+        if (m_stopping)
+            return; //tunnel is being cancelled?
+
+        NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
+        tunnel.swap(tunnelIter->second);
+        remoteHostName = tunnelIter->first;
+        m_pool.erase(tunnelIter);
+
+        auto it = m_connectionRequestsByTunnel.find(tunnelPtr);
+        if (it != m_connectionRequestsByTunnel.end())
+        {
+            userHandlers.swap(it->second.handlers);
+            m_connectionRequestsByTunnel.erase(it);
         }
     }
 
-    if (m_stopping)
-        return; //tunnel is being cancelled?
-
-    NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
-    auto tunnel = std::move(tunnelIter->second);
-    m_pool.erase(tunnelIter);
-    //m_aioThreadBinder.post(
-    //    [tunnel = std::move(tunnel)]() mutable { tunnel.reset(); });
-    lk.unlock();
     tunnel.reset();
+
+    // Reporting error to awaiting users.
+    for (auto& handler: userHandlers)
+        handler(SystemError::interrupted, nullptr);
+
+    m_onTunnelClosedSubscription.notify(std::move(remoteHostName));
 }
 
 void OutgoingTunnelPool::tunnelsStopped(

@@ -118,10 +118,12 @@ class MSSettings
 public:
     static QString defaultROSettingsFilePath();
     static void initializeROSettingsFromConfFile( const QString& fileName );
+    static void initializeROSettings();
     static QSettings* roSettings();
 
     static QString defaultRunTimeSettingsFilePath();
     static void initializeRunTimeSettingsFromConfFile( const QString& fileName );
+    static void initializeRunTimeSettings();
     static QSettings* runTimeSettings();
 };
 
