@@ -19,6 +19,7 @@ angular.module('webadminApp')
         // Common model
         $scope.settings = {
             chooseCloudSystem: false,
+            savePassword: true,
             systemName: '',
 
             cloudEmail: '',
@@ -69,7 +70,7 @@ angular.module('webadminApp')
 
         function sendCredentialsToNativeClient(){
             $log.log("Send credentials to client app: " + $scope.activeLogin);
-            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
+            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds, $scope.savePassword);
         }
 
         function checkInternetOnServer(reload){
