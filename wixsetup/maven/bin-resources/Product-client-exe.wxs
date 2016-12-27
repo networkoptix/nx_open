@@ -25,17 +25,8 @@
                 SuppressOptionsUI="yes"
                 LicenseUrl="License.html" 
                 ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
-<!--            <bal:WixStandardBootstrapperApplication
-                LicenseUrl="License.html"
-                LogoFile="logo-64x64.png"
-        ThemeFile="ClassicTheme.xml"
-            LocalizationFile="ClassicTheme.wxl"
                 SuppressRepair="yes"
-                SuppressOptionsUI="no"
-                ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
-            /> -->
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />

@@ -21,6 +21,7 @@
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
+                SuppressRepair="yes"
                 LicenseUrl="License.html" 
                 ShowFilesInUse="yes"
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
@@ -28,17 +29,6 @@
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeNxtool.wxl" />
-
-<!--        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication
-                LicenseFile="License.rtf"
-                LogoFile="nxtool-logo-64x64.png"
-                SuppressRepair="yes"
-                SuppressOptionsUI="yes"
-                ShowFilesInUse="yes"
-                LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"
-            />
-        </BootstrapperApplicationRef> -->
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="NxtoolPackageGroup"/>
