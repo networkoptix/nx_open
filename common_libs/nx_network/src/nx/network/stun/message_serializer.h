@@ -1,10 +1,4 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STUN_MESSAGE_SERIALIZER_H
-#define STUN_MESSAGE_SERIALIZER_H
+#pragma once
 
 #include <cstdint>
 #include <functional>
@@ -13,8 +7,8 @@
 
 #include "message.h"
 
+#include "stun_message_serializer_buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
-
 
 namespace nx {
 namespace stun {
@@ -36,7 +30,6 @@ namespace stun {
         static nx::Buffer serialized(const Message& message);
 
     private:
-        class MessageSerializerBuffer;
         // header serialization
         nx_api::SerializerState::Type serializeHeader( MessageSerializerBuffer* buffer );
         nx_api::SerializerState::Type serializeHeaderInitial( MessageSerializerBuffer* buffer );
@@ -70,7 +63,5 @@ namespace stun {
         bool m_initialized;
     };
 
-} // namespase stun
-} // namespase nx
-
-#endif  //STUN_MESSAGE_SERIALIZER_H
+} // namespace stun
+} // namespace nx

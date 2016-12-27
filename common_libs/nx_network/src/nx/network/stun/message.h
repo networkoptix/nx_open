@@ -21,6 +21,7 @@
 #endif
 
 #include <nx/network/buffer.h>
+#include <nx/network/connection_server/base_protocol_message_types.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
@@ -29,6 +30,9 @@
 //!Implementation of STUN protocol (rfc5389)
 namespace nx {
 namespace stun {
+
+class MessageParserBuffer;
+class MessageSerializerBuffer;
 
 static const std::uint32_t MAGIC_COOKIE = 0x2112A442;
 
@@ -137,8 +141,61 @@ namespace attrs
 
     struct NX_NETWORK_API Attribute
     {
-        virtual int getType() const = 0;
         virtual ~Attribute() {}
+
+        virtual int getType() const = 0;
+    };
+
+    class NX_NETWORK_API SerializableAttribute:
+        public Attribute
+    {
+    public:
+        virtual nx_api::SerializerState::Type serialize(
+            MessageSerializerBuffer* buffer,
+            std::size_t* bytesWritten) const = 0;
+        virtual bool deserialize(MessageParserBuffer* buffer) = 0;
+    };
+
+    class AttributeFactory
+    {
+    public:
+        static std::unique_ptr<SerializableAttribute> create(int attributeType);
+    };
+
+    class NX_NETWORK_API MappedAddress:
+        public SerializableAttribute
+    {
+    public:
+        static const int TYPE = mappedAddress;
+
+        MappedAddress();
+        MappedAddress(SocketAddress endpoint);
+
+        virtual int getType() const override;
+        virtual nx_api::SerializerState::Type serialize(
+            MessageSerializerBuffer* buffer,
+            std::size_t* bytesWritten) const override;
+        virtual bool deserialize(MessageParserBuffer* buffer) override;
+
+        const SocketAddress& endpoint() const;
+
+    private:
+        static const int kAddressTypeIpV4 = 1;
+        static const int kAddressTypeIpV6 = 2;
+
+        SocketAddress m_endpoint;
+    };
+
+    class NX_NETWORK_API AlternateServer:
+        public MappedAddress
+    {
+    public:
+        static const int TYPE = alternateServer;
+
+        AlternateServer();
+        AlternateServer(SocketAddress endpoint);
+
+        virtual int getType() const override;
     };
 
     struct NX_NETWORK_API XorMappedAddress : Attribute
