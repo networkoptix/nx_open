@@ -319,48 +319,6 @@ static const int DEFAULT_MAX_CAMERAS = 1;
 static const int DEFAULT_MAX_CAMERAS = 128;
 #endif
 
-//TODO #ak have to do something with settings
-class CmdLineArguments
-{
-public:
-    QString logLevel;
-    //!Log level of http requests log
-    QString msgLogLevel;
-    QString ec2TranLogLevel;
-    QString permissionsLogLevel;
-    QString rebuildArchive;
-    QString devModeKey;
-    QString allowedDiscoveryPeers;
-    QString ifListFilter;
-    bool cleanupDb;
-
-    QString configFilePath;
-    QString rwConfigFilePath;
-    bool showVersion;
-    bool showHelp;
-    bool disableCrashHandler;
-    QString engineVersion;
-    QString enforceSocketType;
-    QString enforcedMediatorEndpoint;
-    QString ipVersion;
-
-
-    CmdLineArguments():
-        logLevel(
-#ifdef _DEBUG
-            lit("DEBUG")),
-#else
-            lit("INFO")),
-#endif
-        showVersion(false),
-        showHelp(false),
-        disableCrashHandler(false)
-    {
-    }
-};
-
-static CmdLineArguments cmdLineArguments;
-
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -1094,7 +1052,20 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
 {
     m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
+
     parseCommandLineParameters(argc, argv);
+
+    if (!m_cmdLineArguments.configFilePath.isEmpty())
+        MSSettings::initializeROSettingsFromConfFile(m_cmdLineArguments.configFilePath);
+    else
+        MSSettings::initializeROSettings();
+
+    if (!m_cmdLineArguments.rwConfigFilePath.isEmpty())
+        MSSettings::initializeRunTimeSettingsFromConfFile(m_cmdLineArguments.rwConfigFilePath);
+    else
+        MSSettings::initializeRunTimeSettings();
+
+    addCommandLineParametersFromConfig();
 
     ::srand(::time(NULL));
 }
@@ -1102,7 +1073,7 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
 {
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
         "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
 #ifdef _DEBUG
         "DEBUG"
@@ -1110,50 +1081,68 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
         "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
         "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
-    commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.ifListFilter, "--if", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.ifListFilter, "--if", NULL,
         "Strict media server network interface list (comma delimited list)");
-    commandLineParser.addParameter(&cmdLineArguments.configFilePath, "--conf-file", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.configFilePath, "--conf-file", NULL,
         "Path to config file. By default " + MSSettings::defaultROSettingsFilePath());
-    commandLineParser.addParameter(&cmdLineArguments.rwConfigFilePath, "--runtime-conf-file", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.rwConfigFilePath, "--runtime-conf-file", NULL,
         "Path to config file which is used to save some. By default " + MSSettings::defaultRunTimeSettingsFilePath());
-    commandLineParser.addParameter(&cmdLineArguments.showVersion, "--version", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.showVersion, "--version", NULL,
         lit("Print version info and exit"), true);
-    commandLineParser.addParameter(&cmdLineArguments.showHelp, "--help", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.showHelp, "--help", NULL,
         lit("This help message"), true);
-    commandLineParser.addParameter(&cmdLineArguments.engineVersion, "--override-version", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
-    commandLineParser.addParameter(&cmdLineArguments.enforceSocketType, "--enforce-socket", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.enforceSocketType, "--enforce-socket", NULL,
         lit("Enforces stream socket type (TCP, UDT)"), QString());
-    commandLineParser.addParameter(&cmdLineArguments.enforcedMediatorEndpoint, "--enforce-mediator", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.enforcedMediatorEndpoint, "--enforce-mediator", NULL,
         lit("Enforces mediator address"), QString());
-    commandLineParser.addParameter(&cmdLineArguments.ipVersion, "--ip-version", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
-    commandLineParser.addParameter(&cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
 #ifdef __linux__
-    commandLineParser.addParameter(&cmdLineArguments.disableCrashHandler, "--disable-crash-handler", NULL,
+    commandLineParser.addParameter(&m_cmdLineArguments.disableCrashHandler, "--disable-crash-handler", NULL,
         lit("Disables crash signal handler (linux only)"), true);
 #endif
     commandLineParser.parse(argc, argv, stderr);
 
-    if (cmdLineArguments.showHelp)
+    if (m_cmdLineArguments.showHelp)
     {
         QTextStream stream(stdout);
         commandLineParser.print(stream);
     }
+}
+
+void MediaServerProcess::addCommandLineParametersFromConfig()
+{
+    // move arguments from conf file / registry
+
+    if (m_cmdLineArguments.rebuildArchive.isEmpty())
+        m_cmdLineArguments.rebuildArchive = MSSettings::runTimeSettings()->value("rebuild").toString();
+
+    if (m_cmdLineArguments.msgLogLevel.isEmpty())
+        m_cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
+
+    if (m_cmdLineArguments.ec2TranLogLevel.isEmpty())
+        m_cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL).toString();
 }
 
 MediaServerProcess::~MediaServerProcess()
@@ -2016,7 +2005,7 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
         serverFlags |= Qn::SF_HasLiteClient;
     }
 
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     if (compatibilityMode) // check compatibilityMode here for testing purpose
     {
         serverFlags |= Qn::SF_HasLiteClient;
@@ -2195,13 +2184,13 @@ void MediaServerProcess::performActionsOnExit()
     }
 }
 
-void updateAllowedInterfaces(const CmdLineArguments& cmdLineArguments)
+void MediaServerProcess::updateAllowedInterfaces()
 {
     // check registry
     QString ifList = MSSettings::roSettings()->value(lit("if")).toString();
     // check startup parameter
     if (ifList.isEmpty())
-        ifList = cmdLineArguments.ifListFilter;
+        ifList = m_cmdLineArguments.ifListFilter;
 
     QList<QHostAddress> allowedInterfaces;
     for (const QString& s : ifList.split(QLatin1Char(';'), QString::SkipEmptyParts))
@@ -2214,37 +2203,36 @@ void updateAllowedInterfaces(const CmdLineArguments& cmdLineArguments)
 
 void MediaServerProcess::run()
 {
-    if (!cmdLineArguments.configFilePath.isEmpty())
-        MSSettings::initializeROSettingsFromConfFile(cmdLineArguments.configFilePath);
-    else
-        MSSettings::initializeROSettings();
+    if (m_cmdLineArguments.showVersion)
+    {
+        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
+        return;
+    }
+    if (m_cmdLineArguments.showHelp)
+        return;
 
-    if (!cmdLineArguments.rwConfigFilePath.isEmpty())
-        MSSettings::initializeRunTimeSettingsFromConfFile(cmdLineArguments.rwConfigFilePath);
-    else
-        MSSettings::initializeRunTimeSettings();
 
-    updateAllowedInterfaces(cmdLineArguments);
+    updateAllowedInterfaces();
 
 #ifdef __linux__
-    if (!cmdLineArguments.disableCrashHandler)
+    if (!m_cmdLineArguments.disableCrashHandler)
         linux_exception::installCrashSignalHandler();
 #endif
 
-    if (!cmdLineArguments.enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(cmdLineArguments.enforceSocketType);
-    auto ipVersion = cmdLineArguments.ipVersion;
+    if (!m_cmdLineArguments.enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
+    auto ipVersion = m_cmdLineArguments.ipVersion;
     if (ipVersion.isEmpty())
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 
-    SocketFactory::setIpVersion(cmdLineArguments.ipVersion);
+    SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
 
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(cmdLineArguments.enforcedMediatorEndpoint));
+    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
 
-    if (!cmdLineArguments.engineVersion.isNull())
+    if (!m_cmdLineArguments.engineVersion.isNull())
     {
-        qWarning() << "Starting with overridden version: " << cmdLineArguments.engineVersion;
-        qnCommon->setEngineVersion(QnSoftwareVersion(cmdLineArguments.engineVersion));
+        qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
+        qnCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
     QnCallCountStart(std::chrono::milliseconds(5000));
@@ -2371,7 +2359,7 @@ void MediaServerProcess::run()
     qnCommon->setModuleGUID(serverGuid());
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ms", qnCommon->moduleGUID());
 
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
@@ -2712,9 +2700,9 @@ void MediaServerProcess::run()
         qnGlobalSettings->cloudSystemId().isEmpty() ? "no" : "yes");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
-    if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
+    if (!m_cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QSet<QnUuid> allowedPeers;
-        for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
+        for (const QString &peer: m_cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
@@ -2764,7 +2752,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
-    if (cmdLineArguments.cleanupDb)
+    if (m_cmdLineArguments.cleanupDb)
     {
         const bool kCleanupDbObjects = true;
         const bool kCleanupTransactionLog = true;
@@ -3113,17 +3101,11 @@ protected:
 
         QDir::setCurrent(qApp->applicationDirPath());
 
-        if (cmdLineArguments.rebuildArchive.isEmpty()) {
-            cmdLineArguments.rebuildArchive = MSSettings::runTimeSettings()->value("rebuild").toString();
-        }
         MSSettings::runTimeSettings()->remove("rebuild");
 
-        initLog(cmdLineArguments.logLevel);
+        const auto cmdLineArguments = m_main->cmdLineArguments();
 
-        if( cmdLineArguments.msgLogLevel.isEmpty() )
-            cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
-                nx_ms_conf::HTTP_MSG_LOG_LEVEL,
-                nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
+        initLog(cmdLineArguments.logLevel);
 
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             logDir + QLatin1String("/http_log"),
@@ -3132,10 +3114,6 @@ protected:
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel));
 
         //preparing transaction log
-        if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
-            cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
-                nx_ms_conf::EC2_TRAN_LOG_LEVEL,
-                nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
         initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
 
         QnLog::instance(QnLog::HWID_LOG)->create(
@@ -3333,18 +3311,14 @@ int MediaServerProcess::main(int argc, char* argv[])
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
-
-    if(cmdLineArguments.showVersion)
-    {
-        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
-        return 0;
-    }
-    if(cmdLineArguments.showHelp)
-        return 0;
-
     QnVideoService service( argc, argv );
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
     return 0;
+}
+
+const CmdLineArguments MediaServerProcess::cmdLineArguments() const
+{
+    return m_cmdLineArguments;
 }

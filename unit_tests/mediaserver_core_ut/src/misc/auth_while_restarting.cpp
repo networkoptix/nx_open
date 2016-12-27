@@ -12,7 +12,7 @@
 #include <api/app_server_connection.h>
 #include <nx/network/http/httpclient.h>
 
-TEST(AuthWhileRestarting, CloudUserAuthWhileRestarting)
+TEST(AuthWhileRestarting, main)
 {
     MediaServerLauncher mediaServerLauncher;
     ASSERT_TRUE(mediaServerLauncher.start());
