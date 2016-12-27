@@ -73,13 +73,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${VC12RedistPath}/bin</directory>
-            <outputDirectory>..</outputDirectory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>${environment.dir}/help/${release.version}/${customization}</directory>
             <outputDirectory>../help</outputDirectory>
         </fileSet>
