@@ -10,7 +10,11 @@ GenericProduct
     Depends { name: "nx_network" }
     Depends { name: "qtsinglecoreapplication" }
 
-    cpp.frameworks: ["Foundation"]
+    Properties
+    {
+        condition: qbs.targetOS.contains("macos")
+        cpp.frameworks: ["Foundation"]
+    }
 
     Group
     {
