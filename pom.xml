@@ -254,6 +254,7 @@
         <artifact.name.bundle>${artifact.name.prefix}-bundle-${artifact.name.suffix}</artifact.name.bundle>
         <artifact.name.servertool>${artifact.name.prefix}-servertool-${artifact.name.suffix}</artifact.name.servertool>
         <artifact.name.paxton>${artifact.name.prefix}-paxton-${artifact.name.suffix}</artifact.name.paxton>
+        <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
         <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
         <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
 
