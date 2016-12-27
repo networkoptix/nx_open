@@ -31,12 +31,11 @@ angular.module('webadminApp')
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                 }
 
-                var ips = data.remoteAddresses;
+                var ips = _.filter(data.remoteAddresses,function(address){
+                    return address !== '127.0.0.1';
+                });
                 var wrongNetwork = true;
                 for (var ip in ips) {
-                    if (ips[ip] == '127.0.0.1') { // Localhost
-                        continue;
-                    }
                     if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
                         continue;
                     }
@@ -582,7 +581,7 @@ angular.module('webadminApp')
                         $location.path('/setup');
                         return null;
                     }
-                    if((r.data.reply.flags.brokenSystem)){ // No drives - redirect to settings and hide everything else
+                    if(r.data.reply.flags.brokenSystem){ // No drives - redirect to settings and hide everything else
                         $location.path('/settings/system');
                         return null;
                     }
