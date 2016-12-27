@@ -1,8 +1,7 @@
-
 #include "cf_url.h"
 
 #include <QtCore/QString>
-#include <platform/core_foundation_mac/cf_string.h>
+#include <nx/utils/platform/core_foundation_mac/cf_string.h>
 
 cf::QnCFUrl::QnCFUrl()
     :

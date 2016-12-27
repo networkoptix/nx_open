@@ -10,6 +10,8 @@ GenericProduct
     Depends { name: "nx_network" }
     Depends { name: "qtsinglecoreapplication" }
 
+    cpp.frameworks: ["Foundation"]
+
     Group
     {
         files: "maven/filter-resources/applauncher_app_info_impl.cpp"
