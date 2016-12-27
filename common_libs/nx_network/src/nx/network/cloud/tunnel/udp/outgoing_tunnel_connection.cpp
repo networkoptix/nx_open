@@ -26,14 +26,15 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
-    m_controlConnection(
-        std::make_unique<ConnectionType>(this, std::move(udtConnection))),
+    m_controlConnection(std::make_unique<ConnectionType>(this, std::move(udtConnection))),
     m_timeouts(timeouts),
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
     m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
+
+    m_controlConnection->socket()->setNonBlockingMode(true);
     m_controlConnection->socket()->setRecvTimeout(timeout.count());
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
