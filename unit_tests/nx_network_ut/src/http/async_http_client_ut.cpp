@@ -376,7 +376,9 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
     std::thread serverThread(
         [&]()
         {
-            const auto server = SocketFactory::createStreamServerSocket();
+            const auto server = std::make_unique<nx::network::TCPServerSocket>(
+                SocketFactory::tcpClientIpVersion());
+
             ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverPort.set_value(server->getLocalAddress().port);
@@ -666,7 +668,7 @@ public:
     TestTcpServer(std::vector<QByteArray> dataToSend):
         m_delayAfterSend(200),
         m_dataToSend(std::move(dataToSend)),
-        m_serverSocket(AF_INET),
+        m_serverSocket(SocketFactory::tcpClientIpVersion()),
         m_terminated(false)
     {
     }

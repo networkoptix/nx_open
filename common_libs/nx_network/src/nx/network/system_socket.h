@@ -220,7 +220,7 @@ public:
     /**
      * Construct a TCP socket with no connection.
      */
-    TCPSocket(int ipVersion);
+    explicit TCPSocket(int ipVersion = AF_INET);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -270,7 +270,7 @@ class NX_NETWORK_API TCPServerSocket
     typedef Socket<AbstractStreamServerSocket> base_type;
 
 public:
-    TCPServerSocket(int ipVersion);
+    explicit TCPServerSocket(int ipVersion = AF_INET);
     ~TCPServerSocket();
 
     TCPServerSocket(const TCPServerSocket&) = delete;
@@ -321,7 +321,7 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket(int ipVersion = AF_INET);
+    explicit UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
