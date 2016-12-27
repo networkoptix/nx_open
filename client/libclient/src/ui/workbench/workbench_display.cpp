@@ -2350,11 +2350,12 @@ void QnWorkbenchDisplay::at_mapper_cellSizeChanged()
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged()
 {
-    synchronizeAllGeometries(true);
+    synchronizeAllGeometries(false);
 
     synchronizeSceneBounds();
 
-    fitInView();
+    fitInView(false);
+
 
     if (qFuzzyIsNull(workbench()->mapper()->spacing()))
         m_frameOpacityAnimator->animateTo(0.0);
