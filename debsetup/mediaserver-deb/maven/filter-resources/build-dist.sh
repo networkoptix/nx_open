@@ -4,7 +4,6 @@ set -e
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=${installer.name}-mediaserver
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
@@ -18,7 +17,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
 
-FINALNAME=${final.artifact.name}-server
+FINALNAME=${artifact.name.server}
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME

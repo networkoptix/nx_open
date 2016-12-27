@@ -20,7 +20,7 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-PACKAGE_NAME=${final.artifact.name}-server.tar.gz
+PACKAGE_NAME=${artifact.name.server}.tar.gz
 UPDATE_NAME=server-update-${box}-${arch}-$VERSION
 
 BUILD_DIR="`mktemp -d`"

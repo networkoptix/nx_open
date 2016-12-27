@@ -7,7 +7,6 @@ FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
-PACKAGENAME=${installer.name}-client
 VERSION=${release.version}
 FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
@@ -23,7 +22,7 @@ LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
-FINALNAME=${final.artifact.name}-client
+FINALNAME=${artifact.name.client}
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
