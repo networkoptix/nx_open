@@ -128,11 +128,11 @@ namespace ec2
 
     void Ec2StaticticsReporter::removeTimer()
     {
-        boost::optional<quint64> timerId;
+        decltype(m_timerId) timerId;
         {
             QnMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
-            std::swap(timerId, m_timerId);
+            m_timerId.swap(timerId);
         }
 
         if (timerId)
