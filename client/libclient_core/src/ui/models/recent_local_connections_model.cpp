@@ -68,6 +68,13 @@ QnRecentLocalConnectionsModel::QnRecentLocalConnectionsModel(QObject *parent):
     m_systemId(),
     m_data()
 {
+    connect(this, &QnRecentLocalConnectionsModel::modelReset,
+        this, &QnRecentLocalConnectionsModel::countChanged);
+    connect(this, &QnRecentLocalConnectionsModel::rowsInserted,
+        this, &QnRecentLocalConnectionsModel::countChanged);
+    connect(this, &QnRecentLocalConnectionsModel::rowsRemoved,
+        this, &QnRecentLocalConnectionsModel::countChanged);
+
     QnClientRecentConnectionsManager::instance()->addModel(this);
 }
 
@@ -93,6 +100,12 @@ void QnRecentLocalConnectionsModel::setSystemId(const QUuid& localId)
 bool QnRecentLocalConnectionsModel::hasConnections() const
 {
     return !m_data.isEmpty();
+}
+
+
+int QnRecentLocalConnectionsModel::count() const
+{
+    return rowCount();
 }
 
 QString QnRecentLocalConnectionsModel::firstUser() const
@@ -176,15 +189,13 @@ int QnRecentLocalConnectionsModel::rowCount(const QModelIndex &parent) const
 QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role) const
 {
     const int row = index.row();
-    if (!qBetween(0, row, rowCount())
-        || !qBetween<int>(FirstRole, role, RolesCount))
-    {
+    if (!qBetween(0, row, rowCount()))
         return QVariant();
-    }
 
     const auto userPasswordData = m_data.at(row);
     switch (role)
     {
+        case Qt::DisplayRole:
         case UserNameRole:
             return userPasswordData.url.userName();
         case PasswordRole:
@@ -198,7 +209,7 @@ QVariant QnRecentLocalConnectionsModel::data(const QModelIndex &index, int role)
 
 RoleNameHash QnRecentLocalConnectionsModel::roleNames() const
 {
-    return kRoleNames;
+    return base_type::roleNames().unite(kRoleNames);
 }
 
 QVariant QnRecentLocalConnectionsModel::getData(const QString &dataRole

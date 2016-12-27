@@ -12,6 +12,7 @@ Page
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     property alias systemId: systemHostsModel.systemId
+    property alias localSystemId: recentLocalConnectionsModel.systemId
     property string systemName
     property alias address: credentialsEditor.address
     property alias login: credentialsEditor.login
@@ -22,11 +23,6 @@ Page
     {
         id: d
         property bool connecting: false
-    }
-
-    QnSystemHostsModel
-    {
-        id: systemHostsModel
     }
 
     Column
@@ -42,7 +38,17 @@ Page
         SessionCredentialsEditor
         {
             id: credentialsEditor
-            hostsModel: systemHostsModel
+
+            hostsModel: QnSystemHostsModel
+            {
+                id: systemHostsModel
+            }
+
+            recentLocalConnectionsModel: QnRecentLocalConnectionsModel
+            {
+                id: recentLocalConnectionsModel
+            }
+
             width: parent.availableWidth
             onAccepted: customConnectionScreen.connect()
         }

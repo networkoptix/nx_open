@@ -79,6 +79,7 @@ Pane
         {
             Workflow.openSavedSession(
                 systemId,
+                localId,
                 systemName,
                 informationBlock.address,
                 informationBlock.user,
@@ -120,7 +121,7 @@ Pane
             }
             else
             {
-                Workflow.openDiscoveredSession(systemId, systemName, informationBlock.address)
+                Workflow.openDiscoveredSession(systemId, localId, systemName, informationBlock.address)
             }
         }
     }
