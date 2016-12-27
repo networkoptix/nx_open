@@ -27,7 +27,6 @@ Product
     Properties
     {
         condition: qbs.targetOS.contains("macos")
-        cpp.cxxStandardLibrary: "libstdc++"
         cpp.minimumMacosVersion: "10.8"
     }
 
