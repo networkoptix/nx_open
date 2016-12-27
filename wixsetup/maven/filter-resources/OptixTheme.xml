@@ -59,14 +59,16 @@
   <Page Name="Success">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
-    <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">Installation complete!</Text>
+
+    <Text Name="SuccessInstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessInstallHeader)</Text>
+    <Text Name="SuccessUninstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessUninstallHeader)</Text> 
+
     <Button Name="LaunchButton" X="-91" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessLaunchButton)</Button>
     <Text Name="SuccessRestartText" X="150" Y="-51" Width="-11" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessRestartText)</Text>
     <Button Name="SuccessRestartButton" X="-91" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.SuccessRestartButton)</Button>
     <Button Name="SuccessCancelButton" X="-11" Y="-11" Width="75" Height="23" TabStop="yes" FontId="0">#(loc.SuccessCloseButton)</Button>
   </Page>
   <Page Name="Failure">
-    <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo_small.png"/>
     <Text X="24" Y="104" Width="-11" Height="32" FontId="6">#(loc.FailureHeader)</Text>
