@@ -158,8 +158,11 @@ class ClientMixin(ComparisonMixin):
             if not isinstance(response.data, list):
                 self.assertEqual(int(response.data.get('error', 0)),
                                  apiErrorCode, "'%s' reply.error != '%s'" % \
-                                 (method,  )
-                self.assertEqual(response.data.get('errorString', ''), apiErrorString, "'%s' reply.errorString" % method)
+                                 (method,  apiErrorCode))
+                self.assertEqual(
+                    response.data.get('errorString', ''),
+                    apiErrorString, "'%s' reply.errorString != '%s'" % \
+                    (method, apiErrorString))
 
     # Call API method & check error
     def sendAndCheckRequest(self,
