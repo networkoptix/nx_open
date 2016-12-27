@@ -23,8 +23,7 @@
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
-        <VC12RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2012</VC12RedistPath>
-        <rdep.packages>vcredist-2015 vcredist-2012 vmaxproxy-2.1</rdep.packages>
+        <rdep.packages>vcredist-2015 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
