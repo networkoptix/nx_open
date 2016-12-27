@@ -24,6 +24,12 @@ Product
         overrideListProperties: !project.developerBuild // Leaving Qt RPATH for developer builds.
         cpp.rpaths: ["$ORIGIN/../lib"]
     }
+    Properties
+    {
+        condition: qbs.targetOS.contains("osx")
+        cpp.cxxStandardLibrary: "libstdc++"
+        cpp.minimumMacosVersion: "10.8"
+    }
 
     configure.outputTags: ["cpp", "hpp", "resources.resource_data"]
 

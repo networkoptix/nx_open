@@ -55,6 +55,12 @@ Module
         enableSoftwareMotionDetection: false
         enableDesktopCamera: false
     }
+    Properties
+    {
+        condition: qbs.targetOS.contains("osx") &&
+            (product.type.contains("staticlibrary") || product.type.contains("dynamiclibrary"))
+        cpp.linkerFlags: outer.concat(["-undefined", "dynamic_lookup"])
+    }
 
     cpp.defines:
     {
@@ -119,6 +125,7 @@ Module
                 "-W",
                 "-Werror=enum-compare",
                 "-Werror=reorder",
+                "-Wno-unused-local-typedefs",
                 "-Werror=delete-non-virtual-dtor",
                 "-Werror=return-type",
                 "-Werror=conversion-null",
@@ -130,10 +137,13 @@ Module
         {
             flags.push(
                 "-msse2",
-                "-Wno-unused-local-typedefs",
                 "-Wno-unknown-pragmas",
                 "-Wno-ignored-qualifiers"
             )
+        }
+        else if (qbs.targetOS.contains("osx"))
+        {
+            flags.push("-msse4.1")
         }
 
         return flags
