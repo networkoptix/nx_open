@@ -134,6 +134,9 @@ TEST_F(UdpHolePunching, loadTest)
     server.pleaseStopSync();
 }
 
+//-------------------------------------------------------------------------------------------------
+// CloudConnectTunnel
+
 class CloudConnectTunnel:
     public CloudConnect
 {
