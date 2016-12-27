@@ -14,7 +14,7 @@ angular.module('webadminApp')
             for (var i=0;i<params.length;i++) {
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
-                    proxy = '/proxy/' + pair[1];
+                    proxy = '/web/proxy/' + pair[1];
                     if(pair[1] === 'demo'){
                         proxy = Config.demo;
                     }
@@ -397,7 +397,6 @@ angular.module('webadminApp')
 
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 // 1. get remote nonce
-                // /proxy/http/{url}/api/getNonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
                     // 2. calculate digest
@@ -541,7 +540,7 @@ angular.module('webadminApp')
                 }
 
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
-                    serverUrl = '/proxy/'+ serverUrl + '/';
+                    serverUrl = '/web/proxy/'+ serverUrl + '/';
                 }
                 if( proxy === Config.demo){
                     serverUrl = proxy + '/';
