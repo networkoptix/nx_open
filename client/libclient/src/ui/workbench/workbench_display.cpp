@@ -29,13 +29,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
-
 #include <redass/redass_controller.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/common/notification_levels.h>
+
+#include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/client/ui/workbench/workbench_animations.h>
 
@@ -250,8 +251,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeSceneBoundsExtension()));
 
-    //queueing connection because some OS make resize call before move widget to correct postion while expanding it to fullscreen --gdm
-    connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(fitInView()), Qt::QueuedConnection);
+    connect(resizeSignalingInstrument, QnSignalingInstrumentActivated, this,
+        [this]()
+        {
+            fitInView(false); //< Direct call to immediate reaction
+            /**
+             * Since we don't animate fit in view we have to execute fitInView second time
+             * after some delay, because some OS make resize call before move widget to correct
+             * position while expanding it to fullscreen. #gdm
+             */
+            executeDelayedParented([this]() { fitInView(false); }, 0, this);
+        });
 
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
@@ -1240,15 +1250,17 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
-    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
-    if (widgetsForResource.size() == 1)
+    const auto resource = widget->resource();
+    NX_ASSERT(m_widgetsByResource.contains(resource));
+    if (m_widgetsByResource.contains(resource))
     {
-        emit resourceAboutToBeRemoved(widget->resource());
-        m_widgetsByResource.remove(widget->resource());
-    }
-    else
-    {
+        QnResourceWidgetList& widgetsForResource = m_widgetsByResource[resource];
         widgetsForResource.removeOne(widget);
+        if (widgetsForResource.empty())
+        {
+            emit resourceAboutToBeRemoved(resource);
+            m_widgetsByResource.remove(resource);
+        }
     }
 
     m_widgets.removeOne(widget);
@@ -2368,8 +2380,11 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     if (accessController()->hasPermissions(resource, requiredPermission))
         return;
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);
@@ -2384,8 +2399,11 @@ void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& re
             workbench()->removeLayout(layout);
     }
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);

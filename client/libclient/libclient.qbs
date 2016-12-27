@@ -44,8 +44,19 @@ GenericProduct
         condition: qbs.targetOS.contains("linux")
         cpp.dynamicLibraries: base.concat(["GL", "Xfixes", "Xss", "X11"])
     }
+    Properties
+    {
+        condition: qbs.targetOS.contains("osx")
+        cpp.frameworks: ["Foundation", "AudioUnit", "AppKit"]
+    }
 
     cpp.includePaths: ["src", project.sourceDirectory + "/cpp/maven/bin-resources"]
+
+    Group
+    {
+        condition: qbs.targetOS.contains("osx")
+        files: ["src/ui/workaround/mac_utils.mm"]
+    }
 
     configure.replacements: ({
         "product.title": vms.clientName,

@@ -2,8 +2,6 @@
 
 #include <QtQuick/private/qquicktextinput_p_p.h>
 #include <QtQuick/private/qquickclipnode_p.h>
-#include <QtLabsTemplates/private/qquickmenu_p.h>
-#include <QtLabsTemplates/private/qquickmenuitem_p.h>
 
 class QnQuickTextInputPrivate : public QQuickTextInputPrivate
 {

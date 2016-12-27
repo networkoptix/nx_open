@@ -50,10 +50,16 @@ Module
     }
     Properties
     {
-        condition: project.target == "isd" || project.target == "isd_s2"
+        condition: project.box == "isd" || project.box == "isd_s2"
         enableAllVendors: false
         enableSoftwareMotionDetection: false
         enableDesktopCamera: false
+    }
+    Properties
+    {
+        condition: qbs.targetOS.contains("osx") &&
+            (product.type.contains("staticlibrary") || product.type.contains("dynamiclibrary"))
+        cpp.linkerFlags: outer.concat(["-undefined", "dynamic_lookup"])
     }
 
     cpp.defines:
@@ -103,7 +109,7 @@ Module
         if (qbs.targetOS.contains("unix"))
             defines.push("QN_EXPORT=")
 
-        if (project.target == "isd" || project.target == "isd_s2")
+        if (project.box == "isd" || project.box == "isd_s2")
             defines.push("EDGE_SERVER")
 
         return defines
@@ -119,6 +125,7 @@ Module
                 "-W",
                 "-Werror=enum-compare",
                 "-Werror=reorder",
+                "-Wno-unused-local-typedefs",
                 "-Werror=delete-non-virtual-dtor",
                 "-Werror=return-type",
                 "-Werror=conversion-null",
@@ -130,10 +137,13 @@ Module
         {
             flags.push(
                 "-msse2",
-                "-Wno-unused-local-typedefs",
                 "-Wno-unknown-pragmas",
                 "-Wno-ignored-qualifiers"
             )
+        }
+        else if (qbs.targetOS.contains("osx"))
+        {
+            flags.push("-msse4.1")
         }
 
         return flags

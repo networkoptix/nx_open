@@ -4,6 +4,7 @@ import qbs.File
 import qbs.FileInfo
 import qbs.TextFile
 import qbs.Process
+import "qbs/imports/VmsUtils/vms_utils.js" as VmsUtils
 
 Project
 {
@@ -20,17 +21,18 @@ Project
     property string fullVersion:
         versionMajor + "." + versionMinor + "." + versionBugfix + "." + buildNumber
 
-    property string target: "linux-x64"
+    property bool developerBuild: true
+    property string box
     property string customization: "default"
     property bool beta: true
+    property string target: VmsUtils.currentTarget(box)
 
     property bool withInstallers: false
 
     property path buildenvDirectory: Environment.getEnv("environment")
 
     references: [
-        (qbs.versionMajor >= 1 && qbs.versionMinor >= 8
-            ? "qbs/dependencies.qbs" : "qbs/dependencies_17.qbs"),
+        "qbs/dependencies.qbs",
         "qbs/mercurial_info.qbs",
         "common_libs",
         "common",

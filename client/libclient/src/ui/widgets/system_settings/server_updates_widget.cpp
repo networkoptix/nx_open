@@ -92,7 +92,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     ui->targetVersionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->targetVersionLabel->setForegroundRole(QPalette::Text);
 
-    ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png"));
+    ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png",
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
     ui->linkCopiedWidget->hide();
 
     setHelpTopic(this, Qn::Administration_Update_Help);
@@ -317,9 +318,9 @@ void QnServerUpdatesWidget::initDownloadActions()
 
 void QnServerUpdatesWidget::updateButtonText()
 {
-    QString text = tr("Update System");
-    if (m_mode == Mode::SpecificBuild)
-        text = tr("Update to Specific Build");
+    QString text = m_mode == Mode::SpecificBuild
+        ? tr("Update to Specific Build")
+        : tr("Update System");
     ui->updateButton->setText(text);
 }
 

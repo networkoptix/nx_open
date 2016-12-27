@@ -39,6 +39,18 @@ GenericProduct
     cpp.allowUnresolvedSymbols: true
     cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
 
+    Properties
+    {
+        condition: qbs.targetOS.contains("osx")
+        cpp.frameworks: ["Foundation", "AppKit"]
+    }
+
+    Group
+    {
+        condition: qbs.targetOS.contains("osx")
+        files: ["src/utils/mac_utils.mm"]
+    }
+
     Group
     {
         files: "maven/filter-resources/app_info_impl.cpp"
@@ -83,6 +95,19 @@ GenericProduct
             "freeLicenseCount": customization.freeLicenseCount,
             "freeLicenseKey": customization.freeLicenseKey,
             "freeLicenseIsTrial": customization.freeLicenseIsTrial
+        })
+    }
+    Group
+    {
+        condition: project.developerBuild
+        files: "qt.conf"
+        fileTags: "configure.input"
+        configure.outputTags: "resources.resource_data"
+        configure.outputProperties: ({
+            "resources": {
+                "priority": 10,
+                "resourcePrefix": "qt/etc"
+            }
         })
     }
 
