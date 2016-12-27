@@ -6,6 +6,8 @@ GenericProduct
     name: "libclient"
     targetName: "client"
 
+    condition: project.withDesktopClient
+
     Depends { name: "libclient_core" }
     Depends { name: "nx_speech_synthesizer" }
     Depends { name: "libvms_gateway" }
@@ -46,7 +48,7 @@ GenericProduct
     }
     Properties
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         cpp.frameworks: ["Foundation", "AudioUnit", "AppKit"]
     }
 
@@ -54,7 +56,7 @@ GenericProduct
 
     Group
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         files: ["src/ui/workaround/mac_utils.mm"]
     }
 

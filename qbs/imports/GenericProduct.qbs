@@ -26,7 +26,7 @@ Product
     }
     Properties
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         cpp.cxxStandardLibrary: "libstdc++"
         cpp.minimumMacosVersion: "10.8"
     }
@@ -94,7 +94,7 @@ Product
         name: "macx"
         files: ["*_macx.cpp", "*_macx.h", "*_macx/*.cpp", "*_macx/*.h"]
         prefix: product.sourceDirectory + "/src/**/"
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
     }
 
     Group

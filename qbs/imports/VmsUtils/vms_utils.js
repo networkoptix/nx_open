@@ -8,7 +8,7 @@ function currentPlatform()
         return "windows"
     if (qbs.targetOS.contains("ios"))
         return "ios"
-    if (qbs.targetOS.contains("osx"))
+    if (qbs.targetOS.contains("macos"))
         return "macosx"
 
     throw "Unsupported target OS " + qbs.targetOS

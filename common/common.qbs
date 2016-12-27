@@ -41,13 +41,13 @@ GenericProduct
 
     Properties
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         cpp.frameworks: ["Foundation", "AppKit"]
     }
 
     Group
     {
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
         files: ["src/utils/mac_utils.mm"]
     }
 
@@ -71,7 +71,7 @@ GenericProduct
             "ffmpeg.version": ffmpeg.version,
             "sigar.version": sigarInfo.version,
             "boost.version": boost.version,
-            "box": vms.box,
+            "box": project.box || "none",
             "beta": project.beta,
             "product.name": customization.productName,
             "product.appName": customization.productNameShort,

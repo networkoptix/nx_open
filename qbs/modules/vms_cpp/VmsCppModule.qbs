@@ -57,7 +57,7 @@ Module
     }
     Properties
     {
-        condition: qbs.targetOS.contains("osx") &&
+        condition: qbs.targetOS.contains("macos") &&
             (product.type.contains("staticlibrary") || product.type.contains("dynamiclibrary"))
         cpp.linkerFlags: outer.concat(["-undefined", "dynamic_lookup"])
     }
@@ -141,7 +141,7 @@ Module
                 "-Wno-ignored-qualifiers"
             )
         }
-        else if (qbs.targetOS.contains("osx"))
+        else if (qbs.targetOS.contains("macos"))
         {
             flags.push("-msse4.1")
         }

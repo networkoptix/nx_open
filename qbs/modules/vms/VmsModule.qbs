@@ -16,7 +16,7 @@ Module
     property string clientBinaryName: {
         if (qbs.targetOS.contains("windows"))
             return customization.productName + ".exe"
-        if (qbs.targetOS.contains("macosx"))
+        if (qbs.targetOS.contains("macos"))
             return customization.productDisplayName
         return "client-bin"
     }
@@ -39,7 +39,7 @@ Module
                 + "/"
                 + customization.productDisplayName
                 + "/"
-        if (qbs.targetOS.contains("macosx"))
+        if (qbs.targetOS.contains("macos"))
             return "/Applications/"
         return "/opt/" + customization.depCompanyName
     }

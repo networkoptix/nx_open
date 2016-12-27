@@ -5,6 +5,8 @@ GenericProduct
     name: "applauncher"
     type: "application"
 
+    condition: project.withDesktopClient
+
     Depends { name: "nx_network" }
     Depends { name: "qtsinglecoreapplication" }
 
