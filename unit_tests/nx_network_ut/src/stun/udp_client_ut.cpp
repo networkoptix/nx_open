@@ -35,7 +35,7 @@ public:
     ~UdpClient()
     {
         for (const auto& serverCtx: m_udpServers)
-            serverCtx.server->pleaseStopSync();
+            serverCtx->server->pleaseStopSync();
     }
 
     /**
@@ -45,10 +45,11 @@ public:
     {
         using namespace std::placeholders;
 
-        ServerContext ctx;
-        ctx.server = std::make_unique<UdpServer>(&ctx.messageDispatcher);
-        ASSERT_TRUE(ctx.server->listen());
-        ctx.messageDispatcher.registerDefaultRequestProcessor(
+        auto ctx = std::make_unique<ServerContext>();
+        ctx->server = std::make_unique<UdpServer>(&ctx->messageDispatcher);
+        ASSERT_TRUE(ctx->server->bind(SocketAddress(HostAddress::localhost, 0)));
+        ASSERT_TRUE(ctx->server->listen());
+        ctx->messageDispatcher.registerDefaultRequestProcessor(
             std::bind(&UdpClient::onMessage, this, _1, _2));
 
         m_udpServers.emplace_back(std::move(ctx));
@@ -61,7 +62,7 @@ public:
     {
         return SocketAddress(
             HostAddress::localhost,
-            nx::utils::random::choice(m_udpServers).server->address().port);
+            nx::utils::random::choice(m_udpServers)->server->address().port);
     }
 
     std::vector<SocketAddress> allServersEndpoints() const
@@ -73,7 +74,7 @@ public:
             endpoints.push_back(
                 SocketAddress(
                     HostAddress::localhost,
-                    serverCtx.server->address().port));
+                    serverCtx->server->address().port));
         }
 
         return endpoints;
@@ -98,11 +99,11 @@ protected:
 
     ServerContext& server(std::size_t index)
     {
-        return m_udpServers[index];
+        return *m_udpServers[index];
     }
 
 private:
-    std::vector<ServerContext> m_udpServers;
+    std::vector<std::unique_ptr<ServerContext>> m_udpServers;
     size_t m_messagesToIgnore;
     size_t m_totalMessagesReceived;
 
