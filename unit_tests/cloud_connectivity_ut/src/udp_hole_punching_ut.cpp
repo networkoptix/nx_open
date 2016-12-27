@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <libconnection_mediator/src/test_support/mediator_functional_test.h>
+#include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
@@ -15,11 +16,12 @@ namespace cloud {
 
 using nx::hpm::MediaServerEmulator;
 
-class UdpHolePunching:
+class CloudConnect:
     public ::testing::Test
 {
 public:
-    UdpHolePunching()
+    CloudConnect(int methods = hpm::api::ConnectionMethod::all):
+        m_methods(methods)
     {
         nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
@@ -41,7 +43,7 @@ public:
         auto serverSocket = std::make_unique<CloudServerSocket>(
             SocketGlobals::mediatorConnector().systemConnection());
 
-        serverSocket->setSupportedConnectionMethods(hpm::api::ConnectionMethod::udpHolePunching);
+        serverSocket->setSupportedConnectionMethods(m_methods);
         NX_CRITICAL(serverSocket->registerOnMediatorSync() == hpm::api::ResultCode::ok);
         return std::unique_ptr<AbstractStreamServerSocket>(std::move(serverSocket));
     }
@@ -52,6 +54,7 @@ protected:
 
 private:
     hpm::MediatorFunctionalTest m_mediator;
+    const int m_methods;
 
     void init()
     {
@@ -70,6 +73,16 @@ private:
 
         SocketGlobals::mediatorConnector().mockupAddress(mediator().stunEndpoint());
         SocketGlobals::mediatorConnector().enable(true);
+    }
+};
+
+class UdpHolePunching:
+    public CloudConnect
+{
+public:
+    UdpHolePunching():
+        CloudConnect(hpm::api::ConnectionMethod::udpHolePunching)
+    {
     }
 };
 
@@ -121,21 +134,25 @@ TEST_F(UdpHolePunching, loadTest)
     server.pleaseStopSync();
 }
 
-class UdpHolePunchingCancellation:
-    public UdpHolePunching
+class CloudConnectTunnel:
+    public CloudConnect
 {
 public:
-    UdpHolePunchingCancellation():
-        m_onTunnelClosedSubscriptionId(nx::utils::kInvalidSubscriptionId)
+    CloudConnectTunnel():
+        m_onTunnelClosedSubscriptionId(nx::utils::kInvalidSubscriptionId),
+        m_tunnelOpened(false)
     {
         using namespace std::placeholders;
 
+        //ConnectorFactory::setEnabledCloudConnectMask(
+        //    static_cast<int>(CloudConnectType::forwardedTcpPort));
+
         SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
-            std::bind(&UdpHolePunchingCancellation::onTunnelClosed, this, _1),
+            std::bind(&CloudConnectTunnel::onTunnelClosed, this, _1),
             &m_onTunnelClosedSubscriptionId);
     }
 
-    ~UdpHolePunchingCancellation()
+    ~CloudConnectTunnel()
     {
         SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().removeSubscription(
             m_onTunnelClosedSubscriptionId);
@@ -161,11 +178,17 @@ protected:
             });
     }
 
-    void ensureOpenedTunnel()
+    void tryOpenTunnel()
+    {
+        auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
+        m_tunnelOpened = clientSocket->connect(serverAddress(), 2000);
+        clientSocket.reset();
+    }
+
+    void openConnection()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
         ASSERT_TRUE(clientSocket->connect(serverAddress(), 3000));
-        clientSocket.reset();
     }
 
     void destroyServerSocketWithinAioThread()
@@ -182,6 +205,9 @@ protected:
 
     void waitForTunnelClosed()
     {
+        if (!m_tunnelOpened)
+            return;
+
         QnMutexLocker lock(&m_mutex);
         for (;;)
         {
@@ -201,6 +227,7 @@ private:
     std::multiset<QString> m_closedTunnels;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
+    bool m_tunnelOpened;
 
     void onTunnelClosed(const QString& hostName)
     {
@@ -210,19 +237,33 @@ private:
     }
 };
 
-TEST_F(UdpHolePunchingCancellation, simple)
+TEST_F(CloudConnectTunnel, cancellation)
 {
-    initializeCloudServerSocket();
-    ensureOpenedTunnel();
+    for (int i = 0; i < 10; ++i)
+    {
+        initializeCloudServerSocket();
+        tryOpenTunnel();
 
-    auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-    clientSocket->connectAsync(serverAddress(), [](SystemError::ErrorCode) {});
+        auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
+        clientSocket->connectAsync(serverAddress(), [](SystemError::ErrorCode) {});
 
-    destroyServerSocketWithinAioThread();
+        destroyServerSocketWithinAioThread();
 
-    clientSocket->pleaseStopSync();
+        clientSocket->pleaseStopSync();
 
-    waitForTunnelClosed();
+        waitForTunnelClosed();
+    }
+}
+
+TEST_F(CloudConnectTunnel, DISABLED_reconnect)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        initializeCloudServerSocket();
+        openConnection();
+        destroyServerSocketWithinAioThread();
+        waitForTunnelClosed();
+    }
 }
 
 } // namespace cloud
