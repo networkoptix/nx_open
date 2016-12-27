@@ -36,8 +36,6 @@
 
 #include <ui/common/notification_levels.h>
 
-#include <ui/workaround/widgets_signals_workaround.h>
-
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/animation/viewport_animator.h>
