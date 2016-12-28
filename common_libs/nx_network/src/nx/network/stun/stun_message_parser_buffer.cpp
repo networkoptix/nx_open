@@ -93,7 +93,7 @@ bool MessageParserBuffer::ensure(std::size_t count, void* buffer)
         // Drain the user buffer here
         if (m_tempBuffer != NULL)
         {
-            for (std::size_t i = m_position; i < m_buffer.size(); ++i)
+            for (std::size_t i = m_position; i < (std::size_t)m_buffer.size(); ++i)
                 m_tempBuffer->push_back(m_buffer.at((int)i));
             // Modify the position pointer here 
             m_position = m_buffer.size();

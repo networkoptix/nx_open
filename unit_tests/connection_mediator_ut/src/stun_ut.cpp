@@ -176,7 +176,7 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::errorResponse );
 
-        const auto err = result.second.getAttribute< stun::attrs::ErrorDescription >();
+        const auto err = result.second.getAttribute< stun::attrs::ErrorCode >();
         ASSERT_NE( err, nullptr );
         ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
     }
@@ -193,7 +193,7 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::errorResponse );
 
-        const auto err = result.second.getAttribute< stun::attrs::ErrorDescription >();
+        const auto err = result.second.getAttribute< stun::attrs::ErrorCode >();
         ASSERT_NE( err, nullptr );
         ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
     }
