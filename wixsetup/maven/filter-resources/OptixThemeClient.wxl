@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="en-us" Language="1033" xmlns="http://schemas.microsoft.com/wix/2006/localization">
-  <String Id="Caption">[WixBundleName] Setup</String>
-  <String Id="Title">[WixBundleName]</String>
+  <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
+  <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
   <String Id="HelpHeader">Setup Help</String>
   <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
@@ -45,4 +45,10 @@
   <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
   <String Id="InstallLicenseLinkText">&lt;a href="#"&gt;End User License Agreement&lt;/a&gt;</String>
   <String Id="Components">Client only</String>
+  <String Id="FilesInUseHeader">Files In Use</String>
+  <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
+  <String Id="FilesInUseCloseRadioButton">Close the &amp;applications and attempt to restart them.</String>
+  <String Id="FilesInUseDontCloseRadioButton">&amp;Do not close applications. A reboot will be required.</String>
+  <String Id="FilesInUseOkButton">&amp;OK</String>
+  <String Id="FilesInUseCancelButton">&amp;Cancel</String>
 </WixLocalization>
