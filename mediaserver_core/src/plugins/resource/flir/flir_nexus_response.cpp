@@ -82,3 +82,63 @@ void CommandResponse::deserialize(const QString& serialized)
             m_parameters[key] = kResponseParams[key];
     }
 }
+
+template<>
+boost::optional<bool> CommandResponse::value<bool>(const QString& parameterName) const
+{
+    bool isBool = m_parameters.at(parameterName).isBool();
+    NX_ASSERT(
+        isBool,
+        lm("Json value is not of boolean type. Requested parameter name %1")
+            .arg(parameterName));
+
+    if (isBool)
+        return m_parameters.at(parameterName).toBool();
+
+    return boost::none;
+}
+
+template<>
+boost::optional<QString> CommandResponse::value<QString>(const QString& parameterName) const
+{
+    bool isString = m_parameters.at(parameterName).isString();
+    NX_ASSERT(
+        isString,
+        lm("Json value is not of string type. Requested parameter name: %1")
+            .arg(parameterName));
+
+    if (isString)
+        return m_parameters.at(parameterName).toString();
+
+    return boost::none;
+}
+
+template<>
+boost::optional<int> CommandResponse::value<int>(const QString& parameterName) const
+{
+    bool isNumeric = m_parameters.at(parameterName).isDouble();
+    NX_ASSERT(
+        isNumeric,
+        lm("Json value is not of double type. Requested parameter name: %1")
+            .arg(parameterName));
+
+    if (isNumeric)
+        return m_parameters.at(parameterName).toInt();
+
+    return boost::none;
+}
+
+template<>
+boost::optional<double> CommandResponse::value<double>(const QString& parameterName) const
+{
+    bool isNumeric = m_parameters.at(parameterName).isDouble();
+    NX_ASSERT(
+        isNumeric,
+        lm("Json value is not of double type. Requested parameter name: %1")
+            .arg(parameterName));
+
+    if (isNumeric)
+        return m_parameters.at(parameterName).toInt();
+
+    return boost::none;
+}

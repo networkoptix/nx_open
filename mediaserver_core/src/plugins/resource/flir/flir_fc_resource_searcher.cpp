@@ -217,6 +217,7 @@ void FcResourceSearcher::doNextReceiveUnsafe()
     if (m_terminated)
         return;
 
+    m_receiveBuffer.reserve(AbstractDatagramSocket::MAX_DATAGRAM_SIZE);
     m_receiveSocket->recvFromAsync(
         &m_receiveBuffer,
         [this](SystemError::ErrorCode erroCode, SocketAddress endpoint, std::size_t bytesRead)

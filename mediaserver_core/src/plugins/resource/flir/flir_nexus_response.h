@@ -41,68 +41,12 @@ public:
     template<typename T>
     boost::optional<T> value(const QString& parameterName) const
     {
-        static_assert(false, "Only QString, int, double and bool specializations are allowed");
+        static_assert(std::is_same<T,int>::value
+            || std::is_same<T,double>::value
+            || std::is_same<T, QString>::value
+            || std::is_same<T, bool>::value,
+            "Only QString, int, double and bool specializations are allowed");
     };
-    
-    template<>
-    boost::optional<bool> value<bool>(const QString& parameterName) const
-    {
-        bool isBool = m_parameters.at(parameterName).isBool();
-        NX_ASSERT(
-            isBool,
-            lm("Json value is not of boolean type. Requested parameter name %1")
-                .arg(parameterName));
-
-        if (isBool)
-            return m_parameters.at(parameterName).toBool();
-
-        return boost::none;
-    }
-
-    template<>
-    boost::optional<QString> value<QString>(const QString& parameterName) const
-    {
-        bool isString = m_parameters.at(parameterName).isString();
-        NX_ASSERT(
-            isString,
-            lm("Json value is not of string type. Requested parameter name: %1")
-                .arg(parameterName));
-
-        if (isString)
-            return m_parameters.at(parameterName).toString();
-
-        return boost::none;
-    }
-
-    template<>
-    boost::optional<int> value<int>(const QString& parameterName) const
-    {
-        bool isNumeric = m_parameters.at(parameterName).isDouble();
-        NX_ASSERT(
-            isNumeric,
-            lm("Json value is not of double type. Requested parameter name: %1")
-                .arg(parameterName));
-
-        if (isNumeric)
-            return m_parameters.at(parameterName).toInt();
-
-        return boost::none;
-    }
-
-    template<>
-    boost::optional<double> value<double>(const QString& parameterName) const
-    {
-        bool isNumeric = m_parameters.at(parameterName).isDouble();
-        NX_ASSERT(
-            isNumeric,
-            lm("Json value is not of double type. Requested parameter name: %1")
-                .arg(parameterName));
-
-        if (isNumeric)
-            return m_parameters.at(parameterName).toInt();
-
-        return boost::none;
-    }
 
 private:
     Type m_responseType;
@@ -110,6 +54,18 @@ private:
     QString m_returnString;
     std::map<QString, QJsonValue> m_parameters;
 };
+
+template<>
+boost::optional<bool> CommandResponse::value<bool>(const QString& parameterName) const;
+
+template<>
+boost::optional<QString> CommandResponse::value<QString>(const QString& parameterName) const;
+
+template<>
+boost::optional<int> CommandResponse::value<int>(const QString& parameterName) const;
+
+template<>
+boost::optional<double> CommandResponse::value<double>(const QString& parameterName) const;
 
 
 } // namespace nexus
