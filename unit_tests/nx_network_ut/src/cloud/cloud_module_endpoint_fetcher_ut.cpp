@@ -17,36 +17,34 @@ static const char* testPath = "/tst";
 
 static const char* modulesXmlWithUrls = R"xml(
     <sequence>
-    <set resName="cdb" resValue="https://cloud-dev.hdw.mx:443"/>
-    <set resName="hpm" resValue="stuns://52.55.171.51:3345"/>
-    <set resName="notification_module" resValue="http://cloud-dev.hdw.mx:80"/>
+        <set resName="cdb" resValue="https://cloud-dev.hdw.mx:443"/>
+        <set resName="hpm" resValue="stuns://52.55.171.51:3345"/>
+        <set resName="notification_module" resValue="http://cloud-dev.hdw.mx:80"/>
     </sequence>
 )xml";
 
-class CloudModuleEndPointFetcher:
+class CloudModuleUrlFetcher:
     public ::testing::Test
 {
 public:
-    CloudModuleEndPointFetcher(const char* modulesXmlBody = nullptr):
-        m_fetcher(
-            "cdb",
-            std::make_unique<nx::network::cloud::RandomEndpointSelector>()),
+    CloudModuleUrlFetcher(const char* modulesXmlBody = nullptr):
+        m_fetcher(std::make_unique<nx::network::cloud::RandomEndpointSelector>()),
         m_modulesXmlBody(modulesXmlBody ? modulesXmlBody : modulesXmlWithUrls)
     {
         init();
     }
 
-    ~CloudModuleEndPointFetcher()
+    ~CloudModuleUrlFetcher()
     {
         m_fetcher.pleaseStopSync();
     }
 
 protected:
-    cloud::CloudModuleEndPointFetcher m_fetcher;
+    cloud::CloudDbUrlFetcher m_fetcher;
 
     QUrl fetchModuleUrl(const char* moduleName)
     {
-        auto fetcher = std::make_unique<cloud::CloudModuleEndPointFetcher>(
+        auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(
             moduleName,
             std::make_unique<nx::network::cloud::RandomEndpointSelector>());
         fetcher->setModulesXmlUrl(m_modulesUrl);
@@ -84,7 +82,7 @@ private:
     }
 };
 
-TEST_F(CloudModuleEndPointFetcher, common)
+TEST_F(CloudModuleUrlFetcher, common)
 {
     ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
     ASSERT_EQ(QUrl("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
@@ -92,7 +90,7 @@ TEST_F(CloudModuleEndPointFetcher, common)
 }
 
 class FtCloudModuleEndPointFetcher:
-    public CloudModuleEndPointFetcher
+    public CloudModuleUrlFetcher
 {
 };
 
@@ -102,7 +100,7 @@ TEST_F(FtCloudModuleEndPointFetcher, cancellation)
     {
         for (int j = 0; j < 10; ++j)
         {
-            cloud::CloudModuleEndPointFetcher::ScopedOperation operation(&m_fetcher);
+            cloud::CloudModuleUrlFetcher::ScopedOperation operation(&m_fetcher);
 
             std::string s;
             operation.get(
@@ -127,18 +125,18 @@ TEST_F(FtCloudModuleEndPointFetcher, cancellation)
 
 static const char* modulesXmlWithEndpoints = R"xml(
     <sequence>
-    <set resName="cdb" resValue="cloud-dev.hdw.mx:80"/>
-    <set resName="hpm" resValue="52.55.171.51:3345"/>
-    <set resName="notification_module" resValue="cloud-dev.hdw.mx:80"/>
+        <set resName="cdb" resValue="cloud-dev.hdw.mx:80"/>
+        <set resName="hpm" resValue="52.55.171.51:3345"/>
+        <set resName="notification_module" resValue="cloud-dev.hdw.mx:80"/>
     </sequence>
 )xml";
 
 class CloudModuleEndPointFetcherCompatibility:
-    public CloudModuleEndPointFetcher
+    public CloudModuleUrlFetcher
 {
 public:
     CloudModuleEndPointFetcherCompatibility():
-        CloudModuleEndPointFetcher(modulesXmlWithEndpoints)
+        CloudModuleUrlFetcher(modulesXmlWithEndpoints)
     {
     }
 };
@@ -154,18 +152,18 @@ TEST_F(CloudModuleEndPointFetcherCompatibility, correctly_parses_endpoints)
 
 static const char* modulesXmlWithEndpointsCdbSsl = R"xml(
     <sequence>
-    <set resName="cdb" resValue="cloud-dev.hdw.mx:443"/>
-    <set resName="hpm" resValue="52.55.171.51:3345"/>
-    <set resName="notification_module" resValue="cloud-dev.hdw.mx:443"/>
+        <set resName="cdb" resValue="cloud-dev.hdw.mx:443"/>
+        <set resName="hpm" resValue="52.55.171.51:3345"/>
+        <set resName="notification_module" resValue="cloud-dev.hdw.mx:443"/>
     </sequence>
 )xml";
 
 class CloudModuleEndPointFetcherCompatibilityAutoSchemeSelection:
-    public CloudModuleEndPointFetcher
+    public CloudModuleUrlFetcher
 {
 public:
     CloudModuleEndPointFetcherCompatibilityAutoSchemeSelection():
-        CloudModuleEndPointFetcher(modulesXmlWithEndpointsCdbSsl)
+        CloudModuleUrlFetcher(modulesXmlWithEndpointsCdbSsl)
     {
     }
 };

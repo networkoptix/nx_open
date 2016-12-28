@@ -24,7 +24,7 @@ class AccountManager:
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(

@@ -22,10 +22,10 @@ namespace cdb {
 namespace cl {
 
 EventConnection::EventConnection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
     m_cdbEndPointFetcher(
-        std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+        std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             endPointFetcher)),
     m_reconnectTimer(network::RetryPolicy(
         network::RetryPolicy::kInfiniteRetries,

@@ -42,7 +42,7 @@ public:
     virtual void setCloudUrl(const std::string& url) override;
 
 private:
-    network::cloud::CloudModuleEndPointFetcher m_endPointFetcher;
+    network::cloud::CloudDbUrlFetcher m_endPointFetcher;
 };
 
 }   //cl

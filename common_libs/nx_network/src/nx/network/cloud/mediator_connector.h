@@ -56,7 +56,7 @@ private:
     boost::optional< nx::utils::future< bool > > m_future;
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
-    std::unique_ptr<nx::network::cloud::CloudModuleEndPointFetcher> m_endpointFetcher;
+    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_endpointFetcher;
     boost::optional<SocketAddress> m_mediatorAddress;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 

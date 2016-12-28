@@ -14,7 +14,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-AuthProvider::AuthProvider(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher):
+AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }

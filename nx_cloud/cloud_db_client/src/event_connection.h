@@ -21,7 +21,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class CloudModuleEndPointFetcher;
+class CloudModuleUrlFetcher;
 
 }   //namespace cloud
 }   //namespace network
@@ -35,7 +35,7 @@ class EventConnection:
 {
 public:
     EventConnection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
         virtual ~EventConnection();
 
     virtual void start(
@@ -52,7 +52,7 @@ private:
         failed
     };
 
-    std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
+    std::unique_ptr<network::cloud::CloudModuleUrlFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
     nx_http::AuthInfo m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;

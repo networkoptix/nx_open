@@ -8,7 +8,7 @@ namespace cdb {
 namespace cl {
 
 MaintenanceManager::MaintenanceManager(
-    network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndpointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher)
     :
     AsyncRequestsExecutor(cloudModuleEndpointFetcher)
 {

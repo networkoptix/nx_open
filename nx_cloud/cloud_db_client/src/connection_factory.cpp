@@ -15,11 +15,8 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-ConnectionFactory::ConnectionFactory()
-:
-    m_endPointFetcher(
-        "cdb",
-        std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
+ConnectionFactory::ConnectionFactory():
+    m_endPointFetcher(std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
 {
 }
 

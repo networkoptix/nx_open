@@ -16,7 +16,7 @@ namespace cdb {
 namespace cl {
 
 Connection::Connection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
     AsyncRequestsExecutor(endPointFetcher)
 {

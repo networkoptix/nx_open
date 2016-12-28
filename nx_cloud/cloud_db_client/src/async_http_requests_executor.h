@@ -35,10 +35,10 @@ class AsyncRequestsExecutor
 {
 public:
     AsyncRequestsExecutor(
-        network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
+        network::cloud::CloudModuleUrlFetcher* const cdbEndPointFetcher)
     :
         m_cdbEndPointFetcher(
-            std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+            std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
                 cdbEndPointFetcher))
     {
     }
@@ -161,7 +161,7 @@ private:
     nx_http::AuthInfo m_auth;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
     std::unique_ptr<
-        network::cloud::CloudModuleEndPointFetcher::ScopedOperation
+        network::cloud::CloudModuleUrlFetcher::ScopedOperation
     > m_cdbEndPointFetcher;
 
     /*!
