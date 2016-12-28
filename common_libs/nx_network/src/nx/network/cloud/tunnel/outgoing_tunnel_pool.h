@@ -63,27 +63,26 @@ public:
 private:
     struct TunnelContext
     {
+        std::unique_ptr<OutgoingTunnel> tunnel;
         std::list<OutgoingTunnel::NewConnectionHandler> handlers;
     };
 
-    typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
+    typedef std::map<QString, TunnelContext> TunnelDictionary;
 
     mutable QnMutex m_mutex;
     mutable bool m_isOwnPeerIdAssigned;
     String m_ownPeerId;
     TunnelDictionary m_pool;
-    std::map<OutgoingTunnel*, TunnelContext> m_connectionRequestsByTunnel;
     bool m_terminated;
     bool m_stopping;
     aio::Timer m_aioThreadBinder;
     OnTunnelClosedSubscription m_onTunnelClosedSubscription;
 
-    const std::unique_ptr<OutgoingTunnel>& 
-        getTunnel(const AddressEntry& targetHostAddress);
+    TunnelContext& getTunnel(const AddressEntry& targetHostAddress);
     void reportConnectionResult(
         SystemError::ErrorCode sysErrorCode,
         std::unique_ptr<AbstractStreamSocket> connection,
-        OutgoingTunnel* tunnel,
+        TunnelContext* tunnelContext,
         std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter);
     void onTunnelClosed(OutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
