@@ -309,7 +309,7 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto socket = SocketFactory::createStreamSocket();
+        auto socket = std::make_unique<CloudStreamSocket>(SocketFactory::tcpServerIpVersion());
         enum class SocketState {init, connected, closed};
         std::atomic<SocketState> socketState(SocketState::init);
 

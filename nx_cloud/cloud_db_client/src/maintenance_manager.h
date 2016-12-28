@@ -14,7 +14,7 @@ class MaintenanceManager:
     public AsyncRequestsExecutor
 {
 public:
-    MaintenanceManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndpointFetcher);
+    MaintenanceManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher);
 
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;

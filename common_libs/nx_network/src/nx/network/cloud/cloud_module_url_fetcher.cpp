@@ -1,4 +1,4 @@
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 
 #include <QtCore/QBuffer>
 
@@ -16,7 +16,32 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
+static constexpr const char* const kCloudDbModuleName = "cdb";
+static constexpr const char* const kConnectionMediatorModuleName = "hpm";
+static constexpr const char* const kNotificationModuleName = "notification_module";
+
+//-------------------------------------------------------------------------------------------------
+// class CloudInstanceSelectionAttributeNameset
+
+CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
+{
+    registerResource(cloudInstanceName, "cloud.instance.name", QVariant::String);
+    registerResource(vmsVersionMajor, "vms.version.major", QVariant::Int);
+    registerResource(vmsVersionMinor, "vms.version.minor", QVariant::Int);
+    registerResource(vmsVersionBugfix, "vms.version.bugfix", QVariant::Int);
+    registerResource(vmsVersionBuild, "vms.version.build", QVariant::Int);
+    registerResource(vmsVersionFull, "vms.version.full", QVariant::String);
+    registerResource(vmsBeta, "vms.beta", QVariant::String);
+    registerResource(vmsCustomization, "vms.customization", QVariant::String);
+    registerResource(cdbUrl, kCloudDbModuleName, QVariant::String);
+    registerResource(hpmUrl, kConnectionMediatorModuleName, QVariant::String);
+    registerResource(notificationModuleUrl, kNotificationModuleName, QVariant::String);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class CloudModuleUrlFetcher
+
+CloudModuleUrlFetcher::CloudModuleUrlFetcher(
     const QString& moduleName,
     std::unique_ptr<AbstractEndpointSelector> endpointSelector)
 :
@@ -31,17 +56,17 @@ CloudModuleEndPointFetcher::CloudModuleEndPointFetcher(
         lit("Given bad cloud module name %1").arg(moduleName));
 
     // Preparing compatibility data.
-    m_moduleToDefaultUrlScheme.emplace("cdb", "http");
-    m_moduleToDefaultUrlScheme.emplace("hpm", "stun");
-    m_moduleToDefaultUrlScheme.emplace("notification_module", "http");
+    m_moduleToDefaultUrlScheme.emplace(kCloudDbModuleName, "http");
+    m_moduleToDefaultUrlScheme.emplace(kConnectionMediatorModuleName, "stun");
+    m_moduleToDefaultUrlScheme.emplace(kNotificationModuleName, "http");
 }
 
-CloudModuleEndPointFetcher::~CloudModuleEndPointFetcher()
+CloudModuleUrlFetcher::~CloudModuleUrlFetcher()
 {
     stopWhileInAioThread();
 }
 
-void CloudModuleEndPointFetcher::stopWhileInAioThread()
+void CloudModuleUrlFetcher::stopWhileInAioThread()
 {
     //We do not need mutex here since no one uses object anymore
     //    and internal events are delivered in same aio thread.
@@ -49,31 +74,31 @@ void CloudModuleEndPointFetcher::stopWhileInAioThread()
     m_endpointSelector.reset();
 }
 
-void CloudModuleEndPointFetcher::setModulesXmlUrl(QUrl url)
+void CloudModuleUrlFetcher::setModulesXmlUrl(QUrl url)
 {
     m_modulesXmlUrl = std::move(url);
 }
 
-void CloudModuleEndPointFetcher::setUrl(QUrl endpoint)
+void CloudModuleUrlFetcher::setUrl(QUrl endpoint)
 {
     QnMutexLocker lk(&m_mutex);
-    m_endpoint = std::move(endpoint);
+    m_url = std::move(endpoint);
 }
 
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-void CloudModuleEndPointFetcher::get(Handler handler)
+void CloudModuleUrlFetcher::get(Handler handler)
 {
     get(nx_http::AuthInfo(), std::move(handler));
 }
 
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
-void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
+void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
 {
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
-    if (m_endpoint)
+    if (m_url)
     {
-        auto result = m_endpoint.get();
+        auto result = m_url.get();
         lk.unlock();
         handler(nx_http::StatusCode::ok, std::move(result));
         return;
@@ -102,7 +127,7 @@ void CloudModuleEndPointFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient->doGet(QUrl(m_modulesXmlUrl));
 }
 
-void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
+void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 {
     QnMutexLocker lk(&m_mutex);
 
@@ -139,7 +164,7 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
 
     //selecting endpoint
     QUrl moduleUrl;
-    if (!findModuleEndpoint(*stree, m_moduleAttrName, &moduleUrl))
+    if (!findModuleUrl(*stree, m_moduleAttrName, &moduleUrl))
     {
         return signalWaitingHandlers(
             &lk,
@@ -147,10 +172,10 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
             QUrl());
     }
 
-    endpointSelected(&lk, nx_http::StatusCode::ok, moduleUrl);
+    saveFoundUrl(&lk, nx_http::StatusCode::ok, moduleUrl);
 }
 
-bool CloudModuleEndPointFetcher::findModuleEndpoint(
+bool CloudModuleUrlFetcher::findModuleUrl(
     const stree::AbstractNode& treeRoot,
     const int moduleAttrName,
     QUrl* const moduleUrl)
@@ -191,7 +216,7 @@ bool CloudModuleEndPointFetcher::findModuleEndpoint(
     return false;
 }
 
-void CloudModuleEndPointFetcher::signalWaitingHandlers(
+void CloudModuleUrlFetcher::signalWaitingHandlers(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value statusCode,
     const QUrl& endpoint)
@@ -205,7 +230,7 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
     lk->relock();
 }
 
-void CloudModuleEndPointFetcher::endpointSelected(
+void CloudModuleUrlFetcher::saveFoundUrl(
     QnMutexLockerBase* const lk,
     nx_http::StatusCode::Value result,
     QUrl selectedEndpoint)
@@ -213,12 +238,12 @@ void CloudModuleEndPointFetcher::endpointSelected(
     if (result != nx_http::StatusCode::ok)
         return signalWaitingHandlers(lk, result, std::move(selectedEndpoint));
 
-    NX_ASSERT(!m_endpoint);
-    m_endpoint = selectedEndpoint;
+    NX_ASSERT(!m_url);
+    m_url = selectedEndpoint;
     signalWaitingHandlers(lk, result, selectedEndpoint);
 }
 
-QUrl CloudModuleEndPointFetcher::buildUrl(const QString& str)
+QUrl CloudModuleUrlFetcher::buildUrl(const QString& str)
 {
     QUrl url(str);
     if (url.host().isEmpty())
@@ -249,23 +274,23 @@ QUrl CloudModuleEndPointFetcher::buildUrl(const QString& str)
 
 //-------------------------------------------------------------------------------------------------
 
-CloudModuleEndPointFetcher::ScopedOperation::ScopedOperation(
-    CloudModuleEndPointFetcher* const fetcher)
+CloudModuleUrlFetcher::ScopedOperation::ScopedOperation(
+    CloudModuleUrlFetcher* const fetcher)
 :
     m_fetcher(fetcher)
 {
 }
 
-CloudModuleEndPointFetcher::ScopedOperation::~ScopedOperation()
+CloudModuleUrlFetcher::ScopedOperation::~ScopedOperation()
 {
 }
 
-void CloudModuleEndPointFetcher::ScopedOperation::get(Handler handler)
+void CloudModuleUrlFetcher::ScopedOperation::get(Handler handler)
 {
     get(nx_http::AuthInfo(), std::move(handler));
 }
 
-void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Handler handler)
+void CloudModuleUrlFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Handler handler)
 {
     auto sharedGuard = m_guard.sharedGuard();
     m_fetcher->get(
@@ -278,24 +303,24 @@ void CloudModuleEndPointFetcher::ScopedOperation::get(nx_http::AuthInfo auth, Ha
         });
 }
 
+//-------------------------------------------------------------------------------------------------
+// class CloudDbUrlFetcher
 
-////////////////////////////////////////////////////////////
-//// class CloudInstanceSelectionAttributeNameset
-////////////////////////////////////////////////////////////
-
-CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
+CloudDbUrlFetcher::CloudDbUrlFetcher(
+    std::unique_ptr<AbstractEndpointSelector> endpointSelector)
+    :
+    CloudModuleUrlFetcher(kCloudDbModuleName, std::move(endpointSelector))
 {
-    registerResource(cloudInstanceName, "cloud.instance.name", QVariant::String);
-    registerResource(vmsVersionMajor, "vms.version.major", QVariant::Int);
-    registerResource(vmsVersionMinor, "vms.version.minor", QVariant::Int);
-    registerResource(vmsVersionBugfix, "vms.version.bugfix", QVariant::Int);
-    registerResource(vmsVersionBuild, "vms.version.build", QVariant::Int);
-    registerResource(vmsVersionFull, "vms.version.full", QVariant::String);
-    registerResource(vmsBeta, "vms.beta", QVariant::String);
-    registerResource(vmsCustomization, "vms.customization", QVariant::String);
-    registerResource(cdbEndpoint, "cdb", QVariant::String);
-    registerResource(hpmEndpoint, "hpm", QVariant::String);
-    registerResource(notificationModuleEndpoint, "notification_module", QVariant::String);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class ConnectionMediatorUrlFetcher
+
+ConnectionMediatorUrlFetcher::ConnectionMediatorUrlFetcher(
+    std::unique_ptr<AbstractEndpointSelector> endpointSelector)
+    :
+    CloudModuleUrlFetcher(kConnectionMediatorModuleName, std::move(endpointSelector))
+{
 }
 
 } // namespace cloud

@@ -62,7 +62,46 @@ struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);
 
-class MediaServerProcess : public QnLongRunnable
+class CmdLineArguments
+{
+public:
+    QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
+    QString ec2TranLogLevel;
+    QString permissionsLogLevel;
+    QString rebuildArchive;
+    QString devModeKey;
+    QString allowedDiscoveryPeers;
+    QString ifListFilter;
+    bool cleanupDb;
+
+    QString configFilePath;
+    QString rwConfigFilePath;
+    bool showVersion;
+    bool showHelp;
+    bool disableCrashHandler;
+    QString engineVersion;
+    QString enforceSocketType;
+    QString enforcedMediatorEndpoint;
+    QString ipVersion;
+
+
+    CmdLineArguments() :
+        logLevel(
+#ifdef _DEBUG
+            lit("DEBUG")),
+#else
+        lit("INFO")),
+#endif
+        showVersion(false),
+        showHelp(false),
+        disableCrashHandler(false)
+    {
+    }
+};
+
+class MediaServerProcess: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -79,12 +118,13 @@ public:
 
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
 
+    const CmdLineArguments cmdLineArguments() const;
+
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
-
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
@@ -106,6 +146,7 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIP);
 
 private:
+
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
@@ -130,6 +171,8 @@ private:
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
+    void updateAllowedInterfaces();
+    void addCommandLineParametersFromConfig();
 private:
     int m_argc;
     char** m_argv;
@@ -153,6 +196,7 @@ private:
     QVector<QString> m_hardwareGuidList;
     nx::SystemName m_systemName;
     std::unique_ptr<QnPlatformAbstraction> m_platform;
+    CmdLineArguments m_cmdLineArguments;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

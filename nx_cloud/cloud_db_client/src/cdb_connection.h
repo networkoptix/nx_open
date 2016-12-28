@@ -25,7 +25,7 @@ class Connection:
 {
 public:
     Connection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
 
     //!Implemetation of api::Connection::getAccountManager
     virtual api::AccountManager* accountManager() override;

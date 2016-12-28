@@ -38,43 +38,45 @@ public:
         vmsVersionFull,
         vmsBeta,
         vmsCustomization,
-        cdbEndpoint,
-        hpmEndpoint,
-        notificationModuleEndpoint
+        cdbUrl,
+        hpmUrl,
+        notificationModuleUrl
     };
 
     CloudInstanceSelectionAttributeNameset();
 };
 
-//!Retrieves url to the specified cloud module
-class NX_NETWORK_API CloudModuleEndPointFetcher:
+/**
+ * Looks up online API url of a specified cloud module. 
+ */
+class NX_NETWORK_API CloudModuleUrlFetcher:
     public aio::BasicPollable
 {
 public:
     typedef nx::utils::MoveOnlyFunc<void(nx_http::StatusCode::Value, QUrl)> Handler;
 
     /**
-     * Helper class to be used if CloudModuleEndPointFetcher user can die before
-     * CloudModuleEndPointFetcher instance.
+     * Helper class to be used if CloudModuleUrlFetcher user can die before
+     *     CloudModuleUrlFetcher instance.
      */
     class NX_NETWORK_API ScopedOperation
     {
     public:
-        ScopedOperation(CloudModuleEndPointFetcher* fetcher);
+        ScopedOperation(CloudModuleUrlFetcher* fetcher);
         ~ScopedOperation();
 
         void get(nx_http::AuthInfo auth, Handler handler);
         void get(Handler handler);
 
     private:
-        CloudModuleEndPointFetcher* const m_fetcher;
+        CloudModuleUrlFetcher* const m_fetcher;
         nx::utils::AsyncOperationGuard m_guard;
     };
 
-    CloudModuleEndPointFetcher(
+    CloudModuleUrlFetcher(
         const QString& moduleName,
         std::unique_ptr<AbstractEndpointSelector> endpointSelector);
-    ~CloudModuleEndPointFetcher();
+    virtual ~CloudModuleUrlFetcher();
 
     virtual void stopWhileInAioThread() override;
 
@@ -83,15 +85,20 @@ public:
      */
     void setModulesXmlUrl(QUrl url);
 
-    //!Specify endpoint explicitely
+    /**
+     * Specify endpoint explicitely.
+     */
     void setUrl(QUrl url);
-    //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
+    /**
+     * Retrieves endpoint if unknown. 
+     * If endpoint is known, then calls handler directly from this method.
+     */
     void get(nx_http::AuthInfo auth, Handler handler);
     void get(Handler handler);
 
 private:
     mutable QnMutex m_mutex;
-    boost::optional<QUrl> m_endpoint;
+    boost::optional<QUrl> m_url;
     nx_http::AsyncHttpClientPtr m_httpClient;
     const CloudInstanceSelectionAttributeNameset m_nameset;
     const int m_moduleAttrName;
@@ -102,7 +109,7 @@ private:
     std::map<QString, QString> m_moduleToDefaultUrlScheme;
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
-    bool findModuleEndpoint(
+    bool findModuleUrl(
         const stree::AbstractNode& treeRoot,
         const int moduleAttrName,
         QUrl* const moduleEndpoint);
@@ -110,11 +117,27 @@ private:
         QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value statusCode,
         const QUrl& endpoint);
-    void endpointSelected(
+    void saveFoundUrl(
         QnMutexLockerBase* const lk,
         nx_http::StatusCode::Value result,
         QUrl selectedEndpoint);
     QUrl buildUrl(const QString& str);
+};
+
+class NX_NETWORK_API CloudDbUrlFetcher:
+    public CloudModuleUrlFetcher
+{
+public:
+    CloudDbUrlFetcher(
+        std::unique_ptr<AbstractEndpointSelector> endpointSelector);
+};
+
+class NX_NETWORK_API ConnectionMediatorUrlFetcher:
+    public CloudModuleUrlFetcher
+{
+public:
+    ConnectionMediatorUrlFetcher(
+        std::unique_ptr<AbstractEndpointSelector> endpointSelector);
 };
 
 } // namespace cloud

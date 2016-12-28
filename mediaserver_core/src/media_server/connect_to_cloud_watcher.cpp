@@ -13,9 +13,8 @@ namespace {
 using namespace nx::network::cloud;
 
 QnConnectToCloudWatcher::QnConnectToCloudWatcher():
-    m_cdbEndPointFetcher(new CloudModuleEndPointFetcher(
-        "cdb",
-        std::make_unique<RandomEndpointSelector>()))
+    m_cdbEndPointFetcher(
+        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>()))
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(kUpdateIfFailIntervalMs);
