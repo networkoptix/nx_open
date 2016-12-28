@@ -602,6 +602,42 @@
         }
     },
 
+    "QCalendarWidget": {
+        "palette": { 
+            "default": {
+                "window": "dark13",
+                "highlight": "dark13",
+                "brightText": "red_l2",
+                "windowText": "light12",
+                "highlightedText": "light4"
+            }
+        }
+    },
+
+    "QCalendarView": {
+        "palette": { 
+            "default": {
+                "text": "light4",
+                "shadow": "dark11",
+                "mid": "dark12",
+                "midlight": "dark14",
+                "highlight": "brand_core",
+                "alternateBase": "dark13",
+                "base": "transparent",
+                "window": "transparent"
+            },
+            "disabled": {
+                "text": "light16"
+            }
+        }
+    },
+
+    "QnCalendarWidget": {
+        "palette": { "default": {
+            "highlight": "dark4"
+        }}
+    },
+
     "QnCalendarItemDelegate": {
         "colors": {
             "selection": "selection.setAlpha(192)",
@@ -613,12 +649,6 @@
             "secondaryMotion": "#ff0000ff",
             "separator": "dark4"
         }
-    },
-
-    "QnCalendarWidget": {
-        "palette": { "default": {
-            "highlight": "dark4"
-        }}
     },
 
     "QnDayTimeWidget": {
