@@ -244,10 +244,10 @@
         <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
         <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
         <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
-        
+
         <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
         <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
-        
+
         <!-- List of public final names which are to be used everywhere -->
         <artifact.name.client>${artifact.name.prefix}-client-${artifact.name.suffix}</artifact.name.client>
         <artifact.name.server>${artifact.name.prefix}-server-${artifact.name.suffix}</artifact.name.server>
@@ -829,7 +829,7 @@
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
-                <rdep.target>isd</rdep.target>               
+                <rdep.target>isd</rdep.target>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -1079,7 +1079,7 @@
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>
-        
+
         <!-- Mobile client profiles -->
         <profile>
             <id>mobile-common</id>
@@ -1240,9 +1240,9 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- Artifact naming profiles -->
-        
+
         <profile>
             <id>artifact-name-beta</id>
             <activation>
@@ -1255,7 +1255,7 @@
                 <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
             </properties>
         </profile>
-        
+
         <profile>
             <id>artifact-name-cloud</id>
             <activation>
@@ -1267,9 +1267,9 @@
             <properties>
                 <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
             </properties>
-        </profile>        
-        
+        </profile>
+
         <!-- End of artifact naming profiles -->
-        
+
     </profiles>
 </project>
