@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <nx/network/socket_common.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

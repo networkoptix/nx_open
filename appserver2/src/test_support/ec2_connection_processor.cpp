@@ -1,4 +1,3 @@
-
 #include "ec2_connection_processor.h"
 
 #include <QtCore/QElapsedTimer>
@@ -6,7 +5,6 @@
 #include <network/http_connection_listener.h>
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
-
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
