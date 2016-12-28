@@ -11,7 +11,7 @@ namespace stun {
 // It will consume all the data in the user buffer, but provide a more consistent interface
 // for user. So if the parser stuck at one byte data, the MessageParserBuffer will temporary
 // store that one byte and make user buffer drained. However without losing any single bytes
-class MessageParserBuffer
+class NX_NETWORK_API MessageParserBuffer
 {
 public:
     MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer);

@@ -5,7 +5,7 @@
 namespace nx {
 namespace stun {
 
-class MessageSerializerBuffer
+class NX_NETWORK_API MessageSerializerBuffer
 {
 public:
     MessageSerializerBuffer(nx::Buffer* buffer);
