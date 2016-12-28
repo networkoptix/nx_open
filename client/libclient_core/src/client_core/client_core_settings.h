@@ -27,6 +27,7 @@ public:
         ForgottenSystems,
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
+        KnownServerUrls,    //< A list of the urls that were discovered by QnDirectModuleFinder.
 
         PropertiesCount
     };
@@ -68,19 +69,20 @@ private:
         QN_DECLARE_RW_PROPERTY(QnCloudSystemList,
             recentCloudSystems, setRecentCloudSystems,
             RecentCloudSystems, QnCloudSystemList())
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(QnStringSet,
             forgottenSystems, setForgottenSystems,
             ForgottenSystems, QnStringSet())
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(int,
             startupDiscoveryPeriodMs, setStartupDiscoveryPeriodMs,
             StartupDiscoveryPeriodMs, 2000)
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(bool,
             skipStartupTilesManagement, setSkipStartupTilesManagement,
             SkipStartupTilesManagement, false)
-        QN_END_PROPERTY_STORAGE()
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,
+            knownServerUrls, setKnownServerUrls,
+            KnownServerUrls, QList<QUrl>())
+    QN_END_PROPERTY_STORAGE()
+
 
 private:
     QSettings* m_settings;
