@@ -50,7 +50,7 @@ private:
     QList<QnInputField*> relevantInputFields() const;
 
     QString passwordPlaceholder() const;
-    void updateConfirmationPlaceholder();
+    void updatePasswordPlaceholders();
 
     void updateRoleComboBox();
     void updateControlsAccess();

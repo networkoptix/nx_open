@@ -164,8 +164,7 @@ bool QnUserSettingsWidget::hasChanges() const
     }
 
     if (permissions.testFlag(Qn::WritePasswordPermission)
-        && !ui->passwordInputField->text().isEmpty()
-        && !m_model->user()->checkLocalUserPassword(ui->passwordInputField->text()))
+        && !ui->passwordInputField->text().isEmpty())
     {
         return true;
     }
@@ -226,8 +225,7 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
 
-    ui->passwordInputField->setPlaceholderText(passwordPlaceholder());
-    updateConfirmationPlaceholder();
+    updatePasswordPlaceholders();
 
     ui->loginInputField->setFocus();
 
@@ -257,12 +255,17 @@ QString QnUserSettingsWidget::passwordPlaceholder() const
     return QString(kPasswordPlaceholderLength, kPasswordChar);
 }
 
-void QnUserSettingsWidget::updateConfirmationPlaceholder()
+void QnUserSettingsWidget::updatePasswordPlaceholders()
 {
-    ui->confirmPasswordInputField->setPlaceholderText(
-        ui->passwordInputField->text().isEmpty()
+    const bool showPlaceholders = ui->passwordInputField->text().isEmpty()
+                               && ui->confirmPasswordInputField->text().isEmpty();
+
+    const QString placeholderText = showPlaceholders
             ? passwordPlaceholder()
-            : QString());
+            : QString();
+
+    ui->passwordInputField->setPlaceholderText(placeholderText);
+    ui->confirmPasswordInputField->setPlaceholderText(placeholderText);
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -460,14 +463,17 @@ void QnUserSettingsWidget::setupInputFields()
     connect(ui->passwordInputField, &QnInputField::textChanged, this,
         [this]()
         {
-            updateConfirmationPlaceholder();
+            updatePasswordPlaceholders();
 
-            if (!ui->confirmPasswordInputField->text().isEmpty())
+            if (ui->confirmPasswordInputField->text().isEmpty() ==
+                ui->passwordInputField->text().isEmpty())
+            {
                 ui->confirmPasswordInputField->validate();
+            }
         });
 
     connect(ui->confirmPasswordInputField, &QnInputField::textChanged,
-        this, &QnUserSettingsWidget::updateConfirmationPlaceholder);
+        this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
         ui->confirmPasswordInputField, &QnInputField::validate);
