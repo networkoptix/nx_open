@@ -222,6 +222,9 @@ void QnLoginDialog::accept() {
         updateUsability();
 
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        if (!guard)
+            return;
+
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
             menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
