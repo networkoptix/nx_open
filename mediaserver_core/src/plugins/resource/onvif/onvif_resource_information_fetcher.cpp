@@ -22,6 +22,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
 #include <plugins/resource/hikvision/hikvision_onvif_resource.h>
+#include <plugins/resource/flir/flir_onvif_resource.h>
 
 using namespace nx::plugins;
 
@@ -409,7 +410,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
     else if (manufacture.toLower().contains(QLatin1String("flir")))
-        resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
+        resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
