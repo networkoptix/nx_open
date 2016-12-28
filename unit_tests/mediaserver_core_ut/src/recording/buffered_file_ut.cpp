@@ -31,6 +31,7 @@ void doTestInternal(int systemFlags)
         std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
         1024*1024*2,
         1024*1024*4,
+        1024*1024*4,
         QnUuid::createUuid()
         ));
 
@@ -172,6 +173,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
             new QBufferedFile(
                 std::shared_ptr<IQnFile>(new QnFile(fileName)),
                 kIoBlockSize,
+                kFfmpegBufferSize,
                 kFfmpegBufferSize,
                 kWriterPoolId);
 #ifdef Q_OS_WIN
