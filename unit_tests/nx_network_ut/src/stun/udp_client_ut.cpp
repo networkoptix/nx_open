@@ -428,6 +428,8 @@ public:
     UdpClientRedirect()
     {
         init();
+
+        m_client.setMaxRetransmissions(1);
     }
 
     ~UdpClientRedirect()
@@ -446,25 +448,60 @@ protected:
         return server(1);
     }
 
-    void givenTwoServersWithRedirection()
+    void givenContentServer()
     {
         using namespace std::placeholders;
-
-        addServer();
-        addServer();
 
         contentServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
             std::bind(&UdpClientRedirect::processBindingRequest, this, _1, _2));
+    }
+
+    void givenSilentContentServer()
+    {
+        using namespace std::placeholders;
+
+        contentServer().messageDispatcher.registerRequestProcessor(
+            stun::bindingMethod,
+            std::bind(&UdpClientRedirect::ignoreMessage, this, _1, _2));
+    }
+
+    void givenRedirectionServer()
+    {
+        using namespace std::placeholders;
 
         redirectionServer().messageDispatcher.registerRequestProcessor(
             stun::bindingMethod,
-            std::bind(&UdpClientRedirect::redirectHandler, this, 
+            std::bind(&UdpClientRedirect::redirectHandler, this,
                 _1, _2, contentServer().server->address()));
+    }
+
+    void givenBrokenRedirectionServer()
+    {
+        using namespace std::placeholders;
+
+        redirectionServer().messageDispatcher.registerRequestProcessor(
+            stun::bindingMethod,
+            std::bind(&UdpClientRedirect::brokenRedirectHandler, this,
+                _1, _2, contentServer().server->address()));
+    }
+
+    void givenTwoServersWithRedirection()
+    {
+        givenContentServer();
+        givenRedirectionServer();
     }
 
     void givenTwoServersWithRedirectionLoop()
     {
+        using namespace std::placeholders;
+
+        contentServer().messageDispatcher.registerRequestProcessor(
+            stun::bindingMethod,
+            std::bind(&UdpClientRedirect::redirectHandler, this,
+                _1, _2, redirectionServer().server->address()));
+
+        givenRedirectionServer();
     }
 
     void whenRequestingRedirectedResource()
@@ -503,13 +540,50 @@ protected:
 
     void thenClientShouldPerformFiniteNumberOfRedirectionAttempts()
     {
+        ASSERT_EQ(SystemError::noError, m_response.first);
+        ASSERT_EQ(stun::MessageClass::errorResponse, m_response.second.header.messageClass);
+
+        const auto errorCode = m_response.second.getAttribute<attrs::ErrorCode>();
+        ASSERT_EQ(error::tryAlternate, errorCode->getCode());
+
+        const auto alternateServer = m_response.second.getAttribute<attrs::AlternateServer>();
+        ASSERT_NE(nullptr, alternateServer);
+    }
+
+    void thenClientShouldReportBrokenRedirectionResponse()
+    {
+        ASSERT_EQ(SystemError::noError, m_response.first);
+        ASSERT_EQ(stun::MessageClass::errorResponse, m_response.second.header.messageClass);
+
+        const auto errorCode = m_response.second.getAttribute<attrs::ErrorCode>();
+        ASSERT_EQ(error::tryAlternate, errorCode->getCode());
+
+        const auto alternateServer = m_response.second.getAttribute<attrs::AlternateServer>();
+        ASSERT_EQ(nullptr, alternateServer);
+    }
+
+    void thenClientShouldReportTimeout()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_response.first);
     }
 
 private:
+    enum class ResponseGenerationRule
+    {
+        createCorrectResponse,
+        doNotAddAlternateServer,
+    };
+
+    stun::UdpClient m_client;
+    std::pair<SystemError::ErrorCode, stun::Message> m_response;
+
     void init()
     {
         ASSERT_TRUE(m_client.bind(SocketAddress::anyPrivateAddress))
             << SystemError::getLastOSErrorText().toStdString();
+
+        addServer();
+        addServer();
     }
 
     void processBindingRequest(
@@ -529,18 +603,46 @@ private:
         stun::Message message,
         SocketAddress targetAddress)
     {
+        sendRedirectResponse(
+            ResponseGenerationRule::createCorrectResponse,
+            std::move(connection),
+            std::move(message),
+            std::move(targetAddress));
+    }
+
+    void brokenRedirectHandler(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        stun::Message message,
+        SocketAddress targetAddress)
+    {
+        sendRedirectResponse(
+            ResponseGenerationRule::doNotAddAlternateServer,
+            std::move(connection),
+            std::move(message),
+            std::move(targetAddress));
+    }
+
+    void ignoreMessage(
+        std::shared_ptr<stun::AbstractServerConnection> /*connection*/,
+        stun::Message /*message*/)
+    {
+    }
+
+    void sendRedirectResponse(
+        ResponseGenerationRule responseGenerationRule,
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        stun::Message message,
+        SocketAddress targetAddress)
+    {
         stun::Message response(stun::Header(
             stun::MessageClass::errorResponse,
             stun::bindingMethod,
             message.header.transactionId));
         response.newAttribute<stun::attrs::ErrorCode>(stun::error::tryAlternate);
-        response.newAttribute<stun::attrs::AlternateServer>(targetAddress);
+        if (responseGenerationRule != ResponseGenerationRule::doNotAddAlternateServer)
+            response.newAttribute<stun::attrs::AlternateServer>(targetAddress);
         connection->sendMessage(std::move(response), nullptr);
     }
-
-private:
-    stun::UdpClient m_client;
-    std::pair<SystemError::ErrorCode, stun::Message> m_response;
 };
 
 TEST_F(UdpClientRedirect, simple_redirect_by_300_and_alternate_server)
@@ -552,14 +654,32 @@ TEST_F(UdpClientRedirect, simple_redirect_by_300_and_alternate_server)
 
 TEST_F(UdpClientRedirect, no_infinite_redirect_loop)
 {
-    //givenTwoServersWithRedirectionLoop();
-    //whenRequestingRedirectedResource();
-    //thenClientShouldPerformFiniteNumberOfRedirectionAttempts();
+    givenTwoServersWithRedirectionLoop();
+    whenRequestingRedirectedResource();
+    thenClientShouldPerformFiniteNumberOfRedirectionAttempts();
 }
 
-TEST_F(UdpClientRedirect, redirect_of_authorized_resource)
+TEST_F(UdpClientRedirect, redirect_response_without_alternate_server_attribute)
 {
+    givenBrokenRedirectionServer();
+    whenRequestingRedirectedResource();
+    thenClientShouldReportBrokenRedirectionResponse();
 }
+
+TEST_F(UdpClientRedirect, content_server_does_not_respond)
+{
+    givenSilentContentServer();
+    givenRedirectionServer();
+
+    whenRequestingRedirectedResource();
+
+    thenClientShouldReportTimeout();
+}
+
+// TODO: #ak add test with authorization
+//TEST_F(UdpClientRedirect, redirect_of_authorized_resource)
+//{
+//}
 
 } // namespace test
 } // namespace stun
