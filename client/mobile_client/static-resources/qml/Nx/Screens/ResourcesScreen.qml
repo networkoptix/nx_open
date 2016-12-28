@@ -93,6 +93,9 @@ Page
 
         layoutId: uiController.layoutId
 
+        keepStatuses: !resourcesScreen.warningVisible
+            && connectionManager.connectionState !== QnConnectionManager.Ready
+
         ScrollIndicator.vertical: ScrollIndicator
         {
             leftPadding: 6

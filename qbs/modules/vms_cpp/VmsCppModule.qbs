@@ -21,8 +21,8 @@ Module
 
     // YOU MUST FIX THE LINES BELOW to make sure it will generate merge conflict
     // if somebody also updates the protocol version
-    // Changed localSystem
-    property int ec2ProtoVersion: 3022
+    // vms-4742. ecs sqlite database was significally increased (twice) on servers update
+    property int ec2ProtoVersion: 3024
 
     Properties
     {

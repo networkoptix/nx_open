@@ -12,6 +12,7 @@ Control
     property alias text: label.text
     property string thumbnail
     property int status
+    property bool keepStatus: false
 
     signal clicked()
     signal thumbnailRefreshRequested()
@@ -24,10 +25,20 @@ Control
     {
         id: d
 
+        property int status: QnCameraListModel.Offline
+
         property bool offline: status == QnCameraListModel.Offline ||
                                status == QnCameraListModel.NotDefined ||
                                status == QnCameraListModel.Unauthorized
         property bool unauthorized: status == QnCameraListModel.Unauthorized
+    }
+
+    Binding
+    {
+        target: d
+        property: "status"
+        value: status
+        when: !keepStatus
     }
 
     background: Rectangle
@@ -58,12 +69,13 @@ Control
                 anchors.centerIn: parent
                 sourceComponent:
                 {
-                    if (d.offline || d.unauthorized)
+                    if (d.offline)
                         return thumbnailDummyComponent
-                    else if (!cameraItem.thumbnail)
+
+                    if (!cameraItem.thumbnail)
                         return thumbnailPreloaderComponent
-                    else
-                        return thumbnailComponent
+
+                    return thumbnailComponent
                 }
             }
         }
@@ -77,7 +89,7 @@ Control
             {
                 id: statusIndicator
 
-                status: cameraItem.status
+                status: d.status
                 y: 4
             }
 
@@ -126,7 +138,9 @@ Control
             Image
             {
                 anchors.horizontalCenter: parent.horizontalCenter
-                source: d.unauthorized ? lp("/images/camera_locked.png") : lp("/images/camera_offline.png")
+                source: d.unauthorized
+                    ? lp("/images/camera_locked.png")
+                    : lp("/images/camera_offline.png")
             }
 
             Text

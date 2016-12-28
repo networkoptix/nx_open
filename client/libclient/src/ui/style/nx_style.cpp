@@ -11,6 +11,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QCalendarWidget>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QCheckBox>
@@ -40,6 +41,8 @@
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <utils/math/color_transformations.h>
+
 
 using namespace style;
 
@@ -64,6 +67,8 @@ namespace
     const char* kPopupShadowCompanion = "popupShadow";
 
     const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
+
+    const char* kCalendarDelegateCompanion = "calendarDelegateReplacement";
 
     const int kQtHeaderIconMargin = 2; // a margin between item view header's icon and label used by Qt
 
@@ -324,18 +329,18 @@ namespace
     }
 
     template <class T>
-    bool isWidgetOwnedBy(const QWidget* widget)
+    T* isWidgetOwnedBy(const QWidget* widget)
     {
         if (!widget)
-            return false;
+            return nullptr;
 
         for (QWidget* parent = widget->parentWidget(); parent != nullptr; parent = parent->parentWidget())
         {
-            if (qobject_cast<const T*>(parent))
-                return true;
+            if (auto desiredParent = qobject_cast<T*>(parent))
+                return desiredParent;
         }
 
-        return false;
+        return nullptr;
     }
 
     enum ScrollBarStyle
@@ -364,6 +369,104 @@ namespace
     public:
         QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
         void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
+    };
+
+    /*
+     * Replacement for standard QCalendarWidget item delegate.
+     * Installs itself in constructor, restores previous delegate in destructor.
+     */
+    class CalendarDelegateReplacement: public QItemDelegate
+    {
+    public:
+        CalendarDelegateReplacement(QAbstractItemView* view, QCalendarWidget* parent):
+            QItemDelegate(parent),
+            m_view(view),
+            m_previous(view ? view->itemDelegate() : nullptr)
+        {
+            m_view->setItemDelegate(this);
+        }
+
+        virtual ~CalendarDelegateReplacement()
+        {
+            if (m_view && m_previous)
+                m_view->setItemDelegate(m_previous);
+        }
+
+        virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
+            const QModelIndex& index) const override
+        {
+            QStyleOptionViewItem viewOption(option);
+            viewOption.state &= ~QStyle::State_HasFocus; //< don't draw focus rect
+            viewOption.palette.setColor(QPalette::Highlight, Qt::transparent);
+
+            const bool selected = option.showDecorationSelected
+                && (option.state.testFlag(QStyle::State_Selected));
+
+            const bool inaccessible = index.flags() == 0;
+
+            const bool hovered = option.state.testFlag(QStyle::State_MouseOver)
+                && !inaccessible && m_view && m_view->isEnabled();
+
+            /*
+            * Standard QCalendarWidget does not support hover.
+            * So we draw cells background here ourselves and don't forget to customize
+            * calendar view's QPalette::Base and QPalette::Window as fully transparent
+            * to prevent standard delegate from overpainting our background.
+            */
+            painter->fillRect(option.rect, option.palette.color(hovered
+                ? QPalette::Midlight
+                : QPalette::Mid));
+
+            if (selected)
+            {
+                static const qreal kSelectionBackgroundOpacity = 0.2;
+                static const qreal kFrameWidth = 2.0;
+
+                const auto color = option.palette.color(QPalette::Highlight);
+
+                QnScopedPainterPenRollback penRollback(painter,
+                    QPen(color, kFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+
+                QnScopedPainterBrushRollback brushRollback(painter,
+                    toTransparent(color, kSelectionBackgroundOpacity));
+
+                static const auto kShift = kFrameWidth / 2.0;
+                painter->drawRect(QRectF(option.rect).adjusted(
+                    kShift, kShift, -kShift - 1, -kShift - 1));
+            }
+
+            QnScopedPainterOpacityRollback opacityRollback(painter);
+            if (inaccessible)
+            {
+                /* Paint semi-transparent highlighted foreground: */
+                painter->setOpacity(Hints::kDisabledItemOpacity);
+                viewOption.state |= QStyle::State_Selected;
+                viewOption.showDecorationSelected = true;
+            }
+
+            if (m_previous)
+                m_previous->paint(painter, viewOption, index);
+
+            opacityRollback.rollback();
+
+            /* Paint shadow under header, if needed: */
+            if (auto calendar = qobject_cast<QCalendarWidget*>(parent()))
+            {
+                static const int kHeaderRow = 0;
+                if (calendar->horizontalHeaderFormat() != QCalendarWidget::NoHorizontalHeader
+                    && index.row() == kHeaderRow)
+                {
+                    QnScopedPainterPenRollback penRollback(painter,
+                        option.palette.color(QPalette::Shadow));
+
+                    painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+                }
+            }
+        }
+
+    private:
+        QPointer<QAbstractItemView> m_view;
+        QPointer<QAbstractItemDelegate> m_previous;
     };
 
 } // unnamed namespace
@@ -1480,24 +1583,18 @@ void QnNxStyle::drawComplexControl(
             {
                 auto drawArrowButton = [&](QStyle::SubControl subControl)
                 {
-                    QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
-
-                    QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Button));
-                    QColor buttonColor;
+                    const QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
+                    const QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Base));
 
                     bool up = (subControl == SC_SpinBoxUp);
                     bool enabled = spinBox->state.testFlag(QStyle::State_Enabled) && spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
 
                     if (enabled && spinBox->activeSubControls.testFlag(subControl))
                     {
-                        if (spinBox->state.testFlag(State_Sunken))
-                            buttonColor = mainColor.darker(1);
-                        else
-                            buttonColor = mainColor;
+                        painter->fillRect(buttonRect, spinBox->state.testFlag(State_Sunken)
+                            ? mainColor
+                            : mainColor.lighter(1));
                     }
-
-                    if (buttonColor.isValid())
-                        painter->fillRect(buttonRect, buttonColor);
 
                     drawArrow(up ? Up : Down,
                         painter,
@@ -2746,10 +2843,18 @@ QRect QnNxStyle::subElementRect(
 
         case SE_LineEditContents:
         {
-            if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
-                //TODO #vkutin See why this ugly "6" is here and not somewhere else
-                return base_type::subElementRect(subElement, option, widget).adjusted(6, 0, 0, 0);
-            break;
+            const auto standardRect = base_type::subElementRect(subElement, option, widget);
+
+            if (isItemViewEdit(widget))
+                return standardRect;
+
+            static const int kLineEditIndent = 6;
+            static const int kCalendarYearEditIndent = 4;
+
+            if (isWidgetOwnedBy<QCalendarWidget>(widget))
+                return standardRect.adjusted(kCalendarYearEditIndent, 0, 0, 0);
+
+            return standardRect.adjusted(kLineEditIndent, 0, 0, 0);
         }
 
         case SE_PushButtonLayoutItem:
@@ -3477,6 +3582,22 @@ void QnNxStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
     }
 
+    if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
+    {
+        if (!calendar->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QTextCharFormat header = calendar->headerTextFormat();
+            QFont font = header.font();
+            font.setWeight(QFont::Bold);
+            font.setPixelSize(Metrics::kCalendarHeaderFontPixelSize);
+            header.setFont(font);
+            calendar->setHeaderTextFormat(header);
+
+            /* To update text formats when palette changes: */
+            calendar->installEventFilter(this);
+        }
+    }
+
     if (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QToolButton*>(widget))
     {
@@ -3494,7 +3615,7 @@ void QnNxStyle::polish(QWidget *widget)
         {
             QFont font = widget->font();
             font.setWeight(QFont::DemiBold);
-            font.setPixelSize(14);
+            font.setPixelSize(Metrics::kHeaderViewFontPixelSize);
             widget->setFont(font);
         }
         widget->setAttribute(Qt::WA_Hover);
@@ -3507,13 +3628,27 @@ void QnNxStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
     }
 
-    if (qobject_cast<QLineEdit*>(widget))
+    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
     {
-        if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
+        if (!lineEdit->property(Properties::kDontPolishFontProperty).toBool()
+            && !isItemViewEdit(lineEdit))
         {
-            QFont font = widget->font();
-            font.setPixelSize(14);
-            widget->setFont(font);
+            QFont font = lineEdit->font();
+
+            if (isWidgetOwnedBy<QCalendarWidget>(lineEdit))
+            {
+                QPalette palette = lineEdit->palette();
+                palette.setBrush(QPalette::Highlight, qApp->palette().highlight());
+                palette.setBrush(QPalette::HighlightedText, qApp->palette().highlightedText());
+                lineEdit->setPalette(palette);
+                font.setBold(true);
+            }
+            else
+            {
+                font.setPixelSize(Metrics::kTextEditFontPixelSize);
+            }
+
+            lineEdit->setFont(font);
         }
     }
 
@@ -3542,7 +3677,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(14);
+            font.setPixelSize(Metrics::kTextEditFontPixelSize);
             widget->setFont(font);
         }
     }
@@ -3613,7 +3748,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(12);
+            font.setPixelSize(Metrics::kTabBarFontPixelSize);
             if (tabShape(widget) == TabShape::Rectangular)
                 font.setWeight(QFont::DemiBold);
             widget->setFont(font);
@@ -3671,6 +3806,24 @@ void QnNxStyle::polish(QWidget *widget)
         }
         else
         {
+            /* Modify calendar item view: */
+            if (auto calendar = isWidgetOwnedBy<QCalendarWidget>(widget))
+            {
+                if (!calendar->property(Properties::kDontPolishFontProperty).toBool())
+                {
+                    QFont font = widget->font();
+                    font.setPixelSize(Metrics::kCalendarItemFontPixelSize);
+                    widget->setFont(font);
+                }
+
+                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion))
+                {
+                    QnObjectCompanionManager::attach(calendar,
+                        new CalendarDelegateReplacement(view, calendar),
+                        kCalendarDelegateCompanion);
+                }
+            }
+
             /* Fix for Qt 5.6 bug: item views don't reset their dropIndicatorRect: */
             connect(view, &QAbstractItemView::pressed, this,
                 [view]()
@@ -3768,6 +3921,9 @@ void QnNxStyle::unpolish(QWidget* widget)
             popupWithCustomizedShadow = parentWidget;
         }
     }
+
+    if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
+        QnObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
 
     if (kCustomizePopupShadows && popupWithCustomizedShadow)
         QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
@@ -3960,6 +4116,24 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
                 };
 
             executeDelayedParented(updateSectionSizes, 0, header);
+        }
+    }
+
+    if (auto calendar = qobject_cast<QCalendarWidget*>(object))
+    {
+        if (event->type() == QEvent::PaletteChange)
+        {
+            QTextCharFormat header = calendar->headerTextFormat();
+            header.setForeground(calendar->palette().windowText());
+            calendar->setHeaderTextFormat(header);
+
+            QTextCharFormat sunday = calendar->weekdayTextFormat(Qt::Sunday);
+            sunday.setForeground(calendar->palette().brightText());
+            calendar->setWeekdayTextFormat(Qt::Sunday, sunday);
+
+            QTextCharFormat saturday = calendar->weekdayTextFormat(Qt::Saturday);
+            saturday.setForeground(calendar->palette().brightText());
+            calendar->setWeekdayTextFormat(Qt::Saturday, saturday);
         }
     }
 
