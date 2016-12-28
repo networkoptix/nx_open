@@ -164,8 +164,7 @@ bool QnUserSettingsWidget::hasChanges() const
     }
 
     if (permissions.testFlag(Qn::WritePasswordPermission)
-        && !ui->passwordInputField->text().isEmpty()
-        && !m_model->user()->checkLocalUserPassword(ui->passwordInputField->text()))
+        && !ui->passwordInputField->text().isEmpty())
     {
         return true;
     }
@@ -462,8 +461,11 @@ void QnUserSettingsWidget::setupInputFields()
         {
             updateConfirmationPlaceholder();
 
-            if (!ui->confirmPasswordInputField->text().isEmpty())
+            if (ui->confirmPasswordInputField->text().isEmpty() ==
+                ui->passwordInputField->text().isEmpty())
+            {
                 ui->confirmPasswordInputField->validate();
+            }
         });
 
     connect(ui->confirmPasswordInputField, &QnInputField::textChanged,
