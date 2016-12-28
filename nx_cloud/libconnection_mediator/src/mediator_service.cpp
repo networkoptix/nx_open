@@ -147,7 +147,7 @@ int MediatorProcess::exec()
             server->setConnectionKeepAliveOptions(settings.stun().keepAliveOptions);
         });
 
-    MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
+    MultiAddressServer<stun::UdpServer> udpStunServer(&stunMessageDispatcher);
     if (!udpStunServer.bind(m_stunEndpoints /*settings.stun().addrToListenList*/))
     {
         NX_LOGX(lit("Can not bind to UDP addresses: %1")

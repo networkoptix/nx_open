@@ -51,7 +51,7 @@ void sendErrorResponse(
             std::move(requestHeader.transactionId)));
 
     response.newAttribute<stun::cc::attrs::ResultCode>(resultCode);
-    response.newAttribute< stun::attrs::ErrorDescription >(
+    response.newAttribute< stun::attrs::ErrorCode >(
         stunErrorCode,
         std::move(reason));
     connection->sendMessage(std::move(response));

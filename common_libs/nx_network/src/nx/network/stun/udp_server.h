@@ -23,7 +23,7 @@ class MessageDispatcher;
 /** Receives STUN message over udp, forwards them to dispatcher, sends response message.
     \note Class methods are not thread-safe
 */
-class NX_NETWORK_API UDPServer
+class NX_NETWORK_API UdpServer
 :
     public QnStoppableAsync,
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
@@ -34,14 +34,14 @@ class NX_NETWORK_API UDPServer
         MessageSerializer> PipelineType;
 
 public:
-    UDPServer(const MessageDispatcher* dispatcher);
-    virtual ~UDPServer();
+    UdpServer(const MessageDispatcher* dispatcher);
+    virtual ~UdpServer();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     bool bind(const SocketAddress& localAddress);
     /** Start receiving messages.
-        If \a UDPServer::bind has not been called, random local address is occupied
+        If \a UdpServer::bind has not been called, random local address is occupied
     */
     bool listen();
 

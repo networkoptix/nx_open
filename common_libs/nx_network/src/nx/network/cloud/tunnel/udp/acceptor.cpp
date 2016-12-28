@@ -17,8 +17,8 @@ TunnelAcceptor::TunnelAcceptor(
 :
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
-    m_udpRetransmissionTimeout(stun::UDPClient::kDefaultRetransmissionTimeOut),
-    m_udpMaxRetransmissions(stun::UDPClient::kDefaultMaxRetransmissions)
+    m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
+    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions)
 {
 }
 
