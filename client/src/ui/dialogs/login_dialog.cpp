@@ -205,12 +205,16 @@ void QnLoginDialog::accept() {
     }
 
     QString name = ui->connectionsComboBox->currentText();
+    const auto guard = QPointer<QnLoginDialog>(this);
 
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url,
         this,
-        [this, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        [this, guard, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
     {
+        if (!guard)
+            return;
+
         if (m_requestHandle != handle)
             return; //connect was cancelled
 
@@ -218,6 +222,9 @@ void QnLoginDialog::accept() {
         updateUsability();
 
         QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        if (!guard)
+            return;
+
         switch (status) {
         case QnConnectionDiagnosticsHelper::Result::Success:
             menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));

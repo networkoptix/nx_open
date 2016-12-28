@@ -508,7 +508,8 @@
         },
         {
             "keys": [
-                "General|IP Camera"
+                "General|IP Camera",
+                "H264|N51820L"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -519,7 +520,9 @@
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
                 "Cellinx|STH795",
-                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
+                "H264|N51820L",
+                "onvif|v047-1"
             ],
             "onvifPtzPresetsEnabled": true
         },

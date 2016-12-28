@@ -318,8 +318,6 @@ public:
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
 
-    void ensureRaisedConeItem(QnResourceWidget *widget);
-
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 
     QGLWidget *newGlWidget(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0) const;
