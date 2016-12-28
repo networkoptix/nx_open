@@ -785,7 +785,7 @@ QString QnAuditLogModel::descriptionTooltip(const QnAuditRecord *record) const
         return result;
     if (!result.isEmpty())
         result += lit("\n");
-    result += tr("Circle mark means that the archive is still available");
+    result += tr("Filled circle mark means the archive is still available");
     return result;
 }
 
