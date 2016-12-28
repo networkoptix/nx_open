@@ -1249,15 +1249,16 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     emit widgetAboutToBeRemoved(widget);
 
     const auto resource = widget->resource();
-    NX_ASSERT(m_widgetsByResource.contains(resource));
-    if (m_widgetsByResource.contains(resource))
+
+    auto widgetsForResource = m_widgetsByResource.find(resource);
+    NX_ASSERT(widgetsForResource != m_widgetsByResource.end());
+    if (widgetsForResource != m_widgetsByResource.end())
     {
-        QnResourceWidgetList& widgetsForResource = m_widgetsByResource[resource];
-        widgetsForResource.removeOne(widget);
-        if (widgetsForResource.empty())
+        widgetsForResource->removeOne(widget);
+        if (widgetsForResource->empty())
         {
             emit resourceAboutToBeRemoved(resource);
-            m_widgetsByResource.remove(resource);
+            m_widgetsByResource.erase(widgetsForResource);
         }
     }
 
@@ -2377,9 +2378,6 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     }
 
     if (accessController()->hasPermissions(resource, requiredPermission))
-        return;
-
-    if (!m_widgetsByResource.contains(resource))
         return;
 
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
