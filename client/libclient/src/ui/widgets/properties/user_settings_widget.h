@@ -49,6 +49,9 @@ private:
 
     QList<QnInputField*> relevantInputFields() const;
 
+    QString passwordPlaceholder() const;
+    void updateConfirmationPlaceholder();
+
     void updateRoleComboBox();
     void updateControlsAccess();
     bool validMode() const;

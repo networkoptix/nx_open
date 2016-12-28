@@ -235,6 +235,9 @@ void QnUserSettingsWidget::loadDataToUi()
     ui->passwordInputField->clear();
     ui->confirmPasswordInputField->clear();
 
+    ui->passwordInputField->setPlaceholderText(passwordPlaceholder());
+    updateConfirmationPlaceholder();
+
     ui->loginInputField->setFocus();
 
     m_aligner->clear();
@@ -249,6 +252,26 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         m_aligner->addWidget(ui->userTypeLabel);
+}
+
+QString QnUserSettingsWidget::passwordPlaceholder() const
+{
+    if (m_model->mode() != QnUserSettingsModel::OtherSettings)
+        return QString();
+
+    static const int kPasswordPlaceholderLength = 10;
+    const QChar kPasswordChar = QChar(qApp->style()->styleHint(
+        QStyle::SH_LineEdit_PasswordCharacter));
+
+    return QString(kPasswordPlaceholderLength, kPasswordChar);
+}
+
+void QnUserSettingsWidget::updateConfirmationPlaceholder()
+{
+    ui->confirmPasswordInputField->setPlaceholderText(
+        ui->passwordInputField->text().isEmpty()
+            ? passwordPlaceholder()
+            : QString());
 }
 
 void QnUserSettingsWidget::applyChanges()
@@ -352,26 +375,28 @@ bool QnUserSettingsWidget::canApplyChanges() const
 void QnUserSettingsWidget::setupInputFields()
 {
     ui->loginInputField->setTitle(tr("Login"));
-    ui->loginInputField->setValidator([this](const QString& text)
-    {
-        if (text.trimmed().isEmpty())
-            return Qn::ValidationResult(tr("Login cannot be empty."));
-
-        for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
+    ui->loginInputField->setValidator(
+        [this](const QString& text)
         {
-            if (user == m_model->user())
-                continue;
+            if (text.trimmed().isEmpty())
+                return Qn::ValidationResult(tr("Login cannot be empty."));
 
-            if (user->getName().toLower() != text.toLower())
-                continue;
+            for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
+            {
+                if (user == m_model->user())
+                    continue;
 
-            return Qn::ValidationResult(tr("User with specified login already exists."));
-        }
+                if (user->getName().toLower() != text.toLower())
+                    continue;
 
-        return Qn::kValidResult;
-    });
+                return Qn::ValidationResult(tr("User with specified login already exists."));
+            }
 
-    auto updatePasswordValidator = [this]
+            return Qn::kValidResult;
+        });
+
+    auto updatePasswordValidator =
+        [this]()
         {
             /* Check if we must update password for the other user. */
             if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
@@ -386,16 +411,17 @@ void QnUserSettingsWidget::setupInputFields()
             }
         };
 
-    connect(ui->loginInputField, &QnInputField::textChanged,     this, updatePasswordValidator);
-    connect(ui->loginInputField, &QnInputField::editingFinished, this, [this]()
-    {
-        if (ui->loginInputField->isValid() && m_model->mode() == QnUserSettingsModel::OtherSettings)
+    connect(ui->loginInputField, &QnInputField::textChanged, this, updatePasswordValidator);
+    connect(ui->loginInputField, &QnInputField::editingFinished, this,
+        [this]()
         {
-            bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
-            if (ui->passwordInputField->isValid() != passwordWasValid)
-                ui->passwordInputField->validate();
-        }
-    });
+            if (ui->loginInputField->isValid() && m_model->mode() == QnUserSettingsModel::OtherSettings)
+            {
+                bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
+                if (ui->passwordInputField->isValid() != passwordWasValid)
+                    ui->passwordInputField->validate();
+            }
+        });
 
     ui->nameInputField->setTitle(tr("Name"));
 
@@ -403,30 +429,32 @@ void QnUserSettingsWidget::setupInputFields()
     ui->emailInputField->setValidator(Qn::defaultEmailValidator());
 
     ui->cloudEmailInputField->setTitle(tr("Email"));
-    ui->cloudEmailInputField->setValidator([this](const QString& text)
-    {
-        if (m_model->mode() != QnUserSettingsModel::NewUser)
-            return Qn::kValidResult;
-
-        auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
-        if (result.state != QValidator::Acceptable)
-            return result;
-
-        auto email = text.trimmed().toLower();
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
+    ui->cloudEmailInputField->setValidator(
+        [this](const QString& text)
         {
-            if (!user->isCloud())
-                continue;
+            if (m_model->mode() != QnUserSettingsModel::NewUser)
+                return Qn::kValidResult;
 
-            if (user->getEmail().toLower() != email)
-                continue;
+            auto result = Qn::defaultNonEmptyValidator(tr("Email cannot be empty."))(text);
+            if (result.state != QValidator::Acceptable)
+                return result;
 
-            return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
-        }
+            auto email = text.trimmed().toLower();
+            for (const auto& user : qnResPool->getResources<QnUserResource>())
+            {
+                if (!user->isCloud())
+                    continue;
 
-        result = Qn::defaultEmailValidator()(text);
-        return result;
-    });
+                if (user->getEmail().toLower() != email)
+                    continue;
+
+                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+            }
+
+            result = Qn::defaultEmailValidator()(text);
+            return result;
+        });
+
     connect(ui->cloudEmailInputField, &QnInputField::textChanged, this,
         [this]
         {
@@ -438,11 +466,17 @@ void QnUserSettingsWidget::setupInputFields()
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
     ui->passwordInputField->setPasswordIndicatorEnabled(true);
 
-    connect(ui->passwordInputField, &QnInputField::textChanged, this, [this]()
+    connect(ui->passwordInputField, &QnInputField::textChanged, this,
+        [this]()
         {
+            updateConfirmationPlaceholder();
+
             if (!ui->confirmPasswordInputField->text().isEmpty())
                 ui->confirmPasswordInputField->validate();
         });
+
+    connect(ui->confirmPasswordInputField, &QnInputField::textChanged,
+        this, &QnUserSettingsWidget::updateConfirmationPlaceholder);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
         ui->confirmPasswordInputField, &QnInputField::validate);
