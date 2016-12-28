@@ -161,6 +161,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
     const size_t kFileCount = 5;
     const int kIoBlockSize = 1024 * 1024 * 4;
     const int kFfmpegBufferSize = 1024;
+    const int kFfmpegMaxBufferSize = 1024*1024*4;
     const QnUuid kWriterPoolId = QnUuid::createUuid();
     std::vector<FileTestData> files;
     files.reserve(kFileCount);
@@ -174,7 +175,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
                 std::shared_ptr<IQnFile>(new QnFile(fileName)),
                 kIoBlockSize,
                 kFfmpegBufferSize,
-                kFfmpegBufferSize,
+                kFfmpegMaxBufferSize,
                 kWriterPoolId);
 #ifdef Q_OS_WIN
         ioDevice->setSystemFlags(FILE_FLAG_NO_BUFFERING);
