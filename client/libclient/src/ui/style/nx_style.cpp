@@ -3792,7 +3792,7 @@ void QnNxStyle::polish(QWidget *widget)
         }
         else
         {
-            /* Set font size for header item view: */
+            /* Modify calendar item view: */
             if (auto calendar = isWidgetOwnedBy<QCalendarWidget>(widget))
             {
                 if (!calendar->property(Properties::kDontPolishFontProperty).toBool())
