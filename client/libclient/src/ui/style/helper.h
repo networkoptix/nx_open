@@ -44,6 +44,12 @@ namespace style
         static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
         static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
         static const int kPushButtonIconMargin;         /**< Margin around push button icon */
+
+        static const int kTabBarFontPixelSize;
+        static const int kTextEditFontPixelSize;
+        static const int kHeaderViewFontPixelSize;
+        static const int kCalendarItemFontPixelSize;
+        static const int kCalendarHeaderFontPixelSize;
     };
 
     class Hints

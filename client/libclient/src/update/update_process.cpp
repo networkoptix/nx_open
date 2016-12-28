@@ -285,7 +285,14 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
     downloadUpdates();
 }
 
-void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode) {
+void QnUpdateProcess::at_downloadTaskFinished(QnDownloadUpdatesPeerTask* task, int errorCode)
+{
+    if (errorCode == QnDownloadUpdatesPeerTask::Cancelled)
+    {
+        finishUpdate(QnUpdateResult::Cancelled);
+        return;
+    }
+
     if (errorCode != 0) {
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(errorCode == QnDownloadUpdatesPeerTask::NoFreeSpaceError ? QnUpdateResult::DownloadingFailed_NoFreeSpace : QnUpdateResult::DownloadingFailed);

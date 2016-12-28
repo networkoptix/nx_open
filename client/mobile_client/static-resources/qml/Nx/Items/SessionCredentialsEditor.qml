@@ -14,7 +14,8 @@ Pane
     implicitWidth: parent ? parent.width : 400
     background: null
 
-    property alias hostsModel: hostSelectionDialog.hostsModel
+    property alias hostsModel: hostSelectionDialog.model
+    property alias recentLocalConnectionsModel: userSelectionDialog.model;
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
@@ -85,6 +86,17 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
+
+            IconButton
+            {
+                id: chooseUserButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                icon: lp("/images/expand.png")
+                onClicked: userSelectionDialog.open()
+                visible: recentLocalConnectionsModel.count > 1
+            }
+
             onAccepted: KeyNavigation.tab.forceActiveFocus()
             onActiveFocusChanged:
             {
@@ -126,12 +138,25 @@ Pane
         }
     }
 
-    HostSelectionDialog
+    ItemSelectionDialog
     {
         id: hostSelectionDialog
-        deleteOnClose: false
-        activeHost: address
-        onActiveHostChanged: addressField.text = activeHost
+        title: qsTr("Hosts")
+        activeItem: address
+        onActiveItemChanged: addressField.text = activeItem
+    }
+
+    ItemSelectionDialog
+    {
+        id: userSelectionDialog
+        title: qsTr("Users")
+        activeItem: login
+        onItemChanged:
+        {
+            loginField.text = activeItem
+            passwordField.text = model.getData("password", activeItemRow)
+            passwordField.forceActiveFocus()
+        }
     }
 
     function focusAddressField()

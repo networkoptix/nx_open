@@ -15,6 +15,7 @@
 #include <utils/math/color_transformations.h>
 
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/delegates/calendar_item_delegate.h>
 #include <ui/common/palette.h>
 
@@ -37,6 +38,8 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
 {
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+
+    setProperty(style::Properties::kDontPolishFontProperty, true);
 
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));

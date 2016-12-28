@@ -18,8 +18,8 @@
 #include <ui/common/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 #include <ui/workbench/workbench_context.h>
@@ -240,13 +240,13 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     okButton = new QnBusyIndicatorButton(q);
     okButton->setText(baseOkButton->text()); // Title from OS theme
     okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
-    okButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(okButton);
     q->removeButton(baseOkButton.data());
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
-    nextButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(nextButton);
     q->addButton(nextButton, QDialogButtonBox::ActionRole);
     nextButton->setVisible(false);
 

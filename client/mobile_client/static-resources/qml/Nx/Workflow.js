@@ -40,12 +40,13 @@ function openNewSessionScreen()
     item.focusHostField()
 }
 
-function openDiscoveredSession(systemId, systemName, address)
+function openDiscoveredSession(systemId, localSystemId, systemName, address)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
+                "localSystemId": localSystemId,
                 "systemName": systemName,
                 "address": address
             }
@@ -53,12 +54,13 @@ function openDiscoveredSession(systemId, systemName, address)
     item.focusLoginField()
 }
 
-function openSavedSession(systemId, systemName, address, login, password)
+function openSavedSession(systemId, localSystemId, systemName, address, login, password)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
+                "localSystemId": localSystemId,
                 "systemName": systemName,
                 "address": address,
                 "login": login,

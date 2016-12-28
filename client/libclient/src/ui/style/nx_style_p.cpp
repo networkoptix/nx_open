@@ -133,6 +133,33 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
     return color;
 }
 
+bool QnNxStylePrivate::isCheckableButton(const QStyleOption* option)
+{
+    if (qstyleoption_cast<const QStyleOptionButton*>(option))
+    {
+        if (option->state.testFlag(QStyle::State_On) ||
+            option->state.testFlag(QStyle::State_Off) ||
+            option->state.testFlag(QStyle::State_NoChange))
+        {
+            return true;
+        }
+
+        const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
+        if (buttonWidget && buttonWidget->isCheckable())
+            return true;
+    }
+
+    return false;
+}
+
+bool QnNxStylePrivate::isTextButton(const QStyleOption* option)
+{
+    if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+        return button->features.testFlag(QStyleOptionButton::Flat);
+
+    return false;
+}
+
 void QnNxStylePrivate::drawSwitch(
     QPainter *painter,
     const QStyleOption *option,
@@ -412,6 +439,19 @@ void QnNxStylePrivate::drawTextButton(
     }
 
     QRect textRect(option->rect);
+
+    if (isCheckableButton(option))
+    {
+        QStyleOption switchOption(*option); //< not QStyleOptionButton for standalone switch
+        switchOption.rect.setWidth(Metrics::kStandaloneSwitchSize.width());
+
+        if (option->direction == Qt::LeftToRight)
+            textRect.setLeft(switchOption.rect.right() + Metrics::kStandardPadding + 1);
+        else
+            textRect.setRight(switchOption.rect.left() - Metrics::kStandardPadding - 1);
+
+        drawSwitch(painter, &switchOption, widget);
+    }
 
     if (!option->icon.isNull())
     {

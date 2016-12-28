@@ -303,6 +303,7 @@ BaseTile
                   * Discussed with R. Vasilenko - we can rely on admin/admin
                   * credentials for factory (new) systems. Otherwise it is error
                   * situation  on server side
+                  * TODO: ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
                   */
                 var kFactorySystemUser = "admin";
                 var kFactorySystemPassword = "admin";

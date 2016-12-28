@@ -39,18 +39,18 @@ QnContext::QnContext(QObject* parent) :
         SystemUri::ReferralContext::WelcomePage,
         this))
 {
-    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
-            this, [this]()
-    {
-        auto thumbnailCache = QnCameraThumbnailCache::instance();
-        if (!thumbnailCache)
-            return;
+    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this,
+        [this]()
+        {
+            auto thumbnailCache = QnCameraThumbnailCache::instance();
+            if (!thumbnailCache)
+                return;
 
-        if (m_connectionManager->connectionState() == QnConnectionManager::Connected)
-            thumbnailCache->start();
-        else
-            thumbnailCache->stop();
-    });
+            if (m_connectionManager->isOnline())
+                thumbnailCache->start();
+            else
+                thumbnailCache->stop();
+        });
 
     connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
             this, [this]()

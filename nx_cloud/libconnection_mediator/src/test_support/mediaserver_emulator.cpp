@@ -116,6 +116,7 @@ MediaServerEmulator::MediaServerEmulator(
 MediaServerEmulator::~MediaServerEmulator()
 {
     pleaseStopSync();
+    m_httpServer.reset();
 }
 
 void MediaServerEmulator::bindToAioThread(network::aio::AbstractAioThread* aioThread)
@@ -427,7 +428,9 @@ void MediaServerEmulator::stopWhileInAioThread()
     m_stunPipeline.reset();
     m_udtStreamSocket.reset();
     m_udtStreamServerSocket.reset();
-    m_httpServer.reset();
+
+    // NOTE: m_httpServer does not support non-blocking destruction
+    m_httpServer->pleaseStop();
 }
 
 } // namespace hpm

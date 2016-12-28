@@ -1054,11 +1054,6 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
-     * Shows resource pool.
-     */
-    DebugShowResourcePoolAction,
-
-    /**
      * Generates PTZ calibration screenshots.
      */
     DebugCalibratePtzAction,

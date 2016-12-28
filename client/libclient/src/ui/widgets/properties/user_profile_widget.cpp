@@ -129,10 +129,8 @@ void QnUserProfileWidget::loadDataToUi()
     ui->cloudPanelWidget->setEmail(m_model->user()->getEmail());
     ui->cloudPanelWidget->setFullName(m_model->user()->fullName());
 
-    auto options = m_model->mode() == QnUserSettingsModel::OwnProfile
-        ? QnCloudUserPanelWidget::ShowManageLinkOption
-        : QnCloudUserPanelWidget::NoOptions;
-    ui->cloudPanelWidget->setOptions(options);
+    ui->cloudPanelWidget->setManageLinkShown(
+        m_model->mode() == QnUserSettingsModel::OwnProfile);
 }
 
 void QnUserProfileWidget::updatePermissionsLabel(const QString& text)
