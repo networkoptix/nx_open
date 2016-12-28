@@ -111,7 +111,6 @@ void QnSystemHostsModel::reloadHosts()
 
         emit firstHostChanged();
         emit isEmptyChanged();
-        emit countChanged();
     }
 
     m_disconnectHelper.reset(new QnDisconnectHelper());
