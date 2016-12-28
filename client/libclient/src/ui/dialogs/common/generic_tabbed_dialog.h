@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ui/dialogs/common/button_box_dialog.h>
+#include <utils/common/updatable.h>
 
 class QnAbstractPreferencesWidget;
 
@@ -15,10 +16,11 @@ class QnAbstractPreferencesWidget;
  *  *   every page must implement loadDataToUi / hasChanges / applyChanges methods
  *  *   every page should emit hasChangesChanged in all cases where new changes can appear
  */
-class QnGenericTabbedDialog: public QnButtonBoxDialog {
+class QnGenericTabbedDialog: public QnButtonBoxDialog, public QnUpdatable
+{
     Q_OBJECT
+    using base_type = QnButtonBoxDialog;
 
-    typedef QnButtonBoxDialog base_type;
 public:
     explicit QnGenericTabbedDialog(QWidget *parent = nullptr, Qt::WindowFlags windowFlags = 0);
 
@@ -151,5 +153,4 @@ private:
 private:
     QList<Page> m_pages;
     QPointer<QTabWidget> m_tabWidget;
-    bool m_updating;
 };
