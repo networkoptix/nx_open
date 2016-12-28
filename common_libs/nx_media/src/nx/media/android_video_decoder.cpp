@@ -109,7 +109,6 @@ public:
             //if (!m_fbo)
             //    m_fbo = FboPtr(new QOpenGLFramebufferObject(m_frameSize));
             //return m_fbo;
-
         #else
             return FboPtr(new QOpenGLFramebufferObject(m_frameSize));
         #endif
@@ -166,6 +165,7 @@ class AndroidVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(AndroidVideoDecoder)
     AndroidVideoDecoder *q_ptr;
+
 public:
     AndroidVideoDecoderPrivate(const ResourceAllocatorPtr& allocator):
         frameNumber(0),
@@ -203,7 +203,8 @@ public:
     void registerNativeMethods()
     {
         JNINativeMethod methods[] {
-            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V", reinterpret_cast<void *>(nx::media::fillInputBuffer)}
+            {"fillInputBuffer", "(Ljava/nio/ByteBuffer;JII)V",
+                reinterpret_cast<void*>(nx::media::fillInputBuffer)}
         };
 
         QAndroidJniEnvironment env;
@@ -445,11 +446,27 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
     {
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
         QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
-        jint maxWidth = javaDecoder.callMethod<jint>("maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        jint maxHeight = javaDecoder.callMethod<jint>("maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        QSize size(maxWidth, maxHeight);
-        maxResolutions[codec] = size;
-        qDebug() << "Maximum hardware decoder resolution:" << size << "for codec" << codecMimeType;
+        jint maxWidth = javaDecoder.callMethod<jint>(
+            "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        jint maxHeight = javaDecoder.callMethod<jint>(
+            "maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
+        NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
+            .arg(maxWidth).arg(maxHeight).arg(codecMimeType), cl_logWARNING);
+        const QSize maxSize{maxWidth, maxHeight};
+        if (maxSize.isEmpty())
+        {
+            // NOTE: Zeroes come from JNI in case the Java class was not loaded due to some issue.
+            NX_LOG(lm("ERROR: Android Video Decoder failed to report max resolution for codec %1")
+                .arg(codecMimeType), cl_logERROR);
+        }
+        else
+        {
+// TODO: #mike: TEMPORARY HACK - DO NOT COMMIT
+const QSize maxSize{};
+            NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
+                .arg(maxSize.width()).arg(maxSize.height()).arg(codecMimeType), cl_logWARNING);
+            maxResolutions[codec] = maxSize;
+        }
     }
 }
 
@@ -459,7 +476,20 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
 
     QMutexLocker lock(&AndroidVideoDecoderPrivate::maxResolutionsMutex);
     const QSize maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
-    return resolution.width() <= maxSize.width() && resolution.height() <= maxSize.height();
+
+    if (maxSize.isEmpty())
+        return true;
+
+    if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
+    {
+        NX_LOG(lm("Codec for %1 is not compatible with resolution (%2, %3) because max is (%4, %5)")
+            .arg(codecToString(codec))
+            .arg(resolution.width()).arg(resolution.height())
+            .arg(maxSize.width()).arg(maxSize.height()), cl_logWARNING);
+        return false;
+    }
+
+    return true;
 }
 
 QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
