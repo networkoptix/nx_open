@@ -1,15 +1,12 @@
-
 #pragma once
 
 #include <nx/utils/thread/mutex.h>
 
 #include <network/tcp_connection_processor.h>
 
-
 class QnHttpConnectionListener;
 
-class Ec2ConnectionProcessor
-    :
+class Ec2ConnectionProcessor:
     public QnTCPConnectionProcessor
 {
 public:

@@ -28,7 +28,6 @@
 
 #include "ec2_connection_processor.h"
 
-
 static int registerQtResources()
 {
     Q_INIT_RESOURCE(appserver2);
