@@ -468,6 +468,9 @@ void QnUserSettingsWidget::setupInputFields()
             }
         });
 
+    connect(ui->confirmPasswordInputField, &QnInputField::textChanged,
+        this, &QnUserSettingsWidget::updateConfirmationPlaceholder);
+
     connect(ui->passwordInputField, &QnInputField::editingFinished,
         ui->confirmPasswordInputField, &QnInputField::validate);
 
