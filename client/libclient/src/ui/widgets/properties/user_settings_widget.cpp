@@ -176,17 +176,8 @@ bool QnUserSettingsWidget::hasChanges() const
         if (m_model->user()->userRoleId() != userRoleId)
             return true;
 
-        if (userRoleId.isNull())
-        {
-            /* Check if we have selected a predefined internal user role. */
-            Qn::UserRole roleType = selectedRole();
-            if (roleType != Qn::UserRole::CustomPermissions
-                && (QnUserRolesManager::userRolePermissions(roleType)
-                    != qnResourceAccessManager->globalPermissions(m_model->user())))
-            {
-                return true;
-            }
-        }
+        if (userRoleId.isNull() && selectedRole() != m_model->user()->userRole())
+            return true;
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
