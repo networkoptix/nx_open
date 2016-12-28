@@ -137,7 +137,7 @@ do
 done
 
 #copying qt libs
-QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql WebSockets"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns DBus Web*"
 fi
