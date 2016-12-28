@@ -424,6 +424,17 @@ TEST_F(UdpClient, client_response_injection)
 class UdpClientRedirect:
     public UdpClient
 {
+public:
+    UdpClientRedirect()
+    {
+        init();
+    }
+
+    ~UdpClientRedirect()
+    {
+        m_client.pleaseStopSync();
+    }
+
 protected:
     ServerContext& contentServer()
     {
@@ -481,7 +492,13 @@ protected:
         ASSERT_EQ(stun::MessageClass::successResponse, m_response.second.header.messageClass);
         const auto mappedAddress = m_response.second.getAttribute<attrs::MappedAddress>();
         ASSERT_NE(nullptr, mappedAddress);
-        ASSERT_EQ(contentServer().server->address(), mappedAddress->endpoint());
+        ASSERT_EQ(m_client.localAddress(), mappedAddress->endpoint());
+        ASSERT_EQ(
+            contentServer().server->address(),
+            m_response.second.transportHeader.locationEndpoint);
+        ASSERT_EQ(
+            redirectionServer().server->address(),
+            m_response.second.transportHeader.requestedEndpoint);
     }
 
     void thenClientShouldPerformFiniteNumberOfRedirectionAttempts()
@@ -489,6 +506,12 @@ protected:
     }
 
 private:
+    void init()
+    {
+        ASSERT_TRUE(m_client.bind(SocketAddress::anyPrivateAddress))
+            << SystemError::getLastOSErrorText().toStdString();
+    }
+
     void processBindingRequest(
         std::shared_ptr<stun::AbstractServerConnection> connection,
         stun::Message message)
@@ -510,8 +533,8 @@ private:
             stun::MessageClass::errorResponse,
             stun::bindingMethod,
             message.header.transactionId));
-        response.newAttribute<stun::attrs::ErrorDescription>(stun::error::tryAlternate);
-        response.newAttribute<stun::attrs::AlternateServer>(connection->getSourceAddress());
+        response.newAttribute<stun::attrs::ErrorCode>(stun::error::tryAlternate);
+        response.newAttribute<stun::attrs::AlternateServer>(targetAddress);
         connection->sendMessage(std::move(response), nullptr);
     }
 

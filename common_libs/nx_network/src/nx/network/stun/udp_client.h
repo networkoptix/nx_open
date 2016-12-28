@@ -3,11 +3,15 @@
 #include <chrono>
 #include <deque>
 
+#include <boost/optional.hpp>
+
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
+
 #include "message.h"
 #include "message_parser.h"
 #include "message_serializer.h"
 #include "unreliable_message_pipeline.h"
-#include "nx/network/aio/timer.h"
 
 namespace nx {
 namespace stun {
@@ -30,9 +34,11 @@ typedef nx::network::UnreliableMessagePipelineEventHandler<Message>
  *     SystemError::interrupted before destruction.
  */
 class NX_NETWORK_API UdpClient:
-    public QnStoppableAsync,
+    public network::aio::BasicPollable,
     private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
+    using BaseType = network::aio::BasicPollable;
+
 public:
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode errorCode,
@@ -40,12 +46,13 @@ public:
 
     static const std::chrono::milliseconds kDefaultRetransmissionTimeOut;
     static const int kDefaultMaxRetransmissions;
+    static const int kDefaultMaxRedirectCount;
 
     UdpClient();
     UdpClient(SocketAddress serverAddress);
-    virtual ~UdpClient();
+    virtual ~UdpClient() override;
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
 
     /**
      * @param request MUST contain unique transactionId
@@ -102,9 +109,12 @@ private:
          */
         SocketAddress resolvedServerAddress;
         Message request;
+        int redirectCount;
 
         RequestContext();
-        RequestContext(RequestContext&&);
+        
+        RequestContext(RequestContext&&) = default;
+        RequestContext& operator=(RequestContext&&) = default;
     };
 
     bool m_receivingMessages;
@@ -115,8 +125,19 @@ private:
     std::map<nx::Buffer, RequestContext> m_ongoingRequests;
     const SocketAddress m_serverAddress;
 
-    virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
+    virtual void stopWhileInAioThread() override;
+
+    virtual void messageReceived(SocketAddress sourceAddress, Message message) override;
     virtual void ioFailure(SystemError::ErrorCode) override;
+
+    bool isMessageShouldBeDiscarded(
+        const SocketAddress& sourceAddress,
+        const Message& message);
+    void processMessageReceived(Message message);
+    boost::optional<const stun::attrs::AlternateServer*>
+        findAlternateServer(const Message& mesage);
+    bool redirect(RequestContext* requestContext, const stun::attrs::AlternateServer& where);
+    void reportMessage(Message message);
 
     void sendRequestInternal(
         SocketAddress serverAddress,
@@ -131,7 +152,6 @@ private:
         nx::Buffer transactionId,
         SocketAddress resolvedServerAddress);
     void timedOut(nx::Buffer transactionId);
-    void cleanupWhileInAioThread();
 };
 
 } // namespace stun
