@@ -273,7 +273,7 @@ protected:
     std::unique_ptr<AbstractStreamSocket> m_udtAddressKeeper;
     std::unique_ptr<TunnelAcceptor> tunnelAcceptor;
     stun::MessageDispatcher stunMessageDispatcher;
-    stun::UDPServer udpStunServer;
+    stun::UdpServer udpStunServer;
 
     bool isUdpServerEnabled;
     size_t connectionRequests;
