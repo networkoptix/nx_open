@@ -778,8 +778,6 @@
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/connection_mediator-deb</module>
-                <module>debsetup/cloud_db-deb</module>
             </modules>
             <properties>
                 <modification>ubuntu</modification>
