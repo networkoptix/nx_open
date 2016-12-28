@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>

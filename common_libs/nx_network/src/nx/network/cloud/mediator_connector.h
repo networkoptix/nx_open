@@ -9,7 +9,7 @@
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 #include "mediator_connections.h"
 
 namespace nx {

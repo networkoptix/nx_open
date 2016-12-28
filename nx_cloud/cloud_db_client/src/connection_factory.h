@@ -8,7 +8,7 @@
 
 #include "include/cdb/connection.h"
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 
 
 namespace nx {

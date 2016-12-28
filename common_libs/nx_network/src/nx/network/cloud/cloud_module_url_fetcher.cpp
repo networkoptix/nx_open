@@ -1,4 +1,4 @@
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 
 #include <QtCore/QBuffer>
 

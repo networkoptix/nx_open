@@ -15,7 +15,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/fusion_data_http_client.h>
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "data/account_data.h"
