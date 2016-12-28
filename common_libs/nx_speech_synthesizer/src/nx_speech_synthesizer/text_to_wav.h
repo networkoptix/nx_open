@@ -28,7 +28,7 @@ class TextToWaveServer
     Q_OBJECT
 
 public:
-    TextToWaveServer();
+    TextToWaveServer(const QString& binaryPath);
     virtual ~TextToWaveServer();
 
     virtual void pleaseStop() override;
@@ -78,6 +78,7 @@ private:
         }
     };
 
+    QString m_binaryPath;
     QnSafeQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;

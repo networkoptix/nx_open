@@ -247,6 +247,7 @@
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
@@ -2650,11 +2651,6 @@ void MediaServerProcess::run()
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
 
-#if !defined(EDGE_SERVER)
-    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
-    speechSynthesizer->start();
-#endif
-
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     if (cmdLineArguments.cleanupDb)
@@ -3350,6 +3346,18 @@ int MediaServerProcess::main(int argc, char* argv[])
         ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
 
     SocketFactory::setIpVersion( ipVersion );
+
+#ifndef EDGE_SERVER
+    QString defaultBinaryPath;
+    if (argc > 0)
+        defaultBinaryPath = QString(argv[0]);
+
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(defaultBinaryPath));
+    textToWaveServer->start();
+    ::Sleep(5000); //< TODO: #dmishin remove it later.
+#endif
+
     QnVideoService service( argc, argv );
 
     if (!engineVersion.isEmpty()) {

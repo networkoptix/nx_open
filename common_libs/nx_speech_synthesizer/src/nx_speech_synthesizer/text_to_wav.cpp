@@ -256,7 +256,7 @@ namespace
 static std::once_flag festivalInitialized;
 static std::once_flag festivalDenitialized;
 
-static void initFestival()
+static void initFestival(const QString binaryPath)
 {
 #ifdef QN_USE_VLD
     VLDDisable();
@@ -264,9 +264,9 @@ static void initFestival()
     //initializing festival engine
     //sprintf( festivalVoxPath, "%s/festival.vox/lib/", QN_BUILDENV_PATH );
 #ifndef Q_OS_MAC
-    sprintf( festivalVoxPath, "%s/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    sprintf( festivalVoxPath, "%s/vox/", binaryPath.toLatin1().constData() );
 #else
-    sprintf( festivalVoxPath, "%s/../Resources/vox/", QCoreApplication::applicationDirPath().toLatin1().constData() );
+    sprintf( festivalVoxPath, "%s/../Resources/vox/", binaryPath.toLatin1().constData() );
 #endif
     festival_libdir = festivalVoxPath;
 
@@ -288,9 +288,9 @@ static void deinitFestival()
 class FestivalInitializer
 {
 public:
-    FestivalInitializer()
+    FestivalInitializer(const QString& binaryPath)
     {
-        std::call_once(festivalInitialized, initFestival);
+        std::call_once(festivalInitialized, initFestival, binaryPath);
     }
 
     ~FestivalInitializer()
@@ -370,9 +370,10 @@ static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudi
 }
 
 
-TextToWaveServer::TextToWaveServer()
+TextToWaveServer::TextToWaveServer(const QString& binaryPath)
 :
-    m_prevTaskID( 1 )
+    m_binaryPath(binaryPath),
+    m_prevTaskID(1)
 {
 }
 
@@ -413,7 +414,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer festivalInitializer;
+    FestivalInitializer festivalInitializer(m_binaryPath);
 
     while( !needToStop() )
     {

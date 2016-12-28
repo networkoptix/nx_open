@@ -45,6 +45,13 @@ Result NX_UTILS_API copy(const QString& sourcePath, const QString& targetPath,
 
 bool NX_UTILS_API ensureDir(const QDir& dir);
 
+QString NX_UTILS_API applicationFilePath(const QString& defaultFilePath);
+QString NX_UTILS_API applicationDirPath(const QString& defaultFilePath);
+
+#ifdef Q_OS_WIN
+QString applicationFileNameInternal(const QString& defaultFileName);
+#endif
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx

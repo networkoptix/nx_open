@@ -57,6 +57,11 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
+#ifndef DISABLE_FESTIVAL
+#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
+#endif
+
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
@@ -211,6 +216,19 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_MAC
     mac_setLimits();
+#endif
+
+#ifndef DISABLE_FESTIVAL
+    QString defaultBinaryPath;
+    if (argc > 0)
+        defaultBinaryPath = QString::fromUtf8(argv[0]);
+
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(defaultBinaryPath));
+
+    textToWaveServer->start();
+
+    ::Sleep(5000); //< TODO: #dmishin remove it later
 #endif
 
     /* These attributes must be set before application instance is created. */

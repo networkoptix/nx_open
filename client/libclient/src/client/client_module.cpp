@@ -315,7 +315,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store(new QnQtbugWorkaround());
 #endif
 
-#ifndef DISABLE_FESTIVAL
+#if 0
     auto textToWaveServer = qnCommon->store(new TextToWaveServer());
     textToWaveServer->start();
 #endif
