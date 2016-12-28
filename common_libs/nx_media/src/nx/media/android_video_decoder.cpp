@@ -461,8 +461,6 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
         }
         else
         {
-// TODO: #mike: TEMPORARY HACK - DO NOT COMMIT
-const QSize maxSize{};
             NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
                 .arg(maxSize.width()).arg(maxSize.height()).arg(codecMimeType), cl_logWARNING);
             maxResolutions[codec] = maxSize;
