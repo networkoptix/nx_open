@@ -29,6 +29,11 @@ enum IDType
     ConnectAction,
 
     /**
+    * Connects to cloud system.
+    */
+    ConnectToCloudSystemAction,
+
+    /**
      * Disconnects from server.
      */
     DisconnectAction,
@@ -350,11 +355,9 @@ enum IDType
     WebClientAction,
 
     /**
-     * Opens web client in the default browser. Placed in submenu
-     * TODO: #ynikitenkov Add ability to add action both in submenu and context menu,
-     * now it is not available
-     */
-    WebClientActionSubMenu,
+     * Opens web admin for given server in the default browser.
+    */
+    WebAdminAction,
 
     /**
      * Opens business events editing dialog.
@@ -1049,11 +1052,6 @@ enum IDType
      * Decrements debug counter.
      */
     DebugDecrementCounterAction,
-
-    /**
-     * Shows resource pool.
-     */
-    DebugShowResourcePoolAction,
 
     /**
      * Generates PTZ calibration screenshots.

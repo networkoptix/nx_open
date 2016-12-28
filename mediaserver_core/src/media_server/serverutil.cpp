@@ -20,7 +20,10 @@
 
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+
 #include <network/authenticate_helper.h>
+#include <network/system_helpers.h>
+
 #include <nx/network/nettools.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
@@ -296,7 +299,7 @@ bool resetSystemToStateNew()
 
     auto adminUserResource = qnResPool->getAdministrator();
     PasswordData data;
-    data.password = QnServer::kDefaultAdminPassword;
+    data.password = helpers::kFactorySystemPassword;
     return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 

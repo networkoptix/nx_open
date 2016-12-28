@@ -133,9 +133,7 @@
         <box>none</box>
         <modification/>
         <beta>true</beta>
-        <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-cloud_${cloud.group}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
         <newmobile/>
@@ -155,7 +153,7 @@
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
-        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>         
+        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.6.1</qt.version>
@@ -196,11 +194,11 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloud.group>internal</cloud.group>
+        <cloud.group>dev</cloud.group>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
-        <toolchain.version>none</toolchain.version>       
+        <toolchain.version>none</toolchain.version>
 
         <additional.defines/>
         <customization.defines/>
@@ -228,11 +226,50 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <projectType>generic</projectType>
+
+        <!--
+        Proposed standart (see https://networkoptix.atlassian.net/wiki/display/SD/Installer+Filenames):
+            {product}-{apptype}-{version}-{platform}-{optional:beta_status}-{optional:cloud_instance_group}.{extension}
+        Where:
+            product = { nxwitness | dwspectrum | qulu | <other customizations> }
+            apptype = { client | server | bundle | <etc> }
+            version = { major.minor.release.build }
+            platform = { win64 | win86 | linux64 | linux86 | mac | android | ios | bpi | rpi | bananapi }
+            beta_status = { beta | <empty> }
+            cloud_instance_group = { dev | test | demo | stage | <empty if instance if prod> }
+            extension = { exe | msi | zip | tar.gz | dmg | ipa }
+        -->
+        <artifact.name.product>${installer.name}</artifact.name.product>
+        <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
+        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
+        <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
+        <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
+        
+        <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
+        <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
+        
+        <!-- List of public final names which are to be used everywhere -->
+        <artifact.name.client>${artifact.name.prefix}-client-${artifact.name.suffix}</artifact.name.client>
+        <artifact.name.server>${artifact.name.prefix}-server-${artifact.name.suffix}</artifact.name.server>
+        <artifact.name.bundle>${artifact.name.prefix}-bundle-${artifact.name.suffix}</artifact.name.bundle>
+        <artifact.name.servertool>${artifact.name.prefix}-servertool-${artifact.name.suffix}</artifact.name.servertool>
+        <artifact.name.client_update>${artifact.name.prefix}-client_update-${artifact.name.suffix}</artifact.name.client_update>
+        <artifact.name.server_update>${artifact.name.prefix}-server_update-${artifact.name.suffix}</artifact.name.server_update>
+        <artifact.name.paxton>${artifact.name.prefix}-paxton-${artifact.name.suffix}</artifact.name.paxton>
+        <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
+        <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
+        <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
+        <artifact.name.client_pdb>${artifact.name.prefix}-client_pdb-${artifact.name.suffix}</artifact.name.client_pdb>
+        <artifact.name.server_pdb>${artifact.name.prefix}-server_pdb-${artifact.name.suffix}</artifact.name.server_pdb>
+        <artifact.name.misc_pdb>${artifact.name.prefix}-misc_pdb-${artifact.name.suffix}</artifact.name.misc_pdb>
+        <artifact.name.libs_pdb>${artifact.name.prefix}-libs_pdb-${artifact.name.suffix}</artifact.name.libs_pdb>
+        <artifact.name.cloud_pdb>${artifact.name.prefix}-cloud_pdb-${artifact.name.suffix}</artifact.name.cloud_pdb>
+
     </properties>
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${artifactId}-${version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -341,25 +378,21 @@
                                     <directory>${parent.customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
-                                        <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/_unused/**</exclude>
-                                    </excludes>
                                 </resource>
                                 <resource>
                                     <directory>${customization.dir}/icons/${platform}</directory>
                                     <filtering>false</filtering>
-                                </resource>                                
+                                </resource>
                                 <resource>
                                     <directory>${customization.dir}/icons/all</directory>
                                     <filtering>false</filtering>
-                                </resource>                                                                                                
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
@@ -489,13 +522,27 @@
                 <module>client/libclient</module>
                 <module>client/desktop_client</module>
                 <module>common_libs/nx_media</module>
-                <module>client/mobile_client</module>
                 <module>nx_cloud/libvms_gateway</module>
             </modules>
         </profile>
         <profile>
+            <id>desktop-nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>
+                <module>client/mobile_client</module>
+            </modules>
+        </profile>
+        <profile>
             <id>windows</id>
-
             <activation>
                 <os>
                     <family>Windows</family>
@@ -526,6 +573,8 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <qt.version>5.6.1-1</qt.version>
+                <artifact.name.platform>win64</artifact.name.platform>
             </properties>
 
         </profile>
@@ -543,6 +592,7 @@
             </activation>
             <properties>
                 <machine.type>X86</machine.type>
+                <artifact.name.platform>win86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -691,12 +741,14 @@
                 <minilauncher.binary.name>applauncher</minilauncher.binary.name>
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
-
+                <artifact.name.platform>mac</artifact.name.platform>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_speech_synthesizer</module>
                 <module>macsetup/client-dmg</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
             </modules>
         </profile>
 
@@ -751,6 +803,7 @@
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
+                <artifact.name.platform>${box}</artifact.name.platform>
             </properties>
             <build>
                 <directory>target-${box}</directory>
@@ -778,7 +831,7 @@
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
+                <rdep.target>isd</rdep.target>               
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -861,6 +914,7 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.2</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
@@ -970,6 +1024,7 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
+                <artifact.name.platform>linux64</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -989,6 +1044,7 @@
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
                 <target.arch>i386</target.arch>
+                <artifact.name.platform>linux86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1008,6 +1064,7 @@
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
                 <target.arch>i386</target.arch>
+                <artifact.name.platform>linux86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1019,12 +1076,12 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-cloud_${cloud.group}</finalName>
+                <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
             </properties>
         </profile>
-
+        
         <!-- Mobile client profiles -->
         <profile>
             <id>mobile-common</id>
@@ -1041,6 +1098,8 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
             </modules>
+            <properties>
+            </properties>
         </profile>
         <profile>
             <id>mobile-android</id>
@@ -1065,9 +1124,11 @@
                 <android.toolchain.version>4.9</android.toolchain.version>
                 <android.platform>android-16</android.platform>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <openal.version>1.17.2</openal.version>
                 <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
+                <artifact.name.platform>android</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1092,11 +1153,13 @@
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
                 <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <libdir>${root.dir}/build_environment/target</libdir>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <openssl.version>1.0.1i</openssl.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
                 <rdep.target>ios</rdep.target>
+                <artifact.name.platform>ios</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1175,9 +1238,40 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>             
+                    </plugin>
                 </plugins>
-            </build> 
-        </profile>  
+            </build>
+        </profile>
+        
+        <!-- Artifact naming profiles -->
+        
+        <profile>
+            <id>artifact-name-beta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
+            </properties>
+        </profile>
+        
+        <profile>
+            <id>artifact-name-cloud</id>
+            <activation>
+                <property>
+                    <name>cloud.group</name>
+                    <value>!prod</value>
+                </property>
+            </activation>
+            <properties>
+                <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
+            </properties>
+        </profile>        
+        
+        <!-- End of artifact naming profiles -->
+        
     </profiles>
 </project>

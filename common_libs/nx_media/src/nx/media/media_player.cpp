@@ -54,8 +54,8 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
-// Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 10;
+// Player will go to the invalid state if no data is received within this timeout.
+static const int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
@@ -262,10 +262,23 @@ void PlayerPrivate::setState(Player::State state)
 void PlayerPrivate::doPeriodicTasks()
 {
     Q_Q(Player);
-    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+
+    if (state == Player::State::Playing)
     {
-        setMediaStatus(Player::MediaStatus::NoMedia);
-        q->stop();
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        {
+            gotDataTimer.restart();
+            return;
+        }
+
+        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
+        {
+            log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+        }
     }
 }
 
@@ -292,7 +305,7 @@ void PlayerPrivate::setLiveMode(bool value)
 
 void PlayerPrivate::setAspectRatio(double value)
 {
-    if (qFuzzyCompare(aspectRatio, value))
+    if (qFuzzyEquals(aspectRatio, value))
         return;
 
     aspectRatio = value;
@@ -438,7 +451,8 @@ void PlayerPrivate::presentNextFrame()
     if (videoSurface)
     {
         if (videoSurface->isActive() &&
-            videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+            (videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat()
+                || videoSurface->surfaceFormat().frameSize() != videoFrameToRender->size()))
         {
             videoSurface->stop();
         }
@@ -745,8 +759,8 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
-	// a bit less then user requested position (inside of current GOP)
+    // positionMs is the actual value from a video frame. It could contain a "coarse" timestamp
+    // a bit less then the user requested position (inside of the current GOP).
     return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
@@ -765,6 +779,8 @@ void Player::setPosition(qint64 value)
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
+
+    emit positionChanged();
 }
 
 int Player::maxTextureSize() const
@@ -869,6 +885,9 @@ void Player::setSource(const QUrl& url)
 
     if (d->resource && currentState == State::Playing)
         play();
+
+    d->log(lit("emit sourceChanged()"));
+    emit sourceChanged();
 
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }

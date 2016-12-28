@@ -40,6 +40,8 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/utils/log/log.h>
+
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
     m_accessController(accessController),
@@ -220,24 +222,33 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     {
         case SystemUri::ClientCommand::LoginToCloud:
         {
+            NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
-        case SystemUri::ClientCommand::ConnectToSystem:
+        case SystemUri::ClientCommand::Client:
         {
             QString systemId = uri.systemId();
-            bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+            if (!systemId.isEmpty())
+            {
+                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
-            QUrl systemUrl = QUrl::fromUserInput(systemId);
-            systemUrl.setUserName(auth.user);
-            systemUrl.setPassword(auth.password);
+                QUrl systemUrl = QUrl::fromUserInput(systemId);
+                NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
 
-            if (systemIsCloud)
-                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                systemUrl.setUserName(auth.user);
+                systemUrl.setPassword(auth.password);
 
-            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
-            parameters.setArgument(Qn::ForceRole, true);
-            menu()->trigger(QnActions::ConnectAction, parameters);
+                if (systemIsCloud)
+                {
+                    qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                    NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
+                }
+
+                auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+                parameters.setArgument(Qn::ForceRole, true);
+                menu()->trigger(QnActions::ConnectAction, parameters);
+            }
             break;
         }
         default:

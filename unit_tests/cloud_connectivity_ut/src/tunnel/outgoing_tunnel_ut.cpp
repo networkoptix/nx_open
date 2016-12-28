@@ -21,9 +21,9 @@
 namespace nx {
 namespace network {
 namespace cloud {
+namespace test {
 
-class DummyConnection
-:
+class DummyConnection:
     public AbstractOutgoingTunnelConnection
 {
 public:
@@ -65,7 +65,7 @@ public:
         }
 
         post(
-            [this, handler]()
+            [this, handler = std::move(handler)]()
             {
                 if (m_connectionShouldWorkFine)
                 {
@@ -98,8 +98,7 @@ private:
 std::atomic<size_t> DummyConnection::instanceCount(0);
 
 
-class DummyConnector
-:
+class DummyConnector:
     public AbstractCrossNatConnector
 {
 public:
@@ -119,8 +118,10 @@ public:
         m_singleShotConnection(singleShotConnection),
         m_canSucceedEvent(canSucceedEvent),
         m_connectTimeout(std::move(connectTimeout)),
-        m_tunnelConnectionInvokedPromise(nullptr)
+        m_tunnelConnectionInvokedPromise(nullptr),
+        m_timer(std::make_unique<aio::Timer>())
     {
+        m_timer->bindToAioThread(getAioThread());
         ++instanceCount;
     }
 
@@ -175,8 +176,15 @@ public:
         --instanceCount;
     }
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        AbstractCrossNatConnector::bindToAioThread(aioThread);
+        m_timer->bindToAioThread(getAioThread());
+    }
+
     virtual void stopWhileInAioThread() override
     {
+        m_timer.reset();
     }
 
     virtual void connect(
@@ -185,7 +193,7 @@ public:
     {
         if (m_connectTimeout)
         {
-            timer()->start(
+            m_timer->start(
                 *m_connectTimeout,
                 [this, handler = std::move(handler)]() mutable
                 {
@@ -197,10 +205,6 @@ public:
             connectInternal(std::move(handler));
         }
     }
-    //virtual const AddressEntry& targetPeerAddress() const override
-    //{
-    //    return m_targetPeerAddress;
-    //}
 
     void setConnectionInvokedPromise(
         nx::utils::promise<std::chrono::milliseconds>* const tunnelConnectionInvokedPromise)
@@ -216,6 +220,7 @@ private:
     nx::utils::promise<void>* const m_canSucceedEvent;
     boost::optional<std::chrono::milliseconds> m_connectTimeout;
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    std::unique_ptr<aio::Timer> m_timer;
 
     void connectInternal(
         ConnectCompletionHandler handler)
@@ -245,8 +250,7 @@ private:
 std::atomic<size_t> DummyConnector::instanceCount(0);
 
 
-class OutgoingTunnelTest
-:
+class OutgoingTunnel:
     public ::testing::Test
 {
 public:
@@ -261,13 +265,13 @@ public:
         std::chrono::steady_clock::time_point endTime;
     };
 
-    OutgoingTunnelTest()
+    OutgoingTunnel()
     {
         NX_CRITICAL(DummyConnector::instanceCount == 0);
         NX_CRITICAL(DummyConnection::instanceCount == 0);
     }
 
-    ~OutgoingTunnelTest()
+    ~OutgoingTunnel()
     {
         if (m_oldFactoryFunc)
             ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
@@ -288,7 +292,7 @@ private:
 };
 
 
-TEST_F(OutgoingTunnelTest, general)
+TEST_F(OutgoingTunnel, general)
 {
     for (int i = 0; i < 100; ++i)
     {
@@ -298,7 +302,7 @@ TEST_F(OutgoingTunnelTest, general)
         const bool singleShotConnection = (bool)nx::utils::random::number(0, 1);
 
         AddressEntry addressEntry("nx_test.com:12345");
-        OutgoingTunnel tunnel(std::move(addressEntry));
+        cloud::OutgoingTunnel tunnel(std::move(addressEntry));
 
         setConnectorFactoryFunc(
             [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
@@ -363,7 +367,7 @@ TEST_F(OutgoingTunnelTest, general)
     }
 }
 
-TEST_F(OutgoingTunnelTest, singleShotConnection)
+TEST_F(OutgoingTunnel, singleShotConnection)
 {
     const bool connectorWillSucceed = false;
     const bool connectionWillSucceed = true;
@@ -386,7 +390,7 @@ TEST_F(OutgoingTunnelTest, singleShotConnection)
 
     for (int j = 0; j < 1000; ++j)
     {
-        OutgoingTunnel tunnel(std::move(addressEntry));
+        cloud::OutgoingTunnel tunnel(std::move(addressEntry));
 
         for (int i = 0; i < connectionsToCreate; ++i)
         {
@@ -410,12 +414,12 @@ TEST_F(OutgoingTunnelTest, singleShotConnection)
     }
 }
 
-TEST_F(OutgoingTunnelTest, handlersQueueingWhileInConnectingState)
+TEST_F(OutgoingTunnel, handlersQueueingWhileInConnectingState)
 {
     const int connectionsToCreate = 100;
 
     AddressEntry addressEntry("nx_test.com:12345");
-    OutgoingTunnel tunnel(std::move(addressEntry));
+    cloud::OutgoingTunnel tunnel(std::move(addressEntry));
 
     nx::utils::promise<void> doConnectEvent;
 
@@ -459,7 +463,7 @@ TEST_F(OutgoingTunnelTest, handlersQueueingWhileInConnectingState)
     tunnel.pleaseStopSync();
 }
 
-TEST_F(OutgoingTunnelTest, cancellation)
+TEST_F(OutgoingTunnel, cancellation)
 {
     const bool connectorWillSucceed = true;
     const bool singleShotConnection = false;
@@ -470,7 +474,7 @@ TEST_F(OutgoingTunnelTest, cancellation)
         for (const bool waitConnectionCompletion: waitConnectionCompletionValues)
         {
             AddressEntry addressEntry("nx_test.com:12345");
-            OutgoingTunnel tunnel(std::move(addressEntry));
+            cloud::OutgoingTunnel tunnel(std::move(addressEntry));
 
             setConnectorFactoryFunc(
                 [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
@@ -511,7 +515,7 @@ TEST_F(OutgoingTunnelTest, cancellation)
         }
 }
 
-TEST_F(OutgoingTunnelTest, connectTimeout)
+TEST_F(OutgoingTunnel, connectTimeout)
 {
     const auto connectorTimeout = std::chrono::seconds(7);
     const int connectionsToCreate = 70;
@@ -541,7 +545,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
         connectedPromises.resize(connectionsToCreate);
 
         AddressEntry addressEntry("nx_test.com:12345");
-        OutgoingTunnel tunnel(std::move(addressEntry));
+        cloud::OutgoingTunnel tunnel(std::move(addressEntry));
         auto tunnelGuard = makeScopedGuard([&tunnel] { tunnel.pleaseStopSync(); });
 
         for (auto& connectionContext: connectedPromises)
@@ -585,10 +589,10 @@ TEST_F(OutgoingTunnelTest, connectTimeout)
 }
 
 /** testing that tunnel passes correct connect timeout to tunnel connection */
-TEST_F(OutgoingTunnelTest, connectTimeout2)
+TEST_F(OutgoingTunnel, connectTimeout2)
 {
     AddressEntry addressEntry("nx_test.com:12345");
-    OutgoingTunnel tunnel(std::move(addressEntry));
+    cloud::OutgoingTunnel tunnel(std::move(addressEntry));
 
     nx::utils::promise<std::chrono::milliseconds> tunnelConnectionInvokedPromise;
 
@@ -638,7 +642,7 @@ TEST_F(OutgoingTunnelTest, connectTimeout2)
     tunnel.pleaseStopSync();
 }
 
-TEST_F(OutgoingTunnelTest, pool)
+TEST_F(OutgoingTunnel, pool)
 {
     OutgoingTunnelPool tunnelPool;
 
@@ -686,6 +690,7 @@ TEST_F(OutgoingTunnelTest, pool)
     tunnelPool.pleaseStopSync();
 }
 
+} // namespace test
 } // namespace cloud
 } // namespace network
 } // namespace nx

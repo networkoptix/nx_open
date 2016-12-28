@@ -20,7 +20,7 @@ TEST(SyncQueueWithItemStayTimeout, basic)
     testQueue.push(1);
     testQueue.push(2);
     const auto item1 = testQueue.pop();
-    ASSERT_TRUE(item1);
+    ASSERT_TRUE(static_cast<bool>(item1));
     ASSERT_EQ(1, *item1);
 
     std::this_thread::sleep_for(2 * timeout);

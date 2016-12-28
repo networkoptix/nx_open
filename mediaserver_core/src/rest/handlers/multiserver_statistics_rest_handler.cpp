@@ -311,11 +311,11 @@ int SendStatisticsActionHandler::executePost(const QnRequestParamList& params
     QnSendStatisticsRequestData request =
         QnMultiserverRequestData::fromParams<QnSendStatisticsRequestData>(params);
 
-    // TODO: #ynikitenkov add support of specified in parameters format, not only json!
+    // TODO: #ynikitenkov: Add support for format specified in parameters, not only json.
     const bool correctJson = QJson::deserialize<QnMetricHashesList>(
         body, &request.metricsList);
 
-    NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorect json with mertics received!");
+    NX_ASSERT(correctJson, Q_FUNC_INFO, "Incorrect json with metrics received!");
     if (!correctJson)
         return nx_http::StatusCode::invalidParameter;
 

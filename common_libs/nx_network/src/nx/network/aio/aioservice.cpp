@@ -34,7 +34,6 @@ AIOService::AIOService( unsigned int threadCount )
 {
     if( !threadCount )
         threadCount = QThread::idealThreadCount();
-    //threadCount = 1;
 
     initializeAioThreadPool(&m_systemSocketAIO, threadCount);
 }
@@ -88,9 +87,18 @@ void AIOService::registerTimer(
     std::chrono::milliseconds timeoutMillis,
     AIOEventHandler<Pollable>* const eventHandler)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker locker(&m_mutex);
+    registerTimerNonSafe(&locker, sock, timeoutMillis, eventHandler);
+}
+
+void AIOService::registerTimerNonSafe(
+    QnMutexLockerBase* const locker,
+    Pollable* const sock,
+    std::chrono::milliseconds timeoutMillis,
+    AIOEventHandler<Pollable>* const eventHandler)
+{
     watchSocketNonSafe(
-        &lk,
+        locker,
         sock,
         aio::etTimedOut,
         eventHandler,

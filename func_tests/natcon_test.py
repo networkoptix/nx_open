@@ -10,10 +10,11 @@ import unittest
 
 import urllib2 # FIXME remove it
 
-from functest_util import checkResultsEqual, generateKey #, HttpRequest
+from functest_util import checkResultsEqual, generateKey
 from testbase import *
 from stortest import StorageBasedTest, TEST_CAMERA_ATTR, TEST_CAMERA_DATA, STORAGE_INIT_TIMEOUT
 from rtsptests import SingleServerRtspPerf, RtspStreamTest, SingleServerHlsTest, HlsStreamingTest #, Camera
+from pycommons.Logger import log, LOGLEVEL
 
 NUM_NAT_SERV = 2  # 2 mediaservers are used: 1st before NAT, 2rd - behind NAT
                   # there is no mediaserver on the box with NAT
@@ -61,7 +62,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
     helpStr = "Connection behind NAT test"
     _test_name = "NAT Connection"
     _test_key = "natcon"
-    _suits = (
+    _suites = (
         ('NatConnectionTests', [
             'VMPreparation',
             'TestDataSynchronization',
@@ -89,7 +90,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
     def _prepareKeys(self, srv_index):
         passwd = self.config.get("General","password")
         user = self.config.get("General","username")
-        answer = self._server_request(HOST_BEHIND_NAT, "api/getNonce")
+        answer = self._server_request(srv_index, "api/getNonce")
         if answer is not None and answer.get("error", '') not in ['', '0', 0]:
             self.fail("api/getNonce request returned API error %s: %s" % \
                       (answer["error"], answer.get("errorString","")))
@@ -99,31 +100,13 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         postKey =  generateKey('POST', user, passwd, nonce, realm)
         return getKey, postKey
 
-    ################################################################
-    # 10.11.2016, from Roman:
-    #
-    # 2. Параметры запроса mergeSystem
-    #
-    #        url(params.value(lit("url"))),
-    #        getKey(params.value(lit("getKey"))),
-    #        postKey(params.value(lit("postKey"))),
-    #        takeRemoteSettings(params.value(lit("takeRemoteSettings"), lit("false")) != lit("false")),
-    #        mergeOneServer(params.value(lit("oneServer"), lit("false")) != lit("false")),
-    #        ignoreIncompatible(params.value(lit("ignoreIncompatible"), lit("false")) != lit("false"))
-    #
-    # Параметры ignoreIncompatible и mergeOneServer тебе не нужны (будут значения по-умолчанию).
-    # Из используемых тобой поменялся только пароль.
-    # takeRemoteSettings - если в системах разные системные настройки, влияет на той,
-    # с какой стороны их значения будут в приоритете. На тест равенства данных не влияет.
-
     def VMPreparation(self):
         "Join servers into one system"
-        print "Server list: %s" % self.sl
+        log(LOGLEVEL.INFO, "Server list: %s" % self.sl)
         self._prepare_test_phase(self._stop_and_init)
         getKey, postKey = self._prepareKeys(HOST_BEHIND_NAT)
         func = ("api/mergeSystems?url=http://%s&"
-               "getKey=%s&postKey=%s&takeRemoteSetting=false&"
-               "oneServer=false&ignoreIncompatible=false" %
+               "getKey=%s&postKey=%s" %
                 (self.sl[0], getKey, postKey))
         answer = self._server_request(HOST_BEHIND_NAT, func)
         #print "Answer: %s" % (answer,)
@@ -143,7 +126,7 @@ class NatConnectionTest(StorageBasedTest):  # (FuncTestCase):
         for method in self._sync_test_requests:
             responseList = []
             for server in self.sl:
-                print "Request http://%s/ec2/%s" % (server, method)
+                log(LOGLEVEL.DEBUG + 9, "Request http://%s/ec2/%s" % (server, method))
                 responseList.append((urllib2.urlopen("http://%s/ec2/%s" % (server, method)),server))
             # checking the last response validation
             checkResultsEqual(responseList, method)

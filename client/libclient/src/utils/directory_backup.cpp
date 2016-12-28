@@ -104,31 +104,25 @@ template<typename BackupsStack>
 bool recursiveBackupImpl(const QString& sourceDirectory, const QString& targetDirectory,
     const QStringList& filters, QnDirectoryBackupBehavior behavior, BackupsStack& successfulBackups)
 {
-    const auto original = QDir(sourceDirectory);
-    auto entries = original.entryList(QDir::AllDirs);
+    const auto source = QDir(sourceDirectory);
+    const auto target = QDir(targetDirectory);
+
+    const auto entries = source.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+    for (const auto& entry: entries)
+    {
+        const auto sourcePath = source.absoluteFilePath(entry);
+        const auto targetPath = target.absoluteFilePath(entry);
+        if (!recursiveBackupImpl(sourcePath, targetPath, filters, behavior, successfulBackups))
+            return false;
+    }
 
     // Bakups files in current firectory
     const auto filesBackup = SingleDirectoryBackupPtr(
         new QnDirectoryBackup(sourceDirectory, filters, targetDirectory));
     if (!filesBackup->backup(behavior))
         return false;
+
     successfulBackups.append(filesBackup);
-
-    static const QStringList kFakeDirectories = QStringList() << lit(".") << lit("..");
-    if (entries.size() == kFakeDirectories.size())
-        return true;
-
-    for (const auto entry : entries)
-    {
-        if (kFakeDirectories.contains(entry))
-            continue;
-
-        static const auto kDirTemplate = lit("%1/%2");
-        const auto source = kDirTemplate.arg(sourceDirectory, entry);
-        const auto target = kDirTemplate.arg(targetDirectory, entry);
-        if (!recursiveBackupImpl(source, target, filters, behavior, successfulBackups))
-            return false;
-    }
 
     return true;
 }

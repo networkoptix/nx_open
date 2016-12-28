@@ -43,7 +43,10 @@ int QnGetNonceRestHandler::executeGet(const QString& path, const QnRequestParams
             return nx_http::StatusCode::ok;
         }
 
-        QByteArray data = client.fetchMessageBodyBuffer();
+        nx_http::BufferType data;
+        while (!client.eof())
+            data.append(client.fetchMessageBodyBuffer());
+
         result = QJson::deserialized<QnJsonRestResult>(data);
         return nx_http::StatusCode::ok;
     }

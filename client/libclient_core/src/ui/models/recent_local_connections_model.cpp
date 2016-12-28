@@ -110,7 +110,8 @@ void QnRecentLocalConnectionsModel::updateData(const QnLocalConnectionDataList &
         return;
 
     const bool hadConnections = hasConnections();
-    const bool firstDataChanged = !m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first();
+    const bool firstDataChanged = (m_data.isEmpty() != newData.isEmpty())
+        || (!m_data.isEmpty() && !newData.isEmpty() && m_data.first() != newData.first());
 
     const auto newCount = filteredData.size();
     for (int newIndex = 0; newIndex != newCount; ++newIndex)

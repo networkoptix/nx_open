@@ -187,6 +187,8 @@ void QnPtzManageDialog::reject()
 
 void QnPtzManageDialog::accept()
 {
+    ui->buttonBox->setFocus(); //< to force table editor to commit changes
+
     saveData();
 
     clear();
@@ -582,6 +584,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     {
                         messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
                         qnSettings->setShowOnceMessages(messagesFilter);
+                        qnSettings->save();
                     }
 
                     if (result != QDialogButtonBox::Ok)

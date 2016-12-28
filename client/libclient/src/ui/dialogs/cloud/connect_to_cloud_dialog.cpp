@@ -104,7 +104,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->indicatorButton->setText(okButton->text()); // Title from OS theme
     d->indicatorButton->setIcon(okButton->icon()); // Icon from OS theme
     d->indicatorButton->setDefault(true);
-    d->indicatorButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(d->indicatorButton);
     ui->buttonBox->removeButton(okButton.data());
     ui->buttonBox->addButton(d->indicatorButton, QDialogButtonBox::AcceptRole);
 
@@ -275,9 +275,9 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
         QDialogButtonBox::Ok,
         q->parentWidget());
 
-    messageBox.exec();
     linkedSuccessfully = true;
     q->accept();
+    messageBox.exec();
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
@@ -295,6 +295,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
+    lockUi(false);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(

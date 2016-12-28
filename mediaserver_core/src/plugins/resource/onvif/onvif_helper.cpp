@@ -75,12 +75,6 @@ static const char* PASSWD_CAMERA = "camera";
 // PasswordHelper
 //
 
-PasswordHelper& PasswordHelper::instance()
-{
-    static PasswordHelper inst;
-    return inst;
-}
-
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
 #ifdef ONVIF_DEBUG

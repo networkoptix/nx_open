@@ -23,6 +23,8 @@
 
 #include <recording/time_period_list.h>
 
+#include <text/time_strings.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
@@ -60,16 +62,20 @@ namespace
     const int kMaxDisplayedTextLevel = 2;
 
     /** Tickmark lengths for all levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkLengthPixels = { 15, 10, 5, 5, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkLengthPixels =
+        { 15, 10, 5, 5, 0 };
 
     /** Font pixel heights for all tickmark levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontHeights = { 12, 12, 11, 11, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontHeights =
+        { 12, 12, 11, 11, 0 };
 
     /** Tickmark text pixel heights for all levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkTextHeightPixels = { 20, 20, 20, 20, 0 };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkTextHeightPixels =
+        { 20, 20, 20, 20, 0 };
 
     /** Font weights for all tickmark levels. */
-    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontWeights = { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
+    const std::array<int, kNumTickmarkLevels + 1> kTickmarkFontWeights =
+        { QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal, QFont::Normal };
 
     /** Minimal distance between tickmarks from the same group for this group to be visible.
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
@@ -157,6 +163,8 @@ namespace
       * When a marker is dragged to these areas it causes window scroll.
       * Has effect only with DragScrollsWindow option. */
     const qreal kWindowScrollPixelThreshold = 1.0;
+
+    const int kNoThumbnailsFontPixelSize = 16;
 
     QTime msecsToTime(qint64 msecs)
     {
@@ -627,26 +635,13 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     static const QString dateMonthsFormat   = lit("MMMM yyyy");             //< Format for displaying month caption in timeline's header.
     static const QString dateYearsFormat    = lit("yyyy");                  //< Format for displaying year caption in timeline's header
 
-    //: Do not translate this string unless you know what you're doing.
-    QString msSuffix = tr("ms", "Suffix for displaying milliseconds on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString sSuffix = tr("s", "Suffix for displaying seconds on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString mSuffix = tr("m", "Suffix for displaying minutes on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString hSuffix = tr("h", "Suffix for displaying hours on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dSuffix = tr("d", "Suffix for displaying days on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString moSuffix = tr("M", "Suffix for displaying months on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString ySuffix = tr("y", "Suffix for displaying years on timeline.");
+    QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
+    QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);
+    QString mSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Minutes);
+    QString hSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Hours);
+    QString dSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Days);
+    QString moSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Months);
+    QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
 
     bool ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
 
@@ -756,7 +751,7 @@ void QnTimeSlider::setLineStretch(int line, qreal stretch)
     if (!checkLine(line))
         return;
 
-    if (qFuzzyCompare(m_lineData[line].stretch, stretch))
+    if (qFuzzyEquals(m_lineData[line].stretch, stretch))
         return;
 
     m_lineData[line].stretch = stretch;
@@ -1536,7 +1531,8 @@ void QnTimeSlider::updatePixmapCache()
     m_pixmapCache->setDateFont(localFont);
     m_pixmapCache->setDateColor(m_colors.dateBarText);
 
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("No thumbnails available"),
+        kNoThumbnailsFontPixelSize, m_colors.noThumbnailsLabel);
 
     for (int i = 0; i < kNumTickmarkLevels; ++i)
     {
@@ -1715,7 +1711,7 @@ qreal QnTimeSlider::msecsPerPixel() const
 
 void QnTimeSlider::updateMSecsPerPixel()
 {
-    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
+    qreal msecsPerPixel = (m_windowEnd - m_windowStart) / qMax(size().width(), 1);
     if (qFuzzyIsNull(msecsPerPixel))
         msecsPerPixel = 1.0; /* Technically, we should never get here, but we want to feel safe. */
 
@@ -1883,11 +1879,11 @@ void QnTimeSlider::animateStepValues(int deltaMs)
         data.currentLineOpacity = adjust(data.currentLineOpacity,   data.targetLineOpacity, data.lineOpacitySpeed * deltaMs);
         data.currentTextOpacity = adjust(data.currentTextOpacity,   data.targetTextOpacity, data.textOpacitySpeed * deltaMs);
 
-        if (data.currentHeight == data.targetHeight)
+        if (qFuzzyIsNull(data.currentHeight - data.targetHeight))
             data.heightSpeed = 0.0;
-        if (data.currentLineOpacity == data.targetLineOpacity)
+        if (qFuzzyIsNull(data.currentLineOpacity - data.targetLineOpacity))
             data.lineOpacitySpeed = 0.0;
-        if (data.currentTextOpacity == data.targetTextOpacity)
+        if (qFuzzyIsNull(data.currentTextOpacity - data.targetTextOpacity))
             data.textOpacitySpeed = 0.0;
     }
 }
@@ -1949,7 +1945,7 @@ void QnTimeSlider::updateTotalLineStretch()
     for (int line = 0; line < m_lineCount; line++)
         totalLineStretch += effectiveLineStretch(line);
 
-    if (qFuzzyCompare(m_totalLineStretch, totalLineStretch))
+    if (qFuzzyEquals(m_totalLineStretch, totalLineStretch))
         return;
 
     m_totalLineStretch = totalLineStretch;
@@ -1994,8 +1990,10 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
 
     if (m_thumbnailsUpdateTimer->isActive())
     {
-        updateThumbnailsStepSizeLater(); /* Re-start the timer. */
-        return;
+        if (instant || forced)
+            m_thumbnailsUpdateTimer->stop();
+        else
+            return;
     }
 
     /* Calculate new bounding size. */
@@ -2025,8 +2023,8 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced)
     qint64 timeStep = m_msecsPerPixel * size.width();
     bool timeStepChanged = qAbs(timeStep / m_msecsPerPixel - thumbnailsLoader()->timeStep() / m_msecsPerPixel) >= 1;
 
-    /* Nothing changed? Leave. */
-    if (!timeStepChanged && !boundingSizeChanged && !m_thumbnailData.isEmpty())
+    /* Nothing changed? Leave. */ //TODO #vkutin Check if removing "!m_thumbnailData.isEmpty()" is fine:
+    if (!timeStepChanged && !boundingSizeChanged && !forced) // && !m_thumbnailData.isEmpty())
         return;
 
     /* Ok, thumbnails have to be re-generated. So we first freeze our old thumbnails. */
@@ -2219,7 +2217,7 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
 
 void QnTimeSlider::drawSeparator(QPainter* painter, const QRectF& rect)
 {
-    if (qFuzzyCompare(rect.top(), this->rect().top()))
+    if (qFuzzyEquals(rect.top(), this->rect().top()))
         return; /* Don't draw separator at the top of the widget. */
 
     QnScopedPainterPenRollback penRollback(painter, QPen(m_colors.separator, 0));
@@ -2392,10 +2390,10 @@ void QnTimeSlider::drawSolidBackground(QPainter* painter, const QRectF& rect)
     qreal rightPos = quickPositionFromValue(windowEnd());
     qreal centralPos = quickPositionFromValue(sliderPosition());
 
-    if (!qFuzzyCompare(leftPos, centralPos))
+    if (!qFuzzyEquals(leftPos, centralPos))
         painter->fillRect(QRectF(leftPos, rect.top(), centralPos - leftPos, rect.height()), palette().window());
 
-    if (!qFuzzyCompare(rightPos, centralPos))
+    if (!qFuzzyEquals(rightPos, centralPos))
         painter->fillRect(QRectF(centralPos, rect.top(), rightPos - centralPos, rect.height()), palette().window());
 }
 
@@ -2554,7 +2552,10 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
         QSizeF labelSizeBound = rect.size();
         labelSizeBound.setHeight(m_noThumbnailsPixmap.height());
 
-        QRectF labelRect = QnGeometry::aligned(QnGeometry::expanded(QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound, Qt::KeepAspectRatio), rect, Qt::AlignCenter);
+        QRect labelRect = QnGeometry::aligned(QnGeometry::expanded(
+            QnGeometry::aspectRatio(m_noThumbnailsPixmap.size()), labelSizeBound,
+            Qt::KeepAspectRatio), rect, Qt::AlignCenter).toRect();
+
         drawCroppedPixmap(painter, labelRect, rect, m_noThumbnailsPixmap, m_noThumbnailsPixmap.rect());
         return;
     }
@@ -2841,8 +2842,9 @@ void QnTimeSlider::sliderChange(SliderChange change)
             bool wasAtMinimum = windowStart == m_oldMinimum;
             bool wasAtMaximum = windowEnd == m_oldMaximum;
 
-            /* If a window is full range it should always be preserved: */
-            if (wasAtMinimum && wasAtMaximum)
+            //TODO: #vkutin Enable this when thumbnail updates fully support it
+            bool keepFullRange = false; // wasAtMinimum && wasAtMaximum;
+            if (keepFullRange)
             {
                 windowStart = minimum();
                 windowEnd = maximum();

@@ -1,28 +1,66 @@
 #pragma once
 
+#include <api/model/api_ioport_data.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
-#include <client/client_color_types.h>
 
 class QnIoModuleOverlayWidgetPrivate;
-class QnIoModuleOverlayWidget : public GraphicsWidget {
+class QnIoModuleOverlayContents;
+
+/*
+Resource overlay providing user interaction with I/O module
+*/
+class QnIoModuleOverlayWidget: public GraphicsWidget
+{
     Q_OBJECT
-    typedef GraphicsWidget base_type;
-    Q_PROPERTY(QnIoModuleColors colors READ colors WRITE setColors)
+    using base_type = GraphicsWidget;
 
 public:
-    QnIoModuleOverlayWidget(QGraphicsWidget *parent = nullptr);
-    ~QnIoModuleOverlayWidget();
+    QnIoModuleOverlayWidget(QGraphicsWidget* parent = nullptr);
+    virtual ~QnIoModuleOverlayWidget();
 
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void setIOModule(const QnVirtualCameraResourcePtr& module);
 
-    const QnIoModuleColors &colors() const;
-    void setColors(const QnIoModuleColors &colors);
+    enum class Style
+    {
+        Form,
+        Tile,
+        Default = Form
+    };
 
-    bool inputEnabled() const;
-    void setInputEnabled(bool value);
+    /** Overlay style set in accordance with resource settings: */
+    Style overlayStyle() const;
+
+    /** Whether user is allowed to toggle output ports: */
+    bool userInputEnabled() const;
+    void setUserInputEnabled(bool value);
 
 private:
     QScopedPointer<QnIoModuleOverlayWidgetPrivate> const d_ptr;
     Q_DECLARE_PRIVATE(QnIoModuleOverlayWidget)
 };
+
+/*
+Visual contents of I/O module overlay
+*/
+class QnIoModuleOverlayContents: public Customized<QGraphicsWidget>
+{
+    Q_OBJECT
+    using base_type = Customized<QGraphicsWidget>;
+
+public:
+    QnIoModuleOverlayContents();
+    virtual ~QnIoModuleOverlayContents();
+
+    virtual void portsChanged(const QnIOPortDataList& ports, bool userInputEnabled) = 0;
+    virtual void stateChanged(const QnIOPortData& port, const QnIOStateData& state) = 0;
+
+    QnIoModuleOverlayWidget* overlayWidget() const;
+
+signals:
+    void userClicked(const QString& port);
+};
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIoModuleOverlayWidget::Style), (lexical))

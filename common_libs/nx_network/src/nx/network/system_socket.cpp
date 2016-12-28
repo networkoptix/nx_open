@@ -4,11 +4,11 @@
 #include <memory>
 #include <boost/type_traits/is_same.hpp>
 
-#include <platform/win32_syscall_resolver.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/platform/win32_syscall_resolver.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <common/common_globals.h>
@@ -615,13 +615,20 @@ bool CommunicatingSocket<InterfaceToImplement>::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeoutMs);
 
-    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-        remoteAddress.address.toString(), this->m_ipVersion);
-
-    while (!ips.empty())
+    std::deque<HostAddress> resolvedAddresses;
+    const SystemError::ErrorCode resultCode = 
+        SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            remoteAddress.address.toString(), this->m_ipVersion, &resolvedAddresses);
+    if (resultCode != SystemError::noError)
     {
-        auto ip = std::move(ips.front());
-        ips.pop_front();
+        SystemError::setLastErrorCode(resultCode);
+        return false;
+    }
+
+    while (!resolvedAddresses.empty())
+    {
+        auto ip = std::move(resolvedAddresses.front());
+        resolvedAddresses.pop_front();
         if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
             return true;
     }
@@ -1106,7 +1113,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 
         if( info )
             m_keepAlive = std::move( *info );
-    #elif defined( Q_OS_LINUX )
+    #else
         int isEnabled = info ? 1 : 0;
         if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
                         &isEnabled, sizeof(isEnabled) ) != 0 )
@@ -1115,22 +1122,23 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
         if( !info )
             return true;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
-                        &info->timeSec, sizeof(info->timeSec) ) < 0 )
-            return false;
+        #if defined( Q_OS_LINUX )
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
+                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+                return false;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
-                        &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
-            return false;
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
+                            &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
+                return false;
 
-        if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
-                        &info->probeCount, sizeof(info->probeCount) ) < 0 )
-            return false;
-    #else
-        int isEnabled = info ? 1 : 0;
-        if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
-                        &isEnabled, sizeof(isEnabled)) != 0 )
-            return false;
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
+                            &info->probeCount, sizeof(info->probeCount) ) < 0 )
+                return false;
+        #elif defined( Q_OS_MACX )
+            if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE,
+                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+                return false;
+        #endif
     #endif
 
     return true;
@@ -1375,6 +1383,12 @@ void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandl
         });
 }
 
+void TCPServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+{
+    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
+    d->asyncServerSocketHelper.cancelIOSync();
+}
+
 //!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
@@ -1396,18 +1410,20 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     auto* acceptedSocket = d->accept(recvTimeoutMs, nonBlockingMode);
     if (!acceptedSocket)
         return nullptr;
-#ifdef _WIN32
-    if (!nonBlockingMode)
-        return acceptedSocket;
 
-    //moving socket to blocking mode by default to be consistent with msdn
-        //(https://msdn.microsoft.com/en-us/library/windows/desktop/ms738573(v=vs.85).aspx)
-    if (!acceptedSocket->setNonBlockingMode(false))
-    {
-        delete acceptedSocket;
-        return nullptr;
-    }
-#endif
+    #if defined(Q_OS_WIN) || defined(Q_OS_MACX)
+        if (!nonBlockingMode)
+            return acceptedSocket;
+
+        // Make all platforms behave like Linux, so all new sockets are in blocking mode
+        // regardless of their origin.
+        if (!acceptedSocket->setNonBlockingMode(false))
+        {
+            delete acceptedSocket;
+            return nullptr;
+        }
+    #endif
+
     return acceptedSocket;
 }
 
@@ -1578,13 +1594,20 @@ bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
     }
     else
     {
-        const auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-            endpoint.address.toString(), m_ipVersion);
+        std::deque<HostAddress> resolvedAddresses;
+        const SystemError::ErrorCode resultCode = 
+            SocketGlobals::addressResolver().dnsResolver().resolveSync(
+                endpoint.address.toString(), m_ipVersion, &resolvedAddresses);
+        if (resultCode != SystemError::noError)
+        {
+            SystemError::setLastErrorCode(resultCode);
+            return false;
+        }
 
         // TODO: Here we select first address with hope it is correct one. This will never work
         // for NAT64, so we have to fix it somehow.
-        if (!ips.empty())
-            m_destAddr = SystemSocketAddress(SocketAddress(ips.front(), endpoint.port), m_ipVersion);
+        m_destAddr = SystemSocketAddress(
+            SocketAddress(resolvedAddresses.front(), endpoint.port), m_ipVersion);
     }
 
     return (bool) m_destAddr.ptr;

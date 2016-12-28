@@ -28,10 +28,16 @@ public:
         registerTypeAccessor(QLatin1String(T::staticMetaObject.className()), accessor);
     }
 
+    /** Clear current set of widgets to align. */
+    void clear();
+
     void align();
 
     bool skipInvisible() const;
     void setSkipInvisible(bool value);
+
+    int minimumSize() const;
+    void setMinimumSize(int value);
 
 private:
     AbstractAccessor* accessor(QWidget* widget) const;
@@ -41,4 +47,5 @@ private:
     QHash<QLatin1String, AbstractAccessor *> m_accessorByClassName;
     QScopedPointer<AbstractAccessor> m_defaultAccessor;
     bool m_skipInvisible;
+    int m_minimumSize;
 };

@@ -220,7 +220,8 @@ int QnMergeSystemsRestHandler::execute(
             return nx_http::StatusCode::ok;
         }
         /* if we've got it successfully we know system name and admin password */
-        moduleInformationData = client.fetchMessageBodyBuffer();
+        while (!client.eof())
+            moduleInformationData.append(client.fetchMessageBodyBuffer());
     }
 
     const auto json = QJson::deserialized<QnJsonRestResult>(moduleInformationData);
@@ -468,7 +469,10 @@ bool executeRequest(
         return false;
     }
 
-    QByteArray response = client.fetchMessageBodyBuffer();
+    nx_http::BufferType response;
+    while (!client.eof())
+        response.append(client.fetchMessageBodyBuffer());
+
     return QJson::deserialize(response, &result);
 }
 

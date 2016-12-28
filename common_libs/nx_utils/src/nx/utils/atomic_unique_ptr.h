@@ -1,18 +1,14 @@
-/**********************************************************
-* 20 feb 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
 #include <memory>
 
-
 namespace nx {
 namespace utils {
 
-/** Same as \a std::unique_ptr, but all operations with internal pointer are done atomically */
+/**
+ * Same as std::unique_ptr, but all operations with internal pointer are done atomically.
+ */
 template<typename T>
 class AtomicUniquePtr
 {
@@ -51,11 +47,7 @@ public:
     {
         return m_ptr.exchange(nullptr);
     }
-    T* get()
-    {
-        return m_ptr.load();
-    }
-    const T* get() const
+    T* get() const
     {
         return m_ptr.load();
     }
@@ -75,11 +67,7 @@ public:
         reset(rhs.release());
         return *this;
     }
-    T* operator->()
-    {
-        return get();
-    }
-    const T* operator->() const
+    T* operator->() const
     {
         return get();
     }
@@ -97,3 +85,22 @@ private:
 
 }   //utils
 }   //nx
+
+namespace std {
+
+template <typename T>
+struct DependentFalse
+{
+    static constexpr bool value = false;
+};
+
+template<typename T>
+void swap(nx::utils::AtomicUniquePtr<T>& /*one*/, nx::utils::AtomicUniquePtr<T>& /*two*/)
+{
+    // DependentFalse is needed for assert to work at template instanciation time, not at definition time.
+    static_assert(
+        DependentFalse<T>::value,
+        "There is no swap implementation for nx::utils::AtomicUniquePtr yet. Use std::move");
+}
+
+} // namespace std

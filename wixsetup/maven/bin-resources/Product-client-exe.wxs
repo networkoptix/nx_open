@@ -1,24 +1,47 @@
 <?xml version="1.0"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <?include BuildVars.wxi ?>
 
-    <Bundle Name="$(var.productName) Client" Version="$(var.releaseVersionFull)" UpgradeCode="$(var.clientBundleUpgradeCode)" DisableModify="yes">
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication
-                LicenseFile="License.rtf"
-                LogoFile="logo-64x64.png"
-                SuppressRepair="yes"
+    <Bundle
+            Name="$(var.productName) Client"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="favicon.ico"
+            UpgradeCode="$(var.clientBundleUpgradeCode)"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+
+        <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" />
+            <Payload SourceFile="installer_bg.png" />
+            <Payload SourceFile="logo_big.png" />
+            <Payload SourceFile="logo_small.png" />
+
+            <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
+                LicenseUrl="License.html" 
+                ShowFilesInUse="yes"
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
+<!--            <bal:WixStandardBootstrapperApplication
+                LicenseUrl="License.html"
+                LogoFile="logo-64x64.png"
+        ThemeFile="ClassicTheme.xml"
+            LocalizationFile="ClassicTheme.wxl"
+                SuppressRepair="yes"
+                SuppressOptionsUI="no"
+                ShowFilesInUse="yes"
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
-            />
+            /> -->
         </BootstrapperApplicationRef>
 
-        <Chain>
-            <PackageGroupRef Id="VC12RedistPackageGroup"/>
-<!--            <PackageGroupRef Id="VC14RedistPackageGroup"/> -->
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
 
-            <RollbackBoundary />
-
+        <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>
         </Chain>
     </Bundle>

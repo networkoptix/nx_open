@@ -9,7 +9,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/raii_guard.h>
@@ -40,7 +40,7 @@ int QnUserRolesModel::rowForUser(const QnUserResourcePtr& user) const
     return d->rowForUser(user);
 }
 
-void QnUserRolesModel::setUserRoles(const ec2::ApiUserGroupDataList& roles)
+void QnUserRolesModel::setUserRoles(const ec2::ApiUserRoleDataList& roles)
 {
     Q_D(QnUserRolesModel);
     d->setUserRoles(roles);

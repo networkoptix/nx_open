@@ -15,8 +15,8 @@ namespace cloud {
 
 OutgoingTunnelPool::OutgoingTunnelPool()
 :
-    m_isSelfPeerIdDesignated(false),
-    m_selfPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
+    m_isOwnPeerIdDesignated(false),
+    m_ownPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
     m_terminated(false),
     m_stopping(false)
 {
@@ -56,28 +56,30 @@ void OutgoingTunnelPool::establishNewConnection(
         std::move(handler));
 }
 
-String OutgoingTunnelPool::selfPeerId() const
+String OutgoingTunnelPool::ownPeerId() const
 {
     QnMutexLocker lock(&m_mutex);
-    if (!m_isSelfPeerIdDesignated)
+    if (!m_isOwnPeerIdDesignated)
     {
-        m_isSelfPeerIdDesignated = true; //< Peer Id is not supposed to be changed after first use.
-        NX_LOGX(lm("Random self peer Id: %1").arg(m_selfPeerId), cl_logINFO);
+        NX_ASSERT(false, "Own peer id is not supposed to be used until it's designated");
+
+        m_isOwnPeerIdDesignated = true; //< Peer id is not supposed to be changed after first use.
+        NX_LOGX(lm("Random own peer id: %1").arg(m_ownPeerId), cl_logINFO);
     }
 
-    return m_selfPeerId;
+    return m_ownPeerId;
 }
 
-void OutgoingTunnelPool::designateSelfPeerId(const String& name, const QnUuid& uuid)
+void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
 {
     const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_isSelfPeerIdDesignated, "selfPeerId is not supposed to be changed");
-    m_isSelfPeerIdDesignated = true;
+    NX_ASSERT(!m_isOwnPeerIdDesignated, "Own peer id is not supposed to be changed");
+    m_isOwnPeerIdDesignated = true;
 
-    m_selfPeerId = QString(id).toUtf8();
-    NX_LOGX(lm("Designated self peer Id: %1").arg(m_selfPeerId), cl_logINFO);
+    m_ownPeerId = QString(id).toUtf8();
+    NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
 
 const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(

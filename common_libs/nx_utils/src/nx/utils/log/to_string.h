@@ -29,6 +29,7 @@ QString toString(const T& t)
 
 NX_UTILS_API QString toString(void* p);
 NX_UTILS_API QString toString(const QByteArray& t);
+NX_UTILS_API QString toString(const std::string& t);
 
 NX_UTILS_API QString toString(const std::chrono::hours& t);
 NX_UTILS_API QString toString(const std::chrono::minutes& t);

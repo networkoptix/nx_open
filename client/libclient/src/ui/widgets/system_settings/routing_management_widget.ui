@@ -108,7 +108,7 @@
         <number>8</number>
        </property>
        <item>
-        <widget class="QTreeView" name="addressesView">
+        <widget class="QnTreeView" name="addressesView">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
            <horstretch>0</horstretch>
@@ -123,6 +123,12 @@
          </property>
          <property name="rootIsDecorated">
           <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights">
+          <bool>true</bool>
+         </property>
+         <property name="allColumnsShowFocus">
+          <bool>true</bool>
          </property>
          <attribute name="headerStretchLastSection">
           <bool>false</bool>
@@ -221,6 +227,11 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/panel.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnTreeView</class>
+   <extends>QTreeView</extends>
+   <header location="global">ui/widgets/common/tree_view.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

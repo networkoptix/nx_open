@@ -22,6 +22,9 @@ public:
     QnWaitCondition waitCond;
     QnIOStateDataList dataToSend;
     QByteArray requestBuffer;
+
+    QByteArray nextMessageToSend;
+    QByteArray messageToSend;
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
@@ -78,9 +81,12 @@ void QnIOMonitorConnectionProcessor::run()
 
         setData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
-        while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID())
+        while (!needToStop()
+               && d->socket->isConnected()
+               && camera->getStatus() >= Qn::Online
+               && camera->getParentId() == qnCommon->moduleGUID())
         {
-            sendMultipartData();
+            sendNextMessage();
             d->waitCond.wait(&d->waitMutex);
         }
         disconnect( camera.data(), nullptr, this, nullptr );
@@ -88,6 +94,7 @@ void QnIOMonitorConnectionProcessor::run()
         camera->inputPortListenerDetached();
         d->socket->pleaseStopSync();
     }
+    d->socket->close();
 }
 
 void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &resource)
@@ -129,15 +136,54 @@ void QnIOMonitorConnectionProcessor::at_cameraIOStateChanged(
     d->waitCond.wakeAll();
 }
 
-void QnIOMonitorConnectionProcessor::sendMultipartData()
+void QnIOMonitorConnectionProcessor::sendNextMessage()
 {
     Q_D(QnIOMonitorConnectionProcessor);
+
+    QnMutexLocker lock(&d->dataMutex);
+
+    d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
+    d->dataToSend.clear();
+    auto messageToSend = createResponse(CODE_OK, "application/json", QByteArray(), "--ioboundary");
+
+    d->socket->post(
+        [this, messageToSend=std::move(messageToSend)]
+        {
+            Q_D(QnIOMonitorConnectionProcessor);
+            if (!d->messageToSend.isEmpty())
+            {
+                d->nextMessageToSend = messageToSend;
+                return;
+            }
+            sendNextMessage(std::move(messageToSend));
+        });
+}
+
+void QnIOMonitorConnectionProcessor::sendNextMessage(QByteArray message)
+{
+    Q_D(QnIOMonitorConnectionProcessor);
+
+    d->messageToSend = std::move(message);
+    using namespace std::placeholders;
+    d->socket->sendAsync(d->messageToSend,
+        std::bind(&QnIOMonitorConnectionProcessor::onDataSent, this, _1, _2));
+}
+
+void QnIOMonitorConnectionProcessor::onDataSent(SystemError::ErrorCode errorCode, size_t bytesSent)
+{
+    Q_D(QnIOMonitorConnectionProcessor);
+
+    d->messageToSend.clear(); //< mark send done
+    if (errorCode != SystemError::noError)
     {
-        QnMutexLocker lock(&d->dataMutex);
-        d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
-        d->dataToSend.clear();
+        qWarning() << "QnIOMonitorConnectionProcessor::onDataSent write error. errCode=" << errorCode;
+        pleaseStop();
+        return;
     }
-    sendResponse(CODE_OK, "application/json", QByteArray(), "--ioboundary");
+
+    if (!d->nextMessageToSend.isEmpty())
+        sendNextMessage(std::move(d->nextMessageToSend));
+    d->nextMessageToSend.clear();
 }
 
 void QnIOMonitorConnectionProcessor::setData(QnIOStateDataList&& value)
@@ -157,8 +203,6 @@ void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
 void QnIOMonitorConnectionProcessor::pleaseStop()
 {
     Q_D(QnIOMonitorConnectionProcessor);
-    if (d->socket)
-        d->socket->pleaseStopSync();
-    QnTCPConnectionProcessor::pleaseStop();
+    QnLongRunnable::pleaseStop();
     d->waitCond.wakeAll();
 }

@@ -1,7 +1,7 @@
 #include "audit_log_session_model.h"
 
-QnAuditLogMasterModel::QnAuditLogMasterModel(QObject *parent): 
-    QnAuditLogModel(parent), 
+QnAuditLogMasterModel::QnAuditLogMasterModel(QObject *parent):
+    QnAuditLogModel(parent),
     m_maxActivity(0)
 {
 
@@ -16,11 +16,6 @@ QVariant QnAuditLogMasterModel::data(const QModelIndex &index, int role) const
 
     switch (role)
     {
-        case Qt::BackgroundColorRole:
-            if (column == UserActivityColumn)
-                return m_colors.chartColor;
-            else
-                return base_type::data(index, role);
         case Qn::AuditLogChartDataRole:
         {
             const QnAuditRecord* record = rawData(index.row());
@@ -28,13 +23,28 @@ QVariant QnAuditLogMasterModel::data(const QModelIndex &index, int role) const
         }
         case Qt::ForegroundRole:
         {
-            const QnAuditRecord* record = rawData(index.row());
-            if (record->eventType == Qn::AR_UnauthorizedLogin && column != SelectRowColumn && column != TimestampColumn)
-                return m_colors.unsucessLoginAction;
-            else
-                return QVariant();
+            switch (column)
+            {
+                case UserActivityColumn:
+                    return m_colors.chartColor;
 
+                case SelectRowColumn:
+                case TimestampColumn:
+                    break;
+
+                default:
+                {
+                    const auto record = rawData(index.row());
+                    if (record->eventType == Qn::AR_UnauthorizedLogin)
+                        return m_colors.unsucessLoginAction;
+
+                    break;
+                }
+            }
+
+            return QVariant();
         }
+
         default:
             return base_type::data(index, role);
     }

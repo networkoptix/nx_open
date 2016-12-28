@@ -204,7 +204,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
     if (m_collapsedItemCountChanged)
     {
         m_collapser.animation.source = m_collapser.item->y();
-        m_collapser.item->setText(tr("%n more item(s)", "", collapsedItemsCount));
+        m_collapser.item->setText(tr("%n more notifications", "", collapsedItemsCount));
         m_collapsedItemCountChanged = false;
         m_speedUp = 1.0 + collapsedItemsCount / 10.0;
     }
@@ -474,6 +474,6 @@ void QnNotificationListWidget::ItemData::animationTick(qreal deltaMSecs)
 
 bool QnNotificationListWidget::ItemData::animationFinished()
 {
-    return qFuzzyCompare(animation.value, animation.target);
+    return qFuzzyEquals(animation.value, animation.target);
 }
 

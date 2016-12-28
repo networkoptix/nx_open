@@ -16,7 +16,6 @@ OutgoingTunnelConnectionWatcher::OutgoingTunnelConnectionWatcher(
     m_inactivityTimer(std::make_unique<aio::Timer>())
 {
     bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
-    launchInactivityTimer();
 }
 
 OutgoingTunnelConnectionWatcher::~OutgoingTunnelConnectionWatcher()
@@ -29,8 +28,8 @@ void OutgoingTunnelConnectionWatcher::bindToAioThread(
 {
     BaseType::bindToAioThread(aioThread);
 
-    m_tunnelConnection->bindToAioThread(getAioThread());
-    m_inactivityTimer->bindToAioThread(getAioThread());
+    m_tunnelConnection->bindToAioThread(aioThread);
+    m_inactivityTimer->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnelConnectionWatcher::stopWhileInAioThread()
@@ -46,7 +45,7 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
 {
     post(
         [this, timeout = std::move(timeout), socketAttributes = std::move(socketAttributes),
-            handler = std::move(handler)]()
+            handler = std::move(handler)]() mutable
         {
             launchInactivityTimer();
             m_tunnelConnection->establishNewConnection(
@@ -54,7 +53,6 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
                 std::move(socketAttributes),
                 std::move(handler));
         });
-
 }
 
 void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
@@ -64,7 +62,8 @@ void OutgoingTunnelConnectionWatcher::launchInactivityTimer()
         m_inactivityTimer->cancelSync();
         m_inactivityTimer->start(
             m_connectionParameters.tunnelInactivityTimeout,
-            std::bind(&OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired, this));
+            std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this,
+                SystemError::timedOut));
     }
 }
 
@@ -75,26 +74,30 @@ void OutgoingTunnelConnectionWatcher::setControlConnectionClosedHandler(
 
     m_onTunnelClosedHandler = std::move(handler);
     m_tunnelConnection->setControlConnectionClosedHandler(
-        std::bind(&OutgoingTunnelConnectionWatcher::onTunnelClosed, this, _1));
+        std::bind(&OutgoingTunnelConnectionWatcher::closeTunnel, this, _1));
 }
 
-void OutgoingTunnelConnectionWatcher::onInactivityTimoutExpired()
+void OutgoingTunnelConnectionWatcher::start()
 {
-    onTunnelClosed(SystemError::timedOut);
-    m_tunnelConnection.reset();
+    launchInactivityTimer();
 }
 
-void OutgoingTunnelConnectionWatcher::onTunnelClosed(SystemError::ErrorCode reason)
+void OutgoingTunnelConnectionWatcher::closeTunnel(SystemError::ErrorCode reason)
 {
     NX_ASSERT(isInSelfAioThread());
 
     m_inactivityTimer.reset();
-    if (m_onTunnelClosedHandler)
-    {
-        auto handler = std::move(m_onTunnelClosedHandler);
-        m_onTunnelClosedHandler = nullptr;
-        handler(reason);
-    }
+
+    decltype(m_tunnelConnection) tunnelConnection;
+    tunnelConnection.swap(m_tunnelConnection);
+    
+    decltype(m_onTunnelClosedHandler) onTunnelClosedHandler;
+    onTunnelClosedHandler.swap(m_onTunnelClosedHandler);
+
+    tunnelConnection.reset();
+
+    if (onTunnelClosedHandler)
+        onTunnelClosedHandler(reason);
 }
 
 } // namespace cloud

@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include <nx/utils/std/cpp14.h>
 #include <udt/udt.h>
 
 #include "../udt/udt_common.h"
@@ -14,19 +15,25 @@ namespace aio {
 
 namespace {
 
-class UdtEpollWrapperImpl:
-    public UdtEpollWrapper
+class UdtEpollWrapper:
+    public AbstractUdtEpollWrapper
 {
 public:
     virtual int epollWait(
         int epollFd,
-        std::map<UDTSOCKET, int>* readfds,
-        std::map<UDTSOCKET, int>* writefds,
-        int64_t msTimeOut,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* lrfds,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* wrfds) override
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t timeoutMillis,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) override
     {
-        return UDT::epoll_wait(epollFd, readfds, writefds, msTimeOut, lrfds, wrfds);
+        return UDT::epoll_wait(
+            epollFd,
+            readReadyUdtSockets,
+            writeReadyUdtSockets,
+            timeoutMillis,
+            readReadySystemSockets,
+            writeReadySystemSockets);
     }
 };
 
@@ -244,12 +251,12 @@ UnifiedPollSet::UnifiedPollSet():
 {
 }
 
-UnifiedPollSet::UnifiedPollSet(std::unique_ptr<UdtEpollWrapper> udtEpollWrapper):
+UnifiedPollSet::UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper> udtEpollWrapper):
     m_epollFd(-1),
     m_udtEpollWrapper(std::move(udtEpollWrapper))
 {
     if (!m_udtEpollWrapper)
-        m_udtEpollWrapper = std::make_unique<UdtEpollWrapperImpl>();
+        m_udtEpollWrapper = std::make_unique<UdtEpollWrapper>();
 
     m_epollFd = UDT::epoll_create();
     m_interruptSocket.setNonBlockingMode(true);

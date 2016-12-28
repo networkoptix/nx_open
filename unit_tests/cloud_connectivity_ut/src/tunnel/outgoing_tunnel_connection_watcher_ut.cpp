@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
@@ -17,8 +19,16 @@ class TestTunnelConnection:
     public AbstractOutgoingTunnelConnection
 {
 public:
+    virtual ~TestTunnelConnection() override
+    {
+        stopWhileInAioThread();
+    }
+
     virtual void stopWhileInAioThread() override
     {
+        auto onClosedHandler = std::move(m_onClosedHandler);
+        if (onClosedHandler)
+            onClosedHandler(SystemError::interrupted);
     }
 
     virtual void establishNewConnection(
@@ -29,9 +39,13 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        m_onClosedHandler = std::move(handler);
     }
+
+private:
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
 };
 
 constexpr auto tunnelInactivityTimeout = std::chrono::seconds(3);
@@ -43,7 +57,9 @@ class OutgoingTunnelConnectionWatcher:
 public:
     typedef ScopedGuard<std::function<void()>> InitializationGuard;
 
-    OutgoingTunnelConnectionWatcher()
+    OutgoingTunnelConnectionWatcher():
+        m_tunnelAioThread(nullptr),
+        m_tunnelCloseEventAioThread(nullptr)
     {
         m_connectionParameters.tunnelInactivityTimeout =
             tunnelInactivityTimeout;
@@ -60,13 +76,27 @@ protected:
             m_connectionParameters,
             std::make_unique<TestTunnelConnection>());
 
+        m_tunnelAioThread = network::SocketGlobals::aioService().getRandomAioThread();
+        m_tunnel->bindToAioThread(m_tunnelAioThread);
+
         m_tunnel->setControlConnectionClosedHandler(
             [this](SystemError::ErrorCode reason)
             {
+                m_tunnel.reset();
+                m_tunnelCloseEventAioThread =
+                    network::SocketGlobals::aioService().getCurrentAioThread();
                 m_tunnelClosedPromise.set_value(reason);
             });
 
-        return InitializationGuard([this]() { m_tunnel->pleaseStopSync(); });
+        m_tunnel->start();
+
+        return InitializationGuard(
+            [this]()
+            {
+                decltype(m_tunnel) tunnel(m_tunnel.release());
+                if (tunnel)
+                    tunnel->pleaseStopSync();
+            });
     }
 
     void waitForTunnelToExpire(
@@ -78,14 +108,33 @@ protected:
         ASSERT_EQ(SystemError::timedOut, tunnelClosedFuture.get());
     }
 
+    void givenActiveTunnel()
+    {
+        m_connectionParameters.tunnelInactivityTimeout = std::chrono::seconds(1);
+        m_initializationGuard = initializeTunnel();
+    }
+    
+    void whenTunnelHasBeenClosedByTimeout()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_tunnelClosedPromise.get_future().get());
+    }
+
+    void thenClosureEventShouldBeReportedWithinTunnelsAioThread()
+    {
+        ASSERT_EQ(m_tunnelCloseEventAioThread, m_tunnelAioThread);
+    }
+
     nx::hpm::api::ConnectionParameters m_connectionParameters;
-    std::unique_ptr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
+    nx::utils::AtomicUniquePtr<cloud::OutgoingTunnelConnectionWatcher> m_tunnel;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosedPromise;
+    InitializationGuard m_initializationGuard;
+    aio::AbstractAioThread* m_tunnelAioThread;
+    aio::AbstractAioThread* m_tunnelCloseEventAioThread;
 };
 
 } // namespace
 
-TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, unused_tunnel)
 {
     const auto initializationGuard = initializeTunnel();
 
@@ -93,7 +142,7 @@ TEST_F(OutgoingTunnelConnectionWatcher, unusedTunnel)
     waitForTunnelToExpire(tunnelClosedFuture);
 }
 
-TEST_F(OutgoingTunnelConnectionWatcher, usingTunnel)
+TEST_F(OutgoingTunnelConnectionWatcher, using_tunnel)
 {
     const auto initializationGuard = initializeTunnel();
 
@@ -121,6 +170,13 @@ TEST_F(OutgoingTunnelConnectionWatcher, usingTunnel)
     }
 
     waitForTunnelToExpire(tunnelClosedFuture);
+}
+
+TEST_F(OutgoingTunnelConnectionWatcher, tunnel_closure_by_timeout_reported_from_correct_aio_thread)
+{
+    givenActiveTunnel();
+    whenTunnelHasBeenClosedByTimeout();
+    thenClosureEventShouldBeReportedWithinTunnelsAioThread();
 }
 
 } // namespace test

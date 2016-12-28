@@ -118,6 +118,18 @@ public:
      * \returns                     True if no error.
      */
     bool updateCameraHistorySync(const QnSecurityCamResourcePtr &camera);
+
+    ec2::ApiCameraHistoryItemDataList getHistoryDetails(const QnUuid& cameraId, bool* isValid);
+
+    /**
+     * \brief                       Set camera history details if provided server list in historyDetails still actual.
+     *                              Otherwise don't change data and returns false.
+     */
+    bool testAndSetHistoryDetails(
+        const QnUuid& cameraId,
+        const ec2::ApiCameraHistoryItemDataList& historyDetails);
+
+    void setHistoryCheckDelay(int value);
 signals:
     /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -152,8 +164,14 @@ private:
     void checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam);
     QnMediaServerResourceList dtsCamFootageData(const QnSecurityCamResourcePtr &camera
         , bool filterOnlineServers = false) const;
+    QnMediaServerResourceList getCameraFootageDataUnsafe(
+        const QnUuid &cameraId,
+        bool filterOnlineServers = false) const;
+    bool isValidHistoryDetails(
+        const QnUuid& cameraId,
+        const ec2::ApiCameraHistoryItemDataList& historyDetails) const;
 private:
-
+    int m_historyCheckDelay;
     mutable QnMutex m_mutex;
     QMap<QnUuid, std::vector<QnUuid>> m_archivedCamerasByServer; // archived cameras by server
 

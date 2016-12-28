@@ -11,7 +11,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 class QnSharedLayoutItemAccessProviderTest: public QnBaseAccessProviderTestFixture
 {
@@ -26,8 +26,8 @@ TEST_F(QnSharedLayoutItemAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
-    ec2::ApiUserGroupData role;
-    QnResourceAccessSubject subject(role);
+    ec2::ApiUserRoleData userRole;
+    QnResourceAccessSubject subject(userRole);
     ASSERT_FALSE(subject.isValid());
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }

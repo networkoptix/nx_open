@@ -33,7 +33,7 @@
        <item>
         <widget class="QLabel" name="noSettingsLabel">
          <property name="text">
-          <string>This camera has no advanced settings</string>
+          <string notr="true">&lt;This camera has no advanced settings&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

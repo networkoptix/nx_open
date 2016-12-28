@@ -36,7 +36,7 @@ QSet<QnUuid> QnUpdateUtils::getServersLinkedToCloud(const QSet<QnUuid>& peers)
     for (const auto& id: peers)
     {
         const auto server =
-            qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+            qnResPool->getIncompatibleResourceById(id, false).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

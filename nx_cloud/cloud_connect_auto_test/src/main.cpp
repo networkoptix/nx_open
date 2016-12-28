@@ -22,8 +22,8 @@ struct TestAddressDescriptor
 };
 
 static TestAddressDescriptor kCloudAddressList[] = {
-    {"0d8dcea3-057a-4f44-81a4-d70e9127ab14", "la_office"},
-    {"df6a3827-56c7-4ff8-b38e-67993983d5d8", "msk_office"}
+    {"becf0a3f-d101-44af-bdc3-13b2296604f0", "la_office"},
+    {"100f9969-8e0c-4b53-90a4-5df6c56f0fed", "msk_office"}
 };
 
 constexpr const int kSendTimeoutMs = 11*1000;
@@ -46,6 +46,8 @@ int main(int /*argc*/, char* /*argv*/[])
 
     nx::network::SocketGlobals::InitGuard socketInitializationGuard;
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cloud_connect_auto_test", QnUuid::createUuid());
 
     bool succeeded = true;
     for (const TestAddressDescriptor& addressDescriptor: kCloudAddressList)

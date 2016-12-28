@@ -1,56 +1,59 @@
 #include "resource_access_subject.h"
 
 #include <core/resource/user_resource.h>
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 struct QnResourceAccessSubjectPrivate
 {
 public:
-    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserGroupData& role):
+    QnResourceAccessSubjectPrivate(const QnUserResourcePtr& user, const ec2::ApiUserRoleData& role):
         user(user),
-        role(role)
+        role(role),
+        m_id(user ? user->getId() : role.id)
     {
     }
 
     bool isValid() const
     {
-        return user || !role.isNull();
+        return !m_id.isNull();
     }
 
     QnUuid id() const
     {
-        return user
-            ? user->getId()
-            : role.id;
+        return m_id;
     }
 
     QnUuid effectiveId() const
     {
-        if (!isValid())
-            return QnUuid();
+        QnUuid key = m_id;
+        if (user && user->userRole() == Qn::UserRole::CustomUserRole)
+            key = user->userRoleId();
 
-        QnUuid key = role.id;
-        if (user)
-        {
-            key = user->getId();
-            if (user->role() == Qn::UserRole::CustomUserGroup)
-                key = user->userGroup();
-        }
         return key;
     }
 
+    void operator=(const QnResourceAccessSubjectPrivate& other)
+    {
+        user = other.user;
+        role = other.role;
+        m_id = other.m_id;
+    }
+
     QnUserResourcePtr user;
-    ec2::ApiUserGroupData role;
+    ec2::ApiUserRoleData role;
+
+private:
+    QnUuid m_id;
 };
 
 
 
 QnResourceAccessSubject::QnResourceAccessSubject(const QnUserResourcePtr& user):
-    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserGroupData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(user, ec2::ApiUserRoleData()))
 {
 }
 
-QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserGroupData& role):
+QnResourceAccessSubject::QnResourceAccessSubject(const ec2::ApiUserRoleData& role):
     d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), role))
 {
 }
@@ -61,7 +64,7 @@ QnResourceAccessSubject::QnResourceAccessSubject(const QnResourceAccessSubject& 
 }
 
 QnResourceAccessSubject::QnResourceAccessSubject():
-    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserGroupData()))
+    d_ptr(new QnResourceAccessSubjectPrivate(QnUserResourcePtr(), ec2::ApiUserRoleData()))
 {
 }
 
@@ -74,7 +77,7 @@ const QnUserResourcePtr& QnResourceAccessSubject::user() const
     return d_ptr->user;
 }
 
-const ec2::ApiUserGroupData& QnResourceAccessSubject::role() const
+const ec2::ApiUserRoleData& QnResourceAccessSubject::role() const
 {
     return d_ptr->role;
 }
@@ -109,15 +112,14 @@ QString QnResourceAccessSubject::name() const
     return d_ptr->user ? d_ptr->user->getName() : d_ptr->role.name;
 }
 
+void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
+{
+    *d_ptr = *(other.d_ptr);
+}
+
 bool QnResourceAccessSubject::operator!=(const QnResourceAccessSubject& other) const
 {
     return !(*this == other);
-}
-
-void QnResourceAccessSubject::operator=(const QnResourceAccessSubject& other)
-{
-    d_ptr->user = other.d_ptr->user;
-    d_ptr->role = other.d_ptr->role;
 }
 
 bool QnResourceAccessSubject::operator==(const QnResourceAccessSubject& other) const

@@ -103,14 +103,7 @@
           <widget class="QComboBox" name="typeComboBox"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="filterLineEdit">
-           <property name="placeholderText">
-            <string>Search</string>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <widget class="QnSearchLineEdit" name="filterLineEdit" native="true"/>
          </item>
         </layout>
        </item>
@@ -131,6 +124,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QnSearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/search_line_edit.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QnResourceTreeWidget</class>
    <extends>QWidget</extends>

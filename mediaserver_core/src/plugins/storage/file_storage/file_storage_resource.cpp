@@ -240,10 +240,33 @@ QString QnFileStorageResource::getPath() const
         return QUrl(url).path();
 }
 
-qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
+qint64 getLocalPossiblyNonExistingPathSize(const QString &path)
+{
+    qint64 result;
+
+    if (QDir(path).exists())
+        return getDiskTotalSpace(path);
+
+    if (!QDir().mkpath(path))
+        return -1;
+
+    result = getDiskTotalSpace(path);
+    QDir(path).removeRecursively();
+
+    return result;
+}
+
+qint64 QnFileStorageResource::calculateAndSetTotalSpaceWithoutInit()
 {
     bool valid = false;
     QString url = getUrl();
+    qint64 result;
+
+    NX_LOG(lit("%1 valid = %2, url = %3")
+           .arg(Q_FUNC_INFO)
+           .arg(m_valid)
+           .arg(url), cl_logDEBUG2);
+
     if (url.isNull() || url.isEmpty())
         return -1;
     {
@@ -261,7 +284,17 @@ qint64 QnFileStorageResource::getTotalSpaceWithoutInit()
         return getTotalSpace();
     }
     // local storage
-    return getDiskTotalSpace(getPath());
+    result = getLocalPossiblyNonExistingPathSize(url);
+    {
+        QnMutexLocker locker(&m_writeTestMutex);
+        m_cachedTotalSpace = result;
+    }
+
+    NX_LOG(lit("%1 result = %2")
+           .arg(Q_FUNC_INFO)
+           .arg(result), cl_logDEBUG2);
+
+    return result;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
@@ -654,7 +687,7 @@ void QnFileStorageResource::setUrl(const QString& url)
 QnFileStorageResource::QnFileStorageResource():
     m_valid(false),
     m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted),
+    m_cachedTotalSpace(QnStorageResource::kUnknownSize),
     m_isSystem(false)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
@@ -797,16 +830,6 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    bool spaceLimitUnset = false;
-    {
-        QnMutexLocker lock(&m_writeTestMutex);
-        if (getSpaceLimit() == 0)
-        {
-            spaceLimitUnset = true;
-            setSpaceLimit(calcInitialSpaceLimit());
-        }
-    }
-
     Qn::StorageInitResult result;
     {
         QnMutexLocker lock(&m_mutexCheckStorage);
@@ -832,11 +855,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
-    qint64 oldCachedTotalSpace = m_cachedTotalSpace;
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
-
-    if (spaceLimitUnset && oldCachedTotalSpace != m_cachedTotalSpace)
-        setSpaceLimit(calcInitialSpaceLimit());
 
     return Qn::StorageInit_Ok;
 }
@@ -868,6 +887,8 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
     else
     {
         qint64 maxSpaceLimit = local ? kMaxLocalStorageSpaceLimit : kMaxNasStorageSpaceLimit;
+        if (baseSpaceLimit > maxSpaceLimit) //< User explicitely set large spaceLimit, let's hope he knows what he's doing.
+            return baseSpaceLimit;
         return qMin(maxSpaceLimit, qMax(m_cachedTotalSpace / kMaxSpaceLimitRatio, baseSpaceLimit));
     }
 

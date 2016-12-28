@@ -47,6 +47,7 @@ bool QnIOModuleMonitor::open()
     }
 
     m_httpClient = nx_http::AsyncHttpClient::create();
+    m_httpClient->setResponseReadTimeoutMs(HTTP_READ_TIMEOUT);
     m_httpClient->setMessageBodyReadTimeoutMs(HTTP_READ_TIMEOUT);
 
     connect(

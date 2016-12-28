@@ -5,15 +5,8 @@
 
 #pragma once
 
-//#define USE_QAPPLICATION
-
 #include <atomic>
 #include <memory>
-
-#ifdef USE_QAPPLICATION
-#include <qtsinglecoreapplication.h>
-#include <qtservice.h>
-#endif
 
 #include <utils/common/stoppable.h>
 #include <nx/network/connection_server/multi_address_server.h>
@@ -37,12 +30,7 @@ namespace gateway {
 
 class AuthorizationManager;
 
-class VmsGatewayProcess
-:
-#ifdef USE_QAPPLICATION
-    public QObject,
-    public QtService<QtSingleCoreApplication>,
-#endif
+class VmsGatewayProcess:
     public QnStoppable
 {
 public:
@@ -58,17 +46,7 @@ public:
 
     void enforceSslFor(const SocketAddress& targetAddress, bool enabled = true);
 
-#ifndef USE_QAPPLICATION
     int exec();
-#endif
-
-protected:
-#ifdef USE_QAPPLICATION
-    virtual int executeApplication() override;
-    virtual void start() override;
-    virtual void stop() override;
-    virtual bool eventFilter(QObject* watched, QEvent* event) override;
-#endif
 
 private:
     conf::RunTimeOptions m_runTimeOptions;
@@ -79,10 +57,8 @@ private:
     int m_timerID;
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-#ifndef USE_QAPPLICATION
     QnMutex m_mutex;
     QnWaitCondition m_cond;
-#endif
 
     void registerApiHandlers(
         const conf::Settings& settings,

@@ -345,9 +345,9 @@ void QnAuditItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& s
 
     QnScopedPainterFontRollback fontRollback(painter, option.font);
     QnScopedPainterPenRollback penRollback(painter, option.palette.color(
-        option.state.testFlag(QStyle::State_Selected) ?
-        QPalette::HighlightedText :
-        QPalette::Text));
+        option.state.testFlag(QStyle::State_Selected)
+            ? QPalette::HighlightedText
+            : QPalette::Text));
 
     /* Paint alternate background: */
     if (index.data(Qn::AlternateColorRole).toInt() > 0)
@@ -582,7 +582,7 @@ void QnAuditItemDelegate::paintUserActivity(const QStyle* style, QPainter* paint
 
     /* Obtain values: */
     qreal chartData = index.data(Qn::AuditLogChartDataRole).toReal();
-    QColor chartColor = index.data(Qt::BackgroundColorRole).value<QColor>();
+    QColor chartColor = index.data(Qt::ForegroundRole).value<QColor>();
 
     /* Draw chart bar: */
     QRect barRect = option.rect.adjusted(2, 1, -2, -1);

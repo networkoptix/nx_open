@@ -43,22 +43,22 @@ public:
         SocketAttributes socketAttributes,
         OutgoingTunnel::NewConnectionHandler handler);
 
-    /** Returns peer Id for cloud connect. */
-    String selfPeerId() const;
+    /** @return Peer id for cloud connect. */
+    String ownPeerId() const;
 
     /**
-     * Sould be called somewhere in every module, so this Id is useful for debug.
+     * Should be called somewhere in every module exactly once, so this id is useful for debug.
      * @param name Short module name, useful for debug.
-     * @param uuid Unique instance Id, e.g. Hardware Id.
+     * @param uuid Unique instance id, e.g. Hardware id.
      */
-    void designateSelfPeerId(const String& name, const QnUuid& uuid);
+    void assignOwnPeerId(const String& name, const QnUuid& uuid);
 
 private:
     typedef std::map<QString, std::unique_ptr<OutgoingTunnel>> TunnelDictionary;
 
     mutable QnMutex m_mutex;
-    mutable bool m_isSelfPeerIdDesignated;
-    String m_selfPeerId;
+    mutable bool m_isOwnPeerIdDesignated;
+    String m_ownPeerId;
     TunnelDictionary m_pool;
     bool m_terminated;
     bool m_stopping;

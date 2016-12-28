@@ -78,7 +78,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
 
 void QnGlobalPermissionsManager::recalculateAllPermissions()
 {
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
         updateGlobalPermissions(subject);
 }
 
@@ -128,10 +128,10 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
 
         QnUuid userId = user->getId();
 
-        switch (user->role())
+        switch (user->userRole())
         {
-            case Qn::UserRole::CustomUserGroup:
-                result = globalPermissions(qnUserRolesManager->userRole(user->userGroup()));
+            case Qn::UserRole::CustomUserRole:
+                result = globalPermissions(qnUserRolesManager->userRole(user->userRoleId()));
                 break;
             case Qn::UserRole::Owner:
             case Qn::UserRole::Administrator:
@@ -176,7 +176,7 @@ void QnGlobalPermissionsManager::handleResourceAdded(const QnResourcePtr& resour
 
         connect(user, &QnUserResource::permissionsChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
-        connect(user, &QnUserResource::userGroupChanged, this,
+        connect(user, &QnUserResource::userRoleChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
         connect(user, &QnUserResource::enabledChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
@@ -190,17 +190,17 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
         handleSubjectRemoved(user);
 }
 
-void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const ec2::ApiUserGroupData& userRole)
+void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
-void QnGlobalPermissionsManager::handleRoleRemoved(const ec2::ApiUserGroupData& userRole)
+void QnGlobalPermissionsManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

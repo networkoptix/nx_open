@@ -165,6 +165,8 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         if (!resource)
             continue;
 
+        disconnect(resource, nullptr, this, nullptr);
+
         resource->setRemovedFromPool(true);
         if (resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
@@ -210,8 +212,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     const auto videoWalls = getResources<QnVideoWallResource>();
     for (const QnResourcePtr& layoutResource : removedLayoutResources)
     {
-        disconnect(layoutResource, nullptr, this, nullptr);
-
         for (const QnVideoWallResourcePtr& videowall : videoWalls) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
         {
             for (QnVideoWallItem item : videowall->items()->getItems())
@@ -230,8 +230,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
     const auto layouts = getResources<QnLayoutResource>();
     for (const QnResourcePtr& otherResource : removedOtherResources)
     {
-        disconnect(otherResource, nullptr, this, nullptr);
-
         for (const QnLayoutResourcePtr& layoutResource : layouts) // TODO: #Elric this is way beyond what one may call 'suboptimal'.
             for (const QnLayoutItemData& data: layoutResource->getItems())
                 if (data.resource.id == otherResource->getId() || data.resource.uniqueId == otherResource->getUniqueId())

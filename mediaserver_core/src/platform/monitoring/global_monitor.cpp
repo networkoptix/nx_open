@@ -13,6 +13,7 @@
 #include <sys/resource.h>
 #endif
 
+#include <iostream>
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -23,6 +24,8 @@
 #include <utils/common/delete_later.h>
 #include <nx/utils/log/log.h>
 
+// Uncomment to enable malloc statistics debug output
+//#define MALLOC_STATISTICS
 
 // -------------------------------------------------------------------------- //
 // QnStubMonitor
@@ -154,7 +157,7 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     d->restartTimersLocked();
 }
 
-static const int STATISTICS_LOGGING_PERIOD_MS = 100 * 60 * 1000;
+static const int STATISTICS_LOGGING_PERIOD_MS = 30 * 60 * 1000;
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);
@@ -185,6 +188,12 @@ qreal QnGlobalMonitor::totalRamUsage() {
     {
         NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logWARNING);
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
+
+#ifdef __linux__
+        std::cerr << std::endl << "-----------------------------> malloc_stats info start " << std::endl;
+        malloc_stats();
+        std::cerr << "-----------------------------> malloc_stats info end" << std::endl << std::endl;
+#endif
     }
 
     return d->totalRamUsage;
@@ -268,15 +277,15 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
 		logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
-#ifdef __linux__
-        const size_t memStatBufSize = 64*1024;
-        std::vector<char> memStatBuf;
-        memStatBuf.resize(memStatBufSize);
-        FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
-        malloc_info(0, memStatStr);
-        fclose(memStatStr);
-        NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
-#endif
+        #if defined(__linux__) && defined(MALLOC_STATISTICS)
+            const size_t memStatBufSize = 64*1024;
+            std::vector<char> memStatBuf;
+            memStatBuf.resize(memStatBufSize);
+            FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
+            malloc_info(0, memStatStr);
+            fclose(memStatStr);
+            NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+        #endif
     }
 
     return d->totalHddLoad;

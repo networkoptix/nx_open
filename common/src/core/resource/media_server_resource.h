@@ -109,7 +109,7 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();

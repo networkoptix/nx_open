@@ -110,10 +110,12 @@ int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int si
     while (sentTotal < size) {
         sent = socket->send(static_cast<const quint8*>(data) + sentTotal, size - sentTotal);
         if (sent < 1) {
-            qWarning() << "TCP socket write error for camera" << m_mac << " has sent" << sent << "of" << size;
+            qWarning() << "TCP socket '" <<  socket->getForeignAddress().toString() <<
+              "' write error for camera" << m_mac << " has sent" << sent << "of" << size;
             SystemError::ErrorCode ercode = 0;
             if (socket->getLastError(&ercode)) {
-                qWarning() << "Socket error code " << ercode;
+              qWarning() << "TCP socket '" << socket->getForeignAddress().toString() <<
+                "'error code " << ercode;
             }
             break;
         }
@@ -196,6 +198,8 @@ void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary
         return;
 
     socket->setSendTimeout(kSendTimeoutMs);
+
+    qDebug() << "Start streaming to " << socket->getForeignAddress().toString();
 
     while (1)
     {

@@ -22,13 +22,18 @@
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+
+#include <QtGui/QDesktopServices>
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QDesktopServices>
-#include <QtSingleApplication>
 
-#include <common/systemexcept.h>
+#include <QtSingleApplication>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -40,6 +45,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/audio/audiodevice.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
@@ -70,6 +76,29 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
+
+    if (startupParams.customUri.isValid())
+    {
+        QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(application));
+        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
+            [manager](QNetworkReply* reply)
+            {
+                qDebug() << lit("Cloud Reply received: %1").arg(QLatin1String(reply->readAll()));
+                reply->deleteLater();
+                manager->deleteLater();
+            });
+
+        QUrl url(QnAppInfo::defaultCloudPortalUrl());
+        url.setPath(lit("/api/utils/visitedKey"));
+        qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
+
+        QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
+
+        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
+    }
+
 
     if (!allowMultipleClientInstances)
     {

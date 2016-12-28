@@ -29,7 +29,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
-
 #include <redass/redass_controller.h>
 
 #include <ui/actions/action_manager.h>
@@ -250,8 +249,17 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeRaisedGeometry()));
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(synchronizeSceneBoundsExtension()));
 
-    //queueing connection because some OS make resize call before move widget to correct postion while expanding it to fullscreen --gdm
-    connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(fitInView()), Qt::QueuedConnection);
+    connect(resizeSignalingInstrument, QnSignalingInstrumentActivated, this,
+        [this]()
+        {
+            fitInView(false); //< Direct call to immediate reaction
+            /**
+             * Since we don't animate fit in view we have to execute fitInView second time
+             * after some delay, because some OS make resize call before move widget to correct
+             * position while expanding it to fullscreen. #gdm
+             */
+            executeDelayedParented([this]() { fitInView(false); }, 0, this);
+        });
 
     connect(m_widgetActivityInstrument, SIGNAL(activityStopped()), this, SLOT(at_widgetActivityInstrument_activityStopped()));
     connect(m_widgetActivityInstrument, SIGNAL(activityResumed()), this, SLOT(at_widgetActivityInstrument_activityStarted()));
@@ -529,7 +537,9 @@ void QnWorkbenchDisplay::initSceneView()
 
         viewport->makeCurrent();
         QnGlHardwareChecker::checkCurrentContext(true);
-        QGLContext::currentContext()->setTextureCacheLimit(256 * 1024);
+
+        /* QGLTextureCache leaks memory very fast when limit exceeded (Qt 5.6.1). */
+        QGLContext::currentContext()->setTextureCacheLimit(2 * 1024 * 1024);
 
         /* Initializing gl context pool used to render decoded pictures in non-GUI thread. */
         DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(viewport);
@@ -915,7 +925,9 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
         gridBackgroundItem()->update(layout);
 
     synchronizeSceneBounds();
-    fitInView();
+
+    static const bool kDontAnimate = false;
+    fitInView(kDontAnimate);
 
     QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
     if (raisedWidget)
@@ -961,18 +973,18 @@ QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resou
     return m_widgetsByResource.value(resource);
 }
 
-QnResourceDisplay *QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
+QnResourceDisplayPtr QnWorkbenchDisplay::display(QnWorkbenchItem *item) const
 {
     if (QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(this->widget(item)))
-        return widget->display().data();
-    return NULL;
+        return widget->display();
+    return QnResourceDisplayPtr();
 }
 
 QnClientVideoCamera *QnWorkbenchDisplay::camera(QnWorkbenchItem *item) const
 {
-    QnResourceDisplay *display = this->display(item);
-    if (display == NULL)
-        return NULL;
+    auto display = this->display(item);
+    if (!display)
+        return nullptr;
 
     return display->camera();
 }
@@ -1067,6 +1079,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         : qnSettings->maxSceneVideoItems();
 
     if (m_widgets.size() >= maxItems)
+    {
+        qnDeleteLater(item);
+        return false;
+    }
+
+    /* Invalid items may lead to very strange behavior bugs. */
+    if (item->uuid().isNull())
     {
         qnDeleteLater(item);
         return false;
@@ -1229,15 +1248,17 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
-    QList<QnResourceWidget *> &widgetsForResource = m_widgetsByResource[widget->resource()];
-    if (widgetsForResource.size() == 1)
+    const auto resource = widget->resource();
+    NX_ASSERT(m_widgetsByResource.contains(resource));
+    if (m_widgetsByResource.contains(resource))
     {
-        emit resourceAboutToBeRemoved(widget->resource());
-        m_widgetsByResource.remove(widget->resource());
-    }
-    else
-    {
+        QnResourceWidgetList& widgetsForResource = m_widgetsByResource[resource];
         widgetsForResource.removeOne(widget);
+        if (widgetsForResource.empty())
+        {
+            emit resourceAboutToBeRemoved(resource);
+            m_widgetsByResource.remove(resource);
+        }
     }
 
     m_widgets.removeOne(widget);
@@ -1406,7 +1427,7 @@ qreal QnWorkbenchDisplay::widgetsFrameOpacity() const
 
 void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
 {
-    if (qFuzzyCompare(m_frameOpacity, opacity))
+    if (qFuzzyEquals(m_frameOpacity, opacity))
         return;
 
     m_frameOpacity = opacity;
@@ -2327,11 +2348,12 @@ void QnWorkbenchDisplay::at_mapper_cellSizeChanged()
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged()
 {
-    synchronizeAllGeometries(true);
+    synchronizeAllGeometries(false);
 
     synchronizeSceneBounds();
 
-    fitInView();
+    fitInView(false);
+
 
     if (qFuzzyIsNull(workbench()->mapper()->spacing()))
         m_frameOpacityAnimator->animateTo(0.0);
@@ -2357,8 +2379,11 @@ void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &reso
     if (accessController()->hasPermissions(resource, requiredPermission))
         return;
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);
@@ -2373,8 +2398,11 @@ void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& re
             workbench()->removeLayout(layout);
     }
 
+    if (!m_widgetsByResource.contains(resource))
+        return;
+
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
-    for (auto widget : m_widgetsByResource[resource])
+    for (auto widget: m_widgetsByResource.take(resource))
     {
         widget->hide();
         qnDeleteLater(widget);

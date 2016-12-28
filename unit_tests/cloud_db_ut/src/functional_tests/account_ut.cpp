@@ -27,13 +27,25 @@ namespace cdb {
 
 namespace {
 
-class Account
-:
+class Account:
     public CdbFunctionalTest
 {
 };
 
 } // namespace
+
+// TODO: #ak following test should be broke into something like
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingReceivalOfActiveAccountNotification();
+//    expectingAccountActivationCodeWorks();
+//}
+//
+//{
+//    havingIssuedAccountRegistrationRequest();
+//    expectingFailureToBindSystemToAccount();
+//}
 
 TEST_F(Account, activation)
 {
@@ -227,7 +239,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account1.email, account1Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
+        ASSERT_EQ(1U, systems.size());
         ASSERT_TRUE(system1 == systems[0]);
     }
 
@@ -236,7 +248,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 0);
+        ASSERT_EQ(systems.size(), 0U);
     }
 
     {
@@ -255,7 +267,7 @@ TEST_F(Account, general)
         std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
+        ASSERT_EQ(systems.size(), 1U);
         ASSERT_TRUE(system1 == systems[0]);
     }
 
@@ -1033,7 +1045,7 @@ TEST_F(Account, created_while_sharing)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(newAccountEmail, newAccountPassword, &systems));
-    ASSERT_EQ(1, systems.size());
+    ASSERT_EQ(1U, systems.size());
     ASSERT_EQ(system1.id, systems[0].id);
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }

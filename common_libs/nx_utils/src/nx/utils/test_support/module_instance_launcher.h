@@ -1,8 +1,3 @@
-/**********************************************************
-* May 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <vector>
@@ -13,12 +8,13 @@
 #include "nx/utils/std/future.h"
 #include "nx/utils/std/thread.h"
 
-
 namespace nx {
 namespace utils {
 namespace test {
 
-/** Added to help create functional tests when each test want to start process from scratch */
+/**
+ * Added to help create functional tests when each test want to start process from scratch.
+ */
 template<typename ModuleProcessType>
 class ModuleLauncher
 {
@@ -65,7 +61,8 @@ public:
 
     virtual bool waitUntilStarted()
     {
-        static const std::chrono::seconds initializedMaxWaitTime(15);
+        // NOTE: Valgrind does not stand small timeouts.
+        static const std::chrono::minutes initializedMaxWaitTime(1);
 
         auto moduleStartedFuture = m_moduleStartedPromise->get_future();
         if (moduleStartedFuture.wait_for(initializedMaxWaitTime) !=

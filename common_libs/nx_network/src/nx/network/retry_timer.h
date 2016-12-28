@@ -7,10 +7,11 @@
 
 #include <chrono>
 #include <limits>
+#include <memory>
 
 #include <utils/common/stoppable.h>
 
-#include "aio/abstract_pollable.h"
+#include "aio/basic_pollable.h"
 #include "aio/timer.h"
 
 
@@ -71,19 +72,13 @@ public:
 */
 class NX_NETWORK_API RetryTimer
 :
-    public aio::AbstractPollable
+    public aio::BasicPollable
 {
 public:
     RetryTimer(const RetryPolicy& policy);
     virtual ~RetryTimer();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync(bool checkForLocks = true) override;
-
-    virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
     /** Returns \a false, if maximum retries have been done */
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
@@ -93,8 +88,11 @@ public:
     /** Resets internal state to default values */
     void reset();
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
-    aio::Timer m_timer;
+    std::unique_ptr<aio::Timer> m_timer;
     const RetryPolicy m_retryPolicy;
     std::chrono::milliseconds m_currentDelay;
     std::chrono::milliseconds m_effectiveMaxDelay;

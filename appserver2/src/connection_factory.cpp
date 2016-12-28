@@ -13,7 +13,7 @@
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 #include <nx_ec/data/api_camera_history_data.h>
 
 #include "rest/active_connections_rest_handler.h"
@@ -875,15 +875,15 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regGet<QnUuid, ApiUserDataList>(p, ApiCommand::getUsers);
 
-    /**%apidoc GET /ec2/getUserGroups
-     * Return user groups registered in the system.
+    /**%apidoc GET /ec2/getUserRoles
+     * Return user roles registered in the system.
      * %param[default] format
      * %param[opt] id Object unique id.
      * %return Return object in the requested format. If "id" parameter is specified, the list will
      *     contain only one object with that id, or nothing, if there is no such object found.
-     * %// AbstractUserManager::getUserGroups
+     * %// AbstractUserManager::getUserRoles
      */
-    regGet<QnUuid, ApiUserGroupDataList>(p, ApiCommand::getUserGroups);
+    regGet<QnUuid, ApiUserRoleDataList>(p, ApiCommand::getUserRoles);
 
     /**%apidoc GET /ec2/getAccessRights
      * Return list of accessible resources ids for each user in the system.
@@ -937,7 +937,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
      *     %value GlobalCustomUserPermission Flag: this user has custom permissions
-     * %param[opt] groupId User group unique id.
+     * %param[opt] userRoleId User role unique id.
      * %param email User's email.
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
@@ -977,16 +977,16 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      */
     regUpdate<ApiIdData>(p, ApiCommand::removeUser);
 
-    /**%apidoc POST /ec2/saveUserGroup
+    /**%apidoc POST /ec2/saveUserRole
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
      * %permissions Administrator.
-     * %param[opt] id Group unique id. Can be omitted when creating a new object. If such object
+     * %param[opt] id User role unique id. Can be omitted when creating a new object. If such object
      * exists, omitted fields will not be changed.
-     * %param name Group name.
+     * %param name User role name.
      * %param permissions Combination (via "|") of the following flags:
      *     %value GlobalEditCamerasPermission Can edit camera settings.
      *     %value GlobalControlVideoWallPermission Can control video walls.
@@ -997,22 +997,22 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value GlobalUserInputPermission Can change PTZ state of a camera, use 2-way audio, I/O
      *         buttons.
      *     %value GlobalAccessAllMediaPermission Has access to all media (cameras and web pages).
-     * %// AbstractUserManager::saveGroup
+     * %// AbstractUserManager::saveUserRole
      */
-    regUpdate<ApiUserGroupData>(p, ApiCommand::saveUserGroup);
+    regUpdate<ApiUserRoleData>(p, ApiCommand::saveUserRole);
 
-    /**%apidoc POST /ec2/removeUserGroup
-     * Delete the specified user group.
+    /**%apidoc POST /ec2/removeUserRole
+     * Delete the specified user role.
      * <p>
      * Parameters should be passed as a JSON object in POST message body with
      * content type "application/json". Example of such object can be seen in
      * the result of the corresponding GET function.
      * </p>
      * %permissions Administrator.
-     * %param id User unique id.
-     * %// AbstractUserManager::removeUserGroup
+     * %param id User role unique id.
+     * %// AbstractUserManager::removeUserRole
      */
-    regUpdate<ApiIdData>(p, ApiCommand::removeUserGroup);
+    regUpdate<ApiIdData>(p, ApiCommand::removeUserRole);
 
     /**%apidoc GET /ec2/getPredefinedRoles
     * Return list of predefined user roles.
@@ -1075,6 +1075,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
+     * %param item.top Top coordinate of the layout item (floating-point).
      * %param item.right Right coordinate of the layout item (floating-point).
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates
@@ -1141,6 +1142,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param item.flags Should have fixed value.
      *     %value 0
      * %param item.left Left coordinate of the layout item (floating-point).
+     * %param item.top Top coordinate of the layout item (floating-point).
      * %param item.right Right coordinate of the layout item (floating-point).
      * %param item.bottom Bottom coordinate of the layout item (floating-point).
      * %param item.rotation Degree of image tilt; a positive value rotates
@@ -1555,6 +1557,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
     connectionInfoCopy.ecUrl = ecUrl;
     connectionInfoCopy.ecUrl.setScheme(
         connectionInfoCopy.allowSslConnections ? lit("https") : lit("http"));
+    connectionInfoCopy.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit(
         "Ec2DirectConnectionFactory::remoteConnectionFinished (2). errorCode = %1, ecUrl = %2")
@@ -1704,6 +1707,7 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
         {
             auto infoWithUrl = connectionInfo;
             infoWithUrl.ecUrl = addr;
+            infoWithUrl.ecUrl.setQuery(QUrlQuery()); /*< Cleanup 'format' parameter. */
             remoteTestConnectionFinished(reqId, errorCode, infoWithUrl, addr, handler);
         };
     m_remoteQueryProcessor.processQueryAsync<nullptr_t, QnConnectionInfo>(

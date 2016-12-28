@@ -29,19 +29,19 @@ enum class CurrentSet
     sysWrite
 };
 
-class NX_NETWORK_API UdtEpollWrapper
+class NX_NETWORK_API AbstractUdtEpollWrapper
 {
 public:
-    virtual ~UdtEpollWrapper() = default;
+    virtual ~AbstractUdtEpollWrapper() = default;
 
     /** Follows UDT::epoll_wait API. */
     virtual int epollWait(
         int epollFd,
-        std::map<UDTSOCKET, int>* readfds,
-        std::map<UDTSOCKET, int>* writefds,
-        int64_t msTimeOut,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* lrfds = NULL,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* wrfds = NULL) = 0;
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t timeoutMillis,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) = 0;
 };
 
 class NX_NETWORK_API UnifiedPollSet
@@ -77,7 +77,7 @@ public:
     };
 
     UnifiedPollSet();
-    UnifiedPollSet(std::unique_ptr<UdtEpollWrapper>);
+    UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper>);
     virtual ~UnifiedPollSet();
 
     /**
@@ -145,7 +145,7 @@ private:
     std::map<AbstractSocket::SOCKET_HANDLE, int> m_readSysFds;
     std::map<AbstractSocket::SOCKET_HANDLE, int> m_writeSysFds;
 
-    std::unique_ptr<UdtEpollWrapper> m_udtEpollWrapper;
+    std::unique_ptr<AbstractUdtEpollWrapper> m_udtEpollWrapper;
 
     template<typename SocketHandle>
     bool addSocket(

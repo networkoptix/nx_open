@@ -42,12 +42,17 @@ QString QnSetupWizardDialogPrivate::getCredentials() const
     return QString::fromUtf8(QJson::serialized(loginInfo));
 }
 
-void QnSetupWizardDialogPrivate::updateCredentials(const QString& login, const QString& password, bool isCloud)
+void QnSetupWizardDialogPrivate::updateCredentials(
+    const QString& login,
+    const QString& password,
+    bool isCloud,
+    bool savePassword)
 {
     loginInfo.localLogin    = isCloud ? QString()   : login;
     loginInfo.localPassword = isCloud ? QString()   : password;
     loginInfo.cloudEmail    = isCloud ? login       : QString();
     loginInfo.cloudPassword = isCloud ? password    : QString();
+    loginInfo.savePassword  = savePassword;
 }
 
 void QnSetupWizardDialogPrivate::cancel()

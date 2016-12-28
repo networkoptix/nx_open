@@ -18,6 +18,7 @@
 #include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
@@ -330,7 +331,7 @@ public:
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
                     filter.scanPeriod.durationMs = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
-                    if (needToStop())
+                    if (needToStop() || QnResource::isStopping())
                         return;
                     ++currentStorageStep;
                 }
@@ -410,29 +411,26 @@ public:
     TestStorageThread(QnStorageManager* owner): m_owner(owner) {}
     virtual void run() override
     {
-        QnStorageManager::StorageMap storageRoots = m_owner->getAllStorages();
-
-        for (QnStorageManager::StorageMap::const_iterator itr = storageRoots.constBegin(); itr != storageRoots.constEnd(); ++itr)
+        for (const auto& storage : m_owner->getStorages())
         {
             if (needToStop())
-                break;
+                return;
 
-            QnStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnStorageResource> (*itr);
-            Qn::ResourceStatus status = fileStorage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
-            if (fileStorage->getStatus() != status)
-                m_owner->changeStorageStatus(fileStorage, status);
+            Qn::ResourceStatus status = storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+            if (storage->getStatus() != status)
+                m_owner->changeStorageStatus(storage, status);
 
             if (status == Qn::Online)
             {
-                const auto space = QString::number(fileStorage->getTotalSpace());
-                if (fileStorage->setProperty(Qn::SPACE, space))
-                    propertyDictionary->saveParams(fileStorage->getId());
+                const auto space = QString::number(storage->getTotalSpace());
+                if (storage->setProperty(Qn::SPACE, space))
+                    propertyDictionary->saveParams(storage->getId());
             }
         }
 
         m_owner->testStoragesDone();
-
     }
+
 private:
     QnStorageManager* m_owner;
 };
@@ -1012,8 +1010,8 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         };
 
         std::pair<QString, QString> keyValue;
-        if (!parseLine(line, keyValue, lineNumber++))
-            continue;
+        if (!parseLine(line, keyValue, lineNumber++) && line.size() > 0)
+            return;
 
         if (keyValue.first.contains(kArchiveCameraNameKey))
             newCamera.coreData.name = keyValue.second;
@@ -2182,6 +2180,9 @@ void QnStorageManager::writeCameraInfoFiles()
         {
             for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
             {
+                if (QnResource::isStopping())
+                    return;
+
                 QString cameraUniqueId = cameraIt.key();
                 auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
                 if (!camResource)

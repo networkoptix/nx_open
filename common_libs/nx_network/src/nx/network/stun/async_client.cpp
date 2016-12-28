@@ -13,36 +13,30 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_useSsl(false),
     m_state(State::disconnected),
-    m_timer(m_settings.reconnectPolicy)
+    m_timer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
+    bindToAioThread(getAioThread());
 }
 
 AsyncClient::~AsyncClient()
 {
-    std::unique_ptr< AbstractStreamSocket > connectingSocket;
-    std::unique_ptr< BaseConnectionType > baseConnection;
-    {
-        QnMutexLocker lock( &m_mutex );
-        connectingSocket = std::move( m_connectingSocket );
-		baseConnection = std::move( m_baseConnection );
-        m_state = State::terminated;
-    }
+    stopWhileInAioThread();
+}
 
-    if (baseConnection)
-        baseConnection->pleaseStopSync(false);
+void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+{
+    network::aio::BasicPollable::bindToAioThread(aioThread);
 
-    if( connectingSocket )
-        connectingSocket->pleaseStopSync(false);
-
-    m_timer.pleaseStopSync(false);
+    m_timer->bindToAioThread(aioThread);
+    if (m_baseConnection)
+        m_baseConnection->bindToAioThread(aioThread);
+    if (m_connectingSocket)
+        m_connectingSocket->bindToAioThread(aioThread);
 }
 
 void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
 {
-    QnMutexLocker lock( &m_mutex );
-    m_endpoint = std::move( endpoint );
-    m_useSsl = useSsl;
-    openConnectionImpl( &lock );
+    connect(std::move(endpoint), useSsl, nullptr);
 }
 
 bool AsyncClient::setIndicationHandler(
@@ -126,7 +120,7 @@ void removeByClient(Container* container, void* client)
 void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handler)
 {
     NX_ASSERT(client);
-    m_timer.dispatch(
+    dispatch(
         [this, client, handler = std::move(handler)]()
         {
             QnMutexLocker lock(&m_mutex);
@@ -141,15 +135,44 @@ void AsyncClient::cancelHandlers(void* client, utils::MoveOnlyFunc<void()> handl
         });
 }
 
+void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
+{
+    dispatch(
+        [this, options = std::move(options)]()
+        {
+            if (m_baseConnection)
+            {
+                if (const auto socket = dynamic_cast<AbstractStreamSocket*>(
+                    m_baseConnection->socket().get()))
+                {
+                    NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
+                    const auto isKeepAliveSet = socket->setKeepAlive(std::move(options));
+                    NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
+                }
+                else
+                {
+                    NX_LOGX(lm("Trying to set keep alive for non-stream socket"), cl_logWARNING);
+                }
+            }
+            else
+            {
+                NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
+                    cl_logDEBUG1);
+            }
+        });
+}
+
 void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection)
 {
 	std::unique_ptr< BaseConnectionType > baseConnection;
+    decltype(m_onConnectionClosedHandler) onConnectionClosedHandler;
     {
         QnMutexLocker lock( &m_mutex );
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
+        onConnectionClosedHandler.swap(m_onConnectionClosedHandler);
     }
 
     if (baseConnection)
@@ -158,6 +181,28 @@ void AsyncClient::closeConnection(
     NX_ASSERT( !baseConnection || !connection ||
                 connection == baseConnection.get(),
                 Q_FUNC_INFO, "Incorrect closeConnection call" );
+
+    if (onConnectionClosedHandler)
+        onConnectionClosedHandler(errorCode);
+}
+
+void AsyncClient::setOnConnectionClosedHandler(
+    OnConnectionClosedHandler onConnectionClosedHandler)
+{
+    m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
+}
+
+void AsyncClient::connect(
+    SocketAddress endpoint,
+    bool useSsl,
+    ConnectCompletionHandler completionHandler)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_endpoint = std::move(endpoint);
+    m_useSsl = useSsl;
+    NX_ASSERT(!m_connectCompletionHandler);
+    m_connectCompletionHandler = std::move(completionHandler);
+    openConnectionImpl(&lock);
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -165,8 +210,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
     if( !m_endpoint )
     {
         lock->unlock();
-        m_timer.post(std::bind(
-            &AsyncClient::onConnectionComplete, this, SystemError::notConnected));
+        post(std::bind(&AsyncClient::onConnectionComplete, this, SystemError::notConnected));
         return;
     }
 
@@ -177,7 +221,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             m_connectingSocket = 
                 SocketFactory::createStreamSocket(
                     m_useSsl, nx::network::NatTraversalSupport::disabled );
-            m_connectingSocket->bindToAioThread(m_timer.getAioThread());
+            m_connectingSocket->bindToAioThread(getAioThread());
 
             auto onComplete = [ this ]( SystemError::ErrorCode code )
                 { onConnectionComplete( code ); };
@@ -212,7 +256,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 }
 
 void AsyncClient::closeConnectionImpl(
-        QnMutexLockerBase* lock, SystemError::ErrorCode code)
+    QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     auto connectingSocket = std::move(m_connectingSocket);
     auto requestQueue = std::move(m_requestQueue);
@@ -233,7 +277,7 @@ void AsyncClient::closeConnectionImpl(
 
     if (m_state != State::terminated)
     {
-        m_timer.scheduleNextTry(
+        m_timer->scheduleNextTry(
             [this]
             {
                 NX_LOGX(lm("Try to restore mediator connection..."), cl_logDEBUG1);
@@ -279,19 +323,30 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
 
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
+    ConnectCompletionHandler connectCompletionHandler;
+    const auto executeOnConnectedHandlerGuard = makeScopedGuard(
+        [&connectCompletionHandler, code]()
+        {
+            if (connectCompletionHandler)
+                connectCompletionHandler(code);
+        });
+
     QnMutexLocker lock( &m_mutex );
+    connectCompletionHandler.swap(m_connectCompletionHandler);
+
     if( m_state == State::terminated )
         return;
 
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
-    m_timer.reset();
+    m_timer->reset();
     NX_ASSERT(!m_baseConnection);
     NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logDEBUG1);
 
-    m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
-    m_baseConnection->setMessageHandler( 
+    m_baseConnection = std::make_unique<BaseConnectionType>(this, std::move(m_connectingSocket));
+    m_baseConnection->bindToAioThread(getAioThread());
+    m_baseConnection->setMessageHandler(
         [ this ]( Message message ){ processMessage( std::move(message) ); } );
 
     m_baseConnection->startReadingConnection();
@@ -363,6 +418,13 @@ void AsyncClient::processMessage(Message message)
                      cl_logERROR );
             return;
     }
+}
+
+void AsyncClient::stopWhileInAioThread()
+{
+    m_timer.reset();
+    m_baseConnection.reset();
+    m_connectingSocket.reset();
 }
 
 } // namespase stun

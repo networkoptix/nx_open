@@ -541,7 +541,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
                 ownerAccount().password,
                 registeredSystemData().id,
                 &systemUsers));
-        ASSERT_EQ(1, systemUsers.size());
+        ASSERT_EQ(1U, systemUsers.size());
     }
 }
 

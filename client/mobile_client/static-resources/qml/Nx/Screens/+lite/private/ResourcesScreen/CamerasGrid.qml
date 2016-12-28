@@ -26,6 +26,9 @@ Item
 
         function switchMode()
         {
+            if (!layoutId)
+                return
+
             if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
             {
                 if (stackView.currentItem.objectName != "videoScreen")

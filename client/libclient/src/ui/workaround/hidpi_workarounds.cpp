@@ -1,7 +1,12 @@
 
 #include "hidpi_workarounds.h"
 
+#include <QtGui/QMovie>
+#include <QtGui/QPixmap>
+#include <QtWidgets/QLabel>
+
 #include <nx/utils/raii_guard.h>
+
 #include <utils/common/connective.h>
 
 #include <ui/widgets/common/emulated_frame_widget.h>
@@ -33,10 +38,7 @@ QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
     for (auto src : QGuiApplication::screens())
         tmp.insert(src->geometry().left(), src);
 
-
     // Searching for appropriate screen
-
-
     const auto xSorted = tmp.values().toVector();
     const auto it = std::find_if(xSorted.begin(), xSorted.end(),
         [screen](const QScreen* value)
@@ -155,12 +157,12 @@ private:
 typedef QSharedPointer<MenuScreenCorrector> MenuScreenCorrectorPtr;
 typedef QHash<QMenu*, MenuScreenCorrectorPtr> MenuScreenCorrectorsHash;
 
-static MenuScreenCorrectorsHash knownCorrectors;
-
-void installMenuMouseEventCorrector(QMenu* menu)
+MenuScreenCorrectorPtr installMenuMouseEventCorrector(QMenu* menu)
 {
-    if (knownCorrectors.contains(menu))
-        return;
+    static MenuScreenCorrectorsHash knownCorrectors;
+    const auto itCorrector = knownCorrectors.find(menu);
+    if (itCorrector != knownCorrectors.end())
+        return *itCorrector;
 
     const auto corrector = MenuScreenCorrectorPtr(new MenuScreenCorrector(menu));
     knownCorrectors.insert(menu, corrector);
@@ -168,37 +170,27 @@ void installMenuMouseEventCorrector(QMenu* menu)
         [menu]() { knownCorrectors.remove(menu); });
 
     menu->installEventFilter(corrector.data());
+    return corrector;
 }
 
 QWindow* getParentWindow(QWidget* widget)
 {
-    // Checks if widget is in graphics view
-
     if (!widget)
         return nullptr;
 
-    auto item = widget;
-    while (item->parentWidget() && !dynamic_cast<QGLWidget*>(item->parentWidget()))
-        item = item->parentWidget();
+    auto topLevel = widget->window();
+    if (topLevel->isWindow())
+        return topLevel->windowHandle();
 
-    if (item->parentWidget())    //< direct child of GL widget
-        return item->parentWidget()->windowHandle();
+    const auto proxy = topLevel->graphicsProxyWidget();
+    if (!proxy)
+        return nullptr;
 
-    // We have at least
-    const auto proxy = item->graphicsProxyWidget();
-    const QGraphicsView* view = (proxy && proxy->scene() && !proxy->scene()->views().isEmpty()
-        ? proxy->scene()->views().first() : nullptr);
-    if (view)
-        return view->viewport()->windowHandle();
+    const auto scene = proxy->scene();
+    if (!scene || scene->views().isEmpty())
+        return nullptr;
 
-    while (widget)
-    {
-        if (widget->windowHandle())
-            return widget->windowHandle();
-
-        widget = widget->parentWidget();
-    }
-    return nullptr;
+    return getParentWindow(scene->views().first());
 }
 
 QPoint getPoint(QWidget* widget, const QPoint& offset, QWindow* parentWindow = nullptr)
@@ -257,9 +249,13 @@ public:
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
         const auto widget = dynamic_cast<QWidget*>(watched);
         const auto parentWindow = getParentWindow(widget);
-        if (!dynamic_cast<ProxyContextMenuEvent*>(event) && parentWindow)
+        const auto nativeEvent = (event->spontaneous()
+            && !dynamic_cast<ProxyContextMenuEvent*>(event));
+
+        if (nativeEvent && parentWindow)
         {
-            const auto targetPos = getPoint(widget, contextMenuEvent->pos(), parentWindow);
+            const auto targetPos = screenRelatedToGlobal(
+                contextMenuEvent->globalPos(), parentWindow->screen());
             auto fixedEvent = ProxyContextMenuEvent(contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);
@@ -284,10 +280,7 @@ QAction* QnHiDpiWorkarounds::showMenu(QMenu* menu, const QPoint& globalPoint)
 {
     if (isWindowsEnvironment)
     {
-        if (!knownCorrectors.contains(menu))
-            installMenuMouseEventCorrector(menu);
-
-        const auto corrector = knownCorrectors.value(menu);
+        const auto corrector = installMenuMouseEventCorrector(menu);
         corrector->setTargetPosition(globalPoint);
     }
 
@@ -312,3 +305,24 @@ void QnHiDpiWorkarounds::init()
     qApp->installEventFilter(new TopLevelWidgetsPositionCorrector());
 }
 
+void QnHiDpiWorkarounds::setMovieToLabel(QLabel* label, QMovie* movie)
+{
+    if (!label || !movie)
+        return;
+
+    const bool started = movie->state() != QMovie::NotRunning;
+    QnRaiiGuardPtr stopGuard;
+    if (!started)
+    {
+        stopGuard = QnRaiiGuard::createDestructible([movie](){ movie->stop(); });
+        movie->start();
+    }
+
+    const auto pixmap = movie->currentPixmap();
+    label->setMovie(movie);
+    if (pixmap.isNull())
+        return;
+
+    const auto fixedSize = pixmap.size() / pixmap.devicePixelRatio();
+    label->setFixedSize(fixedSize);
+}

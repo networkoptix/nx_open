@@ -559,8 +559,15 @@ bool UdtStreamSocket::connect(
     if (remoteAddress.address.isIpAddress())
         return connectToIp(remoteAddress, timeoutMs);
 
-    auto ips = SocketGlobals::addressResolver().dnsResolver().resolveSync(
-        remoteAddress.address.toString(), AF_INET);
+    std::deque<HostAddress> ips;
+    const SystemError::ErrorCode resultCode =
+        SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            remoteAddress.address.toString(), AF_INET, &ips);
+    if (resultCode != SystemError::noError)
+    {
+        SystemError::setLastErrorCode(resultCode);
+        return false;
+    }
 
     while (!ips.empty())
     {
@@ -920,6 +927,11 @@ void UdtStreamServerSocket::pleaseStop(
     nx::utils::MoveOnlyFunc< void() > handler )
 {
     m_aioHelper->cancelIOAsync( std::move( handler ) );
+}
+
+void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+{
+    m_aioHelper->cancelIOSync();
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()

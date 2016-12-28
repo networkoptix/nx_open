@@ -2,6 +2,7 @@
 # Server list is a comma separated ip:port address list, eg : 123.123.123.123:12345,124.124.124.124:12345
 #serverList=127.0.0.1:7001
 serverList=%(serverList)s
+vagrantFolder=%(vagrantFolder)s
 clusterTestSleepTime=5
 mergeTestTimeout=10
 threadNumber=32

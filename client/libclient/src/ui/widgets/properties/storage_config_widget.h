@@ -82,6 +82,7 @@ private:
 
     quint64 nextScheduledBackupTimeMs() const;
 
+    void updateRealtimeBackupMovieStatus(int index);
 private slots:
 
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr& server,

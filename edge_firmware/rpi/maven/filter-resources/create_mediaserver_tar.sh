@@ -20,6 +20,7 @@ if [[ "${box}" == "bananapi" ]]; then
     TOOLCHAIN_ROOT=$environment/packages/bpi/gcc-${gcc.version}
 fi
 TOOLCHAIN_PREFIX=$TOOLCHAIN_ROOT/bin/arm-linux-gnueabihf-
+SYSROOT_PREFIX=$PACKAGES_ROOT/sysroot/usr/lib/arm-linux-gnueabihf
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -29,14 +30,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-mediaserver-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${artifact.name.server}.tar.gz
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 TEMP_DIR="`mktemp -d`"
 BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
@@ -122,6 +117,7 @@ if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so )
 fi
 
+if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then mv -f opt/networkoptix opt/$CUSTOMIZATION; fi
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
 echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
@@ -143,7 +139,7 @@ done
 #copying qt libs
 QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Multimedia Sql"
 if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
-    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns"
+    QTLIBS="Concurrent Core EglDeviceIntegration Gui LabsTemplates MultimediaQuick_p Multimedia Network Qml Quick Sql Xml XmlPatterns DBus Web*"
 fi
 for var in $QTLIBS
 do
@@ -165,7 +161,7 @@ fi
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/mediaserver/etc/
-cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
+cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/mediaserver/etc
 
 #start script and platform specific scripts
 cp -R ./etc $BUILD_DIR
@@ -183,6 +179,14 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
     $TOOLCHAIN_PREFIX"objcopy" --add-gnu-debuglink=$DEBUG_DIR/$PREFIX_DIR/lite_client/bin/mobile_client.debug $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
   fi
+  #creating symlink for rpath needed by mediaserver binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
+
+  #creating symlink for rpath needed by mobile_client binary
+  ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/lib"
+
+  #creating symlink for rpath needed by Qt plugins
+  ln -s "../../lib" "$BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib"
 
   #copying directories needed by lite client
   DIRS_TO_COPY=( \
@@ -202,17 +206,20 @@ if [[ "${box}" == "bpi" ]] && [[ ! -z "$WITH_CLIENT" ]]; then
   #copying debs and uboot
   cp -Rfv $DEBS_DIR $BUILD_DIR/opt
   cp -Rfv $UBOOT_DIR $BUILD_DIR/root
-  
+
   #copying additional binaries
   cp -Rfv $USR_DIR $BUILD_DIR/usr
-  
+
   #additional platform specific files
-  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
-  cp -Rf ${qt.dir}/lib/fonts $BUILD_DIR/$PREFIX_DIR/lite_client/bin/lib
+  cp -Rf ${qt.dir}/libexec $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/translations
+  cp -Rf ${qt.dir}/translations $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -Rf ${qt.dir}/resources $BUILD_DIR/$PREFIX_DIR/lite_client/bin
+  cp -f ${qt.dir}/resources/* $BUILD_DIR/$PREFIX_DIR/lite_client/bin/libexec
   cp -R ./root $BUILD_DIR
   mkdir -p $BUILD_DIR/root/tools/nx
-  cp opt/networkoptix/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
-  chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts
+  cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template $BUILD_DIR/root/tools/nx
+  if [[ "${box}" == "bpi" ]]; then chmod -R 755 $BUILD_DIR/$PREFIX_DIR/mediaserver/var/scripts; fi
 fi
 
 #copying plugins
@@ -230,19 +237,34 @@ if [ -e "$BINS_DIR/plugins" ]; then
     done
 fi
 
+#copying additional sysroot:
+if [[ "${box}" == "bpi" ]]; then
+    SYSROOT_LIBS_TO_COPY+=(
+        libopus \
+        libvpx \
+        libwebpdemux \
+        libwebp )
+    for var in "${SYSROOT_LIBS_TO_COPY[@]}"
+    do
+      echo "Adding lib" ${var}
+      cp $SYSROOT_PREFIX/${var}* $BUILD_DIR/$TARGET_LIB_DIR/ -av
+done
+fi
+
 #copying vox
 VOX_TARGET_DIR=$BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/vox
 mkdir -p $VOX_TARGET_DIR
 cp -Rf $VOX_SOURCE_DIR/* $VOX_TARGET_DIR
 
 if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
-    mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver
-    cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
-    rm -Rf $BUILD_DIR/opt/networkoptix/
+    if [ -f "$BUILD_DIR/etc/init.d/networkoptix-mediaserver" ]; then mv -f $BUILD_DIR/etc/init.d/networkoptix-mediaserver $BUILD_DIR/etc/init.d/$CUSTOMIZATION-mediaserver; fi
+    if [ -f "$BUILD_DIR/etc/init.d/networkoptix-lite-client" ]; then mv -f $BUILD_DIR/etc/init.d/networkoptix-lite-client $BUILD_DIR/etc/init.d/$CUSTOMIZATION-lite-client; fi
 fi
 
 if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
-    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    # Uncomment to enable libc/libstdc++ upgrade.
+    #cp -f -P $PACKAGES_ROOT/libstdc++-6.0.20/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
+    cp -f -P $PACKAGES_ROOT/libstdc++-6.0.19/lib/libstdc++.s* $BUILD_DIR/$TARGET_LIB_DIR
 fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
@@ -278,8 +300,10 @@ if [ ! -f $PACKAGE_NAME ]; then
   echo "Distribution is not created! Exiting"
   exit 1
 fi
-zip ./$UPDATE_NAME.zip ./*
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip
+rm -Rf $BUILD_DIR
 rm -Rf $TEMP_DIR
+rm -Rf $DEBUG_DIR

@@ -19,7 +19,7 @@ public:
     virtual QnUuid getOriginalGuid() const override;
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
 
     virtual QUrl getApiUrl() const override;
 
@@ -29,11 +29,10 @@ protected:
     virtual void updateInternal(const QnResourcePtr& other, Qn::NotifierList& notifiers) override;
 
 signals:
-    void moduleInformationChanged(const QnResourcePtr &resource);
+    void moduleInformationChanged(const QnFakeMediaServerResourcePtr& resource);
 
 private:
     ec2::ApiDiscoveredServerData m_serverData;
     QAuthenticator m_authenticator;
 };
 
-typedef QnSharedResourcePointer<QnFakeMediaServerResource> QnFakeMediaServerResourcePtr;

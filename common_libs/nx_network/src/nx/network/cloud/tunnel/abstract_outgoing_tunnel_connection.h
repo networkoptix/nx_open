@@ -20,8 +20,7 @@ namespace cloud {
  * Cross-Nat tunnel on connector side.
  * @note Class instance can be safely freed within connect handler.
  */
-class AbstractOutgoingTunnelConnection
-:
+class AbstractOutgoingTunnelConnection:
     public aio::BasicPollable
 {
 public:
@@ -29,13 +28,12 @@ public:
      * @param stillValid If false, connection cannot be used anymore 
      * (every subsequent AbstractOutgoingTunnelConnection::establishNewConnection call will fail)
      */
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>,
         bool stillValid)> OnNewConnectionHandler;
 
-    AbstractOutgoingTunnelConnection(aio::AbstractAioThread* aioThread = nullptr)
-    :
+    AbstractOutgoingTunnelConnection(aio::AbstractAioThread* aioThread = nullptr):
         aio::BasicPollable(aioThread)
     {
     }

@@ -14,41 +14,41 @@ namespace aio {
 namespace test {
 
 class TestUdtEpollWrapper:
-    public UdtEpollWrapper
+    public AbstractUdtEpollWrapper
 {
 public:
     virtual int epollWait(
         int /*epollFd*/,
-        std::map<UDTSOCKET, int>* readfds,
-        std::map<UDTSOCKET, int>* writefds,
-        int64_t /*msTimeOut*/,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* lrfds = NULL,
-        std::map<AbstractSocket::SOCKET_HANDLE, int>* wrfds = NULL) override
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t /*timeoutMillis*/,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) override
     {
         std::size_t numberOfEvents = 0;
 
-        if (lrfds)
+        if (readReadySystemSockets)
         {
             numberOfEvents += m_readableSystemSockets.size();
-            *lrfds = m_readableSystemSockets;
+            *readReadySystemSockets = m_readableSystemSockets;
         }
 
-        if (wrfds)
+        if (writeReadySystemSockets)
         {
             numberOfEvents += m_writableSystemSockets.size();
-            *wrfds = m_writableSystemSockets;
+            *writeReadySystemSockets = m_writableSystemSockets;
         }
 
-        if (readfds)
+        if (readReadyUdtSockets)
         {
             numberOfEvents += m_readableUdtSockets.size();
-            *readfds = m_readableUdtSockets;
+            *readReadyUdtSockets = m_readableUdtSockets;
         }
 
-        if (writefds)
+        if (writeReadyUdtSockets)
         {
             numberOfEvents += m_writableUdtSockets.size();
-            *readfds = m_writableUdtSockets;
+            *writeReadyUdtSockets = m_writableUdtSockets;
         }
 
         return (int)numberOfEvents;
@@ -153,6 +153,19 @@ protected:
             handler(it.socket(), it.eventType());
     }
 
+    void initializeBunchOfSocketsOfRandomType()
+    {
+        constexpr int socketCount = 100;
+
+        for (int i = 0; i < socketCount; ++i)
+        {
+            if (nx::utils::random::number<int>(0, 1) > 0)
+                initializeUdtSocket();
+            else
+                initializeRegularSocket();
+        }
+    }
+
     void runRemoveSocketWithMultipleEventsTest()
     {
         subscribeSocketToEvents(aio::etRead | aio::etWrite);
@@ -195,22 +208,13 @@ private:
 
 TEST_F(UnifiedPollSet, removing_socket_with_multiple_events)
 {
-    constexpr int socketCount = 100;
-
-    for (int i = 0; i < socketCount; ++i)
-    {
-        if (nx::utils::random::number<int>(0, 1) > 0)
-            initializeUdtSocket();
-        else
-            initializeRegularSocket();
-    }
-
+    initializeBunchOfSocketsOfRandomType();
     runRemoveSocketWithMultipleEventsTest();
 }
 
 TEST_F(UnifiedPollSet, multiple_pollset_iterators)
 {
-    const auto it = pollset().end();
+    const auto additionalPollsetIteratorInstance = pollset().end();
 
     initializeRegularSocket();
     runRemoveSocketWithMultipleEventsTest();

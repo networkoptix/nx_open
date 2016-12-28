@@ -187,7 +187,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
                 case QnBusiness::ShowPopupAction:
                 {
                     QComboBox* comboBox = new QComboBox(parent);
-                    comboBox->addItem(tr("For All Users"), QnBusiness::EveryOne);
+                    comboBox->addItem(tr("For Users"), QnBusiness::EveryOne);
                     comboBox->addItem(tr("For Administrators Only"), QnBusiness::AdminOnly);
                     return comboBox;
                 }

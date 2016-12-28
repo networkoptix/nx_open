@@ -141,6 +141,8 @@ private:
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;
     WriteBufferMultiplierManager m_writeBufferManager;
+
+    mutable QnMutex m_resourceConnectionMutex;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

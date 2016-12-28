@@ -1,6 +1,6 @@
 #include "settings.h"
 
-#include <utils/common/settings.h>
+#include <nx/utils/settings.h>
 
 namespace nx {
 namespace cdb {

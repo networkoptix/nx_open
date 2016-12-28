@@ -26,20 +26,11 @@
 	<string>${buildNumber}</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.8</string>
-    <key>LSApplicationCategoryType</key>
-    <string>public.app-category.business</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.business</string>
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>
 	<string>© 2011-2014 ${company.name}</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <key>CFBundleURLName</key>
-        <string>Nx Witness Link</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>nx-vms</string>
-        </array>
-    </array>
 </dict>
 </plist>

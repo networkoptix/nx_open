@@ -593,6 +593,7 @@ void QnNavigationItem::at_liveButton_clicked()
     /* Reset speed. It MUST be done before setLive(true) is called. */
     navigator()->setSpeed(1.0);
     navigator()->setLive(true);
+    action(QnActions::PlayPauseAction)->setChecked(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
@@ -659,4 +660,18 @@ QnImageButtonWidget *QnNavigationItem::newActionButton(QnActions::IDType id)
 bool QnNavigationItem::isTimelineRelevant() const
 {
     return this->navigator() && this->navigator()->isTimelineRelevant();
+}
+
+void QnNavigationItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    /* Time slider and time scrollbar has own backgrounds.
+     * Subtract them for proper semi-transparency: */
+    QRegion clipRegion(rect().toRect());
+    if (m_timeSlider->isVisible())
+        clipRegion -= m_timeSlider->geometry().toRect();
+    if (m_timeScrollBar->isVisible())
+        clipRegion -= m_timeScrollBar->geometry().toRect();
+
+    QnScopedPainterClipRegionRollback clipRollback(painter, clipRegion);
+    base_type::paint(painter, option, widget);
 }

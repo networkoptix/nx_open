@@ -11,7 +11,7 @@ QnPlayer
     readonly property bool playing: playbackState == QnPlayer.Playing && mediaStatus == QnPlayer.Loaded
     readonly property bool failed: mediaStatus == QnPlayer.NoMedia
 
-    source: "camera://media/" + resourceId
+    source: resourceId ? "camera://media/" + resourceId : ""
 
     function playLive()
     {

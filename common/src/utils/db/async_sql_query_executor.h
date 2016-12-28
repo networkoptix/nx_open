@@ -23,18 +23,72 @@
 namespace nx {
 namespace db {
 
+class AbstractAsyncSqlQueryExecutor
+{
+public:
+    virtual ~AbstractAsyncSqlQueryExecutor() = default;
+
+    virtual const ConnectionOptions& connectionOptions() const = 0;
+
+    //---------------------------------------------------------------------------------------------
+    // Asynchronous operations.
+
+    virtual void executeUpdate(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) = 0;
+
+    virtual void executeUpdateWithoutTran(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) = 0;
+
+    virtual void executeSelect(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) = 0;
+
+    //---------------------------------------------------------------------------------------------
+    // Synchronous operations.
+
+    virtual DBResult execSqlScriptSync(
+        const QByteArray& script,
+        nx::db::QueryContext* const queryContext) = 0;
+};
+
 /**
  * Executes DB request asynchronously.
  * Scales DB operations on multiple threads
  */
-class AsyncSqlQueryExecutor
+class AsyncSqlQueryExecutor:
+    public AbstractAsyncSqlQueryExecutor
 {
 public:
     AsyncSqlQueryExecutor(const ConnectionOptions& connectionOptions);
     virtual ~AsyncSqlQueryExecutor();
 
+    virtual const ConnectionOptions& connectionOptions() const override;
+
+    /**
+     * Overload for updates with no input data.
+     */
+    virtual void executeUpdate(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override;
+
+    virtual void executeUpdateWithoutTran(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override;
+
+    virtual void executeSelect(
+        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler) override;
+
+    virtual DBResult execSqlScriptSync(
+        const QByteArray& script,
+        nx::db::QueryContext* const queryContext) override;
+
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
+
+    void reserveConnections(int count);
 
     /**
      * Executes data modification request that spawns some output data.
@@ -80,44 +134,6 @@ public:
             std::move(input));
     }
 
-    /**
-     * Overload for updates with no input data.
-     */
-    void executeUpdate(
-        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
-    {
-        scheduleQuery<UpdateWithoutAnyDataExecutor>(
-            std::move(dbUpdateFunc),
-            std::move(completionHandler));
-    }
-
-    void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<DBResult(nx::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, DBResult)> completionHandler)
-    {
-        scheduleQuery<UpdateWithoutAnyDataExecutorNoTran>(
-            std::move(dbUpdateFunc),
-            std::move(completionHandler));
-    }
-
-    template<typename OutputData>
-    void executeSelect(
-        nx::utils::MoveOnlyFunc<
-            DBResult(nx::db::QueryContext*, OutputData* const)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<
-            void(nx::db::QueryContext*, DBResult, OutputData)> completionHandler)
-    {
-        scheduleQuery<SelectExecutor<OutputData>>(
-            std::move(dbSelectFunc),
-            std::move(completionHandler));
-    }
-
-    const ConnectionOptions& connectionOptions() const
-    {
-        return m_connectionOptions;
-    }
-
 private:
     const ConnectionOptions m_connectionOptions;
     mutable QnMutex m_mutex;
@@ -134,7 +150,7 @@ private:
     void reportQueryCancellation(std::unique_ptr<AbstractExecutor>);
     void onConnectionClosed(BaseRequestExecutor* const executorThreadPtr);
     void dropConnectionAsync(
-        const QnMutexLockerBase& /*lk*/,
+        const QnMutexLockerBase&,
         BaseRequestExecutor* const executorThreadPtr);
 
     template<

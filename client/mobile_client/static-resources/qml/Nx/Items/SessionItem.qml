@@ -52,6 +52,7 @@ Pane
     {
         id: mouseArea
 
+        parent: control
         anchors.fill: parent
         onClicked: open()
     }
@@ -70,6 +71,7 @@ Pane
         parent: control
 
         y: 2
+        z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: connectionsModel.hasConnections && !cloudSystem
@@ -86,6 +88,12 @@ Pane
 
     function open()
     {
+        if (!compatible)
+        {
+            Workflow.openOldClientDownloadSuggestion()
+            return
+        }
+
         if (!contentItem.enabled)
             return
 

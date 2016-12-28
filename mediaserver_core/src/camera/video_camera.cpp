@@ -280,6 +280,8 @@ void QnVideoCameraGopKeeper::clearVideoData()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
+    m_primaryGopKeeper(nullptr),
+    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
@@ -287,9 +289,6 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
-    m_primaryGopKeeper = 0;
-    m_secondaryGopKeeper = 0;
-
     //ensuring that vectors will not take much memory
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
@@ -458,10 +457,11 @@ int QnVideoCamera::copyLastGop(
     int cseq,
     bool iFramesOnly)
 {
-    if (primaryLiveStream)
+    if (primaryLiveStream && m_primaryGopKeeper)
         return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
-    else
+    else if (m_secondaryGopKeeper)
         return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
+    return 0;
 }
 
 /*

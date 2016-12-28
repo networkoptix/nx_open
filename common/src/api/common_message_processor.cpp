@@ -116,8 +116,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(userManager, &ec2::AbstractUserNotificationManager::addedOrUpdated,                 this, on_resourceUpdated(ec2::ApiUserData), Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::removed,                        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
     connect(userManager, &ec2::AbstractUserNotificationManager::accessRightsChanged,            this, &QnCommonMessageProcessor::on_accessRightsChanged, Qt::DirectConnection);
-    connect(userManager, &ec2::AbstractUserNotificationManager::groupAddedOrUpdated,            this, &QnCommonMessageProcessor::on_userGroupChanged, Qt::DirectConnection);
-    connect(userManager, &ec2::AbstractUserNotificationManager::groupRemoved,                   this, &QnCommonMessageProcessor::on_userGroupRemoved, Qt::DirectConnection);
+    connect(userManager, &ec2::AbstractUserNotificationManager::userRoleAddedOrUpdated,         this, &QnCommonMessageProcessor::on_userRoleChanged, Qt::DirectConnection);
+    connect(userManager, &ec2::AbstractUserNotificationManager::userRoleRemoved,                this, &QnCommonMessageProcessor::on_userRoleRemoved, Qt::DirectConnection);
 
     auto layoutManager = connection->getLayoutNotificationManager();
     connect(layoutManager, &ec2::AbstractLayoutNotificationManager::addedOrUpdated,             this, on_resourceUpdated(ec2::ApiLayoutData), Qt::DirectConnection);
@@ -185,6 +185,9 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::ApiFullInfoD
 
 void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &data, bool addInformation)
 {
+    if (data.id.isNull())
+        return;
+
     QUrl url(data.url);
 
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(data.id);
@@ -294,18 +297,18 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
     }
 }
 
-void QnCommonMessageProcessor::on_userGroupChanged(const ec2::ApiUserGroupData& userGroup)
+void QnCommonMessageProcessor::on_userRoleChanged(const ec2::ApiUserRoleData& userRole)
 {
-    qnUserRolesManager->addOrUpdateUserRole(userGroup);
+    qnUserRolesManager->addOrUpdateUserRole(userRole);
 }
 
-void QnCommonMessageProcessor::on_userGroupRemoved(const QnUuid& groupId)
+void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
-    qnUserRolesManager->removeUserRole(groupId);
+    qnUserRolesManager->removeUserRole(userRoleId);
     for (const auto& user : qnResPool->getResources<QnUserResource>())
     {
-        if (user->userGroup() == groupId)
-            user->setUserGroup(QnUuid());
+        if (user->userRoleId() == userRoleId)
+            user->setUserRoleId(QnUuid());
     }
 }
 
@@ -507,7 +510,7 @@ void QnCommonMessageProcessor::resetTime()
                 qWarning() << "Time for peer" << info.peerId << "received before peer was found";
                 continue;
             }
-            NX_ASSERT(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType == Qn::PT_Server);
+            NX_ASSERT(ec2::ApiPeerData::isServer(QnRuntimeInfoManager::instance()->item(info.peerId).data.peer.peerType));
             emit peerTimeChanged(info.peerId, syncTime, info.time);
         }
     });
@@ -518,7 +521,7 @@ void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataL
     qnSharedResourcesManager->reset(accessRights);
 }
 
-void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserGroupDataList& roles)
+void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserRoleDataList& roles)
 {
     qnUserRolesManager->resetUserRoles(roles);
 }
@@ -592,7 +595,7 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
     qnStatusDictionary->clear();
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = qnResPool->getResourceById(id))
-            emit resource->statusChanged(resource);
+            emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)
@@ -617,7 +620,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetCamerasWithArchiveList(fullData.cameraHistory);
     resetStatusList(fullData.resStatusList);
     resetAccessRights(fullData.accessRights);
-    resetUserRoles(fullData.userGroups);
+    resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
     resetTime();
 

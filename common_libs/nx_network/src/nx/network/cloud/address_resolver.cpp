@@ -14,7 +14,7 @@
 } while (0)
 
 static const auto kDnsCacheTimeout = std::chrono::seconds(10);
-static const auto kMediatorCacheTimeout = std::chrono::seconds(10);
+static const auto kMediatorCacheTimeout = std::chrono::seconds(1);
 
 namespace nx {
 namespace network {
@@ -205,6 +205,19 @@ void AddressResolver::resolveAsync(
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
+    // Checking if hostName is fixed address.
+    const auto hostStr = hostName.toString().toStdString();
+    const auto ipv4Address = inet_addr(hostStr.c_str());
+    if (ipv4Address != INADDR_NONE)
+    {
+        // Resolved.
+        struct in_addr resolvedAddress;
+        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+        resolvedAddress.s_addr = ipv4Address;
+        AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
+        return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+    }
+
     if (SocketGlobals::config().isHostDisabled(hostName))
         return handler(SystemError::noPermission, {});
 
@@ -322,7 +335,7 @@ void AddressResolver::HostAddressInfo::setDnsEntries(
     std::vector<AddressEntry> entries)
 {
     m_dnsState = State::resolved;
-    m_dnsResolveTime = std::chrono::system_clock::now();
+    m_dnsResolveTime = std::chrono::steady_clock::now();
     m_dnsEntries = std::move(entries);
 }
 
@@ -330,24 +343,21 @@ void AddressResolver::HostAddressInfo::setMediatorEntries(
         std::vector<AddressEntry> entries)
 {
     m_mediatorState = State::resolved;
-    m_mediatorResolveTime = std::chrono::system_clock::now();
+    m_mediatorResolveTime = std::chrono::steady_clock::now();
     m_mediatorEntries = std::move(entries);
 }
 
 void AddressResolver::HostAddressInfo::checkExpirations()
 {
     if (m_dnsState == State::resolved &&
-        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::system_clock::now())
+        m_dnsResolveTime + kDnsCacheTimeout < std::chrono::steady_clock::now())
     {
         m_dnsState = State::unresolved;
         m_dnsEntries.clear();
     }
 
-    if (!kResolveOnMediator)
-        return; // just a short cut
-
     if (m_mediatorState == State::resolved &&
-        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::system_clock::now())
+        m_mediatorResolveTime + kMediatorCacheTimeout < std::chrono::steady_clock::now())
     {
         m_mediatorState = State::unresolved;
         m_mediatorEntries.clear();
@@ -402,6 +412,11 @@ AddressResolver::RequestInfo::RequestInfo(
 {
 }
 
+bool AddressResolver::isMediatorAvailable() const
+{
+    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
+}
+
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 {
     const auto domain = info->first.toString();
@@ -422,6 +437,8 @@ void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
 void AddressResolver::dnsResolve(
     HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion)
 {
+    NX_LOGX(lm("dnsResolve. %1. %2").str(info->first).arg((int)info->second.dnsState()), cl_logDEBUG2);
+
     switch (info->second.dnsState())
     {
         case HostAddressInfo::State::resolved:
@@ -433,6 +450,8 @@ void AddressResolver::dnsResolve(
             break; // continue
     }
 
+    NX_LOGX(lm("dnsResolve async. %1").str(info->first), cl_logDEBUG2);
+
     info->second.dnsProgress();
     QnMutexUnlocker ulk(lk);
     m_dnsResolver.resolveAsync(
@@ -440,6 +459,8 @@ void AddressResolver::dnsResolve(
         [this, info, needMediator, ipVersion](
             SystemError::ErrorCode code, std::deque<HostAddress> ips)
         {
+            NX_LOGX(lm("dnsResolve async done. %1, %2").str(code).str(ips.size()), cl_logDEBUG2);
+
             std::vector<Guard> guards;
 
             QnMutexLocker lk(&m_mutex);
@@ -455,6 +476,7 @@ void AddressResolver::dnsResolve(
 
             info->second.setDnsEntries(std::move(entries));
             guards = grabHandlers(code, info);
+            NX_LOGX(lm("dnsResolve async done. grabndlers.size() = %1").str(guards.size()), cl_logDEBUG2);
             if (needMediator && !info->second.isResolved(NatTraversalSupport::enabled))
                 mediatorResolve(info, &lk, false, ipVersion); // in case it's not resolved yet
         },
@@ -480,8 +502,7 @@ void AddressResolver::mediatorResolve(
         return mediatorResolveImpl(info, lk, needDns, ipVersion);
 
     SystemError::ErrorCode resolveResult = SystemError::notImplemented;
-    if (info->second.isLikelyCloudAddress
-        && static_cast<bool>(nx::network::SocketGlobals::mediatorConnector().mediatorAddress()))
+    if (info->second.isLikelyCloudAddress && isMediatorAvailable())
     {
         info->second.setMediatorEntries({AddressEntry(AddressType::cloud, info->first)});
         resolveResult = SystemError::noError;

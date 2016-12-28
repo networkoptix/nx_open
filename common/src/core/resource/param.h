@@ -72,6 +72,7 @@ namespace Qn
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
+    static const QString IO_OVERLAY_STYLE_PARAM_NAME = lit("ioOverlayStyle");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");

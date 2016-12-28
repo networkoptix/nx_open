@@ -16,8 +16,8 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx_http {
 
@@ -240,9 +240,9 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
 
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(AF_INET);
-    ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(sizeof(testData) - 1, sock.send(testData, sizeof(testData)-1));
+    const auto socket = SocketFactory::createStreamSocket();
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
 
 TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
@@ -257,15 +257,15 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
-    nx::network::TCPSocket sock(AF_INET);
-    ASSERT_TRUE(sock.connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(kQuery.size(), sock.send(kQuery.data(), kQuery.size()));
+    const auto socket = SocketFactory::createStreamSocket();
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(kQuery.size(), socket->send(kQuery.data(), kQuery.size()));
 
     nx::Buffer buffer(1024, Qt::Uninitialized);
-    ASSERT_GT(sock.recv(buffer.data(), buffer.size(), 0), 0);
+    ASSERT_GT(socket->recv(buffer.data(), buffer.size(), 0), 0);
 
     const auto start = std::chrono::steady_clock::now();
-    ASSERT_EQ(0, sock.recv(buffer.data(), buffer.size(), 0));
+    ASSERT_EQ(0, socket->recv(buffer.data(), buffer.size(), 0));
     ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
 }
 

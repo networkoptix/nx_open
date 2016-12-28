@@ -110,7 +110,7 @@ private:
     void enqueueVideoFrame(QVideoFramePtr decodedFrame);
     int getBufferingMask() const;
     QnCompressedVideoDataPtr queueVideoFrame(const QnCompressedVideoDataPtr& videoFrame);
-    bool checkSequence(int sequence) const;
+    bool checkSequence(int sequence);
 private:
     /**
      * In case of multi-sensor video camera this class is used to calculate

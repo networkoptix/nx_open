@@ -334,16 +334,21 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
+        //TODO: #vkutin #gdm #common Make a style metric that holds this value.
+        auto topMargin = overlayWidgets()->buttonsOverlay
+            ? overlayWidgets()->buttonsOverlay->leftButtonsBar()->uniformButtonSize().height()
+            : 0.0;
+
         m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
-        m_ioModuleOverlayWidget->setCamera(m_camera);
+        m_ioModuleOverlayWidget->setIOModule(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        m_ioModuleOverlayWidget->setInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
-        addOverlayWidget(m_ioModuleOverlayWidget
-            , detail::OverlayParams(Visible, true, true));
+        m_ioModuleOverlayWidget->setUserInputEnabled(accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission));
+        m_ioModuleOverlayWidget->setContentsMargins(0.0, topMargin, 0.0, 0.0);
+        addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
-        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
-            , [this]() { updateIoModuleVisibility(true); });
+        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged,
+            this, [this]() { updateIoModuleVisibility(true); });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -1130,6 +1135,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     }
 
     QRectF sourceRect = toSubRect(channelRect, paintRect);
+    m_renderer->setBlurFactor(m_statusOverlay->opacity());
     Qn::RenderStatus result = m_renderer->paint(channel, sourceRect, paintRect, effectiveOpacity());
     m_paintedChannels[channel] = true;
 
@@ -1712,8 +1718,12 @@ void QnMediaResourceWidget::updateAspectRatio()
 {
     if (item() && item()->dewarpingParams().enabled && m_dewarpingParams.enabled)
     {
-        setAspectRatio(item()->dewarpingParams().panoFactor);
-        return;
+        const auto panoFactor = item()->dewarpingParams().panoFactor;
+        if (panoFactor > 1)
+        {
+            setAspectRatio(panoFactor);
+            return;
+        }
     }
 
     qreal baseAspectRatio = calculateVideoAspectRatio();
@@ -1923,7 +1933,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     updateOverlayWidgetsVisibility(animate);
 
     const auto statusOverlay = calculateStatusOverlay();
-    statusOverlayController()->setStatusOverlay(statusOverlay);
+    statusOverlayController()->setStatusOverlay(statusOverlay, animate);
     updateOverlayButton(statusOverlay);
 }
 

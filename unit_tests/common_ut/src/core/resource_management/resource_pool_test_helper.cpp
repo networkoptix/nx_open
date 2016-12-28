@@ -98,8 +98,8 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
     return storage;
 }
 
-ec2::ApiUserGroupData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
+ec2::ApiUserRoleData QnResourcePoolTestHelper::createRole(Qn::GlobalPermissions permissions)
 {
-    return ec2::ApiUserGroupData(QnUuid::createUuid(), QStringLiteral("test_role"),
+    return ec2::ApiUserRoleData(QnUuid::createUuid(), QStringLiteral("test_role"),
         permissions);
 }

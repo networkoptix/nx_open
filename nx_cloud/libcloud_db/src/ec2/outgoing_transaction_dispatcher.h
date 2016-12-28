@@ -14,10 +14,21 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
+class AbstractOutgoingTransactionDispatcher
+{
+public:
+    virtual ~AbstractOutgoingTransactionDispatcher() = default;
+
+    virtual void dispatchTransaction(
+        const nx::String& systemId,
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) = 0;
+};
+
 /**
  * Dispatches transactions that has to be sent to other peers.
  */
-class OutgoingTransactionDispatcher
+class OutgoingTransactionDispatcher:
+    public AbstractOutgoingTransactionDispatcher
 {
 public:
     typedef nx::utils::Subscription<
@@ -27,9 +38,9 @@ public:
 
     OutgoingTransactionDispatcher();
 
-    void dispatchTransaction(
+    virtual void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     OnNewTransactionSubscription* onNewTransactionSubscription();
 

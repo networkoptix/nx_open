@@ -224,9 +224,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchExportHandler>();
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
-#ifdef _DEBUG
     context->instance<QnWorkbenchDebugHandler>();
-#endif
     context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchWebPageHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
@@ -287,7 +285,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::ToggleTourModeAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
-    addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
     addAction(action(QnActions::SystemAdministrationAction));
     if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))

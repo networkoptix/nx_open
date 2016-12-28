@@ -26,6 +26,7 @@ QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
 QnServerPtzControllerPool::~QnServerPtzControllerPool()
 {
     disconnect( this, nullptr, this, nullptr );
+    deinitialize();
 }
 
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {

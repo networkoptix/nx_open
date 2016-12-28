@@ -9,19 +9,25 @@
 namespace nx {
 namespace cdb {
 
+enum class NotificationType
+{
+    activateAccount,
+    restorePassword,
+    systemShared,
+    systemInvite,
+};
+
 //-------------------------------------------------------------------------------------------------
 // Notification data
 
-class ActivateAccountData
+struct ActivateAccountData
 {
-public:
     std::string code;
 };
 #define ActivateAccountData_Fields (code)
 
-class SystemSharedData
+struct SystemSharedData
 {
-public:
     std::string sharer_email;
     std::string sharer_name;
     std::string system_name;
@@ -29,25 +35,33 @@ public:
 };
 #define SystemSharedData_Fields (sharer_email)(sharer_name)(system_name)(system_id)
 
-class InviteUserData:
-    public ActivateAccountData,
-    public SystemSharedData
+struct InviteUserData:
+    ActivateAccountData,
+    SystemSharedData
 {
 };
 #define InviteUserData_Fields \
     ActivateAccountData_Fields \
     SystemSharedData_Fields
 
-template<class MessageData>
-class NotificationData
+struct BasicNotification
 {
-public:
     std::string user_email;
-    std::string type;
-    MessageData message;
-    std::string secret;
+    NotificationType type;
+    std::string customization;
 };
-#define NotificationData_Fields (user_email)(type)(message)(secret)
+
+#define BasicNotification_Fields (user_email)(type)(customization)
+
+bool operator==(const BasicNotification& one, const BasicNotification& two);
+
+template<class MessageData>
+struct NotificationData:
+    BasicNotification
+{
+    MessageData message;
+};
+#define NotificationData_Fields BasicNotification_Fields (message)
 
 typedef NotificationData<ActivateAccountData> ActivateAccountNotificationData;
 #define ActivateAccountNotificationData_Fields NotificationData_Fields
@@ -59,7 +73,8 @@ typedef NotificationData<InviteUserData> InviteUserNotificationData;
 #define InviteUserNotificationData_Fields NotificationData_Fields
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (ActivateAccountData) \
+    (BasicNotification) \
+        (ActivateAccountData) \
         (SystemSharedData) \
         (InviteUserData) \
         (ActivateAccountNotificationData) \
@@ -87,7 +102,7 @@ public:
 };
 
 /**
- * Provides \a AbstractNotification::serializeToJson implementation for a descendant.
+ * Provides AbstractNotification::serializeToJson implementation for a descendant.
  */
 template<typename BaseType, typename FusionEnabledDescendantType>
 class NotificationSerializationProvider:
@@ -160,3 +175,5 @@ public:
 
 } // namespace cdb
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::NotificationType), (lexical))

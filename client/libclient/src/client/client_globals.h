@@ -21,9 +21,9 @@ namespace Qn
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
+        OtherSystemsNode,       /**< Root node for remote systems. */
         LocalResourcesNode,     /**< Root node for local resources. */
         LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
-        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -37,8 +37,8 @@ namespace Qn
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
@@ -46,6 +46,7 @@ namespace Qn
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
+        CloudSystemNode,        /**< Node that represents available cloud system. */
         SystemNode,             /**< Node that represents systems but the current. */
 
         NodeTypeCount
@@ -202,6 +203,7 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */

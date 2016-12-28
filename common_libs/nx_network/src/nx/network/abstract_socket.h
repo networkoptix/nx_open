@@ -427,8 +427,10 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
         \note due to some OS limitations some values might not be actually set eg
-            windows: probeCount is not supported
-            macosx: only boolean enabled/disabled is supported
+            linux: full support
+            windows: only timeSec and intervalSec support
+            macosx: only timeSec support
+            other unix: only boolean enabled/disabled is supported
     */
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) = 0;
     //!Reads keep alive options

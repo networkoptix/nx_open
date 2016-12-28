@@ -4,8 +4,6 @@
 #include <private/qqmlvaluetype_p.h>
 
 #include <context/connection_manager.h>
-#include <context/context_settings.h>
-#include <context/session_settings.h>
 #include <ui/timeline/timeline.h>
 #include <ui/qml/quick_item_mouse_tracker.h>
 #include <ui/qml/text_input.h>
@@ -46,7 +44,6 @@ void QnMobileClientMetaTypes::registerMetaTypes() {
 void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
-    qmlRegisterUncreatableType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings", lit("Cannot create an instance of QnContextSettings."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
     qmlRegisterType<QnOrderedSystemsModel>("com.networkoptix.qml", 1, 0, "QnSystemsModel");
     qmlRegisterType<QnRecentLocalConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentLocalConnectionsModel");

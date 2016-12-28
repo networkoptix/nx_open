@@ -39,6 +39,7 @@ var SettingsPage = function () {
 
     this.get = function () {
         browser.get('/#/settings');
+        browser.waitForAngular();
     };
     this.getSysTab = function () {
         p.get();
@@ -68,6 +69,7 @@ var SettingsPage = function () {
         this.cloudEmailInput.sendKeys(cloudEmail);
         this.cloudPasswordInput.sendKeys(cloudPassword);
         this.dialogConnectButton.click();
+        browser.sleep(4000);
         // expect(this.dialog.getText()).toContain('System is connected to ');
         // this.cloudDialogCloseButton.click();
     };
@@ -86,14 +88,16 @@ var SettingsPage = function () {
         p.dialogDisconnectButton.click();
         //expect(p.dialogMessage.getText()).toContain('System was disconnected from ');
 
-        p.get(); //refresh to end any pending request
+        browser.sleep(4000);
         //  If no local admin existed, add one
         p.helper.checkPresent(p.dialog).then( function() {
             p.helper.checkContainsString(p.dialog, 'Create local administrator').then( function () {
                 p.dialog.element(by.css('[name=password]')).sendKeys(cloudPassword);
                 p.dialog.element(by.css('[name=localPasswordConfirmation]')).sendKeys(cloudPassword);
             }, function() {});
-        }, p.helper.login(p.helper.admin, p.helper.password)); // if dialog is not present
+        }, function () { // if dialog is not present
+            p.helper.login(p.helper.admin, p.helper.password)
+        });
         browser.refresh();
     }
 };

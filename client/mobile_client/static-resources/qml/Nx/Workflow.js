@@ -144,6 +144,21 @@ function openLiteClientControlScreen(clientId)
     item.forceActiveFocus()
 }
 
+function openLiteClientWelcomeScreen()
+{
+    var item = stackView.get(0, Controls.StackView.ForceLoad)
+    if (item && item.objectName == "liteClientWelcomeScreen")
+    {
+        if (stackView.depth > 1)
+            stackView.pop(item)
+    }
+    else
+    {
+        item = stackView.replace(null, Qt.resolvedUrl("Screens/LiteClientWelcomeScreen.qml"))
+        item.forceActiveFocus()
+    }
+}
+
 function openDialog(path, properties)
 {
     var component = Qt.createComponent(path)

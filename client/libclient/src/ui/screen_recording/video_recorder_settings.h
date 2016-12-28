@@ -1,35 +1,40 @@
-#ifndef VIDEORECORDERSETTINGS_H
-#define VIDEORECORDERSETTINGS_H
+#pragma once
 
-#include <QtCore/QRegExp>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include <QtMultimedia/QAudioDeviceInfo>
 #include "qnaudio_device_info.h"
 
 namespace Qn {
-    enum CaptureMode { 
-        FullScreenMode, 
-        FullScreenNoAeroMode,
-        WindowMode 
-    };
 
-    enum DecoderQuality { 
-        BestQuality, 
-        BalancedQuality, 
-        PerformanceQuality 
-    };
+enum CaptureMode
+{
+    FullScreenMode,
+    FullScreenNoAeroMode,
+    WindowMode
+};
 
-    enum Resolution { 
-        NativeResolution, 
-        QuaterNativeResolution, 
-        Exact1920x1080Resolution, 
-        Exact1280x720Resolution, 
-        Exact640x480Resolution, 
-        Exact320x240Resolution 
-    };
+enum DecoderQuality
+{
+    BestQuality,
+    BalancedQuality,
+    PerformanceQuality
+};
+
+enum Resolution
+{
+    NativeResolution,
+    QuaterNativeResolution,
+    Exact1920x1080Resolution,
+    Exact1280x720Resolution,
+    Exact640x480Resolution,
+    Exact320x240Resolution
+};
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(Qn::CaptureMode)
+Q_DECLARE_METATYPE(Qn::DecoderQuality)
+Q_DECLARE_METATYPE(Qn::Resolution)
 
 class QnVideoRecorderSettings : public QObject
 {
@@ -79,5 +84,3 @@ private:
 private:
     QSettings settings;
 };
-
-#endif // VIDEORECORDERSETTINGS_H

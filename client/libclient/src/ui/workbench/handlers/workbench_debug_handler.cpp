@@ -28,59 +28,6 @@
 namespace {
 
 
-
-// -------------------------------------------------------------------------- //
-// QnDebugControlDialog
-// -------------------------------------------------------------------------- //
-class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
-{
-    typedef QnDialog base_type;
-
-public:
-    QnDebugControlDialog(QWidget *parent = NULL):
-        base_type(parent),
-        QnWorkbenchContextAware(parent)
-    {
-        using namespace nx::client::ui::dialogs;
-
-        QVBoxLayout *layout = new QVBoxLayout();
-        layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
-        layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
-        layout->addWidget(newActionButton(QnActions::DebugShowResourcePoolAction));
-
-        {
-            auto button = new QPushButton(lit("Applaucher control"), parent);
-            connect(button, &QPushButton::clicked, this, [this]
-            {
-                auto dialog(new QnApplauncherControlDialog(mainWindow()));
-                dialog->show();
-            });
-            layout->addWidget(button);
-        }
-
-        {
-            auto button = new QPushButton(lit("Animations control"), parent);
-            connect(button, &QPushButton::clicked, this, [this]
-            {
-                auto dialog(new AnimationsControlDialog(mainWindow()));
-                dialog->show();
-            });
-            layout->addWidget(button);
-        }
-
-        setLayout(layout);
-    }
-
-private:
-    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL)
-    {
-        QToolButton *button = new QToolButton(parent);
-        button->setDefaultAction(menu()->action(actionId));
-        button->setToolButtonStyle(Qt::ToolButtonTextOnly);
-        return button;
-    }
-};
-
 class QnWebViewDialog: public QDialog
 {
     using base_type = QDialog;
@@ -98,9 +45,9 @@ public:
         layout->addWidget(m_urlLineEdit);
         layout->addWidget(m_webView);
         connect(m_urlLineEdit, &QLineEdit::returnPressed, this, [this]()
-        {
-            m_webView->load(m_urlLineEdit->text());
-        });
+            {
+                m_webView->load(m_urlLineEdit->text());
+            });
     }
 
     QString url() const { return m_urlLineEdit->text(); }
@@ -115,6 +62,72 @@ private:
     QWebView* m_webView;
     QLineEdit* m_urlLineEdit;
 };
+
+// -------------------------------------------------------------------------- //
+// QnDebugControlDialog
+// -------------------------------------------------------------------------- //
+class QnDebugControlDialog: public QnDialog, public QnWorkbenchContextAware
+{
+    typedef QnDialog base_type;
+
+public:
+    QnDebugControlDialog(QWidget *parent = NULL):
+        base_type(parent),
+        QnWorkbenchContextAware(parent)
+    {
+        using namespace nx::client::ui::dialogs;
+
+        QVBoxLayout *layout = new QVBoxLayout(this);
+        layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));
+        layout->addWidget(newActionButton(QnActions::DebugIncrementCounterAction));
+
+        auto addButton = [this, parent, layout]
+            (const QString& name, std::function<void(void)> handler)
+            {
+                auto button = new QPushButton(name, parent);
+                connect(button, &QPushButton::clicked, handler);
+                layout->addWidget(button);
+            };
+
+        addButton(lit("Applaucher control"), [this] { (new QnApplauncherControlDialog(this))->show();});
+
+        addButton(lit("Animations control"), [this] { (new AnimationsControlDialog(this))->show(); });
+
+        addButton(lit("Web View"), [this]
+            {
+                auto dialog(new QnWebViewDialog(this));
+                dialog->setUrl(lit("http://localhost:7001"));
+                dialog->show();
+            });
+
+        addButton(lit("Palette"), [this]
+            {
+                QnPaletteWidget *w = new QnPaletteWidget(this);
+                w->setPalette(qApp->palette());
+                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                messageBox->addCustomWidget(w);
+                messageBox->show();
+            });
+
+        addButton(lit("Resource Pool"), [this]
+            {
+                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources()));
+                messageBox->show();
+            });
+
+    }
+
+private:
+    QToolButton *newActionButton(QnActions::IDType actionId, QWidget *parent = NULL)
+    {
+        QToolButton *button = new QToolButton(parent);
+        button->setDefaultAction(menu()->action(actionId));
+        button->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        return button;
+    }
+};
+
 
 
 } // namespace
@@ -135,46 +148,23 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
         &QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered);
     connect(action(QnActions::DebugDecrementCounterAction), &QAction::triggered, this,
         &QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered);
-    connect(action(QnActions::DebugShowResourcePoolAction), &QAction::triggered, this,
-        &QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered);
 #endif
 }
 
 void QnWorkbenchDebugHandler::at_debugControlPanelAction_triggered()
 {
-    QScopedPointer<QnDebugControlDialog> dialog(new QnDebugControlDialog(mainWindow()));
-    dialog->exec();
+    QnDebugControlDialog* dialog(new QnDebugControlDialog(mainWindow()));
+    dialog->show();
 }
 
 void QnWorkbenchDebugHandler::at_debugIncrementCounterAction_triggered()
 {
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() + 1);
     qDebug() << qnRuntime->debugCounter();
-
-    at_debugControlPanelAction_triggered();
-    return;
-
-    auto showPalette = [this]
-    {
-        QnPaletteWidget *w = new QnPaletteWidget();
-        w->setPalette(qApp->palette());
-        w->show();
-    };
-
-    // the palette widget code might still be required
-    Q_UNUSED(showPalette);
 }
 
 void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
 {
-    auto dialog(new QnWebViewDialog(mainWindow()));
-    dialog->setUrl(lit("http://localhost:7001"));
-    dialog->show();
-}
-
-void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered()
-{
-    QnMessageBox messageBox(mainWindow());
-    messageBox.addCustomWidget(new QnResourceListView(qnResPool->getResources()));
-    messageBox.exec();
+    qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
+    qDebug() << qnRuntime->debugCounter();
 }

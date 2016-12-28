@@ -88,6 +88,9 @@ public: // Properties
 
     QnAppInfo* appInfo() const;
 
+public:
+    void setupFactorySystem(const QString& serverUrl);
+
 public slots:
     bool isAcceptableDrag(const QList<QUrl>& urls);
 
@@ -106,8 +109,6 @@ public slots:
 
     void connectToAnotherSystem();
 
-    void setupFactorySystem(const QString& serverUrl);
-
     void logoutFromCloud();
 
     void manageCloudAccount();
@@ -118,7 +119,13 @@ public slots:
 
     void forceActiveFocus();
 
+    void forgetPassword(
+        const QString& localSystemId,
+        const QString& userName);
+
 public slots:
+    QColor getContrastColor(const QString& group);
+
     QColor getPaletteColor(const QString& group, int index);
 
     QColor getDarkerColor(const QColor& color, int offset = 1);

@@ -52,7 +52,7 @@ ios {
     OTHER_FILES += $${QMAKE_INFO_PLIST}
     OBJECTIVE_SOURCES += \
         ${basedir}/src/ui/window_utils_ios.mm \
-        ${basedir}/src/utils/settings_migration_ios.mm \
+        ${basedir}/src/nx/mobile_client/settings/settings_migration_ios.mm \
         ${basedir}/src/utils/app_delegate.mm
 
     ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
@@ -67,6 +67,9 @@ ios {
     QMAKE_XCODE_CODE_SIGN_IDENTITY = "${ios.sign.identity}"
     XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
     XCODEBUILD_FLAGS += CODE_SIGN_ENTITLEMENTS=${mobile_client_entitlements}
+    ${ios.skip.sign}: true {
+        XCODEBUILD_FLAGS += CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+    }
 }
 
 SOURCES += ${project.build.directory}/mobile_client_app_info_impl.cpp

@@ -209,6 +209,9 @@ public:
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
 
+    int maxRtpRetryCount() const;
+    void setMaxRtpRetryCount(int newVal);
+
     bool sequentialFlirOnvifSearcherEnabled() const;
     void setSequentialFlirOnvifSearcherEnabled(bool newVal);
 
@@ -321,6 +324,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
+
+    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     AdaptorList m_allAdaptors;
 

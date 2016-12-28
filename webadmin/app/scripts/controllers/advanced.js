@@ -10,7 +10,7 @@ angular.module('webadminApp')
             }
         });
         mediaserver.getModuleInformation().then(function (r) {
-            if(r.data.reply.ecDbReadOnly){
+            if(r.data.reply.flags.noHDD){
                 $location.path('/info'); //readonly - redirect
                 return;
             }

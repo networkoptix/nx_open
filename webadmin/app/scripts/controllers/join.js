@@ -62,6 +62,10 @@ angular.module('webadminApp')
                 case 'SAFE_MODE':
                     errorToShow =  L.join.safeMode;
                     break;
+
+                case 'UNCONFIGURED_SYSTEM':
+                    errorToShow = L.join.newSystemError;
+                    break;
                 case 'CONFIGURATION_ERROR':
                     errorToShow = L.join.configError;
                     break;

@@ -63,11 +63,28 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     PostProcessList* const transactionsToSend,
     TransactionType::Value transactionType)
 {
+    NX_LOG(lit("%1 Processing remove resourse %2 status transaction. Transaction type = %3")
+           .arg(Q_FUNC_INFO)
+           .arg(id.toString())
+           .arg(transactionType), cl_logDEBUG2);
+
     return removeHelper(
         id,
         ApiCommand::removeResourceStatus,
         transactionsToSend,
         transactionType);
+}
+
+detail::ServerQueryProcessor::PostProcessList& detail::ServerQueryProcessor::getStaticPostProcessList()
+{
+    static detail::ServerQueryProcessor::PostProcessList postProcessList;
+    return postProcessList;
+}
+
+QnMutex& detail::ServerQueryProcessor::getStaticUpdateMutex()
+{
+    static QnMutex updateMutex;
+    return updateMutex;
 }
 
 } //namespace ec2

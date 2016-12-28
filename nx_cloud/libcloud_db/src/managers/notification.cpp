@@ -5,50 +5,50 @@
 namespace nx {
 namespace cdb {
 
+bool operator==(const BasicNotification& one, const BasicNotification& two)
+{
+    return one.user_email == two.user_email
+        && one.type == two.type
+        && one.customization == two.customization;
+}
+
 //-------------------------------------------------------------------------------------------------
 // ActivateAccountNotification
 
-constexpr const char* kConfirmaionEmailNotificationName = "activate_account";
-
 ActivateAccountNotification::ActivateAccountNotification()
 {
-    type = kConfirmaionEmailNotificationName;
+    type = NotificationType::activateAccount;
 }
 
 //-------------------------------------------------------------------------------------------------
 // RestorePasswordNotification
 
-constexpr const char* kRestorePasswordNotificationName = "restore_password";
-
 RestorePasswordNotification::RestorePasswordNotification()
 {
-    type = kRestorePasswordNotificationName;
+    type = NotificationType::restorePassword;
 }
 
 //-------------------------------------------------------------------------------------------------
 // SystemSharedNotification
 
-constexpr const char* kSystemSharedNotificationName = "system_shared";
-
 SystemSharedNotification::SystemSharedNotification()
 {
-    type = kSystemSharedNotificationName;
+    type = NotificationType::systemShared;
 }
 
 //-------------------------------------------------------------------------------------------------
 // InviteUserNotification
 
-constexpr const char* kInviteUserNotificationName = "system_invite";
-
 InviteUserNotification::InviteUserNotification()
 {
-    type = kInviteUserNotificationName;
+    type = NotificationType::systemInvite;
 }
 
 //-------------------------------------------------------------------------------------------------
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ActivateAccountData) \
+    (BasicNotification) \
+        (ActivateAccountData) \
         (SystemSharedData) \
         (InviteUserData) \
         (ActivateAccountNotificationData) \
@@ -59,3 +59,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 } // namespace cdb
 } // namespace nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, NotificationType,
+    (nx::cdb::NotificationType::activateAccount, "activate_account")
+    (nx::cdb::NotificationType::restorePassword, "restore_password")
+    (nx::cdb::NotificationType::systemShared, "system_shared")
+    (nx::cdb::NotificationType::systemInvite, "system_invite")
+)

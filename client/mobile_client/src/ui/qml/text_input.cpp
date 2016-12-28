@@ -72,14 +72,24 @@ void QnQuickTextInputPrivate::updateInputMethod()
 }
 
 QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
-    base_type(*(new QnQuickTextInputPrivate), parent)
+    base_type(*(new QnQuickTextInputPrivate), parent),
+    m_contextMenuPos(),
+    m_selectionStart(-1),
+    m_selectionEnd(-1),
+    m_cursorPosition(-1),
+    m_pressAndHoldTimer(new QTimer(this))
 {
     Q_D(QnQuickTextInput);
 
     auto updateInputMethod = [d](){ d->updateInputMethod(); };
-
+    setAcceptedMouseButtons(Qt::AllButtons);
     connect(this, &QnQuickTextInput::visibleChanged, updateInputMethod);
     connect(this, &QnQuickTextInput::enabledChanged, updateInputMethod);
+
+    m_pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
+    m_pressAndHoldTimer->setSingleShot(true);
+    connect(m_pressAndHoldTimer, &QTimer::timeout, this, &QnQuickTextInput::emitPressAndHold);
+    setPersistentSelection(true);
 }
 
 QnQuickTextInput::~QnQuickTextInput()
@@ -172,11 +182,32 @@ void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& 
     d->resizeBackground();
 }
 
+void QnQuickTextInput::emitPressAndHold()
+{
+    if (m_contextMenuPos.isNull())
+        return;
+
+    const auto textLen = text().length();
+    if (m_selectionStart != m_selectionEnd)
+        select(m_selectionStart, m_selectionEnd);
+    else
+        setCursorPosition(m_cursorPosition);
+    emit pressAndHold(m_contextMenuPos);
+};
+
+
 void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {
     Q_D(QnQuickTextInput);
 
+    m_contextMenuPos = event->pos();
+    m_selectionStart = selectionStart();
+    m_selectionEnd = selectionEnd();
+    if (event->button() == Qt::LeftButton)
+        m_pressAndHoldTimer->start();
+
     base_type::mousePressEvent(event);
+    m_cursorPosition = cursorPosition();
 
     d->hscrollWhenPressed = d->hscroll;
     d->dragStarted = false;
@@ -188,6 +219,16 @@ void QnQuickTextInput::mouseMoveEvent(QMouseEvent* event)
 
     if (qAbs(int(event->localPos().x() - d->pressPos.x())) > QGuiApplication::styleHints()->startDragDistance())
         d->dragStarted = true;
+
+    if (d->dragStarted)
+    {
+        m_contextMenuPos = QPoint();
+        m_pressAndHoldTimer->stop();
+    }
+    else
+    {
+        m_contextMenuPos = event->pos();
+    }
 
     if (!d->scrollByMouse)
     {
@@ -232,6 +273,9 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
     Q_D(QnQuickTextInput);
     if (!d->dragStarted)
         emit clicked();
+
+    m_contextMenuPos = QPoint();
+    m_pressAndHoldTimer->stop();
 
     base_type::mouseReleaseEvent(event);
 }

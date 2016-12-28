@@ -326,16 +326,24 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
     return status;
 }
 
-void QnClientSettings::load() {
+void QnClientSettings::load()
+{
+    m_settings->sync();
     updateFromSettings(m_settings);
 }
 
-void QnClientSettings::save() {
+void QnClientSettings::save()
+{
     submitToSettings(m_settings);
+    if (!isWritable())
+        return;
+
     m_settings->sync();
+    emit saved();
 }
 
-bool QnClientSettings::isWritable() const {
+bool QnClientSettings::isWritable() const
+{
     return m_settings->isWritable();
 }
 

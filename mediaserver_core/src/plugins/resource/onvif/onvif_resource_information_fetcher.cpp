@@ -18,10 +18,10 @@
 #include <plugins/resource/pelco/optera/optera_resource.h>
 #include "plugins/resource/flir/flir_onvif_resource.h"
 #include "../vista/vista_resource.h"
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
-#include "common/common_module.h"
-#include <nx/utils/log/log.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/common_module.h>
+#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 
 using namespace nx::plugins;
 
@@ -121,15 +121,9 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
     QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
+
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
-    {
-        NX_LOG(
-            lm("OnvifResourceInformationFetcher, device %1 %2 is ignored by the Onvif driver")
-                .arg(manufacturer)
-                .arg(name),
-            cl_logDEBUG2);
         return true;
-    }
 
     for (uint i = 0; i < sizeof(IGNORE_VENDORS)/sizeof(IGNORE_VENDORS[0]); ++i)
     {
@@ -393,31 +387,29 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
     QnPlOnvifResourcePtr resource;
-    auto canonicalManufacture = manufacture.toLower();
-
-    if (canonicalManufacture.contains(QLatin1String("digital watchdog")) ||
-            canonicalManufacture.contains(QLatin1String("digitalwatchdog")))
+    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) ||
+            manufacture.toLower().contains(QLatin1String("digitalwatchdog")))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (canonicalManufacture == QLatin1String("panoramic"))
+    else if (manufacture.toLower() == QLatin1String("panoramic"))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (canonicalManufacture == QLatin1String("ipnc"))   // new dw panoramic cameras
+    else if (manufacture.toLower() == QLatin1String("ipnc"))   // new dw panoramic cameras
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
-    else if (canonicalManufacture.contains(QLatin1String("sony")))
+    else if (manufacture.toLower().contains(QLatin1String("sony")))
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
-    else if (canonicalManufacture.contains(QLatin1String("seyeon tech")))
+    else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
-    else if (canonicalManufacture.contains(QLatin1String("vista")))
+    else if (manufacture.toLower().contains(QLatin1String("vista")))
         resource = QnPlOnvifResourcePtr(new QnVistaResource());
-    else if (canonicalManufacture.contains(QLatin1String("avigilon")))
+    else if (manufacture.toLower().contains(QLatin1String("avigilon")))
         resource = QnPlOnvifResourcePtr(new QnAvigilonResource());
-    else if (canonicalManufacture.contains(QLatin1String("pelcooptera")))
+    else if (manufacture.toLower().contains(QLatin1String("pelcooptera")))
         resource = QnPlOnvifResourcePtr(new QnOpteraResource());
 #ifdef ENABLE_AXIS
-    else if (canonicalManufacture.contains(QLatin1String("axis")))
+    else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
     else if (manufacture.toLower().contains(QLatin1String("flir")))
-        resource = QnPlOnvifResourcePtr(new flir::OnvifResource());
+        resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 

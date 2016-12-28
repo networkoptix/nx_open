@@ -5,52 +5,41 @@
 
 #include "timer.h"
 
+#include "aioservice.h"
+#include "../socket_global.h"
+
 namespace nx {
 namespace network {
 namespace aio {
 
-void Timer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+Timer::Timer():
+    m_aioService(SocketGlobals::aioService()),
+    m_internalTimerId(0)
 {
-    m_internalSocket.pleaseStop(std::move(completionHandler));
 }
 
-void Timer::pleaseStopSync(bool checkForLocks)
+Timer::~Timer()
 {
-    m_internalSocket.pleaseStopSync(checkForLocks);
-}
-
-void Timer::post(nx::utils::MoveOnlyFunc<void()> funcToCall)
-{
-    m_internalSocket.post(std::move(funcToCall));
-}
-
-void Timer::dispatch(nx::utils::MoveOnlyFunc<void()> funcToCall)
-{
-    m_internalSocket.dispatch(std::move(funcToCall));
-}
-
-AbstractAioThread* Timer::getAioThread() const
-{
-    return m_internalSocket.getAioThread();
-}
-
-void Timer::bindToAioThread(AbstractAioThread* aioThread)
-{
-    m_internalSocket.bindToAioThread(aioThread);
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 void Timer::start(
     std::chrono::milliseconds timeout,
     nx::utils::MoveOnlyFunc<void()> timerFunc)
 {
-    //TODO #ak UDPSocket::registerTimer currently does not support zero timeouts, 
-        //so using following hack
+    // TODO: #ak m_aioService.registerTimer currently does not support zero timeouts, 
+    // so using following hack
     if (timeout == std::chrono::milliseconds::zero())
         timeout = std::chrono::milliseconds(1); 
 
-    m_internalSocket.registerTimer(timeout, std::move(timerFunc));
+    m_handler = std::move(timerFunc);
     m_timeout = timeout;
     m_timerStartClock = std::chrono::steady_clock::now();
+
+    QnMutexLocker lock(m_aioService.mutex());
+    ++m_internalTimerId;
+    m_aioService.registerTimerNonSafe(&lock, &pollable(), timeout, this);
 }
 
 std::chrono::nanoseconds Timer::timeToEvent() const
@@ -63,17 +52,53 @@ std::chrono::nanoseconds Timer::timeToEvent() const
 
 void Timer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    m_internalSocket.cancelIOAsync(etTimedOut, std::move(completionHandler));
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
 }
 
 void Timer::cancelSync()
 {
-    m_internalSocket.cancelIOSync(etTimedOut);
+    if (isInSelfAioThread())
+    {
+        stopWhileInAioThread();
+    }
+    else
+    {
+        nx::utils::promise<void> cancelledPromise;
+        cancelAsync([&cancelledPromise]() { cancelledPromise.set_value(); });
+        cancelledPromise.get_future().wait();
+    }
 }
 
-bool Timer::isInSelfAioThread() const
+void Timer::stopWhileInAioThread()
 {
-    return m_internalSocket.isInSelfAioThread();
+    m_aioService.removeFromWatch(&pollable(), EventType::etTimedOut, true);
+    m_handler = nullptr;
+}
+
+void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
+{
+    NX_ASSERT(sock == &pollable() && eventType == aio::EventType::etTimedOut);
+    NX_CRITICAL(m_handler);
+
+    decltype(m_handler) handler;
+    m_handler.swap(handler);
+
+    nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+    const int internalTimerId = m_internalTimerId;
+
+    handler();
+
+    if (watcher.objectDestroyed())
+        return;
+
+    QnMutexLocker lock(m_aioService.mutex());
+    if (internalTimerId == m_internalTimerId)
+        m_aioService.removeFromWatchNonSafe(&lock, &pollable(), EventType::etTimedOut, true);
 }
 
 } // namespace aio

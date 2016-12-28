@@ -84,18 +84,18 @@ QnPaletteColor QnNxStylePrivate::mainColor(QnNxStyle::Colors::Palette palette) c
         index = 6;
         break;
     case QnNxStyle::Colors::kContrast:
+    case QnNxStyle::Colors::kBrand:
         index = 7;
         break;
     case QnNxStyle::Colors::kRed:
     case QnNxStyle::Colors::kBlue:
-    case QnNxStyle::Colors::kBrand:
         index = 4;
         break;
     case QnNxStyle::Colors::kGreen:
         index = 3;
         break;
     case QnNxStyle::Colors::kYellow:
-        index = 0;
+        index = 2;
         break;
     }
 
@@ -131,6 +131,33 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
     }
 
     return color;
+}
+
+bool QnNxStylePrivate::isCheckableButton(const QStyleOption* option)
+{
+    if (qstyleoption_cast<const QStyleOptionButton*>(option))
+    {
+        if (option->state.testFlag(QStyle::State_On) ||
+            option->state.testFlag(QStyle::State_Off) ||
+            option->state.testFlag(QStyle::State_NoChange))
+        {
+            return true;
+        }
+
+        const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
+        if (buttonWidget && buttonWidget->isCheckable())
+            return true;
+    }
+
+    return false;
+}
+
+bool QnNxStylePrivate::isTextButton(const QStyleOption* option)
+{
+    if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+        return button->features.testFlag(QStyleOptionButton::Flat);
+
+    return false;
 }
 
 void QnNxStylePrivate::drawSwitch(
@@ -197,7 +224,7 @@ void QnNxStylePrivate::drawSwitch(
     QRectF indicatorsRect = QnGeometry::eroded(rect, 3.5);
 
     /* Set clip path with excluded grip circle: */
-    QRectF gripRect = QnGeometry::eroded(rect, dp(1));
+    QRectF gripRect = QnGeometry::eroded(rect, 1);
     gripRect.moveLeft(gripRect.left() + (gripRect.width() - gripRect.height()) * animationProgress);
     gripRect.setWidth(gripRect.height());
     QPainterPath wholeRect;
@@ -222,7 +249,7 @@ void QnNxStylePrivate::drawSwitch(
         QRectF zeroRect = indicatorsRect;
         zeroRect.setLeft(indicatorsRect.right() - indicatorsRect.height());
         painter->setOpacity(baseOpacity * (kSideTransition - animationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOff, dp(2)));
+        painter->setPen(QPen(signColorOff, 2));
         painter->drawRoundedRect(zeroRect, zeroRect.width() / 2, zeroRect.height() / 2);
     }
 
@@ -235,11 +262,11 @@ void QnNxStylePrivate::drawSwitch(
 
     if (oneMinusAnimationProgress < kSideTransition)
     {
-        int x = indicatorsRect.left() + indicatorsRect.height() / 2 + dp(1);
-        int h = indicatorsRect.height() - dp(3);
+        int x = indicatorsRect.left() + indicatorsRect.height() / 2 + 1;
+        int h = indicatorsRect.height() - 3;
         int y = rect.center().y() - h / 2;
         painter->setOpacity(baseOpacity * (kSideTransition - oneMinusAnimationProgress) / kSideTransition);
-        painter->setPen(QPen(signColorOn, dp(2)));
+        painter->setPen(QPen(signColorOn, 2));
         painter->drawLine(x, y, x, y + h + 1);
     }
 
@@ -266,7 +293,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
     QnScopedPainterAntialiasingRollback aaRollback(painter, true);
 
-    const int size = Metrics::kCheckIndicatorSize - dp(5);
+    const int size = Metrics::kCheckIndicatorSize - 5;
     QRect rect = aligned(QSize(size, size), option->rect, Qt::AlignCenter);
 
     QRectF aaAlignedRect(rect);
@@ -289,7 +316,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
         path.lineTo(rc.x(0.55), rc.y(0.70));
         path.lineTo(rc.x(1.12), rc.y(0.13));
 
-        pen.setWidthF(dp(2));
+        pen.setWidthF(2);
         painter->setPen(pen);
 
         painter->drawPath(path);
@@ -300,7 +327,7 @@ void QnNxStylePrivate::drawCheckBox(QPainter *painter, const QStyleOption *optio
 
         if (option->state.testFlag(QStyle::State_NoChange))
         {
-            pen.setWidthF(dp(2));
+            pen.setWidthF(2);
             painter->setPen(pen);
             painter->drawLine(QPointF(rc.x(0.2), rc.y(0.5)), QPointF(rc.x(0.9), rc.y(0.5)));
         }
@@ -352,12 +379,12 @@ void QnNxStylePrivate::drawSortIndicator(QPainter *painter, const QStyleOption *
 
     QColor color = option->palette.brightText().color();
 
-    int w = dp(4);
-    int h = dp(2);
-    int y = option->rect.top() + dp(3);
-    int x = option->rect.x() + dp(1);
-    int wstep = dp(4);
-    int ystep = dp(4);
+    int w = 4;
+    int h = 2;
+    int y = option->rect.top() + 3;
+    int x = option->rect.x() + 1;
+    int wstep = 4;
+    int ystep = 4;
 
     if (!down)
     {
@@ -412,6 +439,19 @@ void QnNxStylePrivate::drawTextButton(
     }
 
     QRect textRect(option->rect);
+
+    if (isCheckableButton(option))
+    {
+        QStyleOption switchOption(*option); //< not QStyleOptionButton for standalone switch
+        switchOption.rect.setWidth(Metrics::kStandaloneSwitchSize.width());
+
+        if (option->direction == Qt::LeftToRight)
+            textRect.setLeft(switchOption.rect.right() + Metrics::kStandardPadding + 1);
+        else
+            textRect.setRight(switchOption.rect.left() - Metrics::kStandardPadding - 1);
+
+        drawSwitch(painter, &switchOption, widget);
+    }
 
     if (!option->icon.isNull())
     {

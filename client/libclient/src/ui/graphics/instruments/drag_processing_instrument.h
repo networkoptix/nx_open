@@ -26,7 +26,7 @@ public:
 
 public slots:
     /**
-     * Resets the drag process. 
+     * Resets the drag process.
      */
     void reset();
 
@@ -35,16 +35,22 @@ public slots:
 protected:
     virtual void aboutToBeDisabledNotify() override;
 
-    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool mouseReleaseEvent(QWidget *viewport, QMouseEvent *event) override;
-    virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
-    virtual bool mousePressEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mouseReleaseEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mouseMoveEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
-    virtual bool mouseReleaseEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mousePressEvent(QWidget* viewport, QMouseEvent* event) override;
+    virtual bool mouseDoubleClickEvent(QWidget* viewport, QMouseEvent* event) override;
+    virtual bool mouseMoveEvent(QWidget* viewport, QMouseEvent* event) override;
+    virtual bool mouseReleaseEvent(QWidget* viewport, QMouseEvent* event) override;
+
+    virtual bool paintEvent(QWidget* viewport, QPaintEvent* event) override;
+
+    virtual bool mousePressEvent(QGraphicsScene* scene, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseDoubleClickEvent(QGraphicsScene* scene, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseMoveEvent(QGraphicsScene* scene, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseReleaseEvent(QGraphicsScene* scene, QGraphicsSceneMouseEvent* event) override;
+
+    virtual bool mousePressEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseDoubleClickEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseMoveEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
+    virtual bool mouseReleaseEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
 
 private:
     void initialize();

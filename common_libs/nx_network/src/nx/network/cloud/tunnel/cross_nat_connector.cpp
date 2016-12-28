@@ -70,6 +70,9 @@ CrossNatConnector::CrossNatConnector(
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
     m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
+
+    m_timer = std::make_unique<aio::Timer>();
+    m_timer->bindToAioThread(getAioThread());
 }
 
 CrossNatConnector::~CrossNatConnector()
@@ -81,6 +84,7 @@ void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
     m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 void CrossNatConnector::stopWhileInAioThread()
@@ -89,6 +93,7 @@ void CrossNatConnector::stopWhileInAioThread()
     m_connectors.clear();
     m_connectResultReportSender.reset();
     m_connection.reset();
+    m_timer.reset();
 }
 
 void CrossNatConnector::connect(
@@ -99,7 +104,7 @@ void CrossNatConnector::connect(
         [this, timeout, handler = std::move(handler)]() mutable
         {
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
-            if (auto holder = SocketGlobals::tcpReversePool().getConnectionHolder(hostName))
+            if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
                 return handler(
@@ -165,7 +170,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
     if (timeout > std::chrono::milliseconds::zero())
     {
         m_connectTimeout = timeout;
-        timer()->start(
+        m_timer->start(
             timeout,
             std::bind(&CrossNatConnector::onTimeout, this));
     }
@@ -188,7 +193,7 @@ void CrossNatConnector::onConnectResponse(
     if (m_done)
         return;
 
-    timer()->cancelSync();
+    m_timer->cancelSync();
 
     // TODO: #ak add support for redirect to another mediator instance.
 
@@ -215,7 +220,7 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
     milliseconds effectiveConnectTimeout(0);
     if (m_connectTimeout)
     {
-        effectiveConnectTimeout = duration_cast<milliseconds>(timer()->timeToEvent());
+        effectiveConnectTimeout = duration_cast<milliseconds>(m_timer->timeToEvent());
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //< Zero timeout is infinity.
     }
@@ -271,10 +276,12 @@ void CrossNatConnector::onConnectorFinished(
     m_connectors.clear();   // Cancelling other connectors.
     if (connection)
     {
-        m_connection = std::make_unique<OutgoingTunnelConnectionWatcher>(
+        auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
             std::move(m_connectionParameters),
             std::move(connection));
-        m_connection->bindToAioThread(getAioThread());
+        tunnelWatcher->bindToAioThread(getAioThread());
+        tunnelWatcher->start();
+        m_connection = std::move(tunnelWatcher);
     }
     holePunchingDone(resultCode, sysErrorCode);
 }
@@ -307,7 +314,7 @@ void CrossNatConnector::holePunchingDone(
         cl_logDEBUG2);
 
     // We are in aio thread.
-    timer()->cancelSync();
+    m_timer->cancelSync();
 
     m_connectResultReport.sysErrorCode = sysErrorCode;
     if (resultCode == api::NatTraversalResultCode::noResponseFromMediator)
@@ -368,7 +375,7 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest() const
 {
     api::ConnectRequest connectRequest;
 
-    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().selfPeerId();
+    connectRequest.originatingPeerId = SocketGlobals::outgoingTunnelPool().ownPeerId();
     connectRequest.connectSessionId = m_connectSessionId;
     connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString().toUtf8();

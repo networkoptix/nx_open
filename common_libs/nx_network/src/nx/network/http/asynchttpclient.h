@@ -63,7 +63,8 @@ namespace nx_http
         enum AuthType {
             authBasicAndDigest,
             authDigest,
-            authDigestWithPasswordHash
+            authDigestWithPasswordHash,
+            authBasic,
         };
 
         enum State
@@ -260,6 +261,8 @@ namespace nx_http
         */
         static AsyncHttpClientPtr create();
 
+        static QString endpointWithProtocol(const QUrl& url);
+
     signals:
         void tcpConnectionEstablished(nx_http::AsyncHttpClientPtr);
         //!Invoked after request has been sent
@@ -315,7 +318,7 @@ namespace nx_http
         AuthType m_authType;
         HttpHeaders m_additionalHeaders;
         int m_awaitedMessageNumber;
-        SocketAddress m_remoteEndpoint;
+        QString m_remoteEndpointWithProtocol;
         AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
         SystemError::ErrorCode m_lastSysErrorCode;
         int m_requestSequence;
@@ -323,6 +326,7 @@ namespace nx_http
         //TODO #ak remove this member
         nx::network::aio::Timer m_aioThreadBinder;
         bool m_precalculatedAuthorizationDisabled;
+        int m_numberOfRedirectsTried;
 
         AsyncHttpClient();
 
@@ -343,6 +347,8 @@ namespace nx_http
         void processResponseHeadersBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             bool* const continueReceiving);
+        bool repeatRequestIfNeeded(const Response& response);
+        bool sendRequestToNewLocation(const Response& response);
         void processResponseMessageBodyBytes(
             std::shared_ptr<AsyncHttpClient> sharedThis,
             std::size_t bytesRead,

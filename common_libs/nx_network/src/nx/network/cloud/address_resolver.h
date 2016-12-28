@@ -201,11 +201,11 @@ protected:
 
     private:
         State m_dnsState;
-        std::chrono::system_clock::time_point m_dnsResolveTime;
+        std::chrono::steady_clock::time_point m_dnsResolveTime;
         std::vector<AddressEntry> m_dnsEntries;
 
         State m_mediatorState;
-        std::chrono::system_clock::time_point m_mediatorResolveTime;
+        std::chrono::steady_clock::time_point m_mediatorResolveTime;
         std::vector<AddressEntry> m_mediatorEntries;
     };
 
@@ -225,6 +225,8 @@ protected:
             NatTraversalSupport natTraversalSupport,
             ResolveHandler handler);
     };
+
+    virtual bool isMediatorAvailable() const;
 
     void tryFastDomainResolve(HaInfoIterator info);
 

@@ -26,27 +26,27 @@ server_msi_strip_folder = 'bin/strip'
 client_msi_strip_folder = 'bin/strip'
 wix_pdb = 'wixsetup.wixpdb'
 
-server_msi_name = '${finalName}-server-only.msi'
-server_exe_name = '${finalName}-server-only.exe'
+server_msi_name = '${artifact.name.server}.msi'
+server_exe_name = '${artifact.name.server}.exe'
 
-client_msi_name = '${finalName}-client-only.msi'
-client_exe_name = '${finalName}-client-only.exe'
+client_msi_name = '${artifact.name.client}.msi'
+client_exe_name = '${artifact.name.client}.exe'
 
-full_exe_name = '${finalName}.exe'
+full_exe_name = '${artifact.name.bundle}.exe'
 
-nxtool_msi_name = '${finalName}-servertool.msi'
-nxtool_exe_name = '${finalName}-servertool.exe'
+nxtool_msi_name = '${artifact.name.servertool}.msi'
+nxtool_exe_name = '${artifact.name.servertool}.exe'
 
-wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtension']
+wix_extensions = ['WixFirewallExtension', 'WixUtilExtension', 'WixUIExtension', 'WixBalExtensionExt']
 common_components = ['MyExitDialog', 'UpgradeDlg', 'SelectionWarning']
-client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'Vcrt14']
-server_components = ['ServerVox', 'Server', 'traytool', 'Vcrt14']
-nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'Vcrt14']
+client_components = ['Associations', 'ClientDlg', 'ClientFonts', 'ClientVox', 'ClientBg', 'ClientQml', 'Client', 'ClientHelp', 'ClientVcrt14']
+server_components = ['ServerVox', 'Server', 'traytool', 'ServerVcrt14', 'TraytoolVcrt14']
+nxtool_components = ['NxtoolDlg', 'Nxtool', 'NxtoolQuickControls', 'NxtoolVcrt14']
 
-client_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage']
-server_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'ServerPackage']
-full_exe_components =   ['VC12RedistPackage', 'VC14RedistPackage', 'ClientPackage', 'ServerPackage']
-nxtool_exe_components = ['VC12RedistPackage', 'VC14RedistPackage', 'NxtoolPackage']
+client_exe_components = ['ArchCheck', 'ClientPackage']
+server_exe_components = ['ArchCheck', 'ServerPackage']
+full_exe_components =   ['ArchCheck', 'ClientPackage', 'ServerPackage']
+nxtool_exe_components = ['ArchCheck', 'NxtoolPackage']
 
 def add_wix_extensions(command):
     for ext in wix_extensions:
@@ -75,19 +75,18 @@ def get_candle_command(project, suffix, args, components):
     add_components(command, components)
 
     command.append(r'-dVcrt14SrcDir=${VC14RedistPath}\bin')
-
-    if suffix.startswith('server'):
-        command.append('-dVcrt14DstDir=${customization}MediaServerDir')
+    command.append(r'-dServerVcrt14DstDir=${customization}MediaServerDir')
+    command.append(r'-dClientVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
+    command.append(r'-dTraytoolVcrt14DstDir=${customization}TrayToolDir')
+    command.append(r'-dNxtoolVcrt14DstDir=${customization}NxtoolDir')
 
     if suffix.startswith('client'):
-        command.append('-dVcrt14DstDir=${customization}_${release.version}.${buildNumber}_Dir')
         command.append('-dClientQmlDir=${ClientQmlDir}')
         command.append('-dClientHelpSourceDir=${ClientHelpSourceDir}')
         command.append('-dClientFontsDir=${ClientFontsDir}')
         command.append('-dClientBgSourceDir=${ClientBgSourceDir}')
 
     if suffix.startswith('nxtool'):
-        command.append('-dVcrt14DstDir=${customization}NxtoolDir')
         command.append('-dNxtoolQuickControlsDir=${NxtoolQuickControlsDir}')
         command.append('-dNxtoolQmlDir=${project.build.directory}\\nxtoolqml')
 

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <chrono>
@@ -11,13 +10,13 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
-#include <utils/db/types.h>
 
 #include <cdb/connection.h>
+#include <utils/db/test_support/test_with_db_helper.h>
+#include <utils/db/types.h>
 
 #include "cloud_db_process_public.h"
 #include "managers/email_manager.h"
-
 
 namespace nx {
 namespace cdb {
@@ -29,9 +28,9 @@ public:
     std::string password;
 };
 
-class CdbLauncher
-:
-    public utils::test::ModuleLauncher<CloudDBProcessPublic>
+class CdbLauncher:
+    public utils::test::ModuleLauncher<CloudDBProcessPublic>,
+    public db::test::TestWithDbHelper
 {
 public:
     //!Calls \a start
@@ -47,8 +46,6 @@ public:
         const std::string& login,
         const std::string& password);
     api::ModuleInfo moduleInfo() const;
-
-    QString testDataDir() const;
 
     api::ResultCode addAccount(
         api::AccountData* const accountData,
@@ -117,6 +114,7 @@ public:
         const std::string& password,
         const std::string& systemId,
         api::SystemDataEx* const system);
+
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
@@ -127,6 +125,12 @@ public:
         const std::string& systemId,
         const std::string& accountEmail,
         api::SystemAccessRole accessRole);
+    api::ResultCode shareSystem(
+        const AccountWithPassword& grantor,
+        const std::string& systemId,
+        const std::string& accountEmail,
+        api::SystemAccessRole accessRole);
+
     api::ResultCode updateSystemSharing(
         const std::string& email,
         const std::string& password,
@@ -147,6 +151,12 @@ public:
         const std::string& password,
         const std::string& systemId,
         std::vector<api::SystemSharingEx>* const sharings);
+    api::ResultCode getSystemSharing(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemId,
+        const std::string& userOfInterestEmail,
+        api::SystemSharingEx* sharing);
     api::ResultCode getAccessRoleList(
         const std::string& email,
         const std::string& password,
@@ -203,14 +213,7 @@ public:
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
 
-    static void setTemporaryDirectoryPath(const QString& path);
-    static QString temporaryDirectoryPath();
-    static void setDbConnectionOptions(
-        const nx::db::ConnectionOptions& connectionOptions);
-    static nx::db::ConnectionOptions dbConnectionOptions();
-
 private:
-    QString m_tmpDir;
     int m_port;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
@@ -220,35 +223,24 @@ private:
 };
 
 namespace api {
-    bool operator==(const api::AccountData& left, const api::AccountData& right);
-}
 
+bool operator==(const api::AccountData& left, const api::AccountData& right);
 
-class EmailManagerStub
-    :
+} // namespace api
+
+class EmailManagerStub:
     public nx::cdb::AbstractEmailManager
 {
 public:
-    EmailManagerStub(nx::cdb::AbstractEmailManager* const target)
-        :
-        m_target(target)
-    {
-    }
+    EmailManagerStub(nx::cdb::AbstractEmailManager* const target);
 
     virtual void sendAsync(
         const AbstractNotification& notification,
-        std::function<void(bool)> completionHandler) override
-    {
-        if (!m_target)
-            return;
-        m_target->sendAsync(
-            notification,
-            std::move(completionHandler));
-    }
+        std::function<void(bool)> completionHandler) override;
 
 private:
     nx::cdb::AbstractEmailManager* const m_target;
 };
 
-}   // namespace cdb
-}   // namespace nx
+} // namespace cdb
+} // namespace nx

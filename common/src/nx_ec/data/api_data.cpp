@@ -4,6 +4,11 @@
 
 namespace ec2 {
 
+bool ApiIdData::operator==(const ApiIdData& rhs) const
+{
+    return id == rhs.id;
+}
+
 #define DB_TYPES \
     (ApiIdData) \
     (ApiDataWithVersion) \

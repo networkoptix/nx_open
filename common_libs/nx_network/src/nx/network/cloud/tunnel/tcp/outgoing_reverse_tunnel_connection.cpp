@@ -1,4 +1,7 @@
 #include "outgoing_reverse_tunnel_connection.h"
+
+#include <nx/utils/std/cpp14.h>
+
 #include "reverse_connection_holder.h"
 
 namespace nx {
@@ -10,11 +13,13 @@ static const std::chrono::minutes kCloseTunnelWhenInactive(10);
 
 OutgoingReverseTunnelConnection::OutgoingReverseTunnelConnection(
     aio::AbstractAioThread* aioThread,
-    std::shared_ptr<ReverseConnectionHolder> connectionHolder)
+    std::shared_ptr<ReverseConnectionSource> connectionHolder)
 :
     AbstractOutgoingTunnelConnection(aioThread),
-    m_connectionHolder(std::move(connectionHolder))
+    m_connectionHolder(std::move(connectionHolder)),
+    m_timer(std::make_unique<aio::Timer>())
 {
+    m_timer->bindToAioThread(aioThread);
 }
 
 OutgoingReverseTunnelConnection::~OutgoingReverseTunnelConnection()
@@ -22,9 +27,16 @@ OutgoingReverseTunnelConnection::~OutgoingReverseTunnelConnection()
     stopWhileInAioThread();
 }
 
+void OutgoingReverseTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
+}
+
 void OutgoingReverseTunnelConnection::stopWhileInAioThread()
 {
     m_asyncGuard.reset();
+    m_timer.reset();
 }
 
 void OutgoingReverseTunnelConnection::establishNewConnection(
@@ -48,7 +60,7 @@ void OutgoingReverseTunnelConnection::establishNewConnection(
                 if (code == SystemError::noError)
                 {
                     socketAttributes.applyTo(socket.get());
-                    timer()->start(
+                    m_timer->start(
                         kCloseTunnelWhenInactive,
                         [this]()
                         {

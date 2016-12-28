@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
@@ -14,14 +14,14 @@ public:
     QnUserRolesManager(QObject* parent = nullptr);
     virtual ~QnUserRolesManager();
 
-    ec2::ApiUserGroupDataList userRoles() const;
-    void resetUserRoles(const ec2::ApiUserGroupDataList& userRoles);
+    ec2::ApiUserRoleDataList userRoles() const;
+    void resetUserRoles(const ec2::ApiUserRoleDataList& userRoles);
 
     template <class IDList>
-    ec2::ApiUserGroupDataList userRoles(IDList idList) const
+    ec2::ApiUserRoleDataList userRoles(IDList idList) const
     {
         QnMutexLocker lk(&m_mutex);
-        ec2::ApiUserGroupDataList result;
+        ec2::ApiUserRoleDataList result;
         for (const auto& id : idList)
         {
             const auto itr = m_roles.find(id);
@@ -32,8 +32,8 @@ public:
     }
 
     bool hasRole(const QnUuid& id) const;
-    ec2::ApiUserGroupData userRole(const QnUuid& id) const;
-    void addOrUpdateUserRole(const ec2::ApiUserGroupData& role);
+    ec2::ApiUserRoleData userRole(const QnUuid& id) const;
+    void addOrUpdateUserRole(const ec2::ApiUserRoleData& role);
     void removeUserRole(const QnUuid& id);
 
     static const QList<Qn::UserRole>& predefinedRoles();
@@ -47,13 +47,13 @@ public:
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
-    void userRoleAddedOrUpdated(const ec2::ApiUserGroupData& userGroup);
-    void userRoleRemoved(const ec2::ApiUserGroupData& userRole);
+    void userRoleAddedOrUpdated(const ec2::ApiUserRoleData& userRole);
+    void userRoleRemoved(const ec2::ApiUserRoleData& userRole);
 
 private:
     mutable QnMutex m_mutex;
 
-    QHash<QnUuid, ec2::ApiUserGroupData> m_roles;
+    QHash<QnUuid, ec2::ApiUserRoleData> m_roles;
 };
 
 #define qnUserRolesManager QnUserRolesManager::instance()

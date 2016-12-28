@@ -9,7 +9,7 @@
             <functions>
                 <function>
                     <name>bookmarks</name>
-                    <description>Reads bookmarks using specified parameters</description>
+                    <description>Read bookmarks using the specified parameters.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -22,7 +22,7 @@
                         <param>
                             <name>startTime</name>
                             <description>
-                                Start time of interval with bookmarks (milliseconds since epoch).
+                                Start time of the interval with bookmarks (in milliseconds since epoch).
                                 Default value is 0. Should be less than endTime.
                             </description>
                             <optional>true</optional>
@@ -30,33 +30,33 @@
                         <param>
                             <name>endTime</name>
                             <description>
-                                End time of interval with bookmarks (milliseconds since epoch).
-                                Default value is current time. Should be greater than startTime.
+                                End time of the interval with bookmarks (in milliseconds since epoch).
+                                Default value is the current time. Should be greater than startTime.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>sortBy</name>
                             <description>
-                                Sorts result by specified value. Default value is "startTime".
+                                Field to sort the results by. Default value is "startTime".
                             </description>
                             <optional>true</optional>
                             <values>
                                 <value>
                                     <name>name</name>
-                                    <description>Sorts bookmarks by name</description>
+                                    <description>Sort bookmarks by name.</description>
                                 </value>
                                 <value>
                                     <name>startTime</name>
-                                    <description>Sorts bookmarks by start time</description>
+                                    <description>Sort bookmarks by start time.</description>
                                 </value>
                                 <value>
                                     <name>duration</name>
-                                    <description>Sorts bookmarks by duration</description>
+                                    <description>Sort bookmarks by duration.</description>
                                 </value>
                                 <value>
                                     <name>cameraName</name>
-                                    <description>Sorts bookmarks by camera name</description>
+                                    <description>Sort bookmarks by camera name.</description>
                                 </value>
                             </values>
                         </param>
@@ -69,48 +69,48 @@
                             <values>
                                 <value>
                                     <name>asc</name>
-                                    <description>Ascending sort order</description>
+                                    <description>Ascending sort order.</description>
                                 </value>
                                 <value>
                                     <name>desc</name>
-                                    <description>Descending sort order</description>
+                                    <description>Descending sort order.</description>
                                 </value>
                             </values>
                         </param>
                         <param>
                             <name>limit</name>
-                            <description>Maximum number of bookmarks which will be returned.
-                            Unlimited by default.
+                            <description>Maximum number of bookmarks to return.
+                                Unlimited by default.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>filter</name>
-                            <description>Text-search filter string</description>
+                            <description>Text-search filter string.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
                                         CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        top level data will be provided.
                                     </description>
                                 </value>
                             </values>
@@ -120,12 +120,12 @@
                 </function>
                 <function>
                     <name>bookmarks/add</name>
-                    <description>Adds bokmark to the target server</description>
+                    <description>Add a bookmark to the target server.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -137,56 +137,56 @@
                         </param>
                         <param>
                             <name>name</name>
-                            <description>Caption of bookmark</description>
+                            <description>Caption of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
-                            <description>Details of bookmark</description>
+                            <description>Details of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>timeout</name>
-                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <description>Time during which the recorded period should be preserved (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>startTime</name>
-                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <description>Start time of the bookmark (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>duration</name>
-                            <description>Length of bookmark (milliseconds)</description>
+                            <description>Length of the bookmark (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>tag</name>
-                            <description>Applied tag. Several tag parameters could be used to specify multiple tags</description>
+                            <description>Applied tag. Several tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
                                         CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        top level data will be provided.
                                     </description>
                                 </value>
                             </values>
@@ -196,36 +196,36 @@
                 </function>
                 <function>
                     <name>bookmarks/delete</name>
-                    <description>Removes bookmark with specified identifier</description>
+                    <description>Remove a bookmark with the specified identifier.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
                                         CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        top level data will be provided.
                                     </description>
                                 </value>
                             </values>
@@ -235,36 +235,36 @@
                 </function>
                 <function>
                     <name>bookmarks/tags</name>
-                    <description>Returns currently used tags</description>
+                    <description>Return currently used tags.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>limit</name>
-                            <description>Maximum number of tags</description>
+                            <description>Maximum number of tags to return.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
                                         CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        top level data will be provided.
                                     </description>
                                 </value>
                             </values>
@@ -274,12 +274,12 @@
                 </function>
                 <function>
                     <name>bookmarks/update</name>
-                    <description>Updates bookmark information</description>
+                    <description>Update information for a bookmark.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -291,56 +291,56 @@
                         </param>
                         <param>
                             <name>name</name>
-                            <description>Caption of bookmark</description>
+                            <description>Caption of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
-                            <description>Details of bookmark</description>
+                            <description>Details of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>timeout</name>
-                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <description>Time during which the recorded period should be preserved (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>startTime</name>
-                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <description>Start time of the bookmark (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>duration</name>
-                            <description>Length of bookmark (milliseconds)</description>
+                            <description>Length of the bookmark (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>tag</name>
-                            <description>Applied tag. Serveral tag parameters could be used to specify multiple tags</description>
+                            <description>Applied tag. Serveral tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
                                         CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        top level data will be provided.
                                     </description>
                                 </value>
                             </values>
@@ -352,10 +352,37 @@
                     <name>updateInformation/freeSpaceForUpdateFiles</name>
                     <description>Get free space available for downloading and extracting update files.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>XML data format.</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
                     <result>
-                        <caption>Returns the amount of free space available for update files in bytes
-                            for each online server in the system.</caption>
+                        <caption>Return the amount of free space available for update files in bytes
+                            for each online server in the system, in the specified format.</caption>
                     </result>
                 </function>
             </functions>
@@ -945,7 +972,7 @@ content type "application/json". Example of such object:
 <pre><code>
 {
     "user": "some_user",
-    "password: "some_password",
+    "password": "some_password",
     "cameras":
     [
         {
@@ -1265,7 +1292,7 @@ content type "application/json". Example of such object:
                     <method>GET</method>
                     <params/>
                     <result>
-                      <caption>XML data with statistics.</caption>
+                      <caption>JSON data with statistics.</caption>
                     </result>
                   </function>
                   <function>
@@ -1274,7 +1301,7 @@ content type "application/json". Example of such object:
                     <method>GET</method>
                     <params/>
                     <result>
-                      <caption>XML with server storages.</caption>
+                      <caption>JSON data with server storages.</caption>
                     </result>
                   </function>
                   <function>
@@ -1297,7 +1324,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>gettime</name>
-                    <description>Returns server UTC time (in milliseconds), time zone and authentication realm (realm is added for convenience)</description>
+                    <description>Return server time (in milliseconds since epoch), time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1881,16 +1908,106 @@ the respective JSON fields can be empty.</description>
                     <params>
                       <param>
                         <name>timezone</name>
-                        <description>Time zone name, as a file path located in Linux "/usr/share/zoneinfo".</description>
+                        <description>Time zone identifier, can be obtained via /api/getTimeZones.</description>
                         <optional>true</optional>
                       </param>
                       <param>
                         <name>datetime</name>
-                        <description>Time in milliseconds since UNIX epoch, or formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
                         <optional>false</optional>
                       </param>
                     </params>
                 </function>
+              <function>
+                <name>setTime</name>
+                <description>
+                  Set current time on the server machine.
+                  Can be called only if server flags include "SF_timeCtrl"
+                  (server flags can be obtained via /ec2/getMediaServersEx in "flags" field).
+<p>
+                  Parameters should be passed as a JSON object in POST message body with
+                  content type "application/json". Example of such object:
+<pre><code>
+{
+    "dateTime": "2015-02-28T16:37:00",
+    "timeZoneId": "Europe/Moscow"
+}
+</code></pre>
+</p>
+              </description>
+                <permissions>Administrator.</permissions>
+                <method>POST</method>
+                <params>
+                  <param>
+                    <name>timeZoneId</name>
+                    <description>Time zone identifier, can be obtained via /api/getTimeZones.</description>
+                    <optional>true</optional>
+                  </param>
+                  <param>
+                    <name>dateTime</name>
+                    <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                    <optional>false</optional>
+                  </param>
+                </params>
+              </function>
+              <function>
+                <name>getTimeZones</name>
+                <description>
+                  Return the complete list of time zones supported by the server machine.
+                </description>
+                <method>GET</method>
+                <params />
+                <result>
+                  <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:</caption>
+                  <params>
+                    <param>
+                      <name>comment</name>
+                      <description>Time zone description in English.</description>
+                    </param>
+                    <param>
+                      <name>displayName</name>
+                      <description>Time zone verbose name in English.</description>
+                    </param>
+                    <param>
+                      <name>hasDaylightTime</name>
+                      <description>Whether the time zone has the DST feature.</description>
+                      <values>
+                        <value>
+                          <name>false</name>
+                          <description />
+                        </value>
+                        <value>
+                          <name>true</name>
+                          <description />
+                        </value>
+                      </values>
+                    </param>
+                    <param>
+                      <name>id</name>
+                      <description>Time zone identifier, to be used for e.g. /api/setTime.</description>
+                    </param>
+                    <param>
+                      <name>isDaylightTime</name>
+                      <description>Whether the time zone is on DST right now. To be reported properly,
+                          the server machine should have the correct current time set.</description>
+                      <values>
+                        <value>
+                          <name>false</name>
+                          <description />
+                        </value>
+                        <value>
+                          <name>true</name>
+                          <description />
+                        </value>
+                      </values>
+                    </param>
+                    <param>
+                      <name>offsetFromUtc</name>
+                      <description>Time zone offset from UTC (in seconds).</description>
+                    </param>
+                  </params>
+                </result>
+              </function>
             </functions>
         </group>
         <group>

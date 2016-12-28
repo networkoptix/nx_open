@@ -43,15 +43,20 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
 {
     SystemUri uri(url);
 
+    if (!uri.isValid())
+    {
+        // Open external URLs.
+        if (url.isValid())
+            QDesktopServices::openUrl(url);
+        return;
+    }
+
     if (uri.referral().source == SystemUri::ReferralSource::MobileClient)
     {
         // Ignore our own URL requests.
         QDesktopServices::openUrl(url);
         return;
     }
-
-    if (!uri.isValid())
-        return;
 
     if (uri.protocol() != SystemUri::Protocol::Native
         && uri.domain() != QnAppInfo::defaultCloudHost())
@@ -70,11 +75,16 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
         case SystemUri::ClientCommand::None:
             break;
         case SystemUri::ClientCommand::Client:
-            // Do nothing because the app will be raised by OS whithout our help.
-            break;
-        case SystemUri::ClientCommand::ConnectToSystem:
-            if (m_uiController)
+            if (m_uiController && !uri.systemId().isEmpty())
             {
+                m_uiController->disconnectFromSystem();
+
+                if (!uri.authenticator().user.isEmpty() && !uri.authenticator().password.isEmpty())
+                {
+                    qnCloudStatusWatcher->setCredentials(QnCredentials(
+                        uri.authenticator().user, uri.authenticator().password));
+                }
+
                 const auto url = uri.connectionUrl();
                 if (url.isValid())
                     m_uiController->connectToSystem(url);
@@ -87,6 +97,8 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
                 qnCloudStatusWatcher->setCredentials(QnCredentials(
                     uri.authenticator().user, uri.authenticator().password));
             }
+            break;
+        case SystemUri::ClientCommand::OpenOnPortal:
             break;
     }
 }

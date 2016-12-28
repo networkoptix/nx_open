@@ -1,5 +1,6 @@
 <Include>
 
+    <?define companyName="${company.name}"?>
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
     <?define serverUpgradeCode = "${customization.upgradeCode}"?>
@@ -77,7 +78,6 @@
     <?define QtDir="${qt.dir}/bin"?>
     <?define QtPluginsDir="${qt.dir}/plugins"?>
 
-    <?define VC12RedistPath="${environment.dir}/packages/${rdep.target}/vcredist-2012/bin"?>
     <?define VC14RedistPath="${VC14RedistPath}"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>

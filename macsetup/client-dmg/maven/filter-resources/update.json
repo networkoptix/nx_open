@@ -5,5 +5,5 @@
     "modification" : "${modification}",
     "cloudHost" : "${cloudHost}",
     "client" : true,
-    "minimalVersion" : "2.3.0.0"
+    "minimalVersion" : "3.0.0.0"
 }

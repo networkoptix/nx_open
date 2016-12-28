@@ -31,7 +31,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none, false);
+    const auto server1 = addRandomServer(system1, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server1);
 
     static const std::vector<std::list<SocketAddress>> kTestCases =
@@ -65,7 +65,9 @@ TEST_F(HolePunchingProcessor, generic_tests)
                 return MediaServerEmulator::ActionToTake::ignoreIndication;
             });
 
-        ASSERT_EQ(api::ResultCode::ok, server1->listen());
+        const auto listenResult = server1->listen();
+        ASSERT_EQ(api::ResultCode::ok, listenResult.first);
+        ASSERT_EQ(KeepAliveOptions(10, 10, 3), listenResult.second.tcpConnectionKeepAlive);
 
         //requesting connect to the server
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
@@ -116,7 +118,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(
-                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                    &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                     &udpClient,
                     std::move(connectionResult),
                     std::placeholders::_1));
@@ -128,7 +130,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(
-                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                    &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                     &udpClient,
                     std::move(connectionResult),
                     std::placeholders::_1));
@@ -147,7 +149,7 @@ TEST_F(HolePunchingProcessor, server_failure)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none, true);
+    const auto server1 = addRandomServer(system1, boost::none);
 
     typedef MediaServerEmulator::ActionToTake MsAction;
     static const std::map<MsAction, api::ResultCode> kTestCases =
@@ -174,7 +176,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             return actionToTake;
         });
 
-        ASSERT_EQ(api::ResultCode::ok, server1->listen());
+        ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
         //requesting connect to the server 
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
@@ -221,7 +223,7 @@ TEST_F(HolePunchingProcessor, server_failure)
             std::tie(resultCode) =
                 makeSyncCall<api::ResultCode>(
                     std::bind(
-                        &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                        &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
                         &udpClient,
                         std::move(connectionResult),
                         std::placeholders::_1));
@@ -239,7 +241,7 @@ TEST_F(HolePunchingProcessor, destruction)
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
 
-    ASSERT_EQ(api::ResultCode::ok, server1->listen());
+    ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
     for (int i = 0; i < 100; ++i)
     {

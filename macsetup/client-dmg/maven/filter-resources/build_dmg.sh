@@ -5,12 +5,12 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${finalName}.dmg"
+DMG_FILE="${artifact.name.client}.dmg"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 
 AS_SRC=app-store
-PKG_FILE="${finalName}.pkg"
+PKG_FILE="${artifact.name.client}.pkg"
 
 QT_DIR="${qt.dir}"
 QT_VERSION="${qt.version}"
@@ -94,7 +94,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 mv update.json $SRC
 cd dmg-folder
-zip -y -r ../client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*.app *.json
+zip -y -r ../${artifact.name.client_update}.zip ./*.app *.json
 cd ..
 
 rm -rf $TMP

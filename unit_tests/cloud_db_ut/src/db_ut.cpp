@@ -57,7 +57,7 @@ TEST_F(DbRegress, general)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems("akolesnikov@networkoptix.com", "123", &systems));
-    ASSERT_EQ(6, systems.size());
+    ASSERT_EQ(6U, systems.size());
 
     const auto laOfficeTestSystemIter = std::find_if(
         systems.begin(), systems.end(),

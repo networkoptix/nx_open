@@ -1,6 +1,8 @@
 #include "aggregation_widget.h"
 #include "ui_aggregation_widget.h"
 
+#include <text/time_strings.h>
+
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
@@ -24,10 +26,10 @@ QnAggregationWidget::QnAggregationWidget(QWidget *parent) :
     minSize.setWidth(defaultOptimalWidth);
     setMinimumSize(minSize);
 
-    ui->periodComboBox->addItem(tr("sec"), second);
-    ui->periodComboBox->addItem(tr("min"), minute);
-    ui->periodComboBox->addItem(tr("hrs"), hour);
-    ui->periodComboBox->addItem(tr("days"), day);
+    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), second);
+    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Minutes), minute);
+    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Hours), hour);
+    ui->periodComboBox->addItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Days), day);
 
     // initial state: checkbox is cleared
     ui->periodWidget->setVisible(false);

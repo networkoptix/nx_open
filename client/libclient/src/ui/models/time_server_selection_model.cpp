@@ -11,6 +11,8 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_runtime_data.h>
 
+#include <text/time_strings.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -491,34 +493,8 @@ QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
     static const int kDoNotSuppress = -1;
     static const QString kSeparator(L' ');
 
-    static const QString sSuffix = tr("s", "Suffix for displaying seconds of server time offset");
-    static const QString mSuffix = tr("m", "Suffix for displaying minutes of server time offset");
-    static const QString hSuffix = tr("h", "Suffix for displaying hours of server time offset");
-
-    auto unitStringsConverter =
-        [&](Qt::TimeSpanUnit unit, int num)
-        {
-            QString suffix;
-            switch (unit)
-            {
-                case::Qt::Seconds:
-                    suffix = sSuffix;
-                    break;
-                case::Qt::Minutes:
-                    suffix = mSuffix;
-                    break;
-                case::Qt::Hours:
-                    suffix = hSuffix;
-                    break;
-                default:
-                    break;
-            }
-
-            return QString::number(num) + suffix;
-        };
-
-    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat, unitStringsConverter,
-        kSeparator);
+    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat,
+        QTimeSpan::SuffixFormat::Short, kSeparator);
 }
 
 QVariant QnTimeServerSelectionModel::offsetForeground(qint64 offsetMs) const

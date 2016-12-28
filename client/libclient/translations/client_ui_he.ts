@@ -26,13 +26,21 @@
     </message>
     <message>
         <location/>
-        <source>Connected servers</source>
-        <translation>שרתים מחוברים</translation>
+        <source>Support</source>
+        <translation>תמיכה</translation>
     </message>
     <message>
         <location/>
-        <source>Support</source>
-        <translation>תמיכה</translation>
+        <source>System Servers</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AccessibleResourcesWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
+        <source>Filter</source>
+        <translation type="unfinished">פילטר</translation>
     </message>
 </context>
 <context>
@@ -69,6 +77,49 @@
     </message>
 </context>
 <context>
+    <name>AdvancedSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
+        <source>Downmix Audio from 5.1 to 2.1</source>
+        <translation type="unfinished">שנמוך(Downmix) אודיו מ5.1 ל2.1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Double Buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum Live Buffer Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Browse Logs</source>
+        <translation type="unfinished">סייר בתיעוד(log)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Local Cache</source>
+        <translation type="unfinished">נקה זכרון מטמון מקומי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset All Warnings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AggregationWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
@@ -97,11 +148,6 @@
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>Audit Trail</source>
         <translation>נתיב ביקורת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>From</source>
-        <translation>מ</translation>
     </message>
     <message>
         <location/>
@@ -145,11 +191,6 @@
     </message>
     <message>
         <location/>
-        <source>E-mail settings</source>
-        <translation>הגדרות דואר אלקטרוני</translation>
-    </message>
-    <message>
-        <location/>
         <source>System actions</source>
         <translation>פעולות מערכת</translation>
     </message>
@@ -170,13 +211,18 @@
     </message>
     <message>
         <location/>
-        <source>To</source>
-        <translation>אל</translation>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation>כל השרתים אינם זמינים. מידע הבדיקה אינו זמין.</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>כל השרתים אינם זמינים. מידע הבדיקה אינו זמין.</translation>
+        <source>Clear Filter</source>
+        <translation type="unfinished">מחק פילטר</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Email settings</source>
+        <translation type="unfinished">הגדרות דואר אלקטרוני</translation>
     </message>
 </context>
 <context>
@@ -211,6 +257,54 @@
         <source>Mbit/s</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BackupSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
+        <source>Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished">הגדר לוח זמנים...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished">הפעל גיבוי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Cameras...&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkBusinessActionWidget</name>
@@ -244,44 +338,39 @@
     <name>BookmarkWidget</name>
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
-        <source>&amp;Name</source>
-        <translation>&amp;שם</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Timeout</source>
-        <translation>&amp;זמן קצוב</translation>
-    </message>
-    <message>
-        <location/>
-        <source>T&amp;ags</source>
-        <translation>ת&amp;גיות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Description</source>
-        <translation>&amp;תיאור</translation>
-    </message>
-    <message>
-        <location/>
-        <source>List of tags divided by commas or spaces</source>
-        <translation>רשימת תגיות מופרדת על ידי רווחים או פסיקים</translation>
-    </message>
-    <message>
-        <location/>
         <source>Popular tags</source>
         <translation>תגיות פופלריות</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description</source>
+        <translation type="unfinished">&amp;תיאור</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout</source>
+        <translation type="unfinished">&amp;זמן קצוב</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tags</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>List of tags divided by commas</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>רענן</translation>
     </message>
@@ -299,6 +388,11 @@
         <location/>
         <source>Bookmark Log</source>
         <translation>יומן סימניות</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Filter</source>
+        <translation type="unfinished">מחק פילטר</translation>
     </message>
 </context>
 <context>
@@ -343,11 +437,6 @@
     <name>BusinessRulesDialog</name>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
-        <source>Alarm/Event Rules</source>
-        <translation>כללי התרעה/אירוע</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add</source>
         <translation>הוסף</translation>
     </message>
@@ -371,16 +460,16 @@
         <source>X</source>
         <translation>X</translation>
     </message>
+    <message>
+        <location/>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
-        <source>Selected Server:</source>
-        <translation>שרת שנבחר:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Server is offline</source>
         <translation>השרת אינו זמין</translation>
     </message>
@@ -391,38 +480,8 @@
     </message>
     <message>
         <location/>
-        <source>S&amp;tart IP:</source>
-        <translation>ה&amp;תחלת טווח IP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;End IP:</source>
-        <translation>&amp;סוף טווח IP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>S&amp;ubnet Scan</source>
-        <translation>ס&amp;ריקת רשת משנה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;שם משתמש:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Auto</source>
         <translation>אוטומטי</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Discovery Port:</source>
-        <translation>&amp;פורט גילוי:</translation>
     </message>
     <message>
         <location/>
@@ -451,16 +510,6 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Scan</source>
-        <translation>&amp;סרוק</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Add selected</source>
-        <translation>&amp;הוסף את הפריטים שנבחרו</translation>
-    </message>
-    <message>
-        <location/>
         <source>New Scan...</source>
         <translation>סריקה חדשה...</translation>
     </message>
@@ -471,13 +520,63 @@
     </message>
     <message>
         <location/>
-        <source>Device Address:</source>
-        <translation>כתובת המכשיר:</translation>
+        <source>Discovered Devices:</source>
+        <translation>מכשירים שנמצאו:</translation>
     </message>
     <message>
         <location/>
-        <source>Discovered Devices:</source>
-        <translation>מכשירים שנמצאו:</translation>
+        <source>Device Address</source>
+        <translation type="unfinished">כתובת המכשיר:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0.0.0.0</source>
+        <translation type="unfinished">0.0.0.0</translation>
+    </message>
+    <message>
+        <location/>
+        <source>End IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0.0.0.255</source>
+        <translation type="unfinished">0.0.0.255</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Subnet Scan</source>
+        <translation type="unfinished">ס&amp;ריקת רשת משנה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Discovery Port</source>
+        <translation type="unfinished">&amp;פורט גילוי:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation type="unfinished">סיסמא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation type="unfinished">כניסה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add selected</source>
+        <translation type="unfinished">&amp;הוסף את הפריטים שנבחרו</translation>
     </message>
 </context>
 <context>
@@ -643,62 +742,29 @@
     </message>
 </context>
 <context>
-    <name>CameraListDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
-        <source>Filter:</source>
-        <translation>מסנן:</translation>
-    </message>
-</context>
-<context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-        <source>&amp;Output ID:</source>
-        <translation>&amp;מזהה פלט:</translation>
+        <source>Output ID:</source>
+        <translation type="unfinished">&amp;מזהה פלט:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;אתחול אוטומטי בעוד (שניות):</translation>
+        <source>Fixed duration:</source>
+        <translation type="unfinished">משך זמן קבוע:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">שניות</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Enable Recording</source>
-        <translation>אפשר הקלטה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get More Licenses...</source>
-        <translation>השג עוד רשיונות...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording Schedule</source>
-        <translation>לוח זמני הקלטות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show Quality on Schedule</source>
-        <translation>הצג איכות ב&quot;לוח זמנים&quot;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Panic Mode: </source>
         <translation>מצב מצוקה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show FPS on Schedule</source>
-        <translation>הצג FPS ב&quot;לוח זמנים&quot;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>הערה: לוח זמני ההקלטות מבוסס על זמן השרת</translation>
     </message>
     <message>
         <location/>
@@ -778,13 +844,76 @@
     </message>
     <message>
         <location/>
-        <source>Apply changes before copying schedule</source>
-        <translation>החלת השינויים לפני העתקת לוח הזמנים</translation>
+        <source>Copy Schedule...</source>
+        <translation>העתק לוח זמנים...</translation>
     </message>
     <message>
         <location/>
-        <source>Copy Schedule...</source>
-        <translation>העתק לוח זמנים...</translation>
+        <source>Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Quality</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show FPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copying Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply changes before copying schedule.</source>
+        <translation type="unfinished">החלת השינויים לפני העתקת לוח הזמנים</translation>
+    </message>
+</context>
+<context>
+    <name>ChangeUserPasswordDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
+        <source>Change password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CloudManagementWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
+        <source>&lt;2. Connect system
+to the cloud&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CloudUserPanelWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConnectToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
+        <source>Email or password is not recognized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stay logged in</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -844,7 +973,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
         <source>Create Backup...</source>
         <translation>צור גיבוי...</translation>
     </message>
@@ -855,16 +984,19 @@
     </message>
 </context>
 <context>
+    <name>DateRangeWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
+        <source>-</source>
+        <translation type="unfinished">-</translation>
+    </message>
+</context>
+<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
         <source>Event Log</source>
         <translation>רשימת אירועים</translation>
-    </message>
-    <message>
-        <location/>
-        <source>-</source>
-        <translation>-</translation>
     </message>
     <message>
         <location/>
@@ -878,13 +1010,18 @@
     </message>
     <message>
         <location/>
-        <source>Alarm/Event Rules</source>
-        <translation>כללי התרעה/אירוע</translation>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>כל השרתים אינם מקוונים. רשימות התיעוד אינן זמינות.</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>כל השרתים אינם מקוונים. רשימות התיעוד אינן זמינות.</translation>
+        <source>&lt; Any camera &gt;</source>
+        <translation type="unfinished">&lt;כל מצלמה&gt;</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Rules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -924,8 +1061,8 @@
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
-        <source>&amp;PTZ preset:</source>
-        <translation>פריסט &amp;PTZ:</translation>
+        <source>PTZ preset:</source>
+        <translation type="unfinished">פריסט &amp;PTZ:</translation>
     </message>
 </context>
 <context>
@@ -975,26 +1112,51 @@
     </message>
     <message>
         <location/>
-        <source>Camera View Angle Correction</source>
-        <translation>תיקון זווית צפיית המצלמה</translation>
+        <source>Fisheye Dewarping</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Calibration</source>
-        <translation>כיול</translation>
+        <source>Auto Calibration</source>
+        <translation type="unfinished">כיול אוטומטי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mount Angle Correction:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>°</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Y Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>X Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ellipticity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
         <source>Main Media Folder</source>
         <translation>תיקיית מדיה ראשית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;סייר...</translation>
     </message>
     <message>
         <location/>
@@ -1003,28 +1165,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;הוסף...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Remove</source>
-        <translation>&amp;הסר</translation>
-    </message>
-    <message>
-        <location/>
         <source>Misc</source>
         <translation>הגדרות שונות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>שנמוך(Downmix) אודיו מ5.1 ל2.1</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Restart required</source>
-        <translation>דורש אתחול</translation>
     </message>
     <message>
         <location/>
@@ -1043,76 +1185,36 @@
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots:</source>
-        <translation>הפעל את התוכנה כשהמחשב עולה:</translation>
+        <source>Browse...</source>
+        <translation type="unfinished">סייר...</translation>
     </message>
     <message>
         <location/>
-        <source>Double Buffering:</source>
-        <translation>החלקת וידאו:</translation>
+        <source>Add...</source>
+        <translation type="unfinished">&amp;הוסף...</translation>
     </message>
     <message>
         <location/>
-        <source>Browse Logs</source>
-        <translation>סייר בתיעוד(log)</translation>
+        <source>Remove</source>
+        <translation type="unfinished">הסר</translation>
     </message>
     <message>
         <location/>
-        <source>Clear Local Cache</source>
-        <translation>נקה זכרון מטמון מקומי</translation>
+        <source>Run Application when PC Boots</source>
+        <translation type="unfinished">הפעל את התוכנה כשהמחשב עולה:</translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui"/>
-        <source>Administration</source>
-        <translation>ניהול</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Monitor All Servers on a Single Layout</source>
-        <translation>נטר את כל השרתים בפריסה אחת</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
         <source>System Settings</source>
         <translation>הגדרות מערכת</translation>
     </message>
     <message>
         <location/>
-        <source>System Backup and Restore</source>
-        <translation>גבוי ושחזור המערכת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Alarm/Event Rules...</source>
-        <translation>&amp;אזעקה/חוקי אירוע...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log...</source>
-        <translation>&amp;יומן אירועים...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Health Monitoring...</source>
-        <translation>&amp;ניטור בריאות...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audit Trail...</source>
-        <translation>נתיב בדיקה...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open Audit Trail Log</source>
-        <translation>פתח יומן נתיב בדיקה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks...</source>
-        <translation>&amp;סימניות...</translation>
+        <source>Backup and Restore</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1124,18 +1226,13 @@
     </message>
     <message>
         <location/>
-        <source>Force aspect ratio to:</source>
-        <translation>כפה יחס גובה-רוחב ל:</translation>
+        <source>Aspect Ratio</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>זוהי מצלמת עדשת עין-הדג</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Rotation:</source>
-        <translation>סיבוב ברירת מחדל</translation>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1159,7 +1256,7 @@
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
         <source>Layout Settings</source>
         <translation>הגדרות פריסה</translation>
     </message>
@@ -1200,28 +1297,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;גזור ליחס הגובה-רוחב של המסך</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Width:</source>
-        <translation>&amp;רוחב:</translation>
-    </message>
-    <message>
-        <location/>
         <source> cells</source>
         <translation>תאים</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Height:</source>
-        <translation>&amp;גובה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Opacity:</source>
-        <translation>&amp;אטימות:</translation>
     </message>
     <message>
         <location/>
@@ -1233,28 +1310,33 @@
         <source>Keep Aspect Ratio</source>
         <translation>שמור על יחס הגובה-רוחב</translation>
     </message>
+    <message>
+        <location/>
+        <source>Crop to monitor aspect ratio</source>
+        <translation type="unfinished">&amp;גזור ליחס הגובה-רוחב של המסך</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Width:</source>
+        <translation type="unfinished">&amp;רוחב:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height:</source>
+        <translation type="unfinished">&amp;גובה:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Opacity:</source>
+        <translation type="unfinished">&amp;אטימות:</translation>
+    </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-        <source>Server UR&amp;L:</source>
-        <translation>כתובת השר&amp;ת:</translation>
-    </message>
-    <message>
-        <location/>
         <source>ldap(s)://host:port</source>
         <translation>ldap(s)://host:port</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ad&amp;min DN:</source>
-        <translation>ש&amp;ם מנהל דומיין:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמה:</translation>
     </message>
     <message>
         <location/>
@@ -1280,6 +1362,21 @@
         <location/>
         <source>LDAP Settings</source>
         <translation>הגדרות LDAP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server URL:</source>
+        <translation type="unfinished">כתובת שרת:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Admin DN:</source>
+        <translation type="unfinished">ש&amp;ם מנהל דומיין:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password:</source>
+        <translation type="unfinished">סיסמה:</translation>
     </message>
 </context>
 <context>
@@ -1351,7 +1448,7 @@
 <context>
     <name>LicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
         <source>Active Licenses</source>
         <translation>רשיונות פעילים</translation>
     </message>
@@ -1362,13 +1459,18 @@
     </message>
     <message>
         <location/>
-        <source>Selected License Details</source>
-        <translation>פרטי רשיונות שנבחרו</translation>
+        <source>New License</source>
+        <translation>רשיון חדש</translation>
     </message>
     <message>
         <location/>
-        <source>New License</source>
-        <translation>רשיון חדש</translation>
+        <source>Details...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The software is licensed to</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1378,23 +1480,18 @@
         <source>Warning</source>
         <translation>אזהרה</translation>
     </message>
+    <message>
+        <location/>
+        <source>License issues:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.ui"/>
-        <source>Automatic Activation via Internet</source>
-        <translation>הפעלה אוטומטית דרך האינטרנט</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
         <source>Manual Activation</source>
         <translation>הפעלה ידנית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>License Key:</source>
-        <translation>מפתח רשיון:</translation>
     </message>
     <message>
         <location/>
@@ -1403,23 +1500,8 @@
     </message>
     <message>
         <location/>
-        <source>License Key is Invalid</source>
-        <translation>מפתח הרשיון שגוי</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware ID:</source>
-        <translation>מזהה-חומרה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Copy to Clipboard</source>
         <translation>העתק ללוח</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Activation Key File:</source>
-        <translation>קובץ מפתח הפעלה:</translation>
     </message>
     <message>
         <location/>
@@ -1446,6 +1528,31 @@
         <source>Activate License</source>
         <translation>הפעל רשיון</translation>
     </message>
+    <message>
+        <location/>
+        <source>Internet Activation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>License Key</source>
+        <translation type="unfinished">מפתח רשיון:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Invalid License Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hardware ID</source>
+        <translation type="unfinished">מזהה-חומרה:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activation Key File</source>
+        <translation type="unfinished">קובץ מפתח הפעלה:</translation>
+    </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
@@ -1456,20 +1563,22 @@
     </message>
     <message>
         <location/>
-        <source>Get More Licenses...</source>
-        <translation>השג עוד רשיונות...</translation>
+        <source>Activate License...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LocalSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
+        <source>Local Settings</source>
+        <translation type="unfinished">הגדרות מקומיות</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui"/>
-        <source>Connect to Server</source>
-        <comment>Groupbox Title</comment>
-        <translation>התחבר לשרת</translation>
-    </message>
-    <message>
-        <location/>
         <source>Save...</source>
         <translation>שמור...</translation>
     </message>
@@ -1480,66 +1589,46 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Connection Options:</source>
-        <translation>&amp;אפשרויות חיבור:</translation>
+        <source>Connection Options:</source>
+        <translation type="unfinished">&amp;אפשרויות חיבור:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Host:</source>
-        <translation>&amp;שרת:</translation>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;שם משתמש:</translation>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמה:</translation>
+        <source>Login</source>
+        <translation type="unfinished">כניסה</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Test</source>
-        <translation>&amp;בדוק</translation>
+        <source>Password</source>
+        <translation type="unfinished">סיסמא</translation>
     </message>
     <message>
         <location/>
-        <source>P&amp;ort:</source>
-        <translation>י&amp;ציאה:</translation>
+        <source>Test</source>
+        <translation type="unfinished">בדיקה</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-Login</source>
-        <translation>&amp;כניסה אוטומטית</translation>
+        <source>Auto-Login</source>
+        <translation type="unfinished">&amp;כניסה אוטומטית</translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
         <translation>מראה ותחושה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Language:</source>
-        <translation>שפה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show IP in tree:</source>
-        <translation>הצג IP בעץ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Skin:</source>
-        <translation>מראה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time:</source>
-        <translation>זמן מחזור הסיור:</translation>
     </message>
     <message>
         <location/>
@@ -1553,31 +1642,6 @@
     </message>
     <message>
         <location/>
-        <source>Background Animation</source>
-        <translation>אנימציית רקע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Background Animation</source>
-        <translation>אפשר אנימציית רקע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Color:</source>
-        <translation>צבע:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select color...</source>
-        <translation>בחר צבע...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Intensity:</source>
-        <translation>חוזק:</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1585,16 +1649,6 @@
         <location/>
         <source>Background Image</source>
         <translation>תמונת רקע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Background Image</source>
-        <translation>אפשר תמונת רקע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Image:</source>
-        <translation>תמונה:</translation>
     </message>
     <message>
         <location/>
@@ -1608,13 +1662,38 @@
     </message>
     <message>
         <location/>
-        <source>Mode:</source>
-        <translation>מצב:</translation>
+        <source>Language</source>
+        <translation type="unfinished">שפה:</translation>
     </message>
     <message>
         <location/>
-        <source>Time Mode:</source>
-        <translation>מצב זמן:</translation>
+        <source>Time Mode</source>
+        <translation type="unfinished">מצב זמן:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show extra info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour sequence cycle time</source>
+        <translation type="unfinished">זמן מחזור הסיור:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Image</source>
+        <translation type="unfinished">תמונה:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Intensity</source>
+        <translation type="unfinished">חוזק:</translation>
     </message>
 </context>
 <context>
@@ -1653,6 +1732,11 @@
         <location/>
         <source>Expert</source>
         <translation>מומחה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1694,27 +1778,19 @@
 <context>
     <name>PopupSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/popup_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
         <translation>הצג את כל ההתראות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Alarms/Events</source>
-        <translation>התרעה/אירוע</translation>
     </message>
     <message>
         <location/>
         <source>System Notifications</source>
         <translation>התראות מערכת</translation>
     </message>
-</context>
-<context>
-    <name>PreferencesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui"/>
-        <source>Local Settings</source>
-        <translation>הגדרות מקומיות</translation>
+        <location/>
+        <source>Events</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1805,23 +1881,8 @@
     <name>QnBuildNumberDialog</name>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
-        <source>Install a specific build.</source>
-        <translation>התקן גירסה ספציפית.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Build Number:</source>
-        <translation>מספר גירסה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>99990</source>
-        <translation>99990</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>סיסמה:</translation>
+        <source>Choose a specific build</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1830,6 +1891,14 @@
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
         <source>Bookmark</source>
         <translation>סימניה</translation>
+    </message>
+</context>
+<context>
+    <name>QnCompatibilityVersionInstallationDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
+        <source>Installing Compatibility Version...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1851,14 +1920,6 @@
     </message>
 </context>
 <context>
-    <name>QnFisheyeCalibrationWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
-        <source>Auto Calibration</source>
-        <translation>כיול אוטומטי</translation>
-    </message>
-</context>
-<context>
     <name>QnIOPortSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
@@ -1867,21 +1928,29 @@
     </message>
 </context>
 <context>
+    <name>QnLoginToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stay logged in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Email or password is not recognized.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnMediaFileSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
         <source>File Settings</source>
         <translation>הגדרות קובץ</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Picture is not loaded</source>
-        <translation>לא נטענה תמונה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is a fish-eye lens file</source>
-        <translation>זהו קובץ עדשת עין-הדג</translation>
     </message>
 </context>
 <context>
@@ -1916,6 +1985,16 @@
         <source>You will be reconnected.</source>
         <translation>תחובר מחדש.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Login:</source>
+        <translation type="unfinished">שם משתמש:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>admin</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1926,23 +2005,23 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Play</source>
-        <translation>&amp;הפעל</translation>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;הוסף...</translation>
+        <source>Add...</source>
+        <translation type="unfinished">&amp;הוסף...</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Rename...</source>
-        <translation>&amp;שנה שם...</translation>
+        <source>Rename...</source>
+        <translation type="unfinished">&amp;שנה שם...</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Delete...</source>
-        <translation>&amp;מחק...</translation>
+        <source>Delete...</source>
+        <translation type="unfinished">&amp;מחק...</translation>
     </message>
 </context>
 <context>
@@ -1952,26 +2031,11 @@
         <source>Filter</source>
         <translation>פילטר</translation>
     </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>נקה פילטר</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.ui"/>
-        <source>Available Server Addresses</source>
-        <translation>כתובות שרת זמינות</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
         <source>Add URL</source>
         <translation>הוסף כתובת(URL)</translation>
     </message>
@@ -1985,51 +2049,16 @@
         <source>Removing this connection option could lead to system malfunction.</source>
         <translation>הסרת אפשרות חיבור זה עלולה להביא לבעיות בתפקוד המערכת.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Add</source>
+        <translation type="unfinished">הוסף</translation>
+    </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Available Update:</source>
-        <translation>עדכון זמין:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Unknown</source>
-        <translation>לא ידוע</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update</source>
-        <translation>עדכן</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update from file:</source>
-        <translation>עדכן מקובץ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Archive url:</source>
-        <translation>כתובת(URL) הארכיון:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy to Clipboard</source>
-        <translation>העתק ללוח</translation>
-    </message>
-    <message>
-        <location/>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation>על מנת לעדכן בצורה ידנית, הורד והשתמש בקובץ הארכיון שבקישור הבא:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
         <source>Cancel</source>
         <translation>ביטול</translation>
     </message>
@@ -2045,8 +2074,23 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates on the Internet.</source>
-        <translation>לא ניתן לבדוק גרסאות באינטרנט.</translation>
+        <source>Applying system updates at the end of the week is not recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Updating to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link copied</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2101,12 +2145,7 @@
 <context>
     <name>QnUserManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/user_management_widget.ui"/>
-        <source>Filter...</source>
-        <translation>סנן...</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
         <source>New User...</source>
         <translation>משתמש חדש...</translation>
     </message>
@@ -2122,29 +2161,39 @@
     </message>
     <message>
         <location/>
-        <source>Enable Selected</source>
-        <translation>הפעל את שנבחרו</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disable Selected</source>
-        <translation>כבה את שנבחרו</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Delete Selected</source>
-        <translation>מחק את שנבחרו</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Selection</source>
         <translation>נקה בחירה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Delete...</source>
+        <translation type="unfinished">&amp;מחק...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/videowall_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
         <source>Video Wall Settings</source>
         <translation>הגדרות קיר וידאו</translation>
     </message>
@@ -2208,7 +2257,7 @@
 <context>
     <name>RecordingSettings</name>
     <message>
-        <location filename="../src/ui/widgets/settings/recording_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
         <source>Video Recording</source>
         <translation>הקלטת וידאו</translation>
     </message>
@@ -2216,11 +2265,6 @@
         <location/>
         <source>Temporary Folder</source>
         <translation>תיקיה זמנית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;סייר...</translation>
     </message>
     <message>
         <location/>
@@ -2259,11 +2303,6 @@
     </message>
     <message>
         <location/>
-        <source>Resolution:</source>
-        <translation>רזולוציה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Native</source>
         <translation>מקורית</translation>
     </message>
@@ -2294,11 +2333,6 @@
     </message>
     <message>
         <location/>
-        <source>Recording Quality:</source>
-        <translation>איכות הקלטה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Best</source>
         <translation>מיטבית</translation>
     </message>
@@ -2319,86 +2353,38 @@
     </message>
     <message>
         <location/>
-        <source>Primary Device:</source>
-        <translation>מכשיר עקרי:</translation>
-    </message>
-    <message>
-        <location/>
         <source>None</source>
         <translation>ללא</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device:</source>
-        <translation>מכשיר חיצוני:</translation>
     </message>
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>על מנת להשתמש באיכות וברזולוציה המיטביים, מומלץ להשתמש במחשב עוצמתי.</translation>
     </message>
-</context>
-<context>
-    <name>RecordingStatisticsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/recording_statistics_widget.ui"/>
-        <source>Refresh</source>
-        <translation>רענן</translation>
+        <location/>
+        <source>Browse...</source>
+        <translation type="unfinished">סייר...</translation>
     </message>
     <message>
         <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation>השרתים אינם מקוונים. הסטטיסטיקות אינן זמינות.</translation>
+        <source>Resolution</source>
+        <translation type="unfinished">רזולוציה:</translation>
     </message>
     <message>
         <location/>
-        <source>10 Tb</source>
-        <translation>10 Tb</translation>
+        <source>Recording Quality</source>
+        <translation type="unfinished">איכות הקלטה:</translation>
     </message>
     <message>
         <location/>
-        <source>Forecast for full storage(s) usage</source>
-        <translation>צפי לניצול מלא של מקום האיחסון</translation>
+        <source>Primary Device</source>
+        <translation type="unfinished">מכשיר עקרי:</translation>
     </message>
     <message>
         <location/>
-        <source>0 Tb</source>
-        <translation>0 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Additional storage:</source>
-        <translation>אחסון נוסף:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 Tb</source>
-        <translation>1000 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 Tb</source>
-        <translation>100 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tb</source>
-        <translation>Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1 Tb</source>
-        <translation>1 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current usage</source>
-        <translation>שימוש עכשווי</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Forecast</source>
-        <translation>צפי</translation>
+        <source>External Device</source>
+        <translation type="unfinished">מכשיר חיצוני:</translation>
     </message>
 </context>
 <context>
@@ -2412,24 +2398,6 @@
         <location/>
         <source>Search</source>
         <translation>חיפוש</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>אתחל פילטר</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-</context>
-<context>
-    <name>ResourceListDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
-        <source>Never suggest saving layouts</source>
-        <translation>אל תציע שמירת פריסות</translation>
     </message>
 </context>
 <context>
@@ -2464,36 +2432,21 @@
     <name>SendmailBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
-        <source>&amp;Additional Recipients:</source>
-        <translation>&amp;נמענים נוספים:</translation>
+        <source>Additional Recipients:</source>
+        <translation type="unfinished">&amp;נמענים נוספים:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Global Email Settings...</source>
-        <translation>&amp;הגדרות אימייל גלובליות...</translation>
+        <source>Global Email Settings...</source>
+        <translation type="unfinished">&amp;הגדרות אימייל גלובליות...</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
-        <source>Name:</source>
-        <translation>שם:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>כתובת IP:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ping</source>
         <translation>פינג</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port:</source>
-        <translation>יציאה:</translation>
     </message>
     <message>
         <location/>
@@ -2509,6 +2462,21 @@
         <location/>
         <source>Failover Priority...</source>
         <translation>קדימות גיבוי...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation type="unfinished">כתובת IP:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2584,26 +2552,6 @@
     </message>
     <message>
         <location/>
-        <source>Name:</source>
-        <translation>שם:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Model:</source>
-        <translation>מודל:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware:</source>
-        <translation>קושחה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Vendor:</source>
-        <translation>ספק:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Address</source>
         <translation>כתובת</translation>
     </message>
@@ -2614,33 +2562,8 @@
     </message>
     <message>
         <location/>
-        <source>Web Page:</source>
-        <translation>דף אינטרנט:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>כתובת IP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>MAC Address:</source>
-        <translation>כתובת MAC:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Authentication</source>
         <translation>אימות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login:</source>
-        <translation>שם משתמש:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>סיסמה:</translation>
     </message>
     <message>
         <location/>
@@ -2664,53 +2587,8 @@
     </message>
     <message>
         <location/>
-        <source>Motion Settings</source>
-        <translation>הגדרות תנועה</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion Detection</source>
         <translation>זיהוי תנועה</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware (camera built-in)</source>
-        <translation>חומרה (המצלמה מובנית)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>תוכנה - המספר המקסימלי של פריימים לשניה עשוי לרדת במקצת על השרת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensitivity:</source>
-        <translation>רגישות:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Mask (0)</source>
-        <translation>מיסוך תנועה(0)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Maximum sensitivity (9)</source>
-        <translation>רגישות מירבית(9)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera web page:</source>
-        <translation>עמוד האינטרנט של המצלמה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>URL</source>
-        <translation>כתובת (URL)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Motion Regions</source>
-        <translation>אתחל איזורי תנועה</translation>
     </message>
     <message>
         <location/>
@@ -2732,36 +2610,76 @@
         <source>I/O ports</source>
         <translation>פורטי קלט/פלט</translation>
     </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Model</source>
+        <translation type="unfinished">מודל</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware</source>
+        <translation type="unfinished">קושחה:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vendor</source>
+        <translation type="unfinished">ספק:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation type="unfinished">כניסה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation type="unfinished">סיסמא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation type="unfinished">כתובת IP:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Web Page</source>
+        <translation type="unfinished">דף אינטרנט:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MAC Address</source>
+        <translation type="unfinished">כתובת MAC:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensitivity</source>
+        <translation type="unfinished">רגישות:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
-        <source>SMTP &amp;Server:</source>
-        <translation>&amp;שרת SMTP:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;User:</source>
-        <translation>&amp;משתמש:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמא:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Email:</source>
-        <translation>כתובת דואר:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>P&amp;ort:</source>
-        <translation>י&amp;ציאה:</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
         <source>Unsecure Connection</source>
         <translation>חיבור לא מאובטח</translation>
     </message>
@@ -2782,24 +2700,14 @@
     </message>
     <message>
         <location/>
-        <source>&amp;System Signature:</source>
-        <translation>חתימת &amp;מערכת:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>הכנס כאן תיאור קצר למערכת.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>חתימת תמיכה:</translation>
+        <source>Port:</source>
+        <translation type="unfinished">יציאה:</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
         <translation>הגדרות דואר יוצא</translation>
     </message>
@@ -2815,37 +2723,9 @@
     </message>
 </context>
 <context>
-    <name>SmtpSimpleSettingsWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
-        <source>&amp;Email:</source>
-        <translation>&amp;כתובת דואר:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמא:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;System Signature:</source>
-        <translation>חתימת &amp;מערכת:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>הכנס כאן תיאור קצר למערכת.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>חתימת תמיכה:</translation>
-    </message>
-</context>
-<context>
     <name>SmtpTestConnectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
         <translation>שרת:</translation>
     </message>
@@ -2886,19 +2766,62 @@
     </message>
 </context>
 <context>
+    <name>StorageAnalyticsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
+        <source>Current Statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Forecast for Full Storage Usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1000 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>100 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>10 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Additional storage:</source>
+        <translation type="unfinished">אחסון נוסף:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servers is offline. Statistics is not available.</source>
+        <translation type="unfinished">השרתים אינם מקוונים. הסטטיסטיקות אינן זמינות.</translation>
+    </message>
+</context>
+<context>
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Rebuild Archive Index</source>
-        <translation>בנה אינדקס ארכיון מחדש</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup progress</source>
-        <translation>התקדמות גיבוי</translation>
-    </message>
-    <message>
-        <location/>
         <source>Cancel</source>
         <translation>ביטול</translation>
     </message>
@@ -2909,75 +2832,39 @@
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop.
-It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation>ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
-פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add External Storage...</source>
         <translation>הוסף אחסון חיצוני...</translation>
     </message>
     <message>
         <location/>
-        <source>Main Storage Locations</source>
-        <translation>מיקום איחסון חיצוני</translation>
+        <source>Storage Locations</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Backup Storage Locations</source>
-        <translation>מיקום איחסון לגיבוי</translation>
+        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
+        <translation type="unfinished">ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
+פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
     </message>
     <message>
         <location/>
-        <source>Execute Backup</source>
-        <translation>הפעל גיבוי</translation>
+        <source>Reindex Archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Set Schedule...</source>
-        <translation>הגדר לוח זמנים...</translation>
+        <source>Reindex Backup</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation>לא הוגדר איחסון לגיבוי. הגיבוי לא יתבצע.</translation>
+        <source>Backup Archive</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation>הגיבוי זמין אם ישנם 2 כונני איחסון או יותר במערכת.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Global Backup Settings</source>
-        <translation>הגדרות גיבוי כלליות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Archive From:</source>
-        <translation>גבה ארכיון מ:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Quality:</source>
-        <translation>איכות גיבוי:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Select at least one camera&gt; </source>
-        <translation>&lt;בחר לפחות מצלמה אחת&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server Backup Settings</source>
-        <translation>הגדרות גיבוי שרת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Time Label</source>
-        <translation>תווית זמן גיבוי</translation>
+        <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3019,7 +2906,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>SystemSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
         <source>(recommended)</source>
         <translation>(מומלץ)</translation>
     </message>
@@ -3042,72 +2929,78 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui"/>
-        <source>Current System Time:</source>
-        <translation>זמן המערכת הנוכחי:</translation>
+        <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
+        <source>System Time</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Synchronizing...</source>
-        <translation>מסנכרן...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation>בחר בשרת הזמין באופן מקומי כשרת השעון שלך במידה ולמערכת אין גישה לאינטרנט:</translation>
+        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+Selected server will be used as a time server if the system has no Internet access.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>UserSettingsDialog</name>
+    <name>UserProfileWidget</name>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.ui"/>
-        <source>Create New User</source>
-        <translation>צור משתמש חדש</translation>
+        <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
+        <source>Change Password...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserRoleSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Access rights</source>
-        <translation>הרשאות גישה</translation>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;שם משתמש:</translation>
+        <source>Delete Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserRolesDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
+        <source>User Roles</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>C&amp;urrent Password:</source>
-        <translation>ס&amp;יסמה נוכחית:</translation>
+        <source>There are no custom user roles yet.
+Click &quot;New role&quot; button to create one.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>E&amp;mail:</source>
-        <translation>א&amp;ימייל:</translation>
+        <source>New role</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UserSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;סיסמה:</translation>
+        <source>User Type</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Advanced...</source>
-        <translation>מתקדם...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Access Rights:</source>
-        <translation>&amp;הרשאות גישה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Confirm Password:</source>
-        <translation>&amp;אשר סיסמה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enabled:</source>
-        <translation>פעיל:</translation>
+        <source>Role</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -34,6 +34,8 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    void start();
+
 private:
     const nx::hpm::api::ConnectionParameters m_connectionParameters;
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_tunnelConnection;
@@ -41,8 +43,7 @@ private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
 
     void launchInactivityTimer();
-    void onInactivityTimoutExpired();
-    void onTunnelClosed(SystemError::ErrorCode reason);
+    void closeTunnel(SystemError::ErrorCode reason);
 };
 
 } // namespace cloud

@@ -3,7 +3,11 @@
 var L = {
     dialogs:{
         okButton: 'Ok',
-        loginTitle: 'Login to Nx Cloud'
+        openLink: 'Visit this link',
+        openLinkWithTitle: 'To {{title}} visit this link'
+    },
+    setup:{
+        createAccount: 'create account'
     },
     passwordRequirements:
     {
@@ -29,9 +33,12 @@ var L = {
         confirmRestoreSettingsNotNetwork: 'Do you want to restart all server\'s settings? Archive and network settings will be saved.',
         unavailable: 'Unavailable',
 
-        confirmDisconnectFromCloud:'Disconnect system from the Nx Cloud',
+        confirmDisconnectFromCloud:'Disconnect system from the {{CLOUD_NAME}}',
         confirmDisconnectFromCloudTitle:'Do you want to disconnect your system? It will be unreachable from the internet then.',
         confirmDisconnectFromCloudAction: 'Disconnect',
+        disconnectedSuccess: 'System was disconnected successfully',
+        connectedSuccess: 'System was connected successfully',
+
         createLocalOwner:null,
         createLocalOwnerTitle:'Create local administrator',
 
@@ -47,8 +54,9 @@ var L = {
         systemIsUnreacheble: 'System is unreachable or doesn\'t exist.',
         incorrectCurrentPassword: 'Incorrect current password',
         incorrectRemotePassword: 'Login or password are incorrect',
-        incompatibleVersion: 'Found system has incompatible version.',
+        incompatibleVersion: 'System is unreachable, doesn\'t exist or has incompatible version.',
         wrongUrl: 'Unable to connect to specified server.',
+        newSystemError: 'Can\'t merge systems. Remote system is not configured yet',
         safeMode: 'Can\'t merge systems. Remote system is in safe mode.',
         configError: 'Can\'t merge systems. Maybe one of the systems is in safe mode.',
         cloudError: 'Can\'t merge systems. Dependent system is connected to cloud. You need to disconnect it first.',

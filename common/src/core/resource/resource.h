@@ -49,6 +49,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
+
     QnResource();
     QnResource(const QnResource&);
     virtual ~QnResource();
@@ -71,7 +72,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false);
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
@@ -191,8 +192,8 @@ public:
      * This is intended as this API cannot be used with QnResource anyway
      * because of threading issues. */
 
-    bool hasProperty(const QString &key) const;
-    QString getProperty(const QString &key) const;
+    virtual bool hasProperty(const QString &key) const;
+    virtual QString getProperty(const QString &key) const;
     static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
 
     ec2::ApiResourceParamDataList getRuntimeProperties() const;
@@ -233,7 +234,7 @@ public:
     void setRemovedFromPool(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
-    void statusChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -323,7 +324,7 @@ private:
     bool emitDynamicSignal(const char *signal, void **arguments);
 
     void emitPropertyChanged(const QString& key);
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
 
     friend class InitAsyncTask;
 
@@ -391,7 +392,7 @@ private:
     QStringList m_tags;
 
     bool m_initialized;
-    QnMutex m_initAsyncMutex;
+    static QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;

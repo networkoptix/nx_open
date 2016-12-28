@@ -429,8 +429,14 @@ void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)
     else
         painter.setPen(Qt::NoPen);
 
-    painter.translate(indicatorRect().topLeft());
-    m_indicator->paint(&painter);
+    paint(&painter);
+}
+
+void QnBusyIndicatorWidget::paint(QPainter* painter)
+{
+    QnScopedPainterTransformRollback transformRollback(painter);
+    painter->translate(indicatorRect().topLeft());
+    m_indicator->paint(painter);
 }
 
 void QnBusyIndicatorWidget::updateIndicator()

@@ -50,35 +50,68 @@ namespace
     static const QString kAdminPasswordDigest = lit("adminMd5Digest");
     static const QString kAdminPasswordCrypt512 = lit("adminCrypt512");
     static const QString kAdminPasswordRealm = lit("adminRealm");
+    static const QString kLocalSystemId = lit("localSystemId");
+    static const QString kLocalSystemName = lit("localSystemName");
+    static const QString kServerName= lit("serverName");
+    static const QString kStorageInfo = lit("storageInfo");
 }
 
-void AdminPasswordData::saveToSettings(QSettings* settings)
+void BeforeRestoreDbData::saveToSettings(QSettings* settings)
 {
     settings->setValue(kAdminPasswordHash, hash);
     settings->setValue(kAdminPasswordDigest, digest);
     settings->setValue(kAdminPasswordCrypt512, cryptSha512Hash);
     settings->setValue(kAdminPasswordRealm, realm);
+    settings->setValue(kLocalSystemId, localSystemId);
+    settings->setValue(kLocalSystemName, localSystemName);
+    settings->setValue(kServerName, serverName);
+    settings->setValue(kStorageInfo, storageInfo);
 }
 
-void AdminPasswordData::loadFromSettings(const QSettings* settings)
+void BeforeRestoreDbData::loadFromSettings(const QSettings* settings)
 {
     hash = settings->value(kAdminPasswordHash).toByteArray();
     digest = settings->value(kAdminPasswordDigest).toByteArray();
     cryptSha512Hash = settings->value(kAdminPasswordCrypt512).toByteArray();
     realm = settings->value(kAdminPasswordRealm, QnAppInfo::realm()).toByteArray();
+    localSystemId = settings->value(kLocalSystemId).toByteArray();
+    localSystemName = settings->value(kLocalSystemName).toByteArray();
+    serverName = settings->value(kServerName).toByteArray();
+    storageInfo = settings->value(kStorageInfo).toByteArray();
 }
 
-void AdminPasswordData::clearSettings(QSettings* settings)
+void BeforeRestoreDbData::clearSettings(QSettings* settings)
 {
     settings->remove(kAdminPasswordHash);
     settings->remove(kAdminPasswordDigest);
     settings->remove(kAdminPasswordCrypt512);
     settings->remove(kAdminPasswordRealm);
+    settings->remove(kLocalSystemId);
+    settings->remove(kLocalSystemName);
+    settings->remove(kServerName);
+    settings->remove(kStorageInfo);
 }
 
-bool AdminPasswordData::isEmpty() const
+bool BeforeRestoreDbData::isEmpty() const
 {
     return digest.isEmpty() && hash.isEmpty();
+}
+
+bool BeforeRestoreDbData::hasInfoForStorage(const QString& url) const
+{
+    return storageInfo.contains(url.toLocal8Bit());
+}
+
+qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
+{
+    int urlPos = storageInfo.indexOf(url);
+    if (urlPos == -1)
+        return -1;
+
+    int spaceLimitStringBeginPos = urlPos + url.size() + 1;
+    int spaceLimitStringEndPos = storageInfo.indexOf(";", spaceLimitStringBeginPos);
+
+    return storageInfo.mid(spaceLimitStringBeginPos, spaceLimitStringEndPos - spaceLimitStringBeginPos).toLongLong();
 }
 
 // ------------------- QnCommonModule --------------------
@@ -96,10 +129,10 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     QnCommonMetaTypes::initialize();
 
-    store<QnLongRunableCleanup>(new QnLongRunableCleanup());
+    store(new QnLongRunableCleanup());
 
     /* Init statics. */
-    store<nx::utils::TimerManager>(new nx::utils::TimerManager());
+    store(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
@@ -291,22 +324,22 @@ qint64 QnCommonModule::systemIdentityTime() const
     return m_systemIdentityTime;
 }
 
-void QnCommonModule::setAdminPasswordData(const AdminPasswordData& data)
+void QnCommonModule::setBeforeRestoreData(const BeforeRestoreDbData& data)
 {
-    m_adminPasswordData = data;
+    m_beforeRestoreDbData = data;
 }
 
-AdminPasswordData QnCommonModule::adminPasswordData() const
+BeforeRestoreDbData QnCommonModule::beforeRestoreDbData() const
 {
-    return m_adminPasswordData;
+    return m_beforeRestoreDbData;
 }
 
-void QnCommonModule::setUseLowPriorityAdminPasswordHach(bool value)
+void QnCommonModule::setUseLowPriorityAdminPasswordHack(bool value)
 {
     m_lowPriorityAdminPassword = value;
 }
 
-bool QnCommonModule::useLowPriorityAdminPasswordHach() const
+bool QnCommonModule::useLowPriorityAdminPasswordHack() const
 {
     return m_lowPriorityAdminPassword;
 }

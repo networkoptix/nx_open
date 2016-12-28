@@ -29,6 +29,8 @@ Page
                 Workflow.popCurrentScreen()
             else if (event.key != Qt.Key_Escape)
                 quitApplication()
+            else
+                return
 
             event.accepted = true
         }

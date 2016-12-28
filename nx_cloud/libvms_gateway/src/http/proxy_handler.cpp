@@ -7,7 +7,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "settings.h"
 #include "run_time_options.h"
 
 namespace nx {
@@ -39,12 +38,18 @@ void ProxyHandler::processRequest(
         return;
     }
 
-    if (!requestOptions.isSsl && m_settings.http().sslSupport)
-        requestOptions.isSsl = m_runTimeOptions.isSslEnforsed(requestOptions.target);
+    if (requestOptions.sslMode == conf::SslMode::undefined
+        && m_settings.http().sslSupport
+        && m_runTimeOptions.isSslEnforced(requestOptions.target))
+    {
+        requestOptions.sslMode = conf::SslMode::enabled;
+    }
 
     // TODO: #ak avoid request loop by using Via header.
 
-    m_targetPeerSocket = SocketFactory::createStreamSocket(requestOptions.isSsl);
+    m_targetPeerSocket = SocketFactory::createStreamSocket(
+        requestOptions.sslMode == conf::SslMode::enabled);
+
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
         !m_targetPeerSocket->setRecvTimeout(m_settings.tcp().recvTimeout) ||
@@ -63,7 +68,7 @@ void ProxyHandler::processRequest(
     // TODO: #ak updating request (e.g., Host header).
     m_targetPeerSocket->connectAsync(
         requestOptions.target,
-        std::bind(&ProxyHandler::onConnected, this, std::placeholders::_1));
+        std::bind(&ProxyHandler::onConnected, this, requestOptions.target, std::placeholders::_1));
 }
 
 void ProxyHandler::closeConnection(
@@ -76,18 +81,15 @@ void ProxyHandler::closeConnection(
         cl_logDEBUG1);
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
-    NX_ASSERT(m_requestCompletionHandler);
-
-    auto handler = std::move(m_requestCompletionHandler);
-    handler(nx_http::StatusCode::serviceUnavailable);
+    if (auto handler = std::move(m_requestCompletionHandler))
+        handler(nx_http::StatusCode::serviceUnavailable);
 }
 
 ProxyHandler::TargetWithOptions::TargetWithOptions(
     nx_http::StatusCode::Value status_, SocketAddress target_)
 :
     status(status_),
-    target(std::move(target_)),
-    isSsl(false)
+    target(std::move(target_))
 {
 }
 
@@ -121,8 +123,13 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromRequest(
             requestOptions.target.port = m_settings.http().proxyTargetPort;
     }
 
-    requestOptions.isSsl |= connection.isSsl();
-    if (requestOptions.isSsl && !m_settings.http().sslSupport)
+    if (requestOptions.sslMode == conf::SslMode::undefined)
+        requestOptions.sslMode = m_settings.cloudConnect().preferedSslMode;
+
+    if (requestOptions.sslMode == conf::SslMode::undefined && connection.isSsl())
+        requestOptions.sslMode = conf::SslMode::enabled;
+
+    if (requestOptions.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
         NX_LOGX(lm("SSL requestd but forbidden by settings %1")
             .str(connection.socket()->getForeignAddress()), cl_logDEBUG1);
@@ -183,8 +190,10 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
         const auto protocol = targetParts.front().toString();
         targetParts.pop_front();
 
-        if (protocol == "ssl" || protocol == "https")
-            requestOptions.isSsl = true;
+        if (protocol == lit("ssl") || protocol == lit("https"))
+            requestOptions.sslMode = conf::SslMode::enabled;
+        else if (protocol == lit("http"))
+            requestOptions.sslMode = conf::SslMode::disabled;
     }
 
     if (targetParts.size() > 1)
@@ -210,28 +219,31 @@ ProxyHandler::TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request
     return requestOptions;
 }
 
-void ProxyHandler::onConnected(SystemError::ErrorCode errorCode)
+void ProxyHandler::onConnected(
+    const SocketAddress& targetAddress, SystemError::ErrorCode errorCode)
 {
+    static const auto isSsl =
+        [](const std::unique_ptr<AbstractStreamSocket>& s)
+        {
+            return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
+        };
+
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to establish connection to %1 (path %2)")
-            .arg(m_targetPeerSocket->getForeignAddress().toString())
-            .arg(m_request.requestLine.url.toString()),
+        NX_LOGX(lm("Failed to establish connection to %1 (path %2) with SSL=%3")
+            .strs(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)),
             cl_logDEBUG1);
+
         auto handler = std::move(m_requestCompletionHandler);
-        handler(
-            (errorCode == SystemError::hostNotFound ||
-                errorCode == SystemError::hostUnreach)
+        return handler(
+            (errorCode == SystemError::hostNotFound || errorCode == SystemError::hostUnreach)
                 ? nx_http::StatusCode::notFound
                 : nx_http::StatusCode::serviceUnavailable);
-        return;
     }
 
-    NX_LOGX(lm("Successfully established connection to %1 (path %2) from %3 with SSL=%4")
-        .str(m_targetPeerSocket->getForeignAddress())
-        .str(m_request.requestLine.url)
-        .str(m_targetPeerSocket->getLocalAddress())
-        .arg(dynamic_cast<nx::network::SslSocket*>(m_targetPeerSocket.get())), cl_logDEBUG2);
+    NX_LOGX(lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
+        .strs(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
+            m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,

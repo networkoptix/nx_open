@@ -59,6 +59,8 @@ public:
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
+    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
+
     /*!
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
     */
@@ -126,7 +128,7 @@ private:
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     QString bitrateToDefaultString(int bitrateKbps) const; 
 
-    void initializePtz();
+    void initialize2WayAudio( const ActiSystemInfo& systemInfo );
     void initializeIO( const ActiSystemInfo& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
     void fetchAndSetAdvancedParameters();
@@ -219,6 +221,8 @@ private:
     boost::optional<bool> m_audioInputOn;
     QnCameraAdvancedParams m_advancedParameters;
     QnCameraAdvancedParams m_advancedParametersCache;
+
+    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 #endif // #ifdef ENABLE_ACTI

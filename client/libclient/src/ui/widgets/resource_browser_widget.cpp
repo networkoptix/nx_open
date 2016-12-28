@@ -57,6 +57,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workaround/hidpi_workarounds.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
@@ -250,17 +251,22 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
 
-    connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateFilter()));
-    connect(ui->filterLineEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFilter()));
-    connect(ui->filterLineEdit, SIGNAL(editingFinished()), this, SLOT(forceUpdateFilter()));
+    connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
+        this, [this]() { updateFilter(false); });
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
+        this, [this]() { updateFilter(false); });
+    connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
+        this, [this]() { updateFilter(true); });
 
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated, this,
-        &QnResourceBrowserWidget::handleItemActivated);
-    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated, this,
-        &QnResourceBrowserWidget::handleItemActivated);
+    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
+        this, &QnResourceBrowserWidget::handleItemActivated);
+    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
+        this, &QnResourceBrowserWidget::handleItemActivated);
 
-    connect(ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(at_tabWidget_currentChanged(int)));
-    connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)), this, SIGNAL(selectionChanged()));
+    connect(ui->tabWidget, &QTabWidget::currentChanged,
+        this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
+    connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+        this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
     ui->resourceTreeWidget->setWorkbench(workbench());
@@ -270,12 +276,18 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
 
-    connect(workbench(), SIGNAL(currentLayoutAboutToBeChanged()), this, SLOT(at_workbench_currentLayoutAboutToBeChanged()));
-    connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
-    connect(workbench(), SIGNAL(itemChanged(Qn::ItemRole)), this, SLOT(at_workbench_itemChanged(Qn::ItemRole)));
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
+        this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
+    connect(workbench(), &QnWorkbench::currentLayoutChanged,
+        this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
+    connect(workbench(), &QnWorkbench::itemChanged,
+        this, &QnResourceBrowserWidget::at_workbench_itemChanged);
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
-        &QnResourceBrowserWidget::updateIcons);
+    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
+        this, &QnResourceBrowserWidget::updateIcons);
+
+    connect(this->context(), &QnWorkbenchContext::userChanged,
+        this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
     installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
         ui->searchTreeWidget->treeView()->verticalScrollBar() }, { QEvent::Show, QEvent::Hide },
@@ -842,6 +854,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
             model->clearCriteria();
+            model->setFilterWildcard(L'*' + filter + L'*');
             if (filter.isEmpty())
             {
                 model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
@@ -890,7 +903,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
     ui->searchTreeWidget->setModel(nullptr);
-    ui->filterLineEdit->setText(QString());
+    ui->filterLineEdit->lineEdit()->setText(QString());
     killSearchTimer();
 }
 
@@ -905,7 +918,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
 
     QN_SCOPED_VALUE_ROLLBACK(&m_ignoreFilterChanges, true);
-    ui->filterLineEdit->setText(layoutFilter(layout));
+    ui->filterLineEdit->lineEdit()->setText(layoutFilter(layout));
 
     /* Bold state has changed. */
     currentTreeWidget()->update();
@@ -987,14 +1000,29 @@ void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyMod
 
 void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)
 {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
+    if (nodeType == Qn::CloudSystemNode)
+    {
+        menu()->trigger(QnActions::ConnectToCloudSystemAction, QnActionParameters()
+            .withArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString()));
+        return;
+    }
+
+    if (nodeType == Qn::VideoWallItemNode)
+    {
+        auto item = qnResPool->getVideoWallItemByUuid(index.data(Qn::UuidRole).value<QnUuid>());
+        menu()->triggerIfPossible(QnActions::StartVideoWallControlAction,
+            QnVideoWallItemIndexList() << item);
+        return;
+    }
+
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     /* Do not open users or fake servers. */
     if (!resource || resource->hasFlags(Qn::user) || resource->hasFlags(Qn::fake))
         return;
 
     /* Do not open servers of admin.  */
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
     if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
