@@ -27,7 +27,9 @@ const QString kFlirDefaultPassword = lit("admin");
 
 } // namespace
 
-using namespace nx::plugins::flir;
+namespace nx {
+namespace plugins {
+namespace flir {
 
 FcResourceSearcher::FcResourceSearcher():
     m_flirFcTypeId(qnResTypePool->getResourceTypeId(manufacture(), kFlirFcResourceTypeName, true)),
@@ -45,7 +47,7 @@ FcResourceSearcher::~FcResourceSearcher()
     }
 
     m_receiveSocket->pleaseStopSync();
-    for (auto& httpClient: m_httpClients)
+    for (auto& httpClient : m_httpClients)
         httpClient.second->pleaseStopSync();
 }
 
@@ -59,7 +61,7 @@ QList<QnResourcePtr> FcResourceSearcher::checkHostAddr(
 
     httpClient.setSendTimeoutMs(kDeviceInfoRequestTimeout.count());
     httpClient.setResponseReadTimeoutMs(kDeviceInfoResponseTimeout.count());
-    
+
     auto deviceInfoUrl = url;
     deviceInfoUrl.setScheme("http");
     deviceInfoUrl.setPath(kDeviceInfoUrlPath);
@@ -113,7 +115,7 @@ QnResourceList FcResourceSearcher::findResources()
     auto now = qnSyncTime->currentMSecsSinceEpoch();
     auto itr = m_deviceInfoCache.begin();
 
-    while ( itr != m_deviceInfoCache.end())
+    while (itr != m_deviceInfoCache.end())
     {
         auto timestamp = itr->second.timestamp;
         auto deviceInfo = itr->second.deviceInfo;
@@ -217,12 +219,10 @@ void FcResourceSearcher::doNextReceiveUnsafe()
 
     m_receiveSocket->recvFromAsync(
         &m_receiveBuffer,
-        std::bind(
-            &FcResourceSearcher::receiveFromCallback,
-            this,
-            std::placeholders::_1,
-            std::placeholders::_2,
-            std::placeholders::_3));
+        [this](SystemError::ErrorCode erroCode, SocketAddress endpoint, std::size_t bytesRead)
+        {
+            receiveFromCallback(erroCode, endpoint, bytesRead);
+        });
 }
 
 void FcResourceSearcher::receiveFromCallback(
@@ -236,7 +236,7 @@ void FcResourceSearcher::receiveFromCallback(
 
     if (errorCode != SystemError::noError)
         initListenerUnsafe();
-    
+
     auto discoveryMessage = QString::fromUtf8(m_receiveBuffer.left(bytesRead));
     auto discoveryInfo = parseDeviceDiscoveryInfo(discoveryMessage);
 
@@ -247,19 +247,19 @@ void FcResourceSearcher::receiveFromCallback(
         doNextReceiveUnsafe();
         return;
     }
-   
+
     auto url = senderAddress.toUrl(lit("http"));
     url.setPort(nx_http::DEFAULT_HTTP_PORT);
     url.setPath(kDeviceInfoUrlPath);
 
     if (m_requestsInProgress.find(senderAddress) == m_requestsInProgress.end())
     {
-        auto onResponseReceived = 
+        auto onResponseReceived =
             [this, senderAddress](nx_http::AsyncHttpClientPtr httpClient)
-            {
-                QnMutexLocker lock(&m_mutex);
-                handleDeviceInfoResponseUnsafe(senderAddress, httpClient);
-            };
+        {
+            QnMutexLocker lock(&m_mutex);
+            handleDeviceInfoResponseUnsafe(senderAddress, httpClient);
+        };
 
         if (m_httpClients.find(senderAddress) == m_httpClients.end())
             m_httpClients[senderAddress] = createHttpClient();
@@ -337,3 +337,9 @@ void FcResourceSearcher::handleDeviceInfoResponseUnsafe(
     m_deviceInfoCache[senderAddress] = tsDeviceInfo;
     m_requestsInProgress.erase(senderAddress);
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx 
+
+

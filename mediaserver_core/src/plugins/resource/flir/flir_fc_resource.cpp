@@ -7,18 +7,22 @@
 #include <utils/common/synctime.h>
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
 
-using namespace nx::plugins::flir;
-
 namespace {
 
-const QString kFlirFcDriverName = lit("FlirFC");
 const std::chrono::milliseconds kServerStatusRequestTimeout = std::chrono::seconds(40);
 const std::chrono::milliseconds kServerStatusResponseTimeout = std::chrono::seconds(40);
 
 } // namespace
 
+namespace nx {
+namespace plugins {
+namespace flir {
+
+const QString kDriverName = lit("FlirFC");
+
 FcResource::FcResource():
-    m_ioManager(nullptr)
+    m_ioManager(nullptr),
+    m_callbackIsInProgress(false)
 {
 }
 
@@ -33,6 +37,10 @@ FcResource::~FcResource()
             "deleteLater",
             Qt::QueuedConnection);
     }
+
+    QnMutexLocker lock(&m_ioMutex);
+    while (m_callbackIsInProgress)
+        m_ioWaitCondition.wait(&m_ioMutex);
 }
 
 CameraDiagnostics::Result FcResource::initInternal()
@@ -54,7 +62,7 @@ CameraDiagnostics::Result FcResource::initInternal()
     if (serverStatus)
     {
         if (!serverStatus->isNexusServerEnabled)
-        { 
+        {
             bool serverEnabled = tryToEnableNexusServer(httpClient);
             if (!serverEnabled)
             {
@@ -64,19 +72,19 @@ CameraDiagnostics::Result FcResource::initInternal()
             }
         }
 
-        const auto& kSettings = serverStatus->settings;
-        if (kSettings.find(fc_private::kNexusInterfaceGroupName) != kSettings.cend())
+        const auto& settings = serverStatus->settings;
+        const auto& group = settings.find(fc_private::kNexusInterfaceGroupName);
+        if (group != settings.cend())
         {
-            const auto& group = kSettings.at(fc_private::kNexusInterfaceGroupName);
-            if (group.find(fc_private::kNexusPortParamName) != group.cend())
+            const auto& nexusPortParameter = group->second.find(fc_private::kNexusPortParamName);
+            if (nexusPortParameter != group->second.cend())
             {
                 bool status = false;
-                const auto kNexusPort = group
-                    .at(fc_private::kNexusPortParamName)
+                const auto nexusPort = nexusPortParameter->second
                     .toInt(&status);
 
                 if (status)
-                    port = kNexusPort;
+                    port = nexusPort;
             }
         }
     }
@@ -118,22 +126,39 @@ bool FcResource::startInputPortMonitoringAsync(std::function<void(bool)>&& compl
     m_ioManager->setInputPortStateChangeCallback(
         [this](QString portId, nx_io_managment::IOPortState portState)
         {
+            QnMutexLocker lock(&m_ioMutex);
+            m_callbackIsInProgress = true;
+            
+            lock.unlock();
             emit cameraInput(
                 toSharedPointer(this),
                 portId,
                 nx_io_managment::isActiveIOPortState(portState),
                 qnSyncTime->currentUSecsSinceEpoch());
+
+            lock.relock();
+            m_callbackIsInProgress = false;
+            m_ioWaitCondition.wakeAll();
         });
 
     m_ioManager->setNetworkIssueCallback(
-        [this](QString reason, bool /*isFatal*/)
+        [this](QString reason, bool isFatal)
         {
+            QnMutexLocker lock(&m_ioMutex);
+            m_callbackIsInProgress = true;
+
+            lock.unlock();
+            const auto logLevel = isFatal ? cl_logWARNING : cl_logERROR;
             NX_LOG(
                 lm("Flir Onvif resource, %1 (%2), netowk issue detected. Reason: %3")
-                .arg(getModel())
-                .arg(getUrl())
-                .arg(reason),
-                cl_logWARNING);
+                    .arg(getModel())
+                    .arg(getUrl())
+                    .arg(reason),
+                logLevel);
+
+            lock.relock();
+            m_callbackIsInProgress = false;
+            m_ioWaitCondition.wakeAll();
         });
 
     m_ioManager->startIOMonitoring();
@@ -154,7 +179,7 @@ void FcResource::stopInputPortMonitoringAsync()
 QnIOPortDataList FcResource::getRelayOutputList() const
 {
     if (m_ioManager)
-        return m_ioManager->getOutputPortList();    
+        return m_ioManager->getOutputPortList();
 
     return QnIOPortDataList();
 }
@@ -177,7 +202,7 @@ QnAbstractStreamDataProvider* FcResource::createLiveDataProvider()
 
 QString FcResource::getDriverName() const
 {
-    return kFlirFcDriverName;
+    return kDriverName;
 }
 
 void FcResource::setIframeDistance(int, int)
@@ -230,7 +255,7 @@ bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
     nx_http::BufferType messageBody;
     while (!httpClient.eof())
         messageBody.append(httpClient.fetchMessageBodyBuffer());
-    
+
     bool status = false;
     auto isEnabled = messageBody.trimmed().toInt(&status);
 
@@ -240,7 +265,7 @@ bool FcResource::tryToEnableNexusServer(nx_http::HttpClient& httpClient)
     return true;
 }
 
-bool nx::plugins::flir::FcResource::setRelayOutputState(
+bool FcResource::setRelayOutputState(
     const QString& outputId,
     bool isActive,
     unsigned int autoResetTimeoutMs)
@@ -290,5 +315,9 @@ bool nx::plugins::flir::FcResource::setRelayOutputState(
 
     return m_ioManager->setOutputPortState(outputId, isActive);
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
 
 #endif // ENABLE_FLIR

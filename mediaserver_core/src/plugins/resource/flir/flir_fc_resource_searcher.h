@@ -21,7 +21,7 @@ class FcResourceSearcher: public QnAbstractNetworkResourceSearcher
     struct TimestampedDeviceInfo
     {
         DeviceInfo deviceInfo;
-        quint64 timestamp;
+        quint64 timestamp = 0;
     };
 
 public:

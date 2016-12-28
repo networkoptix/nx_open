@@ -16,10 +16,9 @@ public:
     virtual CameraDiagnostics::Result initInternal() override;
 };
 
-typedef QnSharedResourcePointer<OnvifResource> QnFlirOnvifResourcePtr;
-
 } // namespace flir
 } // namespace plugins
 } // namespace nx
 
+typedef QnSharedResourcePointer<nx::plugins::flir::OnvifResource> QnFlirOnvifResourcePtr;
 #endif //  ENABLE_ONVIF

@@ -138,6 +138,6 @@ template <> struct hash<SocketAddress>
     }
 };
 
-}
+} // namespace std
 
 Q_DECLARE_METATYPE(SocketAddress)

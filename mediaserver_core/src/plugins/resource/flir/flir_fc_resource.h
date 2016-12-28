@@ -14,6 +14,9 @@ namespace nx {
 namespace plugins {
 namespace flir {
 
+/**
+ * Flir FC-series resource.
+ */
 class FcResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
@@ -54,6 +57,9 @@ private:
 private:
     nexus::WebSocketIoManager* m_ioManager;
     std::map<quint64, PortTimerEntry> m_autoResetTimers;
+    bool m_callbackIsInProgress;
+    QnMutex m_ioMutex;
+    QnWaitCondition m_ioWaitCondition;
 };
 
 } // namespace flir

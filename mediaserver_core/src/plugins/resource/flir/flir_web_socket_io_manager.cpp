@@ -36,6 +36,8 @@ const QString kDigitalInputNameTemplate = lit("Digital Input %1");
 const QString kDigitalOutputNameTemplate = lit("Digital Output %1");
 const QString kMdAreaNameTemplate = lit("Motion detection area %1");
 
+const int kForcedRequest = 1;
+
 } // namespace
 
 using namespace nx::utils;
@@ -315,10 +317,10 @@ void WebSocketIoManager::at_gotMessageOnControlSocket(const QString& message)
     if (response.returnCode() != kNoError)
         return;
 
-    const auto kResponseType = response.responseType();
+    const auto responseType = response.responseType();
 
     QnMutexLocker lock(&m_mutex);
-    switch (kResponseType)
+    switch (responseType)
     {
         case CommandResponse::Type::serverWhoAmI:
             handleServerWhoAmIResponseUnsafe(response);
@@ -405,15 +407,15 @@ void WebSocketIoManager::connectWebsocketUnsafe(
             if (m_timerId != timerId)
                 return;
 
-            const auto kUrl = lit("ws://%1:%2/%3")
+            const auto url = lit("ws://%1:%2/%3")
                 .arg(m_resource->getHostAddress())
                 .arg(m_nexusPort)
                 .arg(path);
 
-            auto message = lm("Connecting socket to url %1").arg(kUrl);
+            auto message = lm("Connecting socket to url %1").arg(url);
             NX_LOGX(message, cl_logDEBUG2);
 
-            proxy->open(kUrl);
+            proxy->open(url);
         };
 
     m_timerId = TimerManager::instance()->addTimer(
@@ -462,8 +464,8 @@ void WebSocketIoManager::connectNotificationWebSocketUnsafe()
         socket, &QWebSocket::textMessageReceived,
         this, &WebSocketIoManager::at_gotMessageOnNotificationWebSocket, Qt::QueuedConnection);
 
-    const auto kNotificationPath = buildNotificationSubscriptionPath();
-    connectWebsocketUnsafe(kNotificationPath, m_notificationProxy);
+    const auto notificationPath = buildNotificationSubscriptionPath();
+    connectWebsocketUnsafe(notificationPath, m_notificationProxy);
 }
 
 void WebSocketIoManager::requestSessionIdUnsafe()
@@ -471,11 +473,11 @@ void WebSocketIoManager::requestSessionIdUnsafe()
     if (!m_monitoringIsInProgress)
         return;
 
-    const auto kMessage = lit("%1?action=%2")
+    const auto message = lit("%1?action=%2")
         .arg(kCommandPrefix)
         .arg(kServerWhoAmICommand);
 
-    m_controlProxy->sendTextMessage(kMessage);
+    m_controlProxy->sendTextMessage(message);
 }
 
 void WebSocketIoManager::requestRemoteControlUnsafe()
@@ -483,14 +485,13 @@ void WebSocketIoManager::requestRemoteControlUnsafe()
     if (!m_monitoringIsInProgress)
         return;
 
-    const int kForced = 1;
-    const auto kMessage = lit("%1?session=%2&action=%3&Forced=%4")
+    const auto message = lit("%1?session=%2&action=%3&Forced=%4")
         .arg(kCommandPrefix)
         .arg(m_nexusSessionId)
         .arg(kRequestControlCommand)
-        .arg(kForced);
+        .arg(kForcedRequest);
 
-    m_controlProxy->sendTextMessage(kMessage);
+    m_controlProxy->sendTextMessage(message);
 }
 
 QString WebSocketIoManager::buildNotificationSubscriptionPath() const
@@ -591,7 +592,7 @@ void WebSocketIoManager::handleRemoteControlReleaseResponseUnsafe(const CommandR
     qDebug() << "Got remote control release response. It's nice.";
 }
 
-void WebSocketIoManager::handleIoSensorOutputStateSetResponseUnsafe(const CommandResponse& response)
+void WebSocketIoManager::handleIoSensorOutputStateSetResponseUnsafe(const CommandResponse& /*response*/)
 {
     // Do nothing.
 }
@@ -602,21 +603,21 @@ void WebSocketIoManager::checkAndNotifyIfNeeded(const Notification& notification
     if (!m_monitoringIsInProgress)
         return;
 
-    const auto kAlarmName = notification.alarmId;
+    const auto alarmId = notification.alarmId;
 
-    if (m_alarmStates.find(kAlarmName) == m_alarmStates.end())
+    if (m_alarmStates.find(alarmId) == m_alarmStates.end())
         return;
 
-    if (m_alarmStates[kAlarmName] == notification.alarmState)
+    if (m_alarmStates[alarmId] == notification.alarmState)
         return;
 
-    m_alarmStates[kAlarmName] = notification.alarmState;
+    m_alarmStates[alarmId] = notification.alarmState;
     auto callback = m_stateChangeCallback;
 
     lock.unlock(); //< Not sure if it is right
 
     callback(
-        kAlarmName,
+        alarmId,
         nx_io_managment::fromBoolToIOPortState(notification.alarmState));
 }
 
@@ -716,13 +717,14 @@ void WebSocketIoManager::reinitMonitoringUnsafe()
 int WebSocketIoManager::getPortNumberByPortId(const QString& portId) const
 {
     auto typeAndNumber = portId.split(L':');
-    NX_ASSERT(
-        typeAndNumber.size() == 2,
-        lm("Wrong port id format. Expected: $TYPE:NUMBER, given: %1")
-            .arg(portId));
-
     if (typeAndNumber.size() != 2)
+    {
+        NX_ASSERT(
+            false,
+            lm("Wrong port id format. Expected: $TYPE:NUMBER, given: %1")
+                .arg(portId));
         return 0; //< There is no output with such a number.
+    }
 
     return typeAndNumber[1].toInt();
 }
