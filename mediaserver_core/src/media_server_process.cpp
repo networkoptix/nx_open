@@ -1896,6 +1896,11 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+
+    nx_hls::QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
+        MSSettings::roSettings()->value(
+        nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
+        nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
