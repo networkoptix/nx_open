@@ -2849,10 +2849,18 @@ QRect QnNxStyle::subElementRect(
 
         case SE_LineEditContents:
         {
-            if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
-                //TODO #vkutin See why this ugly "6" is here and not somewhere else
-                return base_type::subElementRect(subElement, option, widget).adjusted(6, 0, 0, 0);
-            break;
+            const auto standardRect = base_type::subElementRect(subElement, option, widget);
+
+            if (isItemViewEdit(widget))
+                return standardRect;
+
+            static const int kLineEditIndent = 6;
+            static const int kCalendarYearEditIndent = 4;
+
+            if (isWidgetOwnedBy<QCalendarWidget>(widget))
+                return standardRect.adjusted(kCalendarYearEditIndent, 0, 0, 0);
+
+            return standardRect.adjusted(kLineEditIndent, 0, 0, 0);
         }
 
         case SE_PushButtonLayoutItem:
@@ -3626,15 +3634,27 @@ void QnNxStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
     }
 
-    if (qobject_cast<QLineEdit*>(widget))
+    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
     {
-        if (!widget->property(Properties::kDontPolishFontProperty).toBool()
-            && !isItemViewEdit(widget)
-            && !isWidgetOwnedBy<QCalendarWidget>(widget))
+        if (!lineEdit->property(Properties::kDontPolishFontProperty).toBool()
+            && !isItemViewEdit(lineEdit))
         {
-            QFont font = widget->font();
-            font.setPixelSize(Metrics::kTextEditFontPixelSize);
-            widget->setFont(font);
+            QFont font = lineEdit->font();
+
+            if (isWidgetOwnedBy<QCalendarWidget>(lineEdit))
+            {
+                QPalette palette = lineEdit->palette();
+                palette.setBrush(QPalette::Highlight, qApp->palette().highlight());
+                palette.setBrush(QPalette::HighlightedText, qApp->palette().highlightedText());
+                lineEdit->setPalette(palette);
+                font.setBold(true);
+            }
+            else
+            {
+                font.setPixelSize(Metrics::kTextEditFontPixelSize);
+            }
+
+            lineEdit->setFont(font);
         }
     }
 
