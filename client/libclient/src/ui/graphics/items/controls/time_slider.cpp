@@ -23,6 +23,8 @@
 
 #include <recording/time_period_list.h>
 
+#include <text/time_strings.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
@@ -633,26 +635,13 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     static const QString dateMonthsFormat   = lit("MMMM yyyy");             //< Format for displaying month caption in timeline's header.
     static const QString dateYearsFormat    = lit("yyyy");                  //< Format for displaying year caption in timeline's header
 
-    //: Do not translate this string unless you know what you're doing.
-    QString msSuffix = tr("ms", "Suffix for displaying milliseconds on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString sSuffix = tr("s", "Suffix for displaying seconds on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString mSuffix = tr("m", "Suffix for displaying minutes on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString hSuffix = tr("h", "Suffix for displaying hours on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString dSuffix = tr("d", "Suffix for displaying days on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString moSuffix = tr("M", "Suffix for displaying months on timeline.");
-
-    //: Do not translate this string unless you know what you're doing.
-    QString ySuffix = tr("y", "Suffix for displaying years on timeline.");
+    QString msSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds);
+    QString sSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds);
+    QString mSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Minutes);
+    QString hSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Hours);
+    QString dSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Days);
+    QString moSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Months);
+    QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
 
     bool ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
 

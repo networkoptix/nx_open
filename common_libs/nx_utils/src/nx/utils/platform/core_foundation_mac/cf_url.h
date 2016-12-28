@@ -1,7 +1,6 @@
-
 #pragma once
 
-#include <platform/core_foundation_mac/cf_ref_holder.h>
+#include <nx/utils/platform/core_foundation_mac/cf_ref_holder.h>
 
 class QString;
 

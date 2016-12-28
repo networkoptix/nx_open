@@ -5,9 +5,9 @@
 
 #include <CoreServices/CoreServices.h>
 
-#include <platform/core_foundation_mac/cf_url.h>
-#include <platform/core_foundation_mac/cf_string.h>
-#include <platform/core_foundation_mac/cf_array.h>
+#include <nx/utils/platform/core_foundation_mac/cf_url.h>
+#include <nx/utils/platform/core_foundation_mac/cf_string.h>
+#include <nx/utils/platform/core_foundation_mac/cf_array.h>
 #include <nx/utils/software_version.h>
 
 namespace {

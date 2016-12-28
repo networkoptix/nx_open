@@ -10,6 +10,7 @@ class QnPermissionsWidget;
 class QnAccessibleResourcesWidget;
 class QnAbstractPermissionsModel;
 class QnUserSettingsModel;
+class QnAlertBar;
 
 namespace Ui
 {
@@ -46,6 +47,8 @@ protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
     virtual void retranslateUi() override;
     virtual void applyChanges() override;
+    virtual bool hasChanges() const override;
+    virtual void loadDataToUi() override;
 
 private:
     void applyChangesInternal();
@@ -67,8 +70,7 @@ private:
     QnPermissionsWidget* m_permissionsPage;
     QnAccessibleResourcesWidget* m_camerasPage;
     QnAccessibleResourcesWidget* m_layoutsPage;
-    QPushButton* m_editRolesButton;
-
+    QPushButton* m_userEnabledButton;
 };
 
 Q_DECLARE_METATYPE(QnUserSettingsDialog::DialogPage)

@@ -32,6 +32,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
+#include <utils/common/qtimespan.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
@@ -1100,16 +1101,18 @@ QString QnBusinessRuleViewModel::getAggregationText() const
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");
 
-    if (m_aggregationPeriodSec >= DAY && m_aggregationPeriodSec % DAY == 0)
-        return tr("Every %n days", "", m_aggregationPeriodSec / DAY);
+    const qint64 kMsecPerSec = 1000;
+    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
+    static const int kDoNotSuppress = -1;
+    static const QString kSeparator(L' ');
 
-    if (m_aggregationPeriodSec >= HOUR && m_aggregationPeriodSec % HOUR == 0)
-        return tr("Every %n hours", "", m_aggregationPeriodSec / HOUR);
+    const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
+    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(kDoNotSuppress,
+        kFormat,
+        QTimeSpan::SuffixFormat::Full,
+        kSeparator);
 
-    if (m_aggregationPeriodSec >= MINUTE && m_aggregationPeriodSec % MINUTE == 0)
-        return tr("Every %n minutes", "", m_aggregationPeriodSec / MINUTE);
-
-    return tr("Every %n seconds", "", m_aggregationPeriodSec);
+    return tr("Every %1").arg(timespan);
 }
 
 QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState value)

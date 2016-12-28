@@ -1863,11 +1863,6 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Ctrl+Alt+Shift+-")).
         text(lit("Decrement Debug Counter"));
 
-    factory(QnActions::DebugShowResourcePoolAction).
-        flags(Qn::GlobalHotkey | Qn::DevMode).
-        shortcut(lit("Ctrl+Alt+Shift+R")).
-        text(lit("Show Resource Pool"));
-
     factory(QnActions::DebugCalibratePtzAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).
         text(lit("Calibrate PTZ"));

@@ -56,6 +56,12 @@ namespace style
 
     const int Metrics::kPushButtonIconMargin = 6;
 
+    const int Metrics::kTabBarFontPixelSize = 12;
+    const int Metrics::kTextEditFontPixelSize = 14;
+    const int Metrics::kHeaderViewFontPixelSize = 14;
+    const int Metrics::kCalendarItemFontPixelSize = 12;
+    const int Metrics::kCalendarHeaderFontPixelSize = 11;
+
     const qreal Hints::kDisabledItemOpacity = 0.3;
     const int Hints::kMinimumFormLabelWidth = 64;
 
