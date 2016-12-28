@@ -110,6 +110,7 @@ namespace error
         tryAlternate        = 300,
         badRequest          = 400,
         unauthtorized       = 401,
+        notFound            = 404,
         unknownAttribute    = 420,
         staleNonce          = 438,
         serverError         = 500,
@@ -250,20 +251,21 @@ namespace attrs
         virtual int getType() const override { return TYPE; }
     };
 
-    struct NX_NETWORK_API ErrorDescription : Attribute, BufferedValue
+    struct NX_NETWORK_API ErrorCode: Attribute, BufferedValue
     {
         static const int TYPE = errorCode;
 
-        ErrorDescription( int code_, const nx::String& phrase = nx::String() );
+        ErrorCode( int code_, const nx::String& phrase = nx::String() );
         virtual int getType() const override { return TYPE; }
 
-        inline int getClass() const { return code / 100; }
-        inline int getNumber() const { return code % 100; }
-        inline int getCode() const { return code; }
+        inline int getClass() const { return m_code / 100; }
+        inline int getNumber() const { return m_code % 100; }
+        inline int getCode() const { return m_code; }
+        inline const nx::String& getReason() const { return m_reason; }
 
     private:
-        int code;           //!< This value is full error code
-        nx::String reason;  //!< utf8 string, limited to 127 characters
+        int m_code;           //!< This value is full error code
+        nx::String m_reason;  //!< utf8 string, limited to 127 characters
     };
 
     struct NX_NETWORK_API FingerPrint : Attribute

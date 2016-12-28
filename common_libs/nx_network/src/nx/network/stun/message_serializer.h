@@ -45,7 +45,7 @@ namespace stun {
         // value 
         nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& , std::size_t* value );
-        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorDescription& , std::size_t* value );
+        nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode& , std::size_t* value );
         nx_api::SerializerState::Type serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& , std::size_t* value );
         // this function will do minimum checking for the message object
         bool checkMessageIntegratiy();

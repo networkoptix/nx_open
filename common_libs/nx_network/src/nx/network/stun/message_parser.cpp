@@ -102,7 +102,7 @@ Attribute* MessageParser::parseErrorCode() {
         }
     }
 
-    return new ErrorDescription( code, phrase );
+    return new ErrorCode( code, phrase );
 }
 
 Attribute* MessageParser::parseFingerprint() {

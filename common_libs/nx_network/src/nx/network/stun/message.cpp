@@ -270,11 +270,18 @@ UserName::UserName( const String& value )
 {
 }
 
-ErrorDescription::ErrorDescription( int code_, const nx::String& phrase )
-    : BufferedValue( bufferToString( phrase ) )
-    , code( code_ )
+//-------------------------------------------------------------------------------------------------
+// ErrorCode
+
+ErrorCode::ErrorCode( int code_, const nx::String& phrase ):
+    BufferedValue( bufferToString( phrase ) ),
+    m_code( code_ ),
+    m_reason( bufferToString( phrase ) )
 {
 }
+
+//-------------------------------------------------------------------------------------------------
+// FingerPrint
 
 FingerPrint::FingerPrint( uint32_t crc32_ )
     : crc32( crc32_ )
@@ -402,14 +409,14 @@ boost::optional< QString > Message::hasError( SystemError::ErrorCode code ) cons
 
     if( header.messageClass != MessageClass::successResponse )
     {
-        if( const auto err = getAttribute< attrs::ErrorDescription >() )
+        if( const auto err = getAttribute< attrs::ErrorCode >() )
         {
             return QString( lm( "STUN error %1: %2" )
                 .arg( err->getCode() ).arg( err->getString() ) );
         }
         else
         {
-            return QString( lm( "STUN error without ErrorDescription" ) );
+            return QString( lm( "STUN error without ErrorCode" ) );
         }
     }
 
