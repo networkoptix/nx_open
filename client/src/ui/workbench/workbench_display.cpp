@@ -65,7 +65,6 @@
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
-#include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -613,16 +612,6 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
-void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget) {
-    Q_ASSERT_X(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
-    QnGridRaisedConeItem* item = raisedConeItem(widget);
-    if (item->scene() == m_scene)
-        return;
-    m_scene->addItem(item);
-    setLayer(item, Qn::RaisedConeBgLayer);
-    item->setOpacity(0.0);
-}
-
 QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const {
     QRectF occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
     QRectF viewportGeometry = mapRectToScene(m_view, m_view->viewport()->rect());
@@ -670,23 +659,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         /* Sync new & old geometry. */
         if(oldWidget != NULL) {
             synchronize(oldWidget, true);
-
-            if (canShowLayoutBackground()) {
-                ensureRaisedConeItem(oldWidget);
-                raisedConeItem(oldWidget)->setEffectEnabled(false);
-                setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
-            }
         }
 
         if(newWidget != NULL) {
             bringToFront(newWidget);
-
-            if (canShowLayoutBackground()) {
-                ensureRaisedConeItem(newWidget);
-                setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-                raisedConeItem(newWidget)->setEffectEnabled(!workbench()->currentLayout()->resource()->backgroundImageFilename().isEmpty());
-            }
-
             synchronize(newWidget, true);
         }
         break;
@@ -797,12 +773,6 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout) {
 
     synchronizeSceneBounds();
     fitInView();
-
-    QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
-    if (raisedWidget) {
-        ensureRaisedConeItem(raisedWidget);
-        raisedConeItem(raisedWidget)->setEffectEnabled(!layout->backgroundImageFilename().isEmpty());
-    }
 }
 
 void QnWorkbenchDisplay::updateSelectionFromTree() {
@@ -1439,10 +1409,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Adjust for raise. */
     if(widget == raisedWidget && widget != zoomedWidget && m_view != NULL) {
         QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
-        if (!qnRuntime->isActiveXMode()) {
-            ensureRaisedConeItem(widget);
-            raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
-        }
         QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
         qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
         enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());
