@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QUrl>
+#include <QtCore/QList>
 #include <QtCore/QObject>
 
 class QnServerAddressWatcher : public QObject
