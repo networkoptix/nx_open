@@ -332,7 +332,7 @@ namespace
     T* isWidgetOwnedBy(const QWidget* widget)
     {
         if (!widget)
-            return false;
+            return nullptr;
 
         for (QWidget* parent = widget->parentWidget(); parent != nullptr; parent = parent->parentWidget())
         {
