@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.0.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>artifacts_validator</artifactId>
+    <packaging>pom</packaging>
+    <name>Validator of published artifacts</name>
+
+    <properties>
+        <root.dir>${basedir}/..</root.dir>
+        <cloud.parameter/>
+        <beta.parameter/>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1.1</version>
+                <executions>
+                    <execution>
+                        <id>validate-artifacts</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>check_published.py</argument>
+                                <argument>--customization=${customization}</argument>
+                                <argument>--cloud=${cloud.parameter}</argument>
+                                <argument>--build=${buildNumber}</argument>
+                                <argument>--verbose</argument>
+                                <argument>--beta=${beta}</argument>
+                            </arguments>
+                            <workingDirectory>${root.dir}/build_utils/python</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>cloud-parameter-check</id>
+            <activation>
+                <property>
+                    <name>cloud.group</name>
+                    <value>!prod</value>
+                </property>
+            </activation>
+            <properties>
+                <cloud.parameter>${cloud.group}</cloud.parameter>
+            </properties>
+        </profile>
+        <profile>
+            <id>beta-parameter-check</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <beta.parameter>true</beta.parameter>
+            </properties>
+        </profile>
+    </profiles>
+</project>
