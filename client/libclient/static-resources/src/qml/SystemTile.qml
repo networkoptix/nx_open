@@ -113,10 +113,35 @@ BaseTile
         }
     }
 
+    NxPopupMenu
+    {
+        id: tileMenu;
+        NxMenuItem
+        {
+            text: "Edit";
+            leftPadding: 16;
+            rightPadding: 16;
+
+            onTriggered: control.toggle();
+        }
+    }
+
     onCollapsedTileClicked:
     {
         if (!control.isAvailable)
             return;
+
+        if (buttons == Qt.RightButton)
+        {
+            if (control.menuButton.visible)
+            {
+                tileMenu.x = x;
+                tileMenu.y = y;
+                tileMenu.parent = control;
+                tileMenu.open();
+            }
+            return;
+        }
 
         switch(control.impl.tileType)
         {
@@ -153,17 +178,7 @@ BaseTile
     {
         visible: impl.hasSavedConnection && control.isAvailable;
 
-        menu: NxPopupMenu
-        {
-            NxMenuItem
-            {
-                text: "Edit";
-                leftPadding: 16;
-                rightPadding: 16;
-
-                onTriggered: control.toggle();
-            }
-        }
+        menu: tileMenu;
     }
 
     areaLoader.source:

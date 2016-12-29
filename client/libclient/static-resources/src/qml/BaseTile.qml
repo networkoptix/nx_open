@@ -32,7 +32,7 @@ Item
     property string systemId;
     property string localId;
 
-    signal collapsedTileClicked();
+    signal collapsedTileClicked(int buttons, int x, int y);
 
     property bool forceImmediateAnimation: false;
 
@@ -289,14 +289,18 @@ Item
         {
             id: toggleMouseArea;
 
+            property int pressedButtons: 0;
+
             x: (control.isExpanded ? -parent.x : 0);
             y: (control.isExpanded ? -parent.y : 0);
             width: tileHolder.parent.width;
             height: tileHolder.parent.height;
 
+            acceptedButtons: (Qt.LeftButton | Qt.RightButton);
             hoverEnabled: true;
             onPressed:
             {
+                pressedButtons = mouse.buttons;
                 if (context.connectingToSystem.length)
                     return;
 
@@ -309,11 +313,11 @@ Item
 
             onReleased:
             {
-                if (context.connectingToSystem.length)
+                if (context.connectingToSystem.length || control.isExpanded)
                     return;
 
-                if (!control.isExpanded)
-                    control.collapsedTileClicked();
+                control.collapsedTileClicked(toggleMouseArea.pressedButtons,
+                    mouse.x, mouse.y);
             }
         }
 
