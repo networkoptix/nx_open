@@ -17,7 +17,6 @@
     <properties>
         <root.dir>${basedir}/..</root.dir>
         <cloud.parameter/>
-        <beta.parameter/>
     </properties>
 
     <build>
