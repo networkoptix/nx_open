@@ -460,8 +460,7 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98", 
-                "UNIVIEW|IPC6242SR-X22",
-                "TRUEN Co., Ltd.|TN-P4230CSLXIR"
+                "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -509,7 +508,9 @@
         {
             "keys": [
                 "General|IP Camera",
-                "H264|N51820L"
+                "H264|N51820L",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR",
+                "TRUEN Co. Ltd.|*"
             ],
             "ptzTraits": "FourWayPtz"
         },
