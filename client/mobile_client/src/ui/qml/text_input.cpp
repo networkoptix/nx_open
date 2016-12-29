@@ -89,7 +89,6 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     m_pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
     m_pressAndHoldTimer->setSingleShot(true);
     connect(m_pressAndHoldTimer, &QTimer::timeout, this, &QnQuickTextInput::emitPressAndHold);
-    setPersistentSelection(true);
 }
 
 QnQuickTextInput::~QnQuickTextInput()

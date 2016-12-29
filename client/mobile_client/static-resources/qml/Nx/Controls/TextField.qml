@@ -257,6 +257,8 @@ QnTextInput
     {
         contextMenu.x = pos.x
         contextMenu.y = pos.y
+
+        control.persistentSelection = true;
         contextMenu.open()
     }
 
@@ -270,6 +272,7 @@ QnTextInput
          * menu and draws blank space instead
          */
         height: 4 * cutItem.height
+
         MenuItem
         {
             id: cutItem
@@ -297,6 +300,12 @@ QnTextInput
             text: qsTr("Select All")
             enabled: (control.selectedText != control.text)
             onTriggered: { control.selectAll() }
+        }
+
+        onVisibleChanged:
+        {
+            if (!visible)
+                control.persistentSelection = false;
         }
     }
 }
