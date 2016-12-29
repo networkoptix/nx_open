@@ -46,7 +46,15 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
 {
-    return min + (qtDevice()() % (max - min + 1));
+    if (max == min)
+        return min;
+
+    Type diff = max - min;
+    if (diff < std::numeric_limits<Type>::max())
+        ++diff;
+    //< Otherwise, ++diff will overflow and become zero.
+
+    return min + (qtDevice()() % diff);
 }
 
 /**
