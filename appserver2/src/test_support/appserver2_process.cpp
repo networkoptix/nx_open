@@ -25,6 +25,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
+#include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
 
@@ -206,13 +207,11 @@ int Appserver2Process::exec()
     runtimeData.brand = QnAppInfo::productNameShort();
     runtimeData.platform = QnAppInfo::applicationPlatform();
 
-#ifdef __arm__
     if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
     {
         runtimeData.nx1mac = Nx1::getMac();
         runtimeData.nx1serial = Nx1::getSerial();
     }
-#endif
 
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
     runtimeInfoManager.updateLocalItem(runtimeData);    // initializing localInfo
@@ -223,7 +222,7 @@ int Appserver2Process::exec()
     if (settings.showHelp())
     {
         //settings.printCmdLineArgsHelp();
-        //TODO 
+        //TODO
         return 0;
     }
 
