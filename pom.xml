@@ -1241,6 +1241,19 @@
             </build>
         </profile>
 
+        <profile>
+            <id>artifacts_validator-id</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>artifactsValidator</name>
+                </property>
+            </activation>            
+            <modules>
+                <module>artifacts_validator</module>
+            </modules>
+        </profile>
+        
         <!-- Artifact naming profiles -->
 
         <profile>
