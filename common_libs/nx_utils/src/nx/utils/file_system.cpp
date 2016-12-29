@@ -237,7 +237,7 @@ QString applicationFilePath(const QString& defaultFilePath)
 #if defined( Q_OS_UNIX )
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     // Try looking for a /proc/<pid>/exe symlink first which points to
-    // the absolute path of the executable
+    // the absolute path of the executable.
     QFileInfo pfi(QString::fromLatin1("/proc/%1/exe").arg(getpid()));
     if (pfi.exists() && pfi.isSymLink())
         return pfi.canonicalFilePath();
@@ -248,26 +248,20 @@ QString applicationFilePath(const QString& defaultFilePath)
 
     if (!argv0.isEmpty() && argv0.at(0) == QLatin1Char('/'))
     {
-        /*
-        If argv0 starts with a slash, it is already an absolute
-        file path.
-        */
+        // If argv0 starts with a slash, it is already an absolute
+        // file path.
         absPath = argv0;
     }
     else if (argv0.contains(QLatin1Char('/')))
     {
-        /*
-        If argv0 contains one or more slashes, it is a file path
-        relative to the current directory.
-        */
+        // If argv0 contains one or more slashes, it is a file path
+        // relative to the current directory.
         absPath = QDir::current().absoluteFilePath(argv0);
     }
     else
     {
-        /*
-        Otherwise, the file path has to be determined using the
-        PATH environment variable.
-        */
+        // Otherwise, the file path has to be determined using the
+        // PATH environment variable.
         absPath = QStandardPaths::findExecutable(argv0);
     }
 
