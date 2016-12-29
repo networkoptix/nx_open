@@ -59,7 +59,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     ui(new Ui::UserSettingsWidget()),
     m_model(model),
     m_rolesModel(new QnUserRolesModel(this, QnUserRolesModel::AllRoleFlags)),
-    m_aligner(new QnAligner(this))
+    m_aligner(new QnAligner(this)),
+    m_lastUserTypeIndex(kCloudIndex) //< actual only for cloud systems (when selector is visible)
 {
     ui->setupUi(this);
 
@@ -202,7 +203,7 @@ void QnUserSettingsWidget::loadDataToUi()
         bool localSystem = qnGlobalSettings->cloudSystemId().isEmpty();
         ui->userTypeWidget->setHidden(localSystem);
         ui->mainStackedWidget->setCurrentWidget(ui->localUserPage);
-        ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : kCloudIndex);
+        ui->userTypeComboBox->setCurrentIndex(localSystem ? kLocalIndex : m_lastUserTypeIndex);
     }
     else if (m_model->mode() == QnUserSettingsModel::OtherSettings)
     {
@@ -323,6 +324,9 @@ void QnUserSettingsWidget::applyChanges()
         if (selectedRole() != Qn::UserRole::CustomPermissions)
             m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
     }
+
+    if (!ui->userTypeWidget->isHidden())
+        m_lastUserTypeIndex = ui->userTypeComboBox->currentIndex();
 }
 
 bool QnUserSettingsWidget::canApplyChanges() const
