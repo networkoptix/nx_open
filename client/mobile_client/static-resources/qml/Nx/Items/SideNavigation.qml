@@ -120,7 +120,7 @@ Drawer
                 id: disconnectButton
 
                 icon: lp("/images/disconnect.png")
-                text: qsTr("Disconnect from server")
+                text: qsTr("Disconnect from Server")
                 visible: connectionManager.connectionState !== QnConnectionManager.Disconnected
                 onClicked: uiController.disconnectFromSystem()
             }
