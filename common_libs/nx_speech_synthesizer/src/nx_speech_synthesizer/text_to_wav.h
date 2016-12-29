@@ -33,6 +33,8 @@ public:
 
     virtual void pleaseStop() override;
 
+    void setOnInitializedHandler(std::function<void()> handler);
+
 public slots:
     //!Adds task to the queue
     /*!
@@ -79,6 +81,7 @@ private:
     };
 
     QString m_binaryPath;
+    std::function<void()> m_onInitializedHandler;
     QnSafeQueue<QSharedPointer<SynthetiseSpeechTask> > m_textQueue;
     QAtomicInt m_prevTaskID;
     QnWaitCondition m_cond;

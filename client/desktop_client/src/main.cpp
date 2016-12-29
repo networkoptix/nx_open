@@ -226,9 +226,11 @@ int main(int argc, char **argv)
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
         nx::utils::file_system::applicationDirPath(defaultBinaryPath));
 
+    nx::utils::promise<void> promise;
+    auto fut = promise.get_future();
+    textToWaveServer->setOnInitializedHandler([&promise](){promise.set_value();});
     textToWaveServer->start();
-
-    ::Sleep(5000); //< TODO: #dmishin remove it later
+    fut.wait();
 #endif
 
     /* These attributes must be set before application instance is created. */

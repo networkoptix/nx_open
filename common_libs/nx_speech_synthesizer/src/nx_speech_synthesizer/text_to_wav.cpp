@@ -268,6 +268,7 @@ static void initFestival(const QString binaryPath)
 #else
     sprintf( festivalVoxPath, "%s/../Resources/vox/", binaryPath.toLatin1().constData() );
 #endif
+    qDebug() << "=====> FESTIVAL_VOX_PATH:" << festivalVoxPath;
     festival_libdir = festivalVoxPath;
 
     const int heap_size = 1510000;  // default scheme heap size
@@ -288,9 +289,11 @@ static void deinitFestival()
 class FestivalInitializer
 {
 public:
-    FestivalInitializer(const QString& binaryPath)
+    FestivalInitializer(const QString& binaryPath, std::function<void()> handler)
     {
         std::call_once(festivalInitialized, initFestival, binaryPath);
+        if (handler)
+            handler();
     }
 
     ~FestivalInitializer()
@@ -388,6 +391,11 @@ void TextToWaveServer::pleaseStop()
     m_textQueue.push( QSharedPointer<SynthetiseSpeechTask>(new SynthetiseSpeechTask()) );
 }
 
+void TextToWaveServer::setOnInitializedHandler(std::function<void()> handler)
+{
+    m_onInitializedHandler = handler;
+}
+
 int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const dest )
 {
     QSharedPointer<SynthetiseSpeechTask> task = addTaskToQueue( text, dest );
@@ -414,7 +422,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer festivalInitializer(m_binaryPath);
+    FestivalInitializer festivalInitializer(m_binaryPath, m_onInitializedHandler);
 
     while( !needToStop() )
     {

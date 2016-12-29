@@ -2,6 +2,12 @@
 
 #if defined(Q_OS_UNIX)
     #include <unistd.h>
+    #include <QtCore/QStandardPaths>
+#endif
+
+#if defined(Q_OS_MAC)
+    #include <sys/syslimits.h>
+    #include <CoreFoundation/CoreFoundation.h>
 #endif
 
 #if defined(Q_OS_WIN)
@@ -11,6 +17,29 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
 #include <QtCore/QDir>
+
+namespace {
+
+#ifdef Q_OS_MAC
+
+QString fromCFStringToQString(CFStringRef str)
+{
+    if (!str)
+        return QString();
+
+    CFIndex length = CFStringGetLength(str);
+    if (length == 0)
+        return QString();
+
+    QString string(length, Qt::Uninitialized);
+    CFStringGetCharacters(str, CFRangeMake(0, length), reinterpret_cast<UniChar *>
+        (const_cast<QChar *>(string.unicode())));
+    return string;
+}
+
+#endif
+
+} // namespace
 
 namespace nx {
 namespace utils {
@@ -187,6 +216,7 @@ QString applicationFileNameInternal(const QString& defaultFileName)
 
 QString applicationDirPath(const QString& defaultFilePath)
 {
+    uint32_t someTest;
     return QFileInfo(applicationFilePath(defaultFilePath)).path();
 }
 
@@ -196,13 +226,12 @@ QString applicationFilePath(const QString& defaultFilePath)
 #if defined(Q_OS_WIN)
     return QFileInfo(applicationFileNameInternal(defaultFilePath)).filePath();
 #elif defined(Q_OS_MAC)
-    // Need to work it around somehow.
-    QString qAppFileName_str = applicationFileNameInternal(defaultFilePath);
-    if(!qAppFileName_str.isEmpty())
+    auto bundleUrl = CFBundleCopyExecutableURL(CFBundleGetMainBundle);
+    if (bundleUrl)
     {
-        QFileInfo fi(qAppFileName_str);
-        if (fi.exists()) 
-            return fi.canonicalFilePath();
+        auto path = CFURLCopyFileSystemPath(bundleUrl, kCFURLPOSIXPathStyle);
+        if (path)
+            return fromCFStringToQString(path);
     }
 #endif
 #if defined( Q_OS_UNIX )
