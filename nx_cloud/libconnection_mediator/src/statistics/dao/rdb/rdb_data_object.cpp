@@ -12,7 +12,7 @@ namespace stats {
 namespace dao {
 namespace rdb {
 
-nx::db::DBResult RdbDataObject::save(
+nx::db::DBResult DataObject::save(
     nx::db::QueryContext* queryContext,
     ConnectSession stats)
 {
@@ -55,7 +55,7 @@ nx::db::DBResult RdbDataObject::save(
     return nx::db::DBResult::ok;
 }
 
-nx::db::DBResult RdbDataObject::readAllRecords(
+nx::db::DBResult DataObject::readAllRecords(
     nx::db::QueryContext* queryContext,
     std::deque<ConnectSession>* connectionRecords)
 {
