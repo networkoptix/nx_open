@@ -18,7 +18,7 @@ BIN_PATH="$PREFIX/bin/$BIN_NAME"
 ulimit -n 8192
 ulimit -c unlimited
 
-start() 
+start()
 {
     SERVICE_PID=$(pidof "$BIN_NAME")
     if [ ! -z "$SERVICE_PID" ]; then
@@ -41,7 +41,7 @@ start()
     echo "0" >/sys/class/graphics/fbcon/cursor_blink
 
     WEBADMIN_BUILD=$(curl -s "http://127.0.0.1:$PORT/static/version.txt" |grep changeset |awk '{print $2}')
-    if [ -z "$WEBADMIN_BUILD" ]; then 
+    if [ -z "$WEBADMIN_BUILD" ]; then
         echo "Server is not running. Cannot run Lite Client"
         return 1
     else
@@ -49,9 +49,9 @@ start()
         echo -n "Starting $BIN_NAME via /api/startLiteClient: "
         curl -s "http://127.0.0.1:$PORT/api/startLiteClient"
     fi
-    
+
     sleep 5
-    
+
     if [ $(pidof "$BIN_NAME") ]; then
         echo "OK"
     else
@@ -59,14 +59,14 @@ start()
     fi
 }
 
-startquiet() 
+startquiet()
 {
     start
 }
 
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
-stop() 
+stop()
 {
     echo -n "Stopping $BIN_NAME... "
     killall "$1" "$BIN_NAME" >/dev/null 2>&1
@@ -81,7 +81,7 @@ stop()
     done
 
     # Changing active tty back to 1.
-    if [ "$VTCONSOLE" != "1" ]; then 
+    if [ "$VTCONSOLE" != "1" ]; then
         chvt 1
     fi
 
@@ -101,7 +101,7 @@ start_watchdog()
 
 stop_watchdog()
 {
-    WATCHDOG_PID=$(ps -eO command | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
+    WATCHDOG_PID=$(ps -eO command | grep lite-client | grep run_watchdog | grep -v grep | cut -b 1-5 | sort -r | head -n 1)
     if [ ! "$WATCHDOG_PID" ]; then
         echo "$CUSTOMIZATION-lite-client watchdog is not running"
         return 0
