@@ -26,7 +26,7 @@ NxImageButton
         target: control.menu;
         onVisibleChanged:
         {
-            if (control.menu.visible)
+            if (menu.visible || !forcePressed)
                 return;
 
             menu.parent = prevMenuParent;

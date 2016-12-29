@@ -137,7 +137,6 @@ BaseTile
             {
                 tileMenu.x = x;
                 tileMenu.y = y;
-                tileMenu.parent = control;
                 tileMenu.open();
             }
             return;
