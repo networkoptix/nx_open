@@ -106,7 +106,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
     {
-        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, true);
+        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, false);
         m_rootNodes[t] = node;
         if (node)
         {
