@@ -68,7 +68,6 @@
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
-#include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
