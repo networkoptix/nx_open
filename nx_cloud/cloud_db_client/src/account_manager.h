@@ -17,7 +17,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class AccountManager:
     public api::AccountManager,
@@ -57,7 +57,7 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

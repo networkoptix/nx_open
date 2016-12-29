@@ -19,7 +19,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 EventConnection::EventConnection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
@@ -284,6 +284,6 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
     //TODO #ak reporting event
 }
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

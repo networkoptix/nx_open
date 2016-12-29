@@ -27,7 +27,7 @@ class CloudModuleUrlFetcher;
 }   //namespace network
 
 namespace cdb {
-namespace cl {
+namespace client {
 
 class EventConnection:
     public QObject,
@@ -82,6 +82,6 @@ private slots:
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

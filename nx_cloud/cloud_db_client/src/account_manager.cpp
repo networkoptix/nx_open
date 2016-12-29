@@ -11,7 +11,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -103,6 +103,6 @@ void AccountManager::createTemporaryCredentials(
         std::move(errorHandler));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

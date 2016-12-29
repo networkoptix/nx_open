@@ -14,7 +14,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class SystemManager:
     public api::SystemManager,
@@ -57,7 +57,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

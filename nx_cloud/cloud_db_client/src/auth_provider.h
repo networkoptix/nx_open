@@ -12,7 +12,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class AuthProvider:
     public api::AuthProvider,
@@ -32,7 +32,7 @@ public:
 };
 
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

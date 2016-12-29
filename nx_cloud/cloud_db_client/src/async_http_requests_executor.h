@@ -26,7 +26,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 /** Executes HTTP requests asynchronously.
     On object destruction all not yet completed requests are cancelled
@@ -269,7 +269,7 @@ private:
     }
 };
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx
 

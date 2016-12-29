@@ -12,7 +12,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
@@ -50,6 +50,6 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

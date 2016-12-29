@@ -17,7 +17,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class Connection:
     public api::Connection,
@@ -61,7 +61,7 @@ private:
     std::unique_ptr<MaintenanceManager> m_maintenanceManager;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

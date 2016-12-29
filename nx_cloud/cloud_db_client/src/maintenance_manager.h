@@ -7,7 +7,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class MaintenanceManager:
     public api::MaintenanceManager,
@@ -20,6 +20,6 @@ public:
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;
 };
 
-} // namespace cl
+} // namespace client
 } // namespace cdb
 } // namespace nx

@@ -13,11 +13,9 @@
 
 namespace nx {
 namespace cdb {
-//! "cl" stands for "client"
-namespace cl {
+namespace client {
 
-class ConnectionFactory
-:
+class ConnectionFactory:
     public api::ConnectionFactory
 {
 public:
@@ -45,7 +43,7 @@ private:
     network::cloud::CloudDbUrlFetcher m_endPointFetcher;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

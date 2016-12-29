@@ -5,7 +5,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 MaintenanceManager::MaintenanceManager(
     network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher)
@@ -23,6 +23,6 @@ void MaintenanceManager::getConnectionsFromVms(
         std::bind(completionHandler, std::placeholders::_1, api::VmsConnectionDataList()));
 }
 
-} // namespace cl
+} // namespace client
 } // namespace cdb
 } // namespace nx
