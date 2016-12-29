@@ -283,10 +283,6 @@ angular.module('webadminApp')
 
                     var isOwner = result.data.reply.isAdmin ;
 
-                    if(self.hasProxy()){
-                        isAdmin = false;
-                        isOwner = false;
-                    }
                     return {
                         isAdmin:isAdmin,
                         isOwner:isOwner,
@@ -302,23 +298,20 @@ angular.module('webadminApp')
             execute:function(script,mode){
                 return $http.post('/web/api/execute/' + script + '?' + (mode||''));
             },
-            getModuleInformation: function(url) {
-                url = url || proxy;
-                if(url === true){//force reload cache
-                    cacheModuleInfo = null;
-                    url = proxy;
-                }
-                if(url === proxy){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
-                    if(cacheModuleInfo === null){
-                        cacheModuleInfo = wrapRequest(getModuleInformation());
-                    }
-                    // on error - clear object to reload next time
-                    return cacheModuleInfo;
-                }
-                //Some another server
-                return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
+            pingServer:function(url){
+                return $http.get(url + '/web/api/moduleInformation',{
                     timeout: 3*1000
                 });
+            },
+            getModuleInformation: function(reload) {
+                if(reload === true){//force reload cache
+                    cacheModuleInfo = null;
+                }
+                if(cacheModuleInfo === null){
+                    cacheModuleInfo = wrapRequest(getModuleInformation());
+                }
+                // on error - clear object to reload next time
+                return cacheModuleInfo;
             },
             systemCloudInfo:function(){
                 return this.getSystemSettings().then(function(data){

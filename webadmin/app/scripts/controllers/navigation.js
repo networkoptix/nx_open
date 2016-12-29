@@ -11,6 +11,8 @@ angular.module('webadminApp')
             $scope.liteClient = result.lite;
         });
 
+        $scope.hasProxy = mediaserver.hasProxy();
+
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
