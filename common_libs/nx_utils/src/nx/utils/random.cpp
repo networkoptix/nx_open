@@ -57,7 +57,12 @@ QByteArray generate(std::size_t count, char min, char max)
 
     std::generate(
         data.begin(), data.end(),
-        [/*&distribution*/min, max]() { return min + (qtDevice()() % (max-min)); });
+        [/*&distribution*/min, max]()
+        {
+            return max == min
+                ? min
+                : (min + (qtDevice()() % (max - min)));
+        });
 
     return data;
 }
