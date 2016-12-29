@@ -295,29 +295,29 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
         auto request = std::move( m_requestQueue.front().first );
         auto handler = std::move( m_requestQueue.front().second );
         auto& tid = request.header.transactionId;
-
         m_requestQueue.pop_front();
-        if ( !m_requestsInProgress.emplace(
-                 tid, std::move( handler ) ).second )
-        {
-            NX_ASSERT( false, Q_FUNC_INFO,
-                        "transactionId is not unique" );
 
-            NX_LOGX( lit( "transactionId is not unique: %1" )
-                    .arg( QString::fromUtf8( tid.toHex() ) ),
-                    cl_logERROR );
-        }
-        else
+        const auto emplace = m_requestsInProgress.emplace(tid, std::pair<void*, RequestHandler>());
+        if ( !emplace.second )
         {
-            m_baseConnection->sendMessage(
-                std::move( request ),
-                [ this ]( SystemError::ErrorCode code ) mutable
+            NX_ASSERT( false, lm( "transactionId is not unique: %1" ).arg( tid.toHex() ) );
+            post(
+                [handler = std::move(handler.second)]()
                 {
-                    QnMutexLocker lock( &m_mutex );
-                    if( code != SystemError::noError )
-                        dispatchRequestsInQueue( &lock );
-                } );
+                    handler(SystemError::invalidData, {});
+                });
+            continue;
         }
+
+        emplace.first->second = std::move(handler);
+        m_baseConnection->sendMessage(
+            std::move( request ),
+            [ this ]( SystemError::ErrorCode code ) mutable
+            {
+                QnMutexLocker lock( &m_mutex );
+                if( code != SystemError::noError )
+                    dispatchRequestsInQueue( &lock );
+            } );
     }
 }
 
