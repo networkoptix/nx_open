@@ -76,6 +76,7 @@
     <String Id="Product_LaunchNxtool"                               Overridable="yes">退出安裝時執行 ${nxtool.name} </String>
     <String Id="Product_ArchMismatch_x86"                           Overridable="yes">此安裝檔為 32 位元專用. 安裝即將結束. </String>
     <String Id="Product_ArchMismatch_x64"                           Overridable="yes">此安裝檔為 64 位元專用. 安裝即將結束. </String>
+    <String Id="Product_CloudHostMismatch"                          Overridable="yes">This beta package is for another cloud instance. Please disconnect from the cloud first. Setup will now exit.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">至少選擇一個元件</String>
