@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "udp_server.h"
 
 #include <memory>
@@ -13,18 +8,17 @@
 #include "message_dispatcher.h"
 #include "udp_message_response_sender.h"
 
-
 namespace nx {
 namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
-UdpServer::UdpServer(const MessageDispatcher* dispatcher)
-:
+UdpServer::UdpServer(const MessageDispatcher* dispatcher):
     m_messagePipeline(this),
     m_boundToLocalAddress(false),
     m_dispatcher(dispatcher)
 {
+    bindToAioThread(getAioThread());
 }
 
 UdpServer::~UdpServer()
@@ -32,9 +26,11 @@ UdpServer::~UdpServer()
     pleaseStopSync();
 }
 
-void UdpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void UdpServer::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
-    m_messagePipeline.pleaseStop(std::move(handler));
+    network::aio::BasicPollable::bindToAioThread(aioThread);
+
+    m_messagePipeline.bindToAioThread(aioThread);
 }
 
 bool UdpServer::bind(const SocketAddress& localAddress)
@@ -80,6 +76,11 @@ const std::unique_ptr<network::UDPSocket>& UdpServer::socket()
     return m_messagePipeline.socket();
 }
 
+void UdpServer::stopWhileInAioThread()
+{
+    m_messagePipeline.pleaseStopSync();
+}
+
 void UdpServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
     m_dispatcher->dispatchRequest(
@@ -92,5 +93,5 @@ void UdpServer::ioFailure(SystemError::ErrorCode)
     //TODO #ak
 }
 
-}   //stun
-}   //nx
+} // namespace stun
+} // namespace nx

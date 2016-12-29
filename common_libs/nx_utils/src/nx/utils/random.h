@@ -46,8 +46,13 @@ Type number(
     Type max = std::numeric_limits<Type>::max(),
     typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
 {
-    std::uniform_int_distribution<Type> distribution(min, max);
-    return distribution(qtDevice());
+    if (max == min)
+        return min;
+
+    return min + (qtDevice()() % (max - min));
+
+    //std::uniform_int_distribution<Type> distribution(min, max);
+    //return distribution(qtDevice());
 }
 
 /**
