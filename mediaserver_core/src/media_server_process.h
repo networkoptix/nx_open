@@ -39,25 +39,6 @@ namespace ec2 {
     class CrashReporter;
 }
 
-namespace aux {
-void saveStoragesInfoToBeforeRestoreData(
-    BeforeRestoreDbData* beforeRestoreDbData,
-    const QnStorageResourceList& storages);
-
-class UnmountedStoragesFilter
-{
-public:
-    UnmountedStoragesFilter(const QString& mediaFolderName);
-    QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allStorages, const QStringList& paths);
-
-private:
-    QString getStorageUrlWithoutMediaFolder(const QString& url);
-
-    QString m_mediaFolderName;
-};
-
-}
-
 struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);
@@ -159,15 +140,7 @@ private:
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void savePersistentDataBeforeDbRestore();
     bool isStopping() const;
-    void setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager);
-    void loadBeforeRestoreDbData();
-    void loadOrGenerateDefaultSystemName();
-    void clearMigrationInfo();
-    QnUuid generateSystemIdFromSystemName();
-    void setUpSystemName();
-    void setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);

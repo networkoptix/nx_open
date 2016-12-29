@@ -244,6 +244,7 @@
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
+#include "media_server_process_aux.h"
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -266,7 +267,6 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
-static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class MediaServerProcess;
@@ -313,7 +313,6 @@ void addFakeVideowallUser()
 }
 
 } // namespace
-
 
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
@@ -508,11 +507,11 @@ static int freeGB(QString drive)
 }
 #endif
 
-aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+nx::mserver_aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
     m_mediaFolderName(mediaFolderName)
 {}
 
-QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
+QString nx::mserver_aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
 {
     if (!url.endsWith(m_mediaFolderName))
         return url;
@@ -525,7 +524,7 @@ QString aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QStr
     return url.mid(0, indexBeforeMediaFolderName);
 }
 
-QnStorageResourceList aux::UnmountedStoragesFilter::getUnmountedStorages(
+QnStorageResourceList nx::mserver_aux::UnmountedStoragesFilter::getUnmountedStorages(
         const QnStorageResourceList& allStorages,
         const QStringList& paths)
 {
@@ -771,7 +770,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
 
-        aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
+        nx::mserver_aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
         auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
                 m_mediaServer->getStorages(),
                 listRecordFolders());
@@ -1167,7 +1166,11 @@ void MediaServerProcess::at_databaseDumped()
     if (isStopping())
         return;
 
-    savePersistentDataBeforeDbRestore();
+    nx::mserver_aux::savePersistentDataBeforeDbRestore(
+                qnResPool->getAdministrator(),
+                m_mediaServer,
+                nx::mserver_aux::createServerSettingsProxy().get()
+            ).saveToSettings(MSSettings::roSettings());
     restartServer(500);
 }
 
@@ -1181,7 +1184,11 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         // If system Id has been changed, reset 'database restore time' variable
-        savePersistentDataBeforeDbRestore();
+        nx::mserver_aux::savePersistentDataBeforeDbRestore(
+                    qnResPool->getAdministrator(),
+                    m_mediaServer,
+                    nx::mserver_aux::createServerSettingsProxy().get()
+                ).saveToSettings(MSSettings::roSettings());
         restartServer(0);
     }
 }
@@ -1920,45 +1927,6 @@ bool MediaServerProcess::initTcpListener(
     return true;
 }
 
-void aux::saveStoragesInfoToBeforeRestoreData(
-    BeforeRestoreDbData* beforeRestoreDbData,
-    const QnStorageResourceList& storages)
-{
-    QByteArray result;
-    for (const auto& storage : storages)
-    {
-        result.append(storage->getUrl().toLocal8Bit());
-        result.append(";");
-        result.append(QByteArray::number(storage->getSpaceLimit()));
-        result.append(";");
-    }
-
-    beforeRestoreDbData->storageInfo = result;
-}
-
-void MediaServerProcess::savePersistentDataBeforeDbRestore()
-{
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    BeforeRestoreDbData data;
-
-    if (admin)
-    {
-        data.digest = admin->getDigest();
-        data.hash = admin->getHash();
-        data.cryptSha512Hash = admin->getCryptSha512Hash();
-        data.realm = admin->getRealm().toUtf8();
-    }
-
-    data.localSystemId = qnGlobalSettings->localSystemId().toByteArray();
-    data.localSystemName = qnGlobalSettings->systemName().toLocal8Bit();
-    if (m_mediaServer)
-        data.serverName = m_mediaServer->getName().toLocal8Bit();
-
-    aux::saveStoragesInfoToBeforeRestoreData(&data, m_mediaServer->getStorages());
-
-    data.saveToSettings(MSSettings::roSettings());
-}
-
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
     auto mapper = std::make_unique<nx_upnp::PortMapper>();
@@ -2079,66 +2047,6 @@ void MediaServerProcess::initPublicIpDiscovery()
 void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGuidList)
 {
     m_hardwareGuidList = hardwareGuidList;
-}
-
-void MediaServerProcess::setUpSystemIdentity(CloudConnectionManager& cloudConnectionManager)
-{
-    loadBeforeRestoreDbData();
-    if (qnGlobalSettings->systemName().isEmpty())
-    {
-        setUpSystemName();
-        setUpLocalSystemId(cloudConnectionManager);
-    }
-
-    clearMigrationInfo();
-    qnGlobalSettings->synchronizeNow();
-}
-
-void MediaServerProcess::loadBeforeRestoreDbData()
-{
-    if (!qnCommon->beforeRestoreDbData().localSystemId.isNull())
-        qnGlobalSettings->setLocalSystemId(QnUuid::fromStringSafe(qnCommon->beforeRestoreDbData().localSystemId));
-
-    if (!qnCommon->beforeRestoreDbData().localSystemName.isNull())
-        qnGlobalSettings->setSystemName(QString::fromLocal8Bit(qnCommon->beforeRestoreDbData().localSystemName));
-}
-
-void MediaServerProcess::setUpSystemName()
-{
-    loadOrGenerateDefaultSystemName();
-    qnGlobalSettings->setSystemName(m_systemName.value());
-}
-
-void MediaServerProcess::setUpLocalSystemId(CloudConnectionManager& cloudConnectionManager)
-{
-    if (m_systemName.isDefault())
-        resetSystemState(cloudConnectionManager);
-    else
-        qnGlobalSettings->setLocalSystemId(generateSystemIdFromSystemName());
-}
-
-QnUuid MediaServerProcess::generateSystemIdFromSystemName()
-{
-    QString serverKey;
-    if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
-    {
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-            serverKey = qMax(serverKey, server->getAuthKey());
-    }
-    return guidFromArbitraryData(m_systemName.value() + serverKey);
-}
-
-void MediaServerProcess::clearMigrationInfo()
-{
-    nx::SystemName().saveToConfig(); //< remove from config file
-}
-
-void MediaServerProcess::loadOrGenerateDefaultSystemName()
-{
-    m_systemName.loadFromConfig();
-
-    if (m_systemName.value().isEmpty())
-        m_systemName.resetToDefault();
 }
 
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
@@ -2552,8 +2460,7 @@ void MediaServerProcess::run()
             nx_ms_conf::ALLOW_SSL_CONNECTIONS,
             nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
 
-    bool isNewServerInstance = false;
-    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
+    bool foundOwnServerInDb = false;
     m_moduleFinder = new QnModuleFinder(false);
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
@@ -2563,6 +2470,7 @@ void MediaServerProcess::run()
         if (server)
         {
             fromResourceToApi(server, prevServerData);
+            foundOwnServerInDb = true;
         }
         else
         {
@@ -2574,9 +2482,6 @@ void MediaServerProcess::run()
                 server->setName(QString::fromLocal8Bit(beforeRestoreDbData.serverName));
             else
                 server->setName(getDefaultServerName());
-
-            if (!noSetupWizardFlag && beforeRestoreDbData.localSystemId.isNull())
-                isNewServerInstance = true;
         }
 
         server->setServerFlags((Qn::ServerFlags) calcServerFlags());
@@ -2617,7 +2522,10 @@ void MediaServerProcess::run()
         ec2::ApiMediaServerData newServerData;
         fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
-            m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
+            m_mediaServer = registerServer(
+                        ec2Connection,
+                        server,
+                        nx::mserver_aux::isNewServerInstance(qnCommon->beforeRestoreDbData(), foundOwnServerInDb));
         else
             m_mediaServer = server;
 
@@ -2775,7 +2683,10 @@ void MediaServerProcess::run()
 
     qnGlobalSettings->initialize();
 
-    setUpSystemIdentity(cloudManagerGroup.connectionManager);
+    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
+    auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
+
+    nx::mserver_aux::setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
 
     BeforeRestoreDbData::clearSettings(settings);
 
@@ -2784,19 +2695,19 @@ void MediaServerProcess::run()
 
     if (!QnPermissionsHelper::isSafeMode())
     {
-        bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
-            qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
-        if (isNewServerInstance ||
-            (isCloudInstanceChanged && isConnectedToCloud))
+        if (nx::mserver_aux::needToResetSystem(
+                    nx::mserver_aux::isNewServerInstance(
+                        qnCommon->beforeRestoreDbData(),
+                        foundOwnServerInDb),
+                    settingsProxy.get()))
         {
-            if (isCloudInstanceChanged)
+            if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
 
             resetSystemState(cloudManagerGroup.connectionManager);
         }
-        if (isCloudInstanceChanged)
+        if (settingsProxy->isCloudInstanceChanged())
         {
             ec2::ErrorCode errCode;
             do
