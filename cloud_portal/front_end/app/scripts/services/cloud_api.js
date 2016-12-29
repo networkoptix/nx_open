@@ -58,7 +58,7 @@ angular.module('cloudApp')
         var getSystems = cacheGet(apiBase + '/systems');
         var modules = cacheGet(apiBase + '/modules');
         modules().then(function(result){
-            Config.gatewayUrl = window.location.protocol + "//" + result.data.vms_gateway_host +':' + result.data.vms_gateway_port;
+            Config.gatewayUrl = window.location.protocol + '//' + result.data.vms_gateway_host +':' + result.data.vms_gateway_port;
         });
 
         return {
@@ -94,7 +94,7 @@ angular.module('cloudApp')
             },
 
             notification_send:function(userEmail,type,message){
-                return $http.post(apiBase.replace("/api","/notifications") + '/send',{
+                return $http.post(apiBase.replace('/api','/notifications') + '/send',{
                     user_email:userEmail,
                     type:type,
                     message:message
@@ -198,7 +198,7 @@ angular.module('cloudApp')
                 });
             },
             accessRoles: function(systemId){
-                console.error("This method must not be used");
+                console.error('This method must not be used');
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
             },
 

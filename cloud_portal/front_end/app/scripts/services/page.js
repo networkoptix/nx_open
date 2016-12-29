@@ -10,7 +10,7 @@ angular.module('cloudApp')
                         if(clean || title.indexOf(L.productName)>=0){
                             $rootScope.pageTitle = title;
                         }else{
-                            $rootScope.pageTitle = L.pageTitles.template.replace("{{title}}",title);
+                            $rootScope.pageTitle = L.pageTitles.template.replace('{{title}}',title);
                         }
                     }else{
                         $rootScope.pageTitle = L.pageTitles.default;

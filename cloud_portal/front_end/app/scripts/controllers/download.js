@@ -37,6 +37,6 @@ angular.module('cloudApp')
 
             page.title(L.pageTitles.downloadPlatform + platform.name);
 
-            $location.path("/download/" + addHash, false);
+            $location.path('/download/' + addHash, false);
         }
     }]);

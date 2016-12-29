@@ -29,7 +29,7 @@ angular.module('cloudApp', [
     $routeProvider
         .when('/register/success', {
             title: L.pageTitles.registerSuccess,
-            templateUrl: 'static/views/regActions.html',
+            templateUrl: Config.viewsDir + 'regActions.html',
             controller: 'RegisterCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.registerSuccess = true; }]
@@ -37,7 +37,7 @@ angular.module('cloudApp', [
         })
         .when('/register/successActivated', {
             title: L.pageTitles.registerSuccess,
-            templateUrl: 'static/views/regActions.html',
+            templateUrl: Config.viewsDir + 'regActions.html',
             controller: 'RegisterCtrl',
             resolve: {
                 test: ['$route',function ($route) {
@@ -48,17 +48,17 @@ angular.module('cloudApp', [
         })
         .when('/register/:code', {
             title: L.pageTitles.register,
-            templateUrl: 'static/views/regActions.html',
+            templateUrl: Config.viewsDir + 'regActions.html',
             controller: 'RegisterCtrl'
         })
         .when('/register', {
             title: L.pageTitles.register,
-            templateUrl: 'static/views/regActions.html',
+            templateUrl: Config.viewsDir + 'regActions.html',
             controller: 'RegisterCtrl'
         })
         .when('/account/password', {
             title: L.pageTitles.changePassword,
-            templateUrl: 'static/views/account.html',
+            templateUrl: Config.viewsDir + 'account.html',
             controller: 'AccountCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.passwordMode = true; }]
@@ -66,7 +66,7 @@ angular.module('cloudApp', [
         })
         .when('/account', {
             title: L.pageTitles.account,
-            templateUrl: 'static/views/account.html',
+            templateUrl: Config.viewsDir + 'account.html',
             controller: 'AccountCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.accountMode = true; }]
@@ -76,13 +76,13 @@ angular.module('cloudApp', [
 
         .when('/systems', {
             title: L.pageTitles.systems,
-            templateUrl: 'static/views/systems.html',
+            templateUrl: Config.viewsDir + 'systems.html',
             controller: 'SystemsCtrl'
         })
         .when('/systems/default', {
             // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
             title: L.pageTitles.systems,
-            templateUrl: 'static/views/systems.html',
+            templateUrl: Config.viewsDir + 'systems.html',
             controller: 'SystemsCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.defaultMode = true; }]
@@ -90,12 +90,12 @@ angular.module('cloudApp', [
         })
         .when('/systems/:systemId', {
             title: L.pageTitles.system,
-            templateUrl: 'static/views/system.html',
+            templateUrl: Config.viewsDir + 'system.html',
             controller: 'SystemCtrl'
         })
         .when('/systems/:systemId/share', {
             title: L.pageTitles.systemShare,
-            templateUrl: 'static/views/system.html',
+            templateUrl: Config.viewsDir + 'system.html',
             controller: 'SystemCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
@@ -103,7 +103,7 @@ angular.module('cloudApp', [
         })
         .when('/activate', {
             title: L.pageTitles.activate,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
@@ -111,7 +111,7 @@ angular.module('cloudApp', [
         })
         .when('/activate/sent', {
             title: L.pageTitles.activateSent,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.reactivatingSuccess = true; }]
@@ -119,7 +119,7 @@ angular.module('cloudApp', [
         })
         .when('/activate/success',{
             title: L.pageTitles.activateSuccess,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.activationSuccess = true; }]
@@ -127,12 +127,12 @@ angular.module('cloudApp', [
         })
         .when('/activate/:activateCode', {
             title: L.pageTitles.activateCode,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/restore_password', {
             title: L.pageTitles.restorePassword,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoring = true; }]
@@ -140,7 +140,7 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/sent', {
             title: L.pageTitles.restorePassword,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.restoringSuccess = true; }]
@@ -148,7 +148,7 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/success', {
             title: L.pageTitles.restorePasswordSuccess,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.changeSuccess = true; }]
@@ -156,24 +156,24 @@ angular.module('cloudApp', [
         })
         .when('/restore_password/:restoreCode', {
             title: L.pageTitles.restorePasswordCode,
-            templateUrl: 'static/views/activeActions.html',
+            templateUrl: Config.viewsDir + 'activeActions.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/content/:page', {
             title: L.pageTitles.contentPage,
-            templateUrl: 'static/views/static.html',
+            templateUrl: Config.viewsDir + 'static.html',
             controller: 'StaticCtrl'
         })
 
         .when('/debug', {
             title: L.pageTitles.debug,
-            templateUrl: 'static/views/debug.html',
+            templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
         })
 
         .when('/login', {
             title: L.pageTitles.login,
-            templateUrl: 'static/views/startPage.html',
+            templateUrl: Config.viewsDir + 'startPage.html',
             controller: 'StartPageCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
@@ -182,24 +182,28 @@ angular.module('cloudApp', [
 
         .when('/download', {
             title: L.pageTitles.download,
-            templateUrl: 'static/views/download.html',
+            templateUrl: Config.viewsDir + 'download.html',
             controller: 'DownloadCtrl'
         })
         .when('/download/:platform', {
             title: L.pageTitles.downloadPlatform,
-            templateUrl: 'static/views/download.html',
+            templateUrl: Config.viewsDir + 'download.html',
             controller: 'DownloadCtrl'
         })
         .when('/', {
             title: L.pageTitles.startPage,
-            templateUrl: 'static/views/startPage.html',
+            templateUrl: Config.viewsDir + 'startPage.html',
             controller: 'StartPageCtrl'
         })
         .otherwise({
             title: L.pageTitles.pageNotFound,
-            templateUrl: 'static/views/404.html'
+            templateUrl: Config.viewsDir + '404.html'
         });
 }]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
+
+    $rootScope.Config = Config;
+    $rootScope.L = L;
+
     var original = $location.path;
     $location.path = function (path, reload) {
         if (reload === false) {

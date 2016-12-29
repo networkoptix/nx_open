@@ -4,7 +4,7 @@ angular.module('cloudApp')
     function (cloudApi, process, urlProtocol, dialogs) {
         return {
             restrict: 'E',
-            templateUrl: 'static/views/components/open-client-button.html',
+            templateUrl: Config.viewsDir + 'components/open-client-button.html',
             scope:{
                 system:'='
             },

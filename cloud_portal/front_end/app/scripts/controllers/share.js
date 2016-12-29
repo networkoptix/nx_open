@@ -4,8 +4,6 @@ angular.module('cloudApp')
     .controller('ShareCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account', 'mediaserver',
     function ($scope, cloudApi, process, dialogs, $q, account, mediaserver) {
 
-        $scope.Config = Config;
-        $scope.L = L;
         $scope.buttonText = L.sharing.shareConfirmButton;
 
         var dialogSettings = dialogs.getSettings($scope);
