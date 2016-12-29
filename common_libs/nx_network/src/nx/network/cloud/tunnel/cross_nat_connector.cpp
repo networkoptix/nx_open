@@ -7,6 +7,7 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection_watcher.h"
@@ -191,6 +192,10 @@ void CrossNatConnector::onConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
+    NX_LOGX(lm("cross-nat %1. Received %2 response from mediator")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)),
+        cl_logDEBUG2);
+
     if (m_done)
         return;
 
@@ -241,8 +246,14 @@ void CrossNatConnector::startNatTraversing(
         m_connectSessionId,
         response,
         std::move(m_mediatorUdpClient->takeSocket()));
+    NX_ASSERT(!m_connectors.empty());
     // TODO: #ak sorting connectors by priority
     m_mediatorUdpClient.reset();
+
+    NX_LOGX(lm("cross-nat %1. Starting %1 connectors")
+        .arg(m_connectSessionId).arg(m_connectors.size()),
+        cl_logDEBUG2);
+
     for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
         (*it)->bindToAioThread(getAioThread());
@@ -269,6 +280,11 @@ void CrossNatConnector::onConnectorFinished(
     SystemError::ErrorCode sysErrorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
+    NX_LOGX(lm("cross-nat %1. Connector has finished with result: %2, %3")
+        .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
+        .arg(SystemError::toString(sysErrorCode)),
+        cl_logDEBUG2);
+
     auto connector = std::move(*connectorIter);
     m_connectors.erase(connectorIter);
 
