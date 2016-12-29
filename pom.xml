@@ -259,11 +259,11 @@
         <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
         <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
         <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
-        <artifact.name.client_pdb>${artifact.name.prefix}-client_pdb-${artifact.name.suffix}</artifact.name.client_pdb>
-        <artifact.name.server_pdb>${artifact.name.prefix}-server_pdb-${artifact.name.suffix}</artifact.name.server_pdb>
-        <artifact.name.misc_pdb>${artifact.name.prefix}-misc_pdb-${artifact.name.suffix}</artifact.name.misc_pdb>
-        <artifact.name.libs_pdb>${artifact.name.prefix}-libs_pdb-${artifact.name.suffix}</artifact.name.libs_pdb>
-        <artifact.name.cloud_pdb>${artifact.name.prefix}-cloud_pdb-${artifact.name.suffix}</artifact.name.cloud_pdb>
+        <artifact.name.client_debug>${artifact.name.prefix}-client_debug-${artifact.name.suffix}</artifact.name.client_debug>
+        <artifact.name.server_debug>${artifact.name.prefix}-server_debug-${artifact.name.suffix}</artifact.name.server_debug>
+        <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
+        <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
+        <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
 
     </properties>
 
