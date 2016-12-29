@@ -1,5 +1,5 @@
  <assembly>
-    <id>${box}-${arch}-${release.version}.${buildNumber}</id>
+    <id>client_update</id>
     <formats>
         <format>dir</format>
     </formats>
@@ -9,11 +9,12 @@
             <directory>${libdir}/bin/release</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
-                <include>audio/**</include>
-                <include>fonts/**</include>
-                <include>imageformats/*.dll</include>
-                <include>platforms/*.dll</include>
-                <include>qml/**</include>
+                <include>audio/qtaudio_windows.dll</include>
+                <include>fonts/*.ttf</include>
+                <include>imageformats/qgif.dll</include>
+                <include>imageformats/qjpeg.dll</include>
+                <include>imageformats/qtiff.dll</include>
+                <include>platforms/qwindows.dll</include>
                 <include>vox/**</include>
                 <include>av*.dll</include>
                 <include>${applauncher.binary.name}</include>
@@ -30,7 +31,17 @@
                 <include>swscale-4.dll</include>
                 <include>udt.dll</include>
             </includes>
+            <excludes>
+                <exclude>libvorbisfile.dll</exclude>
+            </excludes>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/clientqml</directory>
+            <outputDirectory>../qml</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet>        
         <fileSet>
             <directory>${qt.dir}/bin</directory>
             <outputDirectory>..</outputDirectory>
@@ -67,13 +78,6 @@
         </fileSet>
         <fileSet>
             <directory>${VC14RedistPath}/bin</directory>
-            <outputDirectory>..</outputDirectory>
-            <includes>
-                <include>*.*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${VC12RedistPath}/bin</directory>
             <outputDirectory>..</outputDirectory>
             <includes>
                 <include>*.*</include>

@@ -39,40 +39,20 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
         SystemUri::ReferralContext::SettingsDialog);
     ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
         urlHelper.accountManagementUrl()));
-
-    connect(ui->enabledButton, &QPushButton::toggled, this, &QnCloudUserPanelWidget::enabledChanged);
-    setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
 }
 
 QnCloudUserPanelWidget::~QnCloudUserPanelWidget()
-{}
-
-bool QnCloudUserPanelWidget::enabled() const
 {
-    return ui->enabledButton->isChecked();
 }
 
-void QnCloudUserPanelWidget::setEnabled(bool value)
+bool QnCloudUserPanelWidget::isManageLinkShown() const
 {
-    ui->enabledButton->setChecked(value);
+    return !ui->manageAccountLabel->isHidden();
 }
 
-QnCloudUserPanelWidget::Options QnCloudUserPanelWidget::options() const
+void QnCloudUserPanelWidget::setManageLinkShown(bool value)
 {
-    Options result = 0;
-    if (!ui->enabledButton->isHidden())
-        result |= ShowEnableButtonOption;
-
-    if (!ui->manageAccountLabel->isHidden())
-        result |= ShowManageLinkOption;
-
-    return result;
-}
-
-void QnCloudUserPanelWidget::setOptions(Options value)
-{
-    ui->enabledButton->setHidden(!value.testFlag(ShowEnableButtonOption));
-    ui->manageAccountLabel->setHidden(!value.testFlag(ShowManageLinkOption));
+    ui->manageAccountLabel->setHidden(!value);
 }
 
 QString QnCloudUserPanelWidget::email() const

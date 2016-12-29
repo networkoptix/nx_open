@@ -25,13 +25,6 @@
 #include <utils/merge_systems_common.h>
 #include <network/system_helpers.h>
 
-namespace {
-
-static const QString kFactorySystemUser = lit("admin");
-static const QString kFactorySystemPassword = lit("admin");
-
-}
-
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
     :
@@ -104,8 +97,8 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
     if (target.isNull())
         return;
 
-    auto password = helpers::isNewSystem(moduleInformation)
-        ? kFactorySystemPassword
+    const QString password = helpers::isNewSystem(moduleInformation)
+        ? helpers::kFactorySystemPassword
         : requestPassword();
 
     if (password.isEmpty())
@@ -216,7 +209,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
     const QString& adminPassword)
 {
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(helpers::kFactorySystemUser);
     auth.setPassword(adminPassword);
 
     /* Check if there is a valid starter license in the remote system. */

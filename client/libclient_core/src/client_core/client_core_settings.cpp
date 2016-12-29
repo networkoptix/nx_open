@@ -62,8 +62,16 @@ void QnClientCoreSettings::writeValueToSettings(
             break;
         }
         case CloudPassword:
+        {
             processedValue = nx::utils::xorEncrypt(value.toString(), kEncodeXorKey);
             break;
+        }
+        case KnownServerUrls:
+        {
+            auto list = value.value<QList<QUrl>>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
+            break;
+        }
         default:
             break;
     }
@@ -94,6 +102,9 @@ QVariant QnClientCoreSettings::readValueFromSettings(
         case CloudPassword:
             return nx::utils::xorDecrypt(baseValue.toString(), kEncodeXorKey);
 
+        case KnownServerUrls:
+            return qVariantFromValue(
+                QJson::deserialized<QList<QUrl>>(baseValue.toByteArray()));
         default:
             break;
     }

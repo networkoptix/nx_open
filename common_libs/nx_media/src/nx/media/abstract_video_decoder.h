@@ -91,6 +91,11 @@ public:
      */
     virtual double getSampleAspectRatio() const { return 1.0; }
 
+    /**
+     * Returns frame size in pixels.
+     */
+    static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame);
+
 protected:
     /**
      * Retrieve current video window position and size via VideoGeometryAccessor.

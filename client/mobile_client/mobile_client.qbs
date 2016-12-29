@@ -6,6 +6,8 @@ GenericProduct
     name: "mobile_client"
     type: "application"
 
+    condition: project.withMobileClient
+
     Depends { name: "Qt"; submodules: ["webchannel", "websockets"] }
     Depends { name: "qtsingleguiapplication" }
     Depends { name: "roboto-ttf" }

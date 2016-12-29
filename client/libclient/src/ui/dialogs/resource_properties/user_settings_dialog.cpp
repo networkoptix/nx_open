@@ -46,7 +46,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_permissionsPage(new QnPermissionsWidget(m_model, this)),
     m_camerasPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::MediaFilter, this)),
     m_layoutsPage(new QnAccessibleResourcesWidget(m_model, QnResourceAccessFilter::LayoutsFilter, this)),
-    m_editRolesButton(new QPushButton(tr("Edit Roles..."), this))
+    m_userEnabledButton(new QPushButton(tr("Enabled"), this))
 {
     ui->setupUi(this);
 
@@ -63,16 +63,16 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
                 updatePermissions();
         });
 
-    connect(m_settingsPage,     &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_permissionsPage,  &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_camerasPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
-    connect(m_layoutsPage,      &QnAbstractPreferencesWidget::hasChangesChanged, this,
-        &QnUserSettingsDialog::updatePermissions);
+    connect(m_settingsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_permissionsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_camerasPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
+    connect(m_layoutsPage, &QnAbstractPreferencesWidget::hasChangesChanged,
+        this, &QnUserSettingsDialog::updatePermissions);
 
-    connect(m_settingsPage,     &QnUserSettingsWidget::userTypeChanged,          this,
+    connect(m_settingsPage, &QnUserSettingsWidget::userTypeChanged, this,
         [this](bool isCloud)
         {
             /* Kinda hack to change user type: we have to recreate user resource: */
@@ -115,18 +115,13 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
         tryClose(true);
     });
 
-    ui->buttonBox->addButton(m_editRolesButton, QDialogButtonBox::HelpRole);
-    connect(m_editRolesButton, &QPushButton::clicked, this,
-        [this]
-        {
-            QnUuid roleId = isPageVisible(ProfilePage)
-                ? m_user->userRoleId()
-                : m_settingsPage->selectedUserRoleId();
-            menu()->trigger(QnActions::UserRolesAction,
-                QnActionParameters().withArgument(Qn::UuidRole, roleId));
-        });
+    ui->buttonBox->addButton(m_userEnabledButton, QDialogButtonBox::HelpRole);
+    connect(m_userEnabledButton, &QPushButton::clicked, this, &QnUserSettingsDialog::updateButtonBox);
 
-    m_editRolesButton->setVisible(false);
+    m_userEnabledButton->setFlat(true);
+    m_userEnabledButton->setCheckable(true);
+    m_userEnabledButton->setVisible(false);
+    setHelpTopic(m_userEnabledButton, Qn::UserSettings_DisableUser_Help);
 
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
@@ -276,22 +271,35 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     m_model->setUser(user);
 
     /* Hide Apply button if cannot apply changes. */
-    bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile || m_model->mode() == QnUserSettingsModel::OtherSettings;
+    bool applyButtonVisible = m_model->mode() == QnUserSettingsModel::OwnProfile
+                           || m_model->mode() == QnUserSettingsModel::OtherSettings;
     ui->buttonBox->button(QDialogButtonBox::Apply)->setVisible(applyButtonVisible);
 
     /** Hide Cancel button if we cannot edit user. */
-    bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile && m_model->mode() != QnUserSettingsModel::Invalid;
+    bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile
+                            && m_model->mode() != QnUserSettingsModel::Invalid;
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(cancelButtonVisible);
 
     ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
-        || m_model->mode() == QnUserSettingsModel::OtherProfile);
-
+                                  || m_model->mode() == QnUserSettingsModel::OtherProfile);
     forcedUpdate();
+}
+
+void QnUserSettingsDialog::loadDataToUi()
+{
+    ui->alertBar->setText(QString());
+
+    base_type::loadDataToUi();
+
+    bool userIsEnabled = m_user && m_user->isEnabled();
+    m_userEnabledButton->setChecked(userIsEnabled);
+    if (!userIsEnabled)
+        ui->alertBar->setText(tr("User is disabled"));
 }
 
 void QnUserSettingsDialog::forcedUpdate()
 {
-    base_type::forcedUpdate();
+    Qn::updateGuarded(this, [this]() { base_type::forcedUpdate(); });
     updatePermissions();
     updateButtonBox();
 }
@@ -390,6 +398,20 @@ void QnUserSettingsDialog::applyChanges()
 void QnUserSettingsDialog::applyChangesInternal()
 {
     base_type::applyChanges();
+
+    if (accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+        m_user->setEnabled(m_userEnabledButton->isChecked());
+}
+
+bool QnUserSettingsDialog::hasChanges() const
+{
+    if (base_type::hasChanges())
+        return true;
+
+    if (m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission))
+        return (m_user->isEnabled() != m_userEnabledButton->isChecked());
+
+    return false;
 }
 
 void QnUserSettingsDialog::updateControlsVisibility()
@@ -413,7 +435,8 @@ void QnUserSettingsDialog::updateControlsVisibility()
     setPageVisible(CamerasPage,     customAccessRights);
     setPageVisible(LayoutsPage,     customAccessRights);
 
-    m_editRolesButton->setVisible(settingsPageVisible);
+    m_userEnabledButton->setVisible(settingsPageVisible && m_user
+        && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission));
 
     /* Buttons state takes into account pages visibility, so we must recalculate it. */
     updateButtonBox();

@@ -8,46 +8,6 @@ import Rdep
 
 Project
 {
-    id: deps
-    name: "deps"
-
-    property string packagesDir:
-        FileInfo.joinPaths(Environment.getEnv("environment"), "packages")
-    property string python: "python2"
-
-    property string boostVersion: "1.60.0"
-    property string opensslVersion: "1.0.2e"
-    property string ffmpegVersion: "3.1.1"
-    property string quazipVersion: "0.7.1"
-    property string onvifVersion: "2.1.2-io2"
-    property string sigarVersion: "1.7"
-    property string openldapVersion: "2.4.42"
-    property string saslVersion: "2.1.26"
-    property string openalVersion: "1.16"
-    property string libjpeg_turboVersion: "1.4.2"
-    property string libcreateprocessVersion: "0.1"
-    property string festivalVersion: "2.1"
-    property string festival_voxVersion: festivalVersion
-    property string vmuxVersion: "1.0.0"
-    property string gtestVersion: "0.7.1"
-    property string gmockVersion: "0.7.1"
-    property string helpVersion: customization + "-" + releaseVersion
-
-    Probe
-    {
-        id: branchProbe
-
-        property string branch
-
-        property string _branchFile: FileInfo.joinPaths(sourceDirectory, ".hg/branch")
-        property var _lastModified: File.lastModified(_branchFile)
-
-        configure:
-        {
-            branch = (new TextFile(_branchFile)).readAll().trim()
-        }
-    }
-
     RdepProbe
     {
         id: boost
@@ -70,12 +30,14 @@ Project
     RdepProbe
     {
         id: qtsingleguiapplication
+        condition: withMobileClient
         packageName: "qtsingleguiapplication"
         target: "any"
     }
     RdepProbe
     {
         id: qtsingleapplication
+        condition: withDesktopClient
         packageName: "qtsingleapplication"
         target: "any"
     }
@@ -100,25 +62,15 @@ Project
 
     RdepProbe
     {
-        id: sigar
-        packageName: "sigar"
-    }
-
-    RdepProbe
-    {
-        id: onvif
-        packageName: "onvif"
-    }
-
-    RdepProbe
-    {
         id: festival
+        condition: withDesktopClient || withMediaServer
         packageName: "festival"
     }
 
     RdepProbe
     {
         id: festivalVox
+        condition: withDesktopClient || withMediaServer
         packageName: "festival-vox"
         target: "any"
     }
@@ -126,6 +78,7 @@ Project
     RdepProbe
     {
         id: robotoFont
+        condition: withDesktopClient || withMobileClient
         packageName: "roboto-ttf"
         target: "any"
     }
@@ -133,67 +86,32 @@ Project
     RdepProbe
     {
         id: robotoMonoFont
+        condition: withDesktopClient || withMobileClient
         packageName: "roboto-mono-ttf"
         target: "any"
     }
 
-    RdepProbe
+    references:
     {
-        id: help
-        packageName: "help"
-        target: "any"
-    }
+        var result = [
+            boost.packagePath,
+            openssl.packagePath,
+            qtservice.packagePath,
+            qtsinglecoreapplication.packagePath
+        ]
 
-    RdepProbe
-    {
-        id: nxSdk
-        packageName: "nx_sdk-1.6.0"
-        target: "any"
-    }
+        qtsingleapplication.found && result.push(qtsingleapplication.packagePath)
+        qtsingleguiapplication.found && result.push(qtsingleguiapplication.packagePath)
 
-    RdepProbe
-    {
-        id: nxStorageSdk
-        packageName: "nx_storage_sdk-1.6.0"
-        target: "any"
-    }
+        ffmpeg.found && result.push(ffmpeg.packagePath)
+        quazip.found && result.push(quazip.packagePath)
 
-    RdepProbe
-    {
-        id: serverExternalForBranch
-        packageName: "server-external-" + branchProbe.branch
-        target: "any"
-        required: false
-    }
+        festival.found && result.push(festival.packagePath)
+        festivalVox.found && result.push(festivalVox.packagePath)
 
-    RdepProbe
-    {
-        id: serverExternal
-        packageName: "server-external-" + releaseVersion
-        target: "any"
-        condition: !serverExternalForBranch.found
-    }
+        robotoFont.found && result.push(robotoFont.packagePath)
+        robotoMonoFont.found && result.push(robotoMonoFont.packagePath)
 
-    references: [
-        boost.packagePath,
-        qtservice.packagePath,
-        qtsinglecoreapplication.packagePath,
-        qtsingleguiapplication.packagePath,
-        qtsingleapplication.packagePath,
-        openssl.packagePath,
-        ffmpeg.packagePath,
-        quazip.packagePath,
-        sigar.packagePath,
-        onvif.packagePath,
-        festival.packagePath,
-        festivalVox.packagePath,
-        robotoFont.packagePath,
-        robotoMonoFont.packagePath,
-        help.packagePath,
-        nxSdk.packagePath,
-        nxStorageSdk.packagePath,
-        serverExternalForBranch.found
-            ? serverExternalForBranch.packagePath
-            : serverExternal.packagePath
-    ]
+        return result
+    }
 }

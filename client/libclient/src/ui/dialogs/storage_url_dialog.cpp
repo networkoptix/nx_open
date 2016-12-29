@@ -10,7 +10,7 @@
 #include <core/resource/abstract_storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <ui/style/helper.h>
+#include <ui/style/custom_style.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -43,7 +43,7 @@ QnStorageUrlDialog::QnStorageUrlDialog(
     QScopedPointer<QAbstractButton> baseOkButton(ui->buttonBox->button(QDialogButtonBox::Ok));
     m_okButton->setText(baseOkButton->text()); // Title from OS theme
     m_okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
-    m_okButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(m_okButton);
     ui->buttonBox->removeButton(baseOkButton.data());
     ui->buttonBox->addButton(m_okButton, QDialogButtonBox::AcceptRole);
 

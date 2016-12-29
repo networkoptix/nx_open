@@ -79,7 +79,6 @@
     <?define QtPluginsDir="${qt.dir}/plugins"?>
 
     <?define VC14RedistPath="${VC14RedistPath}"?>
-    <?define VC12RedistPath="${VC12RedistPath}"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

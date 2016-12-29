@@ -28,6 +28,9 @@ public:
         registerTypeAccessor(QLatin1String(T::staticMetaObject.className()), accessor);
     }
 
+    /** Clear current set of widgets to align. */
+    void clear();
+
     void align();
 
     bool skipInvisible() const;
