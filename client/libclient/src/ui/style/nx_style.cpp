@@ -332,7 +332,7 @@ namespace
     T* isWidgetOwnedBy(const QWidget* widget)
     {
         if (!widget)
-            return false;
+            return nullptr;
 
         for (QWidget* parent = widget->parentWidget(); parent != nullptr; parent = parent->parentWidget())
         {
@@ -1583,24 +1583,18 @@ void QnNxStyle::drawComplexControl(
             {
                 auto drawArrowButton = [&](QStyle::SubControl subControl)
                 {
-                    QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
-
-                    QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Button));
-                    QColor buttonColor;
+                    const QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
+                    const QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Base));
 
                     bool up = (subControl == SC_SpinBoxUp);
                     bool enabled = spinBox->state.testFlag(QStyle::State_Enabled) && spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
 
                     if (enabled && spinBox->activeSubControls.testFlag(subControl))
                     {
-                        if (spinBox->state.testFlag(State_Sunken))
-                            buttonColor = mainColor.darker(1);
-                        else
-                            buttonColor = mainColor;
+                        painter->fillRect(buttonRect, spinBox->state.testFlag(State_Sunken)
+                            ? mainColor
+                            : mainColor.lighter(1));
                     }
-
-                    if (buttonColor.isValid())
-                        painter->fillRect(buttonRect, buttonColor);
 
                     drawArrow(up ? Up : Down,
                         painter,

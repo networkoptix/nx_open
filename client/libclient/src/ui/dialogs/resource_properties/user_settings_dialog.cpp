@@ -275,8 +275,6 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
                            || m_model->mode() == QnUserSettingsModel::OtherSettings;
     ui->buttonBox->button(QDialogButtonBox::Apply)->setVisible(applyButtonVisible);
 
-    setReadOnly(!applyButtonVisible);
-
     /** Hide Cancel button if we cannot edit user. */
     bool cancelButtonVisible = m_model->mode() != QnUserSettingsModel::OtherProfile
                             && m_model->mode() != QnUserSettingsModel::Invalid;
@@ -301,7 +299,7 @@ void QnUserSettingsDialog::loadDataToUi()
 
 void QnUserSettingsDialog::forcedUpdate()
 {
-    base_type::forcedUpdate();
+    Qn::updateGuarded(this, [this]() { base_type::forcedUpdate(); });
     updatePermissions();
     updateButtonBox();
 }

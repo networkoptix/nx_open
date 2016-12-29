@@ -251,15 +251,6 @@
         }
     },
 
-    "QAbstractSpinBox": {
-        "palette": {
-            "default": {
-                "base":             "dark5",
-                "button":           "dark8"
-            }
-        }
-    },
-
     "QnAlertBar": {
         "palette": { 
             "default": {
@@ -605,6 +596,7 @@
     "QCalendarWidget": {
         "palette": { 
             "default": {
+                "base": "dark14",
                 "window": "dark13",
                 "highlight": "dark13",
                 "brightText": "red_l2",
