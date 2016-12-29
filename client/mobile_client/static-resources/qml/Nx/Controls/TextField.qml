@@ -258,8 +258,9 @@ QnTextInput
         contextMenu.x = pos.x
         contextMenu.y = pos.y
 
-        control.persistentSelection = true;
+        control.persistentSelection = true
         contextMenu.open()
+        control.persistentSelection = false
     }
 
     Menu
@@ -300,12 +301,6 @@ QnTextInput
             text: qsTr("Select All")
             enabled: (control.selectedText != control.text)
             onTriggered: { control.selectAll() }
-        }
-
-        onVisibleChanged:
-        {
-            if (!visible)
-                control.persistentSelection = false;
         }
     }
 }
