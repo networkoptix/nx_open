@@ -53,11 +53,11 @@ QtDevice& qtDevice()
 QByteArray generate(std::size_t count, char min, char max)
 {
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
-    std::uniform_int_distribution<int> distribution(min, max);
+    //std::uniform_int_distribution<int> distribution(min, max);
 
     std::generate(
         data.begin(), data.end(),
-        [&distribution]() { return distribution(qtDevice()); });
+        [/*&distribution*/min, max]() { return min + (qtDevice()() % (max-min)); });
 
     return data;
 }
