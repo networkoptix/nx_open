@@ -88,7 +88,7 @@ angular.module('cloudApp')
                 this.get().then(function(){
                     dialogs.confirm(L.dialogs.logoutConfirmText,
                         L.dialogs.logoutConfirmTitle,
-                        L.dialogs.logoutConfirmButton, "danger").then(function(){
+                        L.dialogs.logoutConfirmButton, 'danger').then(function(){
                         self.logout(true);
                     },function(){
                         self.redirectAuthorised();

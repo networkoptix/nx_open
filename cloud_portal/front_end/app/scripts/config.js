@@ -1,6 +1,8 @@
 'use strict';
 
 var Config = {
+    viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
     realm: 'VMS',
@@ -31,23 +33,18 @@ var Config = {
             style: 'label-default'
         },
         notActivated: {
-            label: L.systemStatuses.notActivated,
             style: 'label-danger'
         },
         activated: {
-            label: L.systemStatuses.activated,
             style: 'label-info'
         },
         online: {
-            label: L.systemStatuses.online,
             style: 'label-success'
         },
         offline: {
-            label: L.systemStatuses.offline,
             style: 'label-default'
         },
         unavailable: {
-            label: L.systemStatuses.unavailable,
             style: 'label-default'
         }
     },
@@ -68,29 +65,29 @@ var Config = {
         globalAdminAccessRoleFlag: 'Admin', // TODO: remove it later when cloud permissions are ready
         predefinedRoles:[
             {
-                "isOwner": true,
-                "name": "Owner",
-                "permissions": "GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+                'isOwner': true,
+                'name': 'Owner',
+                'permissions': 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
             },
             {
-                "name": "Administrator",
-                "permissions": "GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+                'name': 'Administrator',
+                'permissions': 'GlobalAdminPermission|GlobalEditCamerasPermission|GlobalControlVideoWallPermission|GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
             },
             {
-                "name": "Advanced Viewer",
-                "permissions": "GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission"
+                'name': 'Advanced Viewer',
+                'permissions': 'GlobalViewLogsPermission|GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalManageBookmarksPermission|GlobalUserInputPermission|GlobalAccessAllMediaPermission'
             },
             {
-                "name": "Viewer",
-                "permissions": "GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllMediaPermission"
+                'name': 'Viewer',
+                'permissions': 'GlobalViewArchivePermission|GlobalExportPermission|GlobalViewBookmarksPermission|GlobalAccessAllMediaPermission'
             },
             {
-                "name": "Live Viewer",
-                "permissions": "GlobalAccessAllMediaPermission"
+                'name': 'Live Viewer',
+                'permissions': 'GlobalAccessAllMediaPermission'
             },
             {
-                "name": 'Custom',
-                "permissions": 'NoPermission'
+                'name': 'Custom',
+                'permissions': 'NoPermission'
             }
         ],
         order: [
@@ -102,18 +99,13 @@ var Config = {
         ]
     },
 
-    emailRegex:"^[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$", // Check only @ and . in the email
+    emailRegex:'^[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+(\\.[-!#$%&\'*+/=?^_`{}|~0-9a-zA-Z]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,6}\\.?$', // Check only @ and . in the email
 
     passwordRequirements: {
         minLength: 8,
-        minLengthMessage:L.passwordRequirements.minLengthMessage,
         maxLength: 255,
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
-        requiredMessage: L.passwordRequirements.requiredMessage,
         minClassesCount: 2,
-        strongClassesCount: 3,
-        weakMessage: L.passwordRequirements.weakMessage,
-        strongMessage: L.passwordRequirements.strongMessage,
-        commonMessage: L.passwordRequirements.commonMessage
+        strongClassesCount: 3
     }
 };

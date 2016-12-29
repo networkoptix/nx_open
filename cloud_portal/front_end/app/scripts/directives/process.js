@@ -3,7 +3,7 @@
 angular.module('cloudApp').directive('processButton', ['$timeout',function ($timeout) {
         return {
             restrict: 'E',
-            templateUrl: 'static/views/components/process-button.html',
+            templateUrl: Config.viewsDir + 'components/process-button.html',
             scope:{
                 process:'=',
                 buttonDisabled:'=',
@@ -30,7 +30,7 @@ angular.module('cloudApp').directive('processButton', ['$timeout',function ($tim
 
                 function setFocusToInvalid(form){
                     $timeout(function() {
-                        $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
+                        $('[name="' + form.$name + '"]').find('.ng-invalid:visible:first').focus();
                     });
                 }
 

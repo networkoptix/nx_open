@@ -16,7 +16,7 @@
         if (screen.width) {
             width = (screen.width) ? screen.width : '';
             height = (screen.height) ? screen.height : '';
-            screenSize += '' + width + " x " + height;
+            screenSize += '' + width + ' x ' + height;
         }
 
         //browser
@@ -163,7 +163,7 @@
         }
 
         // flash (you'll need to include swfobject)
-        /* script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js" */
+        /* script src='//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js' */
         var flashVersion = null;
         if (typeof swfobject != 'undefined') {
             var fv = swfobject.getFlashPlayerVersion();

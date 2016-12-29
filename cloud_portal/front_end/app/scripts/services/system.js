@@ -219,7 +219,7 @@ angular.module('cloudApp')
 
             return self.mediaserver.getAggregatedUsersData().then(function(result){
                 if(!result.data.reply){
-                    $log.error("Aggregated request to server has failed", result);
+                    $log.error('Aggregated request to server has failed', result);
                     return $q.reject();
                 }
                 var usersList = result.data.reply['ec2/getUsers'];
