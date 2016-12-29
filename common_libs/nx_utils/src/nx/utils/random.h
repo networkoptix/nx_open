@@ -11,6 +11,7 @@ namespace random {
 
 /**
  * Exception free, qrand based random device.
+ * @note Should be used on platforms where std::random_device does not work as expected.
  */
 class NX_UTILS_API QtDevice
 {
@@ -24,9 +25,6 @@ public:
     static constexpr result_type min() { return 0; }
     static constexpr result_type max() { return RAND_MAX; }
 };
-
-/** Thread local std::random_device. */
-NX_UTILS_API std::random_device& device();
 
 /** Thread local QtDevice. */
 NX_UTILS_API QtDevice& qtDevice();
@@ -49,14 +47,7 @@ Type number(
     typename std::enable_if<std::is_integral<Type>::value>::type* = 0)
 {
     std::uniform_int_distribution<Type> distribution(min, max);
-    try
-    {
-        return distribution(device());
-    }
-    catch(const std::exception&)
-    {
-        return distribution(qtDevice());
-    }
+    return distribution(qtDevice());
 }
 
 /**
@@ -69,14 +60,7 @@ Type number(
     typename std::enable_if<std::is_floating_point<Type>::value>::type* = 0)
 {
     std::uniform_real_distribution<Type> distribution(min, max);
-    try
-    {
-        return distribution(device());
-    }
-    catch(const std::exception&)
-    {
-        return distribution(qtDevice());
-    }
+    return distribution(qtDevice());
 }
 
 /**

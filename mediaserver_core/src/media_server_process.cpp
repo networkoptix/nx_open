@@ -1068,8 +1068,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
         MSSettings::initializeRunTimeSettings();
 
     addCommandLineParametersFromConfig();
-
-    ::srand(::time(NULL));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
