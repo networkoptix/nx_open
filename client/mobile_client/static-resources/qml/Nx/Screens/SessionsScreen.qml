@@ -127,8 +127,8 @@ Page
             id: customConnectionButton
 
             text: dummyMessage.visible
-                ? qsTr("Connect to System")
-                : qsTr("Connect to Another System")
+                ? qsTr("Connect to Server")
+                : qsTr("Connect to Another Server")
 
             anchors.centerIn: parent
             width: parent.width - 16

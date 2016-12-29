@@ -8,7 +8,7 @@ Page
 {
     id: customConnectionScreen
 
-    title: systemName ? systemName : qsTr("Connect to System")
+    title: systemName ? systemName : qsTr("Connect to Server")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     property alias systemId: systemHostsModel.systemId
