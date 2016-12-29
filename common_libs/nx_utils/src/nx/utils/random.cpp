@@ -50,16 +50,25 @@ QtDevice& qtDevice()
     #endif
 }
 
-QByteArray generate(std::size_t count, char min, char max)
+QByteArray generate(std::size_t count)
 {
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
+    for (int i = 0; i != data.size(); ++i)
+    {
+        const auto n = number<short>(0, 255);
+        data[i] = reinterpret_cast<const char&>(n);
+    }
 
-    std::generate(
-        data.begin(), data.end(),
-        [min, max]()
-        {
-            return (min + (qtDevice()() % (max - min + 1)));
-        });
+    return data;
+}
+
+QByteArray word(std::size_t count)
+{
+    static const std::string kAbc("abcdefjhijklmnopqrstuvwxyz");
+
+    QByteArray data(static_cast<int>(count), Qt::Uninitialized);
+    for (int i = 0; i != data.size(); ++i)
+        data[i] = choice(kAbc);
 
     return data;
 }
