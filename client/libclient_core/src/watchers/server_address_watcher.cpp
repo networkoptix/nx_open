@@ -4,6 +4,7 @@
 
 #include <network/module_finder.h>
 #include <nx/network/socket_global.h>
+#include <network/direct_module_finder.h>
 #include <network/direct_module_finder_helper.h>
 #include <client/client_message_processor.h>
 #include <client_core/client_core_settings.h>
@@ -17,15 +18,17 @@ QnServerAddressWatcher::QnServerAddressWatcher(
         QObject* parent)
     : QObject(parent)
 {
-    auto moduleFinder = qnModuleFinder;
+    const auto moduleFinder = qnModuleFinder;
     NX_ASSERT(qnModuleFinder, "QnModuleFinder is not ready");
     if (!moduleFinder)
         return;
 
-    auto directModuleFinderHelper = moduleFinder->directModuleFinderHelper();
+    const auto directModuleFinderHelper = moduleFinder->directModuleFinderHelper();
     NX_ASSERT(directModuleFinderHelper, "QnDirectModuleFinderHelper is not ready");
     if (!directModuleFinderHelper)
         return;
+
+    const auto directModuleFinder = moduleFinder->directModuleFinder();
 
     m_urls = qnClientCoreSettings->knownServerUrls();
     if (m_urls.size() > kMaxUrlsToStore)
@@ -36,7 +39,7 @@ QnServerAddressWatcher::QnServerAddressWatcher(
     directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 
     connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
-            this, [this, directModuleFinderHelper]()
+            this, [this, directModuleFinderHelper, directModuleFinder]()
             {
                 QUrl url = QnAppServerConnectionFactory::url();
                 if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
@@ -49,6 +52,9 @@ QnServerAddressWatcher::QnServerAddressWatcher(
                 m_urls.prepend(url);
                 while (m_urls.size() > kMaxUrlsToStore)
                     m_urls.removeLast();
+
+                // Forces QnDirectModuleFinder to use url of connection
+                directModuleFinder->checkUrl(url);
 
                 directModuleFinderHelper->setForcedUrls(this, QSet<QUrl>::fromList(m_urls));
 

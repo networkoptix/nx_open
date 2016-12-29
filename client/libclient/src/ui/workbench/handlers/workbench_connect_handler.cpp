@@ -205,8 +205,13 @@ void storeLocalSystemConnection(
     if (!storePassword)
         url.setPassword(QString());
 
-    const auto connectionData =
-        helpers::storeLocalSystemConnection(systemName, localSystemId, url);
+    QnLocalConnectionData connectionData;
+    if (!helpers::storeLocalSystemConnection(
+        systemName, localSystemId, url, connectionData))
+    {
+        return;
+    }
+
     qnClientCoreSettings->save();
 
     const auto lastUsed = QnConnectionData(systemName, url, localSystemId);
