@@ -1,6 +1,8 @@
 #include "export_timelapse_dialog.h"
 #include "ui_export_timelapse_dialog.h"
 
+#include <text/time_strings.h>
+
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/scoped_value_rollback.h>
@@ -196,13 +198,25 @@ void QnExportTimelapseDialog::initControls()
 
     qint64 maxExpectedLengthMs = m_sourcePeriodLengthMs / kMinimalSpeed;
     if (maxExpectedLengthMs >= kMsInSec)
-        addModelItem(tr("sec"), kMsInSec, m_filteredUnitsModel);
+    {
+        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Seconds), kMsInSec,
+            m_filteredUnitsModel);
+    }
     if (maxExpectedLengthMs >= kMsInMin)
-        addModelItem(tr("min"), kMsInMin, m_filteredUnitsModel);
+    {
+        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Minutes), kMsInMin,
+            m_filteredUnitsModel);
+    }
     if (maxExpectedLengthMs >= kMsInHour)
-        addModelItem(tr("hrs"), kMsInHour, m_filteredUnitsModel);
+    {
+        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Hours), kMsInHour,
+            m_filteredUnitsModel);
+    }
     if (maxExpectedLengthMs >= kMsInDay)
-        addModelItem(tr("days"), kMsInDay, m_filteredUnitsModel);
+    {
+        addModelItem(QnTimeStrings::longSuffix(QnTimeStrings::Suffix::Days), kMsInDay,
+            m_filteredUnitsModel);
+    }
 
     m_maxSpeed = m_sourcePeriodLengthMs / kMinimalLengthMs;
     ui->speedSpinBox->setRange(kMinimalSpeed, m_maxSpeed);
@@ -307,41 +321,9 @@ int QnExportTimelapseDialog::fromSliderScale(int sliderValue) const
 
 QString QnExportTimelapseDialog::durationMsToString(qint64 durationMs)
 {
-    static const QString msSuffix = tr("ms", "Suffix for displaying milliseconds in rapid review dialog");
-    static const QString sSuffix = tr("s", "Suffix for displaying seconds in rapid review dialog");
-    static const QString mSuffix = tr("m", "Suffix for displaying minutes in rapid review dialog");
-    static const QString hSuffix = tr("h", "Suffix for displaying hours in rapid review dialog");
-    static const QString dSuffix = tr("d", "Suffix for displaying days in rapid review dialog");
-
-    auto unitStringsConverter =
-        [&](Qt::TimeSpanUnit unit, int num)
-        {
-            QString format;
-            switch (unit)
-            {
-            case::Qt::Milliseconds:
-                format = msSuffix;
-                break;
-            case::Qt::Seconds:
-                format = sSuffix;
-                break;
-            case::Qt::Minutes:
-                format = mSuffix;
-                break;
-            case::Qt::Hours:
-                format = hSuffix;
-                break;
-            case::Qt::Days:
-                format = dSuffix;
-                break;
-            default:
-                break;
-            }
-            return QString::number(num) + format;
-        };
-
-    /* Make sure passed format is fully covered by converter. */
-    return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds, unitStringsConverter, lit(" "));
+    static const QString kSeparator(L' ');
+    return QTimeSpan(durationMs).toApproximateString(3, Qt::DaysAndTime | Qt::Milliseconds,
+        QTimeSpan::SuffixFormat::Short, kSeparator);
 }
 
 qint64 QnExportTimelapseDialog::expectedLengthMeasureUnit(int index) const

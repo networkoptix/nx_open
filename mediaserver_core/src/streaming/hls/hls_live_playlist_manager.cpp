@@ -10,25 +10,21 @@
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 
-#include "media_server/settings.h"
-
-
 namespace nx_hls
 {
     static const size_t CHUNKS_IN_PLAYLIST = 3;
 
     HLSLivePlaylistManager::HLSLivePlaylistManager(
         MediaStreamCache* const mediaStreamCache,
-        quint64 targetDurationUSec )
+        quint64 targetDurationUSec,
+        int removedChunksToKeepCount)
     :
         m_mediaStreamCache( mediaStreamCache ),
         m_targetDurationUSec( targetDurationUSec ),
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 ),
-        m_removedChunksToKeepCount( MSSettings::roSettings()->value(
-            nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
-            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() )
+        m_removedChunksToKeepCount(removedChunksToKeepCount)
     {
         using namespace std::placeholders;
         m_mediaStreamCache->addEventReceiver( this );
@@ -58,7 +54,7 @@ namespace nx_hls
 
         m_inactivityTimer.restart();
 
-        //NOTE commented code is a trick to minimize live delay with hls playback. But current implementation results in 
+        //NOTE commented code is a trick to minimize live delay with hls playback. But current implementation results in
             //playback freezing and switching to lo-quality, since downloading is done with same speed as playback and HLS client thinks bandwidth is not sufficient.
             //But, something can still be done to minimize that delay
         //if( m_chunks.empty() )
@@ -152,7 +148,7 @@ namespace nx_hls
                     //   the duration of the Playlist file minus the duration of the segment
                     //   is less than three times the target duration.
                 while( (m_totalPlaylistDuration - m_chunks.front().duration > m_targetDurationUSec * CHUNKS_IN_PLAYLIST) &&
-                       (m_chunks.size() > CHUNKS_IN_PLAYLIST) ) //in case of a large GOP (it is common for second stream) 
+                       (m_chunks.size() > CHUNKS_IN_PLAYLIST) ) //in case of a large GOP (it is common for second stream)
                                                                 //first condition may produce 1 or 2 chunks per playlist which is bad for iOS
                 {
                     //When the server removes a media segment from the Playlist, the

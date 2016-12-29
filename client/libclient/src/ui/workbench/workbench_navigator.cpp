@@ -1945,7 +1945,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused)
         for (QHash<QnResourceDisplayPtr, bool>::iterator itr = m_autoPausedResourceDisplays.begin(); itr != m_autoPausedResourceDisplays.end(); ++itr)
         {
             itr.key()->play();
-            if (itr.value())
+            if (itr.value() && itr.key()->archiveReader())
                 itr.key()->archiveReader()->jumpTo(DATETIME_NOW, 0);
         }
 

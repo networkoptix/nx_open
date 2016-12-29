@@ -15,6 +15,7 @@
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
+#include <platform/platform_abstraction.h>
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
@@ -24,6 +25,7 @@
 #include <media_server/serverutil.h>
 
 #include "health/system_health.h"
+#include "platform/platform_abstraction.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -41,7 +43,46 @@ struct CloudManagerGroup;
 
 void restartServer(int restartTimeout);
 
-class MediaServerProcess : public QnLongRunnable
+class CmdLineArguments
+{
+public:
+    QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
+    QString ec2TranLogLevel;
+    QString permissionsLogLevel;
+    QString rebuildArchive;
+    QString devModeKey;
+    QString allowedDiscoveryPeers;
+    QString ifListFilter;
+    bool cleanupDb;
+
+    QString configFilePath;
+    QString rwConfigFilePath;
+    bool showVersion;
+    bool showHelp;
+    bool disableCrashHandler;
+    QString engineVersion;
+    QString enforceSocketType;
+    QString enforcedMediatorEndpoint;
+    QString ipVersion;
+
+
+    CmdLineArguments() :
+        logLevel(
+#ifdef _DEBUG
+            lit("DEBUG")),
+#else
+        lit("INFO")),
+#endif
+        showVersion(false),
+        showHelp(false),
+        disableCrashHandler(false)
+    {
+    }
+};
+
+class MediaServerProcess: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -57,15 +98,14 @@ public:
     static int main(int argc, char* argv[]);
 
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
-    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint);
-    void setEngineVersion(const QnSoftwareVersion& version);
+
+    const CmdLineArguments cmdLineArguments() const;
 
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
-
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
@@ -87,6 +127,7 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIP);
 
 private:
+
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
@@ -102,7 +143,9 @@ private:
     bool isStopping() const;
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
     void performActionsOnExit();
-
+    void parseCommandLineParameters(int argc, char* argv[]);
+    void updateAllowedInterfaces();
+    void addCommandLineParametersFromConfig();
 private:
     int m_argc;
     char** m_argv;
@@ -124,9 +167,9 @@ private:
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
     QVector<QString> m_hardwareGuidList;
-    QString m_enforcedMediatorEndpoint;
-    QnSoftwareVersion m_engineVersion;
     nx::SystemName m_systemName;
+    std::unique_ptr<QnPlatformAbstraction> m_platform;
+    CmdLineArguments m_cmdLineArguments;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

@@ -79,6 +79,7 @@ private:
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
     void onConnectResponse(
+        stun::TransportHeader stunTransportHeader,
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     std::chrono::milliseconds calculateTimeLeftForConnect();

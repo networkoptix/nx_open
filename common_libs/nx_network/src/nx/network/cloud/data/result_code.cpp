@@ -8,9 +8,9 @@ namespace hpm {
 namespace api {
 
 ResultCode fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorDescription& errorDescription)
+    const nx::stun::attrs::ErrorCode& errorCode)
 {
-    switch (errorDescription.getCode())
+    switch (errorCode.getCode())
     {
         case nx::stun::error::badRequest:
             return ResultCode::badRequest;

@@ -274,7 +274,7 @@ void Settings::loadConfiguration()
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
         m_cloudConnect.preferedSslMode = SslMode::disabled;
     else
-        m_cloudConnect.preferedSslMode = SslMode::undefined;
+        m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 }
 
 }   //namespace conf

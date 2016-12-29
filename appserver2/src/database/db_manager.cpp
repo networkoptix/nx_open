@@ -30,6 +30,8 @@
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
 
+#include <network/system_helpers.h>
+
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_stored_file_data.h"
@@ -551,7 +553,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         QString defaultAdminPassword = qnCommon->defaultAdminPassword();
         if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
         {
-            defaultAdminPassword = lit("admin");
+            defaultAdminPassword = helpers::kFactorySystemPassword;
             if (m_dbJustCreated)
                 qnCommon->setUseLowPriorityAdminPasswordHack(true);
         }

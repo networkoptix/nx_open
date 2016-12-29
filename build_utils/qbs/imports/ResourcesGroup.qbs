@@ -4,5 +4,7 @@ Group
 {
     files: "*"
     fileTags: ["resources.resource_data"]
-    prefix: resources.resourceSourceBase + "/**/"
+    prefix: resources.resourceSourceBase
+        ? resources.resourceSourceBase + "/**/"
+        : undefined
 }

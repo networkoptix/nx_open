@@ -1940,7 +1940,13 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     qint64 freeSpace = storage->getFreeSpace();
     if (freeSpace == -1)
         return true; // nothing to delete
+
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
+
+    NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
+            .arg(storage->getUrl())
+            .arg(toDelete / (1024 * 1024)), cl_logINFO);
+
     DeviceFileCatalog::Chunk deletedChunk;
 
     while (toDelete > 0)

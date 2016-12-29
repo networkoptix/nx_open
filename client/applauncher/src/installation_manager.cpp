@@ -17,8 +17,8 @@
 #include <utils/update/zip_utils.h>
 
 #if defined(Q_OS_MACX)
-#include <platform/core_foundation_mac/cf_url.h>
-#include <platform/core_foundation_mac/cf_string.h>
+#include <nx/utils/platform/core_foundation_mac/cf_url.h>
+#include <nx/utils/platform/core_foundation_mac/cf_string.h>
 #endif
 
 namespace {

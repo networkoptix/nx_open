@@ -181,11 +181,17 @@ public:
     QString toString(const QString &format) const;
     QString toString(Qt::TimeSpanFormat format) const;
 
-    typedef std::function<QString(Qt::TimeSpanUnit unit, int num)> unitStringFunction;
+
+    enum class SuffixFormat
+    {
+        Short,
+        Long,
+        Full
+    };
     QString toApproximateString(int suppresSecondUnitLimit = 3,
-                                Qt::TimeSpanFormat format = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days | Qt::Weeks,
-                                unitStringFunction unitStringConverter = unitStringFunction(),
-                                QString unitsSeparator = QLatin1String(", "));
+        Qt::TimeSpanFormat format = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days | Qt::Weeks,
+        SuffixFormat suffixFormat = SuffixFormat::Full,
+        QString unitsSeparator = QLatin1String(", "));
 #endif
 
     // Assignment operator

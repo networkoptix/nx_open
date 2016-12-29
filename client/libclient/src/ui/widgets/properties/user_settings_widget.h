@@ -44,6 +44,13 @@ signals:
 private:
     void setupInputFields();
     QList<QnInputField*> inputFields() const;
+    QList<QnInputField*> localInputFields() const;
+    QList<QnInputField*> cloudInputFields() const;
+
+    QList<QnInputField*> relevantInputFields() const;
+
+    QString passwordPlaceholder() const;
+    void updatePasswordPlaceholders();
 
     void updateRoleComboBox();
     void updateControlsAccess();
@@ -53,5 +60,7 @@ private:
     QScopedPointer<Ui::UserSettingsWidget> ui;
     QnUserSettingsModel* const m_model;
     QnUserRolesModel* const m_rolesModel;
+    QList<QnInputField*> m_localInputFields;
+    QList<QnInputField*> m_cloudInputFields;
     QnAligner* const m_aligner;
 };

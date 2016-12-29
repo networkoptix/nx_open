@@ -94,15 +94,13 @@ std::chrono::milliseconds RetryPolicy::maxDelay() const
 //// class RetryTimer
 ////////////////////////////////////////////////////////////
 
-RetryTimer::RetryTimer(const RetryPolicy& policy)
-:
+RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
+    aio::BasicPollable(aioThread),
     m_retryPolicy(policy),
     m_triesMade(0)
 {
     reset();
-
-    m_timer = std::make_unique<aio::Timer>();
-    m_timer->bindToAioThread(getAioThread());
+    m_timer = std::make_unique<aio::Timer>(aioThread);
 }
 
 RetryTimer::~RetryTimer()

@@ -20,6 +20,7 @@
 
 #include <network/module_finder.h>
 #include <network/networkoptixmodulerevealcommon.h>
+#include <network/system_helpers.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -297,10 +298,13 @@ void QnLoginDialog::accept()
         return;
 
     QUrl url = currentUrl();
+	const auto guard = QPointer<QnLoginDialog>(this);
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
-        [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        [this, url, guard](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
         {
+            if (!guard)
+                return;
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
@@ -310,6 +314,8 @@ void QnLoginDialog::accept()
             auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
+            if (!guard)
+                return;
             switch (status)
             {
                 case Qn::SuccessConnectionResult:
@@ -420,7 +426,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         QUrl url;
         url.setPort(DEFAULT_APPSERVER_PORT);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
-        url.setUserName(lit("admin"));
+        url.setUserName(helpers::kFactorySystemUser);
 
         customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
     }
@@ -539,7 +545,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
     ui->loginLineEdit->setText(url.userName().isEmpty()
-        ? lit("admin")  // 99% of users have only one login - admin
+        ? helpers::kFactorySystemUser  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
 

@@ -2,6 +2,8 @@ import qbs
 
 Project
 {
+    condition: withDesktopClient || withMobileClient
+
     references: [
         "libclient_core",
         "libclient",

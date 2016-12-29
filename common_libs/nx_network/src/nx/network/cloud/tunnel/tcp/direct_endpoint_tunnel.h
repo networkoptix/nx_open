@@ -27,6 +27,8 @@ public:
 
     virtual void stopWhileInAioThread() override;
 
+    virtual void start() override;
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,

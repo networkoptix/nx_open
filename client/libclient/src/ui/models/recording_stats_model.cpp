@@ -11,6 +11,8 @@
 
 #include <nx/utils/string.h>
 
+#include <utils/common/qtimespan.h>
+
 namespace {
 
 //TODO: #vkutin #common Refactor all this to use some common formatting
@@ -358,34 +360,15 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     if (data.archiveDurationSecs == 0)
         return tr("empty");
 
-    qint64 tmpVal = data.archiveDurationSecs;
-    int years = tmpVal / kSecondsPerYear;
-    tmpVal -= years * kSecondsPerYear;
-    int months = tmpVal / kSecondsPerMonth;
-    tmpVal -= months * kSecondsPerMonth;
-    int days = tmpVal / kSecondsPerDay;
-    tmpVal -= days * kSecondsPerDay;
-    int hours = tmpVal / kSecondsPerHour;
-    QString result;
-    static const QString kDelimiter(lit(" "));
-    if (years > 0)
-        result += tr("%n years", "", years);
-    if (months > 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n months", "", months);
-    }
-    if (days > 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n days", "", days);
-    }
-    if (hours > 0 && years == 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n hours", "", hours);
-    }
-    if (result.isEmpty())
-        result = tr("less than an hour");
-    return result;
+    if (data.archiveDurationSecs < kSecondsPerHour)
+        return tr("less than an hour");
+
+    static const int kMsecPerSec = 1000;
+    static const QString kSeparator(L' ');
+    static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
+    static const int kDoNotSuppress = -1;
+
+    qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
+    return QTimeSpan(durationMs).toApproximateString(kDoNotSuppress, kFormat,
+        QTimeSpan::SuffixFormat::Full, kSeparator);
 }

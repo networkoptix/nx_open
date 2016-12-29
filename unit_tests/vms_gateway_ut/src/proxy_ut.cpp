@@ -166,7 +166,7 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
 TEST_F(VmsGatewayProxyTest, SslEnabled)
 {
     addArg("-http/sslSupport", "true");
-    addArg("-cloudConnect/preferedSslMode", "undefined");
+    addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     expectSecurity(false);
@@ -277,7 +277,7 @@ TEST_F(VmsGatewayProxyTest, SslRestricted)
 TEST_F(VmsGatewayProxyTest, SslForbidden)
 {
     addArg("-http/sslSupport", "false");
-    addArg("-cloudConnect/preferedSslMode", "undefined");
+    addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
     ASSERT_TRUE(startAndWaitUntilStarted());
     expectSecurity(false);
 

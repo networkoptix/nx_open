@@ -27,12 +27,22 @@ int QnIOPortsViewModel::columnCount(const QModelIndex &parent) const {
     return 0;
 }
 
+QnIOPortsViewModel::Action QnIOPortsViewModel::actionFor(const QnIOPortData& value) const
+{
+    if (value.portType != Qn::PT_Output)
+        return NoAction;
+
+    return (value.autoResetTimeoutMs ? Impulse : ToggleState);
+}
+
 QString QnIOPortsViewModel::textData(const QModelIndex &index) const
 {
     const QnIOPortData& value = m_data.at(index.row());
 
     switch(index.column())
     {
+    case NumberColumn:
+        return QString::number(index.row() + 1 /* 1-based */);
     case IdColumn:
         return nx::utils::elideString(value.id, kMaxIdLength);
     case TypeColumn:
@@ -41,8 +51,12 @@ QString QnIOPortsViewModel::textData(const QModelIndex &index) const
         return stateToString(value.getDefaultState());
     case NameColumn:
         return value.getName();
-    case AutoResetColumn:
-        return QString::number(value.autoResetTimeoutMs);
+    case ActionColumn:
+        return actionToString(actionFor(value));
+    case DurationColumn:
+        return actionFor(value) == Impulse
+            ? QString::number(value.autoResetTimeoutMs)
+            : QString();
     default:
         return QString();
     }
@@ -54,6 +68,8 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
 
     switch(index.column())
     {
+    case NumberColumn:
+        return index.row();
     case IdColumn:
         return value.id;
     case TypeColumn:
@@ -62,8 +78,12 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
         return value.getDefaultState();
     case NameColumn:
         return value.getName();
-    case AutoResetColumn:
-        return value.autoResetTimeoutMs;
+    case ActionColumn:
+        return actionFor(value);
+    case DurationColumn:
+        if (actionFor(value) == Impulse)
+            return value.autoResetTimeoutMs;
+        return QVariant();
     default:
         return QVariant();
     }
@@ -76,7 +96,6 @@ QVariant QnIOPortsViewModel::data(const QModelIndex &index, int role) const
         return QVariant();
     if (static_cast<size_t>(index.row()) >= m_data.size())
         return false;
-
 
     switch(role)
     {
@@ -122,10 +141,16 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
     switch(index.column())
     {
     case IdColumn:
+    case NumberColumn:
         return false; // doesn't allowed
+
     case TypeColumn:
-        ioPort.portType= (Qn::IOPortType) value.toInt();
-        break;
+    {
+        ioPort.portType = static_cast<Qn::IOPortType>(value.toInt());
+        emit dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
+        return true;
+    }
+
     case DefaultStateColumn:
         switch (ioPort.portType)
         {
@@ -152,12 +177,36 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
             return false;
         }
         break;
-    case AutoResetColumn:
-        ioPort.autoResetTimeoutMs = value.toInt();
+
+    case ActionColumn:
+    {
+        const auto newAction = static_cast<Action>(value.toInt());
+        if (ioPort.portType != Qn::PT_Output || actionFor(ioPort) == newAction)
+            return false;
+        static const int kDefaultDurationMs = 1000;
+        ioPort.autoResetTimeoutMs = (newAction == Impulse ? kDefaultDurationMs : 0);
+        const auto durationIndex = index.sibling(index.row(), DurationColumn);
+        emit dataChanged(durationIndex, durationIndex);
         break;
+    }
+
+    case DurationColumn:
+    {
+        if (ioPort.portType != Qn::PT_Output)
+            return false;
+        const auto oldAction = actionFor(ioPort);
+        ioPort.autoResetTimeoutMs = value.toInt();
+        if (actionFor(ioPort) == oldAction)
+            break;
+        const auto actionIndex = index.sibling(index.row(), ActionColumn);
+        emit dataChanged(actionIndex, actionIndex);
+        break;
+    }
+
     default:
         return false;
     }
+
     emit dataChanged(index, index);
     return true;
 }
@@ -166,11 +215,13 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
-        case IdColumn:           return tr("#");
+        case NumberColumn:       return lit("#");
+        case IdColumn:           return tr("ID");
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");
         case NameColumn:         return tr("Name");
-        case AutoResetColumn:    return tr("Pulse time(ms)");
+        case ActionColumn:       return tr("On click");
+        case DurationColumn:     return tr("Duration");
         default:
             break;
         }
@@ -187,6 +238,7 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
 
     switch (index.column())
     {
+        case NumberColumn:
         case IdColumn:
             break;
         case TypeColumn:
@@ -198,8 +250,12 @@ Qt::ItemFlags QnIOPortsViewModel::flags(const QModelIndex &index) const
             if (value.portType != Qn::PT_Disabled)
                 flags |= Qt::ItemIsEditable;
             break;
-        case AutoResetColumn:
+        case ActionColumn:
             if (value.portType == Qn::PT_Output)
+                flags |= Qt::ItemIsEditable;
+            break;
+        case DurationColumn:
+            if (actionFor(value) == Impulse)
                 flags |= Qt::ItemIsEditable;
             break;
     }
@@ -214,12 +270,14 @@ bool QnIOPortsViewModel::isDisabledData(const QModelIndex &index) const
 
     switch (index.column())
     {
+    case NumberColumn:
     case IdColumn:
     case TypeColumn:
     case DefaultStateColumn:
     case NameColumn:
         return value.portType == Qn::PT_Disabled;
-    case AutoResetColumn:
+    case ActionColumn:
+    case DurationColumn:
         return value.portType != Qn::PT_Output;
     }
     return false;
@@ -278,3 +336,18 @@ QString QnIOPortsViewModel::stateToString(Qn::IODefaultState state)
     NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
     return tr("Invalid state", "IO Port State");
 }
+
+QString QnIOPortsViewModel::actionToString(Action action)
+{
+    switch (action)
+    {
+        case ToggleState:
+            return tr("Toggle state", "IO Output Port Action");
+
+        case Impulse:
+           return tr("Impulse", "IO Output Port Action");
+    }
+
+    return QString();
+}
+

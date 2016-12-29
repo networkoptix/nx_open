@@ -19,7 +19,7 @@ namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
-UDPServer::UDPServer(const MessageDispatcher* dispatcher)
+UdpServer::UdpServer(const MessageDispatcher* dispatcher)
 :
     m_messagePipeline(this),
     m_boundToLocalAddress(false),
@@ -27,23 +27,23 @@ UDPServer::UDPServer(const MessageDispatcher* dispatcher)
 {
 }
 
-UDPServer::~UDPServer()
+UdpServer::~UdpServer()
 {
     pleaseStopSync();
 }
 
-void UDPServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void UdpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_messagePipeline.pleaseStop(std::move(handler));
 }
 
-bool UDPServer::bind(const SocketAddress& localAddress)
+bool UdpServer::bind(const SocketAddress& localAddress)
 {
     m_boundToLocalAddress = true;
     return m_messagePipeline.bind(localAddress);
 }
 
-bool UDPServer::listen()
+bool UdpServer::listen()
 {
     if (!m_boundToLocalAddress)
     {
@@ -55,12 +55,12 @@ bool UDPServer::listen()
     return true;
 }
 
-SocketAddress UDPServer::address() const
+SocketAddress UdpServer::address() const
 {
     return m_messagePipeline.address();
 }
 
-void UDPServer::sendMessage(
+void UdpServer::sendMessage(
     SocketAddress destinationEndpoint,
     const Message& message,
     utils::MoveOnlyFunc<void(SystemError::ErrorCode)> completionHandler)
@@ -75,19 +75,19 @@ void UDPServer::sendMessage(
         });
 }
 
-const std::unique_ptr<network::UDPSocket>& UDPServer::socket()
+const std::unique_ptr<network::UDPSocket>& UdpServer::socket()
 {
     return m_messagePipeline.socket();
 }
 
-void UDPServer::messageReceived(SocketAddress sourceAddress, Message mesage)
+void UdpServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
     m_dispatcher->dispatchRequest(
         std::make_shared<UDPMessageResponseSender>(this, std::move(sourceAddress)),
         std::move(mesage));
 }
 
-void UDPServer::ioFailure(SystemError::ErrorCode)
+void UdpServer::ioFailure(SystemError::ErrorCode)
 {
     //TODO #ak
 }

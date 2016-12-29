@@ -75,6 +75,8 @@ protected:
 
     void prepare()
     {
+        MSSettings::initializeROSettings();
+
         this->ftpStorageUrl = config.ftpUrl;
         this->smbStorageUrl = config.smbUrl;
 

@@ -17,7 +17,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class Connection:
     public api::Connection,
@@ -25,7 +25,7 @@ class Connection:
 {
 public:
     Connection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
 
     //!Implemetation of api::Connection::getAccountManager
     virtual api::AccountManager* accountManager() override;
@@ -61,7 +61,7 @@ private:
     std::unique_ptr<MaintenanceManager> m_maintenanceManager;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

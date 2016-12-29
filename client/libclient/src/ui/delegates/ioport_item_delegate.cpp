@@ -1,181 +1,248 @@
 #include "ioport_item_delegate.h"
 
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QLayout>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QComboBox>
-#include <core/resource/resource.h>
-#include <ui/style/globals.h>
-#include "ui/models/ioports_view_model.h"
+#include <QtWidgets/QDoubleSpinBox>
+
+#include <client/client_globals.h>
+
+#include <text/time_strings.h>
+
+#include <ui/style/helper.h>
+#include <ui/models/ioports_view_model.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
 
-static const int kColumnSizeExtendPx = 20;
+inline qreal secondsFromMs(int ms) { return ms / 1000.0; }
+inline int secondsToMs(int seconds) { return qRound(seconds * 1000.0); }
 
-}
+} // namespace
 
-
-///////////////////////////////////////////////////////////////////////////////////////
-//---------------- QnIOPortItemDelegate ---------------------------------------//
-///////////////////////////////////////////////////////////////////////////////////////
-QnIOPortItemDelegate::QnIOPortItemDelegate(QObject *parent):
-    base_type(parent)
-    //QnWorkbenchContextAware(parent)
+QWidget* QnIoPortItemDelegate::createWidget(
+    QAbstractItemModel* model, const QModelIndex& index, QWidget* parent) const
 {
-}
+    if (index.column() > QnIOPortsViewModel::TypeColumn && index.data(Qn::DisabledRole).toBool())
+        return nullptr;
 
-QnIOPortItemDelegate::~QnIOPortItemDelegate() {
-
-}
-
-void QnIOPortItemDelegate::initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const
-{
-    base_type::initStyleOption(option, index);
-    if (index.data(Qn::DisabledRole).toBool()) {
-        if (QStyleOptionViewItemV4 *vopt = qstyleoption_cast<QStyleOptionViewItemV4 *>(option)) {
-            vopt->state &= ~QStyle::State_Enabled;
-        }
-        option->palette.setColor(QPalette::Highlight, qnGlobals->businessRuleDisabledHighlightColor());
-    }
-}
-
-void QnIOPortItemDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
-{
-    if (index.column() == QnIOPortsViewModel::NameColumn)
-        base_type::updateEditorGeometry(editor, option, index);
-    else
-        editor->setGeometry(option.rect);
-}
-
-QWidget* QnIOPortItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem& option, const QModelIndex &index) const
-{
-    Q_UNUSED(option)
-    Q_UNUSED(parent)
-
-    QnIOPortData ioPort = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
     switch (index.column())
     {
+        case QnIOPortsViewModel::NumberColumn:
+        case QnIOPortsViewModel::IdColumn:
+            return base_type::createWidget(model, index, parent);
+
         case QnIOPortsViewModel::TypeColumn:
-        {
-            QComboBox* comboBox = new QComboBox(parent);
-            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Disabled))
-                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Disabled), Qn::PT_Disabled);
-            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Input))
-                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Input), Qn::PT_Input);
-            if (ioPort.supportedPortTypes.testFlag(Qn::PT_Output))
-                comboBox->addItem(QnIOPortsViewModel::portTypeToString(Qn::PT_Output), Qn::PT_Output);
-            return comboBox;
-        }
         case QnIOPortsViewModel::DefaultStateColumn:
+        case QnIOPortsViewModel::ActionColumn:
         {
-            QComboBox* comboBox = new QComboBox(parent);
-            comboBox->addItem(QnIOPortsViewModel::stateToString(Qn::IO_OpenCircuit), Qn::IO_OpenCircuit);
-            comboBox->addItem(QnIOPortsViewModel::stateToString(Qn::IO_GroundedCircuit), Qn::IO_GroundedCircuit);
-            return comboBox;
-        }
-        case QnIOPortsViewModel::NameColumn:
+            if (index.flags().testFlag(Qt::ItemIsEditable))
             {
-                QLineEdit* lineEdit = new QLineEdit(parent);
+                auto comboBox = new QComboBox(parent);
+                comboBox->setEditable(false);
+
+                switch (index.column())
+                {
+                    case QnIOPortsViewModel::TypeColumn:
+                    {
+                        QnIOPortData data = index.data(Qn::IOPortDataRole).value<QnIOPortData>();
+                        if (data.supportedPortTypes.testFlag(Qn::PT_Disabled))
+                        {
+                            comboBox->addItem(QnIOPortsViewModel::portTypeToString(
+                                Qn::PT_Disabled), Qn::PT_Disabled);
+                        }
+                        if (data.supportedPortTypes.testFlag(Qn::PT_Input))
+                        {
+                            comboBox->addItem(QnIOPortsViewModel::portTypeToString(
+                                Qn::PT_Input), Qn::PT_Input);
+                        }
+                        if (data.supportedPortTypes.testFlag(Qn::PT_Output))
+                        {
+                            comboBox->addItem(QnIOPortsViewModel::portTypeToString(
+                                Qn::PT_Output), Qn::PT_Output);
+                        }
+                        break;
+                    }
+
+                    case QnIOPortsViewModel::DefaultStateColumn:
+                    {
+                        comboBox->addItem(QnIOPortsViewModel::stateToString(
+                            Qn::IO_OpenCircuit), Qn::IO_OpenCircuit);
+                        comboBox->addItem(QnIOPortsViewModel::stateToString(
+                            Qn::IO_GroundedCircuit), Qn::IO_GroundedCircuit);
+                        break;
+                    }
+
+                    case QnIOPortsViewModel::ActionColumn:
+                    {
+                        comboBox->addItem(QnIOPortsViewModel::actionToString(
+                            QnIOPortsViewModel::ToggleState), QnIOPortsViewModel::ToggleState);
+                        comboBox->addItem(QnIOPortsViewModel::actionToString(
+                            QnIOPortsViewModel::Impulse), QnIOPortsViewModel::Impulse);
+                        break;
+                    }
+
+                    default:
+                    {
+                        NX_ASSERT(false); //< should never ever get here
+                        break;
+                    }
+                }
+
+                auto commit =
+                    [model, comboBox](int i)
+                    {
+                        const auto index = indexForWidget(comboBox);
+
+                        if (index.isValid())
+                            model->setData(index, comboBox->itemData(i), Qt::EditRole);
+                    };
+
+                connect(comboBox, QnComboboxCurrentIndexChanged, comboBox, commit);
+                return comboBox;
+            }
+            else
+            {
+                if (index.column() == QnIOPortsViewModel::ActionColumn)
+                    return nullptr;
+
+                auto lineEdit = new QLineEdit(parent);
+                lineEdit->setReadOnly(true);
                 return lineEdit;
             }
-        case QnIOPortsViewModel::AutoResetColumn:
+        }
+
+        case QnIOPortsViewModel::NameColumn:
         {
-            QSpinBox* spinBox = new QSpinBox(parent);
-            spinBox->setMinimum(0);
-            spinBox->setMaximum(999999);
+            auto lineEdit = new QLineEdit(parent);
+            auto commit =
+                [model, lineEdit](const QString& text)
+                {
+                    const auto index = indexForWidget(lineEdit);
+
+                    if (index.isValid())
+                        model->setData(index, text, Qt::EditRole);
+                };
+
+            connect(lineEdit, &QLineEdit::textChanged, lineEdit, commit);
+            return lineEdit;
+        }
+
+        case QnIOPortsViewModel::DurationColumn:
+        {
+            if (!index.flags().testFlag(Qt::ItemIsEditable))
+                return nullptr;
+
+            auto spinBox = new QDoubleSpinBox(parent);
+            spinBox->setDecimals(1);
+            spinBox->setRange(0.1, 99999.9); //< some sensible range in seconds
+            spinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+
+            auto commit =
+                [model, spinBox](double value)
+                {
+                    const auto index = indexForWidget(spinBox);
+
+                    if (index.isValid())
+                        model->setData(index, secondsToMs(value), Qt::EditRole);
+                };
+
+            connect(spinBox, QnSpinboxDoubleValueChanged, spinBox, commit);
             return spinBox;
         }
-    default:
-        break;
     }
 
-    return base_type::createEditor(parent, option, index);
+    return nullptr;
 }
 
-
-void QnIOPortItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const {
-    switch (index.column()) {
-        case QnIOPortsViewModel::TypeColumn:
-        case QnIOPortsViewModel::DefaultStateColumn:
-        {
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor)) {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
-                connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
-            }
-            return;
-        }
-        case QnIOPortsViewModel::NameColumn:
-        {
-            if (QLineEdit* lineEdit = dynamic_cast<QLineEdit *>(editor)) {
-                lineEdit->setText(index.data(Qt::EditRole).toString());
-                connect(lineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_editor_commit()));
-            }
-            return;
-        }
-        case QnIOPortsViewModel::AutoResetColumn:
-        {
-            if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor)) {
-                spinBox->setValue(index.data(Qt::EditRole).toInt());
-                connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(at_editor_commit()));
-            }
-            return;
-        }
-        default:
-            break;
-    }
-
-    base_type::setEditorData(editor, index);
-}
-
-void QnIOPortItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+bool QnIoPortItemDelegate::updateWidget(QWidget* widget, const QModelIndex& index) const
 {
+    if (index.column() > QnIOPortsViewModel::TypeColumn && index.data(Qn::DisabledRole).toBool())
+        return false;
+
+    if (base_type::updateWidget(widget, index))
+        return true;
+
     switch (index.column())
     {
+        case QnIOPortsViewModel::NumberColumn:
+        case QnIOPortsViewModel::IdColumn:
+            return false; //< should have been handled by base_type
+
         case QnIOPortsViewModel::TypeColumn:
         case QnIOPortsViewModel::DefaultStateColumn:
+        case QnIOPortsViewModel::ActionColumn:
         {
-            if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
-                model->setData(index, comboBox->itemData(comboBox->currentIndex()));
-            return;
-        }
-        case QnIOPortsViewModel::NameColumn:
-            if (QLineEdit* lineEdit = dynamic_cast<QLineEdit *>(editor))
-                model->setData(index, lineEdit->text());
-            return;
-        case QnIOPortsViewModel::AutoResetColumn:
+            if (index.flags().testFlag(Qt::ItemIsEditable))
             {
-                if (QSpinBox* spinBox = dynamic_cast<QSpinBox *>(editor))
-                    model->setData(index, spinBox->value());
-                return;
+                auto comboBox = qobject_cast<QComboBox*>(widget);
+                if (!comboBox)
+                    return false;
+
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
+                return true;
             }
-        default:
-            break;
+            else
+            {
+                if (index.column() == QnIOPortsViewModel::ActionColumn)
+                    return !widget; //< should delete if widget exists
+
+                auto lineEdit = qobject_cast<QLineEdit*>(widget);
+                if (!lineEdit)
+                    return false;
+
+                lineEdit->setReadOnly(true);
+                lineEdit->setText(index.data(Qt::DisplayRole).toString());
+                return true;
+            }
+        }
+
+        case QnIOPortsViewModel::NameColumn:
+        {
+            auto lineEdit = qobject_cast<QLineEdit*>(widget);
+            if (!lineEdit)
+                return false;
+
+            const auto newText = index.data(Qt::EditRole).toString();
+            if (lineEdit->text() != newText)
+                lineEdit->setText(newText);
+
+            lineEdit->setReadOnly(!index.flags().testFlag(Qt::ItemIsEditable));
+            return true;
+        }
+
+        case QnIOPortsViewModel::DurationColumn:
+        {
+            if (!index.flags().testFlag(Qt::ItemIsEditable))
+                return !widget; //< should delete if widget exists
+
+            auto spinBox = qobject_cast<QDoubleSpinBox*>(widget);
+            if (!spinBox)
+                return false;
+
+            auto newValue = secondsFromMs(index.data(Qt::EditRole).toInt());
+            if (!qFuzzyIsNull(spinBox->value() - newValue))
+                spinBox->setValue(newValue);
+
+            return true;
+        }
     }
-    base_type::setModelData(editor, model, index);
+
+    return true;
 }
 
-QSize QnIOPortItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize QnIoPortItemDelegate::sizeHint(QWidget* widget, const QModelIndex& index) const
 {
-    QSize result = base_type::sizeHint(option, index);
-    result.setWidth(result.width() + kColumnSizeExtendPx);
+    auto size = base_type::sizeHint(widget, index);
+    auto lineEdit = qobject_cast<QLineEdit*>(widget);
 
-    if (index.isValid() && index.model() && index.model()->flags(index).testFlag(Qt::ItemIsEditable))
-    {
-        QScopedPointer<QWidget> editor(createEditor(nullptr, option, index));
-        QSize editorHint = editor->sizeHint();
-        result.setWidth(std::max(result.width(), editorHint.width()));
-    }
+    if (!lineEdit || !lineEdit->isReadOnly())
+        return size;
 
-    return result;
-}
+    //TODO: Currently we rely on this assumption of how our style lays out LineEdit contents.
+    static const int kFrameWidth = 1;
+    size.setWidth(lineEdit->fontMetrics().width(lineEdit->text())
+        + (style::Metrics::kStandardPadding + kFrameWidth) * 2);
 
-bool QnIOPortItemDelegate::eventFilter(QObject *object, QEvent *event) {
-    QComboBox *editor = qobject_cast<QComboBox*>(object);
-    if (editor && event->type() == QEvent::FocusOut)
-        return false;
-    return base_type::eventFilter(object, event);
-}
-
-void QnIOPortItemDelegate::at_editor_commit() {
-    if (QWidget* w = dynamic_cast<QWidget*> (sender()))
-        emit commitData(w);
+    return size;
 }

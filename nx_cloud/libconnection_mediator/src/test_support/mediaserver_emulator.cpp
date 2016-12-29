@@ -73,11 +73,11 @@ MediaServerEmulator::MediaServerEmulator(
     nx::String serverName)
 :
     m_mediatorConnector(std::make_unique<hpm::api::MediatorConnector>()),
-    m_httpServer(
+    m_httpServer(std::make_unique<nx_http::HttpStreamSocketServer>(
         nullptr,
         &m_httpMessageDispatcher,
         false,
-        nx::network::NatTraversalSupport::disabled),
+        nx::network::NatTraversalSupport::disabled)),
     m_systemData(std::move(systemData)),
     m_serverId(
         serverName.isEmpty()
@@ -102,8 +102,7 @@ MediaServerEmulator::MediaServerEmulator(
                 m_serverIdForModuleInformation);
         });
 
-    m_mediatorUdpClient->socket()->bindToAioThread(m_timer.getAioThread());
-    m_mediatorConnector->bindToAioThread(m_timer.getAioThread());
+    bindToAioThread(getAioThread());
 
     m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));
 
@@ -116,26 +115,42 @@ MediaServerEmulator::MediaServerEmulator(
 
 MediaServerEmulator::~MediaServerEmulator()
 {
-    if (m_mediatorConnector)
-    {
-        m_mediatorConnector->pleaseStopSync();
-        m_mediatorConnector.reset();
-    }
-
     pleaseStopSync();
-    m_httpServer.pleaseStop();
+    m_httpServer.reset();
+}
+
+void MediaServerEmulator::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+{
+    network::aio::BasicPollable::bindToAioThread(aioThread);
+
+    if (m_serverClient)
+        m_serverClient->bindToAioThread(aioThread);
+    if (m_mediatorAddressPublisher)
+        m_mediatorAddressPublisher->bindToAioThread(aioThread);
+    if (m_stunPipeline)
+        m_stunPipeline->bindToAioThread(aioThread);
+    if (m_udtStreamSocket)
+        m_udtStreamSocket->bindToAioThread(aioThread);
+    if (m_udtStreamServerSocket)
+        m_udtStreamServerSocket->bindToAioThread(aioThread);
+    if (m_httpServer)
+        m_httpServer->bindToAioThread(aioThread);
+    if (m_mediatorUdpClient)
+        m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+    if (m_mediatorConnector)
+        m_mediatorConnector->bindToAioThread(aioThread);
 }
 
 bool MediaServerEmulator::start(bool listenToConnectRequests)
 {
-    if (!m_httpServer.bind(SocketAddress(HostAddress::localhost, 0)) ||
-        !m_httpServer.listen())
+    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)) ||
+        !m_httpServer->listen())
     {
         return false;
     }
 
     m_serverClient = m_mediatorConnector->systemConnection();
-    m_serverClient->bindToAioThread(m_timer.getAioThread());
+    m_serverClient->bindToAioThread(getAioThread());
     if (listenToConnectRequests)
     {
         using namespace std::placeholders;
@@ -144,7 +159,7 @@ bool MediaServerEmulator::start(bool listenToConnectRequests)
     }
 
     auto client = m_mediatorConnector->systemConnection();
-    client->bindToAioThread(m_timer.getAioThread());
+    client->bindToAioThread(getAioThread());
     m_mediatorAddressPublisher = std::make_unique<network::cloud::MediatorAddressPublisher>(
         std::move(client));
 
@@ -168,7 +183,7 @@ nx::String MediaServerEmulator::fullName() const
 
 SocketAddress MediaServerEmulator::endpoint() const
 {
-    return m_httpServer.address();
+    return m_httpServer->address();
 }
 
 nx::hpm::api::ResultCode MediaServerEmulator::bind()
@@ -276,6 +291,7 @@ void MediaServerEmulator::onConnectionRequested(
         }
     }
 
+    NX_ASSERT(m_mediatorUdpClient);
     m_mediatorUdpClient->connectionAck(
         std::move(connectionAckData),
         std::bind(&MediaServerEmulator::onConnectionAckResponseReceived, this, _1));
@@ -302,7 +318,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
 
     //connecting to the originating peer
     auto udtStreamSocket = std::make_unique<nx::network::UdtStreamSocket>(AF_INET);
-    udtStreamSocket->bindToAioThread(m_timer.getAioThread());
+    udtStreamSocket->bindToAioThread(getAioThread());
     auto mediatorUdpClientSocket = m_mediatorUdpClient->takeSocket();
     m_mediatorUdpClient.reset();
     if (!udtStreamSocket->bindToUdpSocket(std::move(*mediatorUdpClientSocket)) ||
@@ -313,7 +329,7 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     }
 
     auto udtStreamServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>(AF_INET);
-    udtStreamServerSocket->bindToAioThread(m_timer.getAioThread());
+    udtStreamServerSocket->bindToAioThread(getAioThread());
     if (!udtStreamServerSocket->setReuseAddrFlag(true) ||
         !udtStreamServerSocket->bind(udtStreamSocket->getLocalAddress()) ||
         !udtStreamServerSocket->setNonBlockingMode(true))
@@ -340,6 +356,7 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
     m_stunPipeline = std::make_unique<stun::MessagePipeline>(
         this,
         std::move(m_udtStreamSocket));
+    m_stunPipeline->bindToAioThread(getAioThread());
     m_udtStreamSocket.reset();
     using namespace std::placeholders;
     m_stunPipeline->setMessageHandler(
@@ -403,21 +420,18 @@ void MediaServerEmulator::closeConnection(
     NX_ASSERT(connection == m_stunPipeline.get());
 }
 
-void MediaServerEmulator::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void MediaServerEmulator::stopWhileInAioThread()
 {
-    m_timer.pleaseStop(
-        [this, completionHandler = move(completionHandler)]() mutable
-        {
-            m_mediatorUdpClient.reset();
-            m_serverClient.reset();
-            m_mediatorAddressPublisher.reset();
-            m_stunPipeline.reset();
-            m_udtStreamSocket.reset();
-            m_udtStreamServerSocket.reset();
+    m_mediatorUdpClient.reset();
+    m_serverClient.reset();
+    m_mediatorAddressPublisher.reset();
+    m_stunPipeline.reset();
+    m_udtStreamSocket.reset();
+    m_udtStreamServerSocket.reset();
 
-            completionHandler();
-        });
+    // NOTE: m_httpServer does not support non-blocking destruction
+    m_httpServer->pleaseStop();
 }
 
-}   //hpm
-}   //nx
+} // namespace hpm
+} // namespace nx

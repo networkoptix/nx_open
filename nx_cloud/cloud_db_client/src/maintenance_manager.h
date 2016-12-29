@@ -7,19 +7,19 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 class MaintenanceManager:
     public api::MaintenanceManager,
     public AsyncRequestsExecutor
 {
 public:
-    MaintenanceManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndpointFetcher);
+    MaintenanceManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndpointFetcher);
 
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) override;
 };
 
-} // namespace cl
+} // namespace client
 } // namespace cdb
 } // namespace nx

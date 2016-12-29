@@ -13,13 +13,10 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-ConnectionFactory::ConnectionFactory()
-:
-    m_endPointFetcher(
-        "cdb",
-        std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
+ConnectionFactory::ConnectionFactory():
+    m_endPointFetcher(std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
 {
 }
 
@@ -73,6 +70,6 @@ void ConnectionFactory::setCloudUrl(const std::string& url)
     m_endPointFetcher.setUrl(QUrl(QString::fromStdString(url)));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

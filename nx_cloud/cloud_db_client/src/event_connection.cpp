@@ -5,7 +5,7 @@
 
 #include "event_connection.h"
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <http/custom_headers.h>
@@ -19,13 +19,13 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 EventConnection::EventConnection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
     m_cdbEndPointFetcher(
-        std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+        std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             endPointFetcher)),
     m_reconnectTimer(network::RetryPolicy(
         network::RetryPolicy::kInfiniteRetries,
@@ -284,6 +284,6 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
     //TODO #ak reporting event
 }
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

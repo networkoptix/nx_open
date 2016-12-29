@@ -29,43 +29,39 @@ QString MSSettings::defaultROSettingsFilePath()
 }
 
 static std::unique_ptr<QSettings> roSettingsInstance;
-static std::once_flag roSettings_onceFlag;
 
 void MSSettings::initializeROSettingsFromConfFile( const QString& fileName )
 {
-    std::call_once(
-        roSettings_onceFlag,
-        [fileName](){ roSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) ); } );
+    roSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) );
+}
+
+void MSSettings::initializeROSettings()
+{
+#ifndef _WIN32
+    QFileInfo defaultFileInfo(defaultConfigFileName);
+    if (!defaultFileInfo.exists())
+    {
+        QFileInfo templateInfo(templateConfigFileName);
+        if (templateInfo.exists())
+        {
+            QFile file(templateConfigFileName);
+            file.rename(defaultConfigFileName);
+        }
+    }
+#endif
+    roSettingsInstance.reset(new QSettings(
+#ifndef _WIN32
+        defaultConfigFileName, QSettings::IniFormat
+#else
+        QSettings::SystemScope,
+        QnAppInfo::organizationName(),
+        QnServerAppInfo::applicationName()
+#endif
+    ));
 }
 
 QSettings* MSSettings::roSettings()
 {
-    std::call_once(
-        roSettings_onceFlag,
-        [](){
-#ifndef _WIN32
-            QFileInfo defaultFileInfo(defaultConfigFileName);
-            if (!defaultFileInfo.exists())
-            {
-                QFileInfo templateInfo(templateConfigFileName);
-                if (templateInfo.exists())
-                {
-                    QFile file(templateConfigFileName);
-                    file.rename(defaultConfigFileName);
-                }
-            }
-#endif
-            roSettingsInstance.reset( new QSettings(
-#ifndef _WIN32
-                defaultConfigFileName, QSettings::IniFormat
-#else
-                QSettings::SystemScope,
-                QnAppInfo::organizationName(),
-                QnServerAppInfo::applicationName()
-#endif
-            ) );
-        } );
-
     return roSettingsInstance.get();
 }
 
@@ -79,28 +75,24 @@ QString MSSettings::defaultRunTimeSettingsFilePath()
 }
 
 static std::unique_ptr<QSettings> rwSettingsInstance;
-static std::once_flag rwSettings_onceFlag;
 
 void MSSettings::initializeRunTimeSettingsFromConfFile( const QString& fileName )
 {
-    std::call_once(
-        rwSettings_onceFlag,
-        [fileName](){ rwSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) ); } );
+    rwSettingsInstance.reset( new QSettings( fileName, QSettings::IniFormat ) );
+}
+
+void MSSettings::initializeRunTimeSettings()
+{
+    rwSettingsInstance.reset(new QSettings(
+#ifndef _WIN32
+        defaultConfigFileNameRunTime, QSettings::IniFormat
+#else
+        QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
+#endif
+    ));
 }
 
 QSettings* MSSettings::runTimeSettings()
 {
-    std::call_once(
-        rwSettings_onceFlag,
-        [](){
-            rwSettingsInstance.reset( new QSettings(
-#ifndef _WIN32
-                defaultConfigFileNameRunTime, QSettings::IniFormat
-#else
-                QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
-#endif
-            ) );
-        } );
-
     return rwSettingsInstance.get();
 }

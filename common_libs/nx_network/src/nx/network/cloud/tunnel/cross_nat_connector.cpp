@@ -183,15 +183,18 @@ void CrossNatConnector::issueConnectRequestToMediator(
     using namespace std::placeholders;
     m_mediatorUdpClient->connect(
         prepareConnectRequest(),
-        std::bind(&CrossNatConnector::onConnectResponse, this, _1, _2));
+        std::bind(&CrossNatConnector::onConnectResponse, this, _1, _2, _3));
 }
 
 void CrossNatConnector::onConnectResponse(
+    stun::TransportHeader stunTransportHeader,
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
     if (m_done)
         return;
+
+    m_mediatorAddress = stunTransportHeader.locationEndpoint;
 
     m_timer->cancelSync();
 

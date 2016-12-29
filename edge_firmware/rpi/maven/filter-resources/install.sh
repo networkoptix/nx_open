@@ -16,7 +16,7 @@ exec 2>&1
 
 echo "Starting upgrade ..."
 COMPANY_NAME=${deb.customization.company.name}
-export DISTRIB=${final.artifact.name}-server
+export DISTRIB=${artifact.name.server}
 
 update () {
   cp $DISTRIB.tar.gz /tmp

@@ -10,6 +10,9 @@ struct QnModuleInformation;
 
 namespace helpers {
 
+static const QString kFactorySystemUser = lit("admin");
+static const QString kFactorySystemPassword = lit("admin");
+
 /*
 * Extracts system id. Result is:
 * - identifier of server if it is in "new state"

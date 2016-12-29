@@ -9,7 +9,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
@@ -21,13 +21,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class CloudModuleEndPointFetcher;
+class CloudModuleUrlFetcher;
 
 }   //namespace cloud
 }   //namespace network
 
 namespace cdb {
-namespace cl {
+namespace client {
 
 class EventConnection:
     public QObject,
@@ -35,7 +35,7 @@ class EventConnection:
 {
 public:
     EventConnection(
-        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher);
+        network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
         virtual ~EventConnection();
 
     virtual void start(
@@ -52,7 +52,7 @@ private:
         failed
     };
 
-    std::unique_ptr<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>
+    std::unique_ptr<network::cloud::CloudModuleUrlFetcher::ScopedOperation>
         m_cdbEndPointFetcher;
     nx_http::AuthInfo m_auth;
     nx_http::AsyncHttpClientPtr m_httpClient;
@@ -82,6 +82,6 @@ private slots:
     void onReceivingSerializedEvent(QByteArray serializedEvent);
 };
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

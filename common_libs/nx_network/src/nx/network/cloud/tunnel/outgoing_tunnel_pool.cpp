@@ -13,8 +13,7 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-OutgoingTunnelPool::OutgoingTunnelPool()
-:
+OutgoingTunnelPool::OutgoingTunnelPool():
     m_isOwnPeerIdAssigned(false),
     m_ownPeerId(QnUuid::createUuid().toSimpleString().toUtf8()),
     m_terminated(false),
@@ -38,7 +37,7 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
             tunnelsStopped(std::move(completionHandler));
         });
     for (const auto& tunnel: m_pool)
-        tunnel.second->pleaseStop(tunnelsStoppedFuture.fork());
+        tunnel.second.tunnel->pleaseStop(tunnelsStoppedFuture.fork());
 }
 
 void OutgoingTunnelPool::establishNewConnection(
@@ -47,13 +46,26 @@ void OutgoingTunnelPool::establishNewConnection(
     SocketAttributes socketAttributes,
     OutgoingTunnel::NewConnectionHandler handler)
 {
+    using namespace std::placeholders;
+
     QnMutexLocker lock(&m_mutex);
 
-    const auto& tunnel = getTunnel(targetHostAddress);
-    tunnel->establishNewConnection(
+    auto& tunnelContext = getTunnel(targetHostAddress);
+    tunnelContext.handlers.push_back(std::move(handler));
+    
+    tunnelContext.tunnel->establishNewConnection(
         std::move(timeout),
         std::move(socketAttributes),
-        std::move(handler));
+        [this, tunnelContextPtr = &tunnelContext, handlerIter = --tunnelContext.handlers.end()](
+            SystemError::ErrorCode sysErrorCode,
+            std::unique_ptr<AbstractStreamSocket> connection)
+        {
+            reportConnectionResult(
+                sysErrorCode,
+                std::move(connection),
+                tunnelContextPtr,
+                handlerIter);
+        });
 }
 
 String OutgoingTunnelPool::ownPeerId() const
@@ -82,12 +94,17 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
 
-const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
-    const AddressEntry& targetHostAddress)
+OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
+{
+    return m_onTunnelClosedSubscription;
+}
+
+OutgoingTunnelPool::TunnelContext& 
+    OutgoingTunnelPool::getTunnel(const AddressEntry& targetHostAddress)
 {
     const auto iterAndInsertionResult = m_pool.emplace(
         targetHostAddress.host.toString(),
-        std::unique_ptr<OutgoingTunnel>());
+        TunnelContext());
     if (!iterAndInsertionResult.second)
         return iterAndInsertionResult.first->second;
 
@@ -100,33 +117,63 @@ const std::unique_ptr<OutgoingTunnel>& OutgoingTunnelPool::getTunnel(
     tunnel->setOnClosedHandler(
         std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
-    iterAndInsertionResult.first->second = std::move(tunnel);
+    iterAndInsertionResult.first->second.tunnel = std::move(tunnel);
     return iterAndInsertionResult.first->second;
+}
+
+void OutgoingTunnelPool::reportConnectionResult(
+    SystemError::ErrorCode sysErrorCode,
+    std::unique_ptr<AbstractStreamSocket> connection,
+    TunnelContext* tunnelContext,
+    std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter)
+{
+    OutgoingTunnel::NewConnectionHandler userHandler;
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        userHandler.swap(*handlerIter);
+        tunnelContext->handlers.erase(handlerIter);
+    }
+
+    userHandler(sysErrorCode, std::move(connection));
 }
 
 void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 {
-    QnMutexLocker lk(&m_mutex);
-    TunnelDictionary::iterator tunnelIter = m_pool.end();
-    for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
+    std::list<OutgoingTunnel::NewConnectionHandler> userHandlers;
+    std::unique_ptr<OutgoingTunnel> tunnel;
+    QString remoteHostName;
+
     {
-        if (it->second.get() == tunnelPtr)
+        QnMutexLocker lk(&m_mutex);
+
+        TunnelDictionary::iterator tunnelIter = m_pool.end();
+        for (auto it = m_pool.begin(); it != m_pool.end(); ++it)
         {
-            tunnelIter = it;
-            break;
+            if (it->second.tunnel.get() == tunnelPtr)
+            {
+                tunnelIter = it;
+                break;
+            }
         }
+
+        if (m_stopping)
+            return; //tunnel is being cancelled?
+
+        NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
+        tunnel.swap(tunnelIter->second.tunnel);
+        userHandlers.swap(tunnelIter->second.handlers);
+        remoteHostName = tunnelIter->first;
+        m_pool.erase(tunnelIter);
     }
 
-    if (m_stopping)
-        return; //tunnel is being cancelled?
-
-    NX_LOGX(lm("Removing tunnel to host %1").arg(tunnelIter->first), cl_logDEBUG1);
-    auto tunnel = std::move(tunnelIter->second);
-    m_pool.erase(tunnelIter);
-    //m_aioThreadBinder.post(
-    //    [tunnel = std::move(tunnel)]() mutable { tunnel.reset(); });
-    lk.unlock();
     tunnel.reset();
+
+    // Reporting error to awaiting users.
+    for (auto& handler: userHandlers)
+        handler(SystemError::interrupted, nullptr);
+
+    m_onTunnelClosedSubscription.notify(std::move(remoteHostName));
 }
 
 void OutgoingTunnelPool::tunnelsStopped(

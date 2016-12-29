@@ -16,12 +16,26 @@ MediatorAddressPublisher::MediatorAddressPublisher(
     m_isRequestInProgress(false),
     m_mediatorConnection(std::move(mediatorConnection))
 {
+    bindToAioThread(m_mediatorConnection->getAioThread());
+
     m_mediatorConnection->setOnReconnectedHandler(
         [this]()
         {
             m_publishedAddresses.clear();
             publishAddressesIfNeeded();
         });
+}
+
+MediatorAddressPublisher::~MediatorAddressPublisher()
+{
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+}
+
+void MediatorAddressPublisher::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    BaseType::bindToAioThread(aioThread);
+    m_mediatorConnection->bindToAioThread(aioThread);
 }
 
 void MediatorAddressPublisher::setRetryInterval(std::chrono::milliseconds interval)
@@ -81,6 +95,11 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
             NX_LOGX(lm("Published addresses: %1").container(m_publishedAddresses), cl_logDEBUG1 );
             publishAddressesIfNeeded();
         });
+}
+
+void MediatorAddressPublisher::stopWhileInAioThread()
+{
+    m_mediatorConnection.reset();
 }
 
 } // namespace cloud

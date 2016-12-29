@@ -15,101 +15,82 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
-#include "nx/network/aio/abstract_pollable.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_common.h"
 #include "nx/network/socket_factory.h"
 #include "nx/network/system_socket.h"
 
-
 namespace nx {
 namespace network {
 
-/** Implement this interface to receive messages and events from \a UnreliableMessagePipeline */
+/**
+ * Implement this interface to receive messages and events from UnreliableMessagePipeline.
+ */
 template<class MessageType>
 class UnreliableMessagePipelineEventHandler
 {
 public:
     virtual ~UnreliableMessagePipelineEventHandler() {}
 
-    /** Received message from remote host */
     virtual void messageReceived(
         SocketAddress sourceAddress,
         MessageType msg) = 0;
-    /** Unrecoverable error with socket */
     virtual void ioFailure(SystemError::ErrorCode errorCode) = 0;
 };
 
-/** Pipeline for transferring messages over unreliable transport (datagram socket).
-    This is a helper class for implementing UDP server/client of message-orientied protocol.
-    Received messages are delivered to \a UnreliableMessagePipelineEventHandler<\a MessageType> instance.
-    \note All events are delivered within internal socket's aio thread
-    \note \a UnreliableMessagePipeline object can be safely freed within any event handler
-        (more generally, within internal socket's aio thread).
-        To delete it in another thread, cancel I/O with \a UnreliableMessagePipeline::pleaseStop call
+/**
+ * Pipeline for transferring messages over unreliable transport (datagram socket).
+ * This is a helper class for implementing UDP server/client of message-orientied protocol.
+ * Received messages are delivered to UnreliableMessagePipelineEventHandler<MessageType> instance.
+ * @note All events are delivered within internal socket's aio thread
+ * @note \a UnreliableMessagePipeline object can be safely freed within any event handler
+ *     (more generally, within internal socket's aio thread).
+       To delete it in another thread, cancel I/O with UnreliableMessagePipeline::pleaseStop call
  */
 template<
     class MessageType,
     class ParserType,
     class SerializerType>
-class UnreliableMessagePipeline
-:
-    public aio::AbstractPollable
+class UnreliableMessagePipeline:
+    public aio::BasicPollable
 {
     typedef UnreliableMessagePipeline<
         MessageType,
         ParserType,
         SerializerType
-    > self_type;
+    > SelfType;
+
+    using BaseType = aio::BasicPollable;
 
 public:
     typedef UnreliableMessagePipelineEventHandler<MessageType> CustomPipeline;
 
     /**
-        @param customPipeline \a UnreliableMessagePipeline does not take
-            ownership of \a customPipeline
-    */
-    UnreliableMessagePipeline(CustomPipeline* customPipeline)
-    :
+     * @param customPipeline UnreliableMessagePipeline does not take ownership of customPipeline.
+     */
+    UnreliableMessagePipeline(CustomPipeline* customPipeline):
         m_customPipeline(customPipeline),
         m_socket(std::make_unique<UDPSocket>())
     {
-        // TODO: Figure out smth more clever.
-        NX_CRITICAL(m_socket->setNonBlockingMode(true));
+        // TODO: #ak Should report this error to the caller.
+        NX_ASSERT(m_socket->setNonBlockingMode(true));
+
+        bindToAioThread(getAioThread());
     }
 
-    ~UnreliableMessagePipeline()
+    virtual ~UnreliableMessagePipeline() override
     {
-    }
-
-    /**
-        \note \a completionHandler is invoked in socket's aio thread
-    */
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
-    {
-        m_socket->pleaseStop(std::move(completionHandler));
-    }
-
-    virtual aio::AbstractAioThread* getAioThread() const override
-    {
-        return m_socket->getAioThread();
+        if (isInSelfAioThread())
+            stopWhileInAioThread();
     }
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
+        BaseType::bindToAioThread(aioThread);
+
         m_socket->bindToAioThread(aioThread);
     }
 
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_socket->post(std::move(func));
-    }
-
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_socket->dispatch(std::move(func));
-    }
-
-    /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress)
     {
         return m_socket->bind(localAddress);
@@ -121,7 +102,7 @@ public:
         m_readBuffer.resize(0);
         m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
         m_socket->recvFromAsync(
-            &m_readBuffer, std::bind(&self_type::onBytesRead, this, _1, _2, _3));
+            &m_readBuffer, std::bind(&SelfType::onBytesRead, this, _1, _2, _3));
     }
 
     SocketAddress address() const
@@ -129,7 +110,9 @@ public:
         return m_socket->getLocalAddress();
     }
 
-    /** Messages are pipelined. I.e. this method can be called before previous message has been sent */
+    /**
+     * Messages are pipelined. I.e. this method can be called before previous message has been sent.
+     */
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
@@ -164,15 +147,15 @@ public:
         return m_socket;
     }
 
-    /** Move ownership of socket to the caller.
-        \a UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
-        \note Can be called within send/recv completion handler only
-            (more specifically, within socket's aio thread)!
-    */
+    /**
+     * Move ownership of socket to the caller.
+     * UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
+     * @note Can be called within send/recv completion handler only
+     *     (more specifically, within socket's aio thread)!
+     */
     std::unique_ptr<network::UDPSocket> takeSocket()
     {
         m_terminationFlag.markAsDeleted();
-        //we MUST be in aio thread. TODO #ak add NX_ASSERT for aio thread
         m_socket->cancelIOSync(aio::etNone); 
         return std::move(m_socket);
     }
@@ -217,6 +200,11 @@ private:
     ParserType m_messageParser;
     std::deque<OutgoingMessageContext> m_sendQueue;
     nx::utils::ObjectDestructionFlag m_terminationFlag;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_socket.reset();
+    }
 
     void onBytesRead(
         SystemError::ErrorCode errorCode,
@@ -266,7 +254,7 @@ private:
         m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
         using namespace std::placeholders;
         m_socket->recvFromAsync(
-            &m_readBuffer, std::bind(&self_type::onBytesRead, this, _1, _2, _3));
+            &m_readBuffer, std::bind(&SelfType::onBytesRead, this, _1, _2, _3));
     }
 
     void sendMessageInternal(
@@ -293,7 +281,7 @@ private:
         m_socket->sendToAsync(
             msgCtx.serializedMessage,
             msgCtx.destinationEndpoint,
-            std::bind(&self_type::messageSent, this, _1, _2, _3));
+            std::bind(&SelfType::messageSent, this, _1, _2, _3));
     }
 
     void messageSent(
@@ -333,5 +321,5 @@ private:
     UnreliableMessagePipeline& operator=(const UnreliableMessagePipeline&);
 };
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx
