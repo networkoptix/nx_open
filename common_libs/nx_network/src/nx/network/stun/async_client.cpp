@@ -304,7 +304,7 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
             post(
                 [handler = std::move(handler.second)]()
                 {
-                    handler(SystemError::invalidData, {});
+                    handler(SystemError::invalidData, Message());
                 });
             continue;
         }
