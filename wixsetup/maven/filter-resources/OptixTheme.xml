@@ -10,6 +10,8 @@
   <Font Id="6" Height="-22" Weight="500" Foreground="666666">Segoe UI</Font>
   <Font Id="7" Height="-12" Weight="500" Foreground="000000">Segoe UI</Font>
   <Font Id="8" Height="-16" Weight="500" Foreground="000000">Segoe UI</Font>
+  <Font Id="10" Height="-26" Weight="700" Foreground="000000" Background="FFFFFF">Segoe UI</Font>
+  <Font Id="11" Height="-16" Weight="500" Foreground="000000" Background="FFFFFF">Segoe UI</Font>
 
 <!--  <Text X="130" Y="-45" Width="500" Height="2" FontId="5" Visible="yes"></Text> -->
   <Page Name="Help">
@@ -42,6 +44,7 @@
     <Button Name="OptionsCancelButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">Cancel</Button>
     <Button Name="OptionsOkButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">OK</Button>
   </Page>
+    <Button Name="FilesInUseCloseRadioButton" X="12" Y="-67" Width="-164" Height="23" TabStop="yes" FontId="0" HideWhenDisabled="yes" HexStyle="0x000009">#(loc.FilesInUseCloseRadioButton)</Button>
   <Page Name="Progress">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
     <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
