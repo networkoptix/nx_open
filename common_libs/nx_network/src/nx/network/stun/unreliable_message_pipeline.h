@@ -245,8 +245,10 @@ private:
             }
             else
             {
-                NX_LOGX(lm("Failed to parse UDP datagram of size %1").
-                    arg((unsigned int)bytesRead), cl_logDEBUG1);
+                NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
+                    .arg((unsigned int)bytesRead).str(sourceAddress)
+                    .str(m_socket->getLocalAddress()),
+                    cl_logDEBUG1);
             }
         }
 
