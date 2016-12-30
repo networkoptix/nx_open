@@ -250,7 +250,7 @@ void CrossNatConnector::startNatTraversing(
     // TODO: #ak sorting connectors by priority
     m_mediatorUdpClient.reset();
 
-    NX_LOGX(lm("cross-nat %1. Starting %1 connectors")
+    NX_LOGX(lm("cross-nat %1. Starting %2 connectors")
         .arg(m_connectSessionId).arg(m_connectors.size()),
         cl_logDEBUG2);
 
