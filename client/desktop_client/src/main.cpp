@@ -205,10 +205,6 @@ int main(int argc, char **argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
-#ifdef Q_OS_LINUX
-    linux_exception::installCrashSignalHandler();
-#endif
-
 #ifdef Q_OS_MAC
     mac_setLimits();
 #endif

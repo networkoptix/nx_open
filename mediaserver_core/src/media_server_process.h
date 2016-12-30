@@ -61,7 +61,6 @@ public:
     QString rwConfigFilePath;
     bool showVersion;
     bool showHelp;
-    bool disableCrashHandler;
     QString engineVersion;
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
@@ -76,8 +75,7 @@ public:
         lit("INFO")),
 #endif
         showVersion(false),
-        showHelp(false),
-        disableCrashHandler(false)
+        showHelp(false)
     {
     }
 };

@@ -1113,12 +1113,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
-#ifdef __linux__
-    commandLineParser.addParameter(&m_cmdLineArguments.disableCrashHandler, "--disable-crash-handler", NULL,
-        lit("Disables crash signal handler (linux only)"), true);
-#endif
     commandLineParser.parse(argc, argv, stderr);
-
     if (m_cmdLineArguments.showHelp)
     {
         QTextStream stream(stdout);
@@ -2119,11 +2114,6 @@ void MediaServerProcess::updateAllowedInterfaces()
 void MediaServerProcess::run()
 {
     updateAllowedInterfaces();
-
-#ifdef __linux__
-    if (!m_cmdLineArguments.disableCrashHandler)
-        linux_exception::installCrashSignalHandler();
-#endif
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
         SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);

@@ -17,7 +17,7 @@ BIN_NAME="mediaserver"
 BIN_PATH="$PREFIX/bin/$BIN_NAME"
 LOGS_PATH="/opt/$CUSTOMIZATION/mediaserver/var/log"
 LOG_OUTPUT_FLAG="$LOGS_PATH/log_output.flag"
-RUN_ARGS="-e --disable-crash-handler"
+RUN_ARGS="-e"
 SECONDS_TO_WAIT_BEFORE_KILL_9=120
 
 export VMS_PLUGIN_DIR="$PREFIX/plugins"
