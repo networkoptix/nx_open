@@ -250,6 +250,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
+    setWarningStyle(ui->storagesWarningLabel);
+
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
     m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
@@ -547,8 +549,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         record.isBackup = isBackup;
         m_model->updateStorage(record);
     }
-    else
-    if (index.column() == QnStorageListModel::RemoveActionColumn)
+    else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
         if (m_model->canRemoveStorage(record))
             m_model->removeStorage(record);
@@ -690,6 +691,7 @@ void QnStorageConfigWidget::applyChanges()
             { server->setBackupSchedule(m_backupSchedule); });
     }
 
+    updateDisabledStoragesWarning(false);
     emit hasChangesChanged();
 }
 

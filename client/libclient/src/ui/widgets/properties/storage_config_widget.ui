@@ -75,7 +75,7 @@
       <item>
        <widget class="QLabel" name="storagesWarningLabel">
         <property name="text">
-         <string>Unchecking the storage will cause nothing but writing stop. It won't deny oldest footage removing from the drive.</string>
+         <string>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</string>
         </property>
        </widget>
       </item>
