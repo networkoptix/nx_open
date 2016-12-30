@@ -25,7 +25,20 @@ NxTextEdit
         source: "qrc:/skin/welcome_page/search.png";
     }
 
-    rightControlDelegate: (text.length ? cleanTextControl : null);
+    rightControlDelegate: NxImageButton
+    {
+        visible: text.length;
+        standardIconUrl: "qrc:/skin/welcome_page/input_clear.png";
+        hoveredIconUrl: "qrc:/skin/welcome_page/input_clear_hovered.png";
+        pressedIconUrl: "qrc:/skin/welcome_page/input_clear_pressed.png";
+
+        onClicked:
+        {
+            control.text = "";
+            control.forceActiveFocus();
+        }
+    }
+
 
     onVisibleChanged:
     {
@@ -35,31 +48,20 @@ NxTextEdit
 
     onTextChanged: { timer.restart(); }
 
-
     MouseArea
     {
         id: cancelArea;
 
-        property bool cursorIsOutsideArea:
-        {
-            if (!containsMouse)
-                return false;
+        onMouseXChanged: console.log(mouseX)
 
-            var editAreaPos = cancelArea.mapToItem(control, mouseX, mouseY);
-            return ((editAreaPos.x < 0) || (editAreaPos.y < 0)
-                || (editAreaPos.x > control.width) || (editAreaPos.y > control.height));
-        }
-
-        parent: control.visualParent;
         anchors.fill: parent;
+        parent: (visualParent ? visualParent : control.parent);
 
         visible: control.visible && control.state == "editable";
 
-        hoverEnabled: true;
-        cursorShape: (cursorIsOutsideArea ? Qt.ArrowCursor : Qt.IBeamCursor);
         onPressed:
         {
-            if (!control.text.length && cancelArea.cursorIsOutsideArea)
+            if (!control.text.length)
                 control.state = "masked";
 
             mouse.accepted = false;
@@ -186,23 +188,6 @@ NxTextEdit
                     else
                         control.focus = false;
                 }
-            }
-        }
-    }
-
-    Component
-    {
-        id: cleanTextControl
-        NxImageButton
-        {
-            standardIconUrl: "qrc:/skin/welcome_page/input_clear.png";
-            hoveredIconUrl: "qrc:/skin/welcome_page/input_clear_hovered.png";
-            pressedIconUrl: "qrc:/skin/welcome_page/input_clear_pressed.png";
-
-            onClicked:
-            {
-                control.text = "";
-                control.forceActiveFocus();
             }
         }
     }
