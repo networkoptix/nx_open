@@ -23,6 +23,7 @@ Timer::~Timer()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
+    NX_ASSERT(!m_aioService.isSocketBeingWatched(&pollable()));
 }
 
 void Timer::start(
