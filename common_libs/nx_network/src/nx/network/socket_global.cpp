@@ -138,7 +138,6 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
     m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
@@ -158,6 +157,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_mediatorConnector->clientConnection());
     m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_mediatorConnector->clientConnection());
+    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
 }
 
 QnMutex SocketGlobals::s_mutex;
