@@ -71,6 +71,12 @@ public:
     {
     }
 
+    ~CrossNatConnectorRedirect()
+    {
+        if (m_connectResult.connection)
+            m_connectResult.connection->pleaseStopSync();
+    }
+
 protected:
     void givenMediator()
     {
@@ -81,8 +87,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_redirector.server = 
-            std::make_unique<stun::UdpServer>(&m_redirector.messageDispatcher);
+        m_redirector.server = std::make_unique<stun::UdpServer>(&m_redirector.messageDispatcher);
         ASSERT_TRUE(m_redirector.server->bind(SocketAddress(HostAddress::localhost, 0)));
         ASSERT_TRUE(m_redirector.server->listen());
 
