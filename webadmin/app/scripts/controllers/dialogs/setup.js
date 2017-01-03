@@ -70,7 +70,8 @@ angular.module('webadminApp')
 
         function sendCredentialsToNativeClient(){
             $log.log("Send credentials to client app: " + $scope.activeLogin);
-            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds, $scope.savePassword);
+            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword,
+                $scope.cloudCreds, $scope.settings.savePassword);
         }
 
         function checkInternetOnServer(reload){
