@@ -7,7 +7,9 @@ var L = {
         openLinkWithTitle: 'To {{title}} visit this link'
     },
     setup:{
-        createAccount: 'create account'
+        createAccount: 'create account',
+        errorNoHDD: 'This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.',
+        errorNoNetwork: 'This device needs network connection to work.<br>Please connect it to your local network ot Internet'
     },
     passwordRequirements:
     {

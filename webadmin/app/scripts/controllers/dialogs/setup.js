@@ -142,9 +142,22 @@ angular.module('webadminApp')
                     }
 
                     checkInternet(false);
+                    $log.log("media server flags");
+                    $log.log(scope.serverInfo.flags);
+
+                    if($scope.serverInfo.flags.brokenSystem){
+                        if($scope.serverInfo.flags.noHDD){
+                            $scope.settings.localError = L.setup.errorNoHDD;
+                        }else{
+                            //$scope.serverInfo.flags.wrongNetwork && !data.flags.canSetupNetwork;
+                            //$scope.serverInfo.flags.noNetwork
+                            $scope.settings.localError = L.setup.errorNoNetwork;
+                        }
+                        $scope.next('brokenSystem');
+                        return $q.reject();
+                    }
 
                     if($scope.serverInfo.flags.newSystem) {
-
                         if($scope.serverInfo.flags.canSetupNetwork) {
                             mediaserver.networkSettings().then(function (r) {
                                 $scope.networkSettings = r.data.reply;
@@ -161,11 +174,12 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                         return $q.reject();
-                    }else{
-                        sendCredentialsToNativeClient();
-                        $log.log("System is local - go to local success");
-                        $scope.next('localSuccess');
                     }
+
+                    sendCredentialsToNativeClient();
+                    $log.log("System is local - go to local success");
+                    $scope.next('localSuccess');
+                    return true;
                 });
             });
 
@@ -747,8 +761,13 @@ angular.module('webadminApp')
                     retry: function () {
                         initWizard();
                     }
+                },
+                brokenSystem:{
+                    cancel: $scope.thickClient,
+                    retry: function () {
+                        initWizard();
+                    }
                 }
-
             };
         }
 

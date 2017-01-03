@@ -273,14 +273,11 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                var self = this;
                 return this.getCurrentUser(reload).then(function(result){
-                    /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     var hasAllResources = result.data.reply.permissions.indexOf(Config.globalAccessAllMediaPermission)>=0;
-                    /*jshint bitwise: true*/
-                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
+                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
                     var isOwner = result.data.reply.isAdmin ;
 
                     return {

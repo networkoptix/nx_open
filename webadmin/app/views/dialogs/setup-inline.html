@@ -16,6 +16,18 @@
     </p>
 </div>
 
+
+<div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Couldn't setup your system</h2>
+    <p class="master-description">Your system cannot be configured. <br>
+        <span ng-bind-html="settings.localError"></span>
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+    </p>
+</div>
+
 <div class="panel-body text-center" ng-if="stepIs('start')">
     <div ng-class="{'vertical-center':!liteClient,'master-description':liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
