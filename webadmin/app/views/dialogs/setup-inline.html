@@ -75,8 +75,7 @@
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
-                    <input type="checkbox"
-                           id="{{setting}}"
+                    <input type="checkbox" id="{{setting}}"
                            ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
                 </label>
             </div>
@@ -177,9 +176,9 @@
                    type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
 
-        <div class="checkbox">
+        <div class="checkbox text-left" ng-if="thickClient">
             <labe>
-                <input ng-model="settings.savePassword" class="form-control" type="checkbox">
+                <input ng-model="settings.savePassword" type="checkbox">
                 Stay logged in
             </labe>
         </div>
@@ -229,9 +228,9 @@
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
                    type="password" autocomplete="new-password" placeholder="Repeat password" required>
         </div>
-        <div class="checkbox">
+        <div class="checkbox text-left" ng-if="thickClient">
             <labe>
-                <input ng-model="settings.savePassword" class="form-control" type="checkbox">
+                <input ng-model="settings.savePassword" type="checkbox">
                 Save password
             </labe>
         </div>
