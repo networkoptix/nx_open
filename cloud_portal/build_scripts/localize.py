@@ -82,6 +82,7 @@ def process_files(lang, root_directory, xml_filename):
                 except IOError as a:
                     print(a)
                     continue
+                active_content = active_content.replace("LANGUAGE", lang)  # Insert language information
                 if not html_mode:
                     active_content = json.dumps(json.loads(active_content), ensure_ascii=False)  # normalize json
 
