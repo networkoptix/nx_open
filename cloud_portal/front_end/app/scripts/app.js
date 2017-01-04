@@ -201,7 +201,7 @@ angular.module('cloudApp', [
         });
 }]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
 
-    $rootScope.Config = Config;
+    $rootScope.C = Config;
     $rootScope.L = L;
 
     var original = $location.path;

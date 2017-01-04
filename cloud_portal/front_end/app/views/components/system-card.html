@@ -19,7 +19,7 @@
         <hr>
         <p>
             Your permissions:
-            <b>{{L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
         </p>
 
         <p ng-if="system.permissions.isAdmin">
