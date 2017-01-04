@@ -83,7 +83,7 @@ def process_files(lang, root_directory, xml_filename):
                     print(a)
                     continue
                 if not html_mode:
-                    active_content = json.dumps(json.loads(active_content))  # normalize json
+                    active_content = json.dumps(json.loads(active_content), ensure_ascii=False)  # normalize json
 
             source = message.find('source').text
 
@@ -105,6 +105,29 @@ def process_files(lang, root_directory, xml_filename):
     save_content(target_filename, active_content)
 
 
+def generate_languages_file(target):
+    languages = config['languages']
+    languages_json = []
+    # Localize this language
+    for lang in languages:
+        # copy static/views to target dir
+        lang_dir = os.path.join('static', 'lang_' + lang)
+        if os.path.isdir(lang_dir):
+            shutil.rmtree(lang_dir)
+        shutil.copytree(os.path.join('static', 'views'), os.path.join('static', lang_dir, 'views'))
+
+        process_files(lang, 'static', 'cloud_portal.ts')
+        process_files(lang, 'templates', 'cloud_templates.ts')
+
+        language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
+
+        with open(language_json_filename, 'r') as file_descriptor:
+            data = json.load(file_descriptor)
+            languages_json.append(data)
+
+    save_content(target, json.dumps(languages_json, ensure_ascii=False))
+
+
 read_branding()
 
 # Read config - get languages there
@@ -114,31 +137,10 @@ config = yaml.safe_load(open('cloud_portal.yaml'))
 if 'languages' not in config:
     raise 'No languages section in cloud_portal.yaml'
 
-
 app_filename = 'static/apple-app-site-association'
 with open(app_filename, 'r') as file_descriptor:
     active_content = file_descriptor.read()
 active_content = process_branding(active_content)
 save_content(app_filename, active_content)
 
-
-languages = config['languages']
-languages_json = []
-# Localize this language
-for lang in languages:
-    # copy static/views to target dir
-    lang_dir = os.path.join('static', 'lang_' + lang)
-    if os.path.isdir(lang_dir):
-        shutil.rmtree(lang_dir)
-    shutil.copytree(os.path.join('static', 'views'), os.path.join('static', lang_dir, 'views'))
-
-    process_files(lang, 'static', 'cloud_portal.ts')
-    process_files(lang, 'templates', 'cloud_templates.ts')
-
-    language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
-
-    with open(language_json_filename, 'r') as file_descriptor:
-        data = json.load(file_descriptor)
-        languages_json.append(data)
-
-save_content('static/languages.json', json.dumps(languages_json))
+generate_languages_file('static/languages.json')
