@@ -123,6 +123,7 @@ def generate_languages_file(target):
 
         with open(language_json_filename, 'r') as file_descriptor:
             data = json.load(file_descriptor)
+            data["language"] = lang
             languages_json.append(data)
 
     save_content(target, json.dumps(languages_json, ensure_ascii=False))
