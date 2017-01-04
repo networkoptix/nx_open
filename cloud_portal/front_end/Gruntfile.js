@@ -89,6 +89,7 @@ module.exports = function (grunt) {
             },
             rules: [
                 {from: '^((?!\\.).)*$', to: '/index.html'},
+                {from: '^/static/lang_en/(.*)$', to: '/$1'},
                 {from: '^/static/(.*)$', to: '/$1'}
             ],
             proxies: [
