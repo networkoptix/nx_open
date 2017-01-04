@@ -159,8 +159,12 @@ angular.module('cloudApp')
                 },requestSystem); // Total cache miss
             },
             renameSystem:function(systemId,systemName){
+                var self = this;
                 return $http.post(apiBase + '/systems/' + systemId + '/name',{
                     name:systemName
+                }).then(function(result){
+                    self.systems('clearCache');
+                    return result;
                 });
             },
             getSystemAuth:function(systemId){

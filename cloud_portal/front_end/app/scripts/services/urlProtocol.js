@@ -29,7 +29,7 @@ angular.module('cloudApp')
                 };
 
                 if(linkSettings.systemId){
-                    settings.command = 'systems';
+                    settings.command = 'client';
                 }
 
                 $.extend(settings,linkSettings);
