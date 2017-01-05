@@ -170,7 +170,12 @@ angular.module('cloudApp')
             getSystemAuth:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/auth');
             },
-
+            getLanguages:cacheGet('/static/languages.json',true),
+            changeLanguage:function(language){
+                return $http.post(apiBase + '/utils/language/', {
+                    language: language
+                });
+            },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');

@@ -27,7 +27,13 @@ footer {
   padding-bottom: 2px;
 
 
-  .nav > li > a{
+  .nav > li > span{
+    line-height:24px;
+    display:block;
+  }
+
+  .nav > li > a,
+  .nav > li > span{
     font-size: $font-size-small;
     padding: 10px;
     color:  $light12;
@@ -35,7 +41,7 @@ footer {
       color:$light16;
     }
   }
-  .navbar-right > li > a{
+  .navbar-right > li > a, .navbar-right > li > span > a{
     color:$light8;
     &:hover{
       color:$light12;
