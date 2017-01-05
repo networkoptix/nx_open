@@ -10,7 +10,7 @@
     <message>
       <location/>
       <source>Share</source>
-      <translation> </translation>
+      <translation>Поделиться</translation>
     </message>
     <message>
       <location/>
@@ -20,17 +20,12 @@
     <message>
       <location/>
       <source>Save</source>
-      <translation> </translation>
+      <translation>Сохранить</translation>
     </message>
     <message>
       <location/>
-      <source>Share</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Log in to PRODUCT_NAME</source>
-      <translation> </translation>
+      <source>Log in to</source>
+      <translation>Войти в</translation>
     </message>
     <message>
       <location/>
@@ -45,12 +40,12 @@
     <message>
       <location/>
       <source>Ok</source>
-      <translation> </translation>
+      <translation>Да</translation>
     </message>
     <message>
       <location/>
       <source>Log out</source>
-      <translation> </translation>
+      <translation>Выйти</translation>
     </message>
     <message>
       <location/>
@@ -75,7 +70,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation> </translation>
+      <translation>Удалить</translation>
     </message>
     <message>
       <location/>
@@ -84,13 +79,8 @@
     </message>
     <message>
       <location/>
-      <source>IMeMyMine</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Your system</source>
-      <translation> </translation>
+      <translation>Ваша система</translation>
     </message>
     <message>
       <location/>
@@ -100,12 +90,12 @@
     <message>
       <location/>
       <source>Disconnect</source>
-      <translation> </translation>
+      <translation>Отключить</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation> </translation>
+      <translation>Удалить</translation>
     </message>
     <message>
       <location/>
@@ -115,12 +105,12 @@
     <message>
       <location/>
       <source>Save</source>
-      <translation> </translation>
+      <translation>Сохранить</translation>
     </message>
     <message>
       <location/>
-      <source>Open in VMS_NAME</source>
-      <translation> </translation>
+      <source>Open in</source>
+      <translation>Открыть в</translation>
     </message>
     <message>
       <location/>
@@ -140,7 +130,7 @@
     <message>
       <location/>
       <source>System name</source>
-      <translation> </translation>
+      <translation>Имя системы</translation>
     </message>
     <message>
       <location/>
@@ -154,8 +144,8 @@
     </message>
     <message>
       <location/>
-      <source>Download VMS_NAME</source>
-      <translation> </translation>
+      <source>Download</source>
+      <translation>Скачать</translation>
     </message>
     <message>
       <location/>
@@ -870,21 +860,16 @@
     <message>
       <location filename="views/download.html"/>
       <source>Download</source>
-      <translation> </translation>
+      <translation>Скачать</translation>
     </message>
     <message>
       <location/>
       <source>Latest version</source>
-      <translation> </translation>
+      <translation>Свежак</translation>
     </message>
     <message>
       <location/>
       <source>What's new?</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
     <message>
@@ -1035,7 +1020,7 @@
     <message>
       <location filename="views/systems.html"/>
       <source>Systems</source>
-      <translation> </translation>
+      <translation>Системы</translation>
     </message>
     <message>
       <location/>
@@ -1063,12 +1048,12 @@
     <message>
       <location/>
       <source>Close</source>
-      <translation> </translation>
+      <translation>Закрыть</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation> </translation>
+      <translation>Отменить</translation>
     </message>
     <message>
       <location/>
@@ -1081,7 +1066,7 @@
     <message>
       <location filename="views/components/footer.html"/>
       <source>About</source>
-      <translation> </translation>
+      <translation>О</translation>
     </message>
     <message>
       <location/>
@@ -1090,48 +1075,23 @@
     </message>
     <message>
       <location/>
-      <source>Download VMS_NAME</source>
-      <translation> </translation>
+      <source>Download</source>
+      <translation>Скачать</translation>
     </message>
     <message>
       <location/>
       <source>Help</source>
-      <translation> </translation>
+      <translation>Помощь</translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation> </translation>
+      <translation>Поддержка</translation>
     </message>
     <message>
       <location/>
       <source>Terms</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>&amp;copy; 2016 COMPANY_NAME</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/content/about</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/download</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/content/help</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/content/eula&quot;</source>
-      <translation> </translation>
+      <translation>Условия</translation>
     </message>
   </context>
   <context>
@@ -1139,67 +1099,37 @@
     <message>
       <location filename="views/components/header.html"/>
       <source>About</source>
-      <translation> </translation>
+      <translation>О!</translation>
     </message>
     <message>
       <location/>
       <source>Systems</source>
-      <translation> </translation>
+      <translation>Системы</translation>
     </message>
     <message>
       <location/>
       <source>Log in</source>
-      <translation> </translation>
+      <translation>Войти</translation>
     </message>
     <message>
       <location/>
       <source>Create Account</source>
-      <translation> </translation>
+      <translation>Зарегистрироваться</translation>
     </message>
     <message>
       <location/>
       <source>Account Settings</source>
-      <translation> </translation>
+      <translation>Настройки</translation>
     </message>
     <message>
       <location/>
       <source>Change Password</source>
-      <translation> </translation>
+      <translation>Сменить пароль</translation>
     </message>
     <message>
       <location/>
       <source>Log out</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/content/about</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/login</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/register</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/account/password/</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/account/</source>
-      <translation> </translation>
+      <translation>Выйти</translation>
     </message>
   </context>
   <context>
