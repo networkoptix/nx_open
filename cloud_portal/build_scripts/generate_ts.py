@@ -85,8 +85,8 @@ def process_html_file(root_dir, file_name):
 
 
 def process_inline_text(data):
-    data = re.sub(r'<.+?>', '<>', data)
-    data = re.sub(r'\{\{.+?\}\}', '', data)
+    data = re.sub(r'<.+?>', '<>', data, flags=re.DOTALL)
+    data = re.sub(r'\{\{.+?\}\}', '', data, flags=re.DOTALL)
     data = re.sub(r'>\s*<', '', data)
     data = re.sub(r'><', '', data)
     strings = re.split('<>', data)
@@ -97,35 +97,36 @@ ignore_attributes = ('id', 'name', 'class', 'style',
                      'src', 'srcset', 'rel', 'charset',
                      'type', 'role', 'for', 'target',
                      'width', 'rows', 'cols', 'maxlength',
-                     'autocomplete',
-                     'process', 'form',
-                     'ng\-.*?', 'aria\-.*?',
+                     'autocomplete', 'system',
+                     'process', 'form', 'process-loading', 'action-type',
+                     'ng\-.*?', 'aria\-.*?', 'data\-.*?',
                      'bgcolor', 'content', 'xmlns', 'topmargin', 'leftmargin', 'marginheight', 'marginwidth',
                      'border', 'cellspacing', 'cellpadding', 'border', 'cellspacing' 'cellpadding', 'http\-equiv')
 
-ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?')
+ignore_single_attributes = ('required', 'readonly', 'disabled', 'autofocus', 'validate\-field',
+                            'validate\-email', 'novalidate', 'uib\-.*?')
 
-ignore_regex = (r'href="#.+?"', r'href=".+?\.css"')
+ignore_regex = (r'href="#.+?"', r'href="/.+?"', r'href=".+?\.css"', r'&nbsp;')
 ignore_strings = ('use strict',)
 
 
 def process_attributes(data):
-    data = re.sub(r'<\?.+?\?>', '', data)   # Remove <?xml ... ?> - just in case
-    data = re.sub(r'<!\-.+?\->', '', data)    # Remove all html-comments
-    data = re.sub(r'>.*?<', '><', data)     # Remove everything except tags (clear spaces and texts)
+    data = re.sub(r'<\?.+?\?>', '', data, flags=re.DOTALL)   # Remove <?xml ... ?> - just in case
+    data = re.sub(r'<!\-.+?\->', '', data, flags=re.DOTALL)    # Remove all html-comments
+    data = re.sub(r'>.*?<', '><', data, flags=re.DOTALL)     # Remove everything except tags (clear spaces and texts)
 
     # Important: attributes in single quotes are not supported here
     for attr in ignore_attributes:  # Here we remove all attributes which do not contain language strings.
-        data = re.sub('\s+' + attr + '=".+?"', '', data)    # remove ignore_attribute="some value" with double-quotes
-        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)  # remove ignore_attribute=some_value (after minhtml)
+        data = re.sub('\s+' + attr + '=".+?"', '', data, flags=re.DOTALL)    # remove ignore_attribute="some value" with double-quotes
+        data = re.sub('\s+' + attr + '=[^\s>]+', '', data, flags=re.DOTALL)  # remove ignore_attribute=some_value (after minhtml)
 
     for attr in ignore_single_attributes:   # ignore attributes which can be used without values
-        data = re.sub('\s+' + attr + '=".+?"', '', data)        # remove attribute if it has value in quotes anyway
+        data = re.sub('\s+' + attr + '=".+?"', '', data, flags=re.DOTALL)        # remove attribute if it has value in quotes anyway
         data = re.sub('\s+' + attr + '=[^\s>]+', '', data)      # remove attribute if it has value without quotes anyway
         data = re.sub('\s+' + attr + '(?=[\s/>])', '', data)     # remove attribute without value
 
     for regex in ignore_regex:
-        data = re.sub(regex, '', data)
+        data = re.sub(regex, '', data, flags=re.DOTALL)
 
     data = re.sub(r'<\S+?\s*/?>', '', data)     # remove tags without attributes
     data = re.sub(r'<\S+', '', data)            # remove tags
