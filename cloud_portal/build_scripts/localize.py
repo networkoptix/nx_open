@@ -37,18 +37,23 @@ def process_branding(content):
     return content
 
 
+def make_dir(filename):
+    dirname = os.path.dirname(filename)
+    print ("make dir " + dirname + " for " + filename)
+    if not os.path.exists(dirname):
+        try:
+            os.makedirs(dirname)
+        except OSError as exc:  # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+
+
 def save_content(filename, content):
     if filename:
-        if not os.path.exists(os.path.dirname(filename)):
-            try:
-                os.makedirs(os.path.dirname(filename))
-            except OSError as exc:  # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-
         # proceed with branding
         active_content = process_branding(content)
 
+        make_dir(filename)
         with codecs.open(filename, "w", "utf-8") as file:
             file.write(active_content)
             file.close()
@@ -106,8 +111,7 @@ def process_files(lang, root_directory, xml_filename):
     save_content(target_filename, active_content)
 
 
-def generate_languages_file(target):
-    languages = config['languages']
+def generate_languages_files(languages):
     languages_json = []
     # Localize this language
     for lang in languages:
@@ -115,7 +119,8 @@ def generate_languages_file(target):
         lang_dir = os.path.join('static', 'lang_' + lang)
         if os.path.isdir(lang_dir):
             shutil.rmtree(lang_dir)
-        shutil.copytree(os.path.join('static', 'views'), os.path.join('static', lang_dir, 'views'))
+        make_dir(lang_dir)
+        shutil.copytree(os.path.join('static', 'views'), os.path.join(lang_dir, 'views'))
 
         process_files(lang, 'static', 'cloud_portal.ts')
         process_files(lang, 'templates', 'cloud_templates.ts')
@@ -127,22 +132,27 @@ def generate_languages_file(target):
             data["language"] = lang
             languages_json.append(data)
 
-    save_content(target, json.dumps(languages_json, ensure_ascii=False))
+    save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
+
+
+def process_app_associations():
+    app_filename = 'static/apple-app-site-association'
+    with open(app_filename, 'r') as file_descriptor:
+        active_content = file_descriptor.read()
+    active_content = process_branding(active_content)
+    save_content(app_filename, active_content)
 
 
 read_branding()
 
+# Branding for apple-app-site-association
+process_app_associations()
+
 # Read config - get languages there
 config = yaml.safe_load(open('cloud_portal.yaml'))
 
-# Iterate language
+# Iterate languages
 if 'languages' not in config:
     raise 'No languages section in cloud_portal.yaml'
 
-app_filename = 'static/apple-app-site-association'
-with open(app_filename, 'r') as file_descriptor:
-    active_content = file_descriptor.read()
-active_content = process_branding(active_content)
-save_content(app_filename, active_content)
-
-generate_languages_file('static/languages.json')
+generate_languages_files(config['languages'])
