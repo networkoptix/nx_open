@@ -1,8 +1,8 @@
 <div class="auth-visible" process-loading="gettingSystem">
-    <ng-include src="Config.viewsDir + 'components/system-header.html'"></ng-include>
+    <ng-include src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
         <div class="col-md-4 col-md-push-8">
-            <ng-include src="Config.viewsDir + 'components/system-card.html'"></ng-include>
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
         </div>
         <div class="col-md-8 col-md-pull-4">
             <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
@@ -10,7 +10,7 @@
                     You do not have access to the system information.
                 </span>
             </div>
-            <ng-include src="Config.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
         </div>
     </div>
 </div>

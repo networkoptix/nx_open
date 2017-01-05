@@ -12,7 +12,7 @@ $.ajax({
     dataType: 'json',
     success: function (response) {
         L = response;// Fill global L variable
-        // Fill Config.viewsDir here!
+        Config.viewsDir = 'static/lang_' + L.language + '/views/', //'static/lang_' + lang + '/views/';
         angular.bootstrap(document, ['cloudApp']);
     },
     error:function(error){
@@ -23,7 +23,6 @@ $.ajax({
             dataType: 'json',
             success: function (response) {
                 L = response;// Fill global L variable
-                // Fill Config.viewsDir here!
                 angular.bootstrap(document, ['cloudApp']);
             },
             error:function(){
