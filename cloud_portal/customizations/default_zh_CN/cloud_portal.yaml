@@ -33,5 +33,4 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - en
-    - ru
+    - zh_CN
