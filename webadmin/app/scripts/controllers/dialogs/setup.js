@@ -612,7 +612,7 @@ angular.module('webadminApp')
             $scope.wizardFlow = {
                 0: {},
                 start: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
                     next: 'systemName'
                 },
                 systemName: {
@@ -677,7 +677,7 @@ angular.module('webadminApp')
                             $scope.next('noInternetOnClient');
                             return;
                         }
-                        $scope.next($scope.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
+                        $scope.next($scope.settings.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
                     }
                 },
 
@@ -696,7 +696,7 @@ angular.module('webadminApp')
                     }
                 },
                 cloudLogin: {
-                    back: $scope.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
+                    back: $scope.settings.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
                     next: 'cloudProcess',
                     valid: function () {
                         return checkForm($scope.forms.cloudForm);
@@ -757,13 +757,13 @@ angular.module('webadminApp')
                     }
                 },
                 initFailure: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
                     retry: function () {
                         initWizard();
                     }
                 },
                 brokenSystem:{
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
                     retry: function () {
                         initWizard();
                     }
@@ -834,11 +834,10 @@ angular.module('webadminApp')
                 });
             });
         }
-        //$scope.liteClient = true;// TODO: remove this hardcode
         nativeClient.init().then(function(result){
-            $scope.thickClient = result.thick;
-            $scope.liteClient = result.lite;
-            if($scope.liteClient) {
+            $scope.settings.thickClient = result.thick;
+            $scope.settings.liteClient = result.lite;
+            if($scope.settings.liteClient) {
                 $('body').addClass('lite-client-mode');
             }
             $log.log("check client Thick:" + result.thick);
