@@ -143,7 +143,7 @@ angular.module('webadminApp')
 
                     checkInternet(false);
                     $log.log("media server flags");
-                    $log.log(scope.serverInfo.flags);
+                    $log.log($scope.serverInfo.flags);
 
                     if($scope.serverInfo.flags.brokenSystem){
                         if($scope.serverInfo.flags.noHDD){
