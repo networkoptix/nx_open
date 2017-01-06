@@ -45,6 +45,12 @@ angular.module('webadminApp')
                 $poll(pingModule,1000);
                 return;
             }
+            
+            if(data.flags.canSetupNetwork){
+                mediaserver.networkSettings().then(function(r){
+                    $scope.networkSettings = r.data.reply;
+                });
+            }
             checkUserRights();
         });
 
@@ -346,9 +352,6 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(); //Open Connect Dialog
         };
-        mediaserver.networkSettings().then(function(r){
-            $scope.networkSettings = r.data.reply;
-        });
         $scope.saveNetworkSettings = function(){
             mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
