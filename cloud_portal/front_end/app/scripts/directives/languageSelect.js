@@ -11,7 +11,6 @@ angular.module('cloudApp')
             link:function(scope, element, attrs, ngModel){
                 cloudApi.getLanguages().then(function(data){
                     var languages = data.data;
-                    console.log("languages", languages);
                     var activeLanguage = _.find(languages, function(lang){
                         return lang.language == L.language;
                     })

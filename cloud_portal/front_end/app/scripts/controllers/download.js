@@ -13,8 +13,6 @@ angular.module('cloudApp')
             _.each($scope.downloads.groups,function(platform){
                 platform.installers = _.filter(platform.installers,function(installer){
                     var targetInstaller = _.find($scope.downloadsData.installers,function(existingInstaller){
-
-                        console.log("ti",installer.platform,installer.appType,existingInstaller.platform,existingInstaller.appType);
                         return installer.platform == existingInstaller.platform &&
                                installer.appType == existingInstaller.appType;
                     });
@@ -26,9 +24,6 @@ angular.module('cloudApp')
                     return !!targetInstaller;
                 });
             });
-
-
-            console.log($scope.downloadsData, $scope.downloads);
         });
 
 
