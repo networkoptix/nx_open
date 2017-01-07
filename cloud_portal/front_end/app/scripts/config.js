@@ -107,5 +107,83 @@ var Config = {
         requiredRegex: '^[\x21-\x7E]$|^[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$',
         minClassesCount: 2,
         strongClassesCount: 3
+    },
+
+
+    downloads: {
+        mobile:[ // Mobile apps have permanent links, depending on customization
+            {
+                name: 'ios',
+                os: 'iOS'
+            },
+            {
+                name: 'android',
+                os: 'Android'
+            }
+        ],
+        groups:[
+            { // Tabs
+                name:'windows', // platform id
+                os: 'Windows', // For browser auto-detection
+                installers:[  // This also sets the order for links on the page. Each file to download must be specified here
+                    { // Check https://networkoptix.atlassian.net/wiki/display/SD/Installer+Filenames for specification
+                        platform: 'win64',
+                        appType: 'client',
+                    },
+                    {
+                        platform: 'win64',
+                        appType: 'bundle',
+                    },
+                    {
+                        platform: 'win64',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'bundle',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'client',
+                    }
+                ]
+            },
+            {
+                name:'linux',
+                os: 'Linux',
+                installers:[
+                    {
+                        platform: 'linux64',
+                        appType: 'client',
+                    },
+                    {
+                        platform: 'linux64',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'linux86',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'linux86',
+                        appType: 'client',
+                    }
+                ]
+            },
+            {
+                name:'mac',
+                os: 'MacOS',
+                installers:[
+                    {
+                        platform: 'mac',
+                        appType: 'client',
+                    }
+                ]
+            }
+        ]
     }
 };
