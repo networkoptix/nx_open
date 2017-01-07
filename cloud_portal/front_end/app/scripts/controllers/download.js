@@ -2,10 +2,30 @@
 
 
 angular.module('cloudApp')
-    .controller('DownloadCtrl', ['$scope', '$routeParams', '$location', 'page',
-    function ($scope, $routeParams, $location, page) {
+    .controller('DownloadCtrl', ['$scope', '$routeParams', '$location', 'page', 'cloudApi',
+    function ($scope, $routeParams, $location, page, cloudApi) {
 
-        $scope.downloads = DownloadsConfig;
+        $scope.downloads = Config.downloads;
+
+        cloudApi.getDownloads().then(function(data){
+            $scope.downloadsData = data.data;
+
+            _.each($scope.downloads.groups,function(platform){
+                platform.installers = _.filter(platform.installers,function(installer){
+                    var targetInstaller = _.find($scope.downloadsData.installers,function(existingInstaller){
+                        return installer.platform == existingInstaller.platform &&
+                               installer.appType == existingInstaller.appType;
+                    });
+
+                    if(targetInstaller){
+                        _.extend(installer, targetInstaller);
+                        installer.formatName = L.downloads.platforms[installer.platform] + ' - ' + L.downloads.appTypes[installer.appType];
+                    }
+                    return !!targetInstaller;
+                });
+            });
+        });
+
 
         var platformMatch = {
             'Open BSD': 'Linux',
@@ -20,14 +40,14 @@ angular.module('cloudApp')
         }
 
         var activeOs = $routeParams.platform ||platformMatch[window.jscd.os] || window.jscd.os;
-        _.each($scope.downloads.platforms,function(platform){
+        _.each($scope.downloads.groups,function(platform){
             platform.active = (platform.os || platform.name) === activeOs;
         });
 
 
-        for(var mobile in DownloadsConfig.mobile){
-            if(DownloadsConfig.mobile[mobile].os === activeOs){
-                window.location.href = DownloadsConfig.mobile[mobile].src;
+        for(var mobile in Config.downloads.mobile){
+            if(Config.downloads.mobile[mobile].os === activeOs){
+                window.location.href = L.downloads.mobile[Config.downloads.mobile[mobile].name];
                 break;
             }
         }
