@@ -56,7 +56,10 @@ void MediatorAddressPublisher::updateAddresses(
         [this, addresses = std::move(addresses), handler = std::move(updateHandler)]() mutable
         {
             if (m_serverAddresses == addresses)
+            {
+                handler(hpm::api::ResultCode::ok);
                 return;
+            }
 
             m_serverAddresses = std::move(addresses);
             m_updateHandler = std::move(handler);
