@@ -43,7 +43,7 @@ public class QnVideoDecoder
     }
 
     /**
-     * Call runnable and handle all exceptions.
+     * Call callable (in the same thread) and handle all exceptions.
      */
     private long runCatching(String logPrefix, Callable<Long> callable)
     {
