@@ -4,6 +4,7 @@
 #include <cdb/connection.h>
 #include <utils/common/sync_call.h>
 
+#include <media_server/settings.h>
 
 using namespace nx::cdb;
 
@@ -22,7 +23,7 @@ bool MediaServerCloudIntegrationTest::startCloudDB()
 
 bool MediaServerCloudIntegrationTest::startMediaServer()
 {
-    m_mediaServerLauncher.addSetting(lit("cdbEndpoint"), m_cdb.endpoint().toString());
+    m_mediaServerLauncher.addSetting(nx_ms_conf::CDB_ENDPOINT, m_cdb.endpoint().toString());
 
     if (!m_mediaServerLauncher.start())
         return false;

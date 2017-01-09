@@ -1,8 +1,8 @@
-
 #pragma once
 
 #include <fstream>
 #include <memory>
+#include <list>
 
 #include <QtCore/QString>
 
@@ -11,7 +11,6 @@
 
 #include "utils.h"
 #include "media_server_process.h"
-
 
 class MediaServerLauncher: public QObject
 {
@@ -42,9 +41,10 @@ public:
      * Return media server API url
      */
     QUrl apiUrl() const;
+
 private:
     void prepareToStart();
-private:
+
     std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;
     SocketAddress m_serverEndpoint;
@@ -52,4 +52,5 @@ private:
     //nx::utils::thread m_mediaServerProcessThread;
     std::unique_ptr<MediaServerProcess> m_mediaServerProcess;
     bool m_firstStartup;
+    std::list<std::pair<QString, QString>> m_customSettings;
 };

@@ -2890,6 +2890,8 @@ void MediaServerProcess::run()
     m_mediaServer.clear();
 
     performActionsOnExit();
+
+    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 }
 
 void MediaServerProcess::at_appStarted()

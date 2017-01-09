@@ -103,10 +103,10 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
         if (isCloudUser && !cloudUsers.empty())
             return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_Forbidden, cloudUsers[0]);
 
-            return m_defaultAuthenticator->authorize(
-                method,
-                authorizationHeader,
-                responseHeaders);
+        return m_defaultAuthenticator->authorize(
+            method,
+            authorizationHeader,
+            responseHeaders);
     }
 
     bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(authorizationHeader.digest->params["nonce"]);

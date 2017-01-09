@@ -1,4 +1,3 @@
-
 #include "mediaserver_launcher.h"
 
 #include <nx/network/http/httpclient.h>
@@ -6,7 +5,6 @@
 
 #include <media_server_process.h>
 #include <nx/network/socket_global.h>
-
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
     m_workDirResource(tmpDir),
@@ -27,7 +25,7 @@ SocketAddress MediaServerLauncher::endpoint() const
 
 void MediaServerLauncher::addSetting(const QString& name, const QString& value)
 {
-    m_configFile << name.toStdString() << " = " << value.toStdString() << std::endl;
+    m_customSettings.emplace_back(name, value);
 }
 
 void MediaServerLauncher::prepareToStart()
@@ -42,8 +40,11 @@ void MediaServerLauncher::prepareToStart()
     m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
     m_configFile << "port = " << m_serverEndpoint.port << std::endl;
 
-
-    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
+    for (const auto& customSetting: m_customSettings)
+    {
+        m_configFile << customSetting.first.toStdString() << " = " 
+            << customSetting.second.toStdString() << std::endl;
+    }
 
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
     char* argv[] = { "", "-e", configFileOption.data() };

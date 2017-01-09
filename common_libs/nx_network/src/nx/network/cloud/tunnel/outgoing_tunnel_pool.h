@@ -57,6 +57,7 @@ public:
      * @param uuid Unique instance id, e.g. Hardware id.
      */
     void assignOwnPeerId(const String& name, const QnUuid& uuid);
+    void clearOwnPeerId();
 
     OnTunnelClosedSubscription& onTunnelClosedSubscription();
 
