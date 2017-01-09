@@ -61,6 +61,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->checkBoxBitratePerGOP, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
+    connect(ui->comboBoxForcedMotionStream, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
@@ -101,6 +102,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     bool sameRtpTransport = true;
     QString rtpTransport;
+    int forcedMotionStreamIndex = 0;
 
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
@@ -153,6 +155,15 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
 
+        auto forcedMotionStreamProperty = camera->getProperty(QnMediaResource::motionStreamKey());
+        if (!forcedMotionStreamProperty.isEmpty())
+        {
+            if (forcedMotionStreamProperty == lit("primary"))
+                forcedMotionStreamIndex = 1;
+            else if (forcedMotionStreamProperty == lit("secondary"))
+                forcedMotionStreamIndex = 2;
+        }
+
         camCnt++;
     }
 
@@ -198,6 +209,15 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->comboBoxTransport->setCurrentIndex(-1);
 
+    ui->comboBoxForcedMotionStream->clear();
+    ui->comboBoxForcedMotionStream->addItem(tr("Do not force"), lit(""));
+    ui->comboBoxForcedMotionStream->addItem(tr("Primary"), lit("primary"));
+
+    if (anyHasDualStreaming)
+        ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), lit("secondary"));
+
+    ui->comboBoxForcedMotionStream->setCurrentIndex(forcedMotionStreamIndex);
+
     updateControlBlock();
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
     ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
@@ -211,7 +231,10 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
             && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !ui->checkBoxBitratePerGOP->isEnabled())
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex() == 0;
+            && ui->comboBoxTransport->currentIndex() == 0
+            && ui->comboBoxForcedMotionStream->itemData(ui->comboBoxForcedMotionStream->currentIndex())
+                .toString()
+                .isEmpty();
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -245,13 +268,21 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
-        if (ui->comboBoxTransport->currentIndex() >= 0) {
+        auto index = ui->comboBoxTransport->currentIndex();
+        if (index >= 0) {
             QString txt = ui->comboBoxTransport->currentText();
             if (txt.toLower() == lit("auto"))
                 txt.clear();
             camera->setProperty(QnMediaResource::rtpTransportKey(), txt);
         }
 
+        index = ui->comboBoxForcedMotionStream->currentIndex();
+        if (index >= 0)
+        {
+            camera->setProperty(
+                QnMediaResource::motionStreamKey(),
+                ui->comboBoxForcedMotionStream->itemData(index).toString());
+        }
     }
 }
 
@@ -276,6 +307,7 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->checkBoxBitratePerGOP->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
     ui->comboBoxTransport->setCurrentIndex(0);
+    ui->comboBoxForcedMotionStream->setCurrentIndex(0);
 }
 
 void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {
