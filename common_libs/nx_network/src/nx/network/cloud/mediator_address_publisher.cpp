@@ -55,12 +55,8 @@ void MediatorAddressPublisher::updateAddresses(
     m_mediatorConnection->dispatch(
         [this, addresses = std::move(addresses), handler = std::move(updateHandler)]() mutable
         {
-            if (m_serverAddresses == addresses)
-            {
-                handler(hpm::api::ResultCode::ok);
-                return;
-            }
-
+            NX_ASSERT(!m_updateHandler);
+        
             m_serverAddresses = std::move(addresses);
             m_updateHandler = std::move(handler);
             NX_LOGX(lm("New addresses: %1").container(m_serverAddresses), cl_logDEBUG1);
@@ -70,7 +66,13 @@ void MediatorAddressPublisher::updateAddresses(
 
 void MediatorAddressPublisher::publishAddressesIfNeeded()
 {
-    if (m_isRequestInProgress || m_publishedAddresses == m_serverAddresses)
+    if (m_publishedAddresses == m_serverAddresses)
+    {
+        reportResultToTheCaller(hpm::api::ResultCode::ok);
+        return;
+    }
+
+    if (m_isRequestInProgress)
         return;
 
     m_isRequestInProgress = true;
@@ -79,12 +81,8 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
         [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
         {
             m_isRequestInProgress = false;
-            if (m_updateHandler)
-            {
-                decltype(m_updateHandler) handler;
-                std::swap(handler, m_updateHandler);
-                handler(resultCode);
-            }
+
+            reportResultToTheCaller(resultCode);
 
             if (resultCode != nx::hpm::api::ResultCode::ok)
             {
@@ -103,6 +101,16 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
 void MediatorAddressPublisher::stopWhileInAioThread()
 {
     m_mediatorConnection.reset();
+}
+
+void MediatorAddressPublisher::reportResultToTheCaller(hpm::api::ResultCode resultCode)
+{
+    if (!m_updateHandler)
+        return;
+
+    decltype(m_updateHandler) handler;
+    std::swap(handler, m_updateHandler);
+    handler(resultCode);
 }
 
 } // namespace cloud

@@ -41,6 +41,8 @@ private:
     utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> m_updateHandler;
 
     virtual void stopWhileInAioThread() override;
+
+    void reportResultToTheCaller(hpm::api::ResultCode resultCode);
 };
 
 } // namespace cloud
