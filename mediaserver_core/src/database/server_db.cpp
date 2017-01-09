@@ -312,6 +312,8 @@ QnServerDb::QnServerDb():
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
 
+    if (!tuneDBAfterOpen(&m_sdb))
+        qWarning() << "failed to turn on journal mode for mserver database" << Q_FUNC_INFO;
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
