@@ -39,13 +39,13 @@ Rectangle
             id: searchEdit;
 
             visible: grid.totalItemsCount > grid.itemsPerPage
-            visualParent: screenHolder
 
             anchors.bottom: gridHolder.top
             anchors.bottomMargin: 8
             anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
+            z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 
         Item
