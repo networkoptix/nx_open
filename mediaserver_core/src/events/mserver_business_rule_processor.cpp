@@ -953,15 +953,15 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
         };
 
 
-    for (const auto &email: additional)
+    for (const auto& email: additional)
         addRecipient(email);
 
-    for (const auto &user: users)
+    for (const auto& user: users)
         addRecipient(user->getEmail());
 
-    for (const auto &userRole: userRoles)
+    for (const auto& userRole: userRoles)
     {
-        for (const auto &subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        for (const auto& subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);
