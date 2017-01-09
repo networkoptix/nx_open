@@ -89,12 +89,12 @@ TEST_F(CloudModuleUrlFetcher, common)
     ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
 }
 
-class FtCloudModuleEndPointFetcher:
+class FtCloudModuleUrlFetcher:
     public CloudModuleUrlFetcher
 {
 };
 
-TEST_F(FtCloudModuleEndPointFetcher, cancellation)
+TEST_F(FtCloudModuleUrlFetcher, cancellation)
 {
     for (int i = 0; i < 100; ++i)
     {
@@ -131,17 +131,17 @@ static const char* modulesXmlWithEndpoints = R"xml(
     </sequence>
 )xml";
 
-class CloudModuleEndPointFetcherCompatibility:
+class CloudModuleUrlFetcherCompatibility:
     public CloudModuleUrlFetcher
 {
 public:
-    CloudModuleEndPointFetcherCompatibility():
+    CloudModuleUrlFetcherCompatibility():
         CloudModuleUrlFetcher(modulesXmlWithEndpoints)
     {
     }
 };
 
-TEST_F(CloudModuleEndPointFetcherCompatibility, correctly_parses_endpoints)
+TEST_F(CloudModuleUrlFetcherCompatibility, correctly_parses_endpoints)
 {
     ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("cdb"));
     ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
@@ -158,17 +158,17 @@ static const char* modulesXmlWithEndpointsCdbSsl = R"xml(
     </sequence>
 )xml";
 
-class CloudModuleEndPointFetcherCompatibilityAutoSchemeSelection:
+class CloudModuleUrlFetcherCompatibilityAutoSchemeSelection:
     public CloudModuleUrlFetcher
 {
 public:
-    CloudModuleEndPointFetcherCompatibilityAutoSchemeSelection():
+    CloudModuleUrlFetcherCompatibilityAutoSchemeSelection():
         CloudModuleUrlFetcher(modulesXmlWithEndpointsCdbSsl)
     {
     }
 };
 
-TEST_F(CloudModuleEndPointFetcherCompatibilityAutoSchemeSelection, https)
+TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
 {
     ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
     ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
