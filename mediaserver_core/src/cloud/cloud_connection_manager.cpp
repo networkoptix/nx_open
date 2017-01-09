@@ -26,11 +26,11 @@ constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(
 CloudConnectionManager::CloudConnectionManager():
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
-    const auto cdbUrl = MSSettings::roSettings()->value(
+    const auto cdbEndpoint = MSSettings::roSettings()->value(
         nx_ms_conf::CDB_ENDPOINT,
         "").toString();
-    if (!cdbUrl.isEmpty())
-        m_cdbConnectionFactory->setCloudUrl(cdbUrl.toStdString());
+    if (!cdbEndpoint.isEmpty())
+        m_cdbConnectionFactory->setCloudUrl(lm("http://%1").arg(cdbEndpoint).toStdString());
 
     Qn::directConnect(
         qnGlobalSettings, &QnGlobalSettings::initialized,
@@ -119,26 +119,11 @@ void CloudConnectionManager::processCloudErrorCode(
             .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
 
         //system has been disconnected from cloud: cleaning up cloud credentials...
-        if (!detachFromCloudSilently())
+        if (!detachSystemFromCloud())
         {
             NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         }
     }
-}
-
-bool CloudConnectionManager::detachFromCloudSilently()
-{
-    auto adminUser = qnResPool->getAdministrator();
-    if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
-    {
-        if (!resetSystemToStateNew())
-        {
-            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
-            return false;
-        }
-    }
-
-    return cleanUpCloudDataInLocalDb();
 }
 
 bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
@@ -176,6 +161,21 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
     return true;
 }
 
+bool CloudConnectionManager::detachSystemFromCloud()
+{
+    auto adminUser = qnResPool->getAdministrator();
+    if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
+    {
+        if (!resetSystemToStateNew())
+        {
+            NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
+            return false;
+        }
+    }
+
+    return cleanUpCloudDataInLocalDb();
+}
+
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 {
     return !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
@@ -196,6 +196,11 @@ void CloudConnectionManager::cloudSettingsChanged()
     m_cloudSystemId = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
     const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
+    if (!boundToCloud)
+    {
+        m_cloudSystemId.clear();
+        m_cloudAuthKey.clear();
+    }
 
     lk.unlock();
 
@@ -217,6 +222,9 @@ void CloudConnectionManager::cloudSettingsChanged()
             .setSystemCredentials(boost::none);
         MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
     }
+
+    if (!boundToCloud)
+        detachSystemFromCloud();
 
     emit cloudBindingStatusChanged(boundToCloud);
     if (boundToCloud)
