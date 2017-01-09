@@ -584,6 +584,7 @@ namespace detail
             ResyncStorages,
             ResyncClientInfo,
             ResyncVideoWalls,
+            ResyncWebPages,
         };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 

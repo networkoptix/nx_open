@@ -20,6 +20,7 @@
 
 #include <database/api/db_resource_api.h>
 #include <database/api/db_layout_api.h>
+#include <database/api/db_webpage_api.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -29,6 +30,7 @@
 #include <database/migrations/make_transaction_timestamp_128bit.h>
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
+#include <database/migrations/add_default_webpages_migration.h>
 
 #include <network/system_helpers.h>
 
@@ -505,6 +507,11 @@ bool QnDbManager::init(const QUrl& dbUrl)
             if (m_resyncFlags.testFlag(ResyncVideoWalls))
             {
                 if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncWebPages))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
                     return false;
             }
 
@@ -1395,6 +1402,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded({ClearLog, ResyncLog});
     }
 
+    if (updateName.endsWith(lit("/83_add_default_webpages.sql")))
+    {
+        return ec2::database::migrations::addDefaultWebpages(m_sdb)
+            && resyncIfNeeded(ResyncWebPages);
+    }
+
     return true;
 }
 
@@ -2227,8 +2240,6 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
     if (!database::api::saveLayout(m_sdb, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
-
-
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
@@ -4468,16 +4479,10 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnUuid &layout_id) {
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {
-    qint32 internalId;
-
-    ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    result = insertOrReplaceWebPage(params, internalId);
-    return result;
+    if (!database::api::saveWebPage(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
-
 
 ErrorCode QnDbManager::removeWebPage(const QnUuid& guid)
 {
