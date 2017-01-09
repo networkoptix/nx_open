@@ -22,15 +22,13 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
-
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
     runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 
     result->setParams(rule->actionParams());
-    result->setResources(toIdList(resList));
+    result->setResources(rule->actionResources());
 
     if (QnBusiness::hasToggleState(event->getEventType()) && QnBusiness::hasToggleState(rule->actionType())) {
         QnBusiness::EventState value = state != QnBusiness::UndefinedState ? state : event->getToggleState();
