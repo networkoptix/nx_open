@@ -569,6 +569,24 @@ namespace detail
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
+        enum ResyncFlag
+        {
+            ClearLog,
+            ResyncLog,
+            ResyncLicences,
+            ResyncFiles,
+            ResyncCameraAttributes,
+            ResyncServerAttributes,
+            ResyncServers,
+            ResyncLayouts,
+            ResyncRules,
+            ResyncUsers,
+            ResyncStorages,
+            ResyncClientInfo,
+            ResyncVideoWalls,
+        };
+        Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
+
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
@@ -605,6 +623,8 @@ namespace detail
 
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
 
+        /** Raise flags if db is not just created. Always returns true. */
+        bool resyncIfNeeded(ResyncFlags flags);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -623,24 +643,11 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
-        // todo: move this variables to QFlag
-        bool m_needClearLog;
-        bool m_needResyncLog;
-        bool m_needResyncLicenses;
-        bool m_needResyncFiles;
-        bool m_needResyncCameraUserAttributes;
-        bool m_needResyncServerUserAttributes;
-        bool m_needResyncMediaServers;
+
         bool m_dbJustCreated;
         bool m_isBackupRestore;
-        bool m_needResyncLayout;
-        bool m_needResyncbRules;
-        bool m_needResyncUsers;
-        bool m_needResyncStorages;
-        bool m_needResyncClientInfoData;
-        bool m_needResyncVideoWall = false;
-
         bool m_dbReadOnly;
+        ResyncFlags m_resyncFlags;
     };
 } // namespace detail
 
