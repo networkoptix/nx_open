@@ -1030,6 +1030,16 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
     archiveCameraList.push_back(newCamera);
 }
 
+QStringList QnStorageManager::getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const
+{
+    QStringList result;
+    QnMutexLocker lock(&m_mutexCatalog);
+    for (auto it = m_devFileCatalog[catalog].cbegin(); it != m_devFileCatalog[catalog].cend(); ++it)
+        result.push_back(it.key());
+
+    return result;
+}
+
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
                                                     ArchiveCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
 {
@@ -1043,20 +1053,21 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             ) + DeviceFileCatalog::prefixByCatalog(catalog)
         );
 
-    FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
-    for (auto it = catalogMap.cbegin(); it != catalogMap.cend(); ++it)
+    auto camerasIds = getAllCameraIdsUnderLock(catalog);
+
+    for (const auto& cameraId: camerasIds)
     {
         QString cameraDir =
             closeDirPath(
                 closeDirPath(storage->getUrl()) +
                 DeviceFileCatalog::prefixByCatalog(catalog)
-            ) + it.key();
+            ) + cameraId;
 
         if (!storage->isDirExists(cameraDir))
         {
             DeviceFileCatalogPtr newCatalog(
                 new DeviceFileCatalog(
-                    it.key(),
+                    cameraId,
                     catalog,
                     m_role
                 )
@@ -1066,7 +1077,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()),
                 storage,
                 newCatalog,
-                it.key(),
+                cameraId,
                 catalog
             );
         }
@@ -2184,13 +2195,13 @@ void QnStorageManager::writeCameraInfoFiles()
 
         for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
+            auto cameraIds = getAllCameraIdsUnderLock(static_cast<QnServer::ChunksCatalog>(i));
+            for (const auto& cameraId: cameraIds)
             {
                 if (QnResource::isStopping())
                     return;
 
-                QString cameraUniqueId = cameraIt.key();
-                auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
+                auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
                 if (!camResource)
                     continue;
 
@@ -2198,7 +2209,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 if (camResource->getTypeId() == archiveCamTypeId)
                     continue;
 
-                QString infoFilePath = makeFullPathForInfoFile(paths[i], cameraUniqueId);
+                QString infoFilePath = makeFullPathForInfoFile(paths[i], cameraId);
                 QByteArray infoFileData = composeInfoFileData(camResource);
                 if (!m_storageUrlToCameraInfo.contains(infoFilePath) ||
                     m_storageUrlToCameraInfo[infoFilePath] != infoFileData)
