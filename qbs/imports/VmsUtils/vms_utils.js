@@ -18,8 +18,10 @@ function currentArch()
 {
     if (qbs.architecture == "x86_64")
         return "x64"
-    if (qbs.architecture == "x86" || qbs.architecture == "arm")
+    if (qbs.architecture == "x86")
         return qbs.architecture
+    if (qbs.architecture.startsWith("arm"))
+        return "arm"
 
     throw "Unsupported target architecture " + qbs.architecture
 }
