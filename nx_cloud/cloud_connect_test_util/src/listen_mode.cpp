@@ -228,10 +228,10 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
-            int serverCount = 1;
+            size_t serverCount = 1;
             args.read("server-count", &serverCount);
-            for (int i = serverIds.size(); i < serverCount; i++)
-                serverIds.push_back((serverId + QString::number(i)).toUtf8());
+            for (size_t i = serverIds.size(); i < serverCount; i++)
+                serverIds.push_back(makeServerName(serverId, i));
         }
 
         for (auto& id : serverIds)
@@ -369,6 +369,12 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
+}
+
+String makeServerName(const QString& prefix, size_t number)
+{
+    static const QString kFormat = QLatin1String("%1-%2");
+    return kFormat.arg(prefix).arg((uint) number, 5, 10, QLatin1Char('0')).toUtf8();
 }
 
 void limitStringList(QStringList* list)

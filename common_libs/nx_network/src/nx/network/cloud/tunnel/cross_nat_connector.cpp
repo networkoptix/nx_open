@@ -68,6 +68,7 @@ CrossNatConnector::CrossNatConnector(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
+    s_mediatorResponseCounter.addResult(hpm::api::ResultCode::otherLogicError);
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
     m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
@@ -107,7 +108,9 @@ void CrossNatConnector::connect(
             const auto hostName = m_targetPeerAddress.host.toString().toUtf8();
             if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
+                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
                 NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
+
                 return handler(
                     SystemError::noError,
                     std::make_unique<tcp::OutgoingReverseTunnelConnection>(
@@ -128,6 +131,11 @@ void CrossNatConnector::replaceOriginatingHostAddress(const QString& address)
     m_originatingHostAddressReplacement = address;
 }
 
+utils::ResultCounter<nx::hpm::api::ResultCode>& CrossNatConnector::mediatorResponseCounter()
+{
+    return s_mediatorResponseCounter;
+}
+
 void CrossNatConnector::messageReceived(
     SocketAddress /*sourceAddress*/,
     stun::Message /*msg*/)
@@ -141,6 +149,9 @@ void CrossNatConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
 }
+
+utils::ResultCounter<nx::hpm::api::ResultCode>
+    CrossNatConnector::s_mediatorResponseCounter(&nx::hpm::api::toString);
 
 void CrossNatConnector::issueConnectRequestToMediator(
     std::chrono::milliseconds timeout,
@@ -156,6 +167,7 @@ void CrossNatConnector::issueConnectRequestToMediator(
         post(
             [handler = move(handler), errorCode]() mutable
             {
+                s_mediatorResponseCounter.addResult(hpm::api::ResultCode::badTransport);
                 handler(errorCode, nullptr);
             });
         return;
@@ -192,6 +204,7 @@ void CrossNatConnector::onConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse response)
 {
+    s_mediatorResponseCounter.addResult(resultCode);
     NX_LOGX(lm("cross-nat %1. Received %2 response from mediator")
         .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode)),
         cl_logDEBUG2);

@@ -73,7 +73,7 @@ String OutgoingTunnelPool::ownPeerId() const
     QnMutexLocker lock(&m_mutex);
     if (!m_isOwnPeerIdAssigned)
     {
-        NX_ASSERT(false, "Own peer id is not supposed to be used until it's designated");
+        NX_ASSERT(false, "Own peer id is not supposed to be used until it's assigned");
 
         m_isOwnPeerIdAssigned = true; //< Peer id is not supposed to be changed after first use.
         NX_LOGX(lm("Random own peer id: %1").arg(m_ownPeerId), cl_logINFO);
