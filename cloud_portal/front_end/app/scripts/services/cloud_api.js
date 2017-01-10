@@ -181,7 +181,7 @@ angular.module('cloudApp')
                     $log.error("TODO: remove this hack before the release");
                     return cacheGet('/static/downloads.json', true);
                 })
-            }
+            },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
