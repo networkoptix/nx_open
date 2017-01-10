@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('cloudApi', ['$http', '$q', '$localStorage', function ($http, $q, $localStorage) {
+    .factory('cloudApi', ['$http', '$q', '$localStorage', '$log', function ($http, $q, $localStorage, $log) {
 
         var apiBase = Config.apiBase;
 
@@ -176,7 +176,12 @@ angular.module('cloudApp')
                     language: language
                 });
             },
-            getDownloads:cacheGet('/static/downloads.json',true),
+            getDownloads:function(){
+                return $http.get(apiBase + '/utils/downloads').catch(function(){
+                    $log.error("TODO: remove this hack before the release");
+                    return cacheGet('/static/downloads.json', true);
+                });
+            },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');

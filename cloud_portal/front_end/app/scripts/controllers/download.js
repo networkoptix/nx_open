@@ -20,6 +20,7 @@ angular.module('cloudApp')
                     if(targetInstaller){
                         _.extend(installer, targetInstaller);
                         installer.formatName = L.downloads.platforms[installer.platform] + ' - ' + L.downloads.appTypes[installer.appType];
+                        installer.url = platform.releaseUrl + installer.path;
                     }
                     return !!targetInstaller;
                 });

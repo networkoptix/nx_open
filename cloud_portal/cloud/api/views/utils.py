@@ -4,6 +4,8 @@ from django.core.cache import cache
 from rest_framework.permissions import AllowAny
 from api.helpers.exceptions import handle_exceptions, api_success, require_params, APIRequestException, ErrorCodes
 import datetime, logging
+import json
+import requests
 from cloud import settings
 from django.shortcuts import redirect
 
@@ -66,9 +68,8 @@ def language(request):
             lang = settings.DEFAULT_LANGUAGE  # return default
 
         language_file = '/static/lang_' + lang + '/language.json'
-        return redirect(language_file)
         # Return: redirect to language.json file for selected language
-        pass
+        return redirect(language_file)
     elif request.method == 'POST':
         require_params(request, ('language',))
         lang = request.data['language']
@@ -85,3 +86,54 @@ def language(request):
         # Save cookie
         response.set_cookie('language', lang, 60 * 60 * 24 * 7)  # Cookie for one week
         return response
+
+
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def downloads(request):
+    customization = settings.CUSTOMIZATION
+    cache_key = "downloads_" + customization
+    if request.method == 'POST':  # clear cache on POST request - only for this customization
+        cache.set(cache_key, False)
+    downloads_json = cache.get(cache_key, False)
+    if not downloads_json:
+        # get updates.json
+        updates_json = requests.get(settings.UPDATE_JSON)
+        updates_json = updates_json.json()
+
+        # find settings for customizations
+        if customization not in updates_json:
+            customization = 'default'
+        updates_record = updates_json[customization]
+        latest_release = updates_record['current_release']
+        latest_version = updates_record['releases'][latest_release]
+
+        build_number = latest_version.split('.')[-1]
+        updates_path = updates_record['updates_prefix']
+
+        # get downloads.json for specific version
+        downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+
+        # Check response result here
+        if downloads_json.status_code != requests.codes.ok:
+            # old or broken release - no downloads json
+            # TODO: this is hardcode - remove it after release
+            latest_version = updates_record['releases']['3.0']
+            build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
+            downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+            pass
+
+        downloads_json.raise_for_status()
+        downloads_json = downloads_json.json()
+
+        downloads_json['releaseNotes'] = updates_record['release_notes']
+        downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
+        # add release notes to downloads.json
+        # evaluate file paths
+        release_notes = updates_record['release_notes']
+
+        cache.set(cache_key, json.dumps(downloads_json))
+    else:
+        downloads_json = json.loads(downloads_json)
+    return Response(downloads_json)
