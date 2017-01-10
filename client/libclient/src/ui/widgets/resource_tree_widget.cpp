@@ -356,10 +356,15 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 
     m_graphicsTweaksFlags = flags;
 
+    /*
+     * Currently this is not working: hidden row does not receive full update when scrolled up.
+     * It was working only due to full tree repainting inside graphics proxy widget.
+
     if (flags & Qn::HideLastRow)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
+    */
 
     if (flags & Qn::BypassGraphicsProxy)
     {
