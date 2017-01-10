@@ -1,4 +1,4 @@
-customization: default
+customization: cox
 
 cloud_database:
     host: '$DB_HOST'
@@ -18,7 +18,7 @@ cloud_gateway:
 
 mail_from: 'service@networkoptix.com'
 
-mail_prefix: '[CLOUD_PORTAL]'
+mail_prefix: 'Cox Cloud'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'

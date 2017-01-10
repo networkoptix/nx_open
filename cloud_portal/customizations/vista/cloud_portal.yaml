@@ -18,7 +18,7 @@ cloud_gateway:
 
 mail_from: 'Qloud <service@networkoptix.com>'
 
-mail_prefix: '[QLOUD]'
+mail_prefix: 'Qloud'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
