@@ -42,7 +42,9 @@ public:
     void hideToolTip(bool animated = true);
     void showToolTip(bool animated = true);
 
-protected:
+    void setToolTipEnabled(bool enabled);
+
+protected :
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
     virtual void timerEvent(QTimerEvent *event) override;
@@ -75,6 +77,7 @@ private:
     bool m_instantPositionUpdate;
     QPointF m_dragOffset;
     qreal m_tooltipMargin;
+    bool m_toolTipEnabled;
 };
 
 #endif // QN_TOOL_TIP_SLIDER_H
