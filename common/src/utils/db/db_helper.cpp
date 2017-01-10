@@ -274,6 +274,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
+            NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
             if (!execSQLFile(fileName, m_sdb))
