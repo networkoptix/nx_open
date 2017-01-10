@@ -204,13 +204,14 @@ void MediaServerClient::performApiRequest(
     performGetRequest<Input, QnJsonRestResult>(
         requestName,
         input,
-        [completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
-        {
-            if (sysErrorCode != SystemError::noError)
-                result.error = QnRestResult::CantProcessRequest;
-            completionHandler(std::move(result));
-        });
+        std::function<void(SystemError::ErrorCode, QnJsonRestResult)>(
+            [completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
+            {
+                if (sysErrorCode != SystemError::noError)
+                    result.error = QnRestResult::CantProcessRequest;
+                completionHandler(std::move(result));
+            }));
 }
 
 template<typename Output>
@@ -220,16 +221,17 @@ void MediaServerClient::performApiRequest(
 {
     performGetRequest<QnJsonRestResult>(
         requestName,
-        [completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
-        {
-            Output output;
-            if (sysErrorCode == SystemError::noError)
-                output = result.deserialized<Output>();
-            else
-                result.error = QnRestResult::CantProcessRequest;
-            completionHandler(std::move(result), std::move(output));
-        });
+        std::function<void(SystemError::ErrorCode, QnJsonRestResult)>(
+            [completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
+            {
+                Output output;
+                if (sysErrorCode == SystemError::noError)
+                    output = result.deserialized<Output>();
+                else
+                    result.error = QnRestResult::CantProcessRequest;
+                completionHandler(std::move(result), std::move(output));
+            }));
 }
 
 template<typename Input, typename ... Output>
@@ -259,13 +261,14 @@ void MediaServerClient::performAsyncEc2Call(
 {
     performGetRequest<Output...>(
         requestName,
-        [this, completionHandler = std::move(completionHandler)](
-            SystemError::ErrorCode sysErrorCode, Output... result)
-    {
-        completionHandler(
-            systemErrorCodeToEc2Error(sysErrorCode),
-            std::move(result)...);
-    });
+        std::function<void(SystemError::ErrorCode, Output...)>(
+            [this, completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode, Output... result)
+            {
+                completionHandler(
+                    systemErrorCodeToEc2Error(sysErrorCode),
+                    std::move(result)...);
+            }));
 }
 
 ec2::ErrorCode MediaServerClient::systemErrorCodeToEc2Error(
