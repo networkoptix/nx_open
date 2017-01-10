@@ -18,7 +18,7 @@ cloud_gateway:
 
 mail_from: 'service@networkoptix.com'
 
-mail_prefix: 'FlyView Cloud'
+mail_prefix: '[FlyView Cloud]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
