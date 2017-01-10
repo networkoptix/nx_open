@@ -87,7 +87,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.sourceRowsCount;
+                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -186,11 +186,51 @@ Rectangle
                     }
                 }
 
-                model: QnFilteringSystemsModel
+                function createModel()
                 {
-                    filterCaseSensitivity: Qt.CaseInsensitive;
-                    filterRole: 257;    // Search text role
+                    var code =
+                        "\n\
+                        import QtQuick 2.6;\n\
+                        import NetworkOptix.Qml 1.0;\n\
+                        import com.networkoptix.qml 1.0;\n
+                        QnFilteringSystemsModel\n\
+                        {\n\
+                            filterCaseSensitivity: Qt.CaseInsensitive;\n\
+                            filterRole: 257;    // Search text role\n\
+                        }\n\ ";
+
+                    return Qt.createQmlObject(code, grid, "CustomModel.qml");
                 }
+
+                function updateModel()
+                {
+                    var screenVisible = (context.isVisible && screenHolder.visible);
+                    if (screenVisible == !!grid.model)
+                        return;
+
+                    if (screenVisible)
+                    {
+                        grid.model = grid.createModel();
+                        return;
+                    }
+
+                    grid.model.destroy();
+                    grid.model = null;
+                }
+
+                Connections
+                {
+                    target: context;
+                    onIsVisibleChanged: grid.updateModel();
+                }
+
+                Connections
+                {
+                    target: screenHolder;
+                    onVisibleChanged: grid.updateModel();
+                }
+
+                model: createModel();
 
                 delegate: Item
                 {
@@ -286,7 +326,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (grid.model.sourceRowsCount == 0);
+            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
         }
 
         Item
