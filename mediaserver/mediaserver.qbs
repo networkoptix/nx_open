@@ -35,6 +35,7 @@ Project
         name: "mediaserver"
         type: "application"
 
+        Depends { name: "festival" }
         Depends { name: "server-external" }
         Depends { name: "mediaserver_core" }
 
