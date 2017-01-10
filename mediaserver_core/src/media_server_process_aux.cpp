@@ -11,8 +11,6 @@
 namespace nx {
 namespace mserver_aux {
 
-static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
-
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,
         SystemNameProxyPtr systemName):
@@ -157,13 +155,15 @@ bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
            (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
 }
 
-bool isNewServerInstance(const BeforeRestoreDbData& restoreData, bool foundOwnServerInDb)
+bool isNewServerInstance(
+    const BeforeRestoreDbData& restoreData, 
+    bool foundOwnServerInDb,
+    bool noSetupWizardFlag)
 {
     if (foundOwnServerInDb)
         return false;
 
-    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
-    return !noSetupWizardFlag && restoreData.localSystemId.isNull();
+    return noSetupWizardFlag || restoreData.localSystemId.isNull();
 }
 
 bool setUpSystemIdentity(

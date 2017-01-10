@@ -372,3 +372,21 @@ TEST_F(CloudInstanceChanged, main)
     assertAdminIsDisabled();
     assertNeedToResetSystem(false, true);
 }
+
+TEST_F(BaseRestoreDbTest, IsNewServerInstance)
+{
+    ASSERT_TRUE(nx::mserver_aux::isNewServerInstance(restoreData, false, false));
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, true, false));
+    ASSERT_TRUE(nx::mserver_aux::isNewServerInstance(restoreData, false, true));
+
+    shutdownBeforeRestore();
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, false, false));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem)
+{
+    assertNeedToResetSystem(true, true);
+    settingsProxy->setCloudInstanceChanged(true);
+    settingsProxy->setConnectedToCloud(true);
+    assertNeedToResetSystem(false, true);
+}

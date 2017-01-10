@@ -76,7 +76,10 @@ SettingsProxyPtr createServerSettingsProxy();
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings);
 
-bool isNewServerInstance(const BeforeRestoreDbData& restoreData, bool foundOwnServerInDb);
+bool isNewServerInstance(
+    const BeforeRestoreDbData& restoreData, 
+    bool foundOwnServerInDb,
+    bool noSetupWizardFlag);
 
 BeforeRestoreDbData savePersistentDataBeforeDbRestore(
         const QnUserResourcePtr& admin,

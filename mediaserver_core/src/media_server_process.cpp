@@ -260,6 +260,7 @@
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
+static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 
 static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
@@ -2515,7 +2516,10 @@ void MediaServerProcess::run()
             m_mediaServer = registerServer(
                         ec2Connection,
                         server,
-                        nx::mserver_aux::isNewServerInstance(qnCommon->beforeRestoreDbData(), foundOwnServerInDb));
+                        nx::mserver_aux::isNewServerInstance(
+                            qnCommon->beforeRestoreDbData(), 
+                            foundOwnServerInDb,
+                            MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0));
         else
             m_mediaServer = server;
 
@@ -2688,7 +2692,8 @@ void MediaServerProcess::run()
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(
                         qnCommon->beforeRestoreDbData(),
-                        foundOwnServerInDb),
+                        foundOwnServerInDb,
+                        MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0),
                     settingsProxy.get()))
         {
             if (settingsProxy->isCloudInstanceChanged())

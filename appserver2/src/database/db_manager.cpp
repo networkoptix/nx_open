@@ -559,7 +559,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
 
 
-        bool updateUserResource = false;
+        bool updateUserResource = aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
+
         if (!defaultAdminPassword.isEmpty())
         {
             if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
@@ -572,8 +573,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 updateUserResource = true;
             }
         }
-
-        updateUserResource = aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
 
         if (updateUserResource)
         {
