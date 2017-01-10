@@ -90,11 +90,13 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
-
+#include <utils/unity_launcher_workaround.h>
 #include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
+
+using nx::client::desktop::utils::UnityLauncherWorkaround;
 
 namespace {
 #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
@@ -679,7 +681,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
 #endif
-    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+    UnityLauncherWorkaround::startDetached(qApp->applicationFilePath(), arguments);
 }
 
 void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr &videoWall)

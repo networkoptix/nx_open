@@ -399,10 +399,12 @@ bool ApplauncherProcess::startApplication(
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
 
     NX_LOG(QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG2);
+
+    const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
-        binPath,
+        "./" + info.fileName(),
         arguments,
-        QFileInfo(binPath).canonicalPath(),
+        info.absolutePath(),
         environment))
     {
         NX_LOG(QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1);
