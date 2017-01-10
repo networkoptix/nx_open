@@ -13,12 +13,12 @@ NxTextEdit
 
     property string query;
 
-    backgroundColor: activeColor;
-    activeColor: Style.darkerColor(Style.colors.shadow, 2)
+    backgroundColor: Style.colors.window;
+    activeColor: Style.getPaletteColor("dark", 2);
     textControlEnabled: (state != "masked");
 
     state: "masked";
-    width: mask.width;
+    width: 280;
 
     leftControlDelegate: Image
     {
@@ -39,7 +39,6 @@ NxTextEdit
         }
     }
 
-
     onVisibleChanged:
     {
         if (enabled && visible)
@@ -48,11 +47,36 @@ NxTextEdit
 
     onTextChanged: { timer.restart(); }
 
+    NxLabel
+    {
+        id: searchLabel;
+
+        text: qsTr("Search");
+
+        anchors.verticalCenter: parent.verticalCenter;
+        x: (parent.width - width) / 2;
+        visible: (opacity != 0 && !control.text.length);
+    }
+
+    MouseArea
+    {
+        id: activationArea;
+        anchors.fill: parent;
+
+        hoverEnabled: true;
+        visible: (control.state == "masked");
+        cursorShape: Qt.PointingHandCursor;
+        acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
+        onClicked:
+        {
+            control.forceActiveFocus();
+            control.state = "editable";
+        }
+    }
+
     MouseArea
     {
         id: cancelArea;
-
-        onMouseXChanged: console.log(mouseX)
 
         anchors.fill: parent;
         parent: (visualParent ? visualParent : control.parent);
@@ -68,56 +92,20 @@ NxTextEdit
         }
     }
 
-    Item
+    Rectangle
     {
-        id: mask;
+        x: -1;
+        y: 0;
+        width: parent.width + 2;
+        height: parent.height;
 
-        width: row.width;
-        height: row.height;
-        anchors.centerIn: parent;
-
-        Rectangle
-        {
-            id: maskBackground;
-            color: Style.colors.window;
-            anchors.fill: parent;
-            anchors.margins: -2;
-
-            visible: (searchCaption.opacity == 1);
-        }
-
-        Row
-        {
-            id: row;
-
-            Image
-            {
-                source: "qrc:/skin/welcome_page/search.png";
-                opacity: (searchCaption.opacity == 1 ? 1 : 0);
-            }
-
-            NxLabel
-            {
-                id: searchCaption;
-                text: qsTr("Search");
-                anchors.verticalCenter: parent.verticalCenter;
-            }
-        }
-
-        MouseArea
-        {
-            anchors.fill: parent;
-
-            visible: (control.state == "masked");
-            cursorShape: Qt.PointingHandCursor;
-            acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
-            onClicked:
-            {
-                control.forceActiveFocus();
-                control.state = "editable";
-            }
-        }
+        color: "#00000000";
+        radius: 1;
+        border.color: (control.hasFocus || activationArea.containsMouse
+            ? Style.colors.mid
+            : Style.colors.dark)
     }
+
 
     states:
     [
@@ -127,14 +115,9 @@ NxTextEdit
 
             PropertyChanges
             {
-                target: control;
-                width: control.targetWidth;
-            }
-
-            PropertyChanges
-            {
-                target: searchCaption;
-                opacity: 0;
+                target: searchLabel;
+                x: leftControl.width
+                    + 8; //< Offset for cursor position
             }
         },
 
@@ -144,14 +127,8 @@ NxTextEdit
 
             PropertyChanges
             {
-                target: control;
-                width: mask.width;
-            }
-
-            PropertyChanges
-            {
-                target: searchCaption;
-                opacity: 1;
+                target: searchLabel;
+                x: (control.width - searchLabel.width) / 2;
             }
         }
     ]
@@ -160,23 +137,12 @@ NxTextEdit
     {
         SequentialAnimation
         {
-            ParallelAnimation
+            NumberAnimation
             {
-                NumberAnimation
-                {
-                    target: control;
-                    property: "width";
-                    duration: 200;
-                    easing.type: Easing.InOutCubic;
-                }
-
-                NumberAnimation
-                {
-                    target: searchCaption;
-                    property: "opacity";
-                    duration: 200;
-                    easing.type: Easing.InOutCubic;
-                }
+                target: searchLabel;
+                property: "x";
+                duration: 200;
+                easing.type: Easing.OutCubic;
             }
 
             ScriptAction

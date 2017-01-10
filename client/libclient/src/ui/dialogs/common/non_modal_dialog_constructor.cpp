@@ -57,30 +57,29 @@ QPoint QnShowDialogHelper::calculatePosition(QWidget* dialog) {
     return p;
 }
 
-void QnShowDialogHelper::showNonModalDialog(QWidget *dialog
-    , const QRect &targetGeometry
-    , bool dontFocus)
+void QnShowDialogHelper::showNonModalDialog(QWidget* dialog, const QRect &targetGeometry,
+    bool focus)
 {
     QWidgetList modalWidgets;
 
     /* Checking all top-level widgets. */
-    foreach (QWidget* tlw, qApp->topLevelWidgets()) {
+    for (auto tlw: qApp->topLevelWidgets())
+    {
         if (!tlw->isHidden() && tlw->isModal())
             modalWidgets << tlw;
     }
 
     /* Setup dialog to show after all modal windows are closed. */
-    if (!modalWidgets.isEmpty()) {
-        QnDelayedShowHelper* helper = new QnDelayedShowHelper(dialog, targetGeometry, modalWidgets.size(), dialog);
-        foreach (QWidget* modalWidget, modalWidgets)
+    if (!modalWidgets.isEmpty())
+    {
+        auto helper = new QnDelayedShowHelper(dialog, targetGeometry, modalWidgets.size(), dialog);
+        for (auto modalWidget: modalWidgets)
             modalWidget->installEventFilter(helper);
         return;
     }
 
-    if (dialog->isVisible() && dontFocus) {
+    if (dialog->isVisible() && !focus)
         dialog->raise();
-        return;
-    }
-
-    show(dialog, targetGeometry);
+    else
+        show(dialog, targetGeometry);
 }

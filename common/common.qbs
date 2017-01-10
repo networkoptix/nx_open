@@ -23,7 +23,11 @@ GenericProduct
 
     Depends { name: "openssl" }
     Depends { name: "ffmpeg" }
-    Depends { name: "quazip" }
+    Depends
+    {
+        name: "quazip"
+        condition: project.withDesktopClient || project.withMediaServer
+    }
     Depends { name: "boost" }
 
     Depends { name: "nx_fusion" }
@@ -142,7 +146,11 @@ GenericProduct
         }
         Depends { name: "openssl" }
         Depends { name: "ffmpeg" }
-        Depends { name: "quazip" }
+        Depends
+        {
+            name: "quazip"
+            condition: project.withDesktopClient || project.withMediaServer
+        }
         Depends { name: "nx_fusion" }
 
         cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]

@@ -65,6 +65,7 @@ FocusScope
         style: nxTextEditStyle;
 
         onAccepted: control.accepted();
+        Keys.enabled: false;
 
         Component
         {

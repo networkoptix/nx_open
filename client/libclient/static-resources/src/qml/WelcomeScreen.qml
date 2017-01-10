@@ -41,7 +41,7 @@ Rectangle
             visible: grid.totalItemsCount > grid.itemsPerPage
 
             anchors.bottom: gridHolder.top
-            anchors.bottomMargin: 8
+            anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
