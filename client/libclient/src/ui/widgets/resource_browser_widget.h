@@ -119,6 +119,9 @@ public:
 
     bool isScrollBarVisible() const;
 
+    void hideToolTip();
+    void showToolTip();
+
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -158,8 +161,7 @@ private:
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
-    void hideToolTip();
-    void showToolTip();
+
     void updateIcons();
 
     void at_tabWidget_currentChanged(int index);

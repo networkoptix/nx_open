@@ -627,7 +627,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor, SIGNAL(hoverLeft()), this, SLOT(hideToolTip()));
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &QnResourceBrowserWidget::hideToolTip);
 
     updateToolTipPosition();
 }
