@@ -346,8 +346,15 @@ Qn::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
         return softMotionRole;
 
     //checking stream resolution
-    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION )
+    auto forcedMotionDetection = m_thirdPartyRes->getProperty(QnMediaResource::motionStreamKey());
+    auto forcedPrimaryStreamMotionDetection =
+        forcedMotionDetection == QnMediaResource::primaryStreamValue();
+
+    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION
+        && !forcedPrimaryStreamMotionDetection)
+    {
         return Qn::CR_SecondaryLiveVideo;
+    }
 
     return softMotionRole;
 }

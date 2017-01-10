@@ -34,7 +34,15 @@ QnOpteraDataProvider::~QnOpteraDataProvider()
 
 QnAbstractMediaDataPtr QnOpteraDataProvider::getNextData()
 {
-    return m_dataSource.retrieveData();
+    auto data = m_dataSource.retrieveData();
+
+    if (needMetaData())
+        return getMetaData();
+
+    if (data)
+        data->dataProvider = this;
+
+    return data;
 }
 
 void QnOpteraDataProvider::closeStream()
