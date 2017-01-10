@@ -350,7 +350,12 @@
                 "VS8801|*",
                 "*|VS8801",
                 "VS8401|*",
-                "*|VS8401"
+                "*|VS8401",
+                "Digital Watchdog|DW-CPUHDE04",
+                "Digital Watchdog|DW-CPUHDE08",
+                "Digital Watchdog|DW-CPUHDE16",
+                "Digital Watchdog|VMAX A1",
+                "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
         },
