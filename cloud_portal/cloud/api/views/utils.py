@@ -37,7 +37,6 @@ def visited_key(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
-@handle_exceptions
 def language(request):
     if request.method == 'GET':  # Get language for current user
         # 1. Try session value
@@ -69,9 +68,8 @@ def language(request):
             lang = settings.DEFAULT_LANGUAGE  # return default
 
         language_file = '/static/lang_' + lang + '/language.json'
-        return redirect(language_file)
         # Return: redirect to language.json file for selected language
-        pass
+        return redirect(language_file)
     elif request.method == 'POST':
         require_params(request, ('language',))
         lang = request.data['language']
