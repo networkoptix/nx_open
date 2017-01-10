@@ -34,10 +34,10 @@ QnOpteraDataProvider::~QnOpteraDataProvider()
 
 QnAbstractMediaDataPtr QnOpteraDataProvider::getNextData()
 {
-    auto data = m_dataSource.retrieveData();
-
     if (needMetaData())
         return getMetaData();
+
+    auto data = m_dataSource.retrieveData();
 
     if (data)
         data->dataProvider = this;
