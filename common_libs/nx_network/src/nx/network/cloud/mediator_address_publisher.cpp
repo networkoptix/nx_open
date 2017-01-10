@@ -56,6 +56,8 @@ void MediatorAddressPublisher::updateAddresses(
         [this, addresses = std::move(addresses), handler = std::move(updateHandler)]() mutable
         {
             NX_ASSERT(!m_updateHandler);
+            if (m_updateHandler)
+                reportResultToTheCaller(hpm::api::ResultCode::interrupted);
         
             m_serverAddresses = std::move(addresses);
             m_updateHandler = std::move(handler);

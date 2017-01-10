@@ -21,7 +21,8 @@ enum class ResultCode
     timedOut,
     serverConnectionBroken,
     noReplyFromServer,
-    badTransport
+    badTransport,
+    interrupted,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
