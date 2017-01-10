@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
+    <width>1097</width>
     <height>653</height>
    </rect>
   </property>
@@ -354,9 +354,12 @@
             <enum>QLayout::SetNoConstraint</enum>
            </property>
            <item>
-            <widget class="QLabel" name="labelForcedMotionStream">
+            <widget class="QCheckBox" name="checkBoxForceMotionDetection">
              <property name="text">
-              <string>Forced motion stream</string>
+              <string>Force motion detection for stream:</string>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
