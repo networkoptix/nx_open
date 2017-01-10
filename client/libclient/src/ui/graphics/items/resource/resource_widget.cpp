@@ -1018,10 +1018,19 @@ QColor QnResourceWidget::calculateFrameColor() const
 
 void QnResourceWidget::paintWindowFrame(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* option,
+    const QStyleOptionGraphicsItem* /*option*/,
     QWidget* /*widget*/)
 {
-    painter->fillRect(option->exposedRect, palette().window());
+    constexpr auto kDefaultChannel = 0;
+    constexpr bool kNotForViewport = false;
+    constexpr bool kNotForVisibility = false;
+    constexpr bool kNotRelativeCoordinates = false;
+
+    const auto paintRect = this->exposedRect(kDefaultChannel,
+        kNotForViewport, kNotForVisibility, kNotRelativeCoordinates);
+
+    if (!paintRect.isEmpty())
+        painter->fillRect(paintRect, palette().window());
 
     if (qFuzzyIsNull(m_frameOpacity))
         return;
