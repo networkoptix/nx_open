@@ -514,7 +514,7 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     setsockopt(m_fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
 #endif
 
-    // We dont want child processes, created by exec() to inherit socket descriptors.
+    // We do not want child processes created by exec() to inherit socket descriptors.
 #ifdef FD_CLOEXEC
     int flags = fcntl( m_fd, F_GETFL, 0 );
     if( flags < 0 )
