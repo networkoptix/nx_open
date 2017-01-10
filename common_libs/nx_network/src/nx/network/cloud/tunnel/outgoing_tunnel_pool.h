@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -61,6 +56,10 @@ public:
 
     OnTunnelClosedSubscription& onTunnelClosedSubscription();
 
+    // TODO: Remove this function when SocketGlobals are not dependent on cloud any more.
+    /** Unit test usage only! */
+    static void allowOwnPeerIdChange();
+
 private:
     struct TunnelContext
     {
@@ -87,6 +86,8 @@ private:
         std::list<OutgoingTunnel::NewConnectionHandler>::iterator handlerIter);
     void onTunnelClosed(OutgoingTunnel* tunnelPtr);
     void tunnelsStopped(nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    static bool s_isOwnPeerIdChangeAllowed;
 };
 
 } // namespace cloud

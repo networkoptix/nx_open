@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #include "outgoing_tunnel_pool.h"
 
 #include <nx/utils/log/log.h>
@@ -87,9 +82,10 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
-    //NX_ASSERT(!m_isOwnPeerIdAssigned, "Own peer id is not supposed to be changed");
-    m_isOwnPeerIdAssigned = true;
+    NX_ASSERT(m_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
+        "Own peer id is not supposed to be changed");
 
+    m_isOwnPeerIdAssigned = true;
     m_ownPeerId = QString(id).toUtf8();
     NX_LOGX(lm("Assigned own peer id: %1").arg(m_ownPeerId), cl_logINFO);
 }
@@ -104,6 +100,11 @@ void OutgoingTunnelPool::clearOwnPeerId()
 OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClosedSubscription()
 {
     return m_onTunnelClosedSubscription;
+}
+
+void OutgoingTunnelPool::allowOwnPeerIdChange()
+{
+    m_isOwnPeerIdChangeAllowed = true;
 }
 
 OutgoingTunnelPool::TunnelContext& 
@@ -194,6 +195,8 @@ void OutgoingTunnelPool::tunnelsStopped(
             completionHandler();
         });
 }
+
+bool OutgoingTunnelPool::s_isOwnPeerIdChangeAllowed(false);
 
 } // namespace cloud
 } // namespace network
