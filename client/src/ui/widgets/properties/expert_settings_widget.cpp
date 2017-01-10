@@ -61,7 +61,6 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->checkBoxBitratePerGOP, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
-    connect(ui->comboBoxForcedMotionStream, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     connect(
         ui->checkBoxForceMotionDetection, &QCheckBox::stateChanged,
@@ -344,7 +343,7 @@ bool QnCameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCam
 
     return mdPolicy.isEmpty() //< Do not force MD policy
         || mdPolicy == QnMediaResource::primaryStreamValue()
-        || mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming;
+        || (mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming);
 }
 
 void QnCameraExpertSettingsWidget::at_dataChanged()
