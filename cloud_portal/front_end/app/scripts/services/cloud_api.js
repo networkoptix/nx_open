@@ -177,10 +177,10 @@ angular.module('cloudApp')
                 });
             },
             getDownloads:function(){
-                return cacheGet(apiBase + '/utils/downloads', true).catch(function(){
+                return $http.get(apiBase + '/utils/downloads').catch(function(){
                     $log.error("TODO: remove this hack before the release");
                     return cacheGet('/static/downloads.json', true);
-                })
+                });
             },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
