@@ -470,7 +470,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         emit q->statusChanged(status);
 
     if (isNewErrorCode && (errorCode != QnCloudStatusWatcher::NoError))
-        emit q->errorChanged();
+        emit q->errorChanged(errorCode);
 }
 
 void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)
