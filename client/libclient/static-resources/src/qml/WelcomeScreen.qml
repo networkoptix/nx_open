@@ -231,6 +231,7 @@ Rectangle
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
                         isOnline: model.isOnline;
+                        isReachable: model.isReachable;
 
                         Component.onCompleted:
                         {
@@ -338,7 +339,7 @@ Rectangle
 
         NxBanner
         {
-            visible: !context.isCloudEnabled;
+            visible: !context.isCloudEnabled && context.isLoggedInToCloud;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;
