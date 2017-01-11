@@ -11,7 +11,7 @@ Item
 
         Image
         {
-            source: lp("images/nx1_offline.png")
+            source: lp("/images/nx1_offline.png")
             anchors.horizontalCenter: parent.horizontalCenter
         }
 

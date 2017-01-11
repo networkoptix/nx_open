@@ -142,7 +142,7 @@ Page
         id: offlineDummy
         anchors.fill: parent
         title: qsTr("Nx1 is offline")
-        image: lp("images/alert_nx1_offline.png")
+        image: lp("/images/alert_nx1_offline.png")
         visible: !liteClientController.serverOnline
     }
 
