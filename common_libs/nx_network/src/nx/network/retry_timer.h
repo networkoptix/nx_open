@@ -75,7 +75,7 @@ class NX_NETWORK_API RetryTimer
     public aio::BasicPollable
 {
 public:
-    RetryTimer(const RetryPolicy& policy);
+    RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread = nullptr);
     virtual ~RetryTimer();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;

@@ -106,7 +106,7 @@ public:
         :
             type(_type),
             socket(_socket),
-            socketSequence(0),
+            socketSequence(_socket ? _socket->impl()->socketSequence : 0),
             eventType(_eventType),
             eventHandler(_eventHandler),
             timeout(_timeout),

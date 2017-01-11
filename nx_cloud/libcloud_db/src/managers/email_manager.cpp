@@ -14,7 +14,7 @@
 
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/email/email_manager_impl.h>
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/utils/log/log.h>
 
 #include "notification.h"

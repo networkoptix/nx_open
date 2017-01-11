@@ -10,7 +10,7 @@
 #include <nx/utils/uuid.h>
 
 /**
- * Adds some useful overloads to QString::arg
+ * Adds some useful overloads to QString::arg.
  */
 class NX_UTILS_API QnLogMessage
 {
@@ -94,8 +94,7 @@ public:
     }
 
     operator QString() const;
-
-    std::string toStdString() const { return m_str.toStdString(); }
+    std::string toStdString() const;
 
 private:
     QString m_str;

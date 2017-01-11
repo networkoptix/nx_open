@@ -355,7 +355,7 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
         return;
     }
 
-    NX_CRITICAL( mutexLockPosition == threadContext.currentLockPath.front() );
+    NX_ASSERT( mutexLockPosition == threadContext.currentLockPath.front() );
     threadContext.currentLockPath.pop_front();
 }
 

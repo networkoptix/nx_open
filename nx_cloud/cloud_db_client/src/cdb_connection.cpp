@@ -13,10 +13,10 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 Connection::Connection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
     AsyncRequestsExecutor(endPointFetcher)
 {
@@ -83,6 +83,6 @@ void Connection::ping(
         std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

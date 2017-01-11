@@ -188,9 +188,6 @@ QnClientModule::~QnClientModule()
 
 void QnClientModule::initThread()
 {
-    // these functions should be called in every thread that wants to use rand() and qrand()
-    srand(::time(NULL));
-    qsrand(::time(NULL));
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 }
 

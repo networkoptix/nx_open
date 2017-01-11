@@ -43,7 +43,9 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
               'testMergeTakeLocalSettings',
               'testMergeTakeRemoteSettings',
               'testRestartOneServer',
-              'testCloudMerge'
+              'testMergeCloudWithLocal',
+              'testMergeCloudSystems',
+              'testCloudMergeAfterDisconnect'
           ]),
       )
 
@@ -75,7 +77,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
           self.serverAddr2:
               self.Server(self.sysName2, {}, self.user, self.password)}
 
-    def __prepareInitialState(self, init = True):
+    def __prepareInitialState(self, skipInitSrvs = []):
         tlog(LOGLEVEL.INFO, "Prepare initial state...")
         try:
             self._prepare_test_phase(self._stop_and_init)
@@ -84,23 +86,23 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
             raise
 
         # Assign new system names
-        if init:
-            for srv,info in self.servers.items():
+        for srv,info in self.servers.items():
+            if not srv in skipInitSrvs:
                 settings = info.settings.copy()
                 settings['password'] = info.password
                 settings['systemName'] = info.sysName
                 response = self.client.httpRequest(
-                  srv, "api/setupLocalSystem",
-                  headers={'Content-Type': 'application/json'},
-                  data=json.dumps(settings))
+                    srv, "api/setupLocalSystem",
+                    headers={'Content-Type': 'application/json'},
+                    data=json.dumps(settings))
                 self.checkResponseError(response, "api/setupLocalSystem")
                 # Check setupLocalSystem's settings
                 if info.settings.get("systemSettings"):
                     response = self.client.httpRequest(
-                      srv, "api/systemSettings")
+                        srv, "api/systemSettings")
                     self.__checkSettings(response.data,
-                                         info.settings.get("systemSettings"))
-                time.sleep(1.0)
+                        info.settings.get("systemSettings"))
+            time.sleep(1.0)
 
         tlog(LOGLEVEL.INFO, "Prepare initial state done")
 
@@ -134,7 +136,10 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
                  (name, got_settings[name], val))
 
     # Merge srv2 to srv1
-    def __mergeSystems(self, takeRemoteSettings = False):
+    def __mergeSystems(self,
+                       takeRemoteSettings = False,
+                       apiErrorCode = 0,
+                       apiErrorString = ''):
         tlog(LOGLEVEL.INFO, "Systems merging start...")
         srvInfo1 = self.servers[self.serverAddr1]
         srvInfo2 = self.servers[self.serverAddr2]
@@ -151,8 +156,11 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
            getKey=generateKey('GET', srvInfo1.user, srvInfo1.password, nonce, realm),
            postKey=generateKey('POST', srvInfo1.user, srvInfo1.password, nonce, realm),
            takeRemoteSettings=bool2str(takeRemoteSettings))
-        self.checkResponseError(response, "api/mergeSystems")
-        srvInfo2.change_credentials(srvInfo1)
+        self.checkResponseError(response, "api/mergeSystems",
+                                apiErrorCode = apiErrorCode,
+                                apiErrorString = apiErrorString)
+        if not (apiErrorCode or apiErrorString):
+            srvInfo2.change_credentials(srvInfo1)
         tlog(LOGLEVEL.INFO, "System merging done")
 
     def __waitMergeDone(self):
@@ -317,9 +325,44 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         data1, data2 = self.__waitMergeDone()
         self.__checkSettings(data2, {'arecontRtspEnabled': newArecontRtspEnabled})
 
-    def testCloudMerge(self):
+    def testMergeCloudWithLocal(self):
+        "Merge cloud system with local"
+        self.__prepareInitialState([self.serverAddr1])
+        # Setup cloud and wait new cloud credentials
+        self.__setupCloud(self.serverAddr1, self.sysName1)
+        self.__waitCredentials(self.serverAddr1)
+        
+        # Merge systems (takeRemoteSettings = False) -> Error
+        self.__mergeSystems(False,
+            apiErrorCode = 3,
+            apiErrorString = 'DEPENDENT_SYSTEM_BOUND_TO_CLOUD')
+
+        # Merge systems (takeRemoteSettings = true)
+        self.__mergeSystems(True)
+        self.__waitCredentials(self.serverAddr2)
+        self.__waitMergeDone()
+
+    def testMergeCloudSystems(self):
+        "Merge two cloud systems"
+        self.__prepareInitialState([self.serverAddr1, self.serverAddr2])
+        
+        # Setup cloud and wait new cloud credentials
+        self.__setupCloud(self.serverAddr1, self.sysName1)
+        self.__setupCloud(self.serverAddr2, self.sysName2)
+        self.__waitCredentials(self.serverAddr1)
+        self.__waitCredentials(self.serverAddr2)
+
+        # Merge 2 cloud systems (takeRemoteSettings = False) -> Error
+        self.__mergeSystems(False,
+            apiErrorCode = 3,
+            apiErrorString = 'BOTH_SYSTEM_BOUND_TO_CLOUD')
+        self.__mergeSystems(True,
+            apiErrorCode = 3,
+            apiErrorString = 'BOTH_SYSTEM_BOUND_TO_CLOUD')
+        
+    def testCloudMergeAfterDisconnect(self):
         "Merge after disconnect from cloud"
-        self.__prepareInitialState(False)
+        self.__prepareInitialState([self.serverAddr1, self.serverAddr2])
 
         # Setup cloud and wait new cloud credentials
         self.__setupCloud(self.serverAddr1, self.sysName1)
@@ -357,3 +400,5 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
           not self.__changeBoolSettings(self.serverAddr1, 'auditTrailEnabled')
         data1, data2 = self.__waitMergeDone()
         self.__checkSettings(data2, {'auditTrailEnabled': newAuditTrailEnabled})
+
+    

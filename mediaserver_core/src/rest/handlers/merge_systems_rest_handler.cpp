@@ -365,7 +365,7 @@ int QnMergeSystemsRestHandler::execute(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
     const QUrl &remoteUrl,
-    const QString& getKey,
+    const QString& /*getKey*/,
     const QString& postKey,
     bool oneServer,
     const QnRestConnectionProcessor* owner)

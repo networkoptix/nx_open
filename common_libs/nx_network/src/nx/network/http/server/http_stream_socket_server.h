@@ -15,8 +15,7 @@
 
 namespace nx_http
 {
-    class HttpStreamSocketServer
-    :
+    class HttpStreamSocketServer:
         public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
     {
         typedef StreamSocketServer<HttpStreamSocketServer, HttpServerConnection> base_type;
@@ -25,7 +24,7 @@ namespace nx_http
         typedef HttpServerConnection ConnectionType;
 
         HttpStreamSocketServer(
-            nx_http::AbstractAuthenticationManager* const authenticationManager,
+            nx_http::server::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher,
             bool sslRequired,
             nx::network::NatTraversalSupport natTraversalSupport)
@@ -56,7 +55,7 @@ namespace nx_http
 		}
 
     private:
-        nx_http::AbstractAuthenticationManager* const m_authenticationManager;
+        nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         bool m_persistentConnectionEnabled;
     };

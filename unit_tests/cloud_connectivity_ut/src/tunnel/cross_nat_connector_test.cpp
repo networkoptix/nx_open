@@ -171,51 +171,6 @@ void TunnelConnector::doSimpleConnectTest(
             std::chrono::steady_clock::now() - t1);
 }
 
-
-class CrossNatConnector:
-    public TunnelConnector
-{
-};
-
-TEST_F(CrossNatConnector, timeout)
-{
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
-    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
-
-    // Timing out mediator response by providing incorrect mediator address to connector.
-    const auto connectResult = doSimpleConnectTest(
-        connectTimeout,
-        MediaServerEmulator::ActionToTake::ignoreIndication,
-        SocketAddress(HostAddress::localhost, 10345));
-
-    ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
-    ASSERT_EQ(nullptr, connectResult.connection);
-    //ASSERT_TRUE(
-    //    connectResult.executionTime > connectTimeout*0.8 &&
-    //    connectResult.executionTime < connectTimeout*1.2);
-}
-
-TEST_F(CrossNatConnector, target_host_not_found)
-{
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
-    const auto system1 = mediator().addRandomSystem();
-    const auto server1 = mediator().addRandomServer(system1);
-
-    auto incorrectSystem = system1;
-    incorrectSystem.id += "_hren";
-
-    const auto connectResult = doSimpleConnectTest(
-        std::chrono::seconds::zero(),   //no timeout
-        MediaServerEmulator::ActionToTake::proceedWithConnection,
-        incorrectSystem,
-        server1);
-
-    ASSERT_EQ(SystemError::hostNotFound, connectResult.errorCode);
-    ASSERT_EQ(nullptr, connectResult.connection);
-}
-
 }   //namespace test
 }   //namespace cloud
 }   //namespace network

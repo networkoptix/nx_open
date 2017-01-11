@@ -125,7 +125,7 @@ void HolePunchingProcessor::connect(
     connectionFsmIterAndFlag.first->second = 
         std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
             request.connectSessionId,
-            targetPeerDataLocker.get(),
+            targetPeerDataLocker->value(),
             std::bind(
                 &HolePunchingProcessor::connectSessionFinished,
                 this,

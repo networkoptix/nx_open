@@ -68,6 +68,24 @@ static const QString RES_TYPE_STORAGE = "storage";
 namespace ec2
 {
 
+namespace aux {
+
+bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin)
+{
+    if (!restoreData.isEmpty())
+    {
+        admin->setHash(restoreData.hash);
+        admin->setDigest(restoreData.digest);
+        admin->setCryptSha512Hash(restoreData.cryptSha512Hash);
+        admin->setRealm(restoreData.realm);
+        admin->setEnabled(true);
+        return true;
+    }
+
+    return false;
+}
+}
+
 namespace detail
 {
 
@@ -541,8 +559,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
             NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
 
-        BeforeRestoreDbData beforeRestoreDbData = qnCommon->beforeRestoreDbData();
-
         QString defaultAdminPassword = qnCommon->defaultAdminPassword();
         if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
         {
@@ -553,6 +569,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
 
         bool updateUserResource = false;
+
         if (!defaultAdminPassword.isEmpty())
         {
             if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
@@ -565,15 +582,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 updateUserResource = true;
             }
         }
-        if (!beforeRestoreDbData.isEmpty())
-        {
-            userResource->setHash(beforeRestoreDbData.hash);
-            userResource->setDigest(beforeRestoreDbData.digest);
-            userResource->setCryptSha512Hash(beforeRestoreDbData.cryptSha512Hash);
-            userResource->setRealm(beforeRestoreDbData.realm);
-            userResource->setEnabled(true);
-            updateUserResource = true;
-        }
+
+        updateUserResource |= aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
+
         if (updateUserResource)
         {
             // admin user resource has been updated
@@ -1002,9 +1013,6 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
 
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
-    if (updateName.endsWith(lit("/30_update_history_guid.sql")))
-        return removeOldCameraHistory();
-
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
 

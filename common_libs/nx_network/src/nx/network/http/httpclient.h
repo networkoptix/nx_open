@@ -62,6 +62,7 @@ public:
     BufferType fetchMessageBodyBuffer();
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const QUrl& url() const;
+    const QUrl& contentLocationUrl() const;
     StringType contentType() const;
 
     /** See \a AsyncHttpClient::setSubsequentReconnectTries */
@@ -78,6 +79,7 @@ public:
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
+    void setAuthType(AsyncHttpClient::AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
@@ -103,6 +105,7 @@ private:
     boost::optional<QString> m_userPassword;
     std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
+    boost::optional<AsyncHttpClient::AuthType> m_authType;
 
     void instanciateHttpClient();
     template<typename AsyncClientFunc>

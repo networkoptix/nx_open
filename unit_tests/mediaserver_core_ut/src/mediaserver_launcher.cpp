@@ -1,26 +1,16 @@
-
 #include "mediaserver_launcher.h"
 
 #include <nx/network/http/httpclient.h>
 #include <nx/utils/random.h>
 
 #include <media_server_process.h>
+#include <nx/network/socket_global.h>
 
-
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir)
-    :
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000))
+    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000)),
+    m_firstStartup(true)
 {
-    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
-    m_configFile.open(m_configFilePath.toUtf8().constData());
-
-    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "removeDbOnStartup = 1" << std::endl;
-    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
-    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -35,44 +25,78 @@ SocketAddress MediaServerLauncher::endpoint() const
 
 void MediaServerLauncher::addSetting(const QString& name, const QString& value)
 {
-    m_configFile << name.toStdString() << " = " << value.toStdString() << std::endl;
+    m_customSettings.emplace_back(name, value);
 }
 
-bool MediaServerLauncher::start()
+void MediaServerLauncher::prepareToStart()
 {
+    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
+    m_configFile.open(m_configFilePath.toUtf8().constData());
+
+    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
+    m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
+    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << "port = " << m_serverEndpoint.port << std::endl;
+
+    for (const auto& customSetting: m_customSettings)
+    {
+        m_configFile << customSetting.first.toStdString() << " = " 
+            << customSetting.second.toStdString() << std::endl;
+    }
+
     QByteArray configFileOption = "--conf-file=" + m_configFilePath.toUtf8();
     char* argv[] = { "", "-e", configFileOption.data() };
     const int argc = 3;
 
     m_configFile.flush();
     m_configFile.close();
-    m_mediaServerProcessThread = nx::utils::thread(
-        [this, argc, argv = argv]() mutable
+
+    m_mediaServerProcess.reset();
+    m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+
+    m_firstStartup = false;
+}
+
+bool MediaServerLauncher::start()
+{
+    prepareToStart();
+
+    std::promise<bool> processStartedPromise;
+    auto future = processStartedPromise.get_future();
+
+    connect(
+        m_mediaServerProcess.get(),
+        &MediaServerProcess::started,
+        this,
+        [&processStartedPromise]()
         {
-            MediaServerProcess::main(argc, argv);
-        });
+            processStartedPromise.set_value(true);
+        }, Qt::DirectConnection);
+    m_mediaServerProcess->start();
 
     //waiting for server to come up
     const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
-    while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
-    {
-        nx_http::HttpClient httpClient;
-        if (httpClient.doGet(
-            lit("http://%1/api/moduleInformation").arg(m_serverEndpoint.toString())))
-            break;  //server is alive
-    }
+    auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
+    return result == std::future_status::ready;
+}
 
-    return std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart;
+bool MediaServerLauncher::startAsync()
+{
+    prepareToStart();
+    m_mediaServerProcess->start();
+    return true;
 }
 
 bool MediaServerLauncher::stop()
 {
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(lit("admin"));
-    httpClient.setUserPassword(lit("admin"));
-    if (!httpClient.doGet(lit("http://%1/api/restart").arg(m_serverEndpoint.toString())))
-        return false;
-    m_mediaServerProcessThread.join();
+    m_mediaServerProcess->stopSync();
     return true;
+}
+
+QUrl MediaServerLauncher::apiUrl() const
+{
+    return QUrl(lit("http://") + m_serverEndpoint.toString());
 }

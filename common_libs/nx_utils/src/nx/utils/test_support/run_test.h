@@ -36,6 +36,7 @@ inline int runTest(
         network::SocketGlobalsHolder sgGuard;
         network::SocketGlobals::applyArguments(args);
         network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
+        network::cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
     #endif
 
     if (extraInit)

@@ -60,7 +60,7 @@ public:
 
 enum class SslMode
 {
-    undefined,
+    followIncomingConnection,
     enabled,
     disabled,
 };
@@ -80,7 +80,7 @@ public:
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
-    SslMode preferedSslMode = SslMode::undefined;
+    SslMode preferedSslMode = SslMode::followIncomingConnection;
 };
 
 /*!

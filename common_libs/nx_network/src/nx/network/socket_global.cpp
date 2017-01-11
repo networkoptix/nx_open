@@ -116,14 +116,17 @@ bool SocketGlobals::isInitialized()
 
 void SocketGlobals::applyArguments(const utils::ArgumentParser& arguments)
 {
-    if (const auto value = arguments.get("enforce-mediator", "mediator"))
-        mediatorConnector().mockupAddress(*value);
+    if (const auto value = arguments.get("ip-version", "ip"))
+        SocketFactory::setIpVersion(*value);
 
     if (const auto value = arguments.get("enforce-socket", "socket"))
         SocketFactory::enforceStreamSocketType(*value);
 
     if (arguments.get("enforce-ssl", "ssl"))
         SocketFactory::enforceSsl();
+
+    if (const auto value = arguments.get("enforce-mediator", "mediator"))
+        mediatorConnector().mockupAddress(*value);
 }
 
 void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
@@ -135,7 +138,6 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
     m_debugConfigurationTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
@@ -155,6 +157,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_mediatorConnector->clientConnection());
     m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_mediatorConnector->clientConnection());
+    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
 }
 
 QnMutex SocketGlobals::s_mutex;

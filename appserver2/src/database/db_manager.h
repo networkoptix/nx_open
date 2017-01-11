@@ -25,6 +25,10 @@
 namespace ec2
 {
 
+namespace aux {
+bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
+}
+
 class LicenseManagerImpl;
 
 enum ApiObjectType

@@ -42,7 +42,6 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
-    bool detachFromCloudSilently();
     bool cleanUpCloudDataInLocalDb();
 
     void setProxyVia(const SocketAddress& proxyEndpoint);
@@ -61,6 +60,7 @@ private:
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
+    bool detachSystemFromCloud();
     bool boundToCloud(QnMutexLockerBase* const lk) const;
     void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);

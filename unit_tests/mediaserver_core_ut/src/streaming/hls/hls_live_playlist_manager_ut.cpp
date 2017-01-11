@@ -6,6 +6,7 @@
 #include <nx/utils/random.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 #include <utils/media/media_stream_cache.h>
+#include <media_server/settings.h>
 
 TEST(hls_LivePlaylistManager, general)
 {
@@ -21,7 +22,10 @@ TEST(hls_LivePlaylistManager, general)
     MediaStreamCache mediaCache(
         targetCacheSize.count(),
         maxCacheSize.count());
-    nx_hls::HLSLivePlaylistManager hlsPlaylistManager(&mediaCache, targetDuration.count());
+    nx_hls::HLSLivePlaylistManager hlsPlaylistManager(
+        &mediaCache,
+        targetDuration.count(),
+        nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP);
 
     microseconds totalTimestampChange(0);
     const microseconds startTimestamp(nx::utils::random::number());

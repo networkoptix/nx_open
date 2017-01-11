@@ -75,14 +75,14 @@ public:
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
-    /** Properties for cloud connections */
     const api::ConnectionParameters& connectionParameters() const;
     const nx::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
 
-    //!Loads settings from both command line and conf file (or win32 registry)
+    /**
+     * Loads settings from both command line and conf file (or win32 registry).
+     */
     void load(int argc, char **argv);
-    //!Prints to std out
     void printCmdLineArgsHelp();
 
 private:

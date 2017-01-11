@@ -64,6 +64,9 @@ void DirectEndpointConnector::connect(
     //  currently only mediaserver can be on remote side
     for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
     {
+        NX_LOGX(lm("cross-nat %1. Starting connection to %2")
+            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+
         auto httpClient = nx_http::AsyncHttpClient::create();
         httpClient->bindToAioThread(getAioThread());
         httpClient->setSendTimeoutMs(timeout.count());
@@ -113,6 +116,9 @@ void DirectEndpointConnector::onHttpRequestDone(
 {
     auto connectionContext = std::move(*socketIter);
     m_connections.erase(socketIter);
+
+    NX_LOGX(lm("cross-nat %1. Finished probing %2")
+        .arg(m_connectSessionId).str(httpClient->url()), cl_logDEBUG2);
 
     if (httpClient->failed() &&
         (httpClient->lastSysErrorCode() != SystemError::noError ||
@@ -204,6 +210,9 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
+    NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
+        .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+
     m_connections.clear();
 
     auto tunnel =
