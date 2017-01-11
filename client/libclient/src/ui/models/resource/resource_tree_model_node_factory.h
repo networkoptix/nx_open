@@ -12,7 +12,7 @@ class QnResourceTreeModelNodeFactory
 {
 public:
     static QnResourceTreeModelNodePtr createNode(Qn::NodeType nodeType,
-        QnResourceTreeModel* model, bool lazyInitialization = false);
+        QnResourceTreeModel* model, bool initialize = true);
 
     static QnResourceTreeModelNodePtr createLocalSystemNode(const QString& systemName,
         QnResourceTreeModel* model);

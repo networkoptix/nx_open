@@ -3,6 +3,7 @@ import qbs
 Module
 {
     Depends { name: "cpp" }
+    Depends { name: "Android.ndk"; condition: qbs.targetOS.contains("android") }
 
     property bool enableAllVendors: true
     property bool enableSsl: true
@@ -47,6 +48,7 @@ Module
         enableDataProviders: false
         enableSoftwareMotionDetection: false
         enableSendMail: false
+        Android.ndk.platform: "android-16"
     }
     Properties
     {
@@ -99,8 +101,7 @@ Module
                 "ENABLE_STARDOT",
                 "ENABLE_IQE",
                 "ENABLE_ISD",
-                "ENABLE_PULSE_CAMERA"
-            )
+                "ENABLE_PULSE_CAMERA")
         }
 
         if (qbs.targetOS.contains("windows"))
@@ -129,17 +130,17 @@ Module
                 "-Werror=delete-non-virtual-dtor",
                 "-Werror=return-type",
                 "-Werror=conversion-null",
-                "-Wuninitialized"
-            )
+                "-Wuninitialized")
         }
 
         if (qbs.targetOS.contains("linux"))
         {
+            if (!qbs.targetOS.contains("android"))
+                flags.push("-msse2")
+
             flags.push(
-                "-msse2",
                 "-Wno-unknown-pragmas",
-                "-Wno-ignored-qualifiers"
-            )
+                "-Wno-ignored-qualifiers")
         }
         else if (qbs.targetOS.contains("macos"))
         {

@@ -525,7 +525,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget);
 
     factory(QnActions::ConnectToCloudSystemAction).
-        flags(Qn::NoTarget);
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Connect to System")).
+        condition(new QnTreeNodeTypeCondition(Qn::CloudSystemNode, this));
 
     factory(QnActions::ReconnectAction).
         flags(Qn::NoTarget);

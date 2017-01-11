@@ -13,7 +13,6 @@ QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resourc
     m_sequenceId(QnUuid::createUuid()),
     m_sequenceNumber(1)
 {
-    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, [this]{ emit changed(Qn::CapabilitiesPtzField); });
 }
 
 QnRemotePtzController::~QnRemotePtzController() {

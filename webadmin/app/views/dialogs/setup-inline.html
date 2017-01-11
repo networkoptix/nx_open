@@ -16,12 +16,24 @@
     </p>
 </div>
 
+
+<div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>Couldn't setup your system</h2>
+    <p class="master-description">Your system cannot be configured. <br>
+        <span ng-bind-html="settings.localError"></span>
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
+    </p>
+</div>
+
 <div class="panel-body text-center" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-center':!liteClient,'master-description':liteClient}">
+    <div ng-class="{'vertical-center':!settings.liteClient,'master-description':settings.liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
         <p>You need to configure your server before using it.<br>
         Don't worry. This won't take long.</p>
-        <div class="row" ng-if="liteClient">
+        <div class="row" ng-if="settings.liteClient">
             <div class="col-xs-12">
                <p>
                    You also can set it up from another computer by connecting<br>
@@ -75,8 +87,7 @@
         <div class="form-group" ng-repeat="(setting, value) in systemSettings">
             <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
                 <label>
-                    <input type="checkbox"
-                           id="{{setting}}"
+                    <input type="checkbox" id="{{setting}}"
                            ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
                 </label>
             </div>
@@ -128,9 +139,9 @@
         </div>
     </div>
     <p class="vertical-bottom">
-        <a ng-if="!liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+        <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
            target="_blank" ng-click="openLink($event)">Help me decide</a>
-        <span ng-if="liteClient">Learn more: {{portalUrl}}</span>
+        <span ng-if="settings.liteClient">Learn more: {{portalUrl}}</span>
     </p>
 </div>
 
@@ -177,6 +188,13 @@
                    type="password" autocomplete="new-password" required placeholder="Password" ng-change="clearCloudError()">
         </div>
 
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                Stay logged in
+            </labe>
+        </div>
+
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
@@ -198,7 +216,7 @@
             </p>
         </div>
 
-        <div class="form-group" ng-if="liteClient">
+        <div class="form-group" ng-if="settings.liteClient">
             <p class="help-block">
                 To create an account please visit {{portalUrl}}
             </p>
@@ -221,6 +239,12 @@
                      settings.localPasswordConfirmation != settings.localPassword}">
             <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
                    type="password" autocomplete="new-password" placeholder="Repeat password" required>
+        </div>
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                Save password
+            </labe>
         </div>
 
         <div class="form-group"

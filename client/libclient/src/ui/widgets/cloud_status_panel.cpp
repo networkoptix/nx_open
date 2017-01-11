@@ -124,7 +124,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
         &QnCloudStatusPanelPrivate::updateUi);
 
 #ifdef DIRECT_CLOUD_CONNECT
-    systemsMenu = loggedInMenu->addMenu(QnCloudStatusPanel::tr("Connect to System..."));
+    systemsMenu = loggedInMenu->addMenu(QnCloudStatusPanel::tr("Connect to Server..."));
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::cloudSystemsChanged, this, &QnCloudStatusPanelPrivate::updateSystems);
     updateSystems();
 #endif

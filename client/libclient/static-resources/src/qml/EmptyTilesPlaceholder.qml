@@ -63,6 +63,6 @@ Column
         readonly property string kNoServersFoundText:
             qsTr("No servers found");
         readonly property string kDescription:
-            qsTr("Check your network connection or press \"Connect to System\" button to enter known server address");
+            qsTr("Check your network connection or press \"Connect to Server\" button to enter known server address");
     }
 }

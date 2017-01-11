@@ -63,4 +63,5 @@ private:
     QList<QnInputField*> m_localInputFields;
     QList<QnInputField*> m_cloudInputFields;
     QnAligner* const m_aligner;
+    int m_lastUserTypeIndex;
 };

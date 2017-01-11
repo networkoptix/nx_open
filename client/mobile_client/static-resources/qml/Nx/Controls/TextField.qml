@@ -257,7 +257,10 @@ QnTextInput
     {
         contextMenu.x = pos.x
         contextMenu.y = pos.y
+
+        control.persistentSelection = true
         contextMenu.open()
+        control.persistentSelection = false
     }
 
     Menu
@@ -270,6 +273,7 @@ QnTextInput
          * menu and draws blank space instead
          */
         height: 4 * cutItem.height
+
         MenuItem
         {
             id: cutItem

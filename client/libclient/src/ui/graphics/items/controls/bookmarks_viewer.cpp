@@ -311,6 +311,9 @@ namespace
         mouseEater->addEventType(QEvent::GraphicsSceneMouseMove);
         mouseEater->addEventType(QEvent::GraphicsSceneMouseDoubleClick);
         installEventFilter(mouseEater);
+
+        // We have to set cursor manually to prevent stealing it from underlying items
+        setCursor(Qt::ArrowCursor);
     }
 
     BookmarkToolTipFrame::~BookmarkToolTipFrame()

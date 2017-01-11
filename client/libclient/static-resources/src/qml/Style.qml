@@ -7,6 +7,11 @@ QtObject
 {
     id: thisComponent;
 
+    function getPaletteColor(color, offset)
+    {
+        return context.getPaletteColor(color, offset);
+    }
+
     function darkerColor(color, offset)
     {
         if (!offset)
@@ -93,6 +98,7 @@ QtObject
         readonly property color buttonText: text;
         readonly property color brightText: context.getPaletteColor("light", 16);
         readonly property color mid: context.getPaletteColor("dark", 9);
+        readonly property color dark: context.getPaletteColor("dark", 8);
         readonly property color midlight: context.getPaletteColor("dark", 12);
         readonly property color button: context.getPaletteColor("dark", 10);
         readonly property color brand: context.getPaletteColor("brand", 7);
