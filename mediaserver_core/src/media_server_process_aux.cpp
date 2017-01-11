@@ -171,10 +171,10 @@ bool isNewServerInstance(
     bool foundOwnServerInDb,
     bool noSetupWizardFlag)
 {
-    if (foundOwnServerInDb)
+    if (foundOwnServerInDb || noSetupWizardFlag)
         return false;
 
-    return noSetupWizardFlag || restoreData.localSystemId.isNull();
+    return restoreData.localSystemId.isNull();
 }
 
 bool setUpSystemIdentity(

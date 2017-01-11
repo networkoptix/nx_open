@@ -455,3 +455,76 @@ TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_NoSystemName
               guidFromArbitraryData(detail::TestSystemNameProxy::kDefaultValue + 
                     settingsProxy->getMaxServerKey()));
 }
+
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOn_RestoreDataIsNotSet_NoServerInDb)
+{
+    bool noSetupWizard = true;
+    bool serverFoundInDb = false;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOff_RestoreDataIsNotSet_NoServerInDb)
+{
+    bool noSetupWizard = false;
+    bool serverFoundInDb = false;
+    ASSERT_TRUE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOn_RestoreDataIsNotSet_ServerInDb)
+{
+    bool noSetupWizard = true;
+    bool serverFoundInDb = true;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOff_RestoreDataIsNotSet_ServerInDb)
+{
+    bool noSetupWizard = false;
+    bool serverFoundInDb = true;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOff_RestoreDataIsSet_ServerInDb)
+{
+    fillDefaultAdminAuth();
+    setDefaultSystemIdentity();
+    shutdownBeforeRestore();
+
+    bool noSetupWizard = false;
+    bool serverFoundInDb = true;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOn_RestoreDataIsSet_ServerInDb)
+{
+    fillDefaultAdminAuth();
+    setDefaultSystemIdentity();
+    shutdownBeforeRestore();
+
+    bool noSetupWizard = true;
+    bool serverFoundInDb = true;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOn_RestoreDataIsSet_NoServerInDb)
+{
+    fillDefaultAdminAuth();
+    setDefaultSystemIdentity();
+    shutdownBeforeRestore();
+
+    bool noSetupWizard = true;
+    bool serverFoundInDb = false;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
+
+TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOff_RestoreDataIsSet_NoServerInDb)
+{
+    fillDefaultAdminAuth();
+    setDefaultSystemIdentity();
+    shutdownBeforeRestore();
+
+    bool noSetupWizard = false;
+    bool serverFoundInDb = false;
+    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
+}
