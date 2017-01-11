@@ -356,7 +356,12 @@
                 "VS8801|*",
                 "*|VS8801",
                 "VS8401|*",
-                "*|VS8401"
+                "*|VS8401",
+                "Digital Watchdog|DW-CPUHDE04",
+                "Digital Watchdog|DW-CPUHDE08",
+                "Digital Watchdog|DW-CPUHDE16",
+                "Digital Watchdog|VMAX A1",
+                "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
         },
@@ -466,8 +471,7 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98", 
-                "UNIVIEW|IPC6242SR-X22",
-                "TRUEN Co., Ltd.|TN-P4230CSLXIR"
+                "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -515,7 +519,9 @@
         {
             "keys": [
                 "General|IP Camera",
-                "H264|N51820L"
+                "H264|N51820L",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR",
+                "TRUEN Co. Ltd.|*"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -1311,7 +1317,7 @@
         },
         {
             "keys": [
-                "Sony|SNC-WR630", "Sony|SNC-WR630|2.1.2"
+                "Sony|SNC-WR630", "Sony|SNC-WR600"
             ],
             "ptzMapper": {
                 "fromCamera": {
