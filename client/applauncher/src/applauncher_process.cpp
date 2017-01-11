@@ -402,7 +402,8 @@ bool ApplauncherProcess::startApplication(
 
     const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
-        "./" + info.fileName(),
+        QnAppInfo::applicationPlatform() == "linux"
+            ? "./" + info.fileName() : info.absoluteFilePath(),
         arguments,
         info.absolutePath(),
         environment))
