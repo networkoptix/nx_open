@@ -186,51 +186,23 @@ Rectangle
                     }
                 }
 
-                function createModel()
+                model: modelLoader.item;
+
+                Loader
                 {
-                    var code =
-                        "\n\
-                        import QtQuick 2.6;\n\
-                        import NetworkOptix.Qml 1.0;\n\
-                        import com.networkoptix.qml 1.0;\n
-                        QnFilteringSystemsModel\n\
-                        {\n\
-                            filterCaseSensitivity: Qt.CaseInsensitive;\n\
-                            filterRole: 257;    // Search text role\n\
-                        }\n\ ";
+                    id: modelLoader;
 
-                    return Qt.createQmlObject(code, grid, "CustomModel.qml");
-                }
+                    active: (context.isVisible && screenHolder.visible);
 
-                function updateModel()
-                {
-                    var screenVisible = (context.isVisible && screenHolder.visible);
-                    if (screenVisible == !!grid.model)
-                        return;
-
-                    if (screenVisible)
+                    sourceComponent: Component
                     {
-                        grid.model = grid.createModel();
-                        return;
+                        QnFilteringSystemsModel
+                        {
+                            filterCaseSensitivity: Qt.CaseInsensitive;
+                            filterRole: 257;    // Search text role
+                        }
                     }
-
-                    grid.model.destroy();
-                    grid.model = null;
                 }
-
-                Connections
-                {
-                    target: context;
-                    onIsVisibleChanged: grid.updateModel();
-                }
-
-                Connections
-                {
-                    target: screenHolder;
-                    onVisibleChanged: grid.updateModel();
-                }
-
-                model: createModel();
 
                 delegate: Item
                 {
