@@ -8,14 +8,14 @@ DialogBase
     id: itemSelectionDialog
 
     property string title: ""
-    property string activeItem: ""
-    property int activeItemRow: -1
+    property string currentItem: ""
+    property int currentIndex: -1
     property alias model: repeater.model
 
     closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
     deleteOnClose: false
 
-    signal itemChanged()
+    signal itemActivated()
 
     Column
     {
@@ -37,14 +37,14 @@ DialogBase
                 readonly property int row: index
                 readonly property string value: model.display
 
-                active: value == activeItem
+                active: value == currentItem
                 text: value
 
                 onClicked:
                 {
-                    itemSelectionDialog.activeItem = value
-                    itemSelectionDialog.activeItemRow = row
-                    itemSelectionDialog.itemChanged()
+                    itemSelectionDialog.currentItem = value
+                    itemSelectionDialog.currentIndex = row
+                    itemSelectionDialog.itemActivated()
                     itemSelectionDialog.close()
                 }
             }
