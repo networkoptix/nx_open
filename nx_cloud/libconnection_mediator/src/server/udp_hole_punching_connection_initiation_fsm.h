@@ -41,7 +41,7 @@ public:
      */
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
-        const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
+        const ListeningPeerData& serverPeerData,
         std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
         const conf::Settings& settings);
 
@@ -84,6 +84,8 @@ private:
     
     void onServerConnectionClosed();
     void done(api::ResultCode result);
+
+    static const char* toString(State);
 
     UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&);
     UDPHolePunchingConnectionInitiationFsm&
