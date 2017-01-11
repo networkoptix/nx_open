@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <QByteArray>
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) || defined(Q_OS_DARWIN) || defined(Q_OS_MACOS)
     #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 #endif
 
