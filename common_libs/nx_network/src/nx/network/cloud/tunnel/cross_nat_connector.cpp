@@ -68,7 +68,6 @@ CrossNatConnector::CrossNatConnector(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
-    s_mediatorResponseCounter.addResult(hpm::api::ResultCode::otherLogicError);
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
     m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
