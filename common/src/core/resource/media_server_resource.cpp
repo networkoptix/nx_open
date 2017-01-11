@@ -28,6 +28,7 @@
 #include "network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
 #include "api/server_rest_connection.h"
+#include <common/common_module.h>
 
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -537,7 +538,7 @@ bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (getStatus() != newStatus)
     {
@@ -549,15 +550,12 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
                        "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
-        QnResource::setStatus(newStatus, silenceMode);
-        if (!silenceMode)
+        QnResource::setStatus(newStatus, reason);
+        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        for(const QnResourcePtr& res: childList)
         {
-            QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-            for(const QnResourcePtr& res: childList)
-            {
-                if (res->hasFlags(Qn::depend_on_parent_status))
-                    emit res->statusChanged(res);
-            }
+            if (res->hasFlags(Qn::depend_on_parent_status))
+                emit res->statusChanged(res, Qn::StatusChangeReason::Default);
         }
     }
 }

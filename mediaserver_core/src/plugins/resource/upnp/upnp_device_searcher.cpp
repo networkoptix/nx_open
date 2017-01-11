@@ -12,6 +12,7 @@
 #include <utils/network/system_socket.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/log.h>
 
 
 using namespace std;
@@ -89,7 +90,8 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
-    m_terminated( false )
+    m_terminated( false ),
+    m_needToUpdateReceiveSocket(false)
 {
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
@@ -219,11 +221,17 @@ void UPNPDeviceSearcher::onSomeBytesRead(
 {
     if( errorCode )
     {
-        std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
             QnMutexLocker lk( &m_mutex );
             if( m_terminated )
                 return;
+
+            if (sock == m_receiveSocket.get())
+            {
+                NX_LOG(lit("Error occurred on receive socket. %1").arg(errorCode), cl_logWARNING);
+                m_needToUpdateReceiveSocket = true;
+                return;
+            }
 
             //removing socket from m_socketList
             for( map<QString, SocketReadCtx>::iterator
@@ -233,13 +241,11 @@ void UPNPDeviceSearcher::onSomeBytesRead(
             {
                 if( it->second.sock.get() == sock )
                 {
-                    udpSock = std::move(it->second.sock);
                     m_socketList.erase( it );
                     break;
                 }
             }
         }
-        udpSock->terminateAsyncIO( true );
         return;
     }
 
@@ -334,6 +340,7 @@ std::unique_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::updateReceiveSocket(
     for(const auto iface: getAllIPv4Interfaces())
         m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
 
+    m_needToUpdateReceiveSocket = false;
     m_receiveSocket->readSomeAsync(
         &m_receiveBuffer,
         std::bind(
@@ -352,7 +359,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
 
     {
         QnMutexLocker lk(&m_mutex);
-        if(isInterfaceListChanged())
+        if(isInterfaceListChanged() || m_needToUpdateReceiveSocket)
             oldSock = updateReceiveSocket();
     }
 

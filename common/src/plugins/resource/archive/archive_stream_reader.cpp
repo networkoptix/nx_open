@@ -82,9 +82,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
        )
         m_cycleMode = false;
 
-    // Should init packets here as some times destroy (av_free_packet) could be called before init
-    //connect(dev.data(), SIGNAL(statusChanged(Qn::ResourceStatus, Qn::ResourceStatus)), this, SLOT(onStatusChanged(Qn::ResourceStatus, Qn::ResourceStatus)));
-
 }
 
 /*

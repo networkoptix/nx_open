@@ -49,7 +49,7 @@ Qn::ResourceStatus QnClientCoreCamera::getStatus() const {
     Qn::ResourceStatus serverStatus = qnStatusDictionary->value(getParentId());
     if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
         return Qn::Offline;
-    
+
     return QnResource::getStatus();
 }
 
@@ -58,7 +58,7 @@ void QnClientCoreCamera::setParentId(const QnUuid& parent) {
     if (oldValue != parent) {
         base_type::setParentId(parent);
         if (!oldValue.isNull())
-            emit statusChanged(toSharedPointer(this));
+            emit statusChanged(toSharedPointer(this), Qn::StatusChangeReason::Default);
     }
 }
 

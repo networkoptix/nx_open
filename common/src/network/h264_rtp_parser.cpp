@@ -305,10 +305,11 @@ bool CLH264RtpParser::isFirstSliceNal(
         return false;
 
     BitStreamReader bitReader;
-    bitReader.setBuffer(data+1, data + dataLen);
     int macroNum = -1;
+
     try
     {
+        bitReader.setBuffer(data+1, data + dataLen);
         macroNum = NALUnit::extractUEGolombCode(bitReader);
     }
     catch(BitStreamException &e)
