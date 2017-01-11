@@ -13,6 +13,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -23,6 +25,8 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     m_qualityEditable(false)
 {
     ui->setupUi(this);
+
+    QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->settingsDisabledWarningLabel);
@@ -75,7 +79,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
         this, &QnCameraExpertSettingsWidget::at_dataChanged);
 
     connect(
-        ui->comboBoxForcedMotionStream, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        ui->comboBoxForcedMotionStream, QnComboboxCurrentIndexChanged,
         this, &QnCameraExpertSettingsWidget::at_dataChanged);
 
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
@@ -245,17 +249,18 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     if (anyHasDualStreaming)
         ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), QnMediaResource::secondaryStreamValue());
 
-    auto checkState = Qt::Unchecked;
+    bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
 
-    if (!sameMdPolicies)
-        checkState = Qt::PartiallyChecked;
-    else if (forcedMotionStreamIndex != -1)
-        checkState = Qt::Checked;
+    QnCheckbox::setupTristateCheckbox(
+        ui->checkBoxForceMotionDetection,
+        sameMdPolicies,
+        gotForcedMotionStream);
 
     ui->comboBoxForcedMotionStream->setCurrentIndex(
-        forcedMotionStreamIndex != -1 ? forcedMotionStreamIndex : kPrimaryStreamMdIndex);
-    ui->comboBoxForcedMotionStream->setEnabled(checkState == Qt::Checked);
-    ui->checkBoxForceMotionDetection->setCheckState(checkState);
+         gotForcedMotionStream ? forcedMotionStreamIndex : kPrimaryStreamMdIndex);
+
+    ui->comboBoxForcedMotionStream->setEnabled(
+        ui->checkBoxForceMotionDetection->checkState() == Qt::Checked);
 
     updateControlBlock();
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
