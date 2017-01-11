@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "simple_tftp_client.h"
 
 #ifdef ENABLE_ARECONT
