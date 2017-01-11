@@ -1037,17 +1037,10 @@ QColor QnResourceWidget::calculateFrameColor() const
 
 void QnResourceWidget::paintWindowFrame(
     QPainter* painter,
-    const QStyleOptionGraphicsItem* /*option*/,
+    const QStyleOptionGraphicsItem* option,
     QWidget* /*widget*/)
 {
-    constexpr auto kDefaultChannel = 0;
-    constexpr bool kNotForViewport = false;
-    constexpr bool kNotForVisibility = false;
-    constexpr bool kNotRelativeCoordinates = false;
-
-    const auto paintRect = this->exposedRect(kDefaultChannel,
-        kNotForViewport, kNotForVisibility, kNotRelativeCoordinates);
-
+    const auto paintRect = option->exposedRect & rect();
     if (!paintRect.isEmpty())
         painter->fillRect(paintRect, palette().window());
 
