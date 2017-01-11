@@ -23,6 +23,86 @@
 namespace nx {
 namespace network {
 
+class NX_NETWORK_API DatagramPipeline:
+    public aio::BasicPollable
+{
+    using BaseType = aio::BasicPollable;
+
+public:
+    DatagramPipeline();
+    virtual ~DatagramPipeline() override;
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
+    bool bind(const SocketAddress& localAddress);
+    SocketAddress address() const;
+
+    void startReceivingMessages();
+
+    const std::unique_ptr<network::UDPSocket>& socket();
+    /**
+     * Move ownership of socket to the caller.
+     * UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
+     * @note Can be called within send/recv completion handler only
+     *     (more specifically, within socket's aio thread)!
+     */
+    std::unique_ptr<network::UDPSocket> takeSocket();
+
+    void sendDatagram(
+        SocketAddress destinationEndpoint,
+        nx::Buffer datagram,
+        utils::MoveOnlyFunc<void(SystemError::ErrorCode, SocketAddress)> completionHandler);
+
+protected:
+    virtual void datagramReceived(
+        const SocketAddress& sourceAddress,
+        const nx::Buffer& datagram) = 0;
+    virtual void ioFailure(SystemError::ErrorCode sysErrorCode) = 0;
+
+private:
+    struct OutgoingMessageContext
+    {
+        SocketAddress destinationEndpoint;
+        nx::Buffer serializedMessage;
+        utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            SocketAddress resolvedTargetAddress)> completionHandler;
+
+        OutgoingMessageContext(
+            SocketAddress _destinationEndpoint,
+            nx::Buffer _serializedMessage,
+            utils::MoveOnlyFunc<void(
+                SystemError::ErrorCode, SocketAddress)> _completionHandler);
+        OutgoingMessageContext(OutgoingMessageContext&& rhs);
+
+    private:
+        OutgoingMessageContext(const OutgoingMessageContext&);
+        OutgoingMessageContext& operator=(const OutgoingMessageContext&);
+    };
+
+    std::unique_ptr<UDPSocket> m_socket;
+    nx::Buffer m_readBuffer;
+    std::deque<OutgoingMessageContext> m_sendQueue;
+    nx::utils::ObjectDestructionFlag m_terminationFlag;
+
+    virtual void stopWhileInAioThread() override;
+
+    void onBytesRead(
+        SystemError::ErrorCode errorCode,
+        SocketAddress sourceAddress,
+        size_t bytesRead);
+
+    void sendOutNextMessage();
+
+    void messageSent(
+        SystemError::ErrorCode errorCode,
+        SocketAddress resolvedTargetAddress,
+        size_t bytesSent);
+
+    DatagramPipeline(const DatagramPipeline&);
+    DatagramPipeline& operator=(const DatagramPipeline&);
+};
+
 /**
  * Implement this interface to receive messages and events from UnreliableMessagePipeline.
  */
@@ -43,7 +123,7 @@ public:
  * This is a helper class for implementing UDP server/client of message-orientied protocol.
  * Received messages are delivered to UnreliableMessagePipelineEventHandler<MessageType> instance.
  * @note All events are delivered within internal socket's aio thread
- * @note \a UnreliableMessagePipeline object can be safely freed within any event handler
+ * @note UnreliableMessagePipeline object can be safely freed within any event handler
  *     (more generally, within internal socket's aio thread).
        To delete it in another thread, cancel I/O with UnreliableMessagePipeline::pleaseStop call
  */
@@ -52,7 +132,7 @@ template<
     class ParserType,
     class SerializerType>
 class UnreliableMessagePipeline:
-    public aio::BasicPollable
+    public DatagramPipeline
 {
     typedef UnreliableMessagePipeline<
         MessageType,
@@ -60,7 +140,7 @@ class UnreliableMessagePipeline:
         SerializerType
     > SelfType;
 
-    using BaseType = aio::BasicPollable;
+    using BaseType = DatagramPipeline;
 
 public:
     typedef UnreliableMessagePipelineEventHandler<MessageType> CustomPipeline;
@@ -69,45 +149,8 @@ public:
      * @param customPipeline UnreliableMessagePipeline does not take ownership of customPipeline.
      */
     UnreliableMessagePipeline(CustomPipeline* customPipeline):
-        m_customPipeline(customPipeline),
-        m_socket(std::make_unique<UDPSocket>())
+        m_customPipeline(customPipeline)
     {
-        // TODO: #ak Should report this error to the caller.
-        NX_ASSERT(m_socket->setNonBlockingMode(true));
-
-        bindToAioThread(getAioThread());
-    }
-
-    virtual ~UnreliableMessagePipeline() override
-    {
-        if (isInSelfAioThread())
-            stopWhileInAioThread();
-    }
-
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
-    {
-        BaseType::bindToAioThread(aioThread);
-
-        m_socket->bindToAioThread(aioThread);
-    }
-
-    bool bind(const SocketAddress& localAddress)
-    {
-        return m_socket->bind(localAddress);
-    }
-
-    void startReceivingMessages()
-    {
-        using namespace std::placeholders;
-        m_readBuffer.resize(0);
-        m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
-        m_socket->recvFromAsync(
-            &m_readBuffer, std::bind(&SelfType::onBytesRead, this, _1, _2, _3));
-    }
-
-    SocketAddress address() const
-    {
-        return m_socket->getLocalAddress();
     }
 
     /**
@@ -132,195 +175,42 @@ public:
             NX_ASSERT(false);
         }
 
-        m_socket->dispatch(
-            [this, endpoint = std::move(destinationEndpoint),
-                   message = std::move(serializedMessage),
-                   handler = std::move(completionHandler)]() mutable
-        {
-            sendMessageInternal(
-                std::move(endpoint), std::move(message), std::move(handler));
-        });
-    }
-
-    const std::unique_ptr<network::UDPSocket>& socket()
-    {
-        return m_socket;
-    }
-
-    /**
-     * Move ownership of socket to the caller.
-     * UnreliableMessagePipeline is in undefined state after this call and MUST be freed immediately!
-     * @note Can be called within send/recv completion handler only
-     *     (more specifically, within socket's aio thread)!
-     */
-    std::unique_ptr<network::UDPSocket> takeSocket()
-    {
-        m_terminationFlag.markAsDeleted();
-        m_socket->cancelIOSync(aio::etNone); 
-        return std::move(m_socket);
-    }
-
-private:
-    struct OutgoingMessageContext
-    {
-        SocketAddress destinationEndpoint;
-        nx::Buffer serializedMessage;
-        utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            SocketAddress resolvedTargetAddress)> completionHandler;
-
-        OutgoingMessageContext(
-            SocketAddress _destinationEndpoint,
-            nx::Buffer _serializedMessage,
-            utils::MoveOnlyFunc<void(
-                SystemError::ErrorCode, SocketAddress)> _completionHandler)
-        :   
-            destinationEndpoint(std::move(_destinationEndpoint)),
-            serializedMessage(std::move(_serializedMessage)),
-            completionHandler(std::move(_completionHandler))
-        {
-        }
-
-        OutgoingMessageContext(OutgoingMessageContext&& rhs)
-        :
-            destinationEndpoint(std::move(rhs.destinationEndpoint)),
-            serializedMessage(std::move(rhs.serializedMessage)),
-            completionHandler(std::move(rhs.completionHandler))
-        {
-        }
-
-    private:
-        OutgoingMessageContext(const OutgoingMessageContext&);
-        OutgoingMessageContext& operator=(const OutgoingMessageContext&);
-    };
-
-    CustomPipeline* m_customPipeline;
-    std::unique_ptr<UDPSocket> m_socket;
-    nx::Buffer m_readBuffer;
-    ParserType m_messageParser;
-    std::deque<OutgoingMessageContext> m_sendQueue;
-    nx::utils::ObjectDestructionFlag m_terminationFlag;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_socket.reset();
-    }
-
-    void onBytesRead(
-        SystemError::ErrorCode errorCode,
-        SocketAddress sourceAddress,
-        size_t bytesRead)
-    {
-        static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
-
-        if (errorCode != SystemError::noError)
-        {
-            NX_LOGX(lm("Error reading from socket. %1").
-                arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
-            m_customPipeline->ioFailure(errorCode);
-            if (watcher.objectDestroyed())
-                return; //this has been freed
-            m_socket->registerTimer(
-                kRetryReadAfterFailureTimeout,
-                [this]() { startReceivingMessages(); });
-            return;
-        }
-
-        if (bytesRead > 0)  //zero-sized UDP datagramm is OK
-        {
-            //reading and parsing message
-            size_t bytesParsed = 0;
-            MessageType msg;
-            m_messageParser.setMessage(&msg);
-            if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
-            {
-                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
-                m_customPipeline->messageReceived(
-                    std::move(sourceAddress),
-                    std::move(msg));
-                if (watcher.objectDestroyed())
-                    return; //this has been freed
-            }
-            else
-            {
-                NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
-                    .arg((unsigned int)bytesRead).str(sourceAddress)
-                    .str(m_socket->getLocalAddress()),
-                    cl_logDEBUG1);
-            }
-        }
-
-        m_readBuffer.resize(0);
-        m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
-        using namespace std::placeholders;
-        m_socket->recvFromAsync(
-            &m_readBuffer, std::bind(&SelfType::onBytesRead, this, _1, _2, _3));
-    }
-
-    void sendMessageInternal(
-        SocketAddress destinationEndpoint,
-        nx::Buffer serializedMessage,
-        utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode, SocketAddress)> completionHandler)
-    {
-        OutgoingMessageContext msgCtx(
+        sendDatagram(
             std::move(destinationEndpoint),
             std::move(serializedMessage),
             std::move(completionHandler));
-
-        m_sendQueue.push_back(std::move(msgCtx));
-        if (m_sendQueue.size() == 1)
-            sendOutNextMessage();
     }
 
-    void sendOutNextMessage()
-    {
-        OutgoingMessageContext& msgCtx = m_sendQueue.front();
+private:
+    CustomPipeline* m_customPipeline;
+    ParserType m_messageParser;
 
-        using namespace std::placeholders;
-        m_socket->sendToAsync(
-            msgCtx.serializedMessage,
-            msgCtx.destinationEndpoint,
-            std::bind(&SelfType::messageSent, this, _1, _2, _3));
-    }
-
-    void messageSent(
-        SystemError::ErrorCode errorCode,
-        SocketAddress resolvedTargetAddress,
-        size_t bytesSent)
+    virtual void datagramReceived(
+        const SocketAddress& sourceAddress,
+        const nx::Buffer& datagram) override
     {
-        NX_ASSERT(!m_sendQueue.empty());
-        if (errorCode != SystemError::noError)
+        //reading and parsing message
+        size_t bytesParsed = 0;
+        MessageType msg;
+        m_messageParser.setMessage(&msg);
+        if (m_messageParser.parse(datagram, &bytesParsed) == nx_api::ParserState::done)
         {
-            NX_LOGX(lm("Failed to send message destinationEndpoint %1. %2").
-                arg(m_sendQueue.front().destinationEndpoint.toString()).
-                arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            m_customPipeline->messageReceived(
+                std::move(sourceAddress),
+                std::move(msg));
         }
         else
         {
-            NX_ASSERT(bytesSent == (size_t)m_sendQueue.front().serializedMessage.size());
+            NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
+                .arg((unsigned int)datagram.size()).str(sourceAddress).str(address()),
+                cl_logDEBUG1);
         }
-
-        auto completionHandler = std::move(m_sendQueue.front().completionHandler);
-        if (completionHandler)
-        {
-            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_terminationFlag);
-            completionHandler(
-                errorCode,
-                std::move(resolvedTargetAddress));
-            if (watcher.objectDestroyed())
-                return;
-        }
-        m_sendQueue.pop_front();
-
-        if (!m_sendQueue.empty())
-            sendOutNextMessage();
     }
 
-    UnreliableMessagePipeline(const UnreliableMessagePipeline&);
-    UnreliableMessagePipeline& operator=(const UnreliableMessagePipeline&);
+    virtual void ioFailure(SystemError::ErrorCode sysErrorCode) override
+    {
+        m_customPipeline->ioFailure(sysErrorCode);
+    }
 };
 
 } // namespace network
