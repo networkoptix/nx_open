@@ -58,6 +58,8 @@ Release
 */target-bpi/*
 */target-tx1/*
 
+android-build
+
 build_environment/target
 build_environment/target/buildenv.timestamp
 
