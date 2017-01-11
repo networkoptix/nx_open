@@ -16,6 +16,7 @@
 #include <utils/common/systemerror.h>
 
 #include "nx/network/aio/basic_pollable.h"
+#include "nx/network/connection_server/base_protocol_message_types.h"
 #include "nx/network/socket_common.h"
 #include "nx/network/socket_factory.h"
 #include "nx/network/system_socket.h"
