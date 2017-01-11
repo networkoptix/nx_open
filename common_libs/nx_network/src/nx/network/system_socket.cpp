@@ -1461,6 +1461,11 @@ UDPSocket::UDPSocket(int ipVersion)
     }
 }
 
+SocketAddress UDPSocket::getForeignAddress() const
+{
+    return m_destAddr;
+}
+
 void UDPSocket::setBroadcast() {
     // If this fails, we'll hear about it when we try to send.  This will allow
     // system that cannot broadcast to continue if they don't plan to broadcast

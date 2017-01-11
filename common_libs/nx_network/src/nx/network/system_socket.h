@@ -327,6 +327,8 @@ public:
     UDPSocket(UDPSocket&&) = delete;
     UDPSocket& operator=(UDPSocket&&) = delete;
 
+    virtual SocketAddress getForeignAddress() const override;
+
     /**
      *   Unset foreign address and port
      *   @return true if disassociation is successful
