@@ -377,6 +377,7 @@ class CleanStart : public BaseRestoreDbTest {};
 
 TEST_F(CleanStart, main)
 {
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::no));
     assertNoAdminAuthDataHasBeenSaved();
     assertAdminIsEnabled();
     assertNeedToResetSystem(true, true);
