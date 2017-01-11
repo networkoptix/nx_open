@@ -18,11 +18,10 @@ class QnMaskedProxyWidget: public QGraphicsProxyWidget
     using base_type = QGraphicsProxyWidget;
 
 public:
-    QnMaskedProxyWidget(QGraphicsItem* parent = NULL, Qt::WindowFlags windowFlags = 0);
-
+    QnMaskedProxyWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags windowFlags = 0);
     virtual ~QnMaskedProxyWidget();
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
     QRectF paintRect() const;
     void setPaintRect(const QRectF& paintRect);
@@ -35,8 +34,6 @@ public:
 
     bool isUpdatesEnabled() const;
 
-    virtual bool event(QEvent* e) override;
-
 signals:
     void paintRectChanged();
 
@@ -45,12 +42,9 @@ public slots:
     void enableUpdates() { setUpdatesEnabled(true); }
     void disableUpdates() { setUpdatesEnabled(false); }
 
-protected:
-    virtual bool eventFilter(QObject* object, QEvent* event) override;
-
 private:
     QRectF m_paintRect;
-    bool m_pixmapDirty;
     bool m_updatesEnabled;
     QPixmap m_pixmap;
+    QRect m_pixmapRect;
 };
