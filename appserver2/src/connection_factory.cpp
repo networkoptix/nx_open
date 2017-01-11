@@ -391,7 +391,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     schedule.
      *     %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *         from 00:00:00).
-     *     %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *     %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *         from 00:00:00).
      *     %param scheduleTask.recordAudio Whether to record sound.
      *         %value false
@@ -595,7 +595,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         schedule.
      *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
      *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false
@@ -733,7 +733,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         schedule.
      *         %param scheduleTask.startTime Time of day when the backup starts (in seconds passed
      *             from 00:00:00).
-     *         %param scheduleTask.endTime: Time of day when the backup ends (in seconds passed
+     *         %param scheduleTask.endTime Time of day when the backup ends (in seconds passed
      *             from 00:00:00).
      *         %param scheduleTask.recordAudio Whether to record sound.
      *             %value false

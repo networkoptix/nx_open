@@ -1771,7 +1771,6 @@ void MediaServerProcess::registerRestHandlers(
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
 
-    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     reg("api/storageStatus", new QnStorageStatusRestHandler());
     reg("api/storageSpace", new QnStorageSpaceRestHandler());
     reg("api/statistics", new QnStatisticsRestHandler());
@@ -1810,8 +1809,10 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/iflist", new QnIfListRestHandler());
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
+
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
+
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(), kAdmin);
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
@@ -1828,14 +1829,17 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
 
-    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    // TODO: Introduce constants for API methods registered here, also use them in
+    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors.
+
+    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
+    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
+
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
 
-    // TODO: #rvasilenko: This url is used in 3 different places. Where can we store it?
-    // Static member of QnThumbnailRequestData? New common module?
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
@@ -1846,9 +1850,9 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 
-#ifdef _DEBUG
-    reg("api/debugEvent", new QnDebugEventsRestHandler());
-#endif
+    #ifdef _DEBUG
+        reg("api/debugEvent", new QnDebugEventsRestHandler());
+    #endif
 }
 
 bool MediaServerProcess::initTcpListener(
@@ -2513,15 +2517,19 @@ void MediaServerProcess::run()
         ec2::ApiMediaServerData newServerData;
         fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
+        {
             m_mediaServer = registerServer(
-                        ec2Connection,
-                        server,
-                        nx::mserver_aux::isNewServerInstance(
-                            qnCommon->beforeRestoreDbData(), 
-                            foundOwnServerInDb,
-                            MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0));
+                ec2Connection,
+                server,
+                nx::mserver_aux::isNewServerInstance(
+                    qnCommon->beforeRestoreDbData(),
+                    foundOwnServerInDb,
+                    MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0));
+        }
         else
+        {
             m_mediaServer = server;
+        }
 
         const auto hwInfo = HardwareInformation::instance();
         server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
