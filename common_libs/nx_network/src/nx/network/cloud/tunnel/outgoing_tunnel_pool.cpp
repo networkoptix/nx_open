@@ -82,7 +82,7 @@ void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
     const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(m_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
+    NX_ASSERT(s_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
         "Own peer id is not supposed to be changed");
 
     m_isOwnPeerIdAssigned = true;
@@ -104,7 +104,7 @@ OutgoingTunnelPool::OnTunnelClosedSubscription& OutgoingTunnelPool::onTunnelClos
 
 void OutgoingTunnelPool::allowOwnPeerIdChange()
 {
-    m_isOwnPeerIdChangeAllowed = true;
+    s_isOwnPeerIdChangeAllowed = true;
 }
 
 OutgoingTunnelPool::TunnelContext& 
