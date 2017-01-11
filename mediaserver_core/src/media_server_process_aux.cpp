@@ -13,62 +13,59 @@ namespace mserver_aux {
 
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,
-        SystemNameProxyPtr systemName):
+        SystemNameProxyPtr systemName,
+        const SettingsProxy* settings):
     m_restoreData(restoreData),
-    m_systemName(std::move(systemName))
-{}
+    m_systemName(std::move(systemName)),
+    m_settings(settings)
+{
+    initSystemName();
+    initLocalSystemId();
+    m_systemName->clearFromConfig();
+}
+
+void LocalSystemIndentityHelper::initSystemName()
+{
+    if (!m_restoreData.localSystemName.isNull())
+    {
+        m_systemNameString = QString::fromLocal8Bit(m_restoreData.localSystemName);
+        return;
+    }
+
+    m_systemName->loadFromConfig();
+    if (m_systemName->value().isEmpty())
+        m_systemName->resetToDefault();
+
+    m_systemNameString = m_systemName->value();
+}
+
+void LocalSystemIndentityHelper::initLocalSystemId()
+{
+    if (!m_restoreData.localSystemId.isNull())
+    {
+        m_localSystemId = QnUuid::fromStringSafe(m_restoreData.localSystemId);
+        return;
+    }
+
+    m_localSystemId = generateLocalSystemId();
+}
 
 QString LocalSystemIndentityHelper::getSystemNameString() const
 {
-    if (!m_restoreData.localSystemName.isNull())
-        return QString::fromLocal8Bit(m_restoreData.localSystemName);
-
-    return generateSystemName();
-}
-
-QString LocalSystemIndentityHelper::getDefaultSystemNameString() const
-{
-    nx::SystemName systemName;
-    systemName.resetToDefault();
-    return systemName.value();
-}
-
-QString LocalSystemIndentityHelper::generateSystemName() const
-{
-    m_systemName->loadFromConfig();
-    if (m_systemName->value().isEmpty())
-        return QString();
-
-    return m_systemName->value();
+    return m_systemNameString;
 }
 
 QnUuid LocalSystemIndentityHelper::getLocalSystemId() const
 {
-    if (!m_restoreData.localSystemId.isNull())
-        return QnUuid::fromStringSafe(m_restoreData.localSystemId);
-
-    return generateLocalSystemId();
+    return m_localSystemId;
 }
 
 QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
 {
-    NX_ASSERT(!m_systemName->isDefault());
-    if (m_systemName->isDefault())
-        NX_LOG(lit("%1 SystemName is default. System state should be reseted."), cl_logWARNING);
+    if (m_settings->isSystemIdFromSystemName())
+        return guidFromArbitraryData(m_systemNameString);
 
-    QString serverKey;
-    if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
-    {
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-            serverKey = qMax(serverKey, server->getAuthKey());
-    }
-    return guidFromArbitraryData(m_systemName->value() + serverKey);
-
-}
-
-void LocalSystemIndentityHelper::clearMigrationInfo()
-{
-    m_systemName->clearFromConfig();
+    return guidFromArbitraryData(m_systemNameString + m_settings->getMaxServerKey());
 }
 
 class ServerSystemNameProxy : public SystemNameProxy
@@ -142,6 +139,20 @@ public:
     {
         return !qnGlobalSettings->cloudSystemId().isEmpty();
     }
+
+    virtual bool isSystemIdFromSystemName() const override
+    {
+        return MSSettings::roSettings()->value("systemIdFromSystemName").toInt() > 0;
+    }
+
+    virtual QString getMaxServerKey() const override
+    {
+        QString serverKey;
+        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+            serverKey = qMax(serverKey, server->getAuthKey());
+
+        return serverKey;
+    }
 };
 
 SettingsProxyPtr createServerSettingsProxy()
@@ -171,17 +182,15 @@ bool setUpSystemIdentity(
         SettingsProxy* settings,
         SystemNameProxyPtr systemNameProxy)
 {
-    LocalSystemIndentityHelper systemIdentityHelper(restoreData, std::move(systemNameProxy));
-    if (systemIdentityHelper.getSystemNameString().isEmpty())
-    {
-        settings->setSystemName(systemIdentityHelper.getDefaultSystemNameString());
-        return false;
-    }
+    LocalSystemIndentityHelper systemIdentityHelper(
+            restoreData, 
+            std::move(systemNameProxy),
+            settings);
 
-    settings->setSystemName(systemIdentityHelper.getSystemNameString());
-    settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
-
-    systemIdentityHelper.clearMigrationInfo();
+    if (settings->systemName().isNull())
+        settings->setSystemName(systemIdentityHelper.getSystemNameString());
+    if (settings->localSystemId().isNull())
+        settings->setLocalSystemId(systemIdentityHelper.getLocalSystemId());
 
     return true;
 }

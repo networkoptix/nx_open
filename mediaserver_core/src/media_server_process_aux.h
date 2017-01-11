@@ -37,27 +37,6 @@ using SystemNameProxyPtr = std::unique_ptr<SystemNameProxy>;
 
 SystemNameProxyPtr createServerSystemNameProxy();
 
-class LocalSystemIndentityHelper
-{
-public:
-    LocalSystemIndentityHelper(
-            const BeforeRestoreDbData& restoreData,
-            SystemNameProxyPtr systemName);
-
-    QString getSystemNameString() const;
-    QString getDefaultSystemNameString() const;
-    QnUuid getLocalSystemId() const;
-    void clearMigrationInfo();
-
-private:
-    QString generateSystemName() const;
-    QnUuid generateLocalSystemId() const;
-
-private:
-    const BeforeRestoreDbData& m_restoreData;
-    SystemNameProxyPtr m_systemName;
-};
-
 class SettingsProxy
 {
 public:
@@ -67,12 +46,39 @@ public:
     virtual void setLocalSystemId(const QnUuid& localSystemId) = 0;
     virtual bool isCloudInstanceChanged() const = 0;
     virtual bool isConnectedToCloud() const = 0;
+    virtual bool isSystemIdFromSystemName() const = 0;
+    virtual QString getMaxServerKey() const = 0;
 
     virtual ~SettingsProxy() {}
 };
 
 using SettingsProxyPtr = std::unique_ptr<SettingsProxy>;
 SettingsProxyPtr createServerSettingsProxy();
+
+
+class LocalSystemIndentityHelper
+{
+public:
+    LocalSystemIndentityHelper(
+            const BeforeRestoreDbData& restoreData,
+            SystemNameProxyPtr systemName,
+            const SettingsProxy* settings);
+
+    QString getSystemNameString() const;
+    QnUuid getLocalSystemId() const;
+
+private:
+    void initSystemName();
+    void initLocalSystemId();
+    QnUuid generateLocalSystemId() const;
+
+private:
+    const BeforeRestoreDbData& m_restoreData;
+    SystemNameProxyPtr m_systemName;
+    QString m_systemNameString;
+    QnUuid m_localSystemId;
+    const SettingsProxy* m_settings;
+};
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings);
 

@@ -21,11 +21,21 @@ namespace detail {
 class TestSystemNameProxy : public nx::mserver_aux::SystemNameProxy
 {
 public:
+    enum class SystemNameInConfig 
+    {
+        yes,
+        no
+    };
+
+    TestSystemNameProxy(SystemNameInConfig value) : m_isSystemNameInConfig(value) {}
+
     static const QString kConfigValue;
+    static const QString kDefaultValue;
 
     virtual void loadFromConfig() override
     {
-        m_systemName = kConfigValue;
+        if (m_isSystemNameInConfig == SystemNameInConfig::yes)
+            m_systemName = kConfigValue;
     }
 
     virtual void clearFromConfig() override
@@ -35,12 +45,12 @@ public:
 
     virtual void resetToDefault() override
     {
-        m_systemName = lit("DEFAULT");
+        m_systemName = kDefaultValue;
     }
 
     virtual bool isDefault() const override
     {
-        return m_systemName == lit("DEFAULT");
+        return m_systemName == kDefaultValue;
     }
 
     virtual QString value() const override
@@ -50,16 +60,19 @@ public:
 
 private:
     QString m_systemName;
+    SystemNameInConfig m_isSystemNameInConfig;
 };
 
 const QString TestSystemNameProxy::kConfigValue = lit("SYSTEM_NAME_CONFIG_VALUE");
+const QString TestSystemNameProxy::kDefaultValue = lit("DEFAULT_SYSTEM_NAME_VALUE");
 
 class TestSettingsProxy : public nx::mserver_aux::SettingsProxy
 {
 public:
     TestSettingsProxy() :
         m_cloudInstanceChanged(false),
-        m_connectedToCloud(false)
+        m_connectedToCloud(false),
+        m_isSystemIdFromSystemName(false)
     {}
 
     virtual QString systemName() const override
@@ -102,11 +115,27 @@ public:
         m_connectedToCloud = value;
     }
 
+    virtual bool isSystemIdFromSystemName() const override
+    {
+        return m_isSystemIdFromSystemName;
+    }
+
+    virtual QString getMaxServerKey() const override
+    {
+        return lit("SERVER_KEY");
+    }
+
+    void setIsSystemIdFromSystemName(bool value)
+    {
+        m_isSystemIdFromSystemName = value;
+    }
+
 private:
     QString m_systemName;
     QnUuid m_localSystemId;
     bool m_cloudInstanceChanged;
     bool m_connectedToCloud;
+    bool m_isSystemIdFromSystemName;
 };
 }
 
@@ -120,10 +149,10 @@ class BaseRestoreDbTest : public testing::Test
     QByteArray kCryptHash;
     QByteArray kRealm;
 
+public:
     QString kSystemName;
     QnUuid kLocalSystemId;
 
-public:
     virtual void SetUp() override
     {
         kHash = QByteArray("HASH");
@@ -198,10 +227,10 @@ public:
         ASSERT_EQ(restoreData.localSystemName, kSystemName);
     }
 
-    void restartServer()
+    void restartServer(detail::TestSystemNameProxy::SystemNameInConfig value)
     {
         settingsProxy.reset(new detail::TestSettingsProxy);
-        systemNameProxy.reset(new detail::TestSystemNameProxy);
+        systemNameProxy.reset(new detail::TestSystemNameProxy(value));
         admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
     }
 
@@ -258,7 +287,7 @@ protected:
 TEST_F(BackupWhenCloudAndRestoreWhenCloud, main)
 {
     shutdownBeforeRestore();
-    restartServer();
+    restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
     setConnectedToCloud();
     useRestoreData();
 
@@ -283,7 +312,7 @@ TEST_F(BackupWhenLocalAndRestoreWhenLocal, main)
     assertAdminIsEnabled();
 
     shutdownBeforeRestore();
-    restartServer();
+    restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
     assertAdminAuthDataHasBeenSaved();
 
     useRestoreData();
@@ -311,7 +340,7 @@ TEST_F(BackupWhenLocalAndRestoreWhenCloud, main)
 
     shutdownBeforeRestore();
     assertAdminAuthDataHasBeenSaved();
-    restartServer();
+    restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
     setConnectedToCloud();
     useRestoreData();
 
@@ -335,7 +364,7 @@ protected:
 TEST_F(BackupWhenCloudAndRestoreWhenLocal, main)
 {
     shutdownBeforeRestore();
-    restartServer();
+    restartServer(detail::TestSystemNameProxy::SystemNameInConfig::yes);
     useRestoreData();
 
     assertAdminIsEnabled();
@@ -351,6 +380,8 @@ TEST_F(CleanStart, main)
     assertNoAdminAuthDataHasBeenSaved();
     assertAdminIsEnabled();
     assertNeedToResetSystem(true, true);
+
+    useRestoreData();
 }
 
 class CloudInstanceChanged : public BaseRestoreDbTest
@@ -373,20 +404,53 @@ TEST_F(CloudInstanceChanged, main)
     assertNeedToResetSystem(false, true);
 }
 
-TEST_F(BaseRestoreDbTest, IsNewServerInstance)
+TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_SystemIdAndNameExistInDb)
 {
-    ASSERT_TRUE(nx::mserver_aux::isNewServerInstance(restoreData, false, false));
-    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, true, false));
-    ASSERT_TRUE(nx::mserver_aux::isNewServerInstance(restoreData, false, true));
+    settingsProxy->setSystemName(kSystemName);
+    settingsProxy->setLocalSystemId(kLocalSystemId);
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::no));
+    nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
 
-    shutdownBeforeRestore();
-    ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, false, false));
+    ASSERT_EQ(settingsProxy->systemName(), kSystemName);
+    ASSERT_EQ(settingsProxy->localSystemId(), kLocalSystemId);
 }
 
-TEST_F(BaseRestoreDbTest, NeedToResetSystem)
+TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_SystemNameInConfig_NoIdFromNameFlag)
 {
-    assertNeedToResetSystem(true, true);
-    settingsProxy->setCloudInstanceChanged(true);
-    settingsProxy->setConnectedToCloud(true);
-    assertNeedToResetSystem(false, true);
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::yes));
+    nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+    ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kConfigValue);
+    ASSERT_EQ(settingsProxy->localSystemId(), 
+              guidFromArbitraryData(detail::TestSystemNameProxy::kConfigValue + 
+                  settingsProxy->getMaxServerKey()));
+}
+
+TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_SystemNameInConfig_IdFromNameFlagSet)
+{
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::yes));
+    settingsProxy->setIsSystemIdFromSystemName(true);
+    nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+    ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kConfigValue);
+    ASSERT_EQ(settingsProxy->localSystemId(), 
+              guidFromArbitraryData(detail::TestSystemNameProxy::kConfigValue));
+}
+
+TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_NoSystemNameInConfig_IdFromNameFlagSet)
+{
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::no));
+    settingsProxy->setIsSystemIdFromSystemName(true);
+    nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+    ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kDefaultValue);
+    ASSERT_EQ(settingsProxy->localSystemId(), guidFromArbitraryData(detail::TestSystemNameProxy::kDefaultValue));
+}
+
+TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_NoSystemNameInConfig_NoIdFromNameFlagSet)
+{
+    systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::no));
+    settingsProxy->setIsSystemIdFromSystemName(false);
+    nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
+    ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kDefaultValue);
+    ASSERT_EQ(settingsProxy->localSystemId(), 
+              guidFromArbitraryData(detail::TestSystemNameProxy::kDefaultValue + 
+                    settingsProxy->getMaxServerKey()));
 }
