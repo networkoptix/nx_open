@@ -123,7 +123,7 @@ int QnAuditItemDelegate::cachedTextWidth(const QFont& font, const QString& textD
         if (isBold)
             localFont.setBold(true);
 
-        width = ::textWidth(localFont, textData);
+        width = textWidth(localFont, textData);
         hash.insert(textData, width);
     }
 
@@ -428,7 +428,7 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
     QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
 
     /* Calculate time offset: */
-    int timeXOffset = ::textWidth(option.font, dateStr);
+    int timeXOffset = textWidth(option.font, dateStr);
 
     /* Draw date: */
     QRect rect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
