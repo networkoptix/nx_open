@@ -1536,7 +1536,7 @@ void QnNxStyle::drawComplexControl(
                                 groupBox->state.testFlag(QStyle::State_Enabled),
                                 text, QPalette::Text);
 
-                            rect.setLeft(rect.left() + QFontMetrics(font).width(text, -1, kTextFlags) + Metrics::kStandardPadding);
+                            rect.setLeft(rect.left() + QFontMetrics(font).size(kTextFlags, text).width() + Metrics::kStandardPadding);
                         }
 
                         if (!detailText.isEmpty())
@@ -2653,11 +2653,11 @@ QRect QnNxStyle::subControlRect(
                             font.setPixelSize(font.pixelSize() + 2);
                             font.setWeight(QFont::DemiBold);
 
-                            int textWidth = QFontMetrics(font).width(text, -1, kTextFlags);
+                            int textWidth = QFontMetrics(font).size(kTextFlags, text).width();
 
                             if (!detailText.isEmpty())
                             {
-                                int detailWidth = groupBox->fontMetrics.width(detailText, -1, kTextFlags);
+                                int detailWidth = groupBox->fontMetrics.size(kTextFlags, detailText).width();
                                 textWidth += Metrics::kStandardPadding + detailWidth;
                             }
 
