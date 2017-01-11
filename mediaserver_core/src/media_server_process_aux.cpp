@@ -65,6 +65,9 @@ QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
     if (m_settings->isSystemIdFromSystemName())
         return guidFromArbitraryData(m_systemNameString);
 
+    if (m_systemName->isDefault())
+        return QnUuid();
+
     return guidFromArbitraryData(m_systemNameString + m_settings->getMaxServerKey());
 }
 
