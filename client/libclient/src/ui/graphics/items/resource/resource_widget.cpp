@@ -144,6 +144,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
+    connect(m_resource, &QnResource::statusChanged, this, [this] { updateStatusOverlay(true);} );
+    connect(m_resource, &QnResource::statusChanged, this, &QnResourceWidget::updateOverlayButton);
 
     /* Set up overlay widgets. */
     QFont font = this->font();
@@ -164,10 +166,11 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_statusController = new QnStatusOverlayController(m_resource, m_statusOverlay, this);
 
     connect(m_statusController, &QnStatusOverlayController::statusOverlayChanged, this,
-        [this, controller = m_statusController](bool animated)
+        [this](bool animated)
         {
             const bool isEmptyOverlay = (m_statusController->statusOverlay() == Qn::EmptyOverlay);
             setOverlayWidgetVisible(m_statusOverlay, !isEmptyOverlay, animated);
+            updateOverlayButton();
         });
 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
@@ -190,8 +193,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
 
     /* Videowall license changes helper */
-    QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
-    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
+    auto videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this,
+        [this]
+        {
+            updateStatusOverlay(true);
+        });
 
     /* Run handlers. */
     setInfoVisible(buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton)->isChecked(), false);
@@ -821,9 +828,21 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay() const
     return calculateStatusOverlay(m_resource->getStatus(), mediaRes && mediaRes->hasVideo(0));
 }
 
-void QnResourceWidget::updateStatusOverlay()
+void QnResourceWidget::updateStatusOverlay(bool animate)
 {
-    m_statusController->setStatusOverlay(calculateStatusOverlay(), true);
+    m_statusController->setStatusOverlay(calculateStatusOverlay(), animate);
+}
+
+Qn::ResourceOverlayButton QnResourceWidget::calculateOverlayButton(
+    Qn::ResourceStatusOverlay statusOverlay) const
+{
+    return Qn::ResourceOverlayButton::Empty;
+}
+
+void QnResourceWidget::updateOverlayButton()
+{
+    const auto statusOverlay = m_statusController->statusOverlay();
+    m_statusController->setCurrentButton(calculateOverlayButton(statusOverlay));
 }
 
 void QnResourceWidget::setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout)
@@ -930,7 +949,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     m_renderStatus = renderStatus;
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    updateStatusOverlay();
+    updateStatusOverlay(true);
 
     emit painted();
 }
