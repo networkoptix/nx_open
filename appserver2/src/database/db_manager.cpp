@@ -1013,9 +1013,6 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
 
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
-    if (updateName.endsWith(lit("/30_update_history_guid.sql")))
-        return removeOldCameraHistory();
-
     if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
 
