@@ -1745,7 +1745,16 @@ int UDPSocket::recvFrom(
     socklen_t addrLen = sizeof( clntAddr );
 
 #ifdef _WIN32
-    int rtn = recvfrom( handle(), (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+    const auto h = handle();
+    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+    if ((rtn == SOCKET_ERROR) &&
+        (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
+    {
+        // Win32 can return connectionReset for UDP(!) socket 
+        //   sometimes on receiving ICMP error response.
+        SystemError::setLastErrorCode(SystemError::again);
+        return -1;
+    }
 #else
     unsigned int recvTimeout = 0;
     if( !getRecvTimeout( &recvTimeout ) )
