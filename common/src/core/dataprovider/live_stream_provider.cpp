@@ -183,9 +183,9 @@ Qn::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
     if (m_softMotionRole == Qn::CR_Default)
     {
         m_forcedMotionStream = m_cameraRes->getProperty(QnMediaResource::motionStreamKey()).toLower();
-        if (m_forcedMotionStream == lit("primary"))
+        if (m_forcedMotionStream == QnMediaResource::primaryStreamValue())
             m_softMotionRole = Qn::CR_LiveVideo;
-        else if (m_forcedMotionStream == lit("secondary"))
+        else if (m_forcedMotionStream == QnMediaResource::secondaryStreamValue())
             m_softMotionRole = Qn::CR_SecondaryLiveVideo;
         else {
             if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
@@ -317,7 +317,7 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
     static const int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
-    bool resoulutionOK =  videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
+    bool resoulutionOK = videoData->width * videoData->height <= maxSquare || !m_forcedMotionStream.isEmpty();
 
     if (m_role == roleForMotionEstimation() && m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && resoulutionOK)
     {
@@ -468,7 +468,9 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
         return;
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
-    bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
+    bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION
+        || m_cameraRes->getProperty(QnMediaResource::motionStreamKey()) == QnMediaResource::primaryStreamValue();
+
     bool cameraValue = m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability;
     if (newValue != cameraValue)
     {
