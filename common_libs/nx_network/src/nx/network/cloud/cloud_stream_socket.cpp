@@ -492,7 +492,11 @@ void CloudStreamSocket::onCloudConnectDone(
     NX_LOGX(lm("onCloudConnectDone. %1").str(errorCode), cl_logDEBUG2);
     
     if (errorCode == SystemError::noError)
+    {
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
+        if (errorCode != SystemError::noError)
+            cloudConnection.reset();
+    }
 
     if (errorCode == SystemError::noError)
     {
