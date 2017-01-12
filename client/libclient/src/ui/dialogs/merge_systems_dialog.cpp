@@ -251,6 +251,13 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
 
+    if ((mergeStatus == utils::MergeSystemsStatus::ok)
+        && helpers::isCloudSystem(moduleInformation)
+        && helpers::isCloudSystem(discoverer->getModuleInformation()))
+    {
+        mergeStatus = utils::MergeSystemsStatus::bothSystemBoundToCloud;
+    }
+
     if (mergeStatus != utils::MergeSystemsStatus::ok
         && mergeStatus != utils::MergeSystemsStatus::starterLicense)
     {

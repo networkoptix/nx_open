@@ -1,5 +1,4 @@
-#ifndef QN_LOG_H
-#define QN_LOG_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -120,11 +119,15 @@ private:
         return d && loglevel <= logLevel();
     }
 
+    static void writeToStdout(const QString& str, QnLogLevel logLevel);
+
 private:
     QnLogPrivate *d;
 
     static std::once_flag s_onceFlag;
     static std::shared_ptr< Logs > s_instance;
+
+    friend class QnLogPrivate;
 };
 
 #define CL_LOG(level)                                           \
@@ -160,14 +163,3 @@ private:
 #define cl_log (*QnLog::instance())
 
 NX_UTILS_API void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
-
-
-template<class T>
-QString toDebugString(const T &value) {
-    QString result;
-    QDebug stream(&result);
-    stream << value;
-    return result;
-}
-
-#endif // QN_LOG_H

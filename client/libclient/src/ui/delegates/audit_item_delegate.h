@@ -28,7 +28,7 @@ private:
     void paintUserActivity(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     void paintFocusRect(const QStyle* style, QPainter* painter, const QStyleOptionViewItem& option) const;
 
-    int textWidth(const QFont& font, const QString& textData, bool isBold = false) const;
+    int cachedTextWidth(const QFont& font, const QString& textData, bool isBold = false) const;
 
     QSize defaultSizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
     QSize descriptionSizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;

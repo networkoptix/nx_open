@@ -329,6 +329,15 @@ namespace Qn
         OverlayCount
     };
 
+    enum class ResourceOverlayButton
+    {
+        Empty,
+        Diagnostics,
+        IoEnable,
+        MoreLicenses,
+        Settings,
+    };
+
     /**
      * Result of a frame rendering operation.
      *

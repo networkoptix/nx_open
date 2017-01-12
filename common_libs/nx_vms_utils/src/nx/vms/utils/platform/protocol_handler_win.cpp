@@ -40,7 +40,7 @@ bool registerSystemUriProtocolHandler(
     if (existingVersion >= version)
         return true; /* Handler already registered. */
 
-    registryEditor.setValue(kDefaultValueKey, QString("URL:%1").arg(description));
+    registryEditor.setValue(kDefaultValueKey, description);
     registryEditor.setValue(kVersionKey, version.toString());
     registryEditor.setValue("URL Protocol", "");
 

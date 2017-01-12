@@ -137,6 +137,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Server | Incompatible,   loadIcon(lit("tree/server_incompatible.png")));
     m_cache.insert(Server | Control,        loadIcon(lit("tree/server_current.png")));
     m_cache.insert(Server | Unauthorized,   loadIcon(lit("tree/server_unauthorized.png")));
+    m_cache.insert(HealthMonitor| Offline,  loadIcon(lit("tree/health_monitor_offline.png")));
     m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
     m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
     m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));

@@ -54,7 +54,7 @@ public:
 
     virtual QnModuleInformation getServer(const QnUuid& serverId) const = 0;
 
-    virtual bool isOnlineServer(const QnUuid& serverId) const = 0;
+    virtual bool isReachableServer(const QnUuid& serverId) const = 0;
 
     // TODO: #ynikitenkov Rename host "field" to appropriate
     virtual QUrl getServerHost(const QnUuid& serverId) const = 0;
@@ -62,6 +62,8 @@ public:
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 
     virtual bool isOnline() const = 0;
+
+    virtual bool isReachable() const = 0;
 
     virtual bool hasInternet() const = 0;
 
@@ -79,6 +81,8 @@ signals:
     void serverRemoved(const QnUuid& serverId);
 
     void onlineStateChanged();
+
+    void reachableStateChanged();
 
     void hasInternetChanged();
 

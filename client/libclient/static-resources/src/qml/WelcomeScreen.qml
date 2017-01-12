@@ -87,7 +87,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.sourceRowsCount;
+                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -186,10 +186,22 @@ Rectangle
                     }
                 }
 
-                model: QnFilteringSystemsModel
+                model: modelLoader.item;
+
+                Loader
                 {
-                    filterCaseSensitivity: Qt.CaseInsensitive;
-                    filterRole: 257;    // Search text role
+                    id: modelLoader;
+
+                    active: (context.isVisible && screenHolder.visible);
+
+                    sourceComponent: Component
+                    {
+                        QnFilteringSystemsModel
+                        {
+                            filterCaseSensitivity: Qt.CaseInsensitive;
+                            filterRole: 257;    // Search text role
+                        }
+                    }
                 }
 
                 delegate: Item
@@ -219,6 +231,7 @@ Rectangle
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
                         isOnline: model.isOnline;
+                        isReachable: model.isReachable;
 
                         Component.onCompleted:
                         {
@@ -286,7 +299,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (grid.model.sourceRowsCount == 0);
+            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
         }
 
         Item
@@ -326,7 +339,7 @@ Rectangle
 
         NxBanner
         {
-            visible: !context.isCloudEnabled;
+            visible: !context.isCloudEnabled && context.isLoggedInToCloud;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;

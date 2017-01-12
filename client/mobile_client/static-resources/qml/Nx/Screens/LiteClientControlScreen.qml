@@ -16,6 +16,9 @@ Page
     leftPadding: 8
     rightPadding: 8
 
+    screenOrientation: (d.minimumHeight > width || d.minimumHeight > height)
+        ? Qt.PortraitOrientation : Qt.PrimaryOrientation
+
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
 
@@ -38,6 +41,8 @@ Page
     QtObject
     {
         id: d
+
+        readonly property real minimumHeight: 300 + bottomLoader.height + header.height
 
         property int activeItemIndex: 0
 
@@ -137,7 +142,7 @@ Page
         id: offlineDummy
         anchors.fill: parent
         title: qsTr("Nx1 is offline")
-        image: lp("images/alert_nx1_offline.png")
+        image: lp("/images/alert_nx1_offline.png")
         visible: !liteClientController.serverOnline
     }
 

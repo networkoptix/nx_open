@@ -28,6 +28,7 @@ namespace
 
         result.insert(QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem");
         result.insert(QnSystemsModel::IsOnlineRoleId, "isOnline");
+        result.insert(QnSystemsModel::IsReachableRoleId, "isReachable");
         result.insert(QnSystemsModel::IsCompatibleRoleId, "isCompatible");
         result.insert(QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal");
@@ -203,9 +204,14 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
              * with offline cloud. Remove isCloudSystemCheck in 3.1
              */
             if (system->isCloudSystem())
-                return (system->isOnline() && system->hasInternet());
+            {
+                return (system->isOnline()
+                    && (system->servers().empty() || system->hasInternet()));
+            }
 
             return system->isOnline();
+        case IsReachableRoleId:
+            return system->isReachable();
         case IsCompatibleRoleId:
             return d->isCompatibleSystem(system);
         case IsCompatibleInternalRoleId:
@@ -324,10 +330,8 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         {
             emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
         };
-
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::onlineStateChanged, this, emitOnlineChanged);
-
 
     // TODO: #ynikitenkov In 3.0 we can't connect to server with offline cloud. Remove this in 3.1
     data->connections
@@ -344,6 +348,15 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
         {
             emitDataChanged(systemDescription, QnSystemsModel::SafeModeRoleId);
         });
+
+
+    const auto emitReachableChanged =
+        [this, systemDescription]()
+    {
+        emitDataChanged(systemDescription, QnSystemsModel::IsReachableRoleId);
+    };
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::onlineStateChanged, this, emitReachableChanged);
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
     internalData.append(data);
@@ -475,7 +488,7 @@ QString QnSystemsModelPrivate::getIncompatibleVersion(
     const auto predicate =
         [this, systemDescription](const QnModuleInformation& serverInfo)
         {
-            if (!systemDescription->isOnlineServer(serverInfo.id))
+            if (!systemDescription->isReachableServer(serverInfo.id))
                 return false;
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult == Qn::IncompatibleVersionConnectionResult;
@@ -500,7 +513,7 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
     return std::all_of(servers.cbegin(), servers.cend(),
         [systemDescription](const QnModuleInformation& serverInfo)
         {
-            if (!systemDescription->isOnlineServer(serverInfo.id))
+            if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;
 
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
@@ -515,7 +528,7 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
     return std::all_of(servers.cbegin(), servers.cend(),
         [systemDescription](const QnModuleInformation& serverInfo)
         {
-            if (!systemDescription->isOnlineServer(serverInfo.id))
+            if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;
 
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);

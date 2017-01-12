@@ -3,6 +3,7 @@
 
 #include <network/module_finder.h>
 #include <network/system_helpers.h>
+#include <network/local_system_description.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
 
@@ -123,8 +124,8 @@ void QnDirectSystemsFinder::addServer(QnModuleInformation moduleInformation)
         const bool isNewSystem = helpers::isNewSystem(moduleInformation);
         const auto localId = helpers::getLocalSystemId(moduleInformation);
         const auto systemDescription = (isNewSystem
-            ? QnSystemDescription::createFactorySystem(systemId)
-            : QnSystemDescription::createLocalSystem(systemId, localId, systemName));
+            ? QnLocalSystemDescription::createFactory(systemId)
+            : QnLocalSystemDescription::create(systemId, localId, systemName));
 
         itSystem = m_systems.insert(systemId, systemDescription);
     }
