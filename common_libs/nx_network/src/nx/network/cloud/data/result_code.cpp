@@ -16,7 +16,7 @@ ResultCode fromStunErrorToResultCode(
             return ResultCode::badRequest;
         case nx::stun::error::unauthtorized:
             return ResultCode::notAuthorized;
-        case nx::stun::cc::error::notFound:
+        case nx::stun::extension::error::notFound:
             return ResultCode::notFound;
         default:
             return ResultCode::otherLogicError;
@@ -32,7 +32,7 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
         case ResultCode::notAuthorized:
             return nx::stun::error::unauthtorized;
         case ResultCode::notFound:
-            return nx::stun::cc::error::notFound;
+            return nx::stun::extension::error::notFound;
         default:
             return nx::stun::error::serverError;
     }

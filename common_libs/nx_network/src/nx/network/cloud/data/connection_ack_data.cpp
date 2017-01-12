@@ -20,27 +20,27 @@ ConnectionAckRequest::ConnectionAckRequest()
 
 void ConnectionAckRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
-    message->newAttribute<stun::cc::attrs::ConnectionMethods>(
+    message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
+    message->newAttribute<stun::extension::attrs::ConnectionMethods>(
         nx::String::number(connectionMethods));
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(forwardedTcpEndpointList));
-    message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
+    message->newAttribute< stun::extension::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
-    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectionAckRequest::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
     return
-        readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+        readAttributeValue<stun::extension::attrs::PublicEndpointList>(
             message, &forwardedTcpEndpointList) &&
-        readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
-        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
-        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList);
+        readStringAttributeValue<stun::extension::attrs::ConnectionId>(message, &connectSessionId) &&
+        readIntAttributeValue<stun::extension::attrs::ConnectionMethods>(message, &connectionMethods) &&
+        readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(message, &udpEndpointList);
 }
 
 }   //api

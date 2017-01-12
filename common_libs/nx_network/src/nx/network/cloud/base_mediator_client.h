@@ -57,8 +57,8 @@ protected:
         utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
-        const nx::stun::cc::methods::Value method =
-            static_cast<nx::stun::cc::methods::Value>(request.header.method);
+        const nx::stun::extension::methods::Value method =
+            static_cast<nx::stun::extension::methods::Value>(request.header.method);
         NX_ASSERT(method == ResponseData::kMethod, "Request and response methods mismatch");
 
         this->sendRequest(
@@ -70,7 +70,7 @@ protected:
             if (code != SystemError::noError)
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                    arg(stun::cc::methods::toString(method)).
+                    arg(stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)),
                     cl_logDEBUG1);
                 return completionHandler(
@@ -81,7 +81,7 @@ protected:
 
             api::ResultCode resultCode = api::ResultCode::ok;
             const auto* resultCodeHeader = 
-                message.getAttribute<nx::stun::cc::attrs::ResultCode>();
+                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 
@@ -99,7 +99,7 @@ protected:
             if (!responseData.parse(message))
             {
                 NX_LOGX(lm("Failed to parse %1 response: %2").
-                    arg(nx::stun::cc::methods::toString(method)).
+                    arg(nx::stun::extension::methods::toString(method)).
                     arg(responseData.errorText()), cl_logDEBUG1);
                 return completionHandler(
                     std::move(message.transportHeader),
@@ -137,8 +137,8 @@ protected:
     {
         using namespace nx::hpm::api;
 
-        const nx::stun::cc::methods::Value method =
-            static_cast<nx::stun::cc::methods::Value>(request.header.method);
+        const nx::stun::extension::methods::Value method =
+            static_cast<nx::stun::extension::methods::Value>(request.header.method);
 
         this->sendRequest(
             std::move(request),
@@ -149,14 +149,14 @@ protected:
             if (code != SystemError::noError)
             {
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                    arg(stun::cc::methods::toString(method)).
+                    arg(stun::extension::methods::toString(method)).
                     arg(SystemError::toString(code)), cl_logDEBUG1);
                 return completionHandler(std::move(message.transportHeader), ResultCode::networkError);
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
             const auto* resultCodeHeader = 
-                message.getAttribute<nx::stun::cc::attrs::ResultCode>();
+                message.getAttribute<nx::stun::extension::attrs::ResultCode>();
             if (resultCodeHeader)
                 resultCode = resultCodeHeader->value();
 

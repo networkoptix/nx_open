@@ -119,7 +119,7 @@ public:
             nx::hpm::api::PingResponse)> completionHandler)
     {
         this->doAuthRequest(
-            stun::cc::methods::ping,
+            stun::extension::methods::ping,
             std::move(requestData),
             std::move(completionHandler));
     }
@@ -187,8 +187,8 @@ protected:
 
         if (auto credentials = m_connector->getSystemCredentials())
         {
-            request.newAttribute<stun::cc::attrs::SystemId>(credentials->systemId);
-            request.newAttribute<stun::cc::attrs::ServerId>(credentials->serverId);
+            request.newAttribute<stun::extension::attrs::SystemId>(credentials->systemId);
+            request.newAttribute<stun::extension::attrs::ServerId>(credentials->serverId);
             request.insertIntegrity(credentials->systemId, credentials->key);
         }
 
@@ -222,7 +222,7 @@ public:
         std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
     {
         setIndicationHandler(
-            nx::stun::cc::indications::connectionRequested,
+            nx::stun::extension::indications::connectionRequested,
             [handler = std::move(handler)](nx::stun::Message msg)
             {
                 ConnectionRequestedEvent indicationData;

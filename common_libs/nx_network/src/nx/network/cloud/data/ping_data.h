@@ -13,8 +13,8 @@ class NX_NETWORK_API PingRequest:
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::ping;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::ping;
 
     std::list<SocketAddress> endpoints;
 
@@ -29,8 +29,8 @@ class NX_NETWORK_API PingResponse:
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::ping;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::ping;
 
     std::list<SocketAddress> endpoints;
 

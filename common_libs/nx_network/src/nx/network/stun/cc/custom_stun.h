@@ -14,7 +14,7 @@
 
 namespace nx {
 namespace stun {
-namespace cc {
+namespace extension {
 
 namespace methods
 {
@@ -256,7 +256,7 @@ namespace attrs
     };
 }
 
-} // namespace cc
+} // namespace extension
 } // namespace stun
 } // namespace nx
 

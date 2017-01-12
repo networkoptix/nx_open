@@ -12,13 +12,13 @@ BindRequest::BindRequest(std::list<SocketAddress> _publicEndpoints):
 
 void BindRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(publicEndpoints));
 }
 
 bool BindRequest::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
         message, &publicEndpoints);
 }
 

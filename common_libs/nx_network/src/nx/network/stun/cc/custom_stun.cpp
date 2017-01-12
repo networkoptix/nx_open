@@ -3,7 +3,7 @@
 
 namespace nx {
 namespace stun {
-namespace cc {
+namespace extension {
 
 namespace methods {
     nx::String toString(Value val)
@@ -149,6 +149,6 @@ std::vector< String > StringList::get() const
 }
 
 } // namespace attrs
-} // namespace cc
+} // namespace extension
 } // namespace stun
 } // namespace nx

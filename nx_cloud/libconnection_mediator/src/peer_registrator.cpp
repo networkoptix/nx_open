@@ -26,12 +26,12 @@ PeerRegistrator::PeerRegistrator(
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::bind,
+            stun::extension::methods::bind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
                 { bind( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::listen,
+            stun::extension::methods::listen,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -42,7 +42,7 @@ PeerRegistrator::PeerRegistrator(
             } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::resolveDomain,
+            stun::extension::methods::resolveDomain,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -53,7 +53,7 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::resolvePeer,
+            stun::extension::methods::resolvePeer,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -64,7 +64,7 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::clientBind,
+            stun::extension::methods::clientBind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -131,7 +131,7 @@ void PeerRegistrator::bind(
         mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
-    if (const auto attr = requestMessage.getAttribute< stun::cc::attrs::PublicEndpointList >())
+    if (const auto attr = requestMessage.getAttribute< stun::extension::attrs::PublicEndpointList >())
         peerDataLocker.value().endpoints = attr->get();
     else
         peerDataLocker.value().endpoints.clear();

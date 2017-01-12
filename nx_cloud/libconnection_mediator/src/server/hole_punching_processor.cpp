@@ -33,7 +33,7 @@ HolePunchingProcessor::HolePunchingProcessor(
     m_statisticsCollector(statisticsCollector)
 {
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connect,
+        stun::extension::methods::connect,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithOutput(
@@ -44,7 +44,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionAck,
+        stun::extension::methods::connectionAck,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -55,7 +55,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionResult,
+        stun::extension::methods::connectionResult,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(

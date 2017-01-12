@@ -92,7 +92,7 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
             nx::stun::Message indication(
                 stun::Header(
                     stun::MessageClass::indication,
-                    stun::cc::indications::connectionRequested));
+                    stun::extension::indications::connectionRequested));
             connectionRequestedEvent.serialize(&indication);
             connectionRequestedEvent.cloudConnectVersion = request.cloudConnectVersion;
 

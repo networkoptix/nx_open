@@ -14,7 +14,7 @@ class NX_NETWORK_API ListenRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::listen;
+    constexpr static const auto kMethod = stun::extension::methods::listen;
 
     nx::String systemId;
     nx::String serverId;
@@ -29,7 +29,7 @@ class NX_NETWORK_API ListenResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::listen;
+    constexpr static const auto kMethod = stun::extension::methods::listen;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
 
