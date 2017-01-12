@@ -129,9 +129,6 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
 #endif
 
     const auto context = QOpenGLContext::currentContext();
-    Q_ASSERT(context);
-    if (!context)
-        return;
 
     base_type::paintEvent(event);
 
