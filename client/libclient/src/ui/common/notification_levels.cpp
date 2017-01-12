@@ -59,8 +59,8 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
 QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType) {
     switch (messageType) {
     case QnSystemHealth::ArchiveRebuildFinished:
-    case QnSystemHealth::ArchiveRebuildCanceled:
         return QnNotificationLevel::Value::CommonNotification;
+    case QnSystemHealth::ArchiveRebuildCanceled:
     case QnSystemHealth::UsersEmailIsEmpty:
     case QnSystemHealth::EmailIsEmpty:
         return QnNotificationLevel::Value::ImportantNotification;
