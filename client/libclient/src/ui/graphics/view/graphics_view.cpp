@@ -24,7 +24,7 @@ namespace {
 } // anonymous namespace
 
 
-QnLayerPainter::QnLayerPainter(): 
+QnLayerPainter::QnLayerPainter():
     m_view(NULL),
     m_layer(static_cast<QGraphicsScene::SceneLayer>(0)),
     m_enabled(true)
@@ -128,10 +128,14 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
     qint64 startCycles = QnPerformance::currentThreadCycles();
 #endif
 
-    const auto context = QOpenGLContext::currentContext();
-    Q_ASSERT(context);
+    auto context = QOpenGLContext::currentContext();
     if (!context)
-        return;
+    {
+        if (QGLWidget* glWidget = qobject_cast<QGLWidget*>(viewport()))
+            glWidget->makeCurrent();
+
+        NX_ASSERT(QOpenGLContext::currentContext());
+    }
 
     base_type::paintEvent(event);
 

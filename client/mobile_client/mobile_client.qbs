@@ -33,4 +33,14 @@ GenericProduct
     {
         resources.resourceSourceBase: product.sourceDirectory + "/static-resources"
     }
+    ResourcesGroup
+    {
+        resources.priority: 1
+        resources.resourceSourceBase: FileInfo.joinPaths(
+            project.sourceDirectory,
+            "customization",
+            project.customization,
+            "mobile_client",
+            "resources")
+    }
 }

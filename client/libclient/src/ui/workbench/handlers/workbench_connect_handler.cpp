@@ -865,17 +865,20 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
 
     auto system = qnSystemsFinder->getSystem(id);
-    if (!system || !system->isOnline())
+    if (!system || !(system->isOnline() && system->isReachable()))
         return;
 
     const auto servers = system->servers();
-    auto onlineServer = std::find_if(servers.cbegin(), servers.cend(),
-        [system](const QnModuleInformation& server) { return system->isOnlineServer(server.id);});
+    auto reachableServer = std::find_if(servers.cbegin(), servers.cend(),
+        [system](const QnModuleInformation& server)
+        {
+            return system->isReachableServer(server.id);
+        });
 
-    if (onlineServer == servers.cend())
+    if (reachableServer == servers.cend())
         return;
 
-    QUrl url = system->getServerHost(onlineServer->id);
+    QUrl url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
     url.setPassword(credentials.password);

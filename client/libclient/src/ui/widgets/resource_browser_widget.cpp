@@ -627,7 +627,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor, SIGNAL(hoverLeft()), this, SLOT(hideToolTip()));
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &QnResourceBrowserWidget::hideToolTip);
 
     updateToolTipPosition();
 }
@@ -664,12 +665,11 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
             return withNodeType(result);
         }
+        case Qn::LayoutItemNode:
+            return withNodeType(selectedLayoutItems());
         default:
             break;
     }
-
-    if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-        return withNodeType(selectedLayoutItems());
 
     QnActionParameters result(selectedResources());
 

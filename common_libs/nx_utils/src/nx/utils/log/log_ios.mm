@@ -1,8 +1,8 @@
-#include "log_ios.h"
+#include "log.h"
 
 #import <Foundation/Foundation.h>
 
-void printStringToNsLog(const std::string& str)
+void QnLog::writeToStdout(const QString& str, QnLogLevel /*logLevel*/)
 {
-    NSLog(@"%@", [[NSString alloc] initWithUTF8String:str.c_str()]);
+    NSLog(@"%@", str.toNSString());
 }

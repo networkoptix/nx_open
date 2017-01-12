@@ -81,6 +81,14 @@ const QLatin1String kTunnelInactivityTimeout("cloudConnect/tunnelInactivityTimeo
 constexpr const std::chrono::seconds kDefaultTunnelInactivityTimeout =
     nx::hpm::api::kDefaultTunnelInactivityTimeout;
 
+const QLatin1String kConnectionAckAwaitTimeout("cloudConnect/connectionAckAwaitTimeout");
+constexpr const std::chrono::seconds kDefaultConnectionAckAwaitTimeout =
+    std::chrono::seconds(7);
+
+const QLatin1String kConnectionResultWaitTimeout("cloudConnect/connectionResultWaitTimeout");
+constexpr const std::chrono::seconds kDefaultConnectionResultWaitTimeout = 
+    std::chrono::seconds(15);
+
 namespace tcp_reverse_retry_policy {
 
 const QLatin1String kMaxCount("cloudConnect/tcpReverseRetryPolicy/maxCount");
@@ -102,6 +110,12 @@ const QLatin1String kBody("cloudConnect/tcpReverseHttpTimeouts/body");
 namespace nx {
 namespace hpm {
 namespace conf {
+
+ConnectionParameters::ConnectionParameters():
+    connectionAckAwaitTimeout(kDefaultConnectionAckAwaitTimeout),
+    connectionResultWaitTimeout(kDefaultConnectionResultWaitTimeout)
+{
+}
 
 Settings::Settings():
     m_settings(
@@ -139,7 +153,7 @@ const Http& Settings::http() const
     return m_http;
 }
 
-const api::ConnectionParameters& Settings::connectionParameters() const
+const ConnectionParameters& Settings::connectionParameters() const
 {
     return m_connectionParameters;
 }
@@ -270,6 +284,16 @@ void Settings::loadConfiguration()
         nx::utils::parseTimerDuration(m_settings.value(
             tcp_reverse_http_timeouts::kBody).toString(),
         nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+
+    m_connectionParameters.connectionAckAwaitTimeout =
+        nx::utils::parseTimerDuration(
+            m_settings.value(kConnectionAckAwaitTimeout).toString(),
+            kDefaultConnectionAckAwaitTimeout);
+
+    m_connectionParameters.connectionResultWaitTimeout =
+        nx::utils::parseTimerDuration(
+            m_settings.value(kConnectionResultWaitTimeout).toString(),
+            kDefaultConnectionResultWaitTimeout);
 
     //analyzing values
     if (m_general.dataDir.isEmpty())

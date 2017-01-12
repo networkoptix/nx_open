@@ -367,6 +367,28 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
         + (opened ? -item->size().height() : kHidePanelOffset);
+
+    if (opened)
+    {
+        item->speedSlider()->setToolTipEnabled(true);
+        item->volumeSlider()->setToolTipEnabled(true);
+    }
+    else
+    {
+        const auto handleClosed =
+            [this]()
+            {
+                item->speedSlider()->setToolTipEnabled(false);
+                item->volumeSlider()->setToolTipEnabled(false);
+                disconnect(m_yAnimator, &VariantAnimator::finished, this, nullptr);
+            };
+
+        if (animate)
+            connect(m_yAnimator, &VariantAnimator::finished, this, handleClosed);
+        else
+            handleClosed();
+    }
+
     if (animate)
         m_yAnimator->animateTo(newY);
     else
@@ -374,12 +396,6 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_resizerWidget->setEnabled(opened);
     item->timeSlider()->setTooltipVisible(opened);
-
-    if (!opened)
-    {
-        item->speedSlider()->hideToolTip();
-        item->volumeSlider()->hideToolTip();
-    }
 
     emit openedChanged(opened, animate);
 }

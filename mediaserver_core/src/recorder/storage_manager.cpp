@@ -799,6 +799,9 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     QFile::rename(fileName, fileName + lit("_deprecated"));
 
     auto sdb = qnStorageDbPool->getSDB(storage);
+    if (!sdb)
+      return;
+
     auto newCatalogs = sdb->loadFullFileCatalog();
     QVector<DeviceFileCatalogPtr> catalogsToWrite;
 

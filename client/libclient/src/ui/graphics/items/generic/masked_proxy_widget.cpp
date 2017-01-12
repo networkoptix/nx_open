@@ -11,12 +11,29 @@
 #include <ui/common/geometry.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
+namespace {
+
+void blitPixmap(const QPixmap& source, QPixmap& destination, const QPoint& location = QPoint(0, 0))
+{
+    NX_ASSERT(source.devicePixelRatio() == destination.devicePixelRatio());
+
+    QPainter blitter(&destination);
+    blitter.setCompositionMode(QPainter::CompositionMode_Source);
+    blitter.drawPixmap(location, source);
+}
+
+} // namespace
+
+
+QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
-    m_pixmapDirty(true),
     m_updatesEnabled(true),
     m_pixmap()
 {
+    /*
+    * Caching must be enabled, otherwise full render of embedded widget occurs at each paint.
+    */
+    setCacheMode(ItemCoordinateCache);
 }
 
 QnMaskedProxyWidget::~QnMaskedProxyWidget()
@@ -32,54 +49,60 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
     if (!widget() || !widget()->isVisible())
         return;
 
-    /* Filter out repaints on the window frame. */
-    QRectF renderRectF = (option->exposedRect.isEmpty() ?
-        rect() : option->exposedRect & rect());
+    const QRect widgetRect = rect().toAlignedRect();
+    QRect updateRect = option->exposedRect.toAlignedRect() & widgetRect;
 
-    /* Filter out areas that are masked out. */
-    if (!m_paintRect.isNull())
-        renderRectF = renderRectF & m_paintRect;
+    if (m_updatesEnabled)
+    {
+        const int pixelRatio = painter->device()->devicePixelRatio();
+        const QSize targetSize = widgetRect.size() * pixelRatio;
 
-    /* Nothing to paint? Just return. */
-    QRect renderRect = renderRectF.toAlignedRect();
-    if (renderRect.isEmpty())
+        if (m_pixmap.devicePixelRatio() != pixelRatio
+            || targetSize.width() > m_pixmap.size().width()
+            || targetSize.height() > m_pixmap.size().height())
+        {
+            m_pixmap = QPixmap(targetSize);
+            m_pixmap.setDevicePixelRatio(pixelRatio);
+            m_pixmapRect = widgetRect;
+            updateRect = widgetRect;
+        }
+
+        if (!updateRect.isEmpty())
+        {
+            if (updateRect != widgetRect)
+            {
+                /* Paint into sub-cache: */
+                QPixmap subPixmap(updateRect.size() * pixelRatio);
+                subPixmap.setDevicePixelRatio(pixelRatio);
+                subPixmap.fill(Qt::transparent);
+                widget()->render(&subPixmap, QPoint(), updateRect);
+
+                /* Blit sub-cache into main cache: */
+                blitPixmap(subPixmap, m_pixmap, updateRect.topLeft());
+            }
+            else
+            {
+                /* Paint directly into cache: */
+                m_pixmap.fill(Qt::transparent);
+                widget()->render(&m_pixmap, updateRect.topLeft(), updateRect);
+            }
+        }
+    }
+
+    if (m_pixmap.isNull())
         return;
 
-    if (m_pixmapDirty && m_updatesEnabled)
-    {
-        const auto widgetRect = this->widget()->rect();
-        const int ratio = painter->device()->devicePixelRatio();
-        const QSize targetSize = widgetRect.size() * ratio;
-        if (m_pixmap.size() != targetSize)
-            m_pixmap = QPixmap(targetSize);
-        m_pixmap.fill(Qt::transparent);
-        m_pixmap.setDevicePixelRatio(ratio);
-        widget()->render(&m_pixmap, QPoint(), widgetRect);
+    /* Rectangle to render, in logical coordinates: */
+    const QRect renderRect = m_pixmapRect & (m_paintRect.isNull()
+        ? widgetRect
+        : widgetRect & m_paintRect.toAlignedRect());
 
-        m_pixmapDirty = false;
-    }
+    /* Source rectangle within pixmap, in device coordinates: */
+    const QRect sourceRect {
+        renderRect.topLeft() * m_pixmap.devicePixelRatio(),
+        renderRect.size() * m_pixmap.devicePixelRatio() };
 
-    const auto aspect = m_pixmap.devicePixelRatio();
-    const auto size = renderRect.size() * aspect;
-    const auto topLeft = (renderRect.topLeft() - rect().topLeft()).toPoint();
-
-    paintPixmapSharp(painter, m_pixmap, renderRect, QRect(topLeft, size));
-}
-
-bool QnMaskedProxyWidget::eventFilter(QObject* object, QEvent* event)
-{
-    if (object == widget())
-    {
-        if (event->type() == QEvent::UpdateRequest)
-            m_pixmapDirty = true;
-
-#ifdef Q_OS_MAC
-        if (event->type() != QEvent::Paint)
-            m_pixmapDirty = true;
-#endif
-    }
-
-    return base_type::eventFilter(object, event);
+    paintPixmapSharp(painter, m_pixmap, renderRect, sourceRect);
 }
 
 QRectF QnMaskedProxyWidget::paintRect() const
@@ -92,9 +115,13 @@ void QnMaskedProxyWidget::setPaintRect(const QRectF& paintRect)
     if (qFuzzyEquals(m_paintRect, paintRect))
         return;
 
-    m_paintRect = paintRect;
-    update();
+    const auto updateRegion = QRegion(paintRect.toAlignedRect())
+        .xored(m_paintRect.toAlignedRect());
 
+    for (const auto& rect: updateRegion.rects())
+        update(rect);
+
+    m_paintRect = paintRect;
     emit paintRectChanged();
 }
 
@@ -113,18 +140,12 @@ QRectF QnMaskedProxyWidget::paintGeometry() const
     if (m_paintRect.isNull())
         return geometry();
 
-    return QRectF(
-        pos() + m_paintRect.topLeft(),
-        m_paintRect.size()
-    );
+    return { pos() + m_paintRect.topLeft(), m_paintRect.size() };
 }
 
 void QnMaskedProxyWidget::setPaintGeometry(const QRectF& paintGeometry)
 {
-    setPaintRect(QRectF(
-        paintGeometry.topLeft() - pos(),
-        paintGeometry.size()
-    ));
+    setPaintRect({ paintGeometry.topLeft() - pos(), paintGeometry.size() });
 }
 
 bool QnMaskedProxyWidget::isUpdatesEnabled() const
@@ -132,16 +153,13 @@ bool QnMaskedProxyWidget::isUpdatesEnabled() const
     return m_updatesEnabled;
 }
 
-bool QnMaskedProxyWidget::event(QEvent* e)
-{
-    m_pixmapDirty = true;
-    return QGraphicsProxyWidget::event(e);
-}
-
 void QnMaskedProxyWidget::setUpdatesEnabled(bool updatesEnabled)
 {
+    if (m_updatesEnabled == updatesEnabled)
+        return;
+
     m_updatesEnabled = updatesEnabled;
 
-    if (updatesEnabled && m_pixmapDirty)
+    if (m_updatesEnabled)
         update();
 }

@@ -78,6 +78,8 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         &ResourceTreeWorkbenchPanel::updateControlsGeometry);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::updateControlsGeometry);
+    connect(item, &QGraphicsWidget::geometryChanged, widget,
+        &QnResourceBrowserWidget::hideToolTip);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);

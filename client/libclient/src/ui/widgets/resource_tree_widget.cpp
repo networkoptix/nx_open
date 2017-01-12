@@ -168,7 +168,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndents(0, 0)));
+        QVariant::fromValue(QnIndents(0, 1)));
 
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
@@ -356,10 +356,15 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 
     m_graphicsTweaksFlags = flags;
 
+    /*
+     * Currently this is not working: hidden row does not receive full update when scrolled up.
+     * It was working only due to full tree repainting inside graphics proxy widget.
+
     if (flags & Qn::HideLastRow)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
+    */
 
     if (flags & Qn::BypassGraphicsProxy)
     {

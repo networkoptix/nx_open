@@ -40,7 +40,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isOnline;
+        return control.isOnline && control.isReachable;
     }
 
     tileColor:
@@ -74,7 +74,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !control.isOnline || !isCompatibleInternal);
+                || !control.isOnline || !control.isReachable || !isCompatibleInternal);
         }
 
         text:
@@ -87,6 +87,8 @@ BaseTile
                 return compatibleVersion;
             if (!control.isOnline)
                 return qsTr("OFFLINE");
+            if (!control.isReachable)
+                return qsTr("UNREACHABLE");
 
             return "";
         }
@@ -238,8 +240,12 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
+                currentAreaItem.connectable = Qt.binding(
+                    function()
+                    {
+                        return control.isOnline && control.isReachable;
+                    });
             }
         }
     }

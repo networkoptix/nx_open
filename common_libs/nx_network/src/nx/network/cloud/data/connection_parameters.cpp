@@ -9,8 +9,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-ConnectionParameters::ConnectionParameters()
-:
+ConnectionParameters::ConnectionParameters():
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
     udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),

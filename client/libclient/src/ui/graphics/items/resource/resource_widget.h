@@ -292,7 +292,11 @@ protected:
 
     Qn::ResourceStatusOverlay calculateStatusOverlay(int resourceStatus, bool hasVideo) const;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const;
-    Q_SLOT void updateStatusOverlay();
+    void updateStatusOverlay(bool animate);
+
+    virtual Qn::ResourceOverlayButton calculateOverlayButton(
+        Qn::ResourceStatusOverlay statusOverlay) const;
+    void updateOverlayButton();
 
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();

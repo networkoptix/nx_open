@@ -172,7 +172,11 @@ void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePt
     if (!model())
         return;
 
-    QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid));
+    if (item.uuid.isNull())
+        return;
+
+    QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
+        Qn::LayoutItemNode));
     node->initialize();
     node->setParent(toSharedPointer());
 

@@ -216,7 +216,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
     return m_servers;
 }
 
-bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
+bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) const
 {
     if (invalidSystem())
         return false;
@@ -224,7 +224,7 @@ bool QnSystemDescriptionAggregator::isOnlineServer(const QnUuid& serverId) const
     return std::any_of(m_systems.begin(), m_systems.end(),
         [serverId](const QnSystemDescriptionPtr& system)
         {
-            return system->isOnlineServer(serverId);
+            return system->isReachableServer(serverId);
         });
 }
 
@@ -251,8 +251,17 @@ bool QnSystemDescriptionAggregator::isOnline() const
     if (invalidSystem())
         return false;
 
-    return std::any_of(m_systems.begin(), m_systems.end(),
-        [](const QnSystemDescriptionPtr& system) { return system->isOnline(); });
+    // Returns online state of most valuable system (by priority)
+    return m_systems.first()->isOnline();
+}
+
+bool QnSystemDescriptionAggregator::isReachable() const
+{
+    if (invalidSystem())
+        return false;
+
+    // Returns online state of most valuable system (by priority)
+    return m_systems.first()->isReachable();
 }
 
 
