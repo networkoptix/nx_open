@@ -1146,7 +1146,6 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         }
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
-        qnStorageDbPool->getSDB(storage);
     }
 }
 
