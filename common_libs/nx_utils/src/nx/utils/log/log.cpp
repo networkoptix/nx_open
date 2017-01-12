@@ -13,10 +13,6 @@
     static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
-#if defined(Q_OS_IOS)
-    #include "log_ios.h"
-#endif
-
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
@@ -34,6 +30,25 @@ QnLogLevel QnLog::logLevelFromString(const QString &value) {
 QString QnLog::logLevelToString(QnLogLevel value) {
     return QLatin1String(qn_logLevelNames[value]);
 }
+
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+    void QnLog::writeToStdout(const QString& str, QnLogLevel logLevel)
+    {
+        switch (logLevel)
+        {
+            case cl_logERROR:
+            case cl_logWARNING:
+                std::cerr << str.toStdString() << std::endl;
+                std::cerr.flush();
+                break;
+
+            default:
+                std::cout << str.toStdString() << std::endl;
+                std::cout.flush();
+                break;
+        }
+    }
+#endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 // -------------------------------------------------------------------------- //
 // QnLogPrivate
@@ -75,51 +90,31 @@ public:
         if (logLevel > m_logLevel)
             return;
 
-        std::ostringstream ostr;
-        const auto curDateTime = QDateTime::currentDateTime();
-        const auto curTime = curDateTime.time();
-        ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData() << " "
-            << curTime.toString(Qt::ISODate).toUtf8().constData() << "." << std::setw(3) << std::setfill('0') << curTime.msec() << std::setfill(' ')
-            << " " << std::setw(6) <<
-#ifdef Q_OS_LINUX
-            gettid()
-#else
-            QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
-#endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
+        static constexpr int kPreambuleMaxLength = 48;
 
+        QString str;
+        str.reserve(msg.size() + kPreambuleMaxLength);
+        str += QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz ");
+        #if defined(Q_OS_LINUX)
+            str += lit(" %1").arg(gettid(), 6);
+        #else
+            str += lit(" %1").arg((qint64) QThread::currentThreadId(), 6, 16);
+        #endif
+        str += lit(" %1: ").arg(qn_logLevelNames[logLevel], 7);
+        str += msg;
+
+        std::unique_lock<std::mutex> lk(m_mutex);
+
+        if (m_baseName == lit("-") || m_file.fail())
         {
-            std::unique_lock<std::mutex> lk( m_mutex );
-
-            if (m_baseName == lit("-") || m_file.fail())
-            {
-                #if defined(Q_OS_IOS)
-                    printStringToNsLog(ostr.str());
-                    return;
-                #endif
-
-                switch (logLevel)
-                {
-                    case cl_logERROR:
-                    case cl_logWARNING:
-                        std::cerr << ostr.str();
-                        std::cerr.flush();
-                        break;
-
-                    default:
-                        std::cout << ostr.str();
-                        std::cout.flush();
-                        break;
-                }
-            }
-            else
-            {
-                m_file << ostr.str();
-                m_file.flush();
-                if (m_file.tellp() >= m_maxFileSize)
-                    openNextFile();
-            }
+            QnLog::writeToStdout(str, logLevel);
+            return;
         }
+
+        m_file << str.toStdString() << std::endl;
+        m_file.flush();
+        if (m_file.tellp() >= m_maxFileSize)
+            openNextFile();
     }
 
     QString syncCurrFileName() const

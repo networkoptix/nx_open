@@ -68,7 +68,7 @@ private:
     QList<QnResourceTreeModelNodePtr> children(const QnResourceTreeModelNodePtr& node) const;
 
     QnResourceTreeModelNodePtr ensureResourceNode(const QnResourcePtr& resource);
-    QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType = Qn::LayoutItemNode);
+    QnResourceTreeModelNodePtr ensureItemNode(const QnResourceTreeModelNodePtr& parentNode, const QnUuid& uuid, Qn::NodeType nodeType);
     QnResourceTreeModelNodePtr ensureRecorderNode(const QnResourceTreeModelNodePtr& parentNode,
         const QnVirtualCameraResourcePtr& camera);
 

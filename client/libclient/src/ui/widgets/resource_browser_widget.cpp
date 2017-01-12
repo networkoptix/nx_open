@@ -665,12 +665,11 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
             return withNodeType(result);
         }
+        case Qn::LayoutItemNode:
+            return withNodeType(selectedLayoutItems());
         default:
             break;
     }
-
-    if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-        return withNodeType(selectedLayoutItems());
 
     QnActionParameters result(selectedResources());
 

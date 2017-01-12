@@ -1132,9 +1132,12 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             if (!m_resource)
                 return QIcon();
 
-            return m_resource->hasFlags(Qn::server)
-                ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor)
-                : qnResIconCache->icon(m_resource);
+            if (!m_resource->hasFlags(Qn::server))
+                return qnResIconCache->icon(m_resource);
+
+            return m_resource->getStatus() == Qn::Offline
+                ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor | QnResourceIconCache::Offline)
+                : qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
         }
 
         case Qn::SharedLayoutsNode:

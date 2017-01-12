@@ -105,7 +105,6 @@ int runUi(QtSingleGuiApplication* application)
     auto basePath = qnSettings->basePath();
     if (!basePath.startsWith(lit("qrc:")))
         basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
-    context.setLocalPrefix(basePath);
     engine.setBaseUrl(QUrl(basePath + lit("qml/")));
     engine.addImportPath(basePath + lit("qml"));
     QQmlFileSelector qmlFileSelector(&engine);
