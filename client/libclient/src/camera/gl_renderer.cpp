@@ -319,10 +319,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 
     };
 
-    drawVideoTextureDirectly(
-        sourceRect,
-        m_blurBufferA->texture(),
-        v_array);
+    drawVideoTextureDirectly(sourceRect, m_blurBufferA->texture(),
+        v_array, m_decodedPictureProvider.opacity());
 
     return result;
 }
@@ -435,7 +433,8 @@ Qn::RenderStatus QnGLRenderer::drawVideoData(const QRectF &sourceRect, const QRe
 void QnGLRenderer::drawVideoTextureDirectly(
     const QRectF& tex0Coords,
     unsigned int tex0ID,
-    const float* v_array )
+    const float* v_array,
+    qreal opacity)
 {
     cl_log.log( lit("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
@@ -453,7 +452,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
     auto shader = renderer->getTextureShader();
     shader->bind();
-    shader->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
+    shader->setColor(QVector4D(1.0f,1.0f,1.0f, opacity));
     shader->setTexture(0);
     drawBindedTexture(shader, v_array, tx_array);
     shader->release();

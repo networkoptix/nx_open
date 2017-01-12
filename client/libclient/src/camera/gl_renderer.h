@@ -127,7 +127,8 @@ private:
     void drawVideoTextureDirectly(
         const QRectF& tex0Coords,
         unsigned int tex0ID,
-        const float* v_array );
+        const float* v_array,
+        qreal opacity = 1.0);
 
     //!Draws texture \a tex0ID with fisheye effect to the screen
     void drawFisheyeRGBVideoTexture(
