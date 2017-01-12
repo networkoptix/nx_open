@@ -6,7 +6,8 @@
 
 #include <ui/style/globals.h>
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusinessActionPtr &businessAction) {
+QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusinessActionPtr &businessAction)
+{
 
     if (businessAction->actionType() == QnBusiness::PlaySoundAction)
         return Value::CommonNotification;
@@ -20,67 +21,72 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
     if (eventType >= QnBusiness::UserDefinedEvent)
         return Value::CommonNotification;
 
-    switch (eventType) {
-    case QnBusiness::CameraMotionEvent:
-    case QnBusiness::CameraInputEvent:
-    case QnBusiness::ServerStartEvent:
-        return Value::CommonNotification;
+    switch (eventType)
+    {
+        case QnBusiness::CameraMotionEvent:
+        case QnBusiness::CameraInputEvent:
+        case QnBusiness::ServerStartEvent:
+            return Value::CommonNotification;
 
-    case QnBusiness::BackupFinishedEvent:
+        case QnBusiness::BackupFinishedEvent:
         {
             QnBusiness::EventReason reason = static_cast<QnBusiness::EventReason>(params.reasonCode);
             bool isCriticalNotification = reason == QnBusiness::BackupFailedChunkError ||
-                                          reason == QnBusiness::BackupFailedNoBackupStorageError ||
-                                          reason == QnBusiness::BackupFailedSourceFileError ||
-                                          reason == QnBusiness::BackupFailedSourceStorageError ||
-                                          reason == QnBusiness::BackupFailedTargetFileError;
+                reason == QnBusiness::BackupFailedNoBackupStorageError ||
+                reason == QnBusiness::BackupFailedSourceFileError ||
+                reason == QnBusiness::BackupFailedSourceStorageError ||
+                reason == QnBusiness::BackupFailedTargetFileError;
             if (isCriticalNotification)
                 return Value::CriticalNotification;
             return Value::CommonNotification;
         }
 
-    case QnBusiness::CameraDisconnectEvent:
-    case QnBusiness::StorageFailureEvent:
-    case QnBusiness::NetworkIssueEvent:
-        return Value::ImportantNotification;
+        case QnBusiness::CameraDisconnectEvent:
+        case QnBusiness::StorageFailureEvent:
+        case QnBusiness::NetworkIssueEvent:
+            return Value::ImportantNotification;
 
-    case QnBusiness::CameraIpConflictEvent:
-    case QnBusiness::ServerFailureEvent:
-    case QnBusiness::ServerConflictEvent:
-    case QnBusiness::LicenseIssueEvent:
-        return Value::CriticalNotification;
+        case QnBusiness::CameraIpConflictEvent:
+        case QnBusiness::ServerFailureEvent:
+        case QnBusiness::ServerConflictEvent:
+        case QnBusiness::LicenseIssueEvent:
+            return Value::CriticalNotification;
 
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
-        return Value::NoNotification;
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
+            return Value::NoNotification;
     }
 }
 
-QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType) {
-    switch (messageType) {
-    case QnSystemHealth::ArchiveRebuildFinished:
-        return QnNotificationLevel::Value::CommonNotification;
-    case QnSystemHealth::ArchiveRebuildCanceled:
-    case QnSystemHealth::UsersEmailIsEmpty:
-    case QnSystemHealth::EmailIsEmpty:
-        return QnNotificationLevel::Value::ImportantNotification;
-    default:
-        break;
+QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageType messageType)
+{
+    switch (messageType)
+    {
+        case QnSystemHealth::ArchiveRebuildFinished:
+            return QnNotificationLevel::Value::CommonNotification;
+        case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::UsersEmailIsEmpty:
+        case QnSystemHealth::EmailIsEmpty:
+            return QnNotificationLevel::Value::ImportantNotification;
+        default:
+            break;
     }
     return QnNotificationLevel::Value::SystemNotification;
 }
 
-QColor QnNotificationLevel::notificationColor(Value level) {
-    switch (level) {
-    case Value::NoNotification:        return Qt::transparent;
-    case Value::OtherNotification:     return Qt::white;
-    case Value::CommonNotification:    return qnGlobals->notificationColorCommon();
-    case Value::ImportantNotification: return qnGlobals->notificationColorImportant();
-    case Value::CriticalNotification:  return qnGlobals->notificationColorCritical();
-    case Value::SystemNotification:    return qnGlobals->notificationColorSystem();
-    default:
-        NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
-        break;
+QColor QnNotificationLevel::notificationColor(Value level)
+{
+    switch (level)
+    {
+        case Value::NoNotification:        return Qt::transparent;
+        case Value::OtherNotification:     return Qt::white;
+        case Value::CommonNotification:    return qnGlobals->notificationColorCommon();
+        case Value::ImportantNotification: return qnGlobals->notificationColorImportant();
+        case Value::CriticalNotification:  return qnGlobals->notificationColorCritical();
+        case Value::SystemNotification:    return qnGlobals->notificationColorSystem();
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "All enum values must be handled");
+            break;
     }
     return QColor();
 }
