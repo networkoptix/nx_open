@@ -7,10 +7,10 @@ QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
-    bool online)
+    bool running)
 {
     return PointerType(new QnCloudSystemDescription(
-        systemId, localSystemId, systemName, ownerEmail, ownerFullName, online));
+        systemId, localSystemId, systemName, ownerEmail, ownerFullName, running));
 }
 
 QnCloudSystemDescription::QnCloudSystemDescription(
@@ -19,22 +19,22 @@ QnCloudSystemDescription::QnCloudSystemDescription(
     const QString& systemName,
     const QString& ownerEmail,
     const QString& ownerFullName,
-    bool online)
+    bool running)
     :
     base_type(systemId, localSystemId, systemName),
     m_ownerEmail(ownerEmail),
     m_ownerFullName(ownerFullName),
-    m_online(online)
+    m_running(running)
 {
 }
 
-void QnCloudSystemDescription::setOnlineState(bool online)
+void QnCloudSystemDescription::setRunning(bool running)
 {
-    if (m_online == online)
+    if (m_running == running)
         return;
 
-    m_online = online;
-    emit onlineStateChanged();
+    m_running = running;
+    emit runningStateChanged();
 }
 
 bool QnCloudSystemDescription::isCloudSystem() const
@@ -42,9 +42,9 @@ bool QnCloudSystemDescription::isCloudSystem() const
     return true;
 }
 
-bool QnCloudSystemDescription::isOnline() const
+bool QnCloudSystemDescription::isRunning() const
 {
-    return m_online;
+    return m_running;
 }
 
 bool QnCloudSystemDescription::isNewSystem() const

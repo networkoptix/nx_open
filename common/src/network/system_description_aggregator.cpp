@@ -100,8 +100,6 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     connect(system, &QnBaseSystemDescription::serverRemoved,
         this, &QnSystemDescriptionAggregator::updateServers);
 
-    connect(system, &QnBaseSystemDescription::hasInternetChanged,
-        this, &QnSystemDescriptionAggregator::hasInternetChanged);
     connect(system, &QnBaseSystemDescription::safeModeStateChanged,
         this, &QnSystemDescriptionAggregator::safeModeStateChanged);
     connect(system, &QnBaseSystemDescription::newSystemStateChanged,
@@ -112,8 +110,12 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
     connect(system, &QnBaseSystemDescription::systemNameChanged, this,
         [this, system]() { onSystemNameChanged(system); });
 
-    connect(system, &QnBaseSystemDescription::onlineStateChanged,
-        this, &QnBaseSystemDescription::onlineStateChanged);
+    connect(system, &QnBaseSystemDescription::runningStateChanged,
+        this, &QnBaseSystemDescription::runningStateChanged);
+    connect(system, &QnBaseSystemDescription::reachableStateChanged,
+        this, &QnBaseSystemDescription::reachableStateChanged);
+    connect(system, &QnBaseSystemDescription::connectibleStateChanged,
+        this, &QnBaseSystemDescription::connectibleStateChanged);
 
     updateServers();
     emitSystemChanged();
@@ -124,8 +126,9 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit isCloudSystemChanged();
     emit ownerChanged();
     emit systemNameChanged();
-    emit onlineStateChanged();
-    emit hasInternetChanged();
+    emit runningStateChanged();
+    emit reachableStateChanged();
+    emit connectibleStateChanged();
     emit safeModeStateChanged();
     emit newSystemStateChanged();
 }
@@ -228,15 +231,6 @@ bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) co
         });
 }
 
-bool QnSystemDescriptionAggregator::hasInternet() const
-{
-    if (invalidSystem())
-        return false;
-
-    return std::any_of(m_systems.begin(), m_systems.end(),
-        [](const QnSystemDescriptionPtr& system) { return system->hasInternet(); });
-}
-
 bool QnSystemDescriptionAggregator::safeMode() const
 {
     if (invalidSystem())
@@ -246,13 +240,13 @@ bool QnSystemDescriptionAggregator::safeMode() const
         [](const QnSystemDescriptionPtr& system) { return system->safeMode(); });
 }
 
-bool QnSystemDescriptionAggregator::isOnline() const
+bool QnSystemDescriptionAggregator::isRunning() const
 {
     if (invalidSystem())
         return false;
 
-    // Returns online state of most valuable system (by priority)
-    return m_systems.first()->isOnline();
+    // Returns running state of most valuable system (by priority)
+    return m_systems.first()->isRunning();
 }
 
 bool QnSystemDescriptionAggregator::isReachable() const
@@ -260,10 +254,22 @@ bool QnSystemDescriptionAggregator::isReachable() const
     if (invalidSystem())
         return false;
 
-    // Returns online state of most valuable system (by priority)
+    // TODO: #ynikitenkov Make "reachable" flag depends on any system in 3.1
+
+    // Returns reachable state of most valuable system (by priority)
     return m_systems.first()->isReachable();
 }
 
+bool QnSystemDescriptionAggregator::isConnectible() const
+{
+    if (invalidSystem())
+        return false;
+
+    // TODO: #ynikitenkov Make "connectible" flag depends on any system in 3.1
+
+    // Returns connectible state of most valuable system (by priority)
+    return m_systems.first()->isConnectible();
+}
 
 void QnSystemDescriptionAggregator::updateServers()
 {

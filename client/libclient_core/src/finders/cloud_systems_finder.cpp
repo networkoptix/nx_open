@@ -146,7 +146,7 @@ void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targ
     {
         const auto itCurrent = m_systems.find(system.cloudId);
         if (itCurrent != m_systems.end())
-            itCurrent.value()->setOnlineState(system.online);
+            itCurrent.value()->setRunning(system.online);
     }
 }
 

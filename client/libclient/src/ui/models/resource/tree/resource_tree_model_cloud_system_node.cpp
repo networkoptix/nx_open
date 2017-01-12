@@ -26,7 +26,7 @@ void QnResourceTreeModelCloudSystemNode::initialize()
             setName(m_system->name());
         });
 
-    connect(m_system, &QnBaseSystemDescription::onlineStateChanged, this,
+    connect(m_system, &QnBaseSystemDescription::connectibleStateChanged, this,
         [this]
         {
             setIcon(calculateIcon());
@@ -53,14 +53,14 @@ QVariant QnResourceTreeModelCloudSystemNode::data(int role, int column) const
 Qt::ItemFlags QnResourceTreeModelCloudSystemNode::flags(int column) const
 {
     Qt::ItemFlags result = base_type::flags(column);
-    if (!m_system->isOnline() && m_system->isReachable())
+    if (!m_system->isConnectible())
         result &= ~Qt::ItemIsEnabled;
     return result;
 }
 
 QIcon QnResourceTreeModelCloudSystemNode::calculateIcon() const
 {
-    return m_system->isOnline() && m_system->isReachable()
+    return m_system->isConnectible()
         ? qnSkin->icon("tree/system_cloud.png")
         : qnSkin->icon("tree/system_cloud_disabled.png");
 }

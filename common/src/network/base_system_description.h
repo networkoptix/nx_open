@@ -14,9 +14,8 @@ enum class QnServerField
     Name = 0x01,
     SystemName = 0x02,
     Host = 0x04,
-    HasInternet = 0x08,
-    SafeMode = 0x10,
-    CloudId = 0x20
+    SafeMode = 0x08,
+    CloudId = 0x10
 };
 Q_DECLARE_FLAGS(QnServerFields, QnServerField)
 Q_DECLARE_METATYPE(QnServerFields)
@@ -61,11 +60,11 @@ public:
 
     virtual qint64 getServerLastUpdatedMs(const QnUuid& serverId) const = 0;
 
-    virtual bool isOnline() const = 0;
+    virtual bool isRunning() const = 0;
 
     virtual bool isReachable() const = 0;
 
-    virtual bool hasInternet() const = 0;
+    virtual bool isConnectible() const = 0;
 
     virtual bool safeMode() const = 0;
 
@@ -80,11 +79,11 @@ signals:
 
     void serverRemoved(const QnUuid& serverId);
 
-    void onlineStateChanged();
+    void runningStateChanged();
 
     void reachableStateChanged();
 
-    void hasInternetChanged();
+    void connectibleStateChanged();
 
     void safeModeStateChanged();
 
