@@ -2174,7 +2174,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
 
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
-    backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
+    //backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
     QDir dir(base + QString("record_catalog") + separator + QString("media") + separator + DeviceFileCatalog::prefixByCatalog(catalogType));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     for(QFileInfo fi: list)
