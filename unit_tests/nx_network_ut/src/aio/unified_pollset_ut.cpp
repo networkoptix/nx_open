@@ -125,18 +125,9 @@ private:
     aio::UnifiedPollSet m_pollset;
 };
 
-TEST_F(UnifiedPollSet, removing_socket_with_multiple_events)
+TEST_F(UnifiedPollSet, all_tests)
 {
-    initializeBunchOfSocketsOfRandomType();
-    runRemoveSocketWithMultipleEventsTest();
-}
-
-TEST_F(UnifiedPollSet, multiple_pollset_iterators)
-{
-    const auto additionalPollsetIteratorInstance = pollset().end();
-
-    initializeRegularSocket();
-    runRemoveSocketWithMultipleEventsTest();
+    runTests();
 }
 
 } // namespace test

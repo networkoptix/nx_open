@@ -24,34 +24,30 @@ public:
     }
 
 protected:
-    virtual void simulateSocketEvents(int events) override
+    virtual void simulateSocketEvents(int /*events*/) override
     {
-        // TODO
-        //for (const auto& socket : sockets())
-        //{
-        //    if (events & aio::etRead)
-        //        m_epollWrapperPtr->markAsReadable(socket.get());
-        //    if (events & aio::etWrite)
-        //        m_epollWrapperPtr->markAsWritable(socket.get());
-        //}
+        for (const auto& socket: sockets())
+        {
+            const auto udpSocket = static_cast<UDPSocket*>(socket.get());
+
+            char buf[16];
+            ASSERT_TRUE(udpSocket->sendTo(buf, sizeof(buf), udpSocket->getLocalAddress())) 
+                << SystemError::getLastOSErrorText().toStdString();
+        }
+    }
+        
+    virtual std::unique_ptr<Pollable> createSocketOfRandomType() override
+    {
+        return createRegularSocket();
     }
 
 private:
     aio::PollSet m_pollset;
 };
 
-TEST_F(PollSet, removing_socket_with_multiple_events)
+TEST_F(PollSet, all_tests)
 {
-    initializeBunchOfSocketsOfRandomType();
-    runRemoveSocketWithMultipleEventsTest();
-}
-
-TEST_F(PollSet, multiple_pollset_iterators)
-{
-    const auto additionalPollsetIteratorInstance = pollset().end();
-
-    initializeRegularSocket();
-    runRemoveSocketWithMultipleEventsTest();
+    runTests();
 }
 
 } // namespace test

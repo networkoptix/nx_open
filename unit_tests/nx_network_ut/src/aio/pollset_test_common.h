@@ -3,9 +3,12 @@
 #include <memory>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx {
 namespace network {
@@ -41,14 +44,39 @@ public:
 
     void runTests()
     {
+        for (const auto& test: m_tests)
+        {
+            std::cout<<"[      SUB ] "<<test.second<<std::endl;
+            (this->*(test.first))();
+        }
     }
 
 protected:
     virtual void simulateSocketEvents(int events) = 0;
 
+    virtual std::unique_ptr<Pollable> createRegularSocket()
+    {
+        auto udpSocket = std::make_unique<UDPSocket>(AF_INET);
+        NX_GTEST_ASSERT_TRUE(udpSocket->bind(SocketAddress(HostAddress::localhost, 0)));
+        return udpSocket;
+    }
+
+    virtual std::unique_ptr<Pollable> createSocketOfRandomType()
+    {
+        if (nx::utils::random::number<int>(0, 1) > 0)
+            return std::make_unique<UdtStreamSocket>(AF_INET);
+        else
+            return createRegularSocket();
+    }
+
     void initializeRegularSocket()
     {
-        m_sockets.push_back(std::make_unique<UDPSocket>(AF_INET));
+        m_sockets.push_back(createRegularSocket());
+    }
+
+    void initializeSocketOfRandomType()
+    {
+        m_sockets.push_back(createSocketOfRandomType());
     }
 
     void initializeUdtSocket()
@@ -58,21 +86,28 @@ protected:
 
     void subscribeSocketToEvents(int events)
     {
-        for (const auto& socket : m_sockets)
+        for (const auto& socket: m_sockets)
         {
             if (events & aio::etRead)
                 m_pollset->add(socket.get(), aio::etRead);
             if (events & aio::etWrite)
                 m_pollset->add(socket.get(), aio::etWrite);
+            m_socketToActiveEventMask[socket.get()] = events;
         }
     }
 
     void unsubscribeSocketFromEvents(Pollable* const socket, int events)
     {
-        if (events & aio::etRead)
+        if ((events & aio::etRead) > 0 && (m_socketToActiveEventMask[socket] & aio::etRead) > 0)
+        {
             m_pollset->remove(socket, aio::etRead);
-        if (events & aio::etWrite)
+            m_socketToActiveEventMask[socket] &= ~aio::etRead;
+        }
+        if ((events & aio::etWrite) > 0 && (m_socketToActiveEventMask[socket] & aio::etWrite) > 0)
+        {
             m_pollset->remove(socket, aio::etWrite);
+            m_socketToActiveEventMask[socket] &= ~aio::etWrite;
+        }
     }
 
     template<typename EventHandler>
@@ -89,12 +124,7 @@ protected:
         constexpr int socketCount = 100;
 
         for (int i = 0; i < socketCount; ++i)
-        {
-            if (nx::utils::random::number<int>(0, 1) > 0)
-                initializeUdtSocket();
-            else
-                initializeRegularSocket();
-        }
+            initializeSocketOfRandomType();
     }
 
     void runRemoveSocketWithMultipleEventsTest()
@@ -103,8 +133,9 @@ protected:
         simulateSocketEvents(aio::etRead | aio::etWrite);
         int numberOfEventsReported = 0;
         handleSocketEvents(
-            [&](Pollable* const socket, aio::EventType /*eventType*/)
+            [&](Pollable* const socket, aio::EventType eventType)
             {
+                static_cast<void*>(&eventType);
                 ++numberOfEventsReported;
 
                 const int seed = nx::utils::random::number<int>(0, 2);
@@ -138,10 +169,12 @@ protected:
 private:
     PollsetType* m_pollset;
     std::vector<std::unique_ptr<Pollable>> m_sockets;
+    std::map<Pollable*, int> m_socketToActiveEventMask;
+    std::list<std::pair<TestFuncType, std::string>> m_tests;
 
     void registerTest(TestFuncType testFunc, const char* testName)
     {
-        //TODO
+        m_tests.emplace_back(testFunc, testName);
     }
 
 
