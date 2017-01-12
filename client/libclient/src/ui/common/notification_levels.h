@@ -8,7 +8,7 @@
 namespace QnNotificationLevel {
 
     /**
-     * Importance level of a notification. 
+     * Importance level of a notification.
      */
     enum class Value {
         NoNotification,
@@ -16,7 +16,6 @@ namespace QnNotificationLevel {
         CommonNotification,
         ImportantNotification,
         CriticalNotification,
-        SystemNotification,
         LevelCount
     };
 
