@@ -97,7 +97,7 @@ struct DependentFalse
 template<typename T>
 void swap(nx::utils::AtomicUniquePtr<T>& /*one*/, nx::utils::AtomicUniquePtr<T>& /*two*/)
 {
-    // DependentFalse is needed for assert to work at template instanciation time, not at definition time.
+    // DependentFalse is needed for assert to work at template instantiation time, not at definition time.
     static_assert(
         DependentFalse<T>::value,
         "There is no swap implementation for nx::utils::AtomicUniquePtr yet. Use std::move");

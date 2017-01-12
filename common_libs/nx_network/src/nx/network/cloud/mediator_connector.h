@@ -9,7 +9,7 @@
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 #include "mediator_connections.h"
 
 namespace nx {
@@ -56,7 +56,7 @@ private:
     boost::optional< nx::utils::future< bool > > m_future;
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
-    std::unique_ptr<nx::network::cloud::CloudModuleEndPointFetcher> m_endpointFetcher;
+    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_endpointFetcher;
     boost::optional<SocketAddress> m_mediatorAddress;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 

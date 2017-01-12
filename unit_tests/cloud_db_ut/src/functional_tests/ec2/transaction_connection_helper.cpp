@@ -68,6 +68,9 @@ bool TransactionConnectionHelper::waitForState(
     ConnectionId connectionId,
     std::chrono::milliseconds durationToWait)
 {
+    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming 
+    //    transition in onTransactionConnectionStateChanged.
+
     using namespace std::chrono;
 
     QnMutexLocker lk(&m_mutex);

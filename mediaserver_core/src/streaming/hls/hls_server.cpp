@@ -62,18 +62,22 @@ namespace nx_hls
 
     //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
+    size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
+
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
     :
         QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),
-        m_bytesSent( 0 ),
-        m_minPlaylistSizeToStartStreaming(MSSettings::roSettings()->value(
-            nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
-            nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt())
+        m_bytesSent( 0 )
     {
         setObjectName( "QnHttpLiveStreamingProcessor" );
+    }
+
+    void QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(size_t value)
+    {
+        m_minPlaylistSizeToStartStreaming = value;
     }
 
     QnHttpLiveStreamingProcessor::~QnHttpLiveStreamingProcessor()

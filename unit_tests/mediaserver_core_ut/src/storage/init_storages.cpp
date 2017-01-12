@@ -2,6 +2,7 @@
 #include "mediaserver_helper/media_server_helper.h"
 #include "storage/storage_test_helper.h"
 #include "media_server_process.h"
+#include "media_server_process_aux.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/storage_resource.h"
 #include "media_server_process.h"
@@ -46,7 +47,7 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     BeforeRestoreDbData restoreData;
     storageList << storage1 << storage2;
 
-    aux::saveStoragesInfoToBeforeRestoreData(&restoreData, storageList);
+    nx::mserver_aux::saveStoragesInfoToBeforeRestoreData(&restoreData, storageList);
 
     ASSERT_TRUE(restoreData.hasInfoForStorage(path1));
     ASSERT_TRUE(restoreData.hasInfoForStorage(path2));
@@ -66,7 +67,7 @@ protected:
 
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
     QString mediaFolderName;
-    aux::UnmountedStoragesFilter unmountedFilter;
+    nx::mserver_aux::UnmountedStoragesFilter unmountedFilter;
     qint64 spaceLimit;
 };
 

@@ -29,7 +29,7 @@ class NX_NETWORK_API CloudStreamSocket:
     using BaseType = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
 
 public:
-    CloudStreamSocket(int ipVersion);
+    explicit CloudStreamSocket(int ipVersion = AF_INET);
     virtual ~CloudStreamSocket();
 
     virtual aio::AbstractAioThread* getAioThread() const override;

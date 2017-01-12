@@ -50,5 +50,5 @@ private:
     std::shared_ptr<AbstractAsyncClient> m_client;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

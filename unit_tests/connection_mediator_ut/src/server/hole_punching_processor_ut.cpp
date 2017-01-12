@@ -77,6 +77,7 @@ TEST_F(HolePunchingProcessor, generic_tests)
         api::ConnectResponse connectResponseData;
         auto connectCompletionHandler =
             [&connectResultPromise, &connectResponseData](
+                stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode resultCode,
                 api::ConnectResponse responseData)
             {
@@ -186,6 +187,7 @@ TEST_F(HolePunchingProcessor, server_failure)
         api::ConnectResponse connectResponseData;
         auto connectCompletionHandler =
             [&mtx, &waitCond, &connectResult, &connectResponseData](
+                stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode resultCode,
                 api::ConnectResponse responseData)
         {
@@ -256,6 +258,7 @@ TEST_F(HolePunchingProcessor, destruction)
         udpClient.connect(
             connectRequest,
             [&connectResponsePromise](
+                stun::TransportHeader /*stunTransportHeader*/,
                 api::ResultCode /*resultCode*/,
                 api::ConnectResponse /*responseData*/)
             {

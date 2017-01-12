@@ -22,7 +22,7 @@ const std::chrono::seconds kConnectionResultWaitTimeout(15);
 
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
-    const ListeningPeerPool::ConstDataLocker& serverPeerDataLocker,
+    const ListeningPeerData& serverPeerData,
     std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
     const conf::Settings& settings)
 :
@@ -30,8 +30,8 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     m_connectionID(std::move(connectionID)),
     m_onFsmFinishedEventHandler(std::move(onFsmFinishedEventHandler)),
     m_settings(settings),
-    m_serverConnectionWeakRef(serverPeerDataLocker.value().peerConnection),
-    m_directTcpAddresses(serverPeerDataLocker.value().endpoints)
+    m_serverConnectionWeakRef(serverPeerData.peerConnection),
+    m_directTcpAddresses(serverPeerData.endpoints)
 {
     auto serverConnectionStrongRef = m_serverConnectionWeakRef.lock();
     if (!serverConnectionStrongRef)
@@ -132,10 +132,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
             
             if (m_state > State::waitingServerPeerUDPAddress)
             {
-                NX_LOGX(
-                    lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
-                        .arg(m_connectionID).arg(static_cast<int>(m_state)),
-                    cl_logDEBUG1);
+                NX_LOGX(lm("Connection %1. Received connectionAck while in %2 state. Ignoring...")
+                    .arg(m_connectionID).arg(toString(m_state)), cl_logDEBUG1);
                 completionHandler(api::ResultCode::ok);
                 return;
             }
@@ -188,6 +186,14 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(
     m_timer.dispatch(
         [this, request, completionHandler = std::move(completionHandler)]()
         {
+            if (m_state < State::waitingConnectionResult)
+            {
+                NX_LOGX(lm("Connection %1. Received ConnectionResultRequest while in state %2")
+                    .arg(m_connectionID).arg(toString(m_state)), cl_logDEBUG2);
+            }
+
+            m_sessionStatisticsInfo.resultCode = request.resultCode;
+
             completionHandler(api::ResultCode::ok);
             m_timer.post(std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
@@ -205,8 +211,9 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 {
     if (m_state < State::waitingConnectionResult)
     {
-        NX_ASSERT(result != api::ResultCode::ok);
-        auto connectResponseSender = std::move(m_connectResponseSender);
+        NX_CRITICAL(m_connectResponseSender);
+        decltype(m_connectResponseSender) connectResponseSender;
+        connectResponseSender.swap(m_connectResponseSender);
         connectResponseSender(
             result,
             api::ConnectResponse());
@@ -217,6 +224,23 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 
     auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
     onFinishedHandler(result);
+}
+
+const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)
+{
+    switch (state)
+    {
+        case State::init:
+            return "init";
+        case State::waitingServerPeerUDPAddress:
+            return "waitingServerPeerUDPAddress";
+        case State::waitingConnectionResult:
+            return "waitingConnectionResult";
+        case State::fini:
+            return "fini";
+        default:
+            return "unknown";
+    }
 }
 
 } // namespace hpm

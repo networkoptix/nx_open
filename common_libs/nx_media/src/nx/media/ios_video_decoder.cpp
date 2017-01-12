@@ -39,6 +39,22 @@ namespace {
         return pix_fmts[0];
     }
 
+    QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+    {
+        switch (pixFormat)
+        {
+            case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUVJ420P:
+                return QVideoFrame::Format_YUV420P;
+            case AV_PIX_FMT_BGRA:
+                return QVideoFrame::Format_BGRA32;
+            case AV_PIX_FMT_NV12:
+                return QVideoFrame::Format_NV12;
+            default:
+                return QVideoFrame::Format_Invalid;
+        }
+    }
+
     QVideoFrame::PixelFormat toQtPixelFormat(OSType pixFormat)
     {
         switch (pixFormat)
@@ -52,6 +68,7 @@ namespace {
             case kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange:
                 return QVideoFrame::Format_NV12;
             default:
+                qWarning() << "unknown OSType format " << (int) pixFormat;
                 return QVideoFrame::Format_Invalid;
         }
     }
@@ -83,26 +100,52 @@ public:
                     int linesize[4],
                     uchar* data[4]) override
     {
-        CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
-        CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
-
         int planes = 1;
         *numBytes = 0;
-        if (CVPixelBufferIsPlanar(pixbuf))
+
+        if (frame->data[3])
         {
-            planes = CVPixelBufferGetPlaneCount(pixbuf);
-            for (int i = 0; i < planes; i++)
+            // map frame to the internal buffer
+            CVPixelBufferRef pixbuf = (CVPixelBufferRef)frame->data[3];
+            CVPixelBufferLockBaseAddress(pixbuf, kCVPixelBufferLock_ReadOnly);
+
+            if (CVPixelBufferIsPlanar(pixbuf))
             {
-                data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
-                linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
-                *numBytes += linesize[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                planes = CVPixelBufferGetPlaneCount(pixbuf);
+                for (int i = 0; i < planes; i++)
+                {
+                    data[i]     = (uint8_t*)CVPixelBufferGetBaseAddressOfPlane(pixbuf, i);
+                    linesize[i] = CVPixelBufferGetBytesPerRowOfPlane(pixbuf, i);
+                    *numBytes += linesize[i] * CVPixelBufferGetHeightOfPlane(pixbuf, i);
+                }
+            }
+            else
+            {
+                data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
+                linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
+                *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
             }
         }
         else
         {
-            data[0] = (uchar*) CVPixelBufferGetBaseAddress(pixbuf);
-            linesize[0] = CVPixelBufferGetBytesPerRow(pixbuf);
-            *numBytes = linesize[0] * CVPixelBufferGetHeight(pixbuf);
+            // map frame to the ffmpeg buffer
+            planes = 0;
+            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
+            for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
+            {
+                ++planes;
+                data[i] = frame->data[i];
+                linesize[i] = frame->linesize[i];
+                
+                int bytesPerPlane = linesize[i] * frame->height;
+                if (i > 0)
+                {
+                    bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
+                    bytesPerPlane *= descr->comp->step;
+                }
+                *numBytes += bytesPerPlane;
+            }
+        
         }
 
         return planes;
@@ -304,8 +347,16 @@ int IOSVideoDecoder::decode(
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
     int frameNum = d->frame->coded_picture_number;
 
-    CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
-    auto qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
+    QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
+    if (d->frame->data[3])
+    {
+        CVPixelBufferRef pixBuf = (CVPixelBufferRef)d->frame->data[3];
+        qtPixelFormat = toQtPixelFormat(CVPixelBufferGetPixelFormatType(pixBuf));
+    }
+    else
+    {
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
+    }
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
         return -1; //< report error
 

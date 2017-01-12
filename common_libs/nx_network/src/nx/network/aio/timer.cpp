@@ -12,7 +12,8 @@ namespace nx {
 namespace network {
 namespace aio {
 
-Timer::Timer():
+Timer::Timer(aio::AbstractAioThread* aioThread):
+    BasicPollable(aioThread),
     m_aioService(SocketGlobals::aioService()),
     m_internalTimerId(0)
 {
@@ -22,6 +23,7 @@ Timer::~Timer()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
+    NX_ASSERT(!m_aioService.isSocketBeingWatched(&pollable()));
 }
 
 void Timer::start(

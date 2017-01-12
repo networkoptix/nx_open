@@ -16,10 +16,11 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-/** Provides helper functions for easy adding requests to mediator */
+/**
+ * Provides helper functions for easy adding requests to mediator.
+ */
 template<class NetworkClientType>
-class BaseMediatorClient
-:
+class BaseMediatorClient:
     public NetworkClientType
 {
 public:
@@ -48,10 +49,12 @@ protected:
             std::move(completionHandler));
     }
 
+    // TODO: #ak following two methods contain much code duplication.
+
     template<typename ResponseData>
     void sendRequestAndReceiveResponse(
         nx::stun::Message request,
-        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+        utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)> completionHandler)
     {
         using namespace nx::hpm::api;
         const nx::stun::cc::methods::Value method =
@@ -71,6 +74,7 @@ protected:
                     arg(SystemError::toString(code)),
                     cl_logDEBUG1);
                 return completionHandler(
+                    std::move(message.transportHeader),
                     ResultCode::networkError,
                     ResponseData());
             }
@@ -86,6 +90,7 @@ protected:
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response
                 return completionHandler(
+                    std::move(message.transportHeader),
                     resultCodeHeader ? resultCode : api::ResultCode::otherLogicError,
                     ResponseData());
             }
@@ -97,19 +102,38 @@ protected:
                     arg(nx::stun::cc::methods::toString(method)).
                     arg(responseData.errorText()), cl_logDEBUG1);
                 return completionHandler(
+                    std::move(message.transportHeader),
                     ResultCode::responseParseError,
                     ResponseData());
             }
 
             completionHandler(
+                std::move(message.transportHeader),
                 resultCode,
                 std::move(responseData));
         });
     }
 
+    template<typename ResponseData>
     void sendRequestAndReceiveResponse(
         nx::stun::Message request,
-        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler)
+    {
+        sendRequestAndReceiveResponse<ResponseData>(
+            std::move(request),
+            nx::utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode, ResponseData)>(
+                [completionHandler = std::move(completionHandler)](
+                    stun::TransportHeader /*transportHeader*/,
+                    nx::hpm::api::ResultCode resultCode,
+                    ResponseData responseData)
+                {
+                    completionHandler(resultCode, std::move(responseData));
+                }));
+    }
+
+    void sendRequestAndReceiveResponse(
+        nx::stun::Message request,
+        utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode)> completionHandler)
     {
         using namespace nx::hpm::api;
 
@@ -127,7 +151,7 @@ protected:
                 NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
                     arg(stun::cc::methods::toString(method)).
                     arg(SystemError::toString(code)), cl_logDEBUG1);
-                return completionHandler(ResultCode::networkError);
+                return completionHandler(std::move(message.transportHeader), ResultCode::networkError);
             }
 
             api::ResultCode resultCode = api::ResultCode::ok;
@@ -141,13 +165,27 @@ protected:
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response
                 return completionHandler(
-                    resultCodeHeader
-                    ? resultCode
-                    : api::ResultCode::otherLogicError);
+                    std::move(message.transportHeader),
+                    resultCodeHeader ? resultCode : api::ResultCode::otherLogicError);
             }
 
-            completionHandler(resultCode);
+            completionHandler(std::move(message.transportHeader), resultCode);
         });
+    }
+
+    void sendRequestAndReceiveResponse(
+        nx::stun::Message request,
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        sendRequestAndReceiveResponse(
+            std::move(request),
+            nx::utils::MoveOnlyFunc<void(stun::TransportHeader, nx::hpm::api::ResultCode)>(
+                [completionHandler = std::move(completionHandler)](
+                    stun::TransportHeader /*transportHeader*/,
+                    nx::hpm::api::ResultCode resultCode)
+                {
+                    completionHandler(resultCode);
+                }));
     }
 };
 

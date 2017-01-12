@@ -8,107 +8,16 @@ from hashlib import md5
 import threading, urllib2
 from functest_util import ClusterWorker, sendRequest, TestRequestError
 from testbase import getTestMaster
+from pycommons.GenData import BasicGenerator
 
 __all__ = [
-    'BasicGenerator', 'UserDataGenerator', 'MediaServerGenerator',
-    'CameraConflictionDataGenerator', 'UserConflictionDataGenerator', 'MediaServerConflictionDataGenerator',
+    'BasicGenerator', 'UserDataGenerator', 'MediaServerGenerator',  'CameraConflictionDataGenerator',
+    'UserConflictionDataGenerator', 'MediaServerConflictionDataGenerator',
     'CameraDataGenerator', 'ConflictionDataGenerator',
     'ResourceDataGenerator',
     'CameraUserAttributesListDataGenerator',
     'ServerUserAttributesListDataGenerator',
 ]
-
-class _unique(object):
-    "Contains some global numbers."
-    SessionNumber = str(random.randint(1,1000000))
-    CameraSeedNumber = 0
-    UserSeedNumber = 0
-    MediaServerSeedNumber = 0
-    LayoutSeedNumber = 0
-    UserRoleSeedNumber = 0
-
-
-class BasicGenerator(object):
-    chars = string.ascii_uppercase + string.digits
-    _removeTemplate = '{ "id":"%s" }'  # used in ancestors
-
-    @staticmethod
-    def generateMac():
-        "Generates MAC address for an object"
-        return ':'.join("%02X" % random.randint(0,255) for _ in xrange(6))
-
-    @staticmethod
-    def generateBool():
-        return "true" if random.randint(0,1) == 0 else "false"
-
-    @staticmethod
-    def generateRandomString(length):
-        return ''.join(random.choice(BasicGenerator.chars) for _ in xrange(length))
-
-    @staticmethod
-    def generateUUIdFromMd5(salt):
-        v = md5(salt).digest()
-        return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" % tuple(ord(b) for b in v)
-
-    def generateRandomId(self):
-        return self.generateUUIdFromMd5(self.generateRandomString(random.randint(6,12)))
-
-    def generateIpV4(self):
-        return '.'.join(str(random.randint(0,255)) for _ in xrange(4))
-
-    def generateIpV4Endpoint(self):
-        return "%s:%d" % (self.generateIpV4(),random.randint(0,65535))
-
-    def generateEmail(self):
-        return "%s@gmail.com" % (self.generateRandomString(random.randint(6,20)),)
-
-    def generateEnum(self,*args):
-        idx = random.randint(0,len(args) - 1)
-        return args[idx]
-
-    def generateUsernamePasswordAndDigest(self, namegen):
-        un = namegen()
-        pwd = self.generateRandomString(random.randint(8,20))
-        d = md5("%s:NetworkOptix:%s" % (un,pwd)).digest()
-
-        return (un,pwd,''.join('%02x' % ord(i) for i in d))
-
-    def generateDigest(self, uname, pwd):
-        d = md5(':'.join((uname, 'NetworkOptix', pwd))).digest()
-        return ''.join("%02x" % ord(i) for i in d)
-
-    def generatePasswordHash(self, pwd):
-        salt = "%x" % (random.randint(0,4294967295))
-        d = md5(salt+pwd).digest()
-        md5_digest = ''.join('%02x' % ord(i) for i in d)
-        return "md5$%s$%s" % (salt,md5_digest)
-
-    def generateCameraName(self):
-        ret = "ec2_test_cam_%s_%s" % (_unique.SessionNumber, _unique.CameraSeedNumber)
-        _unique.CameraSeedNumber += 1
-        return ret
-
-    def generateUserName(self):
-        ret = "ec2_test_user_%s_%s" % (_unique.SessionNumber, _unique.UserSeedNumber)
-        _unique.UserSeedNumber += 1
-        return ret
-
-    def generateMediaServerName(self):
-        ret = "ec2_test_media_server_%s_%s" % (_unique.SessionNumber, _unique.MediaServerSeedNumber)
-        _unique.MediaServerSeedNumber += 1
-        return ret
-
-    def generateLayoutName(self):
-        try:
-            return "ec2_test_layout_%s_%s" % (_unique.SessionNumber, _unique.LayoutSeedNumber)
-        finally:
-            _unique.LayoutSeedNumber += 1
-
-    def generateUserRoleName(self):
-        try:
-            return "ec2_test_user_role_%s_%s" % (_unique.SessionNumber, _unique.UserRoleSeedNumber)
-        finally:
-            _unique.UserRoleSeedNumber += 1
 
 
 class UserDataGenerator(BasicGenerator):
@@ -197,7 +106,6 @@ class MediaServerGenerator(BasicGenerator):
                 for id, addr in (
                      (self.generateRandomId(), self.generateIpV4Endpoint()) for _ in xrange(number))
         ]
-
 
 # This class is used to generate data for simulating resource confliction
 

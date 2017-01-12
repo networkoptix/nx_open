@@ -119,8 +119,8 @@ void ServerConnection::processCustomRequest( Message message )
         std::move(messageHeader.transactionId)));
 
     // TODO: verify with RFC
-    response.newAttribute< stun::attrs::ErrorDescription >(
-        404, "Method is not supported");    //TODO #ak replace 404 with constant
+    response.newAttribute< stun::attrs::ErrorCode >(
+        stun::error::notFound, "Method is not supported");
 
     sendMessage(std::move(response), nullptr);
 }

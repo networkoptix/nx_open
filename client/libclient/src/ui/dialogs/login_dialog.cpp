@@ -298,10 +298,13 @@ void QnLoginDialog::accept()
         return;
 
     QUrl url = currentUrl();
+	const auto guard = QPointer<QnLoginDialog>(this);
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
-        [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        [this, url, guard](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
         {
+            if (!guard)
+                return;
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
@@ -311,6 +314,8 @@ void QnLoginDialog::accept()
             auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
+            if (!guard)
+                return;
             switch (status)
             {
                 case Qn::SuccessConnectionResult:

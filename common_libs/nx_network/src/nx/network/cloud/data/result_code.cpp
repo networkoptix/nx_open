@@ -8,9 +8,9 @@ namespace hpm {
 namespace api {
 
 ResultCode fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorDescription& errorDescription)
+    const nx::stun::attrs::ErrorCode& errorCode)
 {
-    switch (errorDescription.getCode())
+    switch (errorCode.getCode())
     {
         case nx::stun::error::badRequest:
             return ResultCode::badRequest;
@@ -63,4 +63,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, ResultCode,
     (nx::hpm::api::ResultCode::serverConnectionBroken, "serverConnectionBroken")
     (nx::hpm::api::ResultCode::noReplyFromServer, "noReplyFromServer")
     (nx::hpm::api::ResultCode::badTransport, "badTransport")
+    (nx::hpm::api::ResultCode::interrupted, "interrupted")
 )

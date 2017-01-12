@@ -11,142 +11,6 @@ namespace stun {
 
 using namespace attrs;
 
-// This message parser buffer add a simple workaround with the original partial data buffer.
-// It will consume all the data in the user buffer, but provide a more consistent interface
-// for user. So if the parser stuck at one byte data, the MessageParserBuffer will temporary
-// store that one byte and make user buffer drained. However without losing any single bytes
-class MessageParser::MessageParserBuffer
-{
-public:
-    MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer):
-        m_tempBuffer(temp_buffer),
-        m_buffer(buffer),
-        m_position(0)
-    {
-    }
-    MessageParserBuffer(const nx::Buffer& buffer):
-        m_tempBuffer(NULL),
-        m_buffer(buffer),
-        m_position(0)
-    {
-    }
-
-    std::uint16_t NextUint16(bool* ok);
-    std::uint32_t NextUint32(bool* ok);
-    std::uint8_t NextByte(bool* ok);
-    void readNextBytesToBuffer(char* buffer, std::size_t count, bool* ok);
-    // Do not modify the temp_buffer_size_ here
-    void clear()
-    {
-        if (m_tempBuffer != NULL)
-            m_tempBuffer->clear();
-    }
-    std::size_t position() const
-    {
-        return m_position;
-    }
-
-private:
-    std::deque<char>* m_tempBuffer;
-    const nx::Buffer& m_buffer;
-    std::size_t m_position;
-
-    bool ensure(std::size_t byteSize, void* buffer);
-
-    Q_DISABLE_COPY(MessageParserBuffer)
-};
-
-// ensure will check the temporary buffer and also the buffer in nx::Buffer.
-// Additionally, if ensure cannot ensure the buffer size, it will still drain
-// the original buffer , so the user buffer will always be consumed over .
-bool MessageParser::MessageParserBuffer::ensure(std::size_t count, void* buffer)
-{
-    // Get the available bytes that we can read from the stream
-    const std::size_t availableBytes = 
-        (m_tempBuffer == NULL ? 0 : m_tempBuffer->size()) +
-        m_buffer.size() - m_position;
-    if (availableBytes < count)
-    {
-        // Drain the user buffer here
-        if (m_tempBuffer != NULL)
-        {
-            for (int i = m_position; i < m_buffer.size(); ++i)
-                m_tempBuffer->push_back(m_buffer.at(i));
-            // Modify the position pointer here 
-            m_position = m_buffer.size();
-        }
-        return false;
-    }
-    else
-    {
-        std::size_t pos = 0;
-        // 1. Drain the buffer from the temporary buffer here
-        if (m_tempBuffer != NULL)
-        {
-            const std::size_t temp_buffer_size = m_tempBuffer->size();
-            for (std::size_t i = 0; i < temp_buffer_size && count != pos; ++i, ++pos)
-            {
-                *(reinterpret_cast<char*>(buffer) + pos) = m_tempBuffer->front();
-                m_tempBuffer->pop_front();
-            }
-            if (count == pos)
-            {
-                return true;
-            }
-        }
-        // 2. Finish the buffer feeding 
-        memcpy(
-            reinterpret_cast<char*>(buffer) + pos,
-            m_buffer.constData() + m_position,
-            count - pos);
-        m_position += count - pos;
-        return true;
-    }
-}
-
-std::uint16_t MessageParser::MessageParserBuffer::NextUint16( bool* ok ) {
-    std::uint16_t value = 0;
-    if( !ensure(sizeof(quint16),&value) ) {
-        *ok = false; return 0;
-    } 
-    *ok = true;
-    return qFromBigEndian(value);
-}
-
-std::uint32_t MessageParser::MessageParserBuffer::NextUint32( bool* ok ) {
-    std::uint32_t value = 0;
-    if( !ensure(sizeof(quint32),&value) ) {
-        *ok = false; return 0;
-    }
-    *ok = true;
-    return qFromBigEndian(value);
-}
-
-std::uint8_t MessageParser::MessageParserBuffer::NextByte( bool* ok )
-{
-    std::uint8_t value = 0;
-    if (!ensure(sizeof(quint8), &value))
-    {
-        *ok = false;
-        return 0;
-    }
-    *ok = true;
-    return value;
-}
-
-void MessageParser::MessageParserBuffer::readNextBytesToBuffer(
-    char* bytes,
-    std::size_t sz,
-    bool* ok)
-{
-    if (!ensure(sz, bytes))
-    {
-        *ok = false;
-        return;
-    }
-    *ok = true;
-}
-
 // Parsing for each specific type
 Attribute* MessageParser::parseXORMappedAddress() {
     if( m_attribute.value.size() < 8 || m_attribute.value.at(0) != 0 )
@@ -238,7 +102,7 @@ Attribute* MessageParser::parseErrorCode() {
         }
     }
 
-    return new ErrorDescription( code, phrase );
+    return new ErrorCode( code, phrase );
 }
 
 Attribute* MessageParser::parseFingerprint() {
@@ -271,15 +135,39 @@ Attribute* MessageParser::parseUnknownAttribute() {
     return new Unknown( m_attribute.type, m_attribute.value );
 }
 
-Attribute* MessageParser::parseValue() {
-    switch( m_attribute.type ) {
-        case attrs::xorMappedAddress:   return parseXORMappedAddress();
-        case attrs::errorCode:          return parseErrorCode();
-        case attrs::messageIntegrity:   return parseMessageIntegrity();
-        case attrs::fingerPrint:        return parseFingerprint();
-        case attrs::userName:           return new UserName( m_attribute.value );
-        case attrs::nonce:              return new Nonce( m_attribute.value );
-        default:                        return parseUnknownAttribute();
+Attribute* MessageParser::parseValue()
+{
+    switch (m_attribute.type)
+    {
+        case attrs::xorMappedAddress:
+            return parseXORMappedAddress();
+
+        case attrs::errorCode:
+            return parseErrorCode();
+
+        case attrs::messageIntegrity:
+            return parseMessageIntegrity();
+
+        case attrs::fingerPrint:
+            return parseFingerprint();
+
+        case attrs::userName:
+            return new UserName( m_attribute.value );
+
+        case attrs::nonce:
+            return new Nonce( m_attribute.value );
+
+        default:
+            std::unique_ptr<SerializableAttribute> serializableAttribute = 
+                AttributeFactory::create(m_attribute.type);
+            if (serializableAttribute)
+            {
+                MessageParserBuffer parseBuffer(m_attribute.value);
+                if (serializableAttribute->deserialize(&parseBuffer))
+                    return serializableAttribute.release();
+            }
+
+            return parseUnknownAttribute();
     }
 }
 

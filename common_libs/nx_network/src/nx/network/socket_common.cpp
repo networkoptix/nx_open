@@ -290,6 +290,11 @@ QString SocketAddress::toString() const
     return host + (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
 }
 
+std::string SocketAddress::toStdString() const
+{
+    return toString().toStdString();
+}
+
 QUrl SocketAddress::toUrl(const QString& scheme) const
 {
     QUrl url;

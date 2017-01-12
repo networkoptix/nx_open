@@ -957,15 +957,18 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
         addRecipient(email);
 
     for (const auto& user: users)
-        addRecipient(user->getEmail());
+    {
+        if (user->isEnabled())
+            addRecipient(user->getEmail());
+    }
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);
-            if (user)
+            if (user && user->isEnabled())
                 addRecipient(user->getEmail());
         }
     }

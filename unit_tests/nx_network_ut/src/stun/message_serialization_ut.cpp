@@ -103,7 +103,7 @@ TEST( StunMessageSerialization, BindingError )
 {
     Message response( Header( MessageClass::errorResponse, MethodType::bindingMethod ) );
     response.header.transactionId = Buffer::fromHex( DEFAULT_TID );
-    response.newAttribute< attrs::ErrorDescription >( 401, "Unauthorized" );
+    response.newAttribute< attrs::ErrorCode >( 401, "Unauthorized" );
 
     size_t serializedSize;
     Buffer serializedMessage;
@@ -134,7 +134,7 @@ TEST( StunMessageSerialization, BindingError )
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
     ASSERT_EQ( parsed.attributes.size(), (size_t)1 );
 
-    const auto error = parsed.getAttribute< attrs::ErrorDescription >();
+    const auto error = parsed.getAttribute< attrs::ErrorCode >();
     ASSERT_NE( error, nullptr );
     ASSERT_EQ( error->getClass(), 4 );
     ASSERT_EQ( error->getNumber(), 1 );
@@ -237,7 +237,7 @@ TEST(StunMessageSerialization, serialization3)
         "abra-kadabra"));
 
     // TODO: verify with RFC
-    response.newAttribute< stun::attrs::ErrorDescription >(
+    response.newAttribute< stun::attrs::ErrorCode >(
         404, "Method is not supported");    //TODO #ak replace 404 with constant
 
     Buffer serializedMessage;
@@ -257,7 +257,7 @@ TEST(StunMessageSerialization, serialization3)
     ASSERT_EQ(
         nx_api::ParserState::done,
         parser.parse(serializedMessage, &bytesRead));
-    /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorDescription>();
+    /*const auto attr =*/ checkMessage.getAttribute<stun::attrs::ErrorCode>();
     //ASSERT_EQ(testData, attr->getBuffer());
 }
 

@@ -370,9 +370,7 @@ TEST_F(Ec2MserverCloudSynchronization, rename_system)
                 ->addRemotePeer(cdbEc2TransactionUrl());
         }
 
-        const std::string newSystemName =
-            nx::utils::random::generate(10, 'a', 'z').toStdString();
-
+        const std::string newSystemName = nx::utils::random::word(10).toStdString();
         if (updateInCloud)
         {
             ASSERT_EQ(

@@ -45,7 +45,7 @@ public:
                 if (it == s_endpoints.end())
                 {
                     response.header.messageClass = stun::MessageClass::errorResponse;
-                    response.newAttribute<stun::attrs::ErrorDescription>(404);
+                    response.newAttribute<stun::attrs::ErrorCode>(404);
                 }
                 else
                 {

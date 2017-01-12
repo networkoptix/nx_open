@@ -7,7 +7,7 @@
 #include <nx/network/dns_resolver.h>
 #include <utils/common/guard.h>
 
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 #include "mediator_connections.h"
 
 

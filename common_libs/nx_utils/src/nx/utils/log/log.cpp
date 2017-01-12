@@ -8,9 +8,13 @@
 #include <QtCore/QDateTime>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-	#include <sys/types.h>
-	#include <linux/unistd.h>
-	static pid_t gettid(void) { return syscall(__NR_gettid); }
+    #include <sys/types.h>
+    #include <linux/unistd.h>
+    static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
+
+#if defined(Q_OS_IOS)
+    #include "log_ios.h"
 #endif
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
@@ -40,9 +44,9 @@ public:
         m_logLevel(static_cast<QnLogLevel>(0)) /* Log nothing by default. */
     {}
 
-	~QnLogPrivate() {
-		m_file.close();
-	}
+    ~QnLogPrivate() {
+        m_file.close();
+    }
 
     bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel)
     {
@@ -86,12 +90,14 @@ public:
 
         {
             std::unique_lock<std::mutex> lk( m_mutex );
-            if (m_baseName == lit("-"))
+
+            if (m_baseName == lit("-") || m_file.fail())
             {
-                qWarning().nospace().noquote() << ostr.str().c_str();
-            }
-            else if (m_file.fail())
-            {
+                #if defined(Q_OS_IOS)
+                    printStringToNsLog(ostr.str());
+                    return;
+                #endif
+
                 switch (logLevel)
                 {
                     case cl_logERROR:

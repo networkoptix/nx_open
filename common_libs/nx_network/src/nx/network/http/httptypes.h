@@ -235,7 +235,8 @@ namespace nx_http
             lastSuccessCode = 299,
             multipleChoices = 300,
             movedPermanently = 301,
-            moved = 302,
+            found = 302,
+            seeOther = 303,
             notModified = 304,
 
             badRequest = 400,

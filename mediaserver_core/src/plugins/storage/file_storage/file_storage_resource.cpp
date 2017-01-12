@@ -175,6 +175,11 @@ QIODevice* QnFileStorageResource::open(
     int ioBlockSize = 0;
     int ffmpegBufferSize = 0;
 
+    int ffmpegMaxBufferSize =
+        MSSettings::roSettings()->value(
+            nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
+            nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
+
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly)
     {
@@ -211,6 +216,7 @@ QIODevice* QnFileStorageResource::open(
             std::shared_ptr<IQnFile>(new QnFile(fileName)),
             ioBlockSize,
             ffmpegBufferSize,
+            ffmpegMaxBufferSize,
             getId()));
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))

@@ -70,6 +70,8 @@ public:
     //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
 
+    bool isInSelfAioThread();
+
     /** Invokes listen on mediator */
     void registerOnMediator(
         nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> handler);
