@@ -13,7 +13,7 @@ class NX_NETWORK_API BindRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::bind;
+    constexpr static const auto kMethod = stun::extension::methods::bind;
 
     std::list<SocketAddress> publicEndpoints;
 
@@ -26,7 +26,7 @@ class NX_NETWORK_API BindResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::bind;
+    constexpr static const auto kMethod = stun::extension::methods::bind;
 
     BindResponse();
     virtual void serializeAttributes(nx::stun::Message* const message) override;

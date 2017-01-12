@@ -1,43 +1,45 @@
+#include "stun_extension_types.h"
+
 #include <common/common_globals.h>
-#include <nx/network/stun/cc/custom_stun.h>
 
 namespace nx {
 namespace stun {
-namespace cc {
+namespace extension {
 
 namespace methods {
-    nx::String toString(Value val)
+
+nx::String toString(Value val)
+{
+    switch (val)
     {
-        switch (val)
-        {
-            case ping:
-                return "ping";
-            case bind:
-                return "bind";
-            case listen:
-                return "listen";
-            case connectionAck:
-                return "connectionAck";
-            case resolvePeer:
-                return "resolvePeer";
-            case resolveDomain:
-                return "resolveDomain";
-            case connect:
-                return "connect";
-            case connectionResult:
-                return "connectionResult";
-            case udpHolePunchingSyn:
-                return "udpHolePunchingSyn";
-            case tunnelConnectionChosen:
-                return "tunnelConnectionChosen";
-            default:
-                return "unknown";
-        };
-    }
+        case ping:
+            return "ping";
+        case bind:
+            return "bind";
+        case listen:
+            return "listen";
+        case connectionAck:
+            return "connectionAck";
+        case resolvePeer:
+            return "resolvePeer";
+        case resolveDomain:
+            return "resolveDomain";
+        case connect:
+            return "connect";
+        case connectionResult:
+            return "connectionResult";
+        case udpHolePunchingSyn:
+            return "udpHolePunchingSyn";
+        case tunnelConnectionChosen:
+            return "tunnelConnectionChosen";
+        default:
+            return "unknown";
+    };
 }
 
-namespace attrs {
+} // namespace methods
 
+namespace attrs {
 
 const char* toString(AttributeType val)
 {
@@ -86,7 +88,7 @@ const char* toString(AttributeType val)
         default:
             return "unknown";
     }
-}
+} // namespace attrs
 
 
 BaseStringAttribute::BaseStringAttribute( int userType, const String& value )
@@ -149,6 +151,6 @@ std::vector< String > StringList::get() const
 }
 
 } // namespace attrs
-} // namespace cc
+} // namespace extension
 } // namespace stun
 } // namespace nx

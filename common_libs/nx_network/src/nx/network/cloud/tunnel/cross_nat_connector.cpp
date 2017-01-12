@@ -365,7 +365,7 @@ void CrossNatConnector::holePunchingDone(
     stun::Message connectResultReportMessage(
         stun::Header(
             stun::MessageClass::request,
-            stun::cc::methods::connectionResult));
+            stun::extension::methods::connectionResult));
     m_connectResultReport.serialize(&connectResultReportMessage);
     m_connectResultReportSender->sendMessage(
         m_mediatorAddress,

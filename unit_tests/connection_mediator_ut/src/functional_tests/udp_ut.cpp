@@ -45,7 +45,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         nx::stun::Message requestMessage(
             stun::Header(
                 nx::stun::MessageClass::request,
-                nx::stun::cc::methods::resolvePeer));
+                nx::stun::extension::methods::resolvePeer));
         request.serialize(&requestMessage);
         messageSerializer.setMessage(&requestMessage);
         nx::Buffer sendBuffer;

@@ -4,7 +4,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/serialization/lexical.h>
 
 #define DEBUG_LOG(MESSAGE) do \

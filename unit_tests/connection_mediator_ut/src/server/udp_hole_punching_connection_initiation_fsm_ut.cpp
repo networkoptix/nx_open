@@ -9,49 +9,19 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
-#include <nx/network/stun/abstract_server_connection.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
 #include <server/udp_hole_punching_connection_initiation_fsm.h>
 #include <settings.h>
 
+#include "test_connection.h"
+
 namespace nx {
 namespace hpm {
 namespace test {
 
-class TestServerConnection:
-    public stun::AbstractServerConnection
-{
-public:
-    virtual void sendMessage(
-        nx::stun::Message message,
-        std::function<void(SystemError::ErrorCode)> handler = nullptr) override
-    {
-    }
-
-    virtual nx::network::TransportProtocol transportProtocol() const override
-    {
-        return nx::network::TransportProtocol::tcp;
-    }
-
-    virtual SocketAddress getSourceAddress() const override
-    {
-        return SocketAddress();
-    }
-
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-    }
-
-    virtual AbstractCommunicatingSocket* socket() override
-    {
-        return &m_socket;
-    }
-
-private:
-    nx::network::TCPSocket m_socket;
-};
+using TestServerConnection = TestConnection<nx::network::TCPSocket>;
 
 class UDPHolePunchingConnectionInitiationFsm:
     public ::testing::Test
