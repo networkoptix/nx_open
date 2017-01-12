@@ -53,9 +53,16 @@ public:
     QnCheckForUpdateResult checkResult() const;
     void setCheckResult(const QnCheckForUpdateResult &result);
 
+    /** Lowest version from all online system servers. */
+    QnSoftwareVersion lowestInstalledVersion() const;
+
+signals:
+    void lowestInstalledVersionChanged();
+
 private:
     void resetResourses();
     void updateVersionColumn();
+    void updateLowestInstalledVersion();
 
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
@@ -85,6 +92,7 @@ private:
     QSet<QnUuid> m_targets;
 
     QnSoftwareVersion m_latestVersion;
+    QnSoftwareVersion m_lowestInstalledVersion;
     QnCheckForUpdateResult m_checkResult;
     QnServerUpdatesColors m_colors;
 };

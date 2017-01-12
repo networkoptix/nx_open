@@ -20,6 +20,7 @@
 
 #include <database/api/db_resource_api.h>
 #include <database/api/db_layout_api.h>
+#include <database/api/db_webpage_api.h>
 
 #include <database/migrations/business_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
@@ -29,6 +30,7 @@
 #include <database/migrations/make_transaction_timestamp_128bit.h>
 #include <database/migrations/add_history_attributes_to_transaction.h>
 #include <database/migrations/reparent_videowall_layouts.h>
+#include <database/migrations/add_default_webpages_migration.h>
 
 #include <network/system_helpers.h>
 
@@ -191,21 +193,10 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
-    m_needClearLog(false),
-    m_needResyncLog(false),
-    m_needResyncLicenses(false),
-    m_needResyncFiles(false),
-    m_needResyncCameraUserAttributes(false),
-    m_needResyncServerUserAttributes(false),
-    m_needResyncMediaServers(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
-    m_needResyncLayout(false),
-    m_needResyncbRules(false),
-    m_needResyncUsers(false),
-    m_needResyncStorages(false),
-    m_needResyncClientInfoData(false),
-    m_dbReadOnly(false)
+    m_dbReadOnly(false),
+    m_resyncFlags()
 {
 }
 
@@ -279,8 +270,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
             if (QFile::exists(backupDbFileName))
             {
-                m_needResyncLog = true;
-                m_needClearLog = true;
+                m_resyncFlags |= ResyncLog;
+                m_resyncFlags |= ClearLog;
                 m_isBackupRestore = true;
                 if (!QFile::rename(backupDbFileName, dbFileName)) {
                     qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
@@ -373,7 +364,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
         QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
         int addedStoredFilesCnt = 0;
         addStoredFiles(storedFilesDir, &addedStoredFilesCnt);
-        m_needResyncFiles = addedStoredFilesCnt > 0;
+        if (addedStoredFilesCnt > 0)
+            m_resyncFlags |= ResyncFiles;
+
         removeDirRecursive(storedFilesDir);
 
         // updateDBVersion();
@@ -441,7 +434,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
 
         query.addBindValue(DB_INSTANCE_KEY);
-        if (!m_needResyncLog && query.exec() && query.next())
+        if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
         {
             m_dbInstanceId = QnUuid::fromRfc4122(query.value(0).toByteArray());
         }
@@ -469,59 +462,75 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!syncLicensesBetweenDB())
             return false;
 
-        if (m_needClearLog && !transactionLog->clear())
+        if (m_resyncFlags.testFlag(ClearLog) && !transactionLog->clear())
             return false;
 
-        if (m_needResyncLog) {
+        if (m_resyncFlags.testFlag(ResyncLog))
+        {
             if (!resyncTransactionLog())
                 return false;
         }
         else
         {
-            if (m_needResyncLicenses) {
+            if (m_resyncFlags.testFlag(ResyncLicences))
+            {
                 if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
                     return false;
             }
-            if (m_needResyncFiles) {
+            if (m_resyncFlags.testFlag(ResyncFiles))
+            {
                 if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
                     return false;
             }
-            if (m_needResyncCameraUserAttributes) {
+            if (m_resyncFlags.testFlag(ResyncCameraAttributes))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
                     return false;
             }
-            if (m_needResyncServerUserAttributes) {
+            if (m_resyncFlags.testFlag(ResyncServerAttributes))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
                     return false;
             }
-            if (m_needResyncMediaServers) {
+            if (m_resyncFlags.testFlag(ResyncServers))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
                     return false;
             }
-            if (m_needResyncLayout) {
+            if (m_resyncFlags.testFlag(ResyncLayouts))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
                     return false;
             }
-            if (m_needResyncbRules) {
+            if (m_resyncFlags.testFlag(ResyncRules))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
                     return false;
             }
-            if (m_needResyncUsers) {
+            if (m_resyncFlags.testFlag(ResyncUsers))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
                     return false;
             }
-            if (m_needResyncStorages) {
+            if (m_resyncFlags.testFlag(ResyncStorages))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
                     return false;
             }
-            if (m_needResyncClientInfoData) {
+            if (m_resyncFlags.testFlag(ResyncClientInfo))
+            {
                 if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
                     return false;
             }
-            if (m_needResyncVideoWall)
+            if (m_resyncFlags.testFlag(ResyncVideoWalls))
             {
-                 if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
-                     return false;
+                if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncWebPages))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+                    return false;
             }
 
         }
@@ -559,7 +568,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
 
 
-        bool updateUserResource = aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
+        bool updateUserResource = false;
 
         if (!defaultAdminPassword.isEmpty())
         {
@@ -573,6 +582,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 updateUserResource = true;
             }
         }
+
+        updateUserResource |= aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
 
         if (updateUserResource)
         {
@@ -665,7 +676,7 @@ bool QnDbManager::syncLicensesBetweenDB()
     {
         if (saveLicense(license, m_sdb) != ErrorCode::ok)
             return false;
-        m_needResyncLicenses = true; //< resync transaction log due to data changes
+        m_resyncFlags |= ResyncLicences; //< resync transaction log due to data changes
     }
 
     for (const auto& license : addToStatic)
@@ -1002,15 +1013,8 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
 
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
-    if (updateName == lit(":/updates/29_update_history_guid.sql")) {
-        ; //return updateCameraHistoryGuids(); // perform string->guid conversion before SQL update because of reducing field size to 16 bytes. Probably data would lost if moved it to afterInstallUpdate
-    }
-    else if (updateName == lit(":/updates/30_update_history_guid.sql")) {
+    if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
-    }
-    else if (updateName == lit(":/updates/33_history_refactor_dummy.sql")) {
-        return removeOldCameraHistory();
-    }
 
     return true;
 }
@@ -1181,8 +1185,6 @@ bool QnDbManager::fixBusinessRules()
             }
         }
     }
-    if (!m_dbJustCreated)
-        m_needResyncbRules = true;
     return true;
 }
 
@@ -1241,234 +1243,180 @@ bool QnDbManager::encryptKvPairs()
 
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
-    if (updateName == lit(":/updates/07_videowall.sql"))
+    if (updateName.endsWith(lit("/07_videowall.sql")))
     {
-        QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
-        if (!updateTableGuids("vms_resourcetype", "guid", guids))
-            return false;
+        //TODO: #GDM move to migration?
+        auto guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
+        return updateTableGuids("vms_resourcetype", "guid", guids);
     }
-    else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
-        updateResourceTypeGuids();
-    }
-    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql") || updateName == lit(":/updates/65_transaction_log_add_fields.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncLog = true;
-    }
-    else if (updateName == lit(":/updates/21_business_action_parameters.sql")) {
-        updateBusinessActionParameters();
-    }
-    else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
-        updateResourceTypeGuids();
-    }
-    else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
-        addStoredFiles(lit(":/vms_storedfiles/"));
-    }
-    else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
+
+    if (updateName.endsWith(lit("/17_add_isd_cam.sql")))
+        return updateResourceTypeGuids();
+
+    if (updateName.endsWith(lit("/20_adding_camera_user_attributes.sql")))
+        return resyncIfNeeded(ResyncLog);
+
+    if (updateName.endsWith(lit("/21_business_action_parameters.sql")))
+        return updateBusinessActionParameters();
+
+    if (updateName.endsWith(lit("/21_new_dw_cam.sql")))
+        return updateResourceTypeGuids();
+
+    if (updateName.endsWith(lit("/24_insert_default_stored_files.sql")))
+        return addStoredFiles(lit(":/vms_storedfiles/"));
+
+    if (updateName.endsWith(lit("/27_remove_server_status.sql")))
         return removeServerStatusFromTransactionLog();
-    }
-    else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncCameraUserAttributes = true;
-    }
-    else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getSystemRules())
-        {
-            ApiBusinessRuleData bRuleData;
-            fromResourceToApi(bRule, bRuleData);
-            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
-                return false;
-        }
-    }
-    else if (updateName == lit(":/updates/33_resync_layout.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncLayout = true;
-    }
-    else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
-        return removeWrongSupportedMotionTypeForONVIF();
-    }
-    else if (updateName == lit(":/updates/36_fix_brules.sql")) {
-        return fixBusinessRules();
-    }
-    else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
-        return removeEmptyLayoutsFromTransactionLog();
-    }
-    else if (updateName == lit(":/updates/41_resync_tran_log.sql"))
+
+    if (updateName.endsWith(lit("/31_move_group_name_to_user_attrs.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/32_default_business_rules.sql")))
     {
-        if (!m_dbJustCreated) {
-            m_needResyncUsers = true;
-            m_needResyncStorages = true;
-        }
-    }
-    else if (updateName == lit(":/updates/42_add_license_to_user_attr.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncCameraUserAttributes = true;
-    }
-    else if (updateName == lit(":/updates/43_add_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getRulesUpd43())
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getSystemRules())
         {
             ApiBusinessRuleData bRuleData;
             fromResourceToApi(bRule, bRuleData);
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/48_add_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getRulesUpd48())
+
+    if (updateName.endsWith(lit("/33_resync_layout.sql")))
+        return resyncIfNeeded(ResyncLayouts);
+
+    if (updateName.endsWith(lit("/35_fix_onvif_mt.sql")))
+        return removeWrongSupportedMotionTypeForONVIF();
+
+    if (updateName.endsWith(lit("/36_fix_brules.sql")))
+        return fixBusinessRules() && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/37_remove_empty_layouts.sql")))
+        return removeEmptyLayoutsFromTransactionLog();
+
+    if (updateName.endsWith(lit("/41_resync_tran_log.sql")))
+        return resyncIfNeeded({ResyncUsers, ResyncStorages});
+
+    if (updateName.endsWith(lit("/42_add_license_to_user_attr.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/43_add_business_rules.sql")))
+    {
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getRulesUpd43())
         {
             ApiBusinessRuleData bRuleData;
             fromResourceToApi(bRule, bRuleData);
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncClientInfoData = true;
-    }
-    else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncbRules = true;
-    }
-    else if (updateName == lit(":/updates/49_fix_migration.sql")) {
-        if (!m_dbJustCreated)
+
+    if (updateName.endsWith(lit("/48_add_business_rules.sql")))
+    {
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getRulesUpd48())
         {
-            m_needResyncCameraUserAttributes = true;
-            m_needResyncServerUserAttributes = true;
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/49_add_webpage_table.sql"))
+
+    if (updateName.endsWith(lit("/43_resync_client_info_data.sql")))
+        return resyncIfNeeded(ResyncClientInfo);
+
+    if (updateName.endsWith(lit("/44_upd_brule_format.sql")))
+        return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/49_fix_migration.sql")))
+        return resyncIfNeeded({ResyncCameraAttributes, ResyncServerAttributes});
+
+    if (updateName.endsWith(lit("/49_add_webpage_table.sql")))
     {
         QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'WebPage'", CM_MakeHash);
-        if (!updateTableGuids("vms_resourcetype", "guid", guids))
-            return false;
+        return updateTableGuids("vms_resourcetype", "guid", guids);
     }
-    else if (updateName == lit(":/updates/50_add_access_rights.sql"))
-    {
-        if (!m_dbJustCreated)
-        {
-            m_needResyncUsers = true;
-        }
-    }
-    else if (updateName == lit(":/updates/50_fix_migration.sql"))
-    {
-        if (!m_dbJustCreated)
-        {
-            m_needResyncbRules = true;
-            m_needResyncUsers = true;
-        }
-    }
-    else if (updateName == lit(":/updates/51_http_business_action.sql"))
-    {
-        if (!m_dbJustCreated)
-            m_needResyncbRules = true;
-    }
-    else if (updateName == lit(":/updates/54_migrate_permissions.sql"))
-    {
-        if (!ec2::db::migrateV25UserPermissions(m_sdb))
-            return false;
 
-        if (!m_dbJustCreated)
-            m_needResyncUsers = true;
-    }
-    else if (updateName == lit(":/updates/55_migrate_accessible_resources.sql"))
-    {
-        if (!ec2::db::migrateAccessibleResources(m_sdb))
-            return false;
+    if (updateName.endsWith(lit("/50_add_access_rights.sql")))
+        return resyncIfNeeded(ResyncUsers);
 
-        if (!m_dbJustCreated)
-            m_needResyncUsers = true;
-    }
-    else if (updateName == lit(":/updates/56_remove_layout_editable.sql"))
-    {
-        if (!m_dbJustCreated)
-            m_needResyncLayout = true;
-    }
-    else if (updateName == lit(":/updates/58_migrate_camera_output_action.sql"))
-    {
-        if (!ec2::db::migrateBusinessRulesToV30(m_sdb))
-            return false;
+    if (updateName.endsWith(lit("/50_fix_migration.sql")))
+        return resyncIfNeeded({ResyncRules, ResyncUsers});
 
-        if (!m_dbJustCreated)
-            m_needResyncbRules = true;
-    }
-    else if (updateName == lit(":/updates/52_fix_onvif_mt.sql"))
-    {
+    if (updateName.endsWith(lit("/51_http_business_action.sql")))
+        return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/54_migrate_permissions.sql")))
+        return ec2::db::migrateV25UserPermissions(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/55_migrate_accessible_resources.sql")))
+        return ec2::db::migrateAccessibleResources(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/56_remove_layout_editable.sql")))
+        return resyncIfNeeded(ResyncLayouts);
+
+    if (updateName.endsWith(lit("/58_migrate_camera_output_action.sql")))
+        return ec2::db::migrateBusinessRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/52_fix_onvif_mt.sql")))
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
-    }
-    else if (updateName == lit(":/updates/68_add_transaction_type.sql"))
-    {
-        return migration::addTransactionType::migrate(&m_sdb);
-    }
-    else if (updateName == lit(":/updates/68_cleanup_db.sql"))
-    {
-        if (!m_dbJustCreated)
-        {
-            m_needClearLog = true;
-            m_needResyncLog = true;
-        }
-    }
-    else if (updateName == lit(":/updates/70_make_transaction_timestamp_128bit.sql"))
-    {
-        return migration::timestamp128bit::migrate(&m_sdb);
-    }
-    else if (updateName == lit(":/updates/73_encrypt_kvpairs.sql"))
-    {
+
+    if (updateName.endsWith(lit("/65_transaction_log_add_fields.sql")))
+        return resyncIfNeeded(ResyncLog);
+
+    if (updateName.endsWith(lit("/68_add_transaction_type.sql")))
+        return migration::addTransactionType::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+
+    if (updateName.endsWith(lit("/68_cleanup_db.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
+
+    if (updateName.endsWith(lit("/70_make_transaction_timestamp_128bit.sql")))
+        return migration::timestamp128bit::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+
+    if (updateName.endsWith(lit("/73_encrypt_kvpairs.sql")))
         return encryptKvPairs();
-    }
-    else if (updateName == lit(":/updates/74_remove_server_deprecated_columns.sql"))
-    {
-        if (!m_dbJustCreated)
-            m_needResyncMediaServers = true;
-    }
-    else if (updateName == lit(":/updates/75_add_user_id_to_tran.sql"))
-    {
+
+    if (updateName.endsWith(lit("/74_remove_server_deprecated_columns.sql")))
+        return resyncIfNeeded(ResyncServers);
+
+    if (updateName.endsWith(lit("/75_add_user_id_to_tran.sql")))
         return migration::add_history::migrate(&m_sdb);
-    }
-    else if (updateName == lit(":/updates/76_rename_discovery_attribute.sql"))
-    {
-        if (!m_dbJustCreated)
-        {
-            m_needClearLog = true;
-            m_needResyncLog = true;
-        }
-    }
-    else if (updateName == lit(":/updates/77_fix_custom_permission_flag.sql"))
-    {
-        if (!ec2::db::fixCustomPermissionFlag(m_sdb))
-            return false;
 
-        if (!m_dbJustCreated)
-            m_needResyncUsers = true;
-    }
-    else if (updateName == lit(":/updates/78_migrate_videowall_layouts.sql"))
-    {
-        if (!ec2::database::migrations::reparentVideoWallLayouts(m_sdb))
-            return false;
+    if (updateName.endsWith(lit("/76_rename_discovery_attribute.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
 
-        if (!m_dbJustCreated)
-        {
-            m_needResyncLayout = true;
-            m_needResyncVideoWall = true;
-        }
+    if (updateName.endsWith(lit("/77_fix_custom_permission_flag.sql")))
+        return ec2::db::fixCustomPermissionFlag(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/78_migrate_videowall_layouts.sql")))
+    {
+        return ec2::database::migrations::reparentVideoWallLayouts(m_sdb)
+            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
-    else if (updateName == lit(":/updates/81_changed_status_stransaction_hash.sql"))
+
+    if (updateName.endsWith(lit("/81_changed_status_stransaction_hash.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
+
+    if (updateName.endsWith(lit("/82_optera_trash_cleanup.sql")))
     {
         if (!m_dbJustCreated)
-        {
-            m_needClearLog = true;
-            m_needResyncLog = true;
-        }
-    }
-    else if (updateName == lit(":/updates/82_optera_trash_cleanup.sql"))
-    {
-        if (!m_dbJustCreated)
-        {
             cleanupDanglingDbObjects();
-            m_needClearLog = true;
-            m_needResyncLog = true;
-        }
+        return resyncIfNeeded({ClearLog, ResyncLog});
     }
 
+    if (updateName.endsWith(lit("/83_add_default_webpages.sql")))
+    {
+        return ec2::database::migrations::addDefaultWebpages(m_sdb)
+            && resyncIfNeeded(ResyncWebPages);
+    }
+
+    NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
 
@@ -1480,7 +1428,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
-        NX_LOG(QString("Create new database"), cl_logINFO);
+        NX_LOG(lit("Create new database"), cl_logINFO);
 
         m_dbJustCreated = true;
 
@@ -1493,7 +1441,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-        NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
+        NX_LOG(lit("Update database to v 2.3"), cl_logINFO);
 
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
@@ -1503,7 +1451,7 @@ bool QnDbManager::createDatabase()
 
         if (!m_dbJustCreated)
         {
-            m_needResyncLog = true;
+            m_resyncFlags |= ResyncLog;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
         }
@@ -2301,8 +2249,6 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
     if (!database::api::saveLayout(m_sdb, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
-
-
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
@@ -4239,6 +4185,13 @@ ErrorCode QnDbManager::getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& 
     return ErrorCode::ok;
 }
 
+bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
+{
+    if (!m_dbJustCreated)
+        m_resyncFlags |= flags;
+    return true;
+}
+
 ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)
 {
     QSqlQuery query(m_sdb);
@@ -4535,16 +4488,10 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnUuid &layout_id) {
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {
-    qint32 internalId;
-
-    ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    result = insertOrReplaceWebPage(params, internalId);
-    return result;
+    if (!database::api::saveWebPage(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
-
 
 ErrorCode QnDbManager::removeWebPage(const QnUuid& guid)
 {

@@ -652,11 +652,21 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             return parameters.withArgument(Qn::NodeTypeRole, nodeType);
         };
 
-    if (nodeType == Qn::VideoWallItemNode)
-        return withNodeType(selectedVideoWallItems());
-
-    if (nodeType == Qn::VideoWallMatrixNode)
-        return withNodeType(selectedVideoWallMatrices());
+    switch (nodeType)
+    {
+        case Qn::VideoWallItemNode:
+            return withNodeType(selectedVideoWallItems());
+        case Qn::VideoWallMatrixNode:
+            return withNodeType(selectedVideoWallMatrices());
+        case Qn::CloudSystemNode:
+        {
+            QnActionParameters result;
+            result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
+            return withNodeType(result);
+        }
+        default:
+            break;
+    }
 
     if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
         return withNodeType(selectedLayoutItems());

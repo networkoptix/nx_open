@@ -36,6 +36,7 @@ x86/*
 x64/*
 target/*
 packages.config
+.vs
 
 .DS_Store
 Debug

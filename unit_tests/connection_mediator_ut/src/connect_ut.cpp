@@ -12,7 +12,7 @@
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
@@ -89,10 +89,10 @@ TEST_F( ConnectTest, BindConnect )
     msClient.connect( address() );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
-                                             stun::cc::methods::bind ) );
-        request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
-        request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-        request.newAttribute< stun::cc::attrs::PublicEndpointList >(
+                                             stun::extension::methods::bind ) );
+        request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
+        request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
+        request.newAttribute< stun::extension::attrs::PublicEndpointList >(
             std::list< SocketAddress >( 1, testHttpServer.serverAddress() ) );
 
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );

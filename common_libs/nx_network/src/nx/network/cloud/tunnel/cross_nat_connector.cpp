@@ -68,7 +68,6 @@ CrossNatConnector::CrossNatConnector(
         SocketGlobals::cloudConnectSettings().originatingHostAddressReplacement()),
     m_done(false)
 {
-    s_mediatorResponseCounter.addResult(hpm::api::ResultCode::otherLogicError);
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
     m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
@@ -366,7 +365,7 @@ void CrossNatConnector::holePunchingDone(
     stun::Message connectResultReportMessage(
         stun::Header(
             stun::MessageClass::request,
-            stun::cc::methods::connectionResult));
+            stun::extension::methods::connectionResult));
     m_connectResultReport.serialize(&connectResultReportMessage);
     m_connectResultReportSender->sendMessage(
         m_mediatorAddress,

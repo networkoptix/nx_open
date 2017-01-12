@@ -61,6 +61,8 @@ Module
             return "ubuntu"
         if (platform == "macosx")
             return "none"
+        if (platform == "android" || platform == "ios")
+            return "none"
 
         throw "Cannot detect modification for platform " + platform
     }

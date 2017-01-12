@@ -19,7 +19,7 @@ angular.module('webadminApp')
 
                     server.apiUrl = window.location.protocol + '//' + ips[i] + port;
 
-                    mediaserver.getModuleInformation(server.apiUrl).catch(function(error){
+                    mediaserver.pingServer(server.apiUrl).catch(function(error){
                         if(i < ips.length-1) {
                             checkServersIp(server, i + 1);
                         }

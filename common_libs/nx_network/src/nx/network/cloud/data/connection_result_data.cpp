@@ -6,7 +6,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-using namespace stun::cc;
+using namespace stun::extension;
 
 ConnectionResultRequest::ConnectionResultRequest()
 :

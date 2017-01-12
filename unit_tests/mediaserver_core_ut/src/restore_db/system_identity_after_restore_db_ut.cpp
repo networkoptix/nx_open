@@ -451,9 +451,7 @@ TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_NoSystemName
     settingsProxy->setIsSystemIdFromSystemName(false);
     nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
     ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kDefaultValue);
-    ASSERT_EQ(settingsProxy->localSystemId(), 
-              guidFromArbitraryData(detail::TestSystemNameProxy::kDefaultValue + 
-                    settingsProxy->getMaxServerKey()));
+    ASSERT_EQ(settingsProxy->localSystemId(), QnUuid());
 }
 
 

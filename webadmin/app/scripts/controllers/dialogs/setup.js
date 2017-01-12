@@ -19,6 +19,7 @@ angular.module('webadminApp')
         // Common model
         $scope.settings = {
             chooseCloudSystem: false,
+            savePassword: true,
             systemName: '',
 
             cloudEmail: '',
@@ -69,7 +70,8 @@ angular.module('webadminApp')
 
         function sendCredentialsToNativeClient(){
             $log.log("Send credentials to client app: " + $scope.activeLogin);
-            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
+            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword,
+                $scope.cloudCreds, $scope.settings.savePassword);
         }
 
         function checkInternetOnServer(reload){
@@ -140,9 +142,22 @@ angular.module('webadminApp')
                     }
 
                     checkInternet(false);
+                    $log.log("media server flags");
+                    $log.log($scope.serverInfo.flags);
+
+                    if($scope.serverInfo.flags.brokenSystem){
+                        if($scope.serverInfo.flags.noHDD){
+                            $scope.settings.localError = L.setup.errorNoHDD;
+                        }else{
+                            //$scope.serverInfo.flags.wrongNetwork && !data.flags.canSetupNetwork;
+                            //$scope.serverInfo.flags.noNetwork
+                            $scope.settings.localError = L.setup.errorNoNetwork;
+                        }
+                        $scope.next('brokenSystem');
+                        return $q.reject();
+                    }
 
                     if($scope.serverInfo.flags.newSystem) {
-
                         if($scope.serverInfo.flags.canSetupNetwork) {
                             mediaserver.networkSettings().then(function (r) {
                                 $scope.networkSettings = r.data.reply;
@@ -159,11 +174,12 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                         return $q.reject();
-                    }else{
-                        sendCredentialsToNativeClient();
-                        $log.log("System is local - go to local success");
-                        $scope.next('localSuccess');
                     }
+
+                    sendCredentialsToNativeClient();
+                    $log.log("System is local - go to local success");
+                    $scope.next('localSuccess');
+                    return true;
                 });
             });
 
@@ -596,7 +612,7 @@ angular.module('webadminApp')
             $scope.wizardFlow = {
                 0: {},
                 start: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
                     next: 'systemName'
                 },
                 systemName: {
@@ -661,7 +677,7 @@ angular.module('webadminApp')
                             $scope.next('noInternetOnClient');
                             return;
                         }
-                        $scope.next($scope.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
+                        $scope.next($scope.settings.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
                     }
                 },
 
@@ -680,7 +696,7 @@ angular.module('webadminApp')
                     }
                 },
                 cloudLogin: {
-                    back: $scope.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
+                    back: $scope.settings.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
                     next: 'cloudProcess',
                     valid: function () {
                         return checkForm($scope.forms.cloudForm);
@@ -741,12 +757,17 @@ angular.module('webadminApp')
                     }
                 },
                 initFailure: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
+                    retry: function () {
+                        initWizard();
+                    }
+                },
+                brokenSystem:{
+                    cancel: $scope.settings.thickClient,
                     retry: function () {
                         initWizard();
                     }
                 }
-
             };
         }
 
@@ -813,11 +834,10 @@ angular.module('webadminApp')
                 });
             });
         }
-        //$scope.liteClient = true;// TODO: remove this hardcode
         nativeClient.init().then(function(result){
-            $scope.thickClient = result.thick;
-            $scope.liteClient = result.lite;
-            if($scope.liteClient) {
+            $scope.settings.thickClient = result.thick;
+            $scope.settings.liteClient = result.lite;
+            if($scope.settings.liteClient) {
                 $('body').addClass('lite-client-mode');
             }
             $log.log("check client Thick:" + result.thick);

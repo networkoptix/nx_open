@@ -38,7 +38,6 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
     if (result.isEmpty())
         result
         << Qn::OtherSystemsNode
-        << Qn::WebPagesNode
         << Qn::ServersNode
         << Qn::UserResourcesNode
         << Qn::RecorderNode

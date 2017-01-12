@@ -280,7 +280,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 
     auto stunAsyncClient = std::make_shared<stun::test::AsyncClientMock>();
     EXPECT_CALL(*stunAsyncClient, setIndicationHandler(
-        stun::cc::indications::connectionRequested,
+        stun::extension::indications::connectionRequested,
         ::testing::_, ::testing::_)).Times(1);
     EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
@@ -310,7 +310,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
 
     stun::Message message(stun::Header(
         stun::MessageClass::indication,
-        stun::cc::indications::connectionRequested));
+        stun::extension::indications::connectionRequested));
     event.serialize(&message);
     stunAsyncClient->emulateIndication(message);
 
@@ -359,7 +359,7 @@ protected:
 
         m_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         EXPECT_CALL(*m_stunClient, setIndicationHandler(
-            stun::cc::indications::connectionRequested,
+            stun::extension::indications::connectionRequested,
             ::testing::_, ::testing::_)).Times(1);
         EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
@@ -491,7 +491,7 @@ protected:
 
         stun::Message message(stun::Header(
             stun::MessageClass::indication,
-            stun::cc::indications::connectionRequested));
+            stun::extension::indications::connectionRequested));
         event.serialize(&message);
 
         m_stunClient->emulateIndication(message);

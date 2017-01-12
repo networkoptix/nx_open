@@ -11,6 +11,7 @@
 
 #include <nx/utils/string.h>
 
+#include <utils/common/synctime.h>
 #include <utils/common/qtimespan.h>
 
 namespace {
@@ -369,6 +370,8 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     static const int kDoNotSuppress = -1;
 
     qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
-    return QTimeSpan(durationMs).toApproximateString(kDoNotSuppress, kFormat,
-        QTimeSpan::SuffixFormat::Full, kSeparator);
+    qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
+        .toApproximateString(kDoNotSuppress, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
 }

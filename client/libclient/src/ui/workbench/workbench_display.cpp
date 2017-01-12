@@ -2365,9 +2365,6 @@ void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& re
             workbench()->removeLayout(layout);
     }
 
-    if (!m_widgetsByResource.contains(resource))
-        return;
-
     /* Here aboutToBeDestroyed will be called with corresponding handling. */
     for (auto widget: m_widgetsByResource.take(resource))
     {

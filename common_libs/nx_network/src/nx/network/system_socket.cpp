@@ -516,12 +516,19 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
 
     // We do not want child processes created by exec() to inherit socket descriptors.
 #ifdef FD_CLOEXEC
-    int flags = fcntl( m_fd, F_GETFL, 0 );
+    int flags = fcntl( m_fd, F_GETFD, 0 );
     if( flags < 0 )
-        return false;
-    if( fcntl( m_fd, F_SETFD, flags | FD_CLOEXEC ) < 0 )
-        return false;
+    {
+        NX_LOGX(lm("Can not read options by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+    }
+    else if( fcntl( m_fd, F_SETFD, flags | FD_CLOEXEC ) < 0 )
+    {
+        NX_LOGX(lm("Can not set FD_CLOEXEC by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+    }
 #endif
+
     return true;
 }
 

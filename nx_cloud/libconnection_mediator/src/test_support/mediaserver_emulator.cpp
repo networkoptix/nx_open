@@ -380,7 +380,7 @@ void MediaServerEmulator::onMessageReceived(
     if (message.header.messageClass != stun::MessageClass::request)
         return;
 
-    if (message.header.method == stun::cc::methods::udpHolePunchingSyn)
+    if (message.header.method == stun::extension::methods::udpHolePunchingSyn)
     {
         hpm::api::UdpHolePunchingSynResponse synAckResponse;
         if (m_action <= ActionToTake::sendBadSynAck)
@@ -395,7 +395,7 @@ void MediaServerEmulator::onMessageReceived(
         synAckResponse.serialize(&synAckMessage);
         m_stunPipeline->sendMessage(std::move(synAckMessage));
     }
-    else if (message.header.method == stun::cc::methods::tunnelConnectionChosen)
+    else if (message.header.method == stun::extension::methods::tunnelConnectionChosen)
     {
         if (m_action <= ActionToTake::doNotAnswerTunnelChoiceNotification)
             return;
