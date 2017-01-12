@@ -128,7 +128,14 @@ void QnGraphicsView::paintEvent(QPaintEvent *event) {
     qint64 startCycles = QnPerformance::currentThreadCycles();
 #endif
 
-    const auto context = QOpenGLContext::currentContext();
+    auto context = QOpenGLContext::currentContext();
+    if (!context)
+    {
+        if (QGLWidget* glWidget = qobject_cast<QGLWidget*>(viewport()))
+            glWidget->makeCurrent();
+
+        NX_ASSERT(QOpenGLContext::currentContext());
+    }
 
     base_type::paintEvent(event);
 
