@@ -37,7 +37,8 @@ QnContext::QnContext(QObject* parent) :
     m_cloudUrlHelper(new QnCloudUrlHelper(
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
-        this))
+        this)),
+    m_localPrefix(lit("qrc:///"))
 {
     connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this,
         [this]()
