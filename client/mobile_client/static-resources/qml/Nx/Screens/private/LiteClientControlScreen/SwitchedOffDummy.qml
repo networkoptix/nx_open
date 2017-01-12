@@ -9,6 +9,6 @@ Rectangle
     Image
     {
         anchors.centerIn: parent
-        source: lp("images/lite_client_off.png")
+        source: lp("/images/lite_client_off.png")
     }
 }

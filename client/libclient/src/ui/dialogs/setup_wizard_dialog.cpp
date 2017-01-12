@@ -8,7 +8,7 @@
 
 namespace
 {
-    static const QSize kSetupWizardSize(520, 456);
+    static const QSize kSetupWizardSize(496, 392);
 
     QUrl constructUrl(const QUrl &baseUrl)
     {

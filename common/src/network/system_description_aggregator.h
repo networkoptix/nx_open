@@ -41,9 +41,11 @@ public: // overrides
 
     bool isOnline() const override;
 
+    bool isReachable() const override;
+
     ServersList servers() const override;
 
-    bool isOnlineServer(const QnUuid& serverId) const override;
+    bool isReachableServer(const QnUuid& serverId) const override;
 
     bool containsServer(const QnUuid& serverId) const override;
 

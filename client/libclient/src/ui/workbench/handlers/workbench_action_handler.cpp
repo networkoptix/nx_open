@@ -146,7 +146,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
-
+#include <utils/unity_launcher_workaround.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -170,6 +170,8 @@ namespace {
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
+
+using nx::client::desktop::utils::UnityLauncherWorkaround;
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -409,7 +411,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 #ifdef Q_OS_MACX
     mac_startDetached(qApp->applicationFilePath(), arguments);
 #else
-    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+    UnityLauncherWorkaround::startDetached(qApp->applicationFilePath(), arguments);
 #endif
 }
 

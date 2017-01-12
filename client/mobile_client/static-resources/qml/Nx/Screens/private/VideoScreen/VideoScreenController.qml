@@ -40,7 +40,7 @@ Object
     {
         id: d
         property bool resumeOnActivate: false
-        property bool resumeAtLive: false
+        property bool resumeOnOnline: false
     }
 
     QnMediaResourceHelper
@@ -86,7 +86,19 @@ Object
     onFailedChanged:
     {
         if (failed)
+        {
+            d.resumeOnOnline = offline
             mediaPlayer.stop()
+        }
+    }
+
+    onOfflineChanged:
+    {
+        if (!offline && d.resumeOnOnline)
+        {
+            d.resumeOnOnline = false
+            mediaPlayer.play()
+        }
     }
 
     Component.onCompleted:

@@ -58,6 +58,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         if (system.localId.isNull())
             system.localId = guidFromArbitraryData(system.cloudId);
 
+        system.online = (systemData.stateOfHealth == nx::cdb::api::SystemHealth::online);
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -470,7 +471,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         emit q->statusChanged(status);
 
     if (isNewErrorCode && (errorCode != QnCloudStatusWatcher::NoError))
-        emit q->errorChanged();
+        emit q->errorChanged(errorCode);
 }
 
 void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)
