@@ -575,20 +575,21 @@ namespace detail
 
         enum ResyncFlag
         {
-            ClearLog,
-            ResyncLog,
-            ResyncLicences,
-            ResyncFiles,
-            ResyncCameraAttributes,
-            ResyncServerAttributes,
-            ResyncServers,
-            ResyncLayouts,
-            ResyncRules,
-            ResyncUsers,
-            ResyncStorages,
-            ResyncClientInfo,
-            ResyncVideoWalls,
-            ResyncWebPages,
+            None                    =      0,
+            ClearLog                =    0x1,
+            ResyncLog               =    0x2,
+            ResyncLicences          =    0x4,
+            ResyncFiles             =    0x8,
+            ResyncCameraAttributes  =   0x10,
+            ResyncServerAttributes  =   0x20,
+            ResyncServers           =   0x40,
+            ResyncLayouts           =   0x80,
+            ResyncRules             =  0x100,
+            ResyncUsers             =  0x200,
+            ResyncStorages          =  0x400,
+            ResyncClientInfo        =  0x800,
+            ResyncVideoWalls        = 0x1000,
+            ResyncWebPages          = 0x2000,
         };
         Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
 
