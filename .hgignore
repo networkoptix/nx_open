@@ -161,6 +161,7 @@ func_tests/ssh.*.conf
 
 customization/*.html
 
+.sources_cache
 syntax: regexp
 ^core$
 ^Makefile$
