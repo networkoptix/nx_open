@@ -1,4 +1,4 @@
-#include "log_ios.h"
+#include "log.h"
 
 #import <Foundation/Foundation.h>
 
