@@ -185,7 +185,7 @@ angular.module('webadminApp')
 
         }
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials: " + login + ":" + password + " cloud:" + isCloud);
+            $log.log("Apply credentials: " + login + " cloud:" + isCloud);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
