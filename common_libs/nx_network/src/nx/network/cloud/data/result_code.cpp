@@ -1,6 +1,6 @@
 #include "result_code.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/model_functions.h>
 
 namespace nx {

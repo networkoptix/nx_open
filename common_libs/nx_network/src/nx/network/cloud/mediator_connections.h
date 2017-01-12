@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/stun/async_client_user.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/udp_client.h>
 
 #include "abstract_cloud_system_credentials_provider.h"

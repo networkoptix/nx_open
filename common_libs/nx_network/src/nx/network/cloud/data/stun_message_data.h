@@ -3,7 +3,7 @@
 #include <nx/network/buffer.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/log/log_message.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 namespace nx {
 namespace hpm {

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 

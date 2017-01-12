@@ -3,7 +3,7 @@
 
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>

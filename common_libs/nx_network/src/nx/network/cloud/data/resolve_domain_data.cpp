@@ -1,6 +1,6 @@
 #include "resolve_domain_data.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 
 namespace nx {
