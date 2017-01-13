@@ -225,7 +225,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             option.font.setWeight(QFont::Normal);
 
             const auto extra = m_textPixmapCache.pixmap(extraInfo, option.font, extraColor,
-                textEnd - textPos.x(), option.textElideMode);
+                qMax(textEnd - textPos.x(), 1), option.textElideMode);
 
             if (!extra.pixmap.isNull())
                 painter->drawPixmap(textPos + extra.origin, extra.pixmap);
