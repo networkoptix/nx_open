@@ -229,7 +229,7 @@
       <item>
        <widget class="QPushButton" name="eventRulesButton">
         <property name="text">
-         <string>Event Rules</string>
+         <string>Event Rules...</string>
         </property>
        </widget>
       </item>
