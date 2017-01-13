@@ -30,6 +30,9 @@
 #include <controllers/lite_client_controller.h>
 #include <helpers/lite_client_layout_helper.h>
 #include <helpers/cloud_url_helper.h>
+#include <utils/developer_settings_helper.h>
+
+using namespace nx::client::mobile;
 
 void QnMobileClientMetaTypes::initialize() {
     QnClientCoreMetaTypes::initialize();
@@ -66,6 +69,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
+    qmlRegisterType<utils::DeveloperSettingsHelper>(
+        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
 
     qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
