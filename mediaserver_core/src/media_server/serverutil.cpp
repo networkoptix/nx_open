@@ -16,6 +16,12 @@
 #include <common/common_module.h>
 #include <network/authenticate_helper.h>
 
+#include <QtCore/QJsonDocument>
+#include <QtXmlPatterns/QXmlSchema>
+#include <QtXmlPatterns/QXmlSchemaValidator>
+#include <QtXml/QDomDocument>
+
+
 static QnMediaServerResourcePtr m_server;
 
 QByteArray decodeAuthKey(const QByteArray& authKey) {
@@ -101,4 +107,39 @@ bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLo
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(server, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
     return true;
+}
+
+
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
+{
+    static const QByteArray kDefaultContentType("text/plain");
+    static const QByteArray kJsonContentType("application/json");
+    static const QByteArray kXMLContentType("application/xml");
+    static const QByteArray kHTMLContentType("application/html");
+
+    if (msgBody.isEmpty())
+        return kDefaultContentType;
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(msgBody, &error);
+    if(error.error == QJsonParseError::NoError)
+        return kJsonContentType;
+
+    const QRegExp regExpr(lit("<html[^<]*>"));
+
+    int pos = regExpr.indexIn(QString::fromUtf8(msgBody));
+    while (pos >= 0)
+    {
+        // Check that <html pattern found not inside string
+        int quoteCount = msgBody.left(pos).count("\"");
+        if (quoteCount % 2 == 0)
+            return kHTMLContentType;
+        pos = regExpr.indexIn(QString::fromUtf8(msgBody), pos+1);
+    }
+
+    QDomDocument xmlDoc;
+    if (xmlDoc.setContent(msgBody))
+        return kXMLContentType;
+
+    return kDefaultContentType;
 }
