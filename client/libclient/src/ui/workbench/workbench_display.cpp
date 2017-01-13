@@ -839,14 +839,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 newWidget->setOption(QnResourceWidget::ActivityPresence, true);
             }
 
-            /* Hide / show other items when zoomed. */
-            if (newWidget)
-                opacityAnimator(newWidget)->animateTo(1.0);
-            qreal opacity = newWidget ? 0.0 : 1.0;
-            foreach(QnResourceWidget *widget, m_widgets)
-                if (widget != newWidget)
-                    opacityAnimator(widget)->animateTo(opacity);
-
             /* Update margin flags. */
             updateCurrentMarginFlags();
 
