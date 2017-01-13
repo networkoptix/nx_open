@@ -1643,7 +1643,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (mappedAddress.port)
     {
         NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS)
+                .arg(address), cl_logALWAYS);
 
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
@@ -1658,7 +1658,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         if (oldIp != m_forwardedAddresses.end())
         {
             NX_LOGX(lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS)
+                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS);
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();

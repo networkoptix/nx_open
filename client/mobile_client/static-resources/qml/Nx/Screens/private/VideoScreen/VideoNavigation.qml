@@ -196,8 +196,8 @@ Item
             {
                 id: blurRectangle
 
-                readonly property real blurWidth: 36
-                readonly property real margin: 18
+                readonly property real blurWidth: 16
+                readonly property real margin: 8
 
                 width: timeline.height - timeline.chunkBarHeight
                 height: timeline.width

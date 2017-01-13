@@ -281,7 +281,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         {
             NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
             /* Only admins should see notifications with servers. */
-            if (!server || !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            if (!server || !accessController()->hasPermissions(server, Qn::ViewContentPermission))
                 return;
         }
     }

@@ -27,8 +27,7 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: shadow.opacity;
-    property bool isOnline: false;
-    property bool isReachable: false;
+    property bool isConnectible: false;
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
@@ -113,7 +112,7 @@ Item
                 PropertyChanges
                 {
                     target: hideTileButton;
-                    opacity: (control.isOnline && control.isReachable ? 0 : 1);
+                    opacity: (isConnectible ? 0 : 1);
                 }
 
                 PropertyChanges

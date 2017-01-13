@@ -29,7 +29,7 @@ class FtHolePunchingProcessor:
     public MediatorFunctionalTest
 {
 public:
-    enum StartPolicy
+    enum class StartPolicy
     {
         immediately,
         delayed,
@@ -37,7 +37,7 @@ public:
 
     FtHolePunchingProcessor(StartPolicy startPolicy = StartPolicy::immediately)
     {
-        if (startPolicy == immediately)
+        if (startPolicy == StartPolicy::immediately)
         {
             NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
         }

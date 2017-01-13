@@ -29,7 +29,7 @@ namespace {
     const int extraTickCount = 10;
     const qreal zoomAnimationSpeed = 0.004;
     const qreal textOpacityAnimationSpeed = 0.004;
-    const qreal textMargin = 35;
+    const qreal kTextSpacing = 16;
     const qreal zoomMultiplier = 2.0;
     const qreal liveOpacityAnimationSpeed = 0.01;
     const qreal stripesMovingSpeed = 0.002;
@@ -135,6 +135,7 @@ public:
     bool dragWasInterruptedByZoom;
 
     QVector<QnTimelineZoomLevel> zoomLevels;
+    QVector<qreal> maxZoomLevelTextLength;
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
@@ -315,7 +316,11 @@ public:
 
         textHelper.reset(new QnTimelineTextHelper(textFont, textColor, suffixList));
         textTexture = window->createTextureFromImage(textHelper->texture());
+
+        updateMaxZoomLeelTextLengths();
     }
+
+    void updateMaxZoomLeelTextLengths();
 
     void updateStripesTextures();
 
@@ -330,7 +335,7 @@ public:
     bool hasArchive() const;
 };
 
-QnTimeline::QnTimeline(QQuickItem *parent) :
+QnTimeline::QnTimeline(QQuickItem* parent):
     QQuickItem(parent),
     d(new QnTimelinePrivate(this))
 {
@@ -338,27 +343,22 @@ QnTimeline::QnTimeline(QQuickItem *parent) :
     setAcceptedMouseButtons(Qt::LeftButton);
 
     connect(this, &QnTimeline::positionChanged, this, &QnTimeline::positionDateChanged);
-
     connect(this, &QnTimeline::widthChanged, this, [this](){ d->updateZoomLevel(); });
 
     d->suffixList << lit("ms") << lit("s") << lit(":");
 
-    QnTimelineZoomLevel::maxMonthLength = 0;
     QLocale locale;
-    for (int i = 1; i <= 12; ++i) {
-        QString standaloneMonthName = locale.standaloneMonthName(i);
-        QString monthName = locale.monthName(i);
-        d->suffixList.append(standaloneMonthName);
-        d->suffixList.append(monthName);
-        QnTimelineZoomLevel::maxMonthLength = qMax(QnTimelineZoomLevel::maxMonthLength,
-                                                   qMax(standaloneMonthName.length(), monthName.length()));
+    for (int i = 1; i <= 12; ++i)
+    {
+        d->suffixList.append(locale.standaloneMonthName(i));
+        d->suffixList.append(locale.monthName(i));
     }
 
     d->updateTextHelper();
 }
 
-QnTimeline::~QnTimeline() {
-
+QnTimeline::~QnTimeline()
+{
 }
 
 qint64 QnTimeline::windowStart() const {
@@ -835,18 +835,33 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
 
     int textMarkLevel = zoomIndex;
 
-    while (textMarkLevel < d->zoomLevels.size() - 1) {
-        int lowerTextWidth = d->zoomLevels[textMarkLevel].maxTextWidth() * d->textHelper->maxCharWidth();
-        int preLowerTextWidth = d->zoomLevels[textMarkLevel + 1].maxTextWidth() * d->textHelper->maxCharWidth();
-        qint64 preLowerTickInterval = d->zoomLevels[textMarkLevel + 1].nextTick(0);
-        int tickCount = preLowerTickInterval / d->zoomLevels[textMarkLevel].nextTick(0);
-        qreal preLowerTickWidth = width() * preLowerTickInterval / windowSize;
+    while (textMarkLevel < d->zoomLevels.size() - 1)
+    {
+        const auto& currentLevel = d->zoomLevels[textMarkLevel];
+        const auto& upperLevel = d->zoomLevels[textMarkLevel + 1];
 
-        qreal pix = preLowerTickWidth - lowerTextWidth * tickCount - preLowerTextWidth;
-        if (pix > textMargin) {
+        const auto currentLevelMaxTextWidth = d->maxZoomLevelTextLength[textMarkLevel];
+        const auto upperLevelMaxTextWidth = d->maxZoomLevelTextLength[textMarkLevel + 1];
+
+        const auto currentLevelTickIntervalMs = currentLevel.averageTickLength();
+        const auto upperLevelTickIntervalMs = upperLevel.averageTickLength();
+
+        const int ticksBetweenTwoUpperLevelTicks =
+            upperLevelTickIntervalMs / currentLevelTickIntervalMs - 1;
+
+        const auto upperLevelTickLength = width() / windowSize * upperLevelTickIntervalMs;
+
+        const auto freeSpace = upperLevelTickLength - upperLevelMaxTextWidth - kTextSpacing
+            - (kTextSpacing + currentLevelMaxTextWidth) * ticksBetweenTwoUpperLevelTicks;
+
+        if (freeSpace > 0)
+        {
             d->targetTextLevel = textMarkLevel;
             if (qAbs(d->targetTextLevel - d->textLevel) > maxZoomLevelDiff)
-                d->textLevel = d->targetTextLevel + (d->textLevel < d->targetTextLevel ? -maxZoomLevelDiff : maxZoomLevelDiff);
+            {
+                d->textLevel = d->targetTextLevel
+                    + (d->textLevel < d->targetTextLevel ? -maxZoomLevelDiff : maxZoomLevelDiff);
+            }
             break;
         }
 
@@ -862,6 +877,8 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
 
     int textCount = 0;
     int lowerTextCount = 0;
+    int previousTextCount = 0;
+    int previousLowerTextCount = 0;
 
     QSGGeometry::Point2D *tickPoints = nullptr;
     if (drawDebugTicks) {
@@ -869,7 +886,8 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
         ticksNode->markDirty(QSGNode::DirtyGeometry);
     }
 
-    for (int i = 0; i < tickCount; ++i) {
+    for (int i = 0; i < tickCount; ++i)
+    {
         int tickLevel = d->tickLevel(tick);
 
         qreal x;
@@ -878,25 +896,61 @@ QSGNode *QnTimeline::updateTextNode(QSGNode *rootNode) {
         else
             x = xStart + (tick - windowStartAligned) * width() / windowSize;
 
-        if (tickLevel >= textMarkLevel) {
+        if (tickLevel >= textMarkLevel)
+        {
             MarkInfo info;
             info.tick = tick;
             info.x = x;
             info.zoomIndex = tickLevel;
-            markedTicks.append(info);
 
-            lowerTextCount += d->zoomLevels[tickLevel].baseValue(tick).size();
-            lowerTextCount += d->zoomLevels[tickLevel].subValue(tick).size();
-            lowerTextCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
+            enum class LowerTickAction { Append, Replace, Skip };
+            LowerTickAction action = LowerTickAction::Append;
 
-            if (tickLevel > textMarkLevel) {
+            if (!markedTicks.isEmpty())
+            {
+                const auto previousTickLevel = markedTicks.last().zoomIndex;
+
+                // Remove ticks overlapping with ticks with higher zoom level.
+                if (previousTickLevel != tickLevel
+                    && markedTicks.last().x + d->maxZoomLevelTextLength[previousTickLevel] / 2
+                        > x - d->maxZoomLevelTextLength[tickLevel] / 2)
+                {
+                    if (previousTickLevel < tickLevel)
+                        action = LowerTickAction::Replace;
+                    else
+                        action = LowerTickAction::Skip;
+                }
+            }
+
+            if (action == LowerTickAction::Replace)
+            {
+                textCount = previousTextCount;
+                lowerTextCount = previousLowerTextCount;
+                markedTicks.removeLast();
+            }
+
+            previousTextCount = textCount;
+            previousLowerTextCount = lowerTextCount;
+
+            if (action != LowerTickAction::Skip)
+            {
+                markedTicks.append(info);
+
+                lowerTextCount += d->zoomLevels[tickLevel].baseValue(tick).size();
+                lowerTextCount += d->zoomLevels[tickLevel].subValue(tick).size();
+                lowerTextCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
+            }
+
+            if (tickLevel > textMarkLevel)
+            {
                 textCount += d->zoomLevels[tickLevel].baseValue(tick).size();
                 textCount += d->zoomLevels[tickLevel].subValue(tick).size();
                 textCount += d->zoomLevels[tickLevel].suffix(tick).isEmpty() ? 0 : 1;
             }
         }
 
-        if (drawDebugTicks) {
+        if (drawDebugTicks)
+        {
             tickPoints[0].set(x + correction, correction);
             tickPoints[1].set(x + correction, lineHeight + correction);
             tickPoints += 2;
@@ -1107,6 +1161,38 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     lightStripesNode->markDirty(QSGNode::DirtyGeometry);
 
     return chunksNode;
+}
+
+void QnTimelinePrivate::updateMaxZoomLeelTextLengths()
+{
+    const QFontMetricsF fm(parent->font());
+    const QLocale locale;
+
+    maxZoomLevelTextLength.resize(zoomLevels.size());
+    for (int i = 0; i < zoomLevels.size(); ++i)
+    {
+        const auto &level = zoomLevels[i];
+
+        if (level.type == QnTimelineZoomLevel::Days || level.type == QnTimelineZoomLevel::Months)
+        {
+            maxZoomLevelTextLength[i] = 0;
+            for (int month = 1; month <= 12; ++month)
+            {
+                maxZoomLevelTextLength[i] = qMax(
+                    maxZoomLevelTextLength[i],
+                    fm.size(0, level.type == QnTimelineZoomLevel::Days
+                        ? locale.monthName(month)
+                        : locale.standaloneMonthName(month)).width());
+            }
+
+            if (level.type == QnTimelineZoomLevel::Days)
+                maxZoomLevelTextLength[i] += fm.size(0, lit(" 88")).width();
+        }
+        else
+        {
+            maxZoomLevelTextLength[i] = fm.size(0, level.longestText()).width();
+        }
+    }
 }
 
 void QnTimelinePrivate::updateStripesTextures() {

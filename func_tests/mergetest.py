@@ -49,9 +49,9 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
               'testMergeTakeLocalSettings',
               'testMergeTakeRemoteSettings',
               'testRestartOneServer',
-              'testMergeCloudWithLocal',
-              'testMergeCloudSystems',
-              'testCloudMergeAfterDisconnect'
+              # 'testMergeCloudWithLocal',
+              # 'testMergeCloudSystems',
+              # 'testCloudMergeAfterDisconnect'
           ]),
       )
 
@@ -366,6 +366,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
             apiErrorCode = 3,
             apiErrorString = 'BOTH_SYSTEM_BOUND_TO_CLOUD')
 
+        # Test default (admin) user disabled
         srvInfo = self.servers[self.serverAddr1]
         client = Client(srvInfo.user, srvInfo.password)
         response = client.httpRequest(self.serverAddr1, "ec2/getUsers")
