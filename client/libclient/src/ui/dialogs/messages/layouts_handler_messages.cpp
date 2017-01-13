@@ -231,7 +231,7 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
     return result == QDialogButtonBox::Ok;
 }
 
-bool QnLayoutsHandlerMessages::replaceVideoWallResources(QWidget* parent,
+bool QnLayoutsHandlerMessages::changeVideoWallLayout(QWidget* parent,
     const QnResourceList& inaccessible)
 {
     QnSessionAwareMessageBox messageBox(parent);

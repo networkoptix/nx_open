@@ -30,6 +30,5 @@ public:
     static bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts);
     static bool deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible);
 
-    //TODO: #GDM move out to separate handler sometime
-    static bool replaceVideoWallResources(QWidget* parent, const QnResourceList& inaccessible);
+    static bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 };
