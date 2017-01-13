@@ -14,12 +14,16 @@ namespace network {
 namespace aio {
 namespace detail {
 
-AIOThreadImpl::AIOThreadImpl():
-    pollSet(PollSetFactory::instance()->create()),
+AIOThreadImpl::AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSetToUse):
     newReadMonitorTaskCount(0),
     newWriteMonitorTaskCount(0),
     processingPostedCalls(0)
 {
+    if (pollSetToUse)
+        pollSet = std::move(pollSetToUse);
+    else
+        pollSet = PollSetFactory::instance()->create();
+
     m_monotonicClock.restart();
 }
 

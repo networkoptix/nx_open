@@ -207,7 +207,7 @@ public:
     std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
 
-    AIOThreadImpl();
+    AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSet);
 
     //!used as clock for periodic events. Function introduced since implementation can be changed
     qint64 getSystemTimerVal() const;
