@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 
             nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));
-        });
+        },
+        nx::network::InitializationFlags::disableUdt);
     return resultCode;
 }
