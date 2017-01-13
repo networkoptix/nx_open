@@ -1225,7 +1225,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     const auto resource = widget->resource();
 
     auto widgetsForResource = m_widgetsByResource.find(resource);
-    NX_ASSERT(widgetsForResource != m_widgetsByResource.end());
+    // We may have already clean the widget in permissionsChange handler
     if (widgetsForResource != m_widgetsByResource.end())
     {
         widgetsForResource->removeOne(widget);
