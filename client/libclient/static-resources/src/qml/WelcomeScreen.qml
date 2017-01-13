@@ -283,7 +283,7 @@ Rectangle
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
-                anchors.topMargin: 8;
+                anchors.topMargin: 22;
 
                 pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
