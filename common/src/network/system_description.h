@@ -43,7 +43,7 @@ public: // overrides
 
     bool isReachable() const override;
 
-    bool hasInternet() const override;
+    bool isConnectible() const override;
 
     bool safeMode() const override;
 
@@ -72,8 +72,6 @@ protected:
 
     void handleServerRemoved(const QnUuid& serverId);
 
-    void updateHasInternetState();
-
     void updateSafeModeState();
 
 private:
@@ -93,6 +91,5 @@ private:
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
     IdsSet m_reachableServers;
-    bool m_hasInternet;
     bool m_safeMode;
 };

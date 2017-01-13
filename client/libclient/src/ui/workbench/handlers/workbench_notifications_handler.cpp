@@ -98,9 +98,16 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    if (businessAction->getParams().userGroup == QnBusiness::AdminOnly
-        && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
+    const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
+    if (!isAdmin)
+    {
+        if (eventType == QnBusiness::LicenseIssueEvent || eventType == QnBusiness::NetworkIssueEvent)
+            return;
+
+        if (businessAction->getParams().userGroup == QnBusiness::AdminOnly)
+            return;
+    }
 
     if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent)
     {

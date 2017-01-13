@@ -17,16 +17,16 @@ public:
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,
-        bool online);
+        bool running);
 
     virtual ~QnCloudSystemDescription() = default;
 
-    void setOnlineState(bool online);
+    void setRunning(bool running);
 
 public: // Overrides
     virtual bool isCloudSystem() const;
 
-    virtual bool isOnline() const override;
+    virtual bool isRunning() const override;
 
     virtual bool isNewSystem() const override;
 
@@ -41,10 +41,10 @@ private:
         const QString& systemName,
         const QString& ownerEmail,
         const QString& ownerFullName,
-        bool online);
+        bool running);
 
 private:
     const QString m_ownerEmail;
     const QString m_ownerFullName;
-    bool m_online;
+    bool m_running;
 };
