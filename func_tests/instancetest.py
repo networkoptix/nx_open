@@ -1,11 +1,10 @@
 # $Id$
 # Artem V. Nikitin
-# Single server test sample
+# Single server test
 
-import time, os, json, random
+import time, os, json, random, urllib
 from hashlib import md5
-
-from pycommons.MockClient import ClientMixin
+from pycommons.MockClient import ClientMixin, Client
 from pycommons.SingleServerTest import MediaServerInstanceTest
 from pycommons.Logger import LOGLEVEL, log
 from pycommons.Config import config
@@ -23,9 +22,11 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
     _test_key = 'instance'
     # Test suites
     _suites = ( ('SingeServerInstanceSuits', [
-        'testCreateAndCheck',
-        'testNonExistUserGroup',
-        'testRemoveChildObjects']), )
+        # 'testCreateAndCheck',
+        # 'testNonExistUserGroup',
+        # 'testRemoveChildObjects',
+        # 'testServerHeader',
+        'testStaticVulnerability']), )
 
     def setUp(self):
         MediaServerInstanceTest.setUp(self)
@@ -248,4 +249,30 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
 
         self.__checkCameraRemoved(cameraData2.id)
 
+    # https://networkoptix.atlassian.net/browse/VMS-3068
+    def testServerHeader(self):
+        "Do not show specific headers for unathorized client"
+        unauthorized = Client()
+        response = unauthorized.httpRequest(self.server.address, "ec2/testConnection")
+        self.assertEqual(401, response.status)
+        self.assertFalse(response.headers.get("Server"))
+        self.assertTrue(response.headers.get("WWW-Authenticate"))
+        response = self.client.httpRequest(self.server.address, "ec2/testConnection")
+        self.assertEqual(200, response.status)
+        self.assertTrue(response.headers.get("Server"))
+
+    # https://networkoptix.atlassian.net/browse/VMS-3069
+    def testStaticVulnerability(self):
+        "Directory traversal"
+        dataPath = self.server.relativePath('data')
+        # To make relative path valid
+        os.makedirs(os.path.join(dataPath, 'web', 'static'))
+        testFile = os.path.join(dataPath, 'test.file')
+        with file(testFile, 'w') as f:
+            print >> f, "This is just a test file"
+        response = self.client.httpRequest(
+            self.server.address, urllib.quote("static/../../test.file"))
+        self.assertEqual(403, response.status)
+        
+        
         

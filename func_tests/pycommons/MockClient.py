@@ -31,16 +31,16 @@ class Client:
                 self, response.getcode(), headers = response.info())
             self.request = request
             self.response = response
+            self.rawData = self.response.read()
             self.data = self.get_json()
 
         def get_json(self):
             if self.status == 200:
-                data = self.response.read()
                 try:
-                    return json.loads(data)
+                    return json.loads(self.rawData)
                 except ValueError:
-                    return data
-            return None
+                    return self.rawData
+            return self.rawData
 
     def __init__(self, timeout = None):
         self._timeout = timeout or DEFAULT_TIMEOUT
@@ -57,9 +57,7 @@ class Client:
         return urllib2.urlopen(request, timeout = self._timeout)
 
     def httpRequest(
-        self, address, method,
-        data = None,
-        headers={},  **kw):
+        self, address, method, data = None, headers={},  **kw):
         url = "http://%s/%s" % (address, method)
         params = self._params2url(kw)
         if params:
