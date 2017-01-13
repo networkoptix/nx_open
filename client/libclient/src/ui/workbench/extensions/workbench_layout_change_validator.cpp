@@ -40,7 +40,7 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
 
             QnLayoutResourceList layoutProviders = providers.filtered<QnLayoutResource>();
             layoutProviders.removeOne(layout);
-            return !layoutProviders.isEmpty();
+            return layoutProviders.isEmpty();
         });
 
     if (inaccessible.isEmpty())
