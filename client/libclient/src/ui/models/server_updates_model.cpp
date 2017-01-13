@@ -207,7 +207,8 @@ void QnServerUpdatesModel::updateLowestInstalledVersion()
         if (!server)
             continue;
 
-        if (server->getStatus() != Qn::Online)
+        const auto status = server->getStatus();
+        if (status == Qn::Offline || status == Qn::Unauthorized)
             continue;
 
         const auto& version = server->getVersion();
