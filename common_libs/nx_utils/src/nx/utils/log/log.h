@@ -56,6 +56,8 @@ public:
     void log(const QString &msg, QnLogLevel logLevel);
     void log(QnLogLevel logLevel, const char *format, ...);
 
+    static void writeToStdout(const QString& str, QnLogLevel logLevel);
+
 #define QN_LOG_BODY(ARGS)                                                       \
         if(!isActive(logLevel))                                                 \
             return;                                                             \
@@ -119,15 +121,11 @@ private:
         return d && loglevel <= logLevel();
     }
 
-    static void writeToStdout(const QString& str, QnLogLevel logLevel);
-
 private:
     QnLogPrivate *d;
 
     static std::once_flag s_onceFlag;
     static std::shared_ptr< Logs > s_instance;
-
-    friend class QnLogPrivate;
 };
 
 #define CL_LOG(level)                                           \

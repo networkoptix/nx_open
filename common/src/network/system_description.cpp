@@ -11,18 +11,6 @@ namespace
 #define EXTRACT_CHANGE_FLAG(fieldName, flag) static_cast<QnServerFields>(                \
     before.fieldName != after.fieldName ? flag : QnServerField::NoField)
 
-QnServerField testServerFlag(
-    const QnModuleInformation& before,
-    const QnModuleInformation& after,
-    Qn::ServerFlag value,
-    QnServerField flag)
-{
-    if (before.serverFlags.testFlag(value) != after.serverFlags.testFlag(value))
-        return flag;
-
-    return QnServerField::NoField;
-}
-
 QnServerFields getChanges(const QnModuleInformation& before
     , const QnModuleInformation& after)
 {
@@ -32,10 +20,7 @@ QnServerFields getChanges(const QnModuleInformation& before
         | EXTRACT_CHANGE_FLAG(cloudSystemId, QnServerField::CloudId)
         | EXTRACT_CHANGE_FLAG(ecDbReadOnly, QnServerField::SafeMode));
 
-    const auto flagsResult =
-        testServerFlag(before, after, Qn::SF_HasPublicIP, QnServerField::HasInternet);
-
-    return (fieldsResult | flagsResult);
+    return (fieldsResult);
 }
 #undef EXTRACT_CHANGE_FLAG
 }
@@ -53,25 +38,23 @@ QnSystemDescription::QnSystemDescription(
     m_prioritized(),
     m_hosts(),
     m_reachableServers(),
-    m_hasInternet(false),
     m_safeMode(false)
 {
     const auto updateData =
-        [this]()
-        {
-            updateHasInternetState();
-            updateSafeModeState();
-        };
+        [this]() { updateSafeModeState(); };
 
     connect(this, &QnBaseSystemDescription::serverAdded, this, updateData);
     connect(this, &QnBaseSystemDescription::serverRemoved, this, updateData);
 
+    connect(this, &QnBaseSystemDescription::reachableStateChanged,
+        this, &QnBaseSystemDescription::connectibleStateChanged);
+    connect(this, &QnBaseSystemDescription::runningStateChanged,
+        this, &QnBaseSystemDescription::connectibleStateChanged);
+
     connect(this, &QnBaseSystemDescription::serverChanged, this,
         [this](const QnUuid& /*id*/, QnServerFields fields)
         {
-            if (fields.testFlag(QnServerField::HasInternet))
-                updateHasInternetState();
-            else if (fields.testFlag(QnServerField::SafeMode))
+            if (fields.testFlag(QnServerField::SafeMode))
                 updateSafeModeState();
         });
 }
@@ -190,6 +173,11 @@ bool QnSystemDescription::isReachable() const
     return !m_reachableServers.isEmpty();
 }
 
+bool QnSystemDescription::isConnectible() const
+{
+    return (isReachable() && isRunning());
+}
+
 void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)
 {
     const bool wasReachable = isReachable();
@@ -279,29 +267,9 @@ qint64 QnSystemDescription::getServerLastUpdatedMs(const QnUuid& serverId) const
     return m_serverTimestamps.value(serverId).elapsed();
 }
 
-bool QnSystemDescription::hasInternet() const
-{
-    return m_hasInternet;
-}
-
 bool QnSystemDescription::safeMode() const
 {
     return m_safeMode;
-}
-
-void QnSystemDescription::updateHasInternetState()
-{
-    const bool newHasInternet = std::any_of(m_servers.begin(), m_servers.end(),
-        [](const QnModuleInformation& info)
-        {
-            return info.serverFlags.testFlag(Qn::SF_HasPublicIP);
-        });
-
-    if (newHasInternet == m_hasInternet)
-        return;
-
-    m_hasInternet = newHasInternet;
-    emit hasInternetChanged();
 }
 
 void QnSystemDescription::updateSafeModeState()

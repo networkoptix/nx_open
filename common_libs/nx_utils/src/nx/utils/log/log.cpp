@@ -39,12 +39,10 @@ QString QnLog::logLevelToString(QnLogLevel value) {
             case cl_logERROR:
             case cl_logWARNING:
                 std::cerr << str.toStdString() << std::endl;
-                std::cerr.flush();
                 break;
 
             default:
                 std::cout << str.toStdString() << std::endl;
-                std::cout.flush();
                 break;
         }
     }

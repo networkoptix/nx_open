@@ -230,8 +230,10 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
-                        isOnline: model.isOnline;
+
+                        isRunning: model.isRunning;
                         isReachable: model.isReachable;
+                        isConnectible: model.isConnectible;
 
                         Component.onCompleted:
                         {

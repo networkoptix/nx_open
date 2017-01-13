@@ -865,7 +865,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     QString id = parameters.argument(Qn::CloudSystemIdRole).toString();
 
     auto system = qnSystemsFinder->getSystem(id);
-    if (!system || !(system->isOnline() && system->isReachable()))
+    if (!system || !system->isConnectible())
         return;
 
     const auto servers = system->servers();

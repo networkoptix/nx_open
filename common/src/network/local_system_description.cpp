@@ -45,7 +45,7 @@ bool QnLocalSystemDescription::isCloudSystem() const
     return false;
 }
 
-bool QnLocalSystemDescription::isOnline() const
+bool QnLocalSystemDescription::isRunning() const
 {
     return isReachable();
 }
@@ -67,6 +67,9 @@ QString QnLocalSystemDescription::ownerFullName() const
 
 void QnLocalSystemDescription::updateNewSystemState()
 {
+    connect(this, &QnBaseSystemDescription::reachableStateChanged,
+        this, &QnBaseSystemDescription::runningStateChanged);
+
     const auto currentServers = servers();
     const bool newSystemState = std::any_of(currentServers.begin(), currentServers.end(),
         [](const QnModuleInformation& info) { return helpers::isNewSystem(info); });
