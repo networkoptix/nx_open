@@ -10,6 +10,7 @@
 
 #include <api/global_settings.h>
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -362,17 +363,32 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     m_cloudHost = buildInformation.cloudHost;
 
-    auto currentRelease = qnCommon->engineVersion();
-    currentRelease = QnSoftwareVersion(
-        currentRelease.major(), currentRelease.minor(), currentRelease.bugfix());
-    /* Server downgrade is allowed to another builds of the same release only.
-       E.g. 2.3.1.9300 -> 2.3.1.9200 is ok, but 2.3.1.9300 -> 2.3.0.9000 is not.
-       Client could be downgraded with no limits.
-     */
-    if (!m_target.targets.isEmpty() && m_target.version < currentRelease)
+    const bool checkDowngrade = !qnRuntime->isDevMode();
+    if (checkDowngrade)
     {
-        finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
-        return;
+        QnSoftwareVersion highestVersion;
+        for (const auto& serverId : m_target.targets)
+        {
+            const auto server = qnResPool->getIncompatibleResourceById(serverId, true)
+                .dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            const auto status = server->getStatus();
+            if (status == Qn::Offline || status == Qn::Unauthorized)
+                continue;
+
+            const auto version = server->getVersion();
+            if (version > highestVersion)
+                highestVersion = version;
+        }
+
+        /* Server downgrade is prohibited. Client could be downgraded with no limits. */
+        if (!highestVersion.isNull() && m_target.version < highestVersion)
+        {
+            finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
+            return;
+        }
     }
 
     const auto urlPrefix = lit("%1/%2/").arg(m_updateLocationPrefix).arg(m_target.version.build());
