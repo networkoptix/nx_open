@@ -295,6 +295,7 @@ void QnUserSettingsDialog::loadDataToUi()
     m_userEnabledButton->setChecked(userIsEnabled);
     if (!userIsEnabled)
         ui->alertBar->setText(tr("User is disabled"));
+    ui->alertBar->setVisible(!ui->alertBar->text().isEmpty());
 }
 
 void QnUserSettingsDialog::forcedUpdate()
