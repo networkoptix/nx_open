@@ -94,13 +94,13 @@ class MediaServerBaseTest(FuncTest.FuncTestCaseBase, ComparisonMixin):
             if response.status != 200:
                 remain = timeOut - (time.time() - start)
                 if remain <= 0:
-                    if response.error:
+                    if response.status:
                         raise self.XTimedOut(
-                          "Can't connect to server '%s': %s" % \
-                          (address, response.error))
+                          "Can't connect to server '%s': %d '%s'" % \
+                          (address, response.status, response.error))
                     else:
                         raise self.XTimedOut(
-                          "Can't connect to server '%s': got unexpected code %d" % \
+                          "Can't connect to server '%s': got unexpected code '%s'" % \
                           (address, response.error))
             else:
                 self.guid = response.data['ecsGuid']
