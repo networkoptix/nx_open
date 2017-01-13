@@ -79,33 +79,33 @@ static const int jpeg_chroma_quantizer[64] = {
  */
 void MakeTables(int q, quint8* lqt, quint8* cqt)
 {
-  int i;
-  int factor = q;
+    int i;
+    int factor = q;
 
-  if (q < 1) factor = 1;
-  if (q > 99) factor = 99;
-  if (q < 50)
-      q = 5000 / factor;
-  else
-      q = 200 - factor * 2;
-  for (i = 0; i < 64; i++)
-  {
-      int lq = (jpeg_luma_quantizer[i] * q + 50) / 100;
-      int cq = (jpeg_chroma_quantizer[i] * q + 50) / 100;
+    if (q < 1) factor = 1;
+    if (q > 99) factor = 99;
+    if (q < 50)
+        q = 5000 / factor;
+    else
+        q = 200 - factor * 2;
+    for (i = 0; i < 64; i++)
+    {
+        int lq = (jpeg_luma_quantizer[i] * q + 50) / 100;
+        int cq = (jpeg_chroma_quantizer[i] * q + 50) / 100;
 
-      // Limit the quantizers to 1 <= q <= 255.
-      if (lq < 1)
-          lq = 1;
-      else if (lq > 255)
-          lq = 255;
-      lqt[i] = lq;
+        // Limit the quantizers to 1 <= q <= 255.
+        if (lq < 1)
+            lq = 1;
+        else if (lq > 255)
+            lq = 255;
+        lqt[i] = lq;
 
-      if (cq < 1)
-          cq = 1;
-      else if (cq > 255)
-          cq = 255;
-      cqt[i] = cq;
-  }
+        if (cq < 1)
+            cq = 1;
+        else if (cq > 255)
+            cq = 255;
+        cqt[i] = cq;
+    }
 }
 
 quint8 lum_dc_codelens[] = {
@@ -232,81 +232,81 @@ quint8* MakeDRIHeader(quint8* p, u_short dri)
 int QnMjpegRtpParser::makeHeaders(
     quint8* p, int type, int w, int h, const quint8* lqt, const quint8* cqt, u_short dri)
 {
-        quint8* start = p;
+    quint8* start = p;
 
-        // Convert from blocks to pixels.
-        w <<= 3;
-        h <<= 3;
-        *p++ = 0xff;
-        *p++ = 0xd8; //< SOI
+    // Convert from blocks to pixels.
+    w <<= 3;
+    h <<= 3;
+    *p++ = 0xff;
+    *p++ = 0xd8; //< SOI
 
-        m_lummaTablePos = p + 5;
-        p = MakeQuantHeader(p, lqt, 0);
-        m_chromaTablePos = p + 5;
-        p = MakeQuantHeader(p, cqt, 1);
+    m_lumaTablePos = p + 5;
+    p = MakeQuantHeader(p, lqt, 0);
+    m_chromaTablePos = p + 5;
+    p = MakeQuantHeader(p, cqt, 1);
 
-        if (dri != 0)
-            p = MakeDRIHeader(p, dri);
+    if (dri != 0)
+        p = MakeDRIHeader(p, dri);
 
-        *p++ = 0xff;
-        *p++ = 0xc0; //< SOF
-        *p++ = 0; //< length msb
-        *p++ = 17; //< length lsb
-        *p++ = 8; //< 8-bit precision
-        *p++ = h >> 8; //< height msb
-        *p++ = h; //< height lsb
-        *p++ = w >> 8; //< width msb
-        *p++ = w; //< width lsb
-        *p++ = 3; //< number of components
-        *p++ = 0; //< comp 0
-        if (type == 0)
-            *p++ = 0x21; //< hsamp = 2, vsamp = 1
-        else
-            *p++ = 0x22; //< hsamp = 2, vsamp = 2
-        *p++ = 0; //< quant table 0
-        *p++ = 1; //< comp 1
-        *p++ = 0x11; //< hsamp = 1, vsamp = 1
-        *p++ = 1; //< quant table 1
-        *p++ = 2; //< comp 2
-        *p++ = 0x11; //< hsamp = 1, vsamp = 1
-        *p++ = 1; //< quant table 1
-        p = MakeHuffmanHeader(p, lum_dc_codelens,
-            sizeof(lum_dc_codelens),
-            lum_dc_symbols,
-            sizeof(lum_dc_symbols), 0, 0);
-        p = MakeHuffmanHeader(p, lum_ac_codelens,
-            sizeof(lum_ac_codelens),
-            lum_ac_symbols,
-            sizeof(lum_ac_symbols), 0, 1);
-        p = MakeHuffmanHeader(p, chm_dc_codelens,
-            sizeof(chm_dc_codelens),
-            chm_dc_symbols,
-            sizeof(chm_dc_symbols), 1, 0);
-        p = MakeHuffmanHeader(p, chm_ac_codelens,
-            sizeof(chm_ac_codelens),
-            chm_ac_symbols,
-            sizeof(chm_ac_symbols), 1, 1);
-        *p++ = 0xff;
-        *p++ = 0xda; //< SOS
-        *p++ = 0; //< length msb
-        *p++ = 12; //< length lsb
-        *p++ = 3; //< 3 components
-        *p++ = 0; //< comp 0
-        *p++ = 0; //< huffman table 0
-        *p++ = 1; //< comp 1
-        *p++ = 0x11; //< huffman table 1
-        *p++ = 2; //< comp 2
-        *p++ = 0x11; //< huffman table 1
-        *p++ = 0; //< first DCT coeff
-        *p++ = 63; //< last DCT coeff
-        *p++ = 0; //< sucessive approx.
+    *p++ = 0xff;
+    *p++ = 0xc0; //< SOF
+    *p++ = 0; //< length msb
+    *p++ = 17; //< length lsb
+    *p++ = 8; //< 8-bit precision
+    *p++ = h >> 8; //< height msb
+    *p++ = h; //< height lsb
+    *p++ = w >> 8; //< width msb
+    *p++ = w; //< width lsb
+    *p++ = 3; //< number of components
+    *p++ = 0; //< comp 0
+    if (type == 0)
+        *p++ = 0x21; //< hsamp = 2, vsamp = 1
+    else
+        *p++ = 0x22; //< hsamp = 2, vsamp = 2
+    *p++ = 0; //< quant table 0
+    *p++ = 1; //< comp 1
+    *p++ = 0x11; //< hsamp = 1, vsamp = 1
+    *p++ = 1; //< quant table 1
+    *p++ = 2; //< comp 2
+    *p++ = 0x11; //< hsamp = 1, vsamp = 1
+    *p++ = 1; //< quant table 1
+    p = MakeHuffmanHeader(p, lum_dc_codelens,
+        sizeof(lum_dc_codelens),
+        lum_dc_symbols,
+        sizeof(lum_dc_symbols), 0, 0);
+    p = MakeHuffmanHeader(p, lum_ac_codelens,
+        sizeof(lum_ac_codelens),
+        lum_ac_symbols,
+        sizeof(lum_ac_symbols), 0, 1);
+    p = MakeHuffmanHeader(p, chm_dc_codelens,
+        sizeof(chm_dc_codelens),
+        chm_dc_symbols,
+        sizeof(chm_dc_symbols), 1, 0);
+    p = MakeHuffmanHeader(p, chm_ac_codelens,
+        sizeof(chm_ac_codelens),
+        chm_ac_symbols,
+        sizeof(chm_ac_symbols), 1, 1);
+    *p++ = 0xff;
+    *p++ = 0xda; //< SOS
+    *p++ = 0; //< length msb
+    *p++ = 12; //< length lsb
+    *p++ = 3; //< 3 components
+    *p++ = 0; //< comp 0
+    *p++ = 0; //< huffman table 0
+    *p++ = 1; //< comp 1
+    *p++ = 0x11; //< huffman table 1
+    *p++ = 2; //< comp 2
+    *p++ = 0x11; //< huffman table 1
+    *p++ = 0; //< first DCT coeff
+    *p++ = 63; //< last DCT coeff
+    *p++ = 0; //< sucessive approx.
 
-        return p - start;
+    return p - start;
 }
 
-void QnMjpegRtpParser::updateHeaderTables(const quint8* lummaTable, const quint8* chromaTable)
+void QnMjpegRtpParser::updateHeaderTables(const quint8* lumaTable, const quint8* chromaTable)
 {
-    memcpy(m_lummaTablePos, lummaTable, 64 * 1);
+    memcpy(m_lumaTablePos, lumaTable, 64 * 1);
     memcpy(m_chromaTablePos, chromaTable, 64 * 1);
 }
 
@@ -317,7 +317,7 @@ QnMjpegRtpParser::QnMjpegRtpParser():
     m_frequency(90000)
     //m_frameData(CL_MEDIA_ALIGNMENT, 1024 * 64)
 {
-    memset(m_lummaTable, 0, sizeof(m_lummaTable));
+    memset(m_lumaTable, 0, sizeof(m_lumaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
     m_sdpWidth = 0;
     m_sdpHeight = 0;
@@ -328,7 +328,7 @@ QnMjpegRtpParser::QnMjpegRtpParser():
     m_hdrWidth = -1;
     m_hdrHeight = -1;
     m_headerLen = 0;
-    m_lummaTablePos = 0;
+    m_lumaTablePos = 0;
     m_chromaTablePos = 0;
     m_frameSize = 0;
 }
@@ -381,7 +381,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 1)
         return false;
 
-    RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
+    RtpHeader* rtpHeader = (RtpHeader*)rtpBuffer;
     const quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     int bytesLeft = bytesRead - RtpHeader::RTP_HEADER_SIZE;
 
@@ -390,7 +390,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         if (bytesRead < RtpHeader::RTP_HEADER_SIZE + 4)
             return false;
 
-        int extWords = ((int) curPtr[2] << 8) + curPtr[3];
+        int extWords = ((int)curPtr[2] << 8) + curPtr[3];
         curPtr += extWords * 4 + 4;
         bytesLeft -= extWords * 4 + 4;
     }
@@ -421,9 +421,13 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (m_sdpWidth <= 0 && m_sdpHeight <= 0
         && width == (3840 - 2048) / 8 && height == (2160 - 2048) / 8)
     {
-        NX_LOG(lit(
-            "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
-            cl_logDEBUG1);
+        if (!resolutionWorkaroundLogged)
+        {
+            resolutionWorkaroundLogged = true;
+            NX_LOG(lit(
+                "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
+                cl_logDEBUG1);
+        }
         width = 3840 / 8;
         height = 2160 / 8;
     }
@@ -445,7 +449,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (fragmentOffset == 0)
     {
         // 3. Quantization Table header
-        const quint8* lummaTable = 0;
+        const quint8* lumaTable = 0;
         const quint8* chromaTable = 0;
         if (jpegQ >= 128)
         {
@@ -461,27 +465,31 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             if (bytesLeft < length)
                 return false;
 
-            int lummaSize = (Precision & 1) ? 2 : 1;
+            int lumaSize = (Precision & 1) ? 2 : 1;
             int chromaSize = (Precision & 2) ? 2 : 1;
 
-            if (lummaSize != 1 || chromaSize != 1)
+            if (lumaSize != 1 || chromaSize != 1)
             {
-                NX_LOG(lit("16-bit MJPEG is not supported"), cl_logDEBUG1);
+                if (!mjpeg16BitWarningLogged)
+                {
+                    mjpeg16BitWarningLogged = true;
+                    NX_LOG(lit("16-bit MJPEG is not supported"), cl_logDEBUG1);
+                }
                 return false; //< Only 8-bit MJPEG is supported.
             }
 
             if (length > 0)
             {
-                if (length < 64 * (lummaSize + chromaSize))
+                if (length < 64 * (lumaSize + chromaSize))
                     return false;
                 // RFC2435. Same table for each frame, make deep copy of tables.
-                lummaTable = curPtr;
-                chromaTable = curPtr + 64 * lummaSize;
+                lumaTable = curPtr;
+                chromaTable = curPtr + 64 * lumaSize;
                 if (jpegQ != 255)
                 {
                     // Make deep copy because the same table will be reused.
-                    memcpy(m_lummaTable, curPtr, 64 * lummaSize);
-                    memcpy(m_chromaTable, curPtr + 64 * lummaSize, 64 * chromaSize);
+                    memcpy(m_lumaTable, curPtr, 64 * lumaSize);
+                    memcpy(m_chromaTable, curPtr + 64 * lumaSize, 64 * chromaSize);
                 }
             }
 
@@ -490,7 +498,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         }
         else if (jpegQ != m_lastJpegQ)
         {
-            MakeTables(jpegQ, m_lummaTable, m_chromaTable);
+            MakeTables(jpegQ, m_lumaTable, m_chromaTable);
             m_lastJpegQ = jpegQ;
         }
 
@@ -499,23 +507,23 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             if (jpegQ != 255)
             {
                 m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
-                    m_lummaTable, m_chromaTable, dri); //< use deep copy
+                    m_lumaTable, m_chromaTable, dri); //< use deep copy
             }
             else
             {
-                if (!lummaTable || !chromaTable)
+                if (!lumaTable || !chromaTable)
                     return false;
                 m_headerLen = makeHeaders(m_hdrBuffer, jpegType, width, height,
-                    lummaTable, chromaTable, dri); //< use tables direct pointer
+                    lumaTable, chromaTable, dri); //< use tables direct pointer
             }
             m_hdrQ = jpegQ;
             m_hdrDri = dri;
             m_hdrWidth = width;
             m_hdrHeight = height;
         }
-        else if (lummaTable && chromaTable)
+        else if (lumaTable && chromaTable)
         {
-            updateHeaderTables(lummaTable, chromaTable);
+            updateHeaderTables(lumaTable, chromaTable);
         }
 
         m_chunks.clear();
@@ -523,14 +531,14 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     }
 
     // See ToDo in the header.
-    #if 0
+#if 0
     if (!m_context)
     {
         m_context = QnMediaContextPtr(new QnAvCodecMediaContext(AV_CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? AV_PIX_FMT_YUV420P : AV_PIX_FMT_YUV422P;
         //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
-    #endif // 0
+#endif // 0
 
     //m_frameData.write((const char*)curPtr, bytesLeft);
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
@@ -548,15 +556,15 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
             CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
         m_mediaData = videoData;
-        videoData->m_data.uncheckedWrite((const char*) m_hdrBuffer, m_headerLen);
+        videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
         //m_videoData->data.write(m_frameData);
         for (uint i = 0; i < m_chunks.size(); ++i)
         {
             videoData->m_data.uncheckedWrite(
-                (const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
+                (const char*)rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
         }
         if (needAddMarker)
-            videoData->m_data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
+            videoData->m_data.uncheckedWrite((const char*)jpeg_end, sizeof(jpeg_end));
 
         m_chunks.clear();
         m_frameSize = 0;
