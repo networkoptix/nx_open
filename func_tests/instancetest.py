@@ -261,6 +261,7 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
         self.assertEqual(200, response.status)
         self.assertTrue(response.headers.get("Server"))
 
+    # https://networkoptix.atlassian.net/browse/VMS-3069
     def testStaticVulnerability(self):
         "Directory traversal"
         dataPath = self.server.relativePath('data')

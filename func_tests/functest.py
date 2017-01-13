@@ -17,6 +17,7 @@ import os.path
 import signal
 import traceback
 import argparse
+import subprocess
 from collections import OrderedDict
 
 from functest_util import *
@@ -39,7 +40,7 @@ from instancetest import InstanceTest
 from stresst import HTTPStressTest
 from pycommons.Logger import initLog, log, LOGLEVEL
 from pycommons.Config import config
-
+from pycommons.FuncTest import execVBoxCmd
 
 #class AuthH(urllib2.HTTPDigestAuthHandler):
 #    def http_error_401(self, req, fp, code, msg, hdrs):
@@ -1234,6 +1235,14 @@ class MainFunctests(FuncTestCase):
     def InitialClusterTest(self):
         self._checkSkipLegacy()
         testMaster.initial_tests()
+        # https://networkoptix.atlassian.net/browse/VMS-4599
+        for host in self.hosts:
+            try:
+                execVBoxCmd(host, '[ -d "/boot/HD Witness Media" ]')
+                raise Exception(
+                    "'%s': create unnecessary '/boot/HD Witness Media' folder" % host)
+            except subprocess.CalledProcessError:
+                pass
 
     def BasicClusterTest(self):
         self._checkSkipLegacy()
