@@ -187,6 +187,7 @@ ComboBox
             rightPadding: 8;
 
             selectByMouse: true;
+            selectionColor: Style.textEdit.selectionColor;
             clip: true;
             width: parent.width - indicatorItem.width;
             height: parent.height;

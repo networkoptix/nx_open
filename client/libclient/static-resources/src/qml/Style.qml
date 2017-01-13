@@ -55,6 +55,7 @@ QtObject
         readonly property font font: Qt.font({ pixelSize: 14, weight: Font.Normal });
         readonly property font fontReadOnly: Qt.font({ pixelSize: 14, weight: Font.Medium });
         readonly property color color: colors.text;
+        readonly property color selectionColor: colors.highlight;
     }
 
     property QtObject dropDown: QtObject
@@ -104,6 +105,7 @@ QtObject
         readonly property color brand: context.getPaletteColor("brand", 7);
 
         readonly property color brandContrast: context.getContrastColor("brand");
+        readonly property color highlight: brand;
         readonly property color red_main: context.getPaletteColor("red", 4);
         readonly property color yellow_main: context.getPaletteColor("yellow", 0);
 
