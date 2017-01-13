@@ -42,7 +42,7 @@ void MediaServerLauncher::prepareToStart()
 
     for (const auto& customSetting: m_customSettings)
     {
-        m_configFile << customSetting.first.toStdString() << " = " 
+        m_configFile << customSetting.first.toStdString() << " = "
             << customSetting.second.toStdString() << std::endl;
     }
 
@@ -55,8 +55,15 @@ void MediaServerLauncher::prepareToStart()
 
     m_mediaServerProcess.reset();
     m_mediaServerProcess.reset(new MediaServerProcess(argc, argv));
+    connect(m_mediaServerProcess.get(), &MediaServerProcess::started, this, &MediaServerLauncher::started);
 
     m_firstStartup = false;
+}
+
+void MediaServerLauncher::run()
+{
+    prepareToStart();
+    m_mediaServerProcess->run();
 }
 
 bool MediaServerLauncher::start()
@@ -93,6 +100,12 @@ bool MediaServerLauncher::startAsync()
 bool MediaServerLauncher::stop()
 {
     m_mediaServerProcess->stopSync();
+    return true;
+}
+
+bool MediaServerLauncher::stopAsync()
+{
+    m_mediaServerProcess->stopAsync();
     return true;
 }
 

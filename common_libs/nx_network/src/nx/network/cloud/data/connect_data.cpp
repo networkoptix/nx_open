@@ -5,7 +5,7 @@
 
 #include "connect_data.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 
 namespace nx {
@@ -23,27 +23,27 @@ ConnectRequest::ConnectRequest()
 
 void ConnectRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::HostName>(std::move(destinationHostName));
-    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerId));
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
-    message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
-    message->newAttribute<stun::cc::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
-    message->addAttribute(stun::cc::attrs::ignoreSourceAddress, ignoreSourceAddress);
-    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->newAttribute<stun::extension::attrs::HostName>(std::move(destinationHostName));
+    message->newAttribute<stun::extension::attrs::PeerId>(std::move(originatingPeerId));
+    message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
+    message->newAttribute<stun::extension::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
+    message->newAttribute<stun::extension::attrs::UdtHpEndpointList>(std::move(udpEndpointList));
+    message->addAttribute(stun::extension::attrs::ignoreSourceAddress, ignoreSourceAddress);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectRequest::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
     
     return
-        readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
-        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerId) &&
-        readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionId) &&
-        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods) &&
-        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
-        readAttributeValue(message, stun::cc::attrs::ignoreSourceAddress, &ignoreSourceAddress);
+        readStringAttributeValue<stun::extension::attrs::HostName>(message, &destinationHostName) &&
+        readStringAttributeValue<stun::extension::attrs::PeerId>(message, &originatingPeerId) &&
+        readStringAttributeValue<stun::extension::attrs::ConnectionId>(message, &connectSessionId) &&
+        readIntAttributeValue<stun::extension::attrs::ConnectionMethods>(message, &connectionMethods) &&
+        readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(message, &udpEndpointList) &&
+        readAttributeValue(message, stun::extension::attrs::ignoreSourceAddress, &ignoreSourceAddress);
 }
 
 
@@ -57,23 +57,23 @@ ConnectResponse::ConnectResponse()
 
 void ConnectResponse::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(forwardedTcpEndpointList));
-    message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
+    message->newAttribute< stun::extension::attrs::UdtHpEndpointList >(
         std::move(udpEndpointList));
     params.serializeAttributes(message);
-    message->addAttribute(stun::cc::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ConnectResponse::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readEnumAttributeValue(message, stun::cc::attrs::cloudConnectVersion, &cloudConnectVersion))
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
         cloudConnectVersion = kDefaultCloudConnectVersion;  //if not present - old version
 
     return 
-        readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+        readAttributeValue<stun::extension::attrs::PublicEndpointList>(
             message, &forwardedTcpEndpointList) &&
-        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(
+        readAttributeValue<stun::extension::attrs::UdtHpEndpointList>(
             message, &udpEndpointList) &&
         params.parseAttributes(message);
 }

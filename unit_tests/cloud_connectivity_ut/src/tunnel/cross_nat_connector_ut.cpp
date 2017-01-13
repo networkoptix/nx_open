@@ -92,7 +92,7 @@ protected:
         ASSERT_TRUE(m_redirector.server->listen());
 
         m_redirector.messageDispatcher.registerRequestProcessor(
-            stun::cc::methods::connect,
+            stun::extension::methods::connect,
             std::bind(&CrossNatConnectorRedirect::redirectHandler, this,
                 _1, _2, mediator().stunEndpoint()));
     }

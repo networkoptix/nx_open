@@ -193,9 +193,9 @@ TEST(StunMessageSerialization, serialization2)
     const nx::String userName("sdfno234sdf");
     const nx::String nonce("kdfgjn234df");
 
-    //message.newAttribute<stun::cc::attrs::SystemId>(userName);
+    //message.newAttribute<stun::extension::attrs::SystemId>(userName);
     const nx::Buffer testData("sdfr234dfg");
-    message.newAttribute<stun::cc::attrs::ServerId>(testData);
+    message.newAttribute<stun::extension::attrs::ServerId>(testData);
 
     //message.newAttribute< attrs::UserName >(userName);
     //message.newAttribute< attrs::Nonce >(nonce.toHex());
@@ -218,7 +218,7 @@ TEST(StunMessageSerialization, serialization2)
     Message checkMessage;
     parser.setMessage(&checkMessage);
     ASSERT_EQ(nx_api::ParserState::done, parser.parse(buffer, &bytesRead));
-    const auto attr = checkMessage.getAttribute<stun::cc::attrs::ServerId>();
+    const auto attr = checkMessage.getAttribute<stun::extension::attrs::ServerId>();
     ASSERT_EQ(testData, attr->getBuffer());
 
     Buffer buffer1;
@@ -267,7 +267,7 @@ TEST( StunMessageSerialization, Authentification )
 
     Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
     //const nx::Buffer testData("sdfr234dfg");
-    //request.newAttribute<stun::cc::attrs::ServerId>(testData);
+    //request.newAttribute<stun::extension::attrs::ServerId>(testData);
     request.header.transactionId = Buffer::fromHex( DEFAULT_TID );
     request.insertIntegrity( user, key );
 
