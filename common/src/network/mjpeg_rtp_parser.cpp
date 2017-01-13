@@ -417,6 +417,17 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     if (height == 0 && m_sdpHeight > 0)
         height = m_sdpHeight / 8;
 
+    // Workaround: certain 4K cameras do not provide "a=framesize", and drop MSB from resolution.
+    if (m_sdpWidth <= 0 && m_sdpHeight <= 0
+        && width == (3840 - 2048) / 8 && height == (2160 - 2048) / 8)
+    {
+        NX_LOG(lit(
+            "[mjpeg_rtp_parser] Camera reports resolution 112 x 1792, assuming 3840 x 2160 (~4K)"),
+            cl_logDEBUG1);
+        width = 3840 / 8;
+        height = 2160 / 8;
+    }
+
     bytesLeft -= 8;
 
     quint16 dri = 0;
