@@ -1698,6 +1698,18 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            }
         }
     ]
 }
