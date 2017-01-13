@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/aiothread.h>
+#include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket_impl.h>
@@ -91,7 +92,7 @@ private:
 };
 
 class UnifiedPollSet:
-    public CommonPollSetTest<aio::UnifiedPollSet>
+    public CommonPollSetTest
 {
 public:
     UnifiedPollSet():
@@ -121,7 +122,7 @@ protected:
 private:
     std::unique_ptr<TestUdtEpollWrapper> m_epollWrapper;
     TestUdtEpollWrapper* m_epollWrapperPtr;
-    aio::UnifiedPollSet m_pollset;
+    aio::PollSetWrapper<aio::UnifiedPollSet> m_pollset;
 };
 
 TEST(UnifiedPollSet, all_tests)

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/pollset.h>
+#include <nx/network/aio/pollset_wrapper.h>
 
 #include "pollset_test_common.h"
 
@@ -10,7 +11,7 @@ namespace aio {
 namespace test {
 
 class PollSet:
-    public CommonPollSetTest<aio::PollSet>
+    public CommonPollSetTest
 {
 public:
     PollSet()
@@ -41,7 +42,7 @@ protected:
     }
 
 private:
-    aio::PollSet m_pollset;
+    aio::PollSetWrapper<aio::PollSet> m_pollset;
 };
 
 TEST(PollSet, all_tests)

@@ -49,7 +49,7 @@ AIOThread::~AIOThread()
 void AIOThread::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
-    m_impl->pollSet.interrupt();
+    m_impl->pollSet->interrupt();
 }
 
 //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
@@ -82,7 +82,7 @@ void AIOThread::watchSocket(
     else if (eventToWatch == aio::etWrite)
         ++m_impl->newWriteMonitorTaskCount;
     if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
 //!Change timeout of existing polling \a sock for \a eventToWatch to \a timeoutMS. \a eventHandler is changed also
@@ -119,7 +119,7 @@ void AIOThread::changeSocketTimeout(
         nullptr,
         std::move(socketAddedToPollHandler)));
     if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
 //!Do not monitor \a sock for event \a eventType
@@ -173,7 +173,7 @@ void AIOThread::removeFromWatch(
             0,
             &taskCompletedCondition));
 
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 
         //we can be sure that socket will be removed before next poll
 
@@ -206,7 +206,7 @@ void AIOThread::removeFromWatch(
             0,
             nullptr,
             std::move(pollingStoppedHandler)));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
     }
 }
 
@@ -221,7 +221,7 @@ void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> func
             std::move(functor)));
     //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
     if (currentThreadSystemId() != systemThreadId())
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
 //!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
@@ -261,7 +261,7 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
                 sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
                                                 //before posted call is actually cancelled
                 nullptr));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 
         //we can be sure that socket will be removed before next poll
 
@@ -282,14 +282,14 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     {
         m_impl->pollSetModificationQueue.push_back(
             typename detail::AIOThreadImpl::CancelPostedCallsTask(sock->impl()->socketSequence));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
     }
 }
 
 //!Returns number of sockets handled by this object
 size_t AIOThread::socketsHandled() const
 {
-    return m_impl->pollSet.size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
+    return m_impl->pollSet->size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
 }
 
 void AIOThread::run()
@@ -325,12 +325,12 @@ void AIOThread::run()
 
         //calculating delay to the next periodic task
         const int millisToTheNextPeriodicEvent = nextPeriodicEventClock == 0
-            ? aio::INFINITE_TIMEOUT    //no periodic task
+            ? aio::kInfiniteTimeout    //no periodic task
             : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
         //if there are posted calls, just checking sockets state in non-blocking mode
         const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
-        const int triggeredSocketCount = m_impl->pollSet.poll(pollTimeout);
+        const int triggeredSocketCount = m_impl->pollSet->poll(pollTimeout);
 
         if (needToStop())
             break;
