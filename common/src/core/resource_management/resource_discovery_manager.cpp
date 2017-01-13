@@ -567,6 +567,8 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
         if (newIsRtsp && !existIsRtsp)
             continue;
 
+        bool sameChannels = netRes->getChannel() == existRes->getChannel();
+
         bool sameMACs = !existRes->getMAC().isNull() && !netRes->getMAC().isNull()
             && existRes->getMAC() == netRes->getMAC();
 
@@ -589,7 +591,7 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
                      .arg(sameIds)
                      .arg(samePorts));
 
-        bool isSameResource = sameMACs || sameIds || samePorts; 
+        bool isSameResource = sameIds || ((sameMACs || samePorts) && sameChannels); 
         if (isSameResource)
             return existRes; // camera found by different drivers on the same port
     }
