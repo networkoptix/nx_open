@@ -6,8 +6,7 @@
                 "appID": "{{iOSappID}}",
                 "paths": [
                     "/client*",
-                    "/cloud*",
-                    "/systems/*/client"
+                    "/cloud*"
                 ]
             }
         ]
