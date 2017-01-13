@@ -801,7 +801,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *             Equivalent of "CameraBackup_HighQuality|CameraBackup_LowQuality".
      *         %value CameraBackup_Default A default value is used for backup options.
      *
-     *     //% From ApiCameraDataEx:
+     *     %// From ApiCameraDataEx:
      *     %param status Camera status.
      *         %value Offline
      *         %value Online
