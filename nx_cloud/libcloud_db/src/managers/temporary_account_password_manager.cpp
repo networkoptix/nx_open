@@ -2,15 +2,16 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/sql_functions.h>
+#include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <utils/common/guard.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/sql.h>
-#include <nx/fusion/serialization/sql_functions.h>
 
 #include "stree/cdb_ns.h"
 
@@ -103,7 +104,7 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    const auto buffer = nx::utils::random::word(
+    const auto buffer = nx::utils::generateRandomName(
         nx::utils::random::number<size_t>(10, 20));
 
     return std::string(buffer.data(), buffer.size());

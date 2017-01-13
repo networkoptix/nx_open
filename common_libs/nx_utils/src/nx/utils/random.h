@@ -5,9 +5,7 @@
 #include <type_traits>
 #include <QByteArray>
 
-#if defined(Q_OS_WIN) || defined(Q_OS_DARWIN) || defined(Q_OS_MACOS)
-    #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
-#endif
+// #define NX_UTILS_USE_OWN_INT_DISTRIBUTION
 
 namespace nx {
 namespace utils {
@@ -20,19 +18,20 @@ namespace random {
 class NX_UTILS_API QtDevice
 {
 public:
-    typedef int result_type;
+    typedef uint result_type;
     QtDevice();
 
     result_type operator()();
     double entropy() const;
 
     static constexpr result_type min() { return 0; }
-    static constexpr result_type max() { return RAND_MAX; }
+    static constexpr result_type max() { return std::random_device::max(); }
 };
 
 /**
  * Simple implementaion of std::uniform_int_distribution.
- * @note Should be used when std is not avalible (e.g. visual studio 15 has a bug in it).
+ * @note Currenty this distribution is not uniform, because of overflow bug.
+ *     Do not use it without a dare need.
  */
 template<typename Type = int>
 class UniformIntDistribution
@@ -60,7 +59,7 @@ public:
             const auto oldRange = range;
             range *= deviceRange;
             if (range / deviceRange != oldRange)
-                break; // Range owerflow, we got enough.
+                break; // Range overflow, we got enough.
         }
 
         if (std::numeric_limits<Type>::max() == m_range)
@@ -87,11 +86,6 @@ NX_UTILS_API QtDevice& qtDevice();
  * Generates uniform_int_distribution random data the length of count.
  */
 NX_UTILS_API QByteArray generate(std::size_t count);
-
-/**
- * Generates a-z char word the length of count.
- */
-NX_UTILS_API QByteArray word(std::size_t count);
 
 /**
  * Generates uniform_int_distribution random integer in [min, max]

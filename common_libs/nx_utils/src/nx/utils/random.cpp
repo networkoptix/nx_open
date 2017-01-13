@@ -19,9 +19,29 @@ QtDevice::QtDevice()
     ::qsrand((uint) std::chrono::duration_cast<std::chrono::milliseconds>(time).count());
 }
 
+static uint usedBits(QtDevice::result_type number)
+{
+    uint result = 0;
+    while ((number & 0xFF) == 0xFF)
+    {
+        number >>= 8;
+        result += 8;
+    }
+
+    return result;
+}
+
 QtDevice::result_type QtDevice::operator()()
 {
-    return ::qrand();
+    static auto qrandBits = usedBits(RAND_MAX);
+    static result_type qrandMask = (1 << qrandBits) - 1;
+    static auto neededBits = usedBits(max());
+
+    result_type result = 0;
+    for (uint bits = 0; bits < neededBits; bits += qrandBits)
+        result = (result << qrandBits) | (::qrand() & qrandMask);
+
+    return result;
 }
 
 double QtDevice::entropy() const
@@ -58,17 +78,6 @@ QByteArray generate(std::size_t count)
         const auto n = number<short>(0, 255);
         data[i] = reinterpret_cast<const char&>(n);
     }
-
-    return data;
-}
-
-QByteArray word(std::size_t count)
-{
-    static const std::string kAbc("abcdefjhijklmnopqrstuvwxyz");
-
-    QByteArray data(static_cast<int>(count), Qt::Uninitialized);
-    for (int i = 0; i != data.size(); ++i)
-        data[i] = choice(kAbc);
 
     return data;
 }

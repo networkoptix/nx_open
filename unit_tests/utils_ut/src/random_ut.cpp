@@ -70,18 +70,6 @@ TEST(Random, Numbers)
         [](uint64_t a) { return a < std::numeric_limits<uint64_t>::max() / 2; });
 }
 
-TEST(Random, Array)
-{
-    const auto array = nx::utils::random::word(10);
-    ASSERT_EQ(10, array.size());
-
-    for (const auto& number: array)
-    {
-        ASSERT_GE(number, 'a');
-        ASSERT_LE(number, 'z');
-    }
-}
-
 } // namespace test
 } // namespace random
 } // namespace utils
