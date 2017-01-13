@@ -35,8 +35,15 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
                 context()->user(), resource, &providers);
 
             // We need to get only resources which are accessible only by this layout
-            if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
-                return false;
+            // Possibly we already have no access (if item is removed)
+            switch (accessSource)
+            {
+                case QnAbstractResourceAccessProvider::Source::videowall:
+                case QnAbstractResourceAccessProvider::Source::none:
+                    break;
+                default:
+                    return false;
+            }
 
             QnLayoutResourceList layoutProviders = providers.filtered<QnLayoutResource>();
             layoutProviders.removeOne(layout);
