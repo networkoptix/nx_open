@@ -3,22 +3,29 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "pollset.h"
-#include "unified_pollset.h"
 #include "pollset_wrapper.h"
+#include "unified_pollset.h"
 
 namespace nx {
 namespace network {
 namespace aio {
 
-std::unique_ptr<AbstractPollSet> PollSetFactory::create()
+PollSetFactory::PollSetFactory():
+    m_udtEnabled(true)
 {
-    return std::make_unique<PollSetWrapper<UnifiedPollSet>>();
 }
 
-PollSetFactory* PollSetFactory::instance()
+std::unique_ptr<AbstractPollSet> PollSetFactory::create()
 {
-    static PollSetFactory factory;
-    return &factory;
+    if (m_udtEnabled)
+        return std::make_unique<PollSetWrapper<UnifiedPollSet>>();
+    else
+        return std::make_unique<PollSetWrapper<PollSet>>();
+}
+
+void PollSetFactory::disableUdt()
+{
+    m_udtEnabled = false;
 }
 
 } // namespace aio

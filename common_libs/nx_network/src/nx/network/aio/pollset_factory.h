@@ -2,18 +2,26 @@
 
 #include <memory>
 
+#include <nx/utils/singleton.h>
+
 #include "abstract_pollset.h"
 
 namespace nx {
 namespace network {
 namespace aio {
 
-class PollSetFactory
+class PollSetFactory:
+    public Singleton<PollSetFactory>
 {
 public:
+    PollSetFactory();
+
     std::unique_ptr<AbstractPollSet> create();
 
-    static PollSetFactory* instance();
+    void disableUdt();
+
+private:
+    bool m_udtEnabled;
 };
 
 } // namespace aio
