@@ -29,6 +29,7 @@
 #endif
 
 #include "../utils.h"
+#include <media_server/settings.h>
 
 template<qint64 From, qint64 To>
 qint64 genRandomNumber()
@@ -464,6 +465,7 @@ void reopenDbFile(QFile *dbFile, const QString& fileName)
 
 TEST(MediaDbTest, SimpleFileWriteTest)
 {
+    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -566,6 +568,7 @@ TEST(MediaDbTest, BitsTwiddling)
 
 TEST(MediaDbTest, ReadWrite_Simple)
 {
+    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -620,6 +623,7 @@ TEST(MediaDbTest, ReadWrite_Simple)
 
 TEST(MediaDbTest, DbFileTruncate)
 {
+    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -690,6 +694,7 @@ TEST(MediaDbTest, DbFileTruncate)
 
 TEST(MediaDbTest, ReadWrite_MT)
 {
+    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -807,6 +812,7 @@ TEST(MediaDbTest, ReadWrite_MT)
 
 TEST(MediaDbTest, StorageDB)
 {
+    MSSettings::initializeROSettings();
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
@@ -954,6 +960,8 @@ TEST(MediaDbTest, StorageDB)
 
 TEST(MediaDbTest, Migration_from_sqlite)
 {
+    MSSettings::initializeROSettings();
+
     QnWriterPool writerPool;
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
