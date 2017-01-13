@@ -10,8 +10,7 @@ namespace aio {
 namespace test {
 
 class PollSet:
-    public CommonPollSetTest<aio::PollSet>,
-    public ::testing::Test
+    public CommonPollSetTest<aio::PollSet>
 {
 public:
     PollSet()
@@ -45,9 +44,9 @@ private:
     aio::PollSet m_pollset;
 };
 
-TEST_F(PollSet, all_tests)
+TEST(PollSet, all_tests)
 {
-    runTests();
+    PollSet::runTests<PollSet>();
 }
 
 } // namespace test

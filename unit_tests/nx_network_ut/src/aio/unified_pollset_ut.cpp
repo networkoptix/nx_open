@@ -91,8 +91,7 @@ private:
 };
 
 class UnifiedPollSet:
-    public CommonPollSetTest<aio::UnifiedPollSet>,
-    public ::testing::Test
+    public CommonPollSetTest<aio::UnifiedPollSet>
 {
 public:
     UnifiedPollSet():
@@ -125,9 +124,9 @@ private:
     aio::UnifiedPollSet m_pollset;
 };
 
-TEST_F(UnifiedPollSet, all_tests)
+TEST(UnifiedPollSet, all_tests)
 {
-    runTests();
+    UnifiedPollSet::runTests<UnifiedPollSet>();
 }
 
 } // namespace test

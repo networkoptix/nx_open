@@ -24,13 +24,6 @@ class CommonPollSetTest
 public:
     CommonPollSetTest()
     {
-        registerTest(
-            &CommonPollSetTest::removingSocketWithMultipleEvents,
-            "removing_socket_with_multiple_events");
-
-        registerTest(
-            &CommonPollSetTest::multiplePollsetIterators,
-            "multiple_pollset_iterators");
     }
 
     ~CommonPollSetTest()
@@ -42,13 +35,30 @@ public:
         m_pollset = pollset;
     }
 
-    void runTests()
+    template<typename ActualTestClassImplementation>
+    static void runTests()
     {
-        for (const auto& test: m_tests)
-        {
-            std::cout<<"[      SUB ] "<<test.second<<std::endl;
-            (this->*(test.first))();
-        }
+        runTest<ActualTestClassImplementation>(
+            &CommonPollSetTest::removingSocketWithMultipleEvents,
+            "removing_socket_with_multiple_events");
+
+        runTest<ActualTestClassImplementation>(
+            &CommonPollSetTest::multiplePollsetIterators,
+            "multiple_pollset_iterators");
+
+        runTest<ActualTestClassImplementation>(
+            &CommonPollSetTest::removeSocketThatHasUnprocessedEvents,
+            "remove_socket_that_has_unprocessed_events");
+    }
+
+    template<typename ActualTestClassImplementation>
+    static void runTest(
+        typename ActualTestClassImplementation::TestFuncType testFunc,
+        const char* testName)
+    {
+        std::cout << "[      SUB ] " << testName << std::endl;
+        ActualTestClassImplementation test;
+        (test.*testFunc)();
     }
 
 protected:
@@ -69,11 +79,6 @@ protected:
             return createRegularSocket();
     }
 
-    void initializeRegularSocket()
-    {
-        m_sockets.push_back(createRegularSocket());
-    }
-
     void initializeSocketOfRandomType()
     {
         m_sockets.push_back(createSocketOfRandomType());
@@ -84,7 +89,7 @@ protected:
         m_sockets.push_back(std::make_unique<UdtStreamSocket>(AF_INET));
     }
 
-    void subscribeSocketToEvents(int events)
+    void subscribeSocketsToEvents(int events)
     {
         for (const auto& socket: m_sockets)
         {
@@ -119,6 +124,36 @@ protected:
             handler(it.socket(), it.eventType());
     }
 
+    PollsetType& pollset()
+    {
+        return *m_pollset;
+    }
+
+    const PollsetType& pollset() const
+    {
+        return *m_pollset;
+    }
+
+    std::vector<std::unique_ptr<Pollable>>& sockets()
+    {
+        return m_sockets;
+    }
+
+    //---------------------------------------------------------------------------------------------
+    // Tests
+
+    void initializeRegularSocket()
+    {
+        m_sockets.push_back(createRegularSocket());
+    }
+
+    void givenRegularSocketAvailableForReadWrite()
+    {
+        initializeRegularSocket();
+        subscribeSocketsToEvents(aio::etRead | aio::etWrite);
+        simulateSocketEvents(aio::etRead | aio::etWrite);
+    }
+
     void initializeBunchOfSocketsOfRandomType()
     {
         constexpr int socketCount = 100;
@@ -129,7 +164,7 @@ protected:
 
     void runRemoveSocketWithMultipleEventsTest()
     {
-        subscribeSocketToEvents(aio::etRead | aio::etWrite);
+        subscribeSocketsToEvents(aio::etRead | aio::etWrite);
         simulateSocketEvents(aio::etRead | aio::etWrite);
         int numberOfEventsReported = 0;
         handleSocketEvents(
@@ -151,32 +186,27 @@ protected:
             });
     }
 
-    PollsetType& pollset()
+    void whenRemovedSocketFromPollSetOnFirstEvent()
     {
-        return *m_pollset;
+        handleSocketEvents(
+            [&](Pollable* const socket, aio::EventType eventType)
+            {
+                assertIfEventIsNotExpected(socket, eventType);
+
+                unsubscribeSocketFromEvents(socket, aio::etRead | aio::etWrite);
+                removeSocket(socket);
+            });
     }
 
-    const PollsetType& pollset() const
+    void thenPollsetDidNotReportEventsForRemovedSockets()
     {
-        return *m_pollset;
-    }
-
-    std::vector<std::unique_ptr<Pollable>>& sockets()
-    {
-        return m_sockets;
+        // If we did not crash to this point, then everything is ok.
     }
 
 private:
     PollsetType* m_pollset;
     std::vector<std::unique_ptr<Pollable>> m_sockets;
     std::map<Pollable*, int> m_socketToActiveEventMask;
-    std::list<std::pair<TestFuncType, std::string>> m_tests;
-
-    void registerTest(TestFuncType testFunc, const char* testName)
-    {
-        m_tests.emplace_back(testFunc, testName);
-    }
-
 
     //---------------------------------------------------------------------------------------------
     // Tests
@@ -193,6 +223,47 @@ private:
 
         initializeRegularSocket();
         runRemoveSocketWithMultipleEventsTest();
+    }
+
+    void removeSocketThatHasUnprocessedEvents()
+    {
+        givenRegularSocketAvailableForReadWrite();
+        whenRemovedSocketFromPollSetOnFirstEvent();
+        thenPollsetDidNotReportEventsForRemovedSockets();
+    }
+
+    // End of tests
+    //---------------------------------------------------------------------------------------------
+
+    void assertIfEventIsNotExpected(Pollable* const socket, aio::EventType eventType)
+    {
+        auto socketIter = std::find_if(
+            m_sockets.begin(),
+            m_sockets.end(),
+            [socket](const std::unique_ptr<Pollable>& element)
+            {
+                return socket == element.get();
+            });
+        ASSERT_TRUE(socketIter != m_sockets.end());
+
+        auto socketEventIter = m_socketToActiveEventMask.find(socket);
+        ASSERT_TRUE(socketEventIter != m_socketToActiveEventMask.end());
+        ASSERT_NE(0, socketEventIter->second & eventType);
+    }
+
+    void removeSocket(Pollable* const socket)
+    {
+        auto socketIter = std::find_if(
+            m_sockets.begin(),
+            m_sockets.end(),
+            [socket](const std::unique_ptr<Pollable>& element)
+            {
+                return socket == element.get();
+            });
+        ASSERT_TRUE(socketIter != m_sockets.end());
+        m_sockets.erase(socketIter);
+
+        m_socketToActiveEventMask.erase(socket);
     }
 };
 
