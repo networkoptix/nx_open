@@ -129,7 +129,7 @@ def proxy(request, system_id, system_url):
         system_url += full_url[position:]
 
     if request.user.is_authenticated():
-        email = request.user.email
+        email = request.session['login']
         password = request.session['password']
 
     if request.method == 'GET':
