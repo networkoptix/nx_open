@@ -52,7 +52,7 @@ namespace Qn
         NodeTypeCount
     };
 
-    inline bool isSeparatorNode(NodeType t) { return t == SeparatorNode || t == LocalSeparatorNode;  }
+    bool isSeparatorNode(NodeType t);
 
     /**
      * Role of an item on the scene.

@@ -839,14 +839,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 newWidget->setOption(QnResourceWidget::ActivityPresence, true);
             }
 
-            /* Hide / show other items when zoomed. */
-            if (newWidget)
-                opacityAnimator(newWidget)->animateTo(1.0);
-            qreal opacity = newWidget ? 0.0 : 1.0;
-            foreach(QnResourceWidget *widget, m_widgets)
-                if (widget != newWidget)
-                    opacityAnimator(widget)->animateTo(opacity);
-
             /* Update margin flags. */
             updateCurrentMarginFlags();
 
@@ -1225,7 +1217,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     const auto resource = widget->resource();
 
     auto widgetsForResource = m_widgetsByResource.find(resource);
-    NX_ASSERT(widgetsForResource != m_widgetsByResource.end());
+    // We may have already clean the widget in permissionsChange handler
     if (widgetsForResource != m_widgetsByResource.end())
     {
         widgetsForResource->removeOne(widget);

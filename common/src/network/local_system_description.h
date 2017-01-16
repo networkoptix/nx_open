@@ -1,9 +1,8 @@
-
 #pragma once
 
 #include <network/system_description.h>
 
-class QnLocalSystemDescription : public QnSystemDescription
+class QnLocalSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;

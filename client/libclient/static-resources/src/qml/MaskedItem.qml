@@ -36,6 +36,7 @@ Item
     {
         id: maskedAreaLoader;
 
+        width: parent.width;
         visible: isMasked;
         sourceComponent: thisComponent.maskedAreaDelegate;
     }
@@ -44,6 +45,7 @@ Item
     {
         id: areaLoader;
 
+        width: parent.width;
         visible: !isMasked;
         sourceComponent: thisComponent.areaDelegate;
     }

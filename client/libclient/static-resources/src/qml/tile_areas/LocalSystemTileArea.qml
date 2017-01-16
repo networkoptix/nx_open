@@ -77,7 +77,7 @@ Item
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 0);
+        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 2);
 
         InfoItem
         {

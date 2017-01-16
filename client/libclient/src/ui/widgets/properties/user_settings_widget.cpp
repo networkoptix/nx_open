@@ -172,12 +172,11 @@ bool QnUserSettingsWidget::hasChanges() const
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        QnUuid userRoleId = selectedUserRoleId();
-        if (m_model->user()->userRoleId() != userRoleId)
-            return true;
+        const auto selectedRole = this->selectedRole();
 
-        if (userRoleId.isNull() && selectedRole() != m_model->user()->userRole())
-            return true;
+        return selectedRole == Qn::UserRole::CustomUserRole
+            ? m_model->user()->userRoleId() != selectedUserRoleId()
+            : m_model->user()->userRole() != selectedRole;
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))

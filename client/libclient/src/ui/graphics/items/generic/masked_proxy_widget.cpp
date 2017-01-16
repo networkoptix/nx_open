@@ -22,6 +22,18 @@ void blitPixmap(const QPixmap& source, QPixmap& destination, const QPoint& locat
     blitter.drawPixmap(location, source);
 }
 
+int sceneDevicePixelRatio(const QGraphicsScene* scene)
+{
+    int ratio = 1;
+    if (!scene)
+        return ratio;
+
+    for (const auto view: scene->views())
+        ratio = qMax(ratio, view->devicePixelRatio());
+
+    return ratio;
+}
+
 } // namespace
 
 
@@ -54,16 +66,23 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
     if (m_updatesEnabled)
     {
-        const int pixelRatio = painter->device()->devicePixelRatio();
+        const int pixelRatio = scene()
+            ? sceneDevicePixelRatio(scene())
+            : painter->device()->devicePixelRatio();
+
         const QSize targetSize = widgetRect.size() * pixelRatio;
 
-        if (m_pixmap.devicePixelRatio() != pixelRatio
-            || targetSize.width() > m_pixmap.size().width()
+        if (targetSize.width() > m_pixmap.size().width()
             || targetSize.height() > m_pixmap.size().height())
         {
             m_pixmap = QPixmap(targetSize);
             m_pixmap.setDevicePixelRatio(pixelRatio);
             m_pixmapRect = widgetRect;
+            updateRect = widgetRect;
+        }
+        else if (m_pixmap.devicePixelRatio() != pixelRatio)
+        {
+            m_pixmap.setDevicePixelRatio(pixelRatio);
             updateRect = widgetRect;
         }
 
@@ -94,8 +113,8 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
 
     /* Rectangle to render, in logical coordinates: */
     const QRect renderRect = m_pixmapRect & (m_paintRect.isNull()
-        ? widgetRect
-        : widgetRect & m_paintRect.toAlignedRect());
+        ? updateRect
+        : updateRect & m_paintRect.toAlignedRect());
 
     /* Source rectangle within pixmap, in device coordinates: */
     const QRect sourceRect {

@@ -78,7 +78,7 @@ Page
             localId: model.localId
             cloudSystem: model.isCloudSystem
             ownerDescription: cloudSystem ? model.ownerDescription : ""
-            online: model.isConnectible
+            online: model.isConnectable
             compatible: model.isCompatible
             invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
         }
@@ -127,8 +127,8 @@ Page
             id: customConnectionButton
 
             text: dummyMessage.visible
-                ? qsTr("Connect to Server")
-                : qsTr("Connect to Another Server")
+                ? qsTr("Connect to Server...")
+                : qsTr("Connect to Another Server...")
 
             anchors.centerIn: parent
             width: parent.width - 16

@@ -35,7 +35,7 @@ DialogBase
                 id: dialogItem
 
                 readonly property int row: index
-                readonly property string value: model.display
+                readonly property string value: model.display || modelData
 
                 active: value == currentItem
                 text: value

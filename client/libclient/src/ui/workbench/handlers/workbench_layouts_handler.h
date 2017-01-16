@@ -58,13 +58,14 @@ private:
     /** Ask user if layout should be saved. Actual when admin modifies shared layout
      *  or layout belonging to user with custom access rights.
      */
-    bool confirmLayoutChange(const LayoutChange& change);
+    bool confirmLayoutChange(const LayoutChange& change, const QnResourcePtr& layoutOwner);
 
     bool confirmChangeSharedLayout(const LayoutChange& change);
     bool confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts);
     bool confirmChangeLocalLayout(const QnUserResourcePtr& user, const LayoutChange& change);
     bool confirmDeleteLocalLayouts(const QnUserResourcePtr& user, const QnLayoutResourceList& layouts);
     bool confirmStopSharingLayouts(const QnResourceAccessSubject& subject, const QnLayoutResourceList& layouts);
+    bool confirmChangeVideoWallLayout(const LayoutChange& change);
 
     /** If user has custom access rights, he must be given direct access to cameras on changed local layout. */
     void grantMissingAccessRights(const QnUserResourcePtr& user, const LayoutChange& change);

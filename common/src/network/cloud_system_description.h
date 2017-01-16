@@ -1,9 +1,8 @@
-
 #pragma once
 
 #include <network/system_description.h>
 
-class QnCloudSystemDescription : public QnSystemDescription
+class QnCloudSystemDescription: public QnSystemDescription
 {
     Q_OBJECT
     using base_type = QnSystemDescription;
@@ -24,7 +23,7 @@ public:
     void setRunning(bool running);
 
 public: // Overrides
-    virtual bool isCloudSystem() const;
+    virtual bool isCloudSystem() const override;
 
     virtual bool isRunning() const override;
 
