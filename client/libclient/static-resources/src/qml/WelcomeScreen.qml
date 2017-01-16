@@ -333,8 +333,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to Another Server")
-                : qsTr("Connect to Server")
+                ? qsTr("Connect to Another Server...")
+                : qsTr("Connect to Server...")
 
             onClicked: context.connectToAnotherSystem();
         }
