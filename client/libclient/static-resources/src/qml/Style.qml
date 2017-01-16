@@ -60,10 +60,10 @@ QtObject
 
     property QtObject dropDown: QtObject
     {
-        readonly property color bkgColor: colors.text;
+        readonly property color bkgColor: colors.midlight;
         readonly property color hoveredBkgColor: colors.brand;
 
-        readonly property color textColor: context.getPaletteColor("dark", 3)
+        readonly property color textColor: colors.text;
         readonly property color hoveredTextColor: colors.brandContrast;
     }
 
