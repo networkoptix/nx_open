@@ -80,9 +80,8 @@ public:
 private:
     /**
      * Helper function to list nodes in the correct order.
-     * Root nodes are strictly ordered, but there are one type of nodes which
-     * are inserted in between: videowall nodes.
-     * Videowalls are pinned between Layouts and WebPages.
+     * Root nodes are strictly ordered, but there is one type of node which is inserted in between:
+     * videowall nodes, which are pinned between Layouts and WebPages.
      */
     qreal nodeOrder(const QModelIndex &index) const
     {
