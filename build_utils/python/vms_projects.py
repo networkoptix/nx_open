@@ -43,11 +43,11 @@ def getTranslatableProjects():
 
 class CustomizableProject():
 
-    def __init__(self, name, sources, static_files, cusomized_files, prefix = ""):
+    def __init__(self, name, sources, static_files, customized_files, prefix = ""):
         self.name = name
         self.sources = sources
         self.static_files = static_files
-        self.cusomized_files = cusomized_files
+        self.customized_files = customized_files
         self.prefix = prefix
                
     def __repr__(self):
