@@ -36,7 +36,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -323,7 +323,7 @@
        <item>
         <widget class="QLabel" name="warningLabel">
          <property name="text">
-          <string>Servers is offline. Statistics is not available.</string>
+          <string>Server is offline. Statistics are not available.</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>

@@ -32,30 +32,20 @@ typedef CommonSocketImpl PollableSystemSocketImpl;
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
-}   //aio
+} // namespace aio
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
 #endif
 
-struct SockAddrPtr
+struct NX_NETWORK_API SystemSocketAddress
 {
     std::shared_ptr<const sockaddr> ptr;
     socklen_t size;
 
-    SockAddrPtr():
-        ptr(nullptr),
-        size(0)
-    {
-    }
-
-    template<typename T>
-    SockAddrPtr(T* addr):
-        ptr((sockaddr*)addr),
-        size(sizeof(T))
-    {
-        memset(addr, 0, size);
-    }
+    SystemSocketAddress();
+    SystemSocketAddress(SocketAddress address, int ipVersion);
+    operator SocketAddress() const;
 };
 
 /**
@@ -139,7 +129,6 @@ public:
         const QString &service,
         const QString &protocol = QLatin1String("tcp"));
 
-    SockAddrPtr makeAddr(const SocketAddress& socketAddress);
     bool createSocket( int type, int protocol );
 
 protected:
@@ -178,10 +167,6 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
 
-    virtual bool connectToIp(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
-
     //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     //!Implementation of AbstractCommunicatingSocket::send
@@ -215,7 +200,9 @@ public:
     virtual bool close() override;
     virtual bool shutdown() override;
 
-private:
+protected:
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
 };
@@ -233,7 +220,7 @@ public:
     /**
      * Construct a TCP socket with no connection.
      */
-    TCPSocket(int ipVersion);
+    explicit TCPSocket(int ipVersion = AF_INET);
     virtual ~TCPSocket();
 
     TCPSocket(const TCPSocket&) = delete;
@@ -283,7 +270,7 @@ class NX_NETWORK_API TCPServerSocket
     typedef Socket<AbstractStreamServerSocket> base_type;
 
 public:
-    TCPServerSocket(int ipVersion);
+    explicit TCPServerSocket(int ipVersion = AF_INET);
     ~TCPServerSocket();
 
     TCPServerSocket(const TCPServerSocket&) = delete;
@@ -303,6 +290,7 @@ public:
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
@@ -333,11 +321,13 @@ public:
     /**
      *   Construct a UDP socket
      */
-    UDPSocket(int ipVersion = AF_INET);
+    explicit UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
     UDPSocket& operator=(UDPSocket&&) = delete;
+
+    virtual SocketAddress getForeignAddress() const override;
 
     /**
      *   Unset foreign address and port
@@ -376,6 +366,7 @@ public:
 
     //!Implementation of AbstractDatagramSocket::setDestAddr
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
+
     //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
@@ -412,7 +403,7 @@ public:
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
-    SockAddrPtr m_destAddr;
+    SystemSocketAddress m_destAddr;
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();

@@ -121,24 +121,22 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->gridLicenses->header()->setSortIndicator(QnLicenseListModel::LicenseKeyColumn, Qt::AscendingOrder);
 
     /* By [Delete] key remove licenses. */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->gridLicenses->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        int key = static_cast<QKeyEvent*>(event)->key();
-        switch (key)
+    installEventHandler(ui->gridLicenses, QEvent::KeyPress, this,
+        [this](QObject* object, QEvent* event)
         {
-            case Qt::Key_Delete:
+            Q_UNUSED(object);
+            int key = static_cast<QKeyEvent*>(event)->key();
+            switch (key)
+            {
+                case Qt::Key_Delete:
 #if defined(Q_OS_MAC)
-            case Qt::Key_Backspace:
+                case Qt::Key_Backspace:
 #endif
-                removeSelectedLicenses();
-            default:
-                return;
-        }
-    });
+                    removeSelectedLicenses();
+                default:
+                    return;
+            }
+        });
 
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
@@ -236,8 +234,6 @@ void QnLicenseManagerWidget::updateLicenses()
     m_model->updateLicenses(m_licenses);
 
     /* Update info label. */
-    bool useRedLabel = false;
-
     if (!m_licenses.isEmpty())
     {
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
@@ -261,11 +257,13 @@ void QnLicenseManagerWidget::updateLicenses()
         {
             if (!helper->isValid())
             {
-                useRedLabel = true;
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        messages << tr("At least %n %2 are required", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    {
+                        messages << setWarningStyleHtml(tr("At least %n %2 are required", "",
+                            helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
+                    }
                 }
             }
             else
@@ -273,33 +271,29 @@ void QnLicenseManagerWidget::updateLicenses()
                 for (Qn::LicenseType lt: helper->licenseTypes())
                 {
                     if (helper->usedLicenses(lt) > 0)
-                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt));
+                    {
+                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt))
+                            .arg(QnLicense::longDisplayName(lt));
+                    }
                 }
             }
         }
-        ui->infoLabel->setText(messages.join(L'\n'));
+        ui->infoLabel->setText(messages.join(lit("<br/>")));
     }
     else
     {
         if (qnLicensePool->currentHardwareId().isEmpty())
         {
             ui->infoLabel->setText(tr("Obtaining licenses from server..."));
-            useRedLabel = false;
         }
         else
         {
             QString text = (QnAppInfo::freeLicenseCount() > 0)
                 ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
                 : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
-            ui->infoLabel->setText(text);
-            useRedLabel = true;
+            ui->infoLabel->setText(setWarningStyleHtml(text));
         }
     }
-
-    QPalette palette = this->palette();
-    if (useRedLabel)
-        setWarningStyle(&palette);
-    ui->infoLabel->setPalette(palette);
 
     updateButtons();
 }

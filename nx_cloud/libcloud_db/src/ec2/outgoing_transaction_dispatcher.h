@@ -6,29 +6,41 @@
 #include <transaction/transaction.h>
 #include <utils/common/subscription.h>
 
-#include "transaction_serializer.h"
+#include "serialization/serializable_transaction.h"
+#include "serialization/transaction_serializer.h"
 #include "transaction_transport_header.h"
 
 namespace nx {
 namespace cdb {
 namespace ec2 {
 
+class AbstractOutgoingTransactionDispatcher
+{
+public:
+    virtual ~AbstractOutgoingTransactionDispatcher() = default;
+
+    virtual void dispatchTransaction(
+        const nx::String& systemId,
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) = 0;
+};
+
 /**
  * Dispatches transactions that has to be sent to other peers.
  */
-class OutgoingTransactionDispatcher
+class OutgoingTransactionDispatcher:
+    public AbstractOutgoingTransactionDispatcher
 {
 public:
     typedef nx::utils::Subscription<
         const nx::String&,
-        std::shared_ptr<const TransactionWithSerializedPresentation>> OnNewTransactionSubscription;
+        std::shared_ptr<const SerializableAbstractTransaction>> OnNewTransactionSubscription;
     typedef OnNewTransactionSubscription::NotificationCallback OnNewTransactionHandler;
 
     OutgoingTransactionDispatcher();
 
-    void dispatchTransaction(
+    virtual void dispatchTransaction(
         const nx::String& systemId,
-        std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer);
+        std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer) override;
 
     OnNewTransactionSubscription* onNewTransactionSubscription();
 

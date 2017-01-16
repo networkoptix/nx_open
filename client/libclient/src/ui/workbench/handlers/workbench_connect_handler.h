@@ -44,22 +44,15 @@ public:
     explicit QnWorkbenchConnectHandler(QObject *parent = 0);
     ~QnWorkbenchConnectHandler();
 
-    struct ConnectionSettings;
-    typedef QSharedPointer<ConnectionSettings> ConnectionSettingsPtr;
-
-    struct ConnectionSettings
-    {
-        bool isConnectionToCloud;
-        bool storePassword;
-        bool autoLogin;
-
-        static ConnectionSettingsPtr create(
-            bool isConnectionToCloud,
-            bool storePassword,
-            bool autoLogin);
-    };
-
 private:
+    enum ConnectionOption
+    {
+        IsCloudConnection = 0x1,
+        StorePassword = 0x2,
+        AutoLogin = 0x4
+    };
+    Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
+
     void showLoginDialog();
 
     bool tryToRestoreConnection();
@@ -71,7 +64,8 @@ private:
     /// according to specified settings.
     void testConnectionToServer(
         const QUrl& url,
-        const ConnectionSettingsPtr& storeSettings);
+        ConnectionOptions options,
+        bool force);
 
     void connectToServer(const QUrl& url);
 
@@ -82,7 +76,8 @@ private:
         const QUrl& url,
         ec2::ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const ConnectionSettingsPtr& storeSettings);
+        ConnectionOptions options,
+        bool force);
 
     void handleConnectReply(
         int handle,
@@ -99,7 +94,7 @@ private:
     void storeConnectionRecord(
         const QUrl& url,
         const QnConnectionInfo& info,
-        const ConnectionSettingsPtr& storeSettings);
+        ConnectionOptions options);
 
     void showWarnMessagesOnce();
 
@@ -119,8 +114,11 @@ private:
     void at_messageProcessor_initialResourcesReceived();
 
     void at_connectAction_triggered();
+    void at_connectToCloudSystemAction_triggered();
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
+
+    void showPreloader();
 
 private:
     int m_connectingHandle;

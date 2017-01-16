@@ -46,20 +46,23 @@ ApplicationWindow
     {
         updateNavigationBarPadding()
 
-        var url = getInitialUrl()
-        var systemName = ""
-
-        if (url == "")
+        if (autoLoginEnabled)
         {
-            url = getLastUsedUrl()
-            systemName = getLastUsedSystemName()
-        }
+            var url = getInitialUrl()
+            var systemName = ""
 
-        if (url != "")
-        {
-            Workflow.openResourcesScreen(systemName)
-            connectionManager.connectToServer(url)
-            return
+            if (url == "")
+            {
+                url = getLastUsedUrl()
+                systemName = getLastUsedSystemName()
+            }
+
+            if (url != "")
+            {
+                Workflow.openResourcesScreen(systemName)
+                connectionManager.connectToServer(url)
+                return
+            }
         }
 
         // TODO: #dklychkov Check if need it in #3.1 and uncomment.

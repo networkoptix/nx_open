@@ -1,61 +1,74 @@
 #pragma once
 
 #include <atomic>
+#include <chrono>
+#include <deque>
 #include <functional>
+#include <memory>
 
+#include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+
 #include <utils/common/long_runnable.h>
-#include <nx/utils/singleton.h>
 #include <utils/common/systemerror.h>
 
+#include "resolve/predefined_host_resolver.h"
+#include "resolve/system_resolver.h"
 #include "socket_common.h"
 
 namespace nx {
 namespace network {
 
-/*!
-    \note Thread-safe
-*/
-class NX_NETWORK_API DnsResolver
-:
+class NX_NETWORK_API DnsResolver:
     public QnLongRunnable
 {
 public:
     typedef void* RequestId;
-    typedef std::vector<HostAddress> HostAddresses;
-    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, HostAddresses)> Handler;
+    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> Handler;
 
     DnsResolver();
     virtual ~DnsResolver();
 
     virtual void pleaseStop() override;
 
-    /*!
-        \param handler MUST not block
-        \param requestId Used to cancel request. Multiple requests can be started using same request id
-        \return false if failed to start asynchronous resolve operation
-        \note It is garanteed that \a reqID is set before \a completionHandler is called
-    */
-    void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
-    HostAddresses resolveSync(const QString& hostName, int ipVersion);
+    std::chrono::milliseconds resolveTimeout() const;
+    void setResolveTimeout(std::chrono::milliseconds value);
 
-    /*!
-        \param waitForRunningHandlerCompletion if \a true, this method blocks until running completion handler (if any) has returned
-    */
+    /**
+     * @param handler MUST not block
+     * @param requestId Used to cancel request. Multiple requests can be started using same request id.
+     * @return false if failed to start asynchronous resolve operation
+     * @note It is garanteed that reqID is set before completionHandler is called.
+     */
+    void resolveAsync(const QString& hostName, Handler handler, int ipVersion, RequestId requestId);
+    SystemError::ErrorCode resolveSync(
+        const QString& hostName,
+        int ipVersion,
+        std::deque<HostAddress>* resolvedAddresses);
+
+    /**
+     * @param waitForRunningHandlerCompletion if true, this method blocks until 
+     * running completion handler (if any) returns.
+     */
     void cancel(RequestId requestId, bool waitForRunningHandlerCompletion);
 
-    //!Returns \a true if at least one resolve operation is scheduled with \a reqID
     bool isRequestIdKnown(RequestId requestId) const;
 
-    //!Even more priority than /etc/hosts
-    void addEtcHost(const QString& name, HostAddresses addresses);
+    // TODO: #ak following two methods do not belong here.
+    /** Has even greater priority than /etc/hosts. */
+    void addEtcHost(const QString& name, std::vector<HostAddress> addresses);
     void removeEtcHost(const QString& name);
-    HostAddresses getEtcHost(const QString& name, int ipVersion = 0);
+
+    /**
+     * @param priority Greater value increases priority.
+     */
+    void registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority);
+    int minRegisteredResolverPriority() const;
+    int maxRegisteredResolverPriority() const;
 
 protected:
-    //!Implementation of QnLongRunnable::run
-    virtual void run();
+    virtual void run() override;
 
 private:
     class ResolveTask
@@ -66,6 +79,7 @@ private:
         RequestId requestId;
         size_t sequence;
         int ipVersion;
+        std::chrono::steady_clock::time_point creationTime;
 
         ResolveTask(
             QString hostAddress, Handler handler, RequestId requestId,
@@ -78,9 +92,11 @@ private:
     std::list<ResolveTask> m_taskQueue;
     RequestId m_runningTaskRequestId;
     size_t m_currentSequence;
+    std::chrono::milliseconds m_resolveTimeout;
+    PredefinedHostResolver* m_predefinedHostResolver;
+    std::multimap<int, std::unique_ptr<AbstractResolver>, std::greater<int>> m_resolversByPriority;
 
-    mutable QnMutex m_ectHostsMutex;
-    std::map<QString, HostAddresses> m_etcHosts;
+    bool isExpired(const ResolveTask& task) const;
 };
 
 } // namespace network

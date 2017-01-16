@@ -52,6 +52,7 @@ Pane
     {
         id: mouseArea
 
+        parent: control
         anchors.fill: parent
         onClicked: open()
     }
@@ -70,6 +71,7 @@ Pane
         parent: control
 
         y: 2
+        z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
         visible: connectionsModel.hasConnections && !cloudSystem
@@ -77,6 +79,7 @@ Pane
         {
             Workflow.openSavedSession(
                 systemId,
+                localId,
                 systemName,
                 informationBlock.address,
                 informationBlock.user,
@@ -86,6 +89,12 @@ Pane
 
     function open()
     {
+        if (!compatible)
+        {
+            Workflow.openOldClientDownloadSuggestion()
+            return
+        }
+
         if (!contentItem.enabled)
             return
 
@@ -95,8 +104,8 @@ Pane
             {
                 connectionManager.connectToServer(
                     hostsModel.firstHost,
-                    cloudStatusWatcher.cloudLogin(),
-                    cloudStatusWatcher.cloudPassword())
+                    cloudStatusWatcher.credentials.user,
+                    cloudStatusWatcher.credentials.password)
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -112,7 +121,7 @@ Pane
             }
             else
             {
-                Workflow.openDiscoveredSession(systemId, systemName, informationBlock.address)
+                Workflow.openDiscoveredSession(systemId, localId, systemName, informationBlock.address)
             }
         }
     }

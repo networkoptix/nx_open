@@ -46,9 +46,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
-    const CloudConnectionManager& cloudConnectionManager)
+    CloudManagerGroup* cloudManagerGroup)
     :
-    m_cloudConnectionManager(cloudConnectionManager)
+    m_cloudManagerGroup(cloudManagerGroup)
 {
 }
 
@@ -110,7 +110,7 @@ int QnSetupCloudSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    QnSaveCloudSystemCredentialsHandler subHandler(m_cloudConnectionManager);
+    QnSaveCloudSystemCredentialsHandler subHandler(m_cloudManagerGroup);
     int httpResult = subHandler.execute(data, result, owner);
     if (result.error != QnJsonRestResult::NoError)
     {
@@ -137,7 +137,14 @@ int QnSetupCloudSystemRestHandler::execute(
     }
 
     QnSystemSettingsHandler settingsHandler;
-    settingsHandler.executeGet(QString(), data.systemSettings, result, owner);
+    if (!settingsHandler.updateSettings(
+        data.systemSettings,
+        result,
+        Qn::kSystemAccess,
+        owner->authSession()))
+    {
+        qWarning() << "failed to write system settings";
+    }
 
     return httpResult;
 }

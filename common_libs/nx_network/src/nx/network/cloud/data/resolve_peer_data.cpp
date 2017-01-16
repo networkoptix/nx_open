@@ -1,17 +1,10 @@
 #include "resolve_peer_data.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
-
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 namespace nx {
 namespace hpm {
 namespace api {
-
-ResolvePeerRequest::ResolvePeerRequest()
-:
-    ResolvePeerRequest(nx::String())
-{
-}
 
 ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
 :
@@ -22,17 +15,15 @@ ResolvePeerRequest::ResolvePeerRequest(nx::String _hostName)
 
 void ResolvePeerRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::HostName>(hostName);
+    message->newAttribute<stun::extension::attrs::HostName>(hostName);
 }
 
 bool ResolvePeerRequest::parseAttributes(const nx::stun::Message& message)
 {
-    return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName);
+    return readStringAttributeValue<stun::extension::attrs::HostName>(message, &hostName);
 }
 
-
-ResolvePeerResponse::ResolvePeerResponse()
-:
+ResolvePeerResponse::ResolvePeerResponse():
     StunResponseData(kMethod),
     connectionMethods(0)
 {
@@ -40,17 +31,17 @@ ResolvePeerResponse::ResolvePeerResponse()
 
 void ResolvePeerResponse::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(std::move(endpoints));
-    message->newAttribute< stun::cc::attrs::ConnectionMethods >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(std::move(endpoints));
+    message->newAttribute< stun::extension::attrs::ConnectionMethods >(
         nx::String::number(static_cast<qulonglong>(connectionMethods)));
 }
 
 bool ResolvePeerResponse::parseAttributes(const nx::stun::Message& message)
 {
-    if (!readAttributeValue<stun::cc::attrs::PublicEndpointList>(message, &endpoints))
+    if (!readAttributeValue<stun::extension::attrs::PublicEndpointList>(message, &endpoints))
         return false;
     nx::String connectionMethodsStr;
-    if (!readStringAttributeValue<stun::cc::attrs::ConnectionMethods>(
+    if (!readStringAttributeValue<stun::extension::attrs::ConnectionMethods>(
             message, &connectionMethodsStr))
     {
         return false;

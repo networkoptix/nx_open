@@ -4,7 +4,6 @@ set -e
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=${installer.name}-mediaserver
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
@@ -17,12 +16,9 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${artifact.name.server}
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -132,6 +128,6 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
-mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
+(cd $STAGEBASE; zip -y ./$UPDATE_NAME ./* -i *.*)
+mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

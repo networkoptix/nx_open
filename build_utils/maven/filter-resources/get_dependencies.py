@@ -8,6 +8,7 @@ import platform_detection
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
     "qt": "${qt.version}",
+    "gcc": "${gcc.version}",
     "gtest": "${gtest.version}",
     "gmock": "${gmock.version}",
     "ffmpeg": "${ffmpeg.version}",
@@ -26,7 +27,6 @@ DEPENDENCY_VERSIONS = {
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
     "server-external": "${server-external.version}",
-    "server-external-${branch}": "${server-external.version}",
     "help": "${help.version}"
 }
 

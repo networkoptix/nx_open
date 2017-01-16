@@ -30,16 +30,28 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
-    for (auto provider : m_providers)
+    if (providers)
+        providers->clear();
+
+    QnAbstractResourceAccessProvider::Source accessSource = Source::none;
+    for (auto provider: m_providers)
     {
-        if (providers)
-            providers->clear();
-        auto result = provider->accessibleVia(subject, resource, providers);
-        if (result != Source::none)
-            return result;
+        const auto result = provider->accessibleVia(subject, resource, providers);
+        if (accessSource == Source::none)
+            accessSource = result;
+
+        /* If we need provider resources, we must check all child providers. */
+        if (!providers && result != Source::none)
+            break;
     }
 
-    return Source::none;
+    /* Make sure if there is at least one provider then access is granted. */
+    if (providers && !providers->isEmpty())
+    {
+        NX_ASSERT(accessSource != Source::none);
+    }
+
+    return accessSource;
 }
 
 void QnResourceAccessProvider::addBaseProvider(QnAbstractResourceAccessProvider* provider)
@@ -86,15 +98,15 @@ void QnResourceAccessProvider::beginUpdateInternal()
 
 void QnResourceAccessProvider::endUpdateInternal()
 {
-    for (auto p : m_providers)
+    for (auto p: m_providers)
         p->endUpdate();
 }
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
     {
-        for (const QnResourcePtr& resource : qnResPool->getResources())
+        for (const QnResourcePtr& resource: qnResPool->getResources())
         {
             auto value = accessibleVia(subject, resource);
             if (value != QnAbstractResourceAccessProvider::Source::none)

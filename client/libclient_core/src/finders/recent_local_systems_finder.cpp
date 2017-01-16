@@ -3,6 +3,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -48,13 +49,20 @@ void QnRecentLocalSystemsFinder::updateSystems()
         if (connection.localId.isNull())
             continue;
 
-        const auto system = QnSystemDescription::createLocalSystem(
+        if (nx::network::SocketGlobals::addressResolver().
+            isCloudHostName(connection.url.toString()))
+        {
+            continue;
+        }
+
+        const auto system = QnLocalSystemDescription::create(
             connection.localId.toString(), connection.localId, connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
         QnModuleInformation fakeServerInfo;
-        fakeServerInfo.id = QnUuid::createUuid();   // It does not matter
+        fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
+        fakeServerInfo.systemName = connection.systemName;
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
         system->setServerHost(fakeServerInfo.id, connection.url);
         newSystems.insert(system->id(), system);
@@ -154,13 +162,13 @@ void QnRecentLocalSystemsFinder::setFinalSystems(const SystemsHash& newFinalSyst
     const auto added = newSystemsKeys - currentKeys;
     const auto removed = currentKeys - newSystemsKeys;
 
+    for (const auto& systemId: removed)
+        removeFinalSystem(systemId);
+
     for (const auto& systemId: added)
     {
         const auto system = newFinalSystems.value(systemId);
         m_finalSystems.insert(systemId, system);
         emit systemDiscovered(system);
     }
-
-    for (const auto& systemId: removed)
-        removeFinalSystem(systemId);
 }

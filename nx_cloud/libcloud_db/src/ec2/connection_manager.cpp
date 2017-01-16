@@ -89,7 +89,7 @@ void ConnectionManager::createTransactionConnection(
     // TODO: #ak
 
     std::string systemId;
-    if (!authInfo.get(attr::authSystemID, &systemId))
+    if (!authInfo.get(attr::authSystemId, &systemId))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Ignoring createTransactionConnection request without systemId from %1")
@@ -159,8 +159,11 @@ void ConnectionManager::pushTransaction(
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
-    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
+    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath) &&
+        !request.requestLine.url.path().startsWith(kPushEc2TransactionDeprecatedPath)) // TODO: #ak remove after 3.0 release
+    {
         return completionHandler(nx_http::StatusCode::notFound);
+    }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
@@ -208,7 +211,7 @@ void ConnectionManager::pushTransaction(
 
 void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
-    std::shared_ptr<const TransactionWithSerializedPresentation> transactionSerializer)
+    std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
     NX_LOGX(QnLog::EC2_TRAN_LOG, 
         lm("systemId %1. Dispatching transaction %2")
@@ -457,13 +460,13 @@ void ConnectionManager::removeConnection(const nx::String& connectionId)
 void ConnectionManager::onGotTransaction(
     const nx::String& connectionId,
     Qn::SerializationFormat tranFormat,
-    const QByteArray& data,
+    QByteArray serializedTransaction,
     TransactionTransportHeader transportHeader)
 {
     m_transactionDispatcher->dispatchTransaction(
         std::move(transportHeader),
         tranFormat,
-        std::move(data),
+        std::move(serializedTransaction),
         [this, locker = m_startedAsyncCallsCounter.getScopedIncrement(), connectionId](
             api::ResultCode resultCode)
         {

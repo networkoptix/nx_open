@@ -7,6 +7,8 @@ QnClientTranslationManager::QnClientTranslationManager(QObject *parent):
 {
     addPrefix(lit("client_base"));
     addPrefix(lit("client_ui"));
+    addPrefix(lit("client_core"));
+    addPrefix(lit("client_qml"));
 
     // Closing a backdoor for custom translations --Elric
     /*QString extraPath = qnSettings->extraTranslationsPath();

@@ -7,7 +7,7 @@ Column
     id: control;
 
     property string userName;
-    property bool isOnline: false;
+    property bool isConnectible: false;
 
     spacing: 10; // TODO: check is bottom margin is 8px
 
@@ -42,7 +42,7 @@ Column
            if (!context.isCloudEnabled)
                return "qrc:/skin/welcome_page/cloud_unavailable.png";
 
-           return (control.isOnline
+           return (control.isConnectible
             ? "qrc:/skin/welcome_page/cloud_online.png"
             : "qrc:/skin/welcome_page/cloud_offline.png");
         }

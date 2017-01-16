@@ -14,6 +14,7 @@
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
+#include "dao/rdb/account_data_object.h"
 #include "data/account_data.h"
 #include "managers_types.h"
 #include "notification.h"
@@ -37,6 +38,10 @@ class AccountManager
     public AbstractAuthenticationDataProvider
 {
 public:
+    typedef nx::utils::MoveOnlyFunc<
+        nx::db::DBResult(nx::db::QueryContext*, const data::AccountUpdateDataWithEmail&)
+    > UpdateAccountSubroutine;
+
     /**
      * @throw std::runtime_error In case of failure to pre-fill data cache
      */
@@ -124,6 +129,8 @@ public:
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
 
+    void setUpdateAccountSubroutine(UpdateAccountSubroutine func);
+
 private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;
@@ -136,9 +143,11 @@ private:
     /** map<email, temporary password>. */
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     QnCounter m_startedAsyncCallsCounter;
+    UpdateAccountSubroutine m_updateAccountSubroutine;
+    dao::rdb::AccountDataObject m_accountDbController;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext, int* const dummyResult);
+    nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext);
 
     nx::db::DBResult registerNewAccountInDb(
         nx::db::QueryContext* const queryContext,
@@ -174,13 +183,17 @@ private:
         bool activateAccountIfNotActive,
         nx::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
-    void accountUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        bool authenticatedByEmailCode,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
-        data::AccountUpdateDataWithEmail accountData,
-        std::function<void(api::ResultCode)> completionHandler);
+    bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
+    std::vector<nx::db::SqlFilterField> prepareAccountFieldsToUpdate(
+        const data::AccountUpdateDataWithEmail& accountData,
+        bool activateAccountIfNotActive);
+    nx::db::DBResult executeUpdateAccountQuery(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        std::vector<nx::db::SqlFilterField> fieldsToSet);
+    void updateAccountCache(
+        bool activateAccountIfNotActive,
+        data::AccountUpdateDataWithEmail accountData);
 
     nx::db::DBResult resetPassword(
         nx::db::QueryContext* const queryContext,
@@ -193,10 +206,6 @@ private:
         const std::string& accountEmail,
         api::TemporaryCredentials temporaryCredentials,
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler);
-
-    void prepareAccountFieldsToUpdate(
-        const data::AccountUpdateDataWithEmail& accountData,
-        std::vector<nx::db::SqlFilterField>* const fieldsToSet);
 };
 
 } // namespace cdb

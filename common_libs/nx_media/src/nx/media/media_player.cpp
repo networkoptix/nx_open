@@ -21,12 +21,12 @@
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
-#include <nx/utils/flag_config.h>
 #include <nx/utils/log/log.h>
 
 #define OUTPUT_PREFIX "media_player: "
 #include <nx/utils/debug_utils.h>
 
+#include "config.h"
 #include "media_player_quality_chooser.h"
 #include <utils/common/long_runable_cleanup.h>
 
@@ -54,26 +54,11 @@ static const int kTryLaterIntervalMs = 16;
 // Default value for max openGL texture size
 static const int kDefaultMaxTextureSize = 2048;
 
-// Player will go invalid state if no data during timeout
-static const int kGotDataTimeoutMs = 1000 * 10;
+// Player will go to the invalid state if no data is received within this timeout.
+static const int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
-
-struct NxMediaFlagConfig: public nx::utils::FlagConfig
-{
-    using nx::utils::FlagConfig::FlagConfig;
-
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
-    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-    NX_FLAG(0, enableFps, "");
-    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
-    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
-    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
-    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
-    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
-};
-NxMediaFlagConfig conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -90,7 +75,7 @@ static qint64 usecToMsec(qint64 posUsec)
 class PlayerPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(Player)
-    Player *q_ptr;
+        Player *q_ptr;
 
 public:
     // Holds QT property value.
@@ -262,10 +247,23 @@ void PlayerPrivate::setState(Player::State state)
 void PlayerPrivate::doPeriodicTasks()
 {
     Q_Q(Player);
-    if (state == Player::State::Playing && gotDataTimer.hasExpired(kGotDataTimeoutMs))
+
+    if (state == Player::State::Playing)
     {
-        setMediaStatus(Player::MediaStatus::NoMedia);
-        q->stop();
+        if (dataConsumer &&
+            dataConsumer->audioOutput() &&
+            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        {
+            gotDataTimer.restart();
+            return;
+        }
+
+        if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
+        {
+            log("doPeriodicTasks(): No data, timeout expired => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+        }
     }
 }
 
@@ -292,7 +290,7 @@ void PlayerPrivate::setLiveMode(bool value)
 
 void PlayerPrivate::setAspectRatio(double value)
 {
-    if (qFuzzyCompare(aspectRatio, value))
+    if (qFuzzyEquals(aspectRatio, value))
         return;
 
     aspectRatio = value;
@@ -438,7 +436,8 @@ void PlayerPrivate::presentNextFrame()
     if (videoSurface)
     {
         if (videoSurface->isActive() &&
-            videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+            (videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat()
+                || videoSurface->surfaceFormat().frameSize() != videoFrameToRender->size()))
         {
             videoSurface->stop();
         }
@@ -640,25 +639,25 @@ bool PlayerPrivate::initDataProvider()
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
+    {
+        QRect r;
+        if (guardedThis)
         {
-            QRect r;
-            if (guardedThis)
-            {
-                QMutexLocker lock(&guardedThis->videoGeometryMutex);
-                r = guardedThis->videoGeometry;
-            }
+            QMutexLocker lock(&guardedThis->videoGeometryMutex);
+            r = guardedThis->videoGeometry;
+        }
 
-            if (conf.hwVideoX != -1)
-                r.setX(conf.hwVideoX);
-            if (conf.hwVideoY != -1)
-                r.setY(conf.hwVideoY);
-            if (conf.hwVideoWidth != -1)
-                r.setWidth(conf.hwVideoWidth);
-            if (conf.hwVideoHeight != -1)
-                r.setHeight(conf.hwVideoHeight);
+        if (conf.hwVideoX != -1)
+            r.setX(conf.hwVideoX);
+        if (conf.hwVideoY != -1)
+            r.setY(conf.hwVideoY);
+        if (conf.hwVideoWidth != -1)
+            r.setWidth(conf.hwVideoWidth);
+        if (conf.hwVideoHeight != -1)
+            r.setHeight(conf.hwVideoHeight);
 
-            return r;
-        });
+        return r;
+    });
 
     archiveReader->addDataProcessor(dataConsumer.get());
     connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame,
@@ -669,10 +668,10 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_jumpOccurred);
     connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
         [this]()
-        {
-            Q_Q(Player);
-            q->setPosition(kLivePosition);
-        });
+    {
+        Q_Q(Player);
+        q->setPosition(kLivePosition);
+    });
 
     if (!liveMode)
     {
@@ -745,8 +744,8 @@ QAbstractVideoSurface* Player::videoSurface(int channel) const
 qint64 Player::position() const
 {
     Q_D(const Player);
-    // positionMs is real value from video frame. It coud containt 'coarse' timestamp
-	// a bit less then user requested position (inside of current GOP)
+    // positionMs is the actual value from a video frame. It could contain a "coarse" timestamp
+    // a bit less then the user requested position (inside of the current GOP).
     return qMax(d->lastSeekTimeMs, d->positionMs);
 }
 
@@ -765,6 +764,8 @@ void Player::setPosition(qint64 value)
     d->setLiveMode(value == kLivePosition);
 
     d->at_hurryUp(); //< renew receiving frames
+
+    emit positionChanged();
 }
 
 int Player::maxTextureSize() const
@@ -870,6 +871,9 @@ void Player::setSource(const QUrl& url)
     if (d->resource && currentState == State::Playing)
         play();
 
+    d->log(lit("emit sourceChanged()"));
+    emit sourceChanged();
+
     d->log(lit("setSource(\"%1\") END").arg(newUrl.toString()));
 }
 
@@ -921,7 +925,7 @@ void Player::setVideoQuality(int videoQuality)
 
     if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
     {
-        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+        d->log(lit("setVideoQuality(%1): config forceIframesOnly is true => use value %2")
             .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
         videoQuality = LowIframesOnlyVideoQuality;
     }

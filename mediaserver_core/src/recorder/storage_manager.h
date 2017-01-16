@@ -253,6 +253,7 @@ private:
 	template<typename F>
 	void applySpaceInfoAction(int storageIndex, F action);
 
+    QStringList getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const;
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
         const QString               &oldName,

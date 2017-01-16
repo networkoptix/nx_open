@@ -213,29 +213,27 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     });
 
     /* By [Left] disable user, by [Right] enable user: */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->usersTable->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this, [this](QObject* object, QEvent* event)
-    {
-        Q_UNUSED(object);
-        int key = static_cast<QKeyEvent*>(event)->key();
-        switch (key)
+    installEventHandler(ui->usersTable, QEvent::KeyPress, this,
+        [this](QObject* object, QEvent* event)
         {
-            case Qt::Key_Left:
-            case Qt::Key_Right:
+            Q_UNUSED(object);
+            int key = static_cast<QKeyEvent*>(event)->key();
+            switch (key)
             {
-                if (!ui->usersTable->currentIndex().isValid())
+                case Qt::Key_Left:
+                case Qt::Key_Right:
+                {
+                    if (!ui->usersTable->currentIndex().isValid())
+                        return;
+                    QnUserResourcePtr user = ui->usersTable->currentIndex().data(Qn::UserResourceRole).value<QnUserResourcePtr>();
+                    if (!user)
+                        return;
+                    enableUser(user, key == Qt::Key_Right);
+                }
+                default:
                     return;
-                QnUserResourcePtr user = ui->usersTable->currentIndex().data(Qn::UserResourceRole).value<QnUserResourcePtr>();
-                if (!user)
-                    return;
-                enableUser(user, key == Qt::Key_Right);
             }
-            default:
-                return;
-        }
-    });
+        });
 
     setHelpTopic(this,                                                  Qn::SystemSettings_UserManagement_Help);
     setHelpTopic(ui->enableSelectedButton, ui->disableSelectedButton,   Qn::UserSettings_DisableUser_Help);
@@ -447,7 +445,9 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
 
         default:
             menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user)
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage));
+                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
+                .withArgument(Qn::ForceRole, true)
+            );
     }
 }
 

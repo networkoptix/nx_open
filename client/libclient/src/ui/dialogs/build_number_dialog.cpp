@@ -27,6 +27,7 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    okButton->setText(tr("Select Build"));
 
     ui->buildNumberInputField->setTitle(tr("Build Number"));
     ui->buildNumberInputField->setValidator(
@@ -45,13 +46,14 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget* parent) :
                 : Qn::ValidationResult(tr("The password is incorrect."));
         });
 
-    connect(ui->buildNumberInputField, &QnInputField::textChanged, this, [this, okButton](const QString& text)
-    {
-        if (!ui->passwordInputField->text().isEmpty())
-            ui->passwordInputField->validate();
+    connect(ui->buildNumberInputField, &QnInputField::textChanged, this,
+        [this, okButton](const QString& text)
+        {
+            if (!ui->passwordInputField->text().isEmpty())
+                ui->passwordInputField->validate();
 
-        okButton->setEnabled(text.toInt() > 0);
-    });
+            okButton->setEnabled(text.toInt() > 0);
+        });
 
     okButton->setEnabled(false);
 

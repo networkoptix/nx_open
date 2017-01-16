@@ -132,6 +132,9 @@
               <property name="labelAlignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
+              <property name="horizontalSpacing">
+               <number>8</number>
+              </property>
               <property name="verticalSpacing">
                <number>8</number>
               </property>
@@ -139,6 +142,9 @@
                <widget class="QLabel" name="fpsLabel">
                 <property name="text">
                  <string>FPS</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="buddy">
                  <cstring>fpsSpinBox</cstring>
@@ -162,6 +168,9 @@
                <widget class="QLabel" name="qualityLabel">
                 <property name="text">
                  <string>Quality</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="buddy">
                  <cstring>qualityComboBox</cstring>

@@ -2,6 +2,9 @@
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
 
+class QnLayoutItemAggregator;
+using QnLayoutItemAggregatorPtr = QSharedPointer<QnLayoutItemAggregator>;
+
 /** Handles access to cameras and web pages, placed on shared layouts. */
 class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
 {
@@ -25,9 +28,18 @@ protected:
     virtual void handleResourceAdded(const QnResourcePtr& resource) override;
     virtual void handleResourceRemoved(const QnResourcePtr& resource) override;
 
+    virtual void handleSubjectAdded(const QnResourceAccessSubject& subject) override;
+    virtual void handleSubjectRemoved(const QnResourceAccessSubject& subject) override;
+
 private:
     void handleSharedResourcesChanged(const QnResourceAccessSubject& subject,
         const QSet<QnUuid>& oldValues, const QSet<QnUuid>& newValues);
 
-    void updateAccessToLayoutItems(const QnLayoutResourcePtr& layout);
+    void updateAccessToLayout(const QnLayoutResourcePtr& layout);
+
+    QnLayoutItemAggregatorPtr ensureAggregatorForSubject(
+        const QnResourceAccessSubject& subject);
+
+private:
+    QHash<QnUuid, QnLayoutItemAggregatorPtr> m_aggregatorsBySubject;
 };

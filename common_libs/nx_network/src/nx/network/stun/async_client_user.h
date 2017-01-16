@@ -32,6 +32,9 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
+    /** Return AbstractAsyncClient for configuration purposes */
+    AbstractAsyncClient* client() const;
+
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
     virtual ~AsyncClientUser() override;
@@ -47,5 +50,5 @@ private:
     std::shared_ptr<AbstractAsyncClient> m_client;
 };
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

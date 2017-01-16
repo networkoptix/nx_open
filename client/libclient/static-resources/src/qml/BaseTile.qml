@@ -27,12 +27,12 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: shadow.opacity;
-    property bool isOnline: false;
+    property bool isConnectible: false;
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
 
-    signal collapsedTileClicked();
+    signal collapsedTileClicked(int buttons, int x, int y);
 
     property bool forceImmediateAnimation: false;
 
@@ -112,7 +112,7 @@ Item
                 PropertyChanges
                 {
                     target: hideTileButton;
-                    opacity: (control.isOnline ? 0 : 1);
+                    opacity: (isConnectible ? 0 : 1);
                 }
 
                 PropertyChanges
@@ -289,14 +289,18 @@ Item
         {
             id: toggleMouseArea;
 
+            property int pressedButtons: 0;
+
             x: (control.isExpanded ? -parent.x : 0);
             y: (control.isExpanded ? -parent.y : 0);
             width: tileHolder.parent.width;
             height: tileHolder.parent.height;
 
+            acceptedButtons: (Qt.LeftButton | Qt.RightButton);
             hoverEnabled: true;
             onPressed:
             {
+                pressedButtons = mouse.buttons;
                 if (context.connectingToSystem.length)
                     return;
 
@@ -309,11 +313,11 @@ Item
 
             onReleased:
             {
-                if (context.connectingToSystem.length)
+                if (context.connectingToSystem.length || control.isExpanded)
                     return;
 
-                if (!control.isExpanded)
-                    control.collapsedTileClicked();
+                control.collapsedTileClicked(toggleMouseArea.pressedButtons,
+                    mouse.x, mouse.y);
             }
         }
 
@@ -432,8 +436,10 @@ Item
                     bkgColor: tileArea.color;
                     onClicked:
                     {
-                        var id = (isCloudTile ? control.systemId : control.localId);
-                        context.hideSystem(id);
+                        // Hides both cloud and local offline tiles
+                        if (isCloudTile)
+                            context.hideSystem(control.systemId);
+                        context.hideSystem(control.localId);
                     }
                 }
 

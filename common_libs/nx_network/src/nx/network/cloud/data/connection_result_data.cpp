@@ -6,7 +6,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-using namespace stun::cc;
+using namespace stun::extension;
 
 ConnectionResultRequest::ConnectionResultRequest()
 :
@@ -36,9 +36,9 @@ bool ConnectionResultRequest::parseAttributes(const nx::stun::Message& message)
             &connectSessionId);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, NatTraversalResultCode,
     (nx::hpm::api::NatTraversalResultCode::ok, "ok")

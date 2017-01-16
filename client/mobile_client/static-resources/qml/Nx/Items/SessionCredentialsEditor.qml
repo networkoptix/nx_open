@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Dialogs 1.0
 import com.networkoptix.qml 1.0
 
 import "private"
@@ -14,7 +15,8 @@ Pane
     implicitWidth: parent ? parent.width : 400
     background: null
 
-    property alias hostsModel: hostSelectionDialog.hostsModel
+    property alias hostsModel: hostSelectionDialog.model
+    property alias recentLocalConnectionsModel: userSelectionDialog.model;
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
@@ -85,6 +87,18 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
+            rightPadding: chooseUserButton.visible ? chooseUserButton.width : 8
+
+            IconButton
+            {
+                id: chooseUserButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                icon: lp("/images/expand.png")
+                onClicked: userSelectionDialog.open()
+                visible: recentLocalConnectionsModel.count > 1
+            }
+
             onAccepted: KeyNavigation.tab.forceActiveFocus()
             onActiveFocusChanged:
             {
@@ -126,12 +140,25 @@ Pane
         }
     }
 
-    HostSelectionDialog
+    ItemSelectionDialog
     {
         id: hostSelectionDialog
-        deleteOnClose: false
-        activeHost: address
-        onActiveHostChanged: addressField.text = activeHost
+        title: qsTr("Hosts")
+        currentItem: address
+        onCurrentItemChanged: addressField.text = currentItem
+    }
+
+    ItemSelectionDialog
+    {
+        id: userSelectionDialog
+        title: qsTr("Users")
+        currentItem: login
+        onItemActivated:
+        {
+            loginField.text = currentItem
+            passwordField.text = model.getData("password", currentIndex)
+            passwordField.forceActiveFocus()
+        }
     }
 
     function focusAddressField()

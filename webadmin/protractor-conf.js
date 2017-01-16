@@ -23,8 +23,13 @@ exports.config = {
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 30000
+        // adjust id you see message "Timeout - Async callback was not invoked within timeout specified by jasmine.DEFAULT_TIMEOUT_INTERVAL"
+        defaultTimeoutInterval: 90000
     },
+
+    // Waiting for Page Synchronization https://github.com/angular/protractor/blob/master/docs/timeouts.md
+    // Adjust if you see message "Timed out waiting for Protractor to synchronize with the page after 60 seconds"
+    allScriptsTimeout: 60000,
 
     // Authentication before running tests
     onPrepare: function() {
@@ -44,6 +49,7 @@ exports.config = {
                 self.helper.completeSetup(); }
         });
 
-        self.helper.login('admin', 'qweasd123');
+        var pwd = self.helper.password;
+        self.helper.attemptLogin([self.helper.admin, pwd], [self.helper.cloudEmail, pwd]);
     }
 };

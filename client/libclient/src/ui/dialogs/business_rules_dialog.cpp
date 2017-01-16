@@ -35,6 +35,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -170,9 +171,7 @@ namespace {
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
     ui(new Ui::BusinessRulesDialog()),
-    m_popupMenu(new QMenu(this)),
-    m_advancedAction(NULL),
-    m_advancedMode(false)
+    m_popupMenu(new QMenu(this))
 {
     ui->setupUi(this);
     retranslateUi();
@@ -190,8 +189,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     m_currentDetailsWidget = ui->detailsWidget;
 
-    //TODO: #GDM #3.0 fix icon
-    ui->advancedButton->setIcon(qnSkin->icon(lit("buttons/down.png")));
     ui->eventLogButton->setIcon(qnSkin->icon(lit("buttons/event_log.png")));
 
     createActions();
@@ -211,7 +208,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
     sortModel->sort(kSortColumn);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
+
+    enum { kUpdateFilterDelayMs = 200 };
+    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
 
     ui->tableView->setModel(sortModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -232,15 +232,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
 
-    ui->tableView->clearSelection();
     ui->tableView->horizontalHeader()->setSortIndicator(kSortColumn, Qt::AscendingOrder);
 
-    // TODO: #Elric replace with a single connect call
-    QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->tableView->viewport()->installEventFilter(resizeSignalizer);
-    connect(resizeSignalizer, &QnAbstractEventSignalizer::activated, this, &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
-
+    installEventHandler(ui->tableView->viewport(), QEvent::Resize, this,
+        &QnBusinessRulesDialog::at_tableViewport_resizeEvent, Qt::QueuedConnection);
 
     //TODO: #GDM #Business show description label if no rules are loaded
 
@@ -255,9 +250,6 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->deleteRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    connect(ui->advancedButton, &QPushButton::clicked, this,
-        &QnBusinessRulesDialog::toggleAdvancedMode);
-
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::businessRuleDeleted, this,
         &QnBusinessRulesDialog::at_message_ruleDeleted);
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::beforeModelChanged, this,
@@ -268,13 +260,27 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->eventLogButton, &QPushButton::clicked,
         context()->action(QnActions::OpenBusinessLogAction), &QAction::trigger);
 
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged, this,
         &QnBusinessRulesDialog::updateFilter);
-    connect(ui->clearFilterButton, &QToolButton::clicked, this,
-        &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
     updateFilter();
     updateControlButtons();
+
+    auto updateSelection =
+        [this](bool tableIsEmpty)
+        {
+            if (!tableIsEmpty && !ui->tableView->currentIndex().isValid())
+                ui->tableView->setCurrentIndex(ui->tableView->model()->index(0, 0));
+        };
+
+    updateSelection(ui->tableView->model()->rowCount() == 0);
+
+    /*
+    * Create auto-hider which will hide empty table and show a message instead. Table will be
+    * reparented. Snapped scrollbar is already created and will stay in the correct parent.
+    */
+    auto autoHider = QnItemViewAutoHider::create(ui->tableView, tr("No event rules"));
+    connect(autoHider, &QnItemViewAutoHider::viewVisibilityChanged, this, updateSelection);
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(ui->buttonBox);
@@ -286,7 +292,7 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog() {
 }
 
 void QnBusinessRulesDialog::setFilter(const QString &filter) {
-    ui->filterLineEdit->setText(filter);
+    ui->filterLineEdit->lineEdit()->setText(filter);
 }
 
 void QnBusinessRulesDialog::accept()
@@ -365,10 +371,10 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
     const int kInvalidSortingColumn = -1;
 
-    int row = m_rulesViewModel->createRule();
+    m_rulesViewModel->createRule();
     //TODO: #GDM correct way will be return index and proxy it via sort model,
     //but without dynamic sorting it just works this way
-    ui->tableView->selectRow(row);
+    ui->tableView->selectRow(ui->tableView->model()->rowCount() - 1);
     ui->tableView->horizontalHeader()->setSortIndicator(kInvalidSortingColumn, Qt::AscendingOrder);
 }
 
@@ -394,10 +400,6 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 
     QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
-}
-
-void QnBusinessRulesDialog::at_clearFilterButton_clicked() {
-    ui->filterLineEdit->clear();
 }
 
 void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
@@ -456,15 +458,6 @@ void QnBusinessRulesDialog::at_model_dataChanged(const QModelIndex &topLeft, con
     updateFilter();
 }
 
-void QnBusinessRulesDialog::toggleAdvancedMode() {
-    setAdvancedMode(!advancedMode());
-}
-
-void QnBusinessRulesDialog::updateAdvancedAction() {
-    m_currentDetailsWidget->setVisible(advancedMode());
-    m_advancedAction->setText(advancedMode() ? tr("Hide Advanced") : tr("Show Advanced"));
-}
-
 void QnBusinessRulesDialog::createActions() {
     m_newAction = new QAction(tr("&New..."), this);
     connect(m_newAction, &QAction::triggered, this, &QnBusinessRulesDialog::at_newRuleButton_clicked);
@@ -472,17 +465,12 @@ void QnBusinessRulesDialog::createActions() {
     m_deleteAction = new QAction(tr("&Delete"), this);
     connect(m_deleteAction, &QAction::triggered, this, &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    m_advancedAction = new QAction(this);
-    connect(m_advancedAction, &QAction::triggered, this, &QnBusinessRulesDialog::toggleAdvancedMode);
-    updateAdvancedAction();
-
     QAction* scheduleAct = new QAction(tr("&Schedule..."), this);
     connect(scheduleAct, &QAction::triggered, m_currentDetailsWidget, &QnBusinessRuleWidget::at_scheduleButton_clicked);
 
     m_popupMenu->addAction(m_newAction);
     m_popupMenu->addAction(m_deleteAction);
     m_popupMenu->addSeparator();
-    m_popupMenu->addAction(m_advancedAction);
     m_popupMenu->addAction(scheduleAct);
 }
 
@@ -534,7 +522,9 @@ void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr &ruleMod
 }
 
 void QnBusinessRulesDialog::updateControlButtons() {
-    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission) && !qnCommon->isReadOnly();
+    bool hasRights = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+        && !qnCommon->isReadOnly();
+
     bool hasChanges = hasRights && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
@@ -548,12 +538,9 @@ void QnBusinessRulesDialog::updateControlButtons() {
     ui->deleteRuleButton->setEnabled(canDelete);
     m_deleteAction->setEnabled(canDelete);
 
-    ui->advancedButton->setEnabled(m_currentDetailsWidget->model());
-    m_advancedAction->setEnabled(m_currentDetailsWidget->model());
+    m_currentDetailsWidget->setVisible(hasRights && m_currentDetailsWidget->model());
     ui->addRuleButton->setEnabled(hasRights);
     m_newAction->setEnabled(hasRights);
-
-    setAdvancedMode(hasRights && advancedMode());
 }
 
 void QnBusinessRulesDialog::updateFilter() {
@@ -563,39 +550,22 @@ void QnBusinessRulesDialog::updateFilter() {
         ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
         return;
     }
-
-    ui->clearFilterButton->setVisible(!filter.isEmpty());
 }
 
 void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    ui->filterLineEdit->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("filter by devices..."),
-        tr("filter by cameras...")
+    ui->filterLineEdit->lineEdit()->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Filter by devices..."),
+        tr("Filter by cameras...")
     ));
 }
 
-bool QnBusinessRulesDialog::advancedMode() const {
-    return m_advancedMode;
-}
-
-void QnBusinessRulesDialog::setAdvancedMode(bool value) {
-    if (m_advancedMode == value)
-        return;
-
-    if (value && !m_currentDetailsWidget->model())
-        return; // advanced options cannot be displayed
-
-    m_advancedMode = value;
-    updateAdvancedAction();
-}
-
 bool QnBusinessRulesDialog::tryClose(bool force) {
-    if (force || isHidden()) {
+    if (force || isHidden())
+    {
         m_rulesViewModel->reset();
-        setAdvancedMode(false);
         hide();
         return true;
     }
@@ -618,11 +588,9 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     case QDialogButtonBox::Yes:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
-        setAdvancedMode(false);
         break;
     case QDialogButtonBox::No:
         m_rulesViewModel->reset();
-        setAdvancedMode(false);
         break;
     default:
         return false;   // Cancel was pressed

@@ -38,17 +38,54 @@ ComboBox
         target: (model ? model : null);
         ignoreUnknownSignals: true;
 
+        onDataChanged:
+        {
+            if ((topLeft.row > thisComponent.currentIndex)
+                || (bottomRight.row < thisComponent.currentIndex))
+            {
+                return;
+            }
+
+            /**
+              * Since dataChanged signal is not handled by ComboBox properly we have to reload
+              * updated data manually. The best decision is to force index change because in this
+              * case data for each role is updated
+              */
+            var lastIndex = thisComponent.currentIndex;
+            thisComponent.currentIndex = -1;
+            thisComponent.currentIndex = lastIndex;
+        }
+
         onRowsRemoved:
         {
             if (currentIndex == -1)
                 return;
 
             if (count === 0)
+            {
                 currentIndex = -1;
-            else if (currentIndex >= first && currentIndex <= last)
-                currentIndex = -1;  // This item has been removed
+                return;
+            }
+
+            var removedCount = (last - first + 1);
+            if (currentIndex >= first && currentIndex <= last)
+            {
+                var prevItemIndex = first - 1;
+                if (prevItemIndex >= 0)
+                {
+                    currentIndex = prevItemIndex;
+                }
+                else
+                {
+                    var nextItemIndex = (last - removedCount) + 1;
+                    if (nextItemIndex < count)
+                        currentIndex = nextItemIndex;
+                }
+            }
             else if (currentIndex > last)
-                currentIndex -= (last - first + 1);
+            {
+                currentIndex -= removedCount;
+            }
         }
 
         onRowsInserted:

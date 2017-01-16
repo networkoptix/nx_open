@@ -75,9 +75,14 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider)
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull())
+    {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
+    }
     else
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+    {
+        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png",
+            QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    }
 
     connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage& image)
     {
@@ -177,7 +182,6 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
     m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
-    m_closeButton->setToolTip(tr("Close"));
     m_closeButton->setVisible(false);
     connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
 
@@ -294,16 +298,12 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
     button->setAcceptHoverEvents(false);
 
     button->setIcon(icon);
-    button->setToolTip(tooltip);
     button->setProperty(kActionIndexPropertyName, m_actions.size());
     button->setFixedSize(QnSkin::maximumSize(icon));
 
     if (m_defaultActionIdx < 0 || defaultAction)
-    {
         m_defaultActionIdx = m_actions.size();
-        m_textLabel->setToolTip(tooltip);
-        setToolTip(tooltip);
-    }
+
 
     QGraphicsLinearLayout* layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0.0, 0.0, 0.0, 0.0);

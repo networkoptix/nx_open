@@ -16,7 +16,8 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(QObject* parent, QGLContext* 
     QnAbstractRenderer( parent ),
     m_glContext( context ),
     m_screenshotInterface(0),
-    m_panoFactor(1)
+    m_panoFactor(1),
+    m_blurFactor(0.0)
 {
     NX_ASSERT( context != NULL );
 
@@ -180,13 +181,21 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
     return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
 }
 
-Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
+void QnResourceWidgetRenderer::setBlurFactor(qreal value)
+{
+    m_blurFactor = value;
+}
+
+Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity)
+{
     if (m_channelRenderers.size() <= static_cast<size_t>(channel))
         return Qn::NothingRendered;
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)
         return Qn::NothingRendered;
     ctx.uploader->setOpacity(opacity);
+
+    ctx.renderer->setBlurFactor(m_blurFactor);
     return ctx.renderer->paint(sourceRect, targetRect);
 }
 

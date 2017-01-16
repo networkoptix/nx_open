@@ -70,7 +70,11 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease),
+        makeSet(
+            QEvent::GraphicsSceneMousePress,
+            QEvent::GraphicsSceneMouseMove,
+            QEvent::GraphicsSceneMouseDoubleClick,
+            QEvent::GraphicsSceneMouseRelease),
         parent
     ),
     QnWorkbenchContextAware(parent),
@@ -151,7 +155,73 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     return overlay;
 }
 
-FixedArSelectionItem *PtzInstrument::selectionItem() const {
+bool PtzInstrument::processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event)
+{
+    m_clickTimer.stop();
+
+    if (event->button() != Qt::LeftButton)
+    {
+        m_skipNextAction = true; /* Interrupted by RMB? Do nothing. */
+        reset();
+        return false;
+    }
+
+    const auto target = checked_cast<QnMediaResourceWidget*>(item);
+    if (!target->options().testFlag(QnResourceWidget::ControlPtz))
+        return false;
+
+    if (!target->rect().contains(event->pos()))
+        return false; /* Ignore clicks on widget frame. */
+
+    PtzManipulatorWidget* manipulator = nullptr;
+    if (const auto overlay = overlayWidget(target))
+    {
+        manipulator = overlay->manipulatorWidget();
+        if (!manipulator->isVisible()
+            || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
+        {
+            manipulator = nullptr;
+        }
+    }
+
+    const PtzData& data = m_dataByWidget[target];
+    if (manipulator)
+    {
+        m_movement = ContinuousMovement;
+
+        m_movementOrientations = 0;
+        if (data.hasCapabilities(Qn::ContinuousPanCapability))
+            m_movementOrientations |= Qt::Horizontal;
+        if (data.hasCapabilities(Qn::ContinuousTiltCapability))
+            m_movementOrientations |= Qt::Vertical;
+    }
+    else
+    {
+        if (data.hasCapabilities(Qn::VirtualPtzCapability
+            | Qn::AbsolutePtzCapabilities
+            | Qn::LogicalPositioningPtzCapability))
+        {
+            m_movement = VirtualMovement;
+        }
+        else if (data.hasCapabilities(Qn::ViewportPtzCapability))
+        {
+            m_movement = ViewportMovement;
+        }
+        else
+        {
+            m_movement = NoMovement;
+            return false;
+        }
+    }
+
+    m_skipNextAction = false;
+    m_target = target;
+
+    return true;
+}
+
+FixedArSelectionItem *PtzInstrument::selectionItem() const
+{
     return m_selectionItem.data();
 }
 
@@ -321,8 +391,10 @@ void PtzInstrument::processPtzDrag(const QRectF &rect) {
     ptzMoveTo(target(), rect);
 }
 
-void PtzInstrument::processPtzDoubleClick() {
-    if(!target() || m_skipNextAction)
+void PtzInstrument::processPtzDoubleClick()
+{
+    m_isDoubleClick = false; //do not repeat double-click
+    if (!target() || m_skipNextAction)
         return;
 
     QnSplashItem *splashItem = newSplashItem(target());
@@ -337,7 +409,7 @@ void PtzInstrument::processPtzDoubleClick() {
     /* Also do item unzoom if we're zoomed in. */
     QRectF viewportGeometry = display()->viewportGeometry();
     QRectF zoomedItemGeometry = display()->itemGeometry(target()->item());
-    if(viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
+    if (viewportGeometry.width() < zoomedItemGeometry.width() * itemUnzoomThreshold || viewportGeometry.height() < zoomedItemGeometry.height() * itemUnzoomThreshold)
         emit doubleClicked(target());
 }
 
@@ -411,20 +483,26 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     m_dataByWidget.remove(object);
 }
 
-void PtzInstrument::timerEvent(QTimerEvent *event) {
-    if(event->timerId() == m_clickTimer.timerId()) {
+void PtzInstrument::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_clickTimer.timerId())
+    {
         m_clickTimer.stop();
-
         processPtzClick(m_clickPos);
-    } else if(event->timerId() == m_movementTimer.timerId()) {
-        if(!target())
-            return;
-
-        ptzMove(target(), m_dataByWidget[target()].requestedSpeed);
-        m_movementTimer.stop();
-    } else {
-        base_type::timerEvent(event);
     }
+    else
+        if (event->timerId() == m_movementTimer.timerId())
+        {
+            if (!target())
+                return;
+
+            ptzMove(target(), m_dataByWidget[target()].requestedSpeed);
+            m_movementTimer.stop();
+        }
+        else
+        {
+            base_type::timerEvent(event);
+        }
 }
 
 bool PtzInstrument::animationEvent(AnimationEvent *event) {
@@ -465,66 +543,30 @@ bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
 }
 
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-    bool clickTimerWasActive = m_clickTimer.isActive();
-    m_clickTimer.stop();
-
-    if(event->button() != Qt::LeftButton) {
-        m_skipNextAction = true; /* Interrupted by RMB? Do nothing. */
-        reset();
-        return false;
-    }
-
-    QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
-    if(!(target->options() & QnResourceWidget::ControlPtz))
+    if (!processMousePress(item, event))
         return false;
 
-    if(!target->rect().contains(event->pos()))
-        return false; /* Ignore clicks on widget frame. */
-
-    PtzManipulatorWidget *manipulator = NULL;
-    if(PtzOverlayWidget *overlay = overlayWidget(target)) {
-        manipulator = overlay->manipulatorWidget();
-        if(!manipulator->isVisible() || !manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
-            manipulator = NULL;
-    }
-
-    const PtzData &data = m_dataByWidget[target];
-    if(manipulator) {
-        m_movement = ContinuousMovement;
-
-        m_movementOrientations = 0;
-        if(data.hasCapabilities(Qn::ContinuousPanCapability))
-            m_movementOrientations |= Qt::Horizontal;
-        if(data.hasCapabilities(Qn::ContinuousTiltCapability))
-            m_movementOrientations |= Qt::Vertical;
-    } else {
-        if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
-            m_movement = VirtualMovement;
-        } else if(data.hasCapabilities(Qn::ViewportPtzCapability)) {
-            m_movement = ViewportMovement;
-        } else {
-            m_movement = NoMovement;
-            return false;
-        }
-    }
-
-    m_skipNextAction = false;
-    m_target = target;
-    m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
-
-    dragProcessor()->mousePressEvent(target, event);
-
-    event->accept();
-    return false;
+    return base_type::mousePressEvent(item, event);
 }
 
-void PtzInstrument::startDragProcess(DragInfo *) {
+bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event)
+{
+    if (!processMousePress(item, event))
+        return false;
+
+    m_isDoubleClick = true;
+    return base_type::mouseDoubleClickEvent(item, event);
+}
+
+void PtzInstrument::startDragProcess(DragInfo *)
+{
     m_isClick = true;
     emit ptzProcessStarted(target());
 }
 
 void PtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
+    m_isDoubleClick = false;
     m_ptzStartedEmitted = false;
 
     if(!target()) {
@@ -669,25 +711,32 @@ void PtzInstrument::finishDrag(DragInfo *info) {
         emit ptzFinished(target());
 }
 
-void PtzInstrument::finishDragProcess(DragInfo *info) {
-    if(target()) {
-        switch (m_movement) {
-        case ContinuousMovement:
-            ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
-            break;
-        case ViewportMovement:
-        case VirtualMovement:
-            if(m_isClick) {
-                if(m_isDoubleClick) {
-                    processPtzDoubleClick();
-                } else {
-                    m_clickTimer.start(m_clickDelayMSec, this);
-                    m_clickPos = info->mousePressItemPos();
+void PtzInstrument::finishDragProcess(DragInfo *info)
+{
+    if (target())
+    {
+        switch (m_movement)
+        {
+            case ContinuousMovement:
+                ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
+                break;
+            case ViewportMovement:
+            case VirtualMovement:
+                if (m_isClick)
+                {
+                    if (m_isDoubleClick)
+                    {
+                        processPtzDoubleClick();
+                    }
+                    else
+                    {
+                        m_clickTimer.start(m_clickDelayMSec, this);
+                        m_clickPos = info->mousePressItemPos();
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 

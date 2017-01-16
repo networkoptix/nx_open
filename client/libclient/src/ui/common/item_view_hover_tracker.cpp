@@ -16,13 +16,7 @@ QnItemViewHoverTracker::QnItemViewHoverTracker(QAbstractItemView* parent) :
     m_itemView->setMouseTracking(true);
     m_itemView->setAttribute(Qt::WA_Hover);
 
-    auto hoverSignalizer = new QnMultiEventSignalizer(this);
-    hoverSignalizer->addEventType(QEvent::HoverEnter);
-    hoverSignalizer->addEventType(QEvent::HoverLeave);
-    hoverSignalizer->addEventType(QEvent::HoverMove);
-    m_itemView->installEventFilter(hoverSignalizer);
-
-    connect(hoverSignalizer, &QnMultiEventSignalizer::activated, this,
+    installEventHandler(m_itemView, { QEvent::HoverEnter, QEvent::HoverLeave, QEvent::HoverMove }, this,
         [this](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);

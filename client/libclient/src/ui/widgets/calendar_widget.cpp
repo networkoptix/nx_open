@@ -15,6 +15,7 @@
 #include <utils/math/color_transformations.h>
 
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/delegates/calendar_item_delegate.h>
 #include <ui/common/palette.h>
 
@@ -38,6 +39,8 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
+    setProperty(style::Properties::kDontPolishFontProperty, true);
+
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
     monthButton->setMenu(NULL);
@@ -53,10 +56,7 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     connect(tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
     //setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
-    QnSingleEventSignalizer *signalizer = new QnSingleEventSignalizer(this);
-    signalizer->setEventType(QEvent::Paint);
-    tableView->viewport()->installEventFilter(signalizer);
-    connect(signalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(updateCurrentTime()));
+    installEventHandler(tableView->viewport(), QEvent::Paint, this, &QnCalendarWidget::updateCurrentTime);
 
     QAbstractItemModel *model = tableView->model();
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));

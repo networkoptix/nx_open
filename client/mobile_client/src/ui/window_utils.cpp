@@ -14,35 +14,39 @@ QWindow *getMainWindow()
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
-void prepareWindow() {}
+    void prepareWindow() {}
 
-void hideSystemUi() {}
+    void hideSystemUi() {}
 
-void showSystemUi() {}
+    void showSystemUi() {}
 
-int statusBarHeight() {
-    return 0;
-}
+    int statusBarHeight() {
+        return 0;
+    }
 
-int navigationBarHeight() {
-    return 0;
-}
+    int navigationBarHeight() {
+        return 0;
+    }
 
-bool isPhone() {
-    return false;
-}
+    bool isPhone() {
+        return false;
+    }
 
-void setKeepScreenOn(bool keepScreenOn) {
-    Q_UNUSED(keepScreenOn)
-}
+    void setKeepScreenOn(bool keepScreenOn) {
+        Q_UNUSED(keepScreenOn)
+    }
 
-#endif
+#endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
-void setScreenOrientation(Qt::ScreenOrientation orientation)
-{
-    QWindow *window = getMainWindow();
-    if (!window)
-        return;
+#if !defined(Q_OS_ANDROID)
 
-    window->reportContentOrientationChange(orientation);
-}
+    void setScreenOrientation(Qt::ScreenOrientation orientation)
+    {
+        QWindow *window = getMainWindow();
+        if (!window)
+            return;
+
+        window->reportContentOrientationChange(orientation);
+    }
+
+#endif // !defined(Q_OS_ANDROID)

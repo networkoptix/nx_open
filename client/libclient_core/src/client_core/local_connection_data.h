@@ -50,9 +50,12 @@ Q_DECLARE_METATYPE(QnWeightDataList)
 
 namespace helpers {
 
-QnLocalConnectionData storeLocalSystemConnection(
+bool storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
-    const QUrl& url);
+    const QUrl& url,
+    QnLocalConnectionData& result);
+
+void forgetLocalConnectionPassword(const QnUuid& localId, const QString& userName);
 
 }

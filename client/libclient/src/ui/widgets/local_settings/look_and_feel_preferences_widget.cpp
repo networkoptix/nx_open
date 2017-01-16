@@ -2,15 +2,15 @@
 #include "ui_look_and_feel_preferences_widget.h"
 
 #include <QtCore/QDir>
-#include <QtCore/QStandardPaths>
-#include <QtGui/QDesktopServices>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 #include <client/client_globals.h>
 #include <client/client_translation_manager.h>
 
 #include <common/common_module.h>
 
+#include <ui/common/aligner.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
@@ -18,7 +18,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/translation_list_model.h>
 #include <ui/style/custom_style.h>
-#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
@@ -27,29 +26,54 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/local_file_cache.h>
 
+namespace {
+
+qreal opacityFromPercent(int percent)
+{
+    return 0.01 * percent;
+}
+
+int opacityToPercent(qreal opacity)
+{
+    return qRound(opacity * 100);
+}
+
+} // namespace
+
 QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::LookAndFeelPreferencesWidget),
-    m_updating(false),
-    m_oldLanguage(0),
-    m_oldTimeMode(Qn::ServerTimeMode)
+    ui(new Ui::LookAndFeelPreferencesWidget)
 {
     ui->setupUi(this);
 
-    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(this);
-    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
-
-    ui->timeModeWarningLabel->setText(tr("This option will not affect Recording Schedule. Recording Schedule is always based on Server Time."));
+    ui->timeModeWarningLabel->setText(
+        tr("This option will not affect Recording Schedule. "
+           "Recording Schedule is always based on Server Time."));
 
     setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 
+    auto aligner = new QnAligner(this);
+    aligner->addWidgets({
+        ui->languageLabel,
+        ui->timeModeLabel,
+        ui->tourCycleTimeLabel,
+        ui->imageNameLabel,
+        ui->imageModeLabel,
+        ui->imageOpacityLabel
+    });
+
     setupLanguageUi();
     setupTimeModeUi();
     setupBackgroundUi();
+
+    connect(ui->tourCycleTimeSpinBox, QnSpinboxIntValueChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->showIpInTreeCheckBox, &QCheckBox::clicked, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
@@ -58,24 +82,16 @@ QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
 
 void QnLookAndFeelPreferencesWidget::applyChanges()
 {
-    qnSettings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
-    qnSettings->setExtraInfoInTree(
-        ui->showIpInTreeCheckBox->isChecked()
-        ? Qn::RI_FullInfo
-        : Qn::RI_NameOnly
-    );
-    qnSettings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
+    qnSettings->setTourCycleTime(selectedTourCycleTimeMs());
+    qnSettings->setExtraInfoInTree(selectedInfoLevel());
+    qnSettings->setTimeMode(selectedTimeMode());
 
-    QnTranslation translation = ui->languageComboBox->itemData(ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
-    if (!translation.isEmpty())
-    {
-        if (!translation.filePaths().isEmpty())
-        {
-            QString currentTranslationPath = qnSettings->translationPath();
-            if (!translation.filePaths().contains(currentTranslationPath))
-                qnSettings->setTranslationPath(translation.filePaths()[0]);
-        }
-    }
+    //TODO: #GDM store locale code instead
+    qnSettings->setTranslationPath(selectedTranslation());
+
+    /* Background changes are applied instantly. */
+    if (backgroundAllowed())
+        m_oldBackground = qnSettings->backgroundImage();
 }
 
 void QnLookAndFeelPreferencesWidget::loadDataToUi()
@@ -87,35 +103,35 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
 
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
 
-    m_oldLanguage = -1;
     int defaultLanguageIndex = -1;
+    int currentLanguage = -1;
     QString translationPath = qnSettings->translationPath();
-    for(int i = 0; i < ui->languageComboBox->count(); i++)
+    for (int i = 0; i < ui->languageComboBox->count(); i++)
     {
-        QnTranslation translation = ui->languageComboBox->itemData(i, Qn::TranslationRole).value<QnTranslation>();
-        if(translation.filePaths().contains(translationPath)) {
-            m_oldLanguage = i;
-            break;
-        }
+        QnTranslation translation = ui->languageComboBox->itemData(
+            i, Qn::TranslationRole).value<QnTranslation>();
+
+        if (translation.filePaths().contains(translationPath))
+            currentLanguage = i;
 
         if (translation.localeCode() == QnAppInfo::defaultLanguage())
             defaultLanguageIndex = i;
     }
 
-    if (m_oldLanguage < 0) {
+    if (currentLanguage < 0)
+    {
         NX_ASSERT(defaultLanguageIndex >= 0, Q_FUNC_INFO, "default language must definitely be present in translations");
-        m_oldLanguage = std::max(defaultLanguageIndex, 0);
+        currentLanguage = std::max(defaultLanguageIndex, 0);
     }
 
-    ui->languageComboBox->setCurrentIndex(m_oldLanguage);
+    ui->languageComboBox->setCurrentIndex(currentLanguage);
 
-    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-    ui->imageGroupBox->setEnabled(backgroundAllowed);
+    ui->imageGroupBox->setEnabled(backgroundAllowed());
 
     QnBackgroundImage background = qnSettings->backgroundImage();
     m_oldBackground = background;
 
-    if (!backgroundAllowed)
+    if (!backgroundAllowed())
     {
         ui->imageGroupBox->setChecked(false);
     }
@@ -124,46 +140,52 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
         ui->imageGroupBox->setChecked(background.enabled);
         ui->imageNameLineEdit->setText(background.originalName);
         ui->imageModeComboBox->setCurrentIndex(ui->imageModeComboBox->findData(qVariantFromValue(background.mode)));
-        ui->imageOpacitySpinBox->setValue(qRound(background.opacity * 100));
+        ui->imageOpacitySpinBox->setValue(opacityToPercent(background.opacity));
     }
 }
 
 bool QnLookAndFeelPreferencesWidget::hasChanges() const
 {
-    //TODO: #GDM implement me
-    return true;
+    /* Background changes are applied instantly. */
+    if (backgroundAllowed() && qnSettings->backgroundImage() != m_oldBackground)
+        return true;
+
+    return qnSettings->translationPath() != selectedTranslation()
+        || qnSettings->timeMode() != selectedTimeMode()
+        || qnSettings->extraInfoInTree() != selectedInfoLevel()
+        || qnSettings->tourCycleTime() != selectedTourCycleTimeMs();
 }
 
+
+void QnLookAndFeelPreferencesWidget::discardChanges()
+{
+    if (backgroundAllowed())
+        qnSettings->setBackgroundImage(m_oldBackground);
+}
 
 bool QnLookAndFeelPreferencesWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return m_oldLanguage != ui->languageComboBox->currentIndex();
-}
-
-bool QnLookAndFeelPreferencesWidget::canDiscardChanges() const
-{
-    //TODO: #GDM restoring changes does not belongs here
-    bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
-    if (backgroundAllowed)
-        qnSettings->setBackgroundImage(m_oldBackground);
-    return true;
+    return qnRuntime->translationPath() != selectedTranslation();
 }
 
 void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
 {
     QString nameFilter;
-    foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
+    for (const QByteArray&format: QImageReader::supportedImageFormats())
+    {
         if (!nameFilter.isEmpty())
-            nameFilter += QLatin1Char(' ');
-        nameFilter += QLatin1String("*.") + QLatin1String(format);
+            nameFilter += L' ';
+        nameFilter += lit("*.") + QLatin1String(format);
     }
-    nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
+    nameFilter = L'(' + nameFilter + L')';
 
-    const QString previousName = qnSettings->backgroundImage().name;
-    QString folder = QFileInfo(previousName).absolutePath();
+    QString prevOriginalName = qnSettings->backgroundImage().originalName;
+    QString folder = QFileInfo(prevOriginalName).absolutePath();
     if (folder.isEmpty())
         folder = qnSettings->backgroundsFolder();
+
+    const QString previousCachedName = qnSettings->backgroundImage().name;
 
     QScopedPointer<QnCustomFileDialog> dialog(
         new QnCustomFileDialog(
@@ -174,7 +196,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     );
     dialog->setFileMode(QFileDialog::ExistingFile);
 
-    if(!dialog->exec())
+    if (!dialog->exec())
         return;
 
     QString originalFileName = dialog->selectedFile();
@@ -184,58 +206,97 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage()
     qnSettings->setBackgroundsFolder(QFileInfo(originalFileName).absolutePath());
 
     QString cachedName = QnAppServerImageCache::cachedImageFilename(originalFileName);
-    if (previousName == cachedName ||
-        QDir::toNativeSeparators(previousName).toLower() ==
+    if (previousCachedName == cachedName ||
+        QDir::toNativeSeparators(previousCachedName).toLower() ==
         QDir::toNativeSeparators(originalFileName).toLower())
         return;
 
-    QnProgressDialog* progressDialog = new QnProgressDialog(this);
+    auto progressDialog = new QnProgressDialog(this);
     progressDialog->setWindowTitle(tr("Preparing Image..."));
     progressDialog->setLabelText(tr("Please wait while image is being prepared..."));
     progressDialog->setInfiniteProgress();
     progressDialog->setModal(true);
 
-    QnLocalFileCache* imgCache = new QnLocalFileCache(this);
-    connect(imgCache, &QnAppServerFileCache::fileUploaded, this, [this, imgCache, progressDialog, originalFileName](const QString &storedFileName) {
-        if (!progressDialog->wasCanceled()) {
-            QnBackgroundImage background = qnSettings->backgroundImage();
-            background.name = storedFileName;
-            background.originalName = QFileInfo(originalFileName).fileName();
-            qnSettings->setBackgroundImage(background);
-            ui->imageNameLineEdit->setText( background.originalName);
-        }
-        imgCache->deleteLater();
-        progressDialog->hide();
-        progressDialog->deleteLater();
-    });
+    auto imgCache = new QnLocalFileCache(this);
+    connect(imgCache, &QnAppServerFileCache::fileUploaded, this,
+        [this, imgCache, progressDialog, originalFileName](const QString &storedFileName)
+        {
+            if (!progressDialog->wasCanceled())
+            {
+                QnBackgroundImage background = qnSettings->backgroundImage();
+                background.name = storedFileName;
+                background.originalName = originalFileName;
+                qnSettings->setBackgroundImage(background);
+                ui->imageNameLineEdit->setText(QFileInfo(originalFileName).fileName());
+                emit hasChangesChanged();
+            }
+            imgCache->deleteLater();
+            progressDialog->hide();
+            progressDialog->deleteLater();
+        });
 
     imgCache->storeImage(originalFileName);
     progressDialog->exec();
 }
 
+bool QnLookAndFeelPreferencesWidget::backgroundAllowed() const
+{
+    return !qnSettings->lightMode().testFlag(Qn::LightModeNoSceneBackground);
+}
+
+QString QnLookAndFeelPreferencesWidget::selectedTranslation() const
+{
+    QnTranslation translation = ui->languageComboBox->itemData(
+        ui->languageComboBox->currentIndex(), Qn::TranslationRole).value<QnTranslation>();
+    return translation.isEmpty()
+        ? QString()
+        : translation.filePaths()[0];
+}
+
+Qn::TimeMode QnLookAndFeelPreferencesWidget::selectedTimeMode() const
+{
+    return static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(
+        ui->timeModeComboBox->currentIndex()).toInt());
+}
+
+Qn::ResourceInfoLevel QnLookAndFeelPreferencesWidget::selectedInfoLevel() const
+{
+    return ui->showIpInTreeCheckBox->isChecked()
+        ? Qn::RI_FullInfo
+        : Qn::RI_NameOnly;
+}
+
+int QnLookAndFeelPreferencesWidget::selectedTourCycleTimeMs() const
+{
+    return ui->tourCycleTimeSpinBox->value() * 1000;
+}
+
+Qn::ImageBehaviour QnLookAndFeelPreferencesWidget::selectedImageMode() const
+{
+    return ui->imageModeComboBox->currentData().value<Qn::ImageBehaviour>();
+}
+
 void QnLookAndFeelPreferencesWidget::setupLanguageUi()
 {
-    QnTranslationListModel *model = new QnTranslationListModel(this);
+    auto model = new QnTranslationListModel(this);
     model->setTranslations(qnCommon->instance<QnClientTranslationManager>()->loadTranslations());
     ui->languageComboBox->setModel(model);
 
-    setWarningStyle(ui->languageWarningLabel);
-    ui->languageWarningLabel->setVisible(false);
-
-    connect(ui->languageComboBox, QnComboboxCurrentIndexChanged,  this,   [this](int index) {
-        ui->languageWarningLabel->setVisible(m_oldLanguage != index);
-    });
+    connect(ui->languageComboBox, QnComboboxCurrentIndexChanged, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 void QnLookAndFeelPreferencesWidget::setupTimeModeUi()
 {
     ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
     ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
-    connect(ui->timeModeComboBox, QnComboboxActivated,  this,   [this](int index)
-    {
-        Qn::TimeMode selectedMode = static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(index).toInt());
-        ui->timeModeWarningLabel->setVisible(m_oldTimeMode == Qn::ServerTimeMode && selectedMode == Qn::ClientTimeMode);
-    });
+    connect(ui->timeModeComboBox, QnComboboxActivated, this,
+        [this]
+        {
+            ui->timeModeWarningLabel->setVisible(qnSettings->timeMode() == Qn::ServerTimeMode
+                && selectedTimeMode() == Qn::ClientTimeMode);
+            emit hasChangesChanged();
+        });
     setWarningStyle(ui->timeModeWarningLabel);
     ui->timeModeWarningLabel->setVisible(false);
 }
@@ -246,33 +307,42 @@ void QnLookAndFeelPreferencesWidget::setupBackgroundUi()
     ui->imageModeComboBox->addItem(tr("Fit"),     qVariantFromValue(Qn::ImageBehaviour::Fit));
     ui->imageModeComboBox->addItem(tr("Crop"),    qVariantFromValue(Qn::ImageBehaviour::Crop));
 
-    connect(ui->imageGroupBox, &QGroupBox::toggled, this, [this] (bool checked) {
-        if (m_updating)
-            return;
+    connect(ui->imageGroupBox, &QGroupBox::toggled, this,
+        [this](bool checked)
+        {
+            if (m_updating)
+                return;
 
-        QnBackgroundImage background = qnSettings->backgroundImage();
-        background.enabled = checked;
-        qnSettings->setBackgroundImage(background);
-    });
+            QnBackgroundImage background = qnSettings->backgroundImage();
+            background.enabled = checked;
+            qnSettings->setBackgroundImage(background);
+            emit hasChangesChanged();
+        });
 
-    connect(ui->imageSelectButton,        &QPushButton::clicked,    this,   &QnLookAndFeelPreferencesWidget::selectBackgroundImage);
-    connect(ui->imageModeComboBox,        QnComboboxCurrentIndexChanged,  this,   [this]
-    {
-        if (m_updating)
-            return;
+    connect(ui->imageSelectButton, &QPushButton::clicked, this,
+        &QnLookAndFeelPreferencesWidget::selectBackgroundImage);
 
-        QnBackgroundImage background = qnSettings->backgroundImage();
-        background.mode = ui->imageModeComboBox->currentData().value<Qn::ImageBehaviour>();
-        qnSettings->setBackgroundImage(background);
-    });
+    connect(ui->imageModeComboBox, QnComboboxCurrentIndexChanged, this,
+        [this]
+        {
+            if (m_updating)
+                return;
 
-    connect(ui->imageOpacitySpinBox,      QnSpinboxIntValueChanged, this,   [this](int value)
-    {
-        if (m_updating)
-            return;
+            QnBackgroundImage background = qnSettings->backgroundImage();
+            background.mode = selectedImageMode();
+            qnSettings->setBackgroundImage(background);
+            emit hasChangesChanged();
+        });
 
-        QnBackgroundImage background = qnSettings->backgroundImage();
-        background.opacity = 0.01 * value;
-        qnSettings->setBackgroundImage(background);
-    });
+    connect(ui->imageOpacitySpinBox, QnSpinboxIntValueChanged, this,
+        [this](int value)
+        {
+            if (m_updating)
+                return;
+
+            QnBackgroundImage background = qnSettings->backgroundImage();
+            background.opacity = opacityFromPercent(value);
+            qnSettings->setBackgroundImage(background);
+            emit hasChangesChanged();
+        });
 }

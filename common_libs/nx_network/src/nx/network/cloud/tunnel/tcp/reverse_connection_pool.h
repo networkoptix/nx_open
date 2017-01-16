@@ -9,6 +9,7 @@ namespace network {
 namespace cloud {
 namespace tcp {
 
+class ReverseConnectionSource;
 class ReverseConnectionHolder;
 
 /**
@@ -33,7 +34,7 @@ public:
     bool start(HostAddress publicIp, uint16_t port, bool waitForRegistration = false);
     uint16_t port() const;
 
-    std::shared_ptr<ReverseConnectionHolder> getConnectionHolder(const String& hostName);
+    std::shared_ptr<ReverseConnectionSource> getConnectionSource(const String& hostName);
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
 
     // TODO: make is configurable for each client? can it be usefull?
@@ -42,7 +43,7 @@ public:
 
 private:
     bool registerOnMediator(bool waitForRegistration = false);
-    std::shared_ptr<ReverseConnectionHolder> getHolder(const String& hostName, bool mayCreate);
+    std::shared_ptr<ReverseConnectionHolder> getOrCreateHolder(const String& hostName);
 
     const std::unique_ptr<MediatorConnection> m_mediatorConnection;
     ReverseAcceptor m_acceptor;
@@ -50,7 +51,8 @@ private:
     bool m_isReconnectHandlerSet;
 
     mutable QnMutex m_mutex;
-    std::map<String, std::shared_ptr<ReverseConnectionHolder>> m_connectionHolders;
+    typedef std::map<String /*name*/, std::shared_ptr<ReverseConnectionHolder>> HoldersByName;
+    std::map<String /*suffix*/, HoldersByName> m_connectionHolders;
 };
 
 } // namespace tcp

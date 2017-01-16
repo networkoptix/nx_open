@@ -22,7 +22,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
         m_serverData = serverData;
     }
 
-    setStatus(serverData.status, true);
+    setStatus(serverData.status, Qn::StatusChangeReason::Default);
 
     QList<SocketAddress> addressList;
     for (const QString &address : serverData.remoteAddresses)
@@ -46,7 +46,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
     else
         removeFlags(Qn::read_only);
 
-    emit moduleInformationChanged(toSharedPointer());
+    emit moduleInformationChanged(::toSharedPointer(this));
 }
 
 QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
@@ -55,11 +55,11 @@ QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
     return m_serverData;
 }
 
-void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized,
         "Incompatible servers should not take any status but incompatible or unauthorized");
-    base_type::setStatus(newStatus, silenceMode);
+    base_type::setStatus(newStatus, reason);
 }
 
 QUrl QnFakeMediaServerResource::getApiUrl() const

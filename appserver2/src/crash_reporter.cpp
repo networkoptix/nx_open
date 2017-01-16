@@ -1,22 +1,23 @@
 #include "crash_reporter.h"
 
+#include <QDateTime>
+
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
 #include <common/common_module.h>
-#include <common/systemexcept.h>
+
+#include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/app_info.h>
-#include <nx/utils/log/log.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 
 #include "ec2_thread_pool.h"
-
-#include <QDateTime>
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
@@ -173,6 +174,12 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
 
 void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
+    if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
+    {
+        NX_LOGX(lm("Sending is disabled for developer builds (buildNumber=0)"), cl_logINFO);
+        return;
+    }
+
     scanAndReportAsync(settings);
 
     QnMutexLocker lk(&m_mutex);
@@ -264,7 +271,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
-    const auto version = QnAppInfo::applicationFullVersion();
+    const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
     const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
     const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )

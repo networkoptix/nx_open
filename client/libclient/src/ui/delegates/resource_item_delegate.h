@@ -4,6 +4,7 @@
 #include <QtWidgets/QStyledItemDelegate>
 
 #include <client/client_color_types.h>
+#include <ui/common/text_pixmap_cache.h>
 #include <ui/customization/customized.h>
 
 class QnWorkbench;
@@ -68,7 +69,15 @@ private:
 
     ItemState itemState(const QModelIndex& index) const;
 
+    ItemState itemStateForMediaResource(const QModelIndex& index) const;
+    ItemState itemStateForLayout(const QModelIndex& index) const;
+    ItemState itemStateForRecorder(const QModelIndex& index) const;
+    ItemState itemStateForLayoutItem(const QModelIndex& index) const;
+    ItemState itemStateForVideoWall(const QModelIndex& index) const;
+    ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
+
     void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
+
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon;
@@ -79,6 +88,7 @@ private:
     int m_rowSpacing;
     Qn::ResourceInfoLevel m_customInfoLevel;
     Options m_options;
+    mutable QnTextPixmapCache m_textPixmapCache;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceItemDelegate::Options)

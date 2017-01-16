@@ -32,24 +32,27 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_re
 
     std::vector<int> connectionIds;
     for (int i = 0; i < kConnectionsToCreateCount; ++i)
+    {
         connectionIds.push_back(
             connectionHelper.establishTransactionConnection(
                 endpoint(),
                 system.id,
                 system.authKey));
+    }
 
     for (const auto& connectionId: connectionIds)
     {
         ASSERT_TRUE(
             connectionHelper.waitForState(
-                {::ec2::QnTransactionTransportBase::Connected},
+                {::ec2::QnTransactionTransportBase::Connected,
+                    ::ec2::QnTransactionTransportBase::ReadyForStreaming},
                 connectionId,
                 kWaitTimeout));
     }
 
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account.data.email, account.password, system.id));
+        unbindSystem(account.email, account.password, system.id));
 
     for (const auto& connectionId: connectionIds)
     {

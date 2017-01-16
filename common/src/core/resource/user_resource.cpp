@@ -19,7 +19,7 @@ QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
     m_realm(QnAppInfo::realm()),
     m_permissions(0),
-    m_userGroup(),
+    m_userRoleId(),
     m_isOwner(false),
 	m_isEnabled(true),
     m_fullName(),
@@ -38,7 +38,7 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_cryptSha512Hash(right.m_cryptSha512Hash),
     m_realm(right.m_realm),
     m_permissions(right.m_permissions),
-    m_userGroup(right.m_userGroup),
+    m_userRoleId(right.m_userRoleId),
     m_isOwner(right.m_isOwner),
     m_isEnabled(right.m_isEnabled),
     m_email(right.m_email),
@@ -47,14 +47,14 @@ QnUserResource::QnUserResource(const QnUserResource& right):
 {
 }
 
-Qn::UserRole QnUserResource::role() const
+Qn::UserRole QnUserResource::userRole() const
 {
     if (isOwner())
         return Qn::UserRole::Owner;
 
-    QnUuid groupId = userGroup();
-    if (!groupId.isNull())
-        return Qn::UserRole::CustomUserGroup;
+    QnUuid id = userRoleId();
+    if (!id.isNull())
+        return Qn::UserRole::CustomUserRole;
 
     auto permissions = getRawPermissions();
 
@@ -239,21 +239,21 @@ void QnUserResource::setOwner(bool isOwner)
     emit permissionsChanged(::toSharedPointer(this));
 }
 
-QnUuid QnUserResource::userGroup() const
+QnUuid QnUserResource::userRoleId() const
 {
     QnMutexLocker locker(&m_mutex);
-    return m_userGroup;
+    return m_userRoleId;
 }
 
-void QnUserResource::setUserGroup(const QnUuid& group)
+void QnUserResource::setUserRoleId(const QnUuid& userRoleId)
 {
     {
         QnMutexLocker locker(&m_mutex);
-        if (m_userGroup == group)
+        if (m_userRoleId == userRoleId)
             return;
-        m_userGroup = group;
+        m_userRoleId = userRoleId;
     }
-    emit userGroupChanged(::toSharedPointer(this));
+    emit userRoleChanged(::toSharedPointer(this));
 }
 
 bool QnUserResource::isEnabled() const
@@ -307,6 +307,8 @@ ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
 {
     ec2::ApiResourceParamWithRefDataList result;
     QString value = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    if (value.isEmpty() && !fullName().isEmpty() && isCloud())
+        value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())
     {
         ec2::ApiResourceParamWithRefData param(getId(), Qn::USER_FULL_NAME, value);
@@ -365,10 +367,10 @@ void QnUserResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList
             notifiers << [r = toSharedPointer(this)]{ emit r->permissionsChanged(r); };
         }
 
-        if (m_userGroup != localOther->m_userGroup)
+        if (m_userRoleId != localOther->m_userRoleId)
         {
-            m_userGroup = localOther->m_userGroup;
-            notifiers << [r = toSharedPointer(this)]{ emit r->userGroupChanged(r); };
+            m_userRoleId = localOther->m_userRoleId;
+            notifiers << [r = toSharedPointer(this)]{ emit r->userRoleChanged(r); };
         }
 
         if (m_isOwner != localOther->m_isOwner)

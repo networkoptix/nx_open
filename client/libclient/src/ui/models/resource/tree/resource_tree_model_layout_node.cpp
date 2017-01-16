@@ -110,18 +110,6 @@ QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
     return QnResourceAccessSubject();
 }
 
-QIcon QnResourceTreeModelLayoutNode::iconBySubject(const QnResourceAccessSubject& subject) const
-{
-    switch (qnResourceAccessProvider->accessibleVia(subject, resource()))
-    {
-        case QnAbstractResourceAccessProvider::Source::videowall:
-            return qnResIconCache->icon(QnResourceIconCache::VideoWallLayout);
-        default:
-            break;
-    }
-    return base_type::calculateIcon();
-}
-
 void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& resource)
 {
     /* There is a possible situation when layout is ready before its item's resource. */
@@ -174,18 +162,6 @@ QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
     if (!resource())
         return QIcon();
 
-    if (resource()->hasFlags(Qn::exported_layout))
-        return base_type::calculateIcon();
-
-    switch (type())
-    {
-        case Qn::ResourceNode:
-        case Qn::SharedLayoutNode:
-            return iconBySubject(getOwner());
-        default:
-            NX_ASSERT(false);
-            break;
-    }
     return base_type::calculateIcon();
 }
 
@@ -196,7 +172,11 @@ void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePt
     if (!model())
         return;
 
-    QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid));
+    if (item.uuid.isNull())
+        return;
+
+    QnResourceTreeModelNodePtr node(new QnResourceTreeModelNode(model(), item.uuid,
+        Qn::LayoutItemNode));
     node->initialize();
     node->setParent(toSharedPointer());
 

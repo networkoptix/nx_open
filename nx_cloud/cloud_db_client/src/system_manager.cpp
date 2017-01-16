@@ -12,10 +12,9 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-SystemManager::SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
-:
+SystemManager::SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
@@ -38,7 +37,7 @@ void SystemManager::unbindSystem(
 {
     executeRequest(
         kSystemUnbindPath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         completionHandler);
 }
@@ -58,7 +57,7 @@ void SystemManager::getSystem(
 {
     executeRequest(
         kSystemGetPath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
@@ -89,7 +88,7 @@ void SystemManager::getCloudUsersOfSystem(
 {
     executeRequest(
         kSystemGetCloudUsersPath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
@@ -100,7 +99,7 @@ void SystemManager::getAccessRoleList(
 {
     executeRequest(
         kSystemGetAccessRoleListPath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
 }
@@ -122,7 +121,7 @@ void SystemManager::rename(
     std::function<void(api::ResultCode)> completionHandler)
 {
     api::SystemAttributesUpdate data;
-    data.systemID = systemId;
+    data.systemId = systemId;
     data.name = systemName;
 
     executeRequest(
@@ -146,6 +145,6 @@ void SystemManager::recordUserSessionStart(
         completionHandler);
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

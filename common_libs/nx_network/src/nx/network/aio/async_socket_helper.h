@@ -132,41 +132,49 @@ public:
         }
     }
 
-    void connectAsync(
-        const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    void resolve(
+        const HostAddress& address,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, std::deque<HostAddress>)> handler)
     {
-        NX_ASSERT(isNonBlockingMode());
-        if (address.address.isIpAddress())
-            return connectToIpAsync(address, std::move(handler));
-
         m_addressResolverIsInUse = true;
         SocketGlobals::addressResolver().dnsResolver().resolveAsync(
-            address.address.toString(),
-            [this, address, handler = std::move(handler)](
-                SystemError::ErrorCode code, DnsResolver::HostAddresses ips) mutable
+            address.toString(),
+            [this, handler = std::move(handler)](
+                SystemError::ErrorCode code, std::deque<HostAddress> ips)
             {
-                if (code != SystemError::noError)
-                    return this->post(
-                        [handler = std::move(handler), code]() { handler(code); });
-
-                std::queue<HostAddress> ipQueue;
-                for (auto& ip: ips)
-                    ipQueue.push(std::move(ip));
-
-                NX_CRITICAL(!ipQueue.empty());
-                connectToIpsAsync(std::move(ipQueue), address.port, std::move(handler));
+                m_addressResolverIsInUse = false;
+                handler(code, std::move(ips));
             },
             m_ipVersion,
             this);
     }
 
+    void connectAsync(
+        const SocketAddress& endpoint,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    {
+        NX_ASSERT(isNonBlockingMode());
+        if (endpoint.address.isIpAddress())
+            return connectToIpAsync(endpoint, std::move(handler));
+
+        resolve(
+            endpoint.address,
+            [this, port = endpoint.port, handler = std::move(handler)](
+                SystemError::ErrorCode code, std::deque<HostAddress> ips) mutable
+            {
+                if (code != SystemError::noError)
+                    return this->post([h = std::move(handler), code]() { h(code); });
+
+                connectToIpsAsync(std::move(ips), port, std::move(handler));
+            });
+    }
+
     void connectToIpsAsync(
-        std::queue<HostAddress> ips, uint16_t port,
+        std::deque<HostAddress> ips, uint16_t port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
         SocketAddress firstAddress(std::move(ips.front()), port);
-        ips.pop();
+        ips.pop_front();
         connectToIpAsync(
             firstAddress,
             [this, ips = std::move(ips), port, handler = std::move(handler)](
@@ -206,7 +214,7 @@ public:
             )
         {
             this->post(
-                [handler = move(handler), 
+                [handler = std::move(handler),
                     errorCode = SystemError::getLastOSErrorCode()]() mutable
                 { 
                     handler(errorCode);
@@ -221,7 +229,7 @@ public:
         if (!startAsyncConnect(addr))
         {
             this->post(
-                [handler = move(m_connectHandler),
+                [handler = std::move(m_connectHandler),
                     code = SystemError::getLastOSErrorCode()]() mutable
                 {
                     handler(code);
@@ -325,6 +333,7 @@ public:
         }
         else
         {
+            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
             nx::utils::promise< bool > promise;
             cancelIOAsync(eventType, [&]() { promise.set_value(true); });
             promise.get_future().wait();
@@ -549,7 +558,8 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                this->m_socket->connectToIp( resolvedAddress, sendTimeout );
+                NX_CRITICAL( resolvedAddress.address.isIpAddress() );
+                this->m_socket->connect( resolvedAddress, sendTimeout );
             });    //to be called between pollset.add and pollset.polladdress
         return true;
     }

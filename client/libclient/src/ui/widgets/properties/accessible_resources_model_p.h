@@ -14,6 +14,7 @@ class QnAccessibleResourcesModel : public QSortFilterProxyModel
     //TODO: #vkutin Implement "QnRelayoutColumnsProxyModel" and use it as a base
     using base_type = QSortFilterProxyModel;
 
+    Q_OBJECT
 public:
     enum Column
     {

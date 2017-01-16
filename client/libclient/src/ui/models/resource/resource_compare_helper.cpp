@@ -59,7 +59,11 @@ bool QnResourceCompareHelper::resourceLessThan(const QModelIndex& left, const QM
                 return leftLayout->isShared();
         }
 
-        /* Servers should go below other resources. */
+        // Web pages in plain list must be the last
+        if (l->hasFlags(Qn::web_page) != r->hasFlags(Qn::web_page))
+            return r->hasFlags(Qn::web_page);
+
+        // Servers should go below the cameras
         if (l->hasFlags(Qn::server) != r->hasFlags(Qn::server))
             return r->hasFlags(Qn::server);
     }

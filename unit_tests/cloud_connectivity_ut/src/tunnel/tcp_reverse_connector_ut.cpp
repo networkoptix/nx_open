@@ -3,6 +3,7 @@
 #include <thread>
 
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 
@@ -49,7 +50,9 @@ TEST(TcpReverseConnector, General)
     std::thread serverThread(
         [this, &serverAddress]()
         {
-            const auto server = std::make_unique<TCPServerSocket>(AF_INET);
+            const auto server = std::make_unique<TCPServerSocket>(
+                SocketFactory::tcpClientIpVersion());
+
             ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
             ASSERT_TRUE(server->listen());
             serverAddress.set_value(server->getLocalAddress());
@@ -59,7 +62,7 @@ TEST(TcpReverseConnector, General)
 
             Buffer buffer(1024, Qt::Uninitialized);
             int size = 0;
-            while (!buffer.contains(kDelimiter + kDelimiter))
+            while (!buffer.left(size).contains(kDelimiter + kDelimiter))
             {
                 auto recv = client->recv(buffer.data() + size, buffer.size() - size);
                 ASSERT_GT(recv, 0);

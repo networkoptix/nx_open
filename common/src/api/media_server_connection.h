@@ -241,7 +241,7 @@ public:
         const QnGetBookmarkTagsRequestData& request, QObject* target, const char* slot);
 
 protected:
-    virtual QnAbstractReplyProcessor* newReplyProcessor(int object) override;
+    virtual QnAbstractReplyProcessor* newReplyProcessor(int object, const QString& serverId) override;
     virtual bool isReady() const override;
 
     int sendAsyncGetRequestLogged(
@@ -259,7 +259,10 @@ protected:
         const char* replyTypeName,
         QObject* target,
         const char* slot);
+
+    void trace(int handle, int obj, const QString& message = QString());
 private:
+    QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;
     int m_proxyPort;
     bool m_enableOfflineRequests;

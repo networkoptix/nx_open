@@ -373,8 +373,6 @@ void QnSingleCameraSettingsWidget::submitToResource()
         if (m_camera->getAuth() != loginEditAuth)
             m_camera->setAuth(loginEditAuth);
 
-        m_camera->setLicenseUsed(ui->licensingWidget->state() == Qt::Checked);
-
         ui->cameraScheduleWidget->submitToResources();
 
         if (!m_camera->isDtsBased())
@@ -445,11 +443,14 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
         ui->loginEdit->setText(auth.user());
         ui->passwordEdit->setText(auth.password());
 
-        bool dtsBased = m_camera->isDtsBased();
+        const bool dtsBased = m_camera->isDtsBased();
+        const bool isIoModule = m_camera->isIOModule();
         setTabEnabledSafe(Qn::RecordingSettingsTab, !dtsBased && (hasAudio || hasVideo));
         setTabEnabledSafe(Qn::MotionSettingsTab, !dtsBased && hasVideo);
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !dtsBased && hasVideo && !isReadOnly());
-        setTabEnabledSafe(Qn::IOPortsSettingsTab, camera()->isIOModule());
+        setTabEnabledSafe(Qn::IOPortsSettingsTab, isIoModule);
+        setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, !isIoModule);
+
 
         if (!dtsBased)
         {
@@ -501,10 +502,10 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
     {
         /* Check if schedule was changed during load, e.g. limited by max fps. */
         if (!silent)
-            executeDelayed([this]
         {
-            showMaxFpsWarningIfNeeded();
-        });
+            const auto callback = [this]() { showMaxFpsWarningIfNeeded(); };
+            executeDelayedParented(callback, kDefaultDelay, this);
+        }
     }
 
     // Rollback the fisheye preview options. Makes no changes if params were not modified. --gdm

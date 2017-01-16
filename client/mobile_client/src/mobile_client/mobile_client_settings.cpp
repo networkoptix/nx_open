@@ -2,6 +2,7 @@
 
 #include <QtCore/QSettings>
 
+#include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_value_rollback.h>
 
 #include "mobile_client_app_info.h"
@@ -46,6 +47,22 @@ bool QnMobileClientSettings::isLiteClientModeEnabled() const
     return false;
 }
 
+bool QnMobileClientSettings::isAutoLoginEnabled() const
+{
+    switch (static_cast<AutoLoginMode>(autoLoginMode()))
+    {
+        case AutoLoginMode::Enabled:
+            return true;
+        case AutoLoginMode::Auto:
+            return !isLiteClientModeEnabled();
+        case AutoLoginMode::Disabled:
+            return false;
+        default:
+            break;
+    }
+    return false;
+}
+
 void QnMobileClientSettings::updateValuesFromSettings(
         QSettings* settings,
         const QList<int>& ids)
@@ -60,7 +77,19 @@ QVariant QnMobileClientSettings::readValueFromSettings(
         int id,
         const QVariant& defaultValue)
 {
-    return base_type::readValueFromSettings(settings, id, defaultValue);
+    auto baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
+
+    switch (id)
+    {
+        case LastUsedConnection:
+            return qVariantFromValue(
+                QJson::deserialized<QnLocalConnectionData>(baseValue.toByteArray()));
+
+        default:
+            break;
+    }
+
+    return baseValue;
 }
 
 void QnMobileClientSettings::writeValueToSettings(
@@ -68,6 +97,8 @@ void QnMobileClientSettings::writeValueToSettings(
     int id,
     const QVariant& value) const
 {
+    auto processedValue = value;
+
     switch (id)
     {
         /* Temporary options. Not to be written. */
@@ -75,13 +106,22 @@ void QnMobileClientSettings::writeValueToSettings(
         case LiteMode:
         case TestMode:
         case InitialTest:
+        case WebSocketPort:
         case StartupParameters:
+            return;
+
+        case LastUsedConnection:
+        {
+            auto connection = value.value<QnLocalConnectionData>();
+            processedValue = QString::fromUtf8(QJson::serialized(connection));
             break;
+        }
 
         default:
-            base_type::writeValueToSettings(settings, id, value);
             break;
     }
+
+    base_type::writeValueToSettings(settings, id, processedValue);
 }
 
 QnPropertyStorage::UpdateStatus QnMobileClientSettings::updateValue(

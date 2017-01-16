@@ -1,8 +1,3 @@
-/**********************************************************
-* Jan 14, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <nx/utils/log/log_message.h>
@@ -15,10 +10,12 @@ namespace ConnectionMethod
 {
     enum Value
     {
+        none = 0,
         udpHolePunching = 1,
         tcpHolePunching = 2,
         proxy = 4,
         reverseConnect = 8,
+        all = udpHolePunching | tcpHolePunching | proxy | reverseConnect,
     };
 
     inline QString toString(int value)
@@ -34,6 +31,6 @@ namespace ConnectionMethod
 
 typedef int ConnectionMethods;
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

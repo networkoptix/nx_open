@@ -6,6 +6,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 QImage gaussianBlur(const QImage &src, qreal sigma) {
     QImage result;
     gaussianBlur(src, sigma, &result);
@@ -14,7 +16,7 @@ QImage gaussianBlur(const QImage &src, qreal sigma) {
 
 static void gaussianBlurInternal(const QImage &src, qreal sigma, QImage &dst) {
     int r = qMax(1, static_cast<int>(sigma * 3.0 + 0.5));
-    
+
     QVarLengthArray<int, 256> kernel(2 * r + 1);
 #define K (kernel.data() + r)
     int kernelSum = 0;
@@ -95,7 +97,7 @@ void gaussianBlur(const QImage &src, qreal sigma, QImage *dst) {
 QImage cropToAspectRatio(const QImage &source, const qreal targetAspectRatio) {
     QImage result = source;
     qreal aspectRatio = (qreal)source.width() / (qreal)source.height();
-    if (!qFuzzyCompare(aspectRatio, targetAspectRatio)) {
+    if (!qFuzzyEquals(aspectRatio, targetAspectRatio)) {
         if (targetAspectRatio > aspectRatio) {
             int targetHeight = qRound((qreal)source.width() / targetAspectRatio);
             int offset = (source.height() - targetHeight) / 2;

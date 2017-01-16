@@ -9,7 +9,6 @@
 #include "connection_method.h"
 #include "stun_message_data.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {
@@ -19,8 +18,8 @@ class NX_NETWORK_API ResolveDomainRequest
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::resolveDomain;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::resolveDomain;
 
     nx::String domainName;
 
@@ -35,8 +34,8 @@ class NX_NETWORK_API ResolveDomainResponse
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::resolveDomain;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::resolveDomain;
 
     std::vector<nx::String> hostNames;
 

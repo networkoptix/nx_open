@@ -248,20 +248,42 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
+    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
         if (alarmCameras.isEmpty())
             return;
 
-        if (findItem(ruleId, [timestampMs](QnNotificationWidget* item)
-        {
-            return item->property(kItemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
-                && item->property(kItemTimeStampPropertyName)  == timestampMs;
-        }))
+        auto findItemPredicate =
+            [timestampMs](QnNotificationWidget* item)
+            {
+                return item->property(kItemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
+                    && item->property(kItemTimeStampPropertyName) == timestampMs;
+            };
+
+        if (findItem(ruleId, findItemPredicate))
             return; /* Show 'Alarm Layout' notifications only once for each event of one rule. */
 
         title = tr("Alarm: %1").arg(title);
+    }
+    else
+    {
+        if (QnBusiness::isSourceCameraRequired(eventType))
+        {
+            NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
+            if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
+                return;
+        }
+
+        if (QnBusiness::isSourceServerRequired(eventType))
+        {
+            NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
+            /* Only admins should see notifications with servers. */
+            if (!server || !accessController()->hasPermissions(server, Qn::ViewContentPermission))
+                return;
+        }
     }
 
     QnNotificationWidget* item = new QnNotificationWidget(m_list);
@@ -294,23 +316,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     else
     {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (QnBusiness::isSourceCameraRequired(eventType))
-        {
-            NX_ASSERT(camera, Q_FUNC_INFO, "Event has occurred without its camera");
-            if (!camera || !accessController()->hasPermissions(camera, Qn::ViewContentPermission))
-                return;
-        }
-
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (QnBusiness::isSourceServerRequired(eventType))
-        {
-            NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
-            /* Only admins should see notifications with servers. */
-            if (!server || !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-                return;
-        }
-
         switch (eventType)
         {
             case QnBusiness::CameraMotionEvent:

@@ -8,6 +8,7 @@
 
 QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     base_type(parent),
+    m_source(new QnSystemsModel(this)),
     m_weights(),
     m_unknownSystemsWeight(0.0)
 {
@@ -15,10 +16,9 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     if (!qnSystemWeightsManager)
         return;
 
-    auto systemsModel = new QnSystemsModel(this);
-    setSourceModel(systemsModel);
+    setSourceModel(m_source);
 
-    connect(systemsModel, &QnSystemsModel::minimalVersionChanged,
+    connect(m_source, &QnSystemsModel::minimalVersionChanged,
         this, &QnOrderedSystemsModel::minimalVersionChanged);
     setDynamicSortFilter(true);
     sort(0);
@@ -28,8 +28,19 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
     if (qnForgottenSystemsManager)
     {
-        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemsChanged,
-            this, &QnOrderedSystemsModel::softInvalidate);
+        const auto emitSystemDataChanged =
+            [this](const QString& systemId)
+            {
+                const auto row = m_source->getRowIndex(systemId);
+                const auto index = m_source->index(row);
+                if (index.isValid())
+                    emit m_source->dataChanged(index, index, QVector<int>());
+            };
+
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
+            this, emitSystemDataChanged);
+        connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
+            this, emitSystemDataChanged);
     }
 
     handleWeightsChanged();
@@ -132,8 +143,8 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
     if (!index.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool())
-        return true;    //< Skips every online system
+    if (index.data(QnSystemsModel::IsConnectibleRoleId).toBool())
+        return true;    //< Skips every connectible system
 
     const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
     if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))

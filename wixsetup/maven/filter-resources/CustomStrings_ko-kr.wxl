@@ -74,7 +74,8 @@
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">설정을 종료하시면 ${product.name} 이 시작됩니다.</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">설정을 종료하시면 ${nxtool.name} 이 시작됩니다.</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">이 프로그램은 32비트 운영체재용입니다. 설치가 종료 됩니다.</String>
+    <String Id="Product_ArchMismatch_x86"                               Overridable="yes">이 프로그램은 32비트 운영체재용입니다. 설치가 종료 됩니다.</String>
+    <String Id="Product_ArchMismatch_x64"                               Overridable="yes">이 프로그램은 64비트 운영체재용입니다. 설치가 종료 됩니다.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">하나 이상의 구성 요소를 선택하십시오.</String>

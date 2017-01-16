@@ -1,13 +1,15 @@
 #pragma once
 
-#include <nx/network/stun/message.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/retry_timer.h>
+#include <nx/network/stun/message.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace stun {
 
-class NX_NETWORK_API AbstractAsyncClient
+class NX_NETWORK_API AbstractAsyncClient:
+    public network::aio::BasicPollable
 {
 public:
     struct Settings
@@ -89,6 +91,9 @@ public:
     /** Cancels all handlers, passed with @param client */
     virtual void cancelHandlers(
         void* client, utils::MoveOnlyFunc<void()> handler) = 0;
+
+    /** Configures connection keep alive options */
+    virtual void setKeepAliveOptions(KeepAliveOptions options) = 0;
 };
 
 } // namespase stun

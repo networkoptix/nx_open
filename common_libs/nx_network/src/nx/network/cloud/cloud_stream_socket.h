@@ -9,6 +9,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
 
@@ -22,13 +23,17 @@ namespace cloud {
     If connection to peer requires using udp hole punching than this socket uses UDT.
     \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
 */
-class NX_NETWORK_API CloudStreamSocket
-:
+class NX_NETWORK_API CloudStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
+    using BaseType = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
+
 public:
-    CloudStreamSocket(int ipVersion);
+    explicit CloudStreamSocket(int ipVersion = AF_INET);
     virtual ~CloudStreamSocket();
+
+    virtual aio::AbstractAioThread* getAioThread() const override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::*
     virtual bool bind(const SocketAddress& localAddress) override;
@@ -43,10 +48,6 @@ public:
 
     //!Implementation of AbstractCommunicatingSocket::*
     virtual bool connect(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis) override;
-
-    virtual bool connectToIp(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis) override;
 
@@ -78,15 +79,17 @@ public:
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
-    virtual aio::AbstractAioThread* getAioThread() const override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
+
+    bool isInSelfAioThread() const;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
         SocketResultPrimisePtr;
 
     void connectToEntriesAsync(
-        std::queue<AddressEntry> dnsEntries, int port,
+        std::deque<AddressEntry> dnsEntries, int port,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
     void connectToEntryAsync(
@@ -99,12 +102,17 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
+    void cancelIoWhileInAioThread(aio::EventType eventType);
+    void stopWhileInAioThread();
+
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
-    /** Used to tie this to aio thread.
-    //TODO #ak replace with aio thread timer */
-    std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
+    // TODO: #ak replace with aio::BasicPollable inheritance.
+    aio::BasicPollable m_aioThreadBinder;
+    aio::Timer m_timer;
+    aio::BasicPollable m_readIoBinder;
+    aio::BasicPollable m_writeIoBinder;
     std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;

@@ -14,6 +14,10 @@ BaseTile
     property bool factorySystem: false;
     property bool isCompatibleInternal: false;
     property bool safeMode: false;
+    property bool isFactoryTile: impl.isFactoryTile;
+
+    property bool isRunning: false;
+    property bool isReachable: false;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -39,7 +43,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isOnline;
+        return control.isConnectible;
     }
 
     tileColor:
@@ -73,7 +77,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !control.isOnline || !isCompatibleInternal);
+                || !control.isConnectible || !isCompatibleInternal);
         }
 
         text:
@@ -84,8 +88,10 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!control.isOnline)
+            if (!control.isRunning)
                 return qsTr("OFFLINE");
+            if (!control.isReachable)
+                return qsTr("UNREACHABLE");
 
             return "";
         }
@@ -112,18 +118,40 @@ BaseTile
         }
     }
 
+    NxPopupMenu
+    {
+        id: tileMenu;
+        NxMenuItem
+        {
+            text: "Edit";
+            leftPadding: 16;
+            rightPadding: 16;
+
+            onTriggered: control.toggle();
+        }
+    }
+
     onCollapsedTileClicked:
     {
         if (!control.isAvailable)
             return;
 
+        if (buttons == Qt.RightButton)
+        {
+            if (control.menuButton.visible)
+            {
+                tileMenu.x = x;
+                tileMenu.y = y;
+                tileMenu.open();
+            }
+            return;
+        }
+
         switch(control.impl.tileType)
         {
             case control.impl.kFactorySystemTileType:
                 var factorySystemHost = areaLoader.item.host;
-                console.log("Show wizard for system <", systemName,
-                    ">, host <", factorySystemHost, ">");
-                context.setupFactorySystem(factorySystemHost);
+                control.impl.connectToLocalSystem();
                 break;
 
             case control.impl.kCloudSystemTileType:
@@ -154,17 +182,7 @@ BaseTile
     {
         visible: impl.hasSavedConnection && control.isAvailable;
 
-        menu: NxPopupMenu
-        {
-            NxMenuItem
-            {
-                text: "Edit";
-                leftPadding: 16;
-                rightPadding: 16;
-
-                onTriggered: control.toggle();
-            }
-        }
+        menu: tileMenu;
     }
 
     areaLoader.source:
@@ -199,7 +217,6 @@ BaseTile
 
             if (control.impl.tileType === control.impl.kLocalSystemTileType)
             {
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
@@ -208,6 +225,7 @@ BaseTile
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
                 currentAreaItem.factorySystem = Qt.binding( function() { return control.factorySystem; });
+                currentAreaItem.localId = Qt.binding( function() { return control.localId; });
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
@@ -225,7 +243,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
+                currentAreaItem.isConnectible = Qt.binding( function() { return control.isConnectible; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
@@ -290,19 +308,42 @@ BaseTile
 
         function connectToLocalSystem()
         {
-            if (isFactoryTile || isCloudTile)
+            if (isCloudTile)
                 return;
 
             var tile  = control.areaLoader.item;
-            console.log("Connecting to local system<", control.systemName,
-                "host <", tile.selectedHost, "> with credentials: ",
-                tile.selectedUser, ":", tile.selectedPassword,
-                tile.savePassword, tile.autoLogin);
+            if (isFactoryTile)
+            {
+                var factorySystemHost = areaLoader.item.host;
+                console.log("Trying tp setup factory system <", control.systemName,
+                    ">, host <", factorySystemHost, ">");
 
-            context.connectToLocalSystem(
-                control.systemId, tile.selectedHost,
-                tile.selectedUser, tile.selectedPassword,
-                tile.savePassword, tile.autoLogin);
+                /**
+                  * Discussed with R. Vasilenko - we can rely on admin/admin
+                  * credentials for factory (new) systems. Otherwise it is error
+                  * situation  on server side
+                  * TODO: ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
+                  */
+                var kFactorySystemUser = "admin";
+                var kFactorySystemPassword = "admin";
+                context.connectToLocalSystem(
+                    control.systemId, factorySystemHost,
+                    kFactorySystemUser, kFactorySystemPassword,
+                    false, false);
+            }
+            else
+            {
+                console.log("Connecting to local system <", control.systemName,
+                    ">, host <", tile.selectedHost, ">, user <", tile.selectedUser, ">");
+
+                context.connectToLocalSystem(
+                    control.systemId, tile.selectedHost,
+                    tile.selectedUser, tile.selectedPassword,
+                    tile.savePassword, tile.autoLogin);
+            }
+
+
+
         }
     }
 }

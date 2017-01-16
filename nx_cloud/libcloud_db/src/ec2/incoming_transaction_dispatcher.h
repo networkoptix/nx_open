@@ -28,14 +28,15 @@ public:
     IncomingTransactionDispatcher(
         const QnUuid& moduleGuid,
         TransactionLog* const transactionLog);
+    virtual ~IncomingTransactionDispatcher();
 
     /** 
-     * @note Method is non-blocking, result is delivered by invoking \a completionHandler
+     * @note Method is non-blocking, result is delivered by invoking completionHandler.
      */
     void dispatchTransaction(
         TransactionTransportHeader transportHeader,
         Qn::SerializationFormat tranFormat,
-        const QByteArray& data,
+        QByteArray data,
         TransactionProcessedHandler completionHandler);
 
     /**
@@ -84,35 +85,22 @@ private:
     > m_transactionProcessors;
     nx::network::aio::Timer m_aioTimer;
 
+    void dispatchUbjsonTransaction(
+        TransactionTransportHeader transportHeader,
+        QByteArray serializedTransaction,
+        TransactionProcessedHandler handler);
+
+    void dispatchJsonTransaction(
+        TransactionTransportHeader transportHeader,
+        QByteArray serializedTransaction,
+        TransactionProcessedHandler handler);
+
     template<typename TransactionDataSource>
     void dispatchTransaction(
-        const TransactionTransportHeader& transportHeader,
-        const ::ec2::QnAbstractTransaction& transaction,
-        const TransactionDataSource& dataSource,
-        TransactionProcessedHandler completionHandler)
-    {
-        auto it = m_transactionProcessors.find(transaction.command);
-        if (transaction.command == ::ec2::ApiCommand::updatePersistentSequence)
-            return; // TODO: #ak Do something.
-        if (it == m_transactionProcessors.end())
-        {
-            NX_LOGX(lm("Received unsupported transaction %1")
-                .arg(::ec2::ApiCommand::toString(transaction.command)), cl_logDEBUG2);
-            // No handler registered for transaction type.
-            m_aioTimer.post(
-                [completionHandler = std::move(completionHandler)]
-                {
-                    completionHandler(api::ResultCode::notFound);
-                });
-            return;
-        }
-        // TODO: should we always call completionHandler in the same thread?
-        return it->second->processTransaction(
-            transportHeader,
-            transaction,
-            dataSource,
-            std::move(completionHandler));
-    }
+        TransactionTransportHeader transportHeader,
+        ::ec2::QnAbstractTransaction transaction,
+        TransactionDataSource dataSource,
+        TransactionProcessedHandler completionHandler);
 };
 
 } // namespace ec2

@@ -15,14 +15,17 @@
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
+#include <platform/platform_abstraction.h>
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
+#include <media_server/serverutil.h>
 
 #include "health/system_health.h"
+#include "platform/platform_abstraction.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -31,13 +34,53 @@ struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
+struct BeforeRestoreDbData;
 namespace ec2 {
     class CrashReporter;
 }
 
+struct CloudManagerGroup;
+
 void restartServer(int restartTimeout);
 
-class MediaServerProcess : public QnLongRunnable
+class CmdLineArguments
+{
+public:
+    QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
+    QString ec2TranLogLevel;
+    QString permissionsLogLevel;
+    QString rebuildArchive;
+    QString devModeKey;
+    QString allowedDiscoveryPeers;
+    QString ifListFilter;
+    bool cleanupDb;
+
+    QString configFilePath;
+    QString rwConfigFilePath;
+    bool showVersion;
+    bool showHelp;
+    QString engineVersion;
+    QString enforceSocketType;
+    QString enforcedMediatorEndpoint;
+    QString ipVersion;
+
+
+    CmdLineArguments() :
+        logLevel(
+#ifdef _DEBUG
+            lit("DEBUG")),
+#else
+        lit("INFO")),
+#endif
+        showVersion(false),
+        showHelp(false)
+    {
+    }
+};
+
+class MediaServerProcess: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -53,15 +96,14 @@ public:
     static int main(int argc, char* argv[]);
 
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
-    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint);
-    void setEngineVersion(const QnSoftwareVersion& version);
+
+    const CmdLineArguments cmdLineArguments() const;
 
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
-
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
@@ -83,23 +125,25 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIP);
 
 private:
+
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudConnectionManager* const cloudConnectionManager);
-    bool initTcpListener(CloudConnectionManager* const cloudConnectionManager);
+    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
+    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void saveAdminPswdHash();
     bool isStopping() const;
-    void migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager);
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
-
+    void performActionsOnExit();
+    void parseCommandLineParameters(int argc, char* argv[]);
+    void updateAllowedInterfaces();
+    void addCommandLineParametersFromConfig();
 private:
     int m_argc;
     char** m_argv;
@@ -121,8 +165,9 @@ private:
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
     QVector<QString> m_hardwareGuidList;
-    QString m_enforcedMediatorEndpoint;
-    QnSoftwareVersion m_engineVersion;
+    nx::SystemName m_systemName;
+    std::unique_ptr<QnPlatformAbstraction> m_platform;
+    CmdLineArguments m_cmdLineArguments;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

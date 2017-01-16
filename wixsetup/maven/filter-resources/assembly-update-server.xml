@@ -1,15 +1,15 @@
  <assembly>
-	<id>${box}-${arch}-${release.version}.${buildNumber}</id>
+	<id>server_update</id>
 	<formats>
 		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>${project.build.directory}/bin/msi</directory>
+			<directory>${project.build.directory}/bin/exe</directory>
 			<outputDirectory>..</outputDirectory>
 			<includes>
-				<include>*-server-*.msi</include>
+				<include>${artifact.name.server}.exe</include>
 			</includes>		
 		</fileSet>				
 		<fileSet>

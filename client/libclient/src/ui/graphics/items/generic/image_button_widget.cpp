@@ -27,6 +27,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/event_processors.h>
 #include <utils/math/linear_combination.h>
 #include <utils/math/color_transformations.h>
 #include "opengl_renderer.h"
@@ -78,7 +79,7 @@ class QnImageButtonHoverProgressAccessor : public AbstractAccessor
     virtual void set(QObject *object, const QVariant &value) const override
     {
         QnImageButtonWidget *widget = static_cast<QnImageButtonWidget *>(object);
-        if (qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
+        if (qFuzzyEquals(widget->m_hoverProgress, value.toReal()))
             return;
 
         widget->m_hoverProgress = value.toReal();
@@ -120,6 +121,16 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent, Qt::WindowFlags 
         if (!isEnabled())
             updateState(m_state & ~Hovered);
     });
+
+    installEventHandler(this, QEvent::UngrabMouse, this,
+        [this]()
+        {
+            if (!isPressed() || !isEnabled())
+                return;
+
+            setPressed(false);
+            emit released();
+        });
 }
 
 QnImageButtonWidget::~QnImageButtonWidget()

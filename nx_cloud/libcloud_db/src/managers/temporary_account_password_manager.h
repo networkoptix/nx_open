@@ -130,9 +130,7 @@ private:
         const TemporaryAccountCredentialsEx& temporaryCredentials);
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchTemporaryPasswords(
-        nx::db::QueryContext* queryContext,
-        int* const /*dummyResult*/);
+    nx::db::DBResult fetchTemporaryPasswords(nx::db::QueryContext* queryContext);
 
     nx::db::DBResult insertTempPassword(
         nx::db::QueryContext* const queryContext,

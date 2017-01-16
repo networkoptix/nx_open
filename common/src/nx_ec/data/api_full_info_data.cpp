@@ -23,7 +23,7 @@
 #include <nx_ec/data/api_layout_data.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
-#include <nx_ec/data/api_user_group_data.h>
+#include <nx_ec/data/api_user_role_data.h>
 
 #include <nx/fusion/model_functions.h>
 

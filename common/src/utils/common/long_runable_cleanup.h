@@ -14,6 +14,8 @@ class QnLongRunableCleanup:
     public QObject,
     public Singleton<QnLongRunableCleanup>
 {
+    Q_OBJECT
+
 public:
     QnLongRunableCleanup()
     {

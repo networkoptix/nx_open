@@ -18,19 +18,30 @@ namespace nx {
 namespace stun {
 namespace test {
 
-class TestServer: public SocketServer
+class TestServer:
+    public SocketServer
 {
 public:
-    TestServer(const nx::stun::MessageDispatcher& dispatcher)
-        : SocketServer(&dispatcher, false)
+    TestServer(const nx::stun::MessageDispatcher& dispatcher):
+        SocketServer(&dispatcher, false)
     {
+    }
+
+    virtual ~TestServer() override
+    {
+        pleaseStop();
+        for (auto& connection: connections)
+        {
+            connection->pleaseStopSync();
+            connection.reset();
+        }
     }
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
-            std::unique_ptr<AbstractStreamSocket> _socket) override
+        std::unique_ptr<AbstractStreamSocket> _socket) override
     {
         auto connection = SocketServer::createConnection(std::move(_socket));
         connections.push_back(connection);
@@ -53,6 +64,14 @@ protected:
     StunClientServerTest():
         client(std::make_shared<AsyncClient>(defaultSettings()))
     {
+    }
+
+    ~StunClientServerTest()
+    {
+        if (client)
+            client->pleaseStopSync();
+        if (server)
+            server->pleaseStop();
     }
 
     SystemError::ErrorCode sendTestRequestSync()
@@ -165,7 +184,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         ASSERT_EQ(response.header.messageClass, MessageClass::errorResponse);
         ASSERT_EQ(response.header.method, 0xFFF);
 
-        const auto error = response.getAttribute<stun::attrs::ErrorDescription>();
+        const auto error = response.getAttribute<stun::attrs::ErrorCode>();
         ASSERT_NE(error, nullptr);
         ASSERT_EQ(error->getCode(), 404);
         ASSERT_EQ(error->getString(), String("Method is not supported"));
@@ -227,6 +246,58 @@ TEST_F(StunClientServerTest, AsyncClientUser)
             EXPECT_EQ(user->responses.pop().first, SystemError::noError);
         user->pleaseStopSync();
     }
+}
+
+class StunClient:
+    public StunClientServerTest
+{
+public:
+    ~StunClient()
+    {
+        m_stunClient.pleaseStopSync();
+    }
+
+protected:
+    void givenClientConnectedToServer()
+    {
+        const auto address = startServer();
+        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
+        m_stunClient.setOnConnectionClosedHandler(
+            [this](SystemError::ErrorCode closeReason)
+            {
+                m_connectionClosedPromise.set_value(closeReason);
+            });
+        m_stunClient.connect(
+            address,
+            false,
+            [&connectedPromise](SystemError::ErrorCode sysErrorCode)
+            {
+                connectedPromise.set_value(sysErrorCode);
+            });
+        ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
+    }
+
+    void whenServerTerminatedAbruptly()
+    {
+        server->pleaseStop();
+        server.reset();
+    }
+
+    void verifyClientProcessedConnectionCloseProperly()
+    {
+        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
+    }
+
+private:
+    nx::stun::AsyncClient m_stunClient;
+    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+};
+
+TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side)
+{
+    givenClientConnectedToServer();
+    whenServerTerminatedAbruptly();
+    verifyClientProcessedConnectionCloseProperly();
 }
 
 } // namespace test

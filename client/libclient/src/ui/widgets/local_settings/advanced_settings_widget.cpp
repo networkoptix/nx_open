@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
+#include <client/client_runtime_settings.h>
 
 #include <common/common_module.h>
 
@@ -49,25 +50,28 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->downmixAudioCheckBox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
-    connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this, [this](bool toggled)
-    {
-        /* Show warning message if the user disables double buffering. */
-        ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
-        emit hasChangesChanged();
-    });
+    connect(ui->doubleBufferCheckbox, &QCheckBox::toggled, this,
+        [this](bool toggled)
+        {
+            /* Show warning message if the user disables double buffering. */
+            ui->doubleBufferWarningLabel->setVisible(!toggled && qnSettings->isGlDoubleBuffer());
+            emit hasChangesChanged();
+        });
 
     /* Live buffer lengths slider/spin logic: */
-    connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this, [this](int value)
-    {
-        ui->maximumLiveBufferLengthSpinBox->setValue(value);
-        emit hasChangesChanged();
-    });
+    connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
+        [this](int value)
+        {
+            ui->maximumLiveBufferLengthSpinBox->setValue(value);
+            emit hasChangesChanged();
+        });
 
-    connect(ui->maximumLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this, [this](int value)
-    {
-        ui->maximumLiveBufferLengthSlider->setValue(value);
-        emit hasChangesChanged();
-    });
+    connect(ui->maximumLiveBufferLengthSpinBox, QnSpinboxIntValueChanged, this,
+        [this](int value)
+        {
+            ui->maximumLiveBufferLengthSlider->setValue(value);
+            emit hasChangesChanged();
+        });
 }
 
 QnAdvancedSettingsWidget::~QnAdvancedSettingsWidget()
@@ -98,8 +102,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
 bool QnAdvancedSettingsWidget::isRestartRequired() const
 {
     /* These changes can be applied only after client restart. */
-    return qnSettings->isAudioDownmixed() != isAudioDownmixed()
-        || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled();
+    return qnRuntime->isGlDoubleBuffer() != isDoubleBufferingEnabled();
 }
 
 // -------------------------------------------------------------------------- //

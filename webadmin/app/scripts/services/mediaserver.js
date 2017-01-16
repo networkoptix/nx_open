@@ -1,18 +1,20 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
 
+        var mediaserver = {};
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;
 
         var proxy = '';
+        // Support proxy mode
         if(location.search.indexOf('proxy=')>0){
             var params = location.search.replace('?','').split('&');
             for (var i=0;i<params.length;i++) {
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
-                    proxy = '/proxy/' + pair[1];
+                    proxy = '/web/proxy/' + pair[1];
                     if(pair[1] === 'demo'){
                         proxy = Config.demo;
                     }
@@ -23,7 +25,37 @@ angular.module('webadminApp')
 
         function getModuleInformation(){
             var salt = (new Date().getTime()) + '_' + Math.ceil(Math.random()*1000);
-            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt);
+            return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
+                var data = r.data.reply;
+                if(!Config.cloud.portalUrl) {
+                    Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                }
+
+                var ips = _.filter(data.remoteAddresses,function(address){
+                    return address !== '127.0.0.1';
+                });
+                var wrongNetwork = true;
+                for (var ip in ips) {
+                    if (ips[ip].indexOf('169.254.') == 0) { // No DHCP address
+                        continue;
+                    }
+                    wrongNetwork = false;
+                    break;
+                }
+
+                data.flags = {
+                    noHDD: data.ecDbReadOnly,
+                    noNetwork: !ips.length,
+                    wrongNetwork: wrongNetwork,
+                    hasInternet: data.serverFlags.indexOf(Config.publicIpFlag) >= 0,
+                    cleanSystem: data.serverFlags.indexOf(Config.newServerFlag) >= 0,
+                    canSetupNetwork: data.serverFlags.indexOf(Config.iflistFlag) >= 0,
+                    canSetupTime: data.serverFlags.indexOf(Config.timeCtrlFlag) >= 0
+                };
+                data.flags.brokenSystem = data.flags.noHDD || data.flags.noNetwork || (data.flags.wrongNetwork && !data.flags.canSetupNetwork);
+                data.flags.newSystem = data.flags.cleanSystem && !data.flags.brokenSystem;
+                return r;
+            });
         }
 
         var offlineDialog = null;
@@ -49,8 +81,26 @@ angular.module('webadminApp')
                 return; // inline mode - do not do anything
             }
             if(error.status === 403 || error.status === 401) {
-                callLogin();
-                return;
+                // Try to get credentials from native client
+                return nativeClient.init().then(function(){
+                    return nativeClient.getCredentials().then(function(credentials) {
+                        var login = credentials.localLogin;
+                        var password = credentials.localPassword;
+                        if(!(login && password)) {
+                            return $q.reject();
+                        }
+                        return mediaserver.login(login, password).then(function(){
+                            setTimeout(function(){
+                                window.location.reload();
+                            },20);
+                            return true;
+                        });
+                    });
+                }).catch(function(error){
+                    $log.error(error);
+                    $log.log("fall back to login dialog");
+                    callLogin();
+                });
             }
             if(error.status === 0) {
                 return; // Canceled request - do nothing here
@@ -78,8 +128,12 @@ angular.module('webadminApp')
         function wrapPost(url,data){
             return wrapRequest($http.post(url,data));
         }
-        function wrapGet(url){
+        function wrapGet(url, data){
             var canceller = $q.defer();
+            if(data){
+                url += (url.indexOf('?')>0)?'&':'?';
+                url += $.param(data);
+            }
             var obj =  wrapRequest($http.get(url, { timeout: canceller.promise }));
             obj.then(function(){
                 canceller = null;
@@ -95,6 +149,7 @@ angular.module('webadminApp')
         }
 
 
+        // Special hack to make our json recognizable by fusion on mediaserver
         function stringifyValues(object){
             if(!jQuery.isPlainObject(object) && !jQuery.isArray(object)){
                 return object;
@@ -107,7 +162,7 @@ angular.module('webadminApp')
         }
 
 
-        return {
+        mediaserver = {
             checkCurrentPassword:function(password){
                 var login = $localStorage.login;
                 var realm = $localStorage.realm;
@@ -120,14 +175,17 @@ angular.module('webadminApp')
                 return $q.reject();
             },
             getNonce:function(login, url){
-                var proxy1 = proxy;
+                var params = {
+                    userName:login
+                };
                 if(url){
-                    if(url.indexOf("http:")==0 || url.indexOf("https:")==0){
-                        url = url.substring(url.indexOf("//") + 2);
+                    if(url.indexOf("http")<0){
+                        url = "http://" + url;
                     }
-                    proxy1 += '/proxy/https/' + url;
+                    params.url = url;
                 }
-                return $http.get(proxy1 + '/web/api/getNonce?userName=' + login);
+
+                return $http.get(proxy + '/web/api/getNonce?' + $.param(params));
             },
             logout:function(){
                 $localStorage.$reset();
@@ -146,24 +204,34 @@ angular.module('webadminApp')
                 var self = this;
 
                 function sendLogin(){
+                    $log.log("Login1: getNonce for " + login);
                     return self.getNonce(login).then(function(data){
                         var realm = data.data.reply.realm;
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
-                        $localStorage.$reset();
 
+                        $log.log("Login2: nonce is " + nonce);
+                        $log.log("Login2: auth is " + auth);
+
+                        $log.log("Login2: cookieLogin");
                         // Check auth again - without catching errors
                         return $http.post(proxy + '/web/api/cookieLogin',{
                             auth: auth
                         }).then(function(data){
+                            $log.log("Login3: cookieLogin result");
                             if(data.data.error != "0"){
+                                $log.log("Login3: cookieLogin failed: " + data.data.error);
                                 return $q.reject(data.data);
                             }
+                            
+                            $localStorage.$reset();
                             $localStorage.login = login;
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+
+                            $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
                         });
                     });
@@ -205,19 +273,11 @@ angular.module('webadminApp')
                 return proxy !=='';
             },
             getUser:function(reload){
-                if(this.hasProxy()){ // Proxy means read-only
-                    var deferred = $q.defer();
-                    deferred.resolve(false);
-                    return deferred.promise;
-                }
-
                 return this.getCurrentUser(reload).then(function(result){
-                    /*jshint bitwise: false*/
                     var hasEditServerPermission = result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0;
                     var hasAllResources = result.data.reply.permissions.indexOf(Config.globalAccessAllMediaPermission)>=0;
-                    /*jshint bitwise: true*/
-                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
 
+                    var isAdmin = result.data.reply.isAdmin || hasEditServerPermission;
                     var isOwner = result.data.reply.isAdmin ;
 
                     return {
@@ -235,23 +295,20 @@ angular.module('webadminApp')
             execute:function(script,mode){
                 return $http.post('/web/api/execute/' + script + '?' + (mode||''));
             },
-            getModuleInformation: function(url) {
-                url = url || proxy;
-                if(url === true){//force reload cache
-                    cacheModuleInfo = null;
-                    url = proxy;
-                }
-                if(url === proxy){// Кешируем данные о сервере, чтобы не запрашивать 10 раз
-                    if(cacheModuleInfo === null){
-                        cacheModuleInfo = wrapRequest(getModuleInformation());
-                    }
-                    // on error - clear object to reload next time
-                    return cacheModuleInfo;
-                }
-                //Some another server
-                return $http.get(url + '/web/api/moduleInformation?showAddresses=true',{
+            pingServer:function(url){
+                return $http.get(url + '/web/api/moduleInformation',{
                     timeout: 3*1000
                 });
+            },
+            getModuleInformation: function(reload) {
+                if(reload === true){//force reload cache
+                    cacheModuleInfo = null;
+                }
+                if(cacheModuleInfo === null){
+                    cacheModuleInfo = wrapRequest(getModuleInformation());
+                }
+                // on error - clear object to reload next time
+                return cacheModuleInfo;
             },
             systemCloudInfo:function(){
                 return this.getSystemSettings().then(function(data){
@@ -329,7 +386,6 @@ angular.module('webadminApp')
 
             mergeSystems: function(url, remoteLogin, remotePassword, keepMySystem){
                 // 1. get remote nonce
-                // /proxy/http/{url}/api/getNonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
                     // 2. calculate digest
@@ -347,6 +403,13 @@ angular.module('webadminApp')
                         postKey: postKey,
                         url: url,
                         takeRemoteSettings: !keepMySystem
+                    });
+                },function(error){
+                    return $q.reject({
+                        data:{
+                            error:3,
+                            errorString:'INCOMPATIBLE'
+                        }
                     });
                 });
             },
@@ -366,6 +429,13 @@ angular.module('webadminApp')
                         postKey: postKey,
                         url: url
                     }));
+                },function(error){
+                    return $q.reject({
+                        data:{
+                            error:3,
+                            errorString:'INCOMPATIBLE'
+                        }
+                    });
                 });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
@@ -398,6 +468,9 @@ angular.module('webadminApp')
             },
             getTime:function(){
                 return wrapGet(proxy + '/web/api/gettime');
+            },
+            getTimeZones:function(){
+                return wrapGet(proxy + '/web/api/getTimeZones');
             },
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/web/api/logLevel?id=' + logId + (level?'&value=' + level:''));
@@ -456,7 +529,7 @@ angular.module('webadminApp')
                 }
 
                 if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
-                    serverUrl = '/proxy/'+ serverUrl + '/';
+                    serverUrl = '/web/proxy/'+ serverUrl + '/';
                 }
                 if( proxy === Config.demo){
                     serverUrl = proxy + '/';
@@ -491,9 +564,15 @@ angular.module('webadminApp')
 
                 return this.getModuleInformation().then(function (r) {
                     // check for safe mode and new server and redirect.
-                    if(r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0 && !r.data.reply.ecDbReadOnly &&
-                        $location.path()!=='/advanced' && $location.path()!=='/debug'){ // Do not redirect from advanced and debug pages
+                    if($location.path()==='/advanced' ||  $location.path()==='/debug'){ // Do not redirect from advanced and debug pages
+                        return self.getUser();
+                    }
+                    if(r.data.reply.flags.newSystem){  // New system - redirect to setup
                         $location.path('/setup');
+                        return null;
+                    }
+                    if(r.data.reply.flags.brokenSystem){ // No drives - redirect to settings and hide everything else
+                        $location.path('/settings/system');
                         return null;
                     }
                     return self.getUser();
@@ -502,14 +581,33 @@ angular.module('webadminApp')
             checkInternet:function(reload){
                 return this.getModuleInformation(reload).then(function(r){
                     var serverInfo = r.data.reply;
-                    return  (serverInfo.serverFlags && serverInfo.serverFlags.indexOf(Config.publicIpFlag) >= 0);
+                    return serverInfo.flags.hasInternet;
                 });
             },
             createEvent:function(params){
-                return wrapGet(proxy + '/web/api/createEvent?' +  $.param(params));
+                return wrapGet(proxy + '/web/api/createEvent',params);
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+
+            networkSettings:function(settings){
+                if(!settings) {
+                    return wrapGet(proxy + '/web/api/iflist');
+                }
+                return wrapPost(proxy + '/web/api/ifconfig', settings);
+            },
+
+            timeSettings:function(dateTime, timeZone){
+                if(!dateTime || !timeZone) {
+                    return wrapGet(proxy + '/web/api/gettime');
+                }
+                return wrapPost(proxy + '/web/api/setTime', stringifyValues({
+                    timeZoneId: timeZone,
+                    dateTime: dateTime
+                }));
             }
         };
+
+        return mediaserver;
     });

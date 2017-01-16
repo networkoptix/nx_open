@@ -46,6 +46,7 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
     m_lineEdit->addAction(qnSkin->icon("theme/input_search.png"), QLineEdit::LeadingPosition);
+    m_lineEdit->setClearButtonEnabled(true);
 
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
 

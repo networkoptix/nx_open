@@ -1,5 +1,4 @@
-#ifndef QN_FISHEYE_SETTINGS_WIDGET_H
-#define QN_FISHEYE_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtGui/QImage>
 #include <QtWidgets/QWidget>
@@ -8,8 +7,7 @@
 
 namespace Ui
 {
-    class FisheyeSettingsWidget;
-
+class FisheyeSettingsWidget;
 } // namespace Ui
 
 class QnImageProvider;
@@ -34,5 +32,3 @@ signals:
 private:
     QScopedPointer<Ui::FisheyeSettingsWidget> ui;
 };
-
-#endif // QN_FISHEYE_SETTINGS_WIDGET_H

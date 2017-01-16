@@ -1,5 +1,4 @@
-#ifndef NX_NETWORK_SOCKET_GLOBAL_H
-#define NX_NETWORK_SOCKET_GLOBAL_H
+#pragma once
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/singleton.h>
@@ -31,6 +30,7 @@ public:
         NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
         NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
+        NX_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
     };
 
     struct NX_NETWORK_API Config: nx::utils::FlagConfig
@@ -38,9 +38,9 @@ public:
         Config(): nx::utils::FlagConfig("nx_network") { reload(); }
 
         NX_FLAG(0, disableCloudSockets, "Use plain TCP sockets instead of Cloud sockets");
-        NX_STRING_PARAM("", disableAddresses, "Comma separated list of forbidden IP and domains");
+        NX_STRING_PARAM("", disableHosts, "Comma-separated list of forbidden IPs and domains");
 
-        bool isAddressDisabled(const HostAddress& address) const;
+        bool isHostDisabled(const HostAddress& address) const;
     };
 
     typedef cloud::MediatorAddressPublisher AddressPublisher;
@@ -53,15 +53,16 @@ public:
     static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
     static aio::AIOService& aioService() { return s_instance->m_aioService; }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
-    static AddressPublisher& addressPublisher() { return s_instance->m_addressPublisher; }
+    static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
-    static OutgoingTunnelPool& outgoingTunnelPool() { return s_instance->m_outgoingTunnelPool; }
+    static OutgoingTunnelPool& outgoingTunnelPool() { return *s_instance->m_outgoingTunnelPool; }
     static CloudSettings& cloudConnectSettings() { return s_instance->m_cloudConnectSettings; }
-    static TcpReversePool& tcpReversePool() { return s_instance->m_tcpReversePool; }
+    static TcpReversePool& tcpReversePool() { return *s_instance->m_tcpReversePool; }
 
     static void init(); /**< Should be called before any socket use */
     static void deinit(); /**< Should be called when sockets are not needed any more */
     static void verifyInitialization();
+    static bool isInitialized();
 
     static void applyArguments(const utils::ArgumentParser& arguments);
 
@@ -109,18 +110,20 @@ private:
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
     aio::AIOService m_aioService;
-    aio::Timer m_debugConfigurationTimer;
+    std::unique_ptr<aio::Timer> m_debugConfigurationTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
 
-    cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::OutgoingTunnelPool m_outgoingTunnelPool;
+    std::unique_ptr<cloud::MediatorAddressPublisher> m_addressPublisher;
+    std::unique_ptr<cloud::OutgoingTunnelPool> m_outgoingTunnelPool;
     cloud::CloudConnectSettings m_cloudConnectSettings;
-    cloud::tcp::ReverseConnectionPool m_tcpReversePool;
+    std::unique_ptr<cloud::tcp::ReverseConnectionPool> m_tcpReversePool;
 
     QnMutex m_mutex;
     std::map<CustomInit, CustomDeinit> m_customInits;
+
+    void initializeCloudConnectivity();
 };
 
 class SocketGlobalsHolder
@@ -128,16 +131,18 @@ class SocketGlobalsHolder
     public Singleton<SocketGlobalsHolder>
 {
 public:
-    SocketGlobalsHolder()
-    :
+    SocketGlobalsHolder():
         m_socketGlobalsGuard(std::make_unique<SocketGlobals::InitGuard>())
     {
     }
 
-    void reinitialize()
+    void reinitialize(bool initializePeerId = true)
     {
         m_socketGlobalsGuard.reset();
         m_socketGlobalsGuard = std::make_unique<SocketGlobals::InitGuard>();
+
+        if (initializePeerId)
+            SocketGlobals::outgoingTunnelPool().assignOwnPeerId("re", QnUuid::createUuid());
     }
 
 private:
@@ -146,5 +151,3 @@ private:
 
 } // namespace network
 } // namespace nx
-
-#endif  //NX_NETWORK_SOCKET_GLOBAL_H

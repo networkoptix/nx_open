@@ -5,8 +5,6 @@
 
 namespace ec2
 {
-QnMutex detail::ServerQueryProcessor::m_updateDataMutex(QnMutex::Recursive);
-
 void detail::ServerQueryProcessor::setAuditData(
     ECConnectionAuditManager* auditManager,
     const QnAuthSession& authSession)
@@ -18,7 +16,7 @@ void detail::ServerQueryProcessor::setAuditData(
 ErrorCode detail::ServerQueryProcessor::removeHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    std::list<std::function<void()>>* const transactionsToSend,
+    PostProcessList* const transactionsToSend,
     TransactionType::Value transactionType)
 {
     QnTransaction<ApiIdData> removeTran = createTransaction(command, ApiIdData(id));
@@ -33,57 +31,60 @@ ErrorCode detail::ServerQueryProcessor::removeHelper(
 ErrorCode detail::ServerQueryProcessor::removeObjAttrHelper(
     const QnUuid& id,
     ApiCommand::Value command,
-    std::list<std::function<void()>>* const transactionsToSend)
+    PostProcessList* const transactionsToSend)
 {
     return removeHelper(id, command, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     const QnTransaction<ApiIdData>& tran,
-    const AbstractECConnectionPtr& connection,
-    std::list<std::function<void()>>* const transactionsToSend)
+    const AbstractECConnectionPtr& /*connection*/,
+    PostProcessList* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
     dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
 
-    ErrorCode errorCode = processMultiUpdateSync(
+    return processMultiUpdateSync(
         ApiCommand::removeResourceParam,
         tran.transactionType,
         resourceParams,
         transactionsToSend);
-
-    if (errorCode != ErrorCode::ok)
-        return errorCode;
-
-    for (const auto& param : resourceParams)
-    {
-        QnTransaction<ApiResourceParamWithRefData> removeParamTran = 
-            createTransaction(
-                ApiCommand::Value::removeResourceParam,
-                param);
-        triggerNotification(connection, removeParamTran);
-    }
-
-    return errorCode;
 }
 
 ErrorCode detail::ServerQueryProcessor::removeObjAccessRightsHelper(
     const QnUuid& id,
-    std::list<std::function<void()>>* const transactionsToSend)
+    PostProcessList* const transactionsToSend)
 {
     return removeHelper(id, ApiCommand::removeAccessRights, transactionsToSend);
 }
 
 ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
     const QnUuid& id,
-    std::list<std::function<void()>>* const transactionsToSend,
+    PostProcessList* const transactionsToSend,
     TransactionType::Value transactionType)
 {
+    NX_LOG(lit("%1 Processing remove resourse %2 status transaction. Transaction type = %3")
+           .arg(Q_FUNC_INFO)
+           .arg(id.toString())
+           .arg(transactionType), cl_logDEBUG2);
+
     return removeHelper(
         id,
         ApiCommand::removeResourceStatus,
         transactionsToSend,
         transactionType);
+}
+
+detail::ServerQueryProcessor::PostProcessList& detail::ServerQueryProcessor::getStaticPostProcessList()
+{
+    static detail::ServerQueryProcessor::PostProcessList postProcessList;
+    return postProcessList;
+}
+
+QnMutex& detail::ServerQueryProcessor::getStaticUpdateMutex()
+{
+    static QnMutex updateMutex;
+    return updateMutex;
 }
 
 } //namespace ec2

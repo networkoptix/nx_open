@@ -22,7 +22,7 @@ namespace Qn {
 }
 
 /*!
-    \note Derived class MUST call \a initMediaResource() just after object instanciation
+    \note Derived class MUST call \a initMediaResource() just after object instantiation
 */
 class QnMediaResource
 {

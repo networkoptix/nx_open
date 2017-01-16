@@ -2,16 +2,20 @@
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/time.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include "listening_peer_pool.h"
 #include "settings.h"
+#include "statistics/collector.h"
 
 namespace nx {
 namespace hpm {
 
-static QString logRequest(const ConnectionStrongRef& connection, const api::ConnectRequest& request)
+static QString logRequest(
+    const ConnectionStrongRef& connection,
+    const api::ConnectRequest& request)
 {
     return lm("from %1(%2) to %3, session id %4")
         .strs(request.originatingPeerId, connection->getSourceAddress(),
@@ -22,14 +26,18 @@ HolePunchingProcessor::HolePunchingProcessor(
     const conf::Settings& settings,
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
-    ListeningPeerPool* const listeningPeerPool)
+    ListeningPeerPool* listeningPeerPool,
+    stats::AbstractCollector* statisticsCollector)
 :
     RequestProcessor(cloudData),
     m_settings(settings),
-    m_listeningPeerPool(listeningPeerPool)
+    m_listeningPeerPool(listeningPeerPool),
+    m_statisticsCollector(statisticsCollector)
 {
+    // TODO #ak: decouple STUN message handling and logic.
+
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connect,
+        stun::extension::methods::connect,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithOutput(
@@ -40,7 +48,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionAck,
+        stun::extension::methods::connectionAck,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -51,7 +59,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionResult,
+        stun::extension::methods::connectionResult,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -108,26 +116,23 @@ void HolePunchingProcessor::connect(
     if (connectionFsmIterAndFlag.second)
     {
         NX_LOGX(lm("Connect request %1").str(logRequest(connection, request)), cl_logDEBUG2);
+
+        connectionFsmIterAndFlag.first->second =
+            std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
+                request.connectSessionId,
+                targetPeerDataLocker->value(),
+                std::bind(
+                    &HolePunchingProcessor::connectSessionFinished,
+                    this,
+                    std::move(connectionFsmIterAndFlag.first),
+                    std::placeholders::_1),
+                m_settings);
     }
     else
     {
         NX_LOGX(lm("Connect request retransmit %1")
-            .str(logRequest(connection, request)), cl_logDEBUG1);
-
-        //ignoring request, response will be sent by fsm
-        return;
+            .str(logRequest(connection, request)), cl_logDEBUG2);
     }
-
-    connectionFsmIterAndFlag.first->second = 
-        std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            request.connectSessionId,
-            targetPeerDataLocker.get(),
-            std::bind(
-                &HolePunchingProcessor::connectSessionFinished,
-                this,
-                std::move(connectionFsmIterAndFlag.first),
-                std::placeholders::_1),
-            m_settings);
 
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(
@@ -180,6 +185,11 @@ void HolePunchingProcessor::connectionResult(
     NX_LOGX(lm("Connect result from %1, connection id %2, result: %3")
         .strs(connection->getSourceAddress(), request.connectSessionId,
             QnLexical::serialized(request.resultCode)), cl_logDEBUG2);
+
+    auto statisticsInfo = connectionIter->second->statisticsInfo();
+    statisticsInfo.resultCode = request.resultCode;
+    statisticsInfo.endTime = nx::utils::utcTime();
+    m_statisticsCollector->saveConnectSessionStatistics(std::move(statisticsInfo));
 
     connectionIter->second->onConnectionResultRequest(
         std::move(request),

@@ -34,6 +34,7 @@
 #include <ui/style/skin.h>
 #include <ui/widgets/storage_space_slider.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/workaround/hidpi_workarounds.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
@@ -126,7 +127,7 @@ namespace
             {
                 if (auto style = QnNxStyle::instance())
                 {
-                    QnPaletteColor color = style->mainColor(QnNxStyle::Colors::kBlue);
+                    QnPaletteColor color = style->findColor(QPalette().color(QPalette::Link));
                     if (!hovered)
                         color = color.darker(2);
                     opt.palette.setColor(QPalette::Text, color);
@@ -249,6 +250,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
     ui->backupSettingsButtonDuplicate->setText(ui->backupSettingsButton->text());
     connect(ui->backupSettingsButtonDuplicate, &QPushButton::clicked, ui->backupSettingsButton, &QPushButton::clicked);
 
+    setWarningStyle(ui->storagesWarningLabel);
+
     ui->progressBarBackup->setFormat(lit("%1\t%p%").arg(tr("Backup is in progress...")));
 
     m_storagePoolMenu->setProperty(style::Properties::kMenuAsDropdown, true);
@@ -289,15 +292,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
 
     connect(ui->storageView, &QnTreeView::clicked, this, itemClicked);
 
-    connect(ui->backupPages, &QStackedWidget::currentChanged, this,
-        [this](int index)
-        {
-            const auto page = ui->backupPages->widget(index);
-            if (page == ui->backupRealtimePage)
-                m_realtimeBackupMovie->start();
-            else
-                m_realtimeBackupMovie->stop();
-        });
+    connect(ui->backupPages, &QStackedWidget::currentChanged,
+        this, &QnStorageConfigWidget::updateRealtimeBackupMovieStatus);
 
     connect(ui->addExtStorageToMainBtn,     &QPushButton::clicked, this, [this]() { at_addExtStorage(true); });
 
@@ -370,10 +366,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent) :
         &QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
 
     /* By [Left] disable storage, by [Right] enable storage: */
-    auto keySignalizer = new QnSingleEventSignalizer(this);
-    keySignalizer->setEventType(QEvent::KeyPress);
-    ui->storageView->installEventFilter(keySignalizer);
-    connect(keySignalizer, &QnSingleEventSignalizer::activated, this,
+    installEventHandler(ui->storageView, QEvent::KeyPress, this,
         [this, itemClicked](QObject* object, QEvent* event)
         {
             Q_UNUSED(object);
@@ -556,8 +549,7 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
         record.isBackup = isBackup;
         m_model->updateStorage(record);
     }
-    else
-    if (index.column() == QnStorageListModel::RemoveActionColumn)
+    else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
         if (m_model->canRemoveStorage(record))
             m_model->removeStorage(record);
@@ -699,6 +691,7 @@ void QnStorageConfigWidget::applyChanges()
             { server->setBackupSchedule(m_backupSchedule); });
     }
 
+    updateDisabledStoragesWarning(false);
     emit hasChangesChanged();
 }
 
@@ -768,25 +761,40 @@ void QnStorageConfigWidget::cancelBackup()
 bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     int selectedCamerasCount, QString* info)
 {
-    auto error = [info](const QString& error) -> bool
-    {
-        if (info)
-            *info = error;
-        return false;
-    };
+    auto error =
+        [info](const QString& error) -> bool
+        {
+            if (info)
+                *info = error;
+            return false;
+        };
 
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (m_model->storages().size() < 2)
+    QnStorageModelInfoList validStorages;
+    for (const auto& storage: m_model->storages())
+    {
+        if (!storage.isWritable)
+            continue;
+        validStorages << storage;
+    }
+
+
+    //TODO: #GDM what if there is only one storage - and it is backup?
+    //TODO: #GDM what if there are no storages at all?
+
+    if (validStorages.size() < 2)
         return error(tr("Add more drives to use them as backup storage."));
 
-    const auto isCorrectStorage = [](const QnStorageModelInfo& storage)
-    {
-        return storage.isWritable && storage.isUsed && storage.isBackup;
-    };
+    const auto isEnabledBackupStorage =
+        [](const QnStorageModelInfo& storage)
+        {
+            return storage.isUsed && storage.isBackup;
+        };
 
-    if (!any_of(m_model->storages(), isCorrectStorage))
+    //TODO: #GDM what if storage is not used, so we should just enable it?
+    if (!any_of(validStorages, isEnabledBackupStorage))
         return error(tr("Change \"Main\" to \"Backup\" for some of the storage above to enable backup."));
 
     if (hasChanges())
@@ -887,6 +895,15 @@ QString QnStorageConfigWidget::intervalToString(qint64 backupTimeMs)
     return QString();
 }
 
+void QnStorageConfigWidget::updateRealtimeBackupMovieStatus(int index)
+{
+    const auto page = ui->backupPages->widget(index);
+    if (page == ui->backupRealtimePage)
+        m_realtimeBackupMovie->start();
+    else
+        m_realtimeBackupMovie->stop();
+}
+
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int overallSelectedCameras)
 {
     m_lastPerformedBackupTimeMs = m_nextScheduledBackupTimeMs = 0;
@@ -913,12 +930,14 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             if (canStartBackup)
             {
                 ui->realtimeBackupStatusLabel->setText(tr("Realtime backup is active..."));
-                ui->realtimeIconLabel->setMovie(m_realtimeBackupMovie.data());
+                QnHiDpiWorkarounds::setMovieToLabel(ui->realtimeIconLabel, m_realtimeBackupMovie.data());
+                updateRealtimeBackupMovieStatus(ui->backupPages->currentIndex());
             }
             else
             {
                 ui->realtimeBackupStatusLabel->setText(tr("Realtime backup is set up."));
-                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap(lit("archive_backup/backup_ready.png")));
+                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap(lit("archive_backup/backup_ready.png"),
+                    QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
             }
 
             ui->backupPages->setCurrentWidget(ui->backupRealtimePage);

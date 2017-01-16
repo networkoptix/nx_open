@@ -2,15 +2,16 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/sql_functions.h>
+#include <nx/fusion/serialization/sql.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/future.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <utils/common/guard.h>
-#include <nx/fusion/model_functions.h>
-#include <nx/fusion/serialization/sql.h>
-#include <nx/fusion/serialization/sql_functions.h>
 
 #include "stree/cdb_ns.h"
 
@@ -103,8 +104,8 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    const auto buffer = nx::utils::random::generate(
-        nx::utils::random::number<size_t>(10, 20), 'a', 'z');
+    const auto buffer = nx::utils::generateRandomName(
+        nx::utils::random::number<size_t>(10, 20));
 
     return std::string(buffer.data(), buffer.size());
 }
@@ -209,12 +210,11 @@ db::DBResult TemporaryAccountPasswordManager::fillCache()
     nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/)
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -225,8 +225,7 @@ db::DBResult TemporaryAccountPasswordManager::fillCache()
 }
 
 nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/)
+    nx::db::QueryContext* queryContext)
 {
     QSqlQuery readPasswordsQuery(*queryContext->connection());
     readPasswordsQuery.setForwardOnly(true);

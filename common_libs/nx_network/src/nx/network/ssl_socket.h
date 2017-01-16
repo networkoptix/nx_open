@@ -46,6 +46,8 @@ public:
     static void useOrCreateCertificate(
         const QString& filePath,
         const String& name, const String& country, const String& company);
+
+    static void useRandomCertificate(const String& module);
 };
 
 class NX_NETWORK_API SslSocket
@@ -67,10 +69,6 @@ public:
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
 
     virtual bool connect(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-
-    virtual bool connectToIp(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
 

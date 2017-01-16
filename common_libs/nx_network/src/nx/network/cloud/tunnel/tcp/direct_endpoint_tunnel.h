@@ -9,14 +9,12 @@
 
 #include "../abstract_outgoing_tunnel_connection.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 namespace tcp {
 
-class NX_NETWORK_API DirectTcpEndpointTunnel
-    :
+class NX_NETWORK_API DirectTcpEndpointTunnel:
     public AbstractOutgoingTunnelConnection
 {
 public:
@@ -28,6 +26,8 @@ public:
     virtual ~DirectTcpEndpointTunnel();
 
     virtual void stopWhileInAioThread() override;
+
+    virtual void start() override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,

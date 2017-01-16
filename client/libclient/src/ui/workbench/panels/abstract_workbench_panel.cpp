@@ -16,7 +16,8 @@ AbstractWorkbenchPanel::AbstractWorkbenchPanel(
     :
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_parentWidget(parentWidget)
+    m_parentWidget(parentWidget),
+    m_masterOpacity(NxUi::kOpaque)
 {
     NX_ASSERT(m_parentWidget);
 
@@ -53,6 +54,21 @@ AnimationTimer* AbstractWorkbenchPanel::animationTimer() const
 void AbstractWorkbenchPanel::setProxyUpdatesEnabled(bool /* updatesEnabled */ )
 {
     /* This method may be overridden in panels to disable and enable masked widgets. */
+}
+
+qreal AbstractWorkbenchPanel::masterOpacity() const
+{
+    return m_masterOpacity;
+}
+
+void AbstractWorkbenchPanel::setMasterOpacity(qreal value)
+{
+    value = qBound(NxUi::kHidden, value, NxUi::kOpaque);
+    if (qFuzzyIsNull(m_masterOpacity - value))
+        return;
+
+    m_masterOpacity = value;
+    updateOpacity(false);
 }
 
 } //namespace NxUi

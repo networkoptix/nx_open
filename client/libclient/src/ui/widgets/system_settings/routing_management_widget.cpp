@@ -3,31 +3,35 @@
 
 #include <QtWidgets/QInputDialog>
 
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
+#include <core/resource/fake_media_server.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
 
-#include "nx_ec/ec_api.h"
-#include "nx_ec/dummy_handler.h"
+#include <nx/network/socket_global.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/string.h>
 
-#include "ui/help/help_topics.h"
-#include "ui/help/help_topic_accessor.h"
+#include <nx_ec/ec_api.h>
+#include <nx_ec/dummy_handler.h>
+
 #include <ui/common/read_only.h>
-#include "ui/models/resource/resource_list_model.h"
-#include "ui/models/server_addresses_model.h"
-#include "ui/style/custom_style.h"
 #include <ui/delegates/switch_item_delegate.h>
+#include <ui/help/help_topics.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/models/resource/resource_list_model.h>
+#include <ui/models/server_addresses_model.h>
+#include <ui/style/custom_style.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
-#include <nx/network/socket_common.h>
-#include "nx/utils/string.h"
-#include "utils/common/util.h"
-#include <core/resource/fake_media_server.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/util.h>
 
 namespace {
+
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
@@ -78,7 +82,8 @@ namespace {
         for (const QUrl &url: server->getIgnoredUrls())
             ignoredUrls.insert(url);
     }
-}
+
+} // namespace
 
 class RoutingChange {
 public:
@@ -220,6 +225,16 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->header()->setSectionResizeMode(QnServerAddressesModel::InUseColumn, QHeaderView::ResizeToContents);
     ui->addressesView->header()->setSectionsMovable(false);
 
+    ui->addressesView->setIgnoreDefaultSpace(true);
+    connect(ui->addressesView, &QnTreeView::spacePressed, this,
+        [this](const QModelIndex& index)
+        {
+            auto checkIndex = index.sibling(index.row(), QnServerAddressesModel::InUseColumn);
+            auto checkState = static_cast<Qt::CheckState>(checkIndex.data(Qt::CheckStateRole).toInt());
+            auto newState = checkState == Qt::Checked ? Qt::Unchecked : Qt::Checked;
+            ui->addressesView->model()->setData(checkIndex, newState, Qt::CheckStateRole);
+        });
+
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     scrollBar->setUseItemViewPaddingWhenVisible(true);
     ui->addressesView->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -237,9 +252,19 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
 
     updateUi();
+
+    /* Immediate selection screws up initial size, so update on 1st show: */
+    installEventHandler(this, QEvent::Show, this,
+        [this]()
+        {
+            if (!ui->serversView->currentIndex().isValid())
+                ui->serversView->setCurrentIndex(ui->serversView->model()->index(0, 0));
+        });
 }
 
-QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
+QnRoutingManagementWidget::~QnRoutingManagementWidget()
+{
+}
 
 void QnRoutingManagementWidget::loadDataToUi() {
     m_changes->changes.clear();
@@ -378,6 +403,26 @@ void QnRoutingManagementWidget::updateUi() {
     ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
+quint16 QnRoutingManagementWidget::getCurrentServerPort()
+{
+    const auto address = m_server->getPrimaryAddress();
+    const bool isUsualHost = !nx::network::SocketGlobals::addressResolver()
+        .isCloudHostName(address.address.toString());
+
+    if (isUsualHost && (address.port > 0))
+        return address.port;
+
+    const auto addresses = m_serverAddressesModel->addressList();
+    if (addresses.isEmpty())
+        return DEFAULT_APPSERVER_PORT;
+
+    const auto currentPort = addresses.first().port();
+    if (currentPort > 0)
+        return currentPort;
+
+    return DEFAULT_APPSERVER_PORT;
+}
+
 void QnRoutingManagementWidget::at_addButton_clicked() {
     if (!m_server)
         return;
@@ -394,8 +439,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
-    if (url.port() == -1)
-        url.setPort(m_server->getPort());
+    if (url.port() <= 0)
+        url.setPort(getCurrentServerPort());
 
     QUrl implicitUrl = url;
     implicitUrl.setPort(-1);

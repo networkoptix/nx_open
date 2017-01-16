@@ -12,7 +12,7 @@
 
 namespace {
 
-bool lessRoleByName(const ec2::ApiUserGroupData& r1, const ec2::ApiUserGroupData& r2)
+bool lessRoleByName(const ec2::ApiUserRoleData& r1, const ec2::ApiUserRoleData& r2)
 {
     return nx::utils::naturalStringCompare(r1.name, r2.name, Qt::CaseInsensitive) < 0;
 };
@@ -39,8 +39,8 @@ RoleDescription::RoleDescription(const Qn::UserRole roleType):
 {
 }
 
-RoleDescription::RoleDescription(const ec2::ApiUserGroupData& userRole):
-    roleType(Qn::UserRole::CustomUserGroup),
+RoleDescription::RoleDescription(const ec2::ApiUserRoleData& userRole):
+    roleType(Qn::UserRole::CustomUserRole),
     name(userRole.name),
     description(QnUserRolesManager::userRoleDescription(roleType)),
     permissions(QnUserRolesManager::userRolePermissions(roleType)),
@@ -81,13 +81,13 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
         ? count() - 1
         : -1;
 
-    auto role = user->role();
+    auto role = user->userRole();
     switch (role)
     {
-        case Qn::UserRole::CustomUserGroup:
+        case Qn::UserRole::CustomUserRole:
         {
             auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-                [roleId = user->userGroup()](const ec2::ApiUserGroupData& role)
+                [roleId = user->userRoleId()](const ec2::ApiUserRoleData& role)
                 {
                     return role.id == roleId;
                 });
@@ -108,7 +108,7 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
     return m_standardRoles.indexOf(role);
 }
 
-void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserGroupDataList value)
+void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserRoleDataList value)
 {
     std::sort(value.begin(), value.end(), lessRoleByName);
     if (m_userRoles == value)
@@ -139,11 +139,11 @@ void QnUserRolesModelPrivate::updateStandardRoles()
     m_standardRoles = available;
 }
 
-bool QnUserRolesModelPrivate::updateUserRole(const ec2::ApiUserGroupData& userRole)
+bool QnUserRolesModelPrivate::updateUserRole(const ec2::ApiUserRoleData& userRole)
 {
     Q_Q(QnUserRolesModel);
     auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-        [&userRole](const ec2::ApiUserGroupData& role)
+        [&userRole](const ec2::ApiUserRoleData& role)
         {
             return role.id == userRole.id;
         });
@@ -192,7 +192,7 @@ bool QnUserRolesModelPrivate::updateUserRole(const ec2::ApiUserGroupData& userRo
             else
             {
                 /* Role moved backward: */
-                using reverse = ec2::ApiUserGroupDataList::reverse_iterator;
+                using reverse = ec2::ApiUserRoleDataList::reverse_iterator;
                 std::rotate(reverse(roleIterator + 1), reverse(roleIterator), reverse(newPosition));
             }
 
@@ -212,7 +212,7 @@ bool QnUserRolesModelPrivate::updateUserRole(const ec2::ApiUserGroupData& userRo
 bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
 {
     auto roleIterator = std::find_if(m_userRoles.begin(), m_userRoles.end(),
-        [&roleId](const ec2::ApiUserGroupData& role)
+        [&roleId](const ec2::ApiUserRoleData& role)
         {
             return role.id == roleId;
         });
@@ -228,7 +228,7 @@ bool QnUserRolesModelPrivate::removeUserRoleById(const QnUuid& roleId)
     return true;
 }
 
-bool QnUserRolesModelPrivate::removeUserRole(const ec2::ApiUserGroupData& userRole)
+bool QnUserRolesModelPrivate::removeUserRole(const ec2::ApiUserRoleData& userRole)
 {
     return removeUserRoleById(userRole.id);
 }

@@ -32,6 +32,8 @@
 #include <core/resource/security_cam_resource.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
+QnMutex QnResource::m_initAsyncMutex;
+
 // TODO: #rvasilenko move it to QnResourcePool
 Q_GLOBAL_STATIC(QnInitResPool, initResPool)
 
@@ -367,8 +369,7 @@ void QnResource::setParentId(const QnUuid& parent)
         }
     }
 
-    if (!oldParentId.isNull())
-        emit parentIdChanged(toSharedPointer(this));
+    emit parentIdChanged(toSharedPointer(this));
 
     if (initializedChanged)
         emit this->initializedChanged(toSharedPointer(this));
@@ -591,7 +592,7 @@ Qn::ResourceStatus QnResource::getStatus() const
     return qnStatusDictionary->value(getId());
 }
 
-void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus)
+void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
 #ifdef QN_RESOURCE_DEBUG
     qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
@@ -609,10 +610,16 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
         init();
 
-    emit statusChanged(toSharedPointer(this));
+    auto sharedThis = toSharedPointer(this);
+    NX_LOG(lit("%1 Emit statusChanged signal for resource %1, %2, %3")
+            .arg(sharedThis->getId().toString())
+            .arg(sharedThis->getName())
+            .arg(sharedThis->getUrl()), cl_logDEBUG2);
+
+    emit statusChanged(sharedThis, reason);
 }
 
-void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == Qn::NotDefined)
         return;
@@ -627,8 +634,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
     if (oldStatus == newStatus)
         return;
     qnStatusDictionary->setValue(id, newStatus);
-    if (!silenceMode)
-        doStatusChanged(oldStatus, newStatus);
+    doStatusChanged(oldStatus, newStatus, reason);
 }
 
 QDateTime QnResource::getLastDiscoveredTime() const
@@ -1103,12 +1109,13 @@ private:
 
 void QnResource::stopAsyncTasks()
 {
-    m_appStopping = true;
+    pleaseStopAsyncTasks();
     initResPool()->waitForDone();
 }
 
 void QnResource::pleaseStopAsyncTasks()
 {
+    QnMutexLocker lock(&m_initAsyncMutex);
     m_appStopping = true;
 }
 
@@ -1138,7 +1145,6 @@ void QnResource::initAsync(bool optional)
     else
     {
         m_lastInitTime = t;
-        lock.unlock();
         initResPool()->start(task);
     }
 }

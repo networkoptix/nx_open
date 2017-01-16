@@ -9,19 +9,27 @@
 class QnIOPortsViewModel : public QAbstractListModel
 {
     Q_OBJECT
+    using base_type = QAbstractListModel;
 
-    typedef QAbstractListModel base_type;
 public:
-
-    enum Columns {
+    enum Columns
+    {
+        NumberColumn,
         IdColumn,
         TypeColumn,
         DefaultStateColumn,
         NameColumn,
-        AutoResetColumn,
+        ActionColumn,
+        DurationColumn,
         ColumnCount
     };
 
+    enum Action
+    {
+        NoAction,
+        ToggleState,
+        Impulse
+    };
 
     explicit QnIOPortsViewModel(QObject *parent = 0);
     virtual ~QnIOPortsViewModel();
@@ -36,13 +44,17 @@ public:
     void clear();
     void setModelData(const QnIOPortDataList& data);
     QnIOPortDataList modelData() const;
+
+    static QString portTypeToString(Qn::IOPortType portType);
+    static QString stateToString(Qn::IODefaultState state);
+    static QString actionToString(Action action);
+
 private:
     QString textData(const QModelIndex &index) const;
     QVariant editData(const QModelIndex &index) const;
     bool isDisabledData(const QModelIndex &index) const;
+    Action actionFor(const QnIOPortData& value) const;
 
-    QString portTypeToString(Qn::IOPortType portType) const;
-    QString stateToString(Qn::IODefaultState state) const;
 private:
     QnIOPortDataList m_data;
 };

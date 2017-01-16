@@ -22,6 +22,7 @@
 #include "audit/audit_record.h"
 #include "licensing/hardware_info.h"
 #include "backup_status_reply.h"
+#include <utils/email/email.h>
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\

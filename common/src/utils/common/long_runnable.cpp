@@ -7,11 +7,11 @@
 
 #include <QtCore/QSet>
 
+#include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/thread_util.h>
 
-#include <common/systemexcept.h>
 #include <utils/common/warnings.h>
 
 
@@ -225,10 +225,6 @@ void QnLongRunnable::stop() {
 
 void QnLongRunnable::at_started() {
     initSystemThreadId();
-
-    // Just in case
-    srand(::time(NULL));
-    qsrand(::time(NULL));
 
 #ifdef _WIN32
     win32_exception::installThreadSpecificUnhandledExceptionHandler();

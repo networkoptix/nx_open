@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 7, 2016
-* akolesnikov
-***********************************************************/
-
 #include "direct_endpoint_connector.h"
 
 #include <nx/fusion/serialization/json.h>
@@ -10,6 +5,7 @@
 #include <nx/utils/log/log.h>
 
 #include <network/module_information.h>
+#include <rest/server/json_rest_result.h>
 
 #include "direct_endpoint_tunnel.h"
 
@@ -68,6 +64,9 @@ void DirectEndpointConnector::connect(
     //  currently only mediaserver can be on remote side
     for (const SocketAddress& endpoint: response.forwardedTcpEndpointList)
     {
+        NX_LOGX(lm("cross-nat %1. Starting connection to %2")
+            .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+
         auto httpClient = nx_http::AsyncHttpClient::create();
         httpClient->bindToAioThread(getAioThread());
         httpClient->setSendTimeoutMs(timeout.count());
@@ -117,6 +116,9 @@ void DirectEndpointConnector::onHttpRequestDone(
 {
     auto connectionContext = std::move(*socketIter);
     m_connections.erase(socketIter);
+
+    NX_LOGX(lm("cross-nat %1. Finished probing %2")
+        .arg(m_connectSessionId).str(httpClient->url()), cl_logDEBUG2);
 
     if (httpClient->failed() &&
         (httpClient->lastSysErrorCode() != SystemError::noError ||
@@ -178,31 +180,25 @@ bool DirectEndpointConnector::verifyHostResponse(
     if (Qn::serializationFormatFromHttpContentType(contentType) != Qn::JsonFormat)
     {
         NX_LOGX(lm("cross-nat %1. Received unexpected Content-Type %2 from %3")
-            .arg(m_connectSessionId).arg(contentType).str(httpClient->url()),
-            cl_logDEBUG2);
+            .strs(m_connectSessionId, contentType, httpClient->url()), cl_logDEBUG2);
         return false;
     }
 
-    bool parseResult = false;
-    auto moduleInformation = 
-        QJson::deserialized<QnModuleInformation>(
-            httpClient->fetchMessageBodyBuffer(), QnModuleInformation(), &parseResult);
-    if (!parseResult)
+    QnJsonRestResult restResult;
+    if (!QJson::deserialize(httpClient->fetchMessageBodyBuffer(), &restResult)
+        || restResult.error != QnRestResult::Error::NoError)
     {
-        NX_LOGX(lm("cross-nat %1. Failed to parse response from %2")
-            .arg(m_connectSessionId).str(httpClient->url()),
-            cl_logDEBUG2);
+        NX_LOGX(lm("cross-nat %1. Error response '%2' from %3")
+            .strs(m_connectSessionId, restResult.errorString, httpClient->url()), cl_logDEBUG2);
         return false;
     }
 
-    const auto actualHostName = 
-        moduleInformation.id.toSimpleString() + "."
-        + moduleInformation.cloudSystemId;
-
-    if (!actualHostName.endsWith(m_targetHostAddress.host.toString()))
+    QnModuleInformation moduleInformation;
+    if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
+        || !moduleInformation.cloudId().endsWith(m_targetHostAddress.host.toString()))
     {
         NX_LOGX(lm("cross-nat %1. Connected to a wrong server (%2) instead of %3")
-            .arg(m_connectSessionId).arg(actualHostName).str(m_targetHostAddress.host),
+            .strs(m_connectSessionId, moduleInformation.cloudId(), m_targetHostAddress.host),
             cl_logDEBUG2);
         return false;
     }
@@ -214,6 +210,9 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
+    NX_LOGX(lm("cross-nat %1. Reporting successful connection to %2")
+        .arg(m_connectSessionId).str(endpoint), cl_logDEBUG2);
+
     m_connections.clear();
 
     auto tunnel =

@@ -93,7 +93,7 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
         {
             // removing item from the matrices and removing empty matrices (if any)
             QnVideoWallMatrixMap matrices = r->matrices()->getItems();
-            for (QnVideoWallMatrix matrix : matrices)
+            for (QnVideoWallMatrix matrix: matrices)
             {
                 if (!matrix.layoutByItem.contains(item.uuid))
                     continue;
@@ -104,15 +104,16 @@ Qn::Notifier QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item)
                     r->matrices()->updateItem(matrix);
             }
 
-            QnUuid pcUuid = item.pcUuid;
-            for (const QnVideoWallItem &item : r->items()->getItems())
-                if (item.pcUuid == pcUuid)
-                    return;
-
-            //removed last item from this pc
-            r->pcs()->removeItem(pcUuid);
-
             emit r->itemRemoved(r, item);
+
+            const bool lastItemFromThisPc = boost::algorithm::all_of(r->items()->getItems(),
+                [pcUuid = item.pcUuid](const QnVideoWallItem &item)
+                {
+                    return item.pcUuid != pcUuid;
+                });
+
+            if (lastItemFromThisPc)
+                r->pcs()->removeItem(item.pcUuid);
         };
 }
 

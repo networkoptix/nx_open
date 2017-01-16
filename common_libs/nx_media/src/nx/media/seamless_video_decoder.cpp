@@ -5,9 +5,6 @@
 #include <QtMultimedia/QVideoFrame>
 #include <QtCore/QMutexLocker>
 
-#include <utils/media/jpeg_utils.h>
-#include <utils/media/h264_utils.h>
-
 #include "abstract_video_decoder.h"
 #include "video_decoder_registry.h"
 #include "frame_metadata.h"
@@ -17,27 +14,6 @@ namespace nx {
 namespace media {
 
 namespace {
-
-static QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
-{
-    switch (frame->context->getCodecId())
-    {
-        case AV_CODEC_ID_H264:
-        {
-            QSize result;
-            extractSpsPps(frame, &result, nullptr);
-            return result;
-        }
-        case AV_CODEC_ID_MJPEG:
-        {
-            nx_jpg::ImageInfo imgInfo;
-            nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
-            return QSize(imgInfo.width, imgInfo.height);
-        }
-        default:
-            return QSize();
-    }
-}
 
 /**
  * This data is used to compare current and previous frame so as to reset video decoder if needed.
@@ -57,7 +33,7 @@ struct FrameBasicInfo
         codec = frame->compressionType;
         size = QSize(frame->width, frame->height);
         if (size.isEmpty())
-            size = mediaSizeFromRawData(frame);
+            size = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
     }
 
     QSize size;

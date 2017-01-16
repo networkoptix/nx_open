@@ -63,6 +63,7 @@ private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
+    std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
 };
 
 

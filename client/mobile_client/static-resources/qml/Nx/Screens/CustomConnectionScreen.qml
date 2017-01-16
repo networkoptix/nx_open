@@ -8,10 +8,11 @@ Page
 {
     id: customConnectionScreen
 
-    title: systemName ? systemName : qsTr("Connect to System")
+    title: systemName ? systemName : qsTr("Connect to Server")
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     property alias systemId: systemHostsModel.systemId
+    property alias localSystemId: recentLocalConnectionsModel.systemId
     property string systemName
     property alias address: credentialsEditor.address
     property alias login: credentialsEditor.login
@@ -22,11 +23,6 @@ Page
     {
         id: d
         property bool connecting: false
-    }
-
-    QnSystemHostsModel
-    {
-        id: systemHostsModel
     }
 
     Column
@@ -42,7 +38,17 @@ Page
         SessionCredentialsEditor
         {
             id: credentialsEditor
-            hostsModel: systemHostsModel
+
+            hostsModel: QnSystemHostsModel
+            {
+                id: systemHostsModel
+            }
+
+            recentLocalConnectionsModel: QnRecentLocalConnectionsModel
+            {
+                id: recentLocalConnectionsModel
+            }
+
             width: parent.availableWidth
             onAccepted: customConnectionScreen.connect()
         }
@@ -83,9 +89,7 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
-            {
                 Workflow.openResourcesScreen(connectionManager.systemName)
-            }
         }
 
         onConnectionFailed:
@@ -100,7 +104,7 @@ Page
         hideWarning()
         connectButton.forceActiveFocus()
         d.connecting = true
-        connectionManager.connectToServer("http://" + address, login, password)
+        connectionManager.connectByUserInput(address, login, password)
     }
 
     function showWarning(status, info)

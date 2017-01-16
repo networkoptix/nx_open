@@ -7,6 +7,8 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
+class QnSettings;
+
 namespace nx {
 namespace db {
 
@@ -16,8 +18,11 @@ enum class DBResult
     statementError,
     ioError,
     notFound,
-    cancelled, //< This code means that business logic decided to cancel operation 
-                // and rollback transaction. This is not an error.
+    /**
+     * Business logic decided to cancel operation and rollback transaction. 
+     * This is not an error.
+     */
+    cancelled, 
     retryLater,
     uniqueConstraintViolation,
     connectionError
@@ -44,7 +49,7 @@ public:
     QString password;
     QString connectOptions;
     QString encoding;
-    size_t maxConnectionCount;
+    int maxConnectionCount;
     /** Connection is closed if not used for this interval. */
     std::chrono::seconds inactivityTimeout;
     /**
@@ -56,15 +61,11 @@ public:
     std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection;
     int maxErrorsInARowBeforeClosingConnection;
 
-    ConnectionOptions():
-        driverType(RdbmsDriverType::sqlite),
-        port(0),
-        maxConnectionCount(1),
-        inactivityTimeout(std::chrono::minutes(10)),
-        maxPeriodQueryWaitsForAvailableConnection(std::chrono::minutes(1)),
-        maxErrorsInARowBeforeClosingConnection(7)
-    {
-    }
+    ConnectionOptions();
+
+    void loadFromSettings(QnSettings* const settings);
+
+    bool operator==(const ConnectionOptions&) const;
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::DBResult)

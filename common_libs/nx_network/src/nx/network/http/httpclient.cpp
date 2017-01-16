@@ -7,14 +7,21 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/log/log.h>
 
+namespace {
+
+const std::size_t kDefaultMaxInternalBufferSize = 200 * 1024 * 1024; //< 200MB should be enough
+
+} // namespace
 
 namespace nx_http {
 
-HttpClient::HttpClient()
-    :
+HttpClient::HttpClient():
     m_done(false),
-    m_terminated(false)
+    m_error(false),
+    m_terminated(false),
+    m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
 {
     instanciateHttpClient();
 }
@@ -62,6 +69,24 @@ bool HttpClient::doPost(
         true));
 }
 
+bool HttpClient::doPut(
+    const QUrl& url,
+    const nx_http::StringType& contentType,
+    nx_http::StringType messageBody)
+{
+    typedef void(AsyncHttpClient::*FuncType)(
+        const QUrl& /*url*/,
+        const nx_http::StringType& /*contentType*/,
+        nx_http::StringType /*messageBody*/);
+
+    return doRequest(std::bind(
+        static_cast<FuncType>(&nx_http::AsyncHttpClient::doPut),
+        std::placeholders::_1,
+        url,
+        contentType,
+        std::move(messageBody)));
+}
+
 const Response* HttpClient::response() const
 {
     return m_asyncHttpClient->response();
@@ -72,18 +97,29 @@ SystemError::ErrorCode HttpClient::lastSysErrorCode() const
     return m_asyncHttpClient->lastSysErrorCode();
 }
 
+bool HttpClient::isValid() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return !m_error;
+}
+
 bool HttpClient::eof() const
 {
     QnMutexLocker lk(&m_mutex);
-    return m_done && m_msgBodyBuffer.isEmpty();
+    return (m_done && m_msgBodyBuffer.isEmpty()) || m_error;
 }
 
 BufferType HttpClient::fetchMessageBodyBuffer()
 {
     QnMutexLocker lk(&m_mutex);
-    while (!m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done))
+
+    while (!m_terminated && (m_msgBodyBuffer.isEmpty() && !m_done && !m_error))
         m_cond.wait(lk.mutex());
+
     nx_http::BufferType result;
+    if (m_error)
+        return result;
+
     result.swap(m_msgBodyBuffer);
     return result;
 }
@@ -96,6 +132,11 @@ void HttpClient::addAdditionalHeader(const StringType& key, const StringType& va
 const QUrl& HttpClient::url() const
 {
     return m_asyncHttpClient->url();
+}
+
+const QUrl& HttpClient::contentLocationUrl() const
+{
+    return m_asyncHttpClient->contentLocationUrl();
 }
 
 StringType HttpClient::contentType() const
@@ -147,6 +188,13 @@ void HttpClient::setUserPassword(const QString& userPassword)
         m_asyncHttpClient->setUserPassword(userPassword);
 }
 
+void HttpClient::setAuthType(AsyncHttpClient::AuthType value)
+{
+    m_authType = value;
+    if (m_asyncHttpClient)
+        m_asyncHttpClient->setAuthType(value);
+}
+
 void HttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
 {
     m_proxyEndpoint = proxyEndpoint;
@@ -164,10 +212,10 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     nx::utils::promise<void> socketTakenPromise;
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
-    {
-        sock = std::move(m_asyncHttpClient->takeSocket());
-        socketTakenPromise.set_value();
-    });
+        {
+            sock = std::move(m_asyncHttpClient->takeSocket());
+            socketTakenPromise.set_value();
+        });
     socketTakenPromise.get_future().wait();
 
     if (!sock || !sock->setNonBlockingMode(false))
@@ -197,7 +245,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (!m_done)
+    if (!m_done || m_error)
     {
         lk.unlock();
 
@@ -228,6 +276,8 @@ bool HttpClient::doRequest(AsyncClientFunc func)
             m_asyncHttpClient->setUserName(m_userName.get());
         if (m_userPassword)
             m_asyncHttpClient->setUserPassword(m_userPassword.get());
+        if (m_authType)
+            m_asyncHttpClient->setAuthType(m_authType.get());
         if (m_proxyEndpoint)
             m_asyncHttpClient->setProxyVia(m_proxyEndpoint.get());
 
@@ -235,6 +285,7 @@ bool HttpClient::doRequest(AsyncClientFunc func)
     }
 
     m_done = false;
+    m_error = false;
     func(m_asyncHttpClient.get());
 
     m_msgBodyBuffer.clear();
@@ -249,6 +300,16 @@ void HttpClient::onResponseReceived()
     QnMutexLocker lk(&m_mutex);
     //message body buffer can be non-empty
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
+    if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+    {
+        NX_LOG(
+            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
+            .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
+            cl_logWARNING);
+        m_done = true;
+        m_error = true;
+        m_asyncHttpClient->pleaseStopSync();
+    }
     m_cond.wakeAll();
 }
 
@@ -256,6 +317,16 @@ void HttpClient::onSomeMessageBodyAvailable()
 {
     QnMutexLocker lk(&m_mutex);
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
+    if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
+    {
+        NX_LOG(
+            lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
+            .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
+            cl_logWARNING);
+        m_done = true;
+        m_error = true;
+        m_asyncHttpClient->pleaseStopSync();
+    }
     m_cond.wakeAll();
 }
 
@@ -271,4 +342,4 @@ void HttpClient::onReconnected()
     //TODO #ak
 }
 
-}   //namespace nx_http
+} // namespace nx_http

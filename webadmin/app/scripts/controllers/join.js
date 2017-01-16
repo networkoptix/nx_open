@@ -62,6 +62,10 @@ angular.module('webadminApp')
                 case 'SAFE_MODE':
                     errorToShow =  L.join.safeMode;
                     break;
+
+                case 'UNCONFIGURED_SYSTEM':
+                    errorToShow = L.join.newSystemError;
+                    break;
                 case 'CONFIGURATION_ERROR':
                     errorToShow = L.join.configError;
                     break;
@@ -96,7 +100,7 @@ angular.module('webadminApp')
                 }
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
-            },function(){
+            },function(r){
                 var errorToShow = L.join.unknownError;
                 if(r.data && r.data.error!=='0') {
                     errorToShow = errorHandler(r.data.errorString);

@@ -572,7 +572,7 @@ QRect QnWorkbenchLayout::closestFreeSlot(const QPointF &gridPos, const QSize &si
             QPoint delta = walker.next();
 
             qreal distance = metric->calculate(gridCell + delta);
-            if(distance > bestDistance || qFuzzyCompare(distance, bestDistance))
+            if(distance > bestDistance || qFuzzyEquals(distance, bestDistance))
                 continue;
             checkedBorder = Qn::NoBorders;
 

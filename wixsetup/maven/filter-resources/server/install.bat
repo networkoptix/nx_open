@@ -1,6 +1,4 @@
-REM place %FILE%.msi here
-
-SET FILE=${finalName}-server-only.exe
+SET FILE=${artifact.name.server}.exe
 
 :update
     start /wait %FILE% /silent /norestart -l %FILE%.log

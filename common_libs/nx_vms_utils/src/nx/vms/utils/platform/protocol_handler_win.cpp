@@ -19,8 +19,8 @@ using nx::utils::SoftwareVersion;
 bool registerSystemUriProtocolHandler(
     const QString& protocol,
     const QString& applicationBinaryPath,
-    const QString& macOsBundleId,
     const QString& applicationName,
+    const QString& macHandlerBundleIdBase,
     const QString& description,
     const QString& customization,
     const SoftwareVersion& version)
@@ -40,7 +40,7 @@ bool registerSystemUriProtocolHandler(
     if (existingVersion >= version)
         return true; /* Handler already registered. */
 
-    registryEditor.setValue(kDefaultValueKey, QString("URL:%1").arg(description));
+    registryEditor.setValue(kDefaultValueKey, description);
     registryEditor.setValue(kVersionKey, version.toString());
     registryEditor.setValue("URL Protocol", "");
 

@@ -121,7 +121,6 @@ public:
 
     void saveToResource();
     bool takeFromSettings(QSettings* settings);
-
 signals:
     void valueChanged();
 

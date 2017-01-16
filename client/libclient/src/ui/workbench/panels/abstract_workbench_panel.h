@@ -2,15 +2,17 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 class AnimationTimer;
 class QGraphicsWidget;
 struct QnPaneSettings;
 
 namespace NxUi {
 
-class AbstractWorkbenchPanel: public QObject, public QnWorkbenchContextAware
+class AbstractWorkbenchPanel: public Connective<QObject>, public QnWorkbenchContextAware
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
     Q_OBJECT
 public:
@@ -27,6 +29,7 @@ public:
     virtual bool isVisible() const = 0;
     virtual void setVisible(bool visible = true, bool animate = true) = 0;
 
+    /* This is visibility-related virtual opacity in range [0.0, 1.0]. */
     virtual qreal opacity() const = 0;
     virtual void setOpacity(qreal opacity, bool animate = true) = 0;
     virtual void updateOpacity(bool animate = true);
@@ -35,6 +38,13 @@ public:
 
     /** This geometry the panel will have when all animations are finished. */
     virtual QRectF effectiveGeometry() const = 0;
+
+    virtual void stopAnimations() = 0;
+
+    /** Master opacity. Descendants should multiply visibility-related opacity by
+      * the master opacity to obtain final effective opacity for graphics items. */
+    qreal masterOpacity() const;
+    void setMasterOpacity(qreal value);
 
 signals:
     void openedChanged(bool value, bool animated);
@@ -55,6 +65,7 @@ protected:
 
 protected:
     const QGraphicsWidget* m_parentWidget;
+    qreal m_masterOpacity;
 };
 
 }

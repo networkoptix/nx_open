@@ -14,7 +14,7 @@
 namespace nx {
 namespace stun {
 
-class UDPServer;
+class UdpServer;
 
 /** Provides ability to send response to a request message received via UDP
  */
@@ -24,7 +24,7 @@ class UDPMessageResponseSender
 {
 public:
     UDPMessageResponseSender(
-        UDPServer* udpServer,
+        UdpServer* udpServer,
         SocketAddress sourceAddress);
     virtual ~UDPMessageResponseSender();
 
@@ -37,7 +37,7 @@ public:
     virtual AbstractCommunicatingSocket* socket() override;
 
 private:
-    UDPServer* m_udpServer;
+    UdpServer* m_udpServer;
     SocketAddress m_sourceAddress;
 };
 

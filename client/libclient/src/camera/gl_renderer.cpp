@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 
 #include <QtGui/qopengl.h>
+#include <QOpenGLFramebufferObject>
 
 #include <cassert>
 
@@ -44,6 +45,8 @@ namespace {
         return result;
     }
 
+    static const int kMaxBlurSize = 2048;
+
 } // anonymous namespace
 
 
@@ -55,6 +58,7 @@ QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
+    m_blurShader = new QnBlurShaderProgram(this);
 
 
     const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
@@ -121,10 +125,9 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     m_initialized(false),
     m_positionBuffer(QOpenGLBuffer::VertexBuffer),
-    m_textureBuffer(QOpenGLBuffer::VertexBuffer)
-
-    //m_extraMin(-PI/4.0),
-    //m_extraMax(PI/4.0) // rotation range
+    m_textureBuffer(QOpenGLBuffer::VertexBuffer),
+    m_blurFactor(0.0),
+    m_prevBlurFactor(0.0)
 {
     NX_ASSERT( context );
 
@@ -156,12 +159,176 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
+Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
+{
+    QSize result;
+    DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
+    if (!picLock.get())
+    {
+        NX_LOG(lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2);
+        return Qn::NothingRendered;
+    }
+
+    result = QSize(picLock->width(), picLock->height());
+    if (result.width() > kMaxBlurSize)
+    {
+        qreal ar = result.width() / (qreal) result.height();
+        result = QSize(kMaxBlurSize, kMaxBlurSize / ar);
+    }
+
+    if (!m_blurBufferA || m_blurBufferA->size() != result)
+    {
+        m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
+        m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
+        return Qn::NewFrameRendered;
+    }
+
+    if (qFuzzyEquals(m_blurFactor, m_prevBlurFactor))
+        return picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
+    m_prevBlurFactor = m_blurFactor;
+    return Qn::NewFrameRendered;
+}
+
+void QnGLRenderer::doBlurStep(
+    const QRectF& sourceRect,
+    const QRectF& dstRect,
+    GLuint texture,
+    const QVector2D& textureOffset,
+    bool isHorizontalPass)
+{
+    const float v_array[] =
+    {
+        (float)dstRect.left(),
+        (float)dstRect.bottom(),
+
+        (float)dstRect.right(),
+        (float)dstRect.bottom(),
+
+        (float)dstRect.right(),
+        (float)dstRect.top(),
+
+        (float)dstRect.left(),
+        (float)dstRect.top()
+
+    };
+
+    const float tx_array[8] =
+    {
+        (float)sourceRect.x(), (float)sourceRect.y(),
+        (float)sourceRect.right(), (float)sourceRect.top(),
+        (float)sourceRect.right(), (float)sourceRect.bottom(),
+        (float)sourceRect.x(), (float)sourceRect.bottom()
+    };
+
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glCheckError("glBindTexture");
+
+    m_shaders->m_blurShader->bind();
+    m_shaders->m_blurShader->setTexture(0);
+    m_shaders->m_blurShader->setTextureOffset(textureOffset);
+
+    m_shaders->m_blurShader->setHorizontalPass(isHorizontalPass);
+    //m_shaders->m_blurShader->setBlurSize(9);
+    // m_shaders->m_blurShader->setSigma(6);
+    drawBindedTexture(m_shaders->m_blurShader, v_array, tx_array);
+    m_shaders->m_blurShader->release();
+
+}
+
+void QnGLRenderer::setBlurFactor(qreal value)
+{
+    m_blurFactor = value;
+}
+
+void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
+{
+    GLint prevViewPort[4];
+    glGetIntegerv(GL_VIEWPORT, prevViewPort);
+
+    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto prevMatrix = renderer->getModelViewMatrix();
+    renderer->setModelViewMatrix(QMatrix4x4());
+
+    QRectF dstPaintRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+
+    // first step: blur to FBO_A
+    QSize blurSize = m_blurBufferA->size();
+    glViewport(0, 0, blurSize.width(), blurSize.height());
+
+    m_blurBufferA->bind();
+    drawVideoData(sourceRect, dstPaintRect);
+    m_blurBufferA->release();
+
+    const int kIterations = 8;
+
+    QOpenGLFramebufferObject* fboA = m_blurBufferA.get();
+    QOpenGLFramebufferObject* fboB = m_blurBufferB.get();
+    for (int i = 0; i < kIterations; ++i)
+    {
+        // blur A->B, B->A several times
+        const float blurStep = (kIterations - i - 1) * m_blurFactor * 1.2;
+        const QVector2D textureOffset(
+            1.0 / kMaxBlurSize * blurStep,
+            1.0 / kMaxBlurSize * blurStep);
+
+        fboB->bind();
+        doBlurStep(sourceRect, dstPaintRect, fboA->texture(), textureOffset, i % 2 == 0);
+        fboB->release();
+        std::swap(fboA, fboB);
+    }
+
+    renderer->setModelViewMatrix(prevMatrix);
+    glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+}
+
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
 {
-    NX_LOG( lit("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
-
     QOpenGLFunctions::initializeOpenGLFunctions();
 
+    if (qFuzzyEquals(m_blurFactor, 0.0))
+    {
+        m_blurBufferA.reset();
+        m_blurBufferB.reset();
+        m_prevBlurFactor = 0.0;
+        return drawVideoData(sourceRect, targetRect);
+    }
+
+    Qn::RenderStatus result = prepareBlurBuffers();
+    if (result == Qn::NothingRendered || result == Qn::CannotRender)
+        return result;
+
+    if (result == Qn::NewFrameRendered)
+        renderBlurFBO(sourceRect);
+
+    // paint to screen
+    const float v_array[] =
+    {
+        (float)targetRect.left(),
+        (float)targetRect.bottom(),
+
+        (float)targetRect.right(),
+        (float)targetRect.bottom(),
+
+        (float)targetRect.right(),
+        (float)targetRect.top(),
+
+        (float)targetRect.left(),
+        (float)targetRect.top()
+
+    };
+
+    drawVideoTextureDirectly(
+        sourceRect,
+        m_blurBufferA->texture(),
+        v_array);
+
+    return result;
+}
+
+Qn::RenderStatus QnGLRenderer::drawVideoData(const QRectF &sourceRect, const QRectF &targetRect)
+{
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
     {

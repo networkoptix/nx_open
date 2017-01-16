@@ -20,7 +20,8 @@ namespace style
         static const int kMinimumButtonWidth;
         static const int kButtonHeight;
         static const int kHeaderSize;
-        static const int kViewRowHeight;
+        static const int kListRowHeight;                /** QListView minimal row height */
+        static const int kViewRowHeight;                /** Other item views minimal row height */
         static const int kSortIndicatorSize;
         static const int kRounding;
         static const QSize kButtonSwitchSize;
@@ -43,12 +44,19 @@ namespace style
         static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
         static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
         static const int kPushButtonIconMargin;         /**< Margin around push button icon */
+
+        static const int kTabBarFontPixelSize;
+        static const int kTextEditFontPixelSize;
+        static const int kHeaderViewFontPixelSize;
+        static const int kCalendarItemFontPixelSize;
+        static const int kCalendarHeaderFontPixelSize;
     };
 
     class Hints
     {
     public:
         static const qreal kDisabledItemOpacity;        /**< Default disabled item opacity */
+        static const int kMinimumFormLabelWidth;        /**< Minimal text label width in forms */
     };
 
     class Properties
@@ -68,6 +76,8 @@ namespace style
         static const char* kTabBarIndent;           /**< Name of a property to hold an extra indent of a tab bar. */
         static const char* kItemViewRadioButtons;   /**< Name of a property to change item view checkboxes to radio buttons (bool). */
         static const char* kPushButtonMargin;       /**< Name of a property to hold custom push button margin (int). Buttons with custom margin are left-aligned. */
+        static const char* kMenuNoMouseReplayRect;  /**< Name of a property to hold rectangle in global logical coordinates (QRect).
+                                                            If menu is closed by click in this rectangle it won't replay mouse event. */
     };
 
     /** Flags of additional slider features */
@@ -77,9 +87,6 @@ namespace style
     };
 
     Q_DECLARE_FLAGS(SliderFeatures, SliderFeature)
-
-    qreal dpr(qreal value);
-    int dp(qreal value);
 
     bool isDark(const QColor &color);
 

@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_API_CONNECT_DATA_H
-#define NX_MEDIATOR_API_CONNECT_DATA_H
+#pragma once
 
 #include <list>
 
@@ -16,19 +10,20 @@
 #include "stun_message_data.h"
 #include "nx/network/cloud/cloud_connect_version.h"
 
-
 namespace nx {
 namespace hpm {
 namespace api {
 
-/** [connection_mediator, 4.3.5] */
+/**
+ * [connection_mediator, 4.3.5]
+ */
 class NX_NETWORK_API ConnectRequest
 :
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connect;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
 
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
@@ -44,12 +39,6 @@ public:
     CloudConnectVersion cloudConnectVersion;
 
     ConnectRequest();
-
-    ConnectRequest(const ConnectRequest&) = default;
-    ConnectRequest& operator=(const ConnectRequest&) = default;
-    ConnectRequest(ConnectRequest&&) = default;
-    ConnectRequest& operator=(ConnectRequest&&) = default;
-
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
@@ -59,8 +48,8 @@ class NX_NETWORK_API ConnectResponse
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::connect;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
 
     std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
@@ -68,21 +57,10 @@ public:
     CloudConnectVersion cloudConnectVersion;
 
     ConnectResponse();
-
-    ConnectResponse(const ConnectResponse&) = default;
-    ConnectResponse& operator=(const ConnectResponse&) = default;
-    ConnectResponse(ConnectResponse&&) = default;
-    ConnectResponse& operator=(ConnectResponse&&) = default;
-
-    /**
-        \note after this method call object contents are undefined
-    */
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //namespace api
-}   //namespace hpm
-}   //namespace nx
-
-#endif   //NX_MEDIATOR_API_CONNECT_DATA_H
+} // namespace api
+} // namespace hpm
+} // namespace nx

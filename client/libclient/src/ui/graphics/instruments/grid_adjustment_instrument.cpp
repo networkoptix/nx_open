@@ -54,7 +54,11 @@ void GridAdjustmentInstrument::setSpeed(qreal speed)
     m_speed = speed;
 }
 
-bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *event) {
+
+bool GridAdjustmentInstrument::wheelEvent(
+    QGraphicsScene* /* scene */,
+    QGraphicsSceneWheelEvent* event)
+{
     QWidget *viewport = m_currentViewport.data();
     if(viewport == NULL)
         return false;
@@ -63,11 +67,10 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
-    if(workbench()) {
-        QPointF gridMousePos = workbench()->mapper()->mapToGridF(event->scenePos());
-
-        const auto spacing = workbench()->currentLayout()->cellSpacing();
-        qreal delta = m_speed * -degrees;
+    if(workbench())
+    {
+        const qreal spacing = workbench()->currentLayout()->cellSpacing();
+        const qreal delta = m_speed * -degrees;
 
         qreal k = 1.0;
         if(!qFuzzyIsNull(delta))
@@ -80,7 +83,8 @@ bool GridAdjustmentInstrument::wheelEvent(QGraphicsScene *, QGraphicsSceneWheelE
 
         workbench()->currentLayout()->setCellSpacing(spacing + k * delta);
 
-        moveViewportScene(this->view(viewport), workbench()->mapper()->mapFromGridF(gridMousePos) - event->scenePos());
+        static const auto kNoDelta = QPoint(0, 0);
+        moveViewportScene(this->view(viewport), kNoDelta);
     }
 
     event->accept();

@@ -95,6 +95,8 @@ protected:
     void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
                   AbstractStreamSocket* socket);
 
+    void cancelIoFromAioThread();
+
 protected:
     bool m_nonBlockingMode;
     unsigned int m_recvTmeout;

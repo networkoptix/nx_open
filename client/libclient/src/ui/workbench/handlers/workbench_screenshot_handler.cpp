@@ -500,8 +500,12 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
             //TODO: #GDM how is this supposed to work with latestScreenshotTime?
             frame->pts = parameters.utcTimestampMsec * 1000;
             for(auto filter: filters)
+            {
                 frame = filter->updateImage(frame);
-            result = frame->toImage();
+                if (!frame)
+                    break;
+            }
+            result = (bool)frame ? frame->toImage() : QImage();
         }
     }
 

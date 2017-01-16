@@ -27,9 +27,13 @@ namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
     static const size_t TcpConnectTimeoutMs   = 5 * 1000;
 
-    void trace(int handle, const QString& message)
+    void trace(const QString& serverId, int handle, const QString& message)
     {
-        NX_LOG(lit("QnMediaServerConnection %1: %2").arg(handle).arg(message), cl_logDEBUG1);
+        NX_LOG(lit("rest::ServerConnection %1 <%2>: %3")
+            .arg(serverId)
+            .arg(handle)
+            .arg(message),
+            cl_logDEBUG1);
     }
 }
 
@@ -93,18 +97,25 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
     return QnMediaServerResourcePtr(); //< no internet access found
 }
 
+void ServerConnection::trace(int handle, const QString& message) const
+{
+    ::trace(m_serverId.toString(), handle, message);
+}
+
 Handle ServerConnection::getStatisticsSettingsAsync(
     Result<QByteArray>::type callback,
     QThread *targetThread)
 {
-    static const QnEmptyRequestData kEmptyParams = QnEmptyRequestData();
+    QnEmptyRequestData emptyRequest;
+    emptyRequest.format = Qn::SerializationFormat::UbjsonFormat;
     static const auto path = lit("/ec2/statistics/settings");
 
     QnMediaServerResourcePtr server = getServerWithInternetAccess();
     if (!server)
         return Handle(); //< can't process request now. No internet access
 
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, kEmptyParams.toParams()));
+    nx_http::ClientPool::Request request = prepareRequest(
+        nx_http::Method::GET, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -187,7 +198,9 @@ Handle ServerConnection::saveCloudSystemCredentials(
 
 Handle ServerConnection::startLiteClient(GetCallback callback, QThread* targetThread)
 {
-    return executeGet(lit("/api/startLiteClient"), QnRequestParamList(), callback, targetThread);
+    QnRequestParamList params;
+    params.append({lit("startCamerasMode"), lit("true")});
+    return executeGet(lit("/api/startLiteClient"), params, callback, targetThread);
 }
 
 Handle ServerConnection::getFreeSpaceForUpdateFiles(
@@ -267,20 +280,29 @@ Handle ServerConnection::executePost(const QString& path,
 }
 
 template <typename ResultType>
-void invoke(REST_CALLBACK(ResultType) callback, QThread* targetThread, bool success, const Handle& id, const ResultType& result)
+void invoke(REST_CALLBACK(ResultType) callback,
+            QThread* targetThread,
+            bool success,
+            const Handle& id,
+            const ResultType& result,
+            const QString &serverId,
+            const QElapsedTimer& elapsed
+            )
 {
+    if (success)
+        trace(serverId, id, lit("Reply success for %1ms").arg(elapsed.elapsed()));
+    else
+        trace(serverId, id, lit("Reply failed for %1ms").arg(elapsed.elapsed()));
     if (targetThread)
     {
         executeDelayed(
         [callback, success, id, result]
         {
-            trace(id, lit("Reply"));
             callback(success, id, result);
         }, 0, targetThread);
     }
     else
     {
-        trace(id, lit("Reply"));
         callback(success, id, result);
     }
 }
@@ -289,17 +311,25 @@ template <typename ResultType>
 Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
 {
     if (callback)
-        return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
     {
-        bool success = false;
-        ResultType result;
+        const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
+        return sendRequest(request,
+        [callback, targetThread, serverId, timer]
+        (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+        {
+            bool success = false;
+            ResultType result;
         if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
         {
-            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
-            result = parseMessageBody<ResultType>(format, msgBody, &success);
-        }
-        invoke(callback, targetThread, success, id, result);
-    });
+                Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(contentType);
+                result = parseMessageBody<ResultType>(format, msgBody, &success);
+            }
+            invoke(callback, targetThread, success, id, result, serverId, timer);
+        });
+    }
 
     return sendRequest(request);
 }
@@ -308,17 +338,23 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
 {
     if (callback)
     {
+        const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
         QPointer<QThread> targetThreadGuard(targetThread);
-        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
-        {
-            Q_UNUSED(contentType)
-            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        return sendRequest(request,
+            [callback, targetThread, targetThreadGuard, serverId, timer]
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+            {
+                Q_UNUSED(contentType)
+                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-            if (targetThread && targetThreadGuard.isNull())
-                return;
+                if (targetThread && targetThreadGuard.isNull())
+                    return;
 
-            invoke(callback, targetThread, success, id, msgBody);
-        });
+                invoke(callback, targetThread, success, id, msgBody, serverId, timer);
+            });
     }
 
     return sendRequest(request);
@@ -328,16 +364,22 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
 {
     if (callback)
     {
+        const QString serverId = m_serverId.toString();
+        QElapsedTimer timer;
+        timer.start();
+
         QPointer<QThread> targetThreadGuard(targetThread);
-        return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
-        {
-            bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        return sendRequest(request,
+            [callback, targetThread, targetThreadGuard, serverId, timer]
+            (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+            {
+                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
 
-            if (targetThread && targetThreadGuard.isNull())
-                return;
+                if (targetThread && targetThreadGuard.isNull())
+                    return;
 
-            invoke(callback, targetThread, success, id, EmptyResponseType());
-        });
+                invoke(callback, targetThread, success, id, EmptyResponseType(), serverId, timer);
+            });
     }
 
     return sendRequest(request);

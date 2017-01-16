@@ -75,7 +75,8 @@
     <!-- Product -->
     <String Id="Product_LaunchClient"                               Overridable="yes">Executar ${display.product.name} quando a instalação terminar.</String>
     <String Id="Product_LaunchNxtool"                               Overridable="yes">Executar ${nxtool.name} quando a instalação terminar.</String>
-    <String Id="Product_ArchMismatch"                               Overridable="yes">Este 'release' foi desenhado para um Sistema Operativo 32-bit. O instalador vai ser interrompido.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">Este 'release' foi desenhado para um Sistema Operativo 32-bit. O instalador vai ser interrompido.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">Este 'release' foi desenhado para um Sistema Operativo 64-bit. O instalador vai ser interrompido.</String>
 
     <!-- SelectionWarningDlg -->
     <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Seleccione pelo menos um componente</String>

@@ -23,28 +23,29 @@ Rectangle
 
         Image
         {
-            id: statusImage;
-
-            width: 120;
+            width: 320;
             height: 120;
             y: ((searchEdit.y - height) / 2);
             anchors.horizontalCenter: parent.horizontalCenter;
-
             source: "qrc:/skin/welcome_page/logo.png"
+            fillMode: ((sourceSize.height < height) && (sourceSize.width < width)
+                ? Image.Pad
+                : Image.PreserveAspectFit);
         }
+
 
         NxSearchEdit
         {
             id: searchEdit;
 
             visible: grid.totalItemsCount > grid.itemsPerPage
-            visualParent: screenHolder
 
             anchors.bottom: gridHolder.top
-            anchors.bottomMargin: 8
+            anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
+            z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 
         Item
@@ -86,7 +87,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.sourceRowsCount;
+                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -185,10 +186,22 @@ Rectangle
                     }
                 }
 
-                model: QnFilteringSystemsModel
+                model: modelLoader.item;
+
+                Loader
                 {
-                    filterCaseSensitivity: Qt.CaseInsensitive;
-                    filterRole: 257;    // Search text role
+                    id: modelLoader;
+
+                    active: (context.isVisible && screenHolder.visible);
+
+                    sourceComponent: Component
+                    {
+                        QnFilteringSystemsModel
+                        {
+                            filterCaseSensitivity: Qt.CaseInsensitive;
+                            filterRole: 257;    // Search text role
+                        }
+                    }
                 }
 
                 delegate: Item
@@ -217,7 +230,10 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
-                        isOnline: model.isOnline;
+
+                        isRunning: model.isRunning;
+                        isReachable: model.isReachable;
+                        isConnectible: model.isConnectible;
 
                         Component.onCompleted:
                         {
@@ -269,7 +285,7 @@ Rectangle
                 anchors.top: gridHolder.bottom;
                 anchors.topMargin: 8;
 
-                pagesCount: grid.pagesCount;
+                pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
                 onCurrentPageChanged:
                 {
@@ -285,7 +301,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (grid.model.sourceRowsCount == 0);
+            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
         }
 
         Item
@@ -317,15 +333,15 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to Another System")
-                : qsTr("Connect to System")
+                ? qsTr("Connect to Another Server")
+                : qsTr("Connect to Server")
 
             onClicked: context.connectToAnotherSystem();
         }
 
         NxBanner
         {
-            visible: !context.isCloudEnabled;
+            visible: !context.isCloudEnabled && context.isLoggedInToCloud;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;

@@ -1,7 +1,6 @@
 #include "reverse_connection_pool.h"
 #include "reverse_connection_holder.h"
 
-#include <nx/network/cloud/data/client_bind_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
@@ -9,6 +8,15 @@ namespace nx {
 namespace network {
 namespace cloud {
 namespace tcp {
+
+static String getHostSuffix(const String& hostName)
+{
+    const auto dotIndex = hostName.indexOf('.');
+    if (dotIndex != -1)
+        return hostName.right(hostName.length() - dotIndex - 1);
+
+    return String();
+}
 
 ReverseConnectionPool::ReverseConnectionPool(
     std::unique_ptr<MediatorConnection> mediatorConnection)
@@ -18,7 +26,7 @@ ReverseConnectionPool::ReverseConnectionPool(
         [this](String hostName, std::unique_ptr<AbstractStreamSocket> socket)
         {
             NX_LOGX(lm("New socket(%1) from %2").args(socket, hostName), cl_logDEBUG1);
-            getHolder(hostName, true)->saveSocket(std::move(socket));
+            getOrCreateHolder(hostName)->saveSocket(std::move(socket));
         }),
     m_isReconnectHandlerSet(false)
 {
@@ -34,7 +42,7 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
-        SocketGlobals::outgoingTunnelPool().getOrCreateSelfPeerId(),
+        SocketGlobals::outgoingTunnelPool().ownPeerId(),
         serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
@@ -51,27 +59,61 @@ uint16_t ReverseConnectionPool::port() const
     return m_acceptor.address().port;
 }
 
-std::shared_ptr<ReverseConnectionHolder>
-    ReverseConnectionPool::getConnectionHolder(const String& hostName)
+std::shared_ptr<ReverseConnectionSource>
+    ReverseConnectionPool::getConnectionSource(const String& hostName)
 {
-    auto holder = getHolder(hostName, false);
-    if (!holder)
+    QnMutexLocker lk(&m_mutex);
+    const auto suffix = getHostSuffix(hostName);
+    if (suffix.isEmpty())
     {
-        NX_LOGX(lm("There is not holder for %1").str(hostName), cl_logDEBUG2);
+        // Given hostName is a suffix itself, search for any.
+        const auto suffixIterator = m_connectionHolders.find(hostName);
+        if (suffixIterator == m_connectionHolders.end())
+        {
+            NX_LOGX(lm("No holders by host suffix %1").str(hostName), cl_logDEBUG2);
+            return nullptr;
+        }
+
+        for (const auto& host: suffixIterator->second)
+        {
+            if (const auto connections = host.second->socketCount())
+            {
+                NX_LOGX(lm("Return holder for %1 by suffix %2 with %3 connections(s)")
+                    .strs(host.first, hostName, connections), cl_logDEBUG1);
+                return host.second;
+            }
+        }
+
+        NX_LOGX(lm("No connections on %1 holder(s) by suffix %2")
+            .strs(suffixIterator->second.size(), hostName), cl_logDEBUG1);
         return nullptr;
     }
-
-    const auto connections = holder->socketCount();
-    if (connections == 0)
+    else
     {
-        NX_LOGX(lm("There are no sockets on holder for %1").str(hostName), cl_logDEBUG2);
+        const auto suffixIterator = m_connectionHolders.find(suffix);
+        if (suffixIterator == m_connectionHolders.end())
+        {
+            NX_LOGX(lm("No holders by suffix %1 of %2").strs(suffix, hostName), cl_logDEBUG2);
+            return nullptr;
+        }
+
+        const auto hostIterator = suffixIterator->second.find(hostName);
+        if (hostIterator == suffixIterator->second.end())
+        {
+            NX_LOGX(lm("No holders for host %1").str(hostName), cl_logDEBUG2);
+            return nullptr;
+        }
+
+        if (const auto connections = hostIterator->second->socketCount())
+        {
+            NX_LOGX(lm("Return holder for %1 with %2 connections(s)")
+                .strs(hostName, connections), cl_logDEBUG1);
+            return hostIterator->second;
+        }
+
+        NX_LOGX(lm("No connections on holder for %1").strs(hostName), cl_logDEBUG1);
         return nullptr;
     }
-
-    NX_LOGX(lm("Returning holder for %1 with %2 connections(s)")
-        .strs(hostName, connections), cl_logDEBUG1);
-
-    return holder;
 }
 
 void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -82,8 +124,11 @@ void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completio
             m_acceptor.pleaseStop();
 
             // Holders are need to be stopped here, as other shared_ptrs are not primary.
-            for (auto& holder: m_connectionHolders)
-                holder.second->pleaseStopSync();
+            for (auto& suffix: m_connectionHolders)
+            {
+                for (auto& holder: suffix.second)
+                    holder.second->pleaseStopSync();
+            }
 
             m_connectionHolders.clear();
             handler();
@@ -111,14 +156,18 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
     hpm::api::ClientBindRequest request;
     request.originatingPeerID = m_acceptor.selfHostName();
     request.tcpReverseEndpoints.push_back(SocketAddress(m_publicIp, m_acceptor.address().port));
-    m_mediatorConnection->send(
+    m_mediatorConnection->bind(
         std::move(request),
-        [this, registrationPromise](nx::hpm::api::ResultCode code)
+        [this, registrationPromise](
+            hpm::api::ResultCode code, hpm::api::ClientBindResponse responce)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
                 NX_LOGX(lm("Registred on mediator by %1 with %2")
                     .strs(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
+
+                if (auto& options = responce.tcpConnectionKeepAlive)
+                    m_mediatorConnection->client()->setKeepAliveOptions(std::move(*options));
             }
             else
             {
@@ -143,28 +192,17 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
 }
 
 std::shared_ptr<ReverseConnectionHolder>
-    ReverseConnectionPool::getHolder(const String& hostName, bool mayCreate)
+    ReverseConnectionPool::getOrCreateHolder(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
-    auto it = m_connectionHolders.find(hostName);
-    if (it == m_connectionHolders.end())
+    auto& holdersInSuffix = m_connectionHolders[getHostSuffix(hostName)];
+    auto it = holdersInSuffix.find(hostName);
+    if (it == holdersInSuffix.end())
     {
-        if (!mayCreate)
-            return nullptr;
-
-        it = m_connectionHolders.emplace(
+        it = holdersInSuffix.emplace(
             std::move(hostName),
             std::make_shared<ReverseConnectionHolder>(
                 m_mediatorConnection->getAioThread())).first;
-
-        // Register the same holder for system if it was not registred yet:
-        const auto split = hostName.split('.');
-        if (split.size() == 2)
-        {
-            auto& systemId = split.last();
-            if (m_connectionHolders.find(systemId) == m_connectionHolders.end())
-                m_connectionHolders.emplace(std::move(systemId), it->second);
-        }
     }
 
     return it->second;

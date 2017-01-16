@@ -55,11 +55,64 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
+static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
+{
+    Buffer buffer(1024, Qt::Uninitialized);
+    ASSERT_TRUE(socket->setKeepAlive(KeepAliveOptions(10, 5, 3)));
+
+    NX_LOG(lm("waitForKeepAliveDisconnect recv"), cl_logINFO);
+    EXPECT_LT(socket->recv(buffer.data(), buffer.size()), 0);
+    EXPECT_NE(SystemError::noError, SystemError::getLastOSErrorCode());
+    NX_LOG(lm("waitForKeepAliveDisconnect end"), cl_logINFO);
+}
+
+TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
+{
+    const auto server = std::make_unique<TCPServerSocket>(AF_INET);
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
+    ASSERT_TRUE(server->listen(testClientCount()));
+    NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
+
+    std::unique_ptr<AbstractStreamSocket> client(server->accept());
+    ASSERT_TRUE(client);
+    waitForKeepAliveDisconnect(client.get());
+}
+
+TEST(TcpSocket, DISABLED_KeepAliveOptionsClient)
+{
+    const auto client = std::make_unique<TCPSocket>(AF_INET);
+    ASSERT_TRUE(client->connect(SocketAddress("52.55.219.5:3345")));
+    waitForKeepAliveDisconnect(client.get());
+}
+
 TEST(TcpSocket, ErrorHandling)
 {
     nx::network::test::socketErrorHandling(
         []() { return std::make_unique<TCPServerSocket>(AF_INET); },
         []() { return std::make_unique<TCPSocket>(AF_INET); });
+}
+
+TEST(TcpSocket, socket_timer_is_single_shot)
+{
+    constexpr auto kTimeout = std::chrono::milliseconds(10);
+
+    std::atomic<int> triggerCount(0);
+
+    TCPSocket tcpSocket(AF_INET);
+    tcpSocket.registerTimer(kTimeout, [&triggerCount]() { ++triggerCount; });
+
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    tcpSocket.pleaseStopSync();
+
+    ASSERT_EQ(1, triggerCount.load());
+}
+
+TEST(TcpServerSocketIpv6, BindsToLocalAddress)
+{
+    TCPServerSocket socket(AF_INET6);
+    ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
+    ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
 }
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(

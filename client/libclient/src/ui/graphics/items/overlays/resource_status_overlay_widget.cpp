@@ -38,7 +38,7 @@ void setupButton(QPushButton& button)
 {
     static const auto kDefaultButtonHeight = 28.0;
 
-    button.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     button.setFixedHeight(kDefaultButtonHeight);
 
     static const auto kButtonName = lit("itemStateExtraActionButton");
@@ -97,7 +97,6 @@ void setupCaptionLabel(QLabel* label, bool isErrorStyle)
     label->setMinimumHeight(qMax(120, label->heightForWidth(label->width())));
     label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     label->setWordWrap(true);
-    label->setVisible(false);
 
     const auto color = isErrorStyle
         ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
@@ -220,8 +219,8 @@ void QnStatusOverlayWidget::setupPreloader()
 {
     m_preloader->setIndicatorColor(qnNxStyle->mainColor(QnNxStyle::Colors::kContrast).darker(6));
     m_preloader->setBorderColor(qnNxStyle->mainColor(QnNxStyle::Colors::kBase).darker(2));
-    m_preloader->setDotRadius(8);
-    m_preloader->setDotSpacing(8);
+    m_preloader->dots()->setDotRadius(8);
+    m_preloader->dots()->setDotSpacing(8);
 
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->addItem(m_preloader);
@@ -233,7 +232,9 @@ void QnStatusOverlayWidget::setupPreloader()
 void QnStatusOverlayWidget::setupCentralControls()
 {
     m_centralAreaImage->setVisible(false);
+
     setupCaptionLabel(m_caption, m_errorStyle);
+    m_caption->setVisible(false);
 
     const auto container = new QWidget();
     setPaletteColor(container, QPalette::Window, Qt::transparent);
@@ -267,7 +268,17 @@ void QnStatusOverlayWidget::setupExtrasControls()
     const auto layout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
     layout->setContentsMargins(16, 0, 16, 16);
 
-    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder, false);
+    const auto buttonContainter = new QWidget();
+    buttonContainter->setAttribute(Qt::WA_TranslucentBackground, true);
+    buttonContainter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    const auto buttonLayout = new QHBoxLayout(buttonContainter);
+    buttonLayout->setContentsMargins(0, 0, 0, 0);
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(m_button);
+    buttonLayout->addStretch();
+
+    const auto buttonProxy = makeMaskedProxy(buttonContainter, m_extrasHolder, false);
     layout->addItem(buttonProxy);
     layout->setAlignment(buttonProxy, Qt::AlignHCenter);
 

@@ -111,7 +111,6 @@ void QnSystemHostsModel::reloadHosts()
 
         emit firstHostChanged();
         emit isEmptyChanged();
-        emit countChanged();
     }
 
     m_disconnectHelper.reset(new QnDisconnectHelper());
@@ -150,6 +149,7 @@ void QnSystemHostsModel::reloadHosts()
 
         m_disconnectHelper->add(serverAddedConnection);
         m_disconnectHelper->add(serverRemovedConnection);
+        m_disconnectHelper->add(changedConnection);
     };
 
     const auto system = qnSystemsFinder->getSystem(m_systemId);
@@ -222,7 +222,7 @@ bool QnSystemHostsModel::updateServerHostInternal(const ServerIdHostList::iterat
     it->second = host;
     const auto row = (it - m_hosts.begin());
     const auto modelIndex = index(row);
-    dataChanged(modelIndex, modelIndex);
+    emit dataChanged(modelIndex, modelIndex);
 
     if (row == 0)
         emit firstHostChanged();

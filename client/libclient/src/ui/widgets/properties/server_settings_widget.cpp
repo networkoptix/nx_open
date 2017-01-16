@@ -23,7 +23,7 @@
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
 
-#include <nx/network/socket_global.h>
+#include <network/cloud_url_validator.h>
 
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
@@ -254,8 +254,7 @@ void QnServerSettingsWidget::updateUrl()
     ui->ipAddressLineEdit->setText(displayInfo.host());
     ui->portLineEdit->setText(QString::number(displayInfo.port()));
 
-    ui->pingButton->setVisible(
-        !nx::network::SocketGlobals::addressResolver().isCloudHostName(m_server->getApiUrl().host()));
+    ui->pingButton->setVisible(!nx::network::isCloudServer(m_server));
 }
 
 // -------------------------------------------------------------------------- //

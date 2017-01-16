@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 
 class QnUpdatable
 {
@@ -51,3 +52,15 @@ public:
 private:
     QPointer<Updatable> m_guard;
 };
+
+namespace Qn
+{
+
+template<class Updatable>
+static void updateGuarded(Updatable* updatable, std::function<void()> handler)
+{
+    QnUpdatableGuard<Updatable> updateGuard(updatable);
+    handler();
+}
+
+} // namespace Qn

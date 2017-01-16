@@ -7,11 +7,31 @@
 #include <ui/animation/animation_timer.h>
 #include <ui/common/geometry.h>
 
+/*
+* QnBusyIndicatorBase
+*/
 
-class QnBusyIndicatorPainterPrivate
+QnBusyIndicatorBase::QnBusyIndicatorBase(QObject* parent) :
+    base_type(parent)
+{
+    auto animationTimer = new QAnimationTimer(this);
+    animationTimer->addListener(this);
+    startListening();
+}
+
+QnBusyIndicatorBase::~QnBusyIndicatorBase()
+{
+}
+
+
+/*
+* QnBusyIndicatorPrivate
+*/
+
+class QnBusyIndicatorPrivate
 {
 public:
-    QnBusyIndicatorPainterPrivate() :
+    QnBusyIndicatorPrivate() :
         dotCount(3),
         dotSpacing(8),
         dotRadius(4.0),
@@ -96,42 +116,43 @@ public:
 * QnBusyIndicator
 */
 
-QnBusyIndicatorPainter::QnBusyIndicatorPainter() :
-    d_ptr(new QnBusyIndicatorPainterPrivate())
+QnBusyIndicator::QnBusyIndicator(QObject* parent) :
+    base_type(parent),
+    d_ptr(new QnBusyIndicatorPrivate())
 {
 }
 
-QnBusyIndicatorPainter::~QnBusyIndicatorPainter()
+QnBusyIndicator::~QnBusyIndicator()
 {
 }
 
-unsigned int QnBusyIndicatorPainter::dotCount() const
+unsigned int QnBusyIndicator::dotCount() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->dotCount;
 }
 
-void QnBusyIndicatorPainter::setDotCount(unsigned int count)
+void QnBusyIndicator::setDotCount(unsigned int count)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->dotCount == count)
         return;
 
     d->dotCount = count;
 
     d->sizeChanged();
-    indicatorSizeChanged();
+    emit sizeChanged();
 }
 
-qreal QnBusyIndicatorPainter::dotRadius() const
+qreal QnBusyIndicator::dotRadius() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->dotRadius;
 }
 
-void QnBusyIndicatorPainter::setDotRadius(qreal radius)
+void QnBusyIndicator::setDotRadius(qreal radius)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     radius = qMax(0.0, radius);
 
     QSize oldSize = d->indicatorSize;
@@ -140,135 +161,135 @@ void QnBusyIndicatorPainter::setDotRadius(qreal radius)
     d->sizeChanged();
 
     if (oldSize != d->indicatorSize)
-        indicatorSizeChanged();
-    else
-        updateIndicator();
+        emit sizeChanged();
+
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::dotSpacing() const
+unsigned int QnBusyIndicator::dotSpacing() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->dotSpacing;
 }
 
-void QnBusyIndicatorPainter::setDotSpacing(unsigned int spacing)
+void QnBusyIndicator::setDotSpacing(unsigned int spacing)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->dotSpacing == spacing)
         return;
 
     d->dotSpacing = spacing;
 
     d->sizeChanged();
-    indicatorSizeChanged();
+    emit sizeChanged();
 }
 
-qreal QnBusyIndicatorPainter::minimumOpacity() const
+qreal QnBusyIndicator::minimumOpacity() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->minimumOpacity;
 }
 
-void QnBusyIndicatorPainter::setMinimumOpacity(qreal opacity)
+void QnBusyIndicator::setMinimumOpacity(qreal opacity)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     d->minimumOpacity = opacity;
-    updateIndicator();
+    emit updated();
 }
 
-int QnBusyIndicatorPainter::dotLagMs() const
+int QnBusyIndicator::dotLagMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->dotLagMs;
 }
 
-void QnBusyIndicatorPainter::setDotLagMs(int lag)
+void QnBusyIndicator::setDotLagMs(int lag)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->dotLagMs == lag)
         return;
 
     d->dotLagMs = lag;
-    updateIndicator();
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::downTimeMs() const
+unsigned int QnBusyIndicator::downTimeMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->downTimeMs;
 }
 
-void QnBusyIndicatorPainter::setDownTimeMs(unsigned int ms)
+void QnBusyIndicator::setDownTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->downTimeMs == ms)
         return;
 
     d->downTimeMs = ms;
     d->timeChanged();
-    updateIndicator();
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::fadeInTimeMs() const
+unsigned int QnBusyIndicator::fadeInTimeMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->fadeInTimeMs;
 }
 
-void QnBusyIndicatorPainter::setFadeInTimeMs(unsigned int ms)
+void QnBusyIndicator::setFadeInTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->fadeInTimeMs == ms)
         return;
 
     d->fadeInTimeMs = ms;
     d->timeChanged();
-    updateIndicator();
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::upTimeMs() const
+unsigned int QnBusyIndicator::upTimeMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->upTimeMs;
 }
 
-void QnBusyIndicatorPainter::setUpTimeMs(unsigned int ms)
+void QnBusyIndicator::setUpTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->upTimeMs == ms)
         return;
 
     d->upTimeMs = ms;
     d->timeChanged();
-    updateIndicator();
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::fadeOutTimeMs() const
+unsigned int QnBusyIndicator::fadeOutTimeMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->fadeOutTimeMs;
 }
 
-void QnBusyIndicatorPainter::setFadeOutTimeMs(unsigned int ms)
+void QnBusyIndicator::setFadeOutTimeMs(unsigned int ms)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (d->fadeOutTimeMs == ms)
         return;
 
     d->fadeOutTimeMs = ms;
     d->timeChanged();
-    updateIndicator();
+    emit updated();
 }
 
-unsigned int QnBusyIndicatorPainter::totalTimeMs() const
+unsigned int QnBusyIndicator::totalTimeMs() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->totalTimeMs;
 }
 
-void QnBusyIndicatorPainter::setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs)
+void QnBusyIndicator::setAnimationTimesMs(unsigned int downTimeMs, unsigned int fadeInTimeMs, unsigned int upTimeMs, unsigned int fadeOutTimeMs)
 {
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     bool changed = downTimeMs != d->downTimeMs || fadeInTimeMs != d->fadeInTimeMs ||
                    upTimeMs != d->upTimeMs || fadeOutTimeMs != d->fadeOutTimeMs;
 
@@ -280,19 +301,19 @@ void QnBusyIndicatorPainter::setAnimationTimesMs(unsigned int downTimeMs, unsign
     if (changed)
     {
         d->timeChanged();
-        updateIndicator();
+        emit updated();
     }
 }
 
-QSize QnBusyIndicatorPainter::indicatorSize() const
+QSize QnBusyIndicator::size() const
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
     return d->indicatorSize;
 }
 
-void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& origin)
+void QnBusyIndicator::paint(QPainter* painter)
 {
-    Q_D(const QnBusyIndicatorPainter);
+    Q_D(const QnBusyIndicator);
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
@@ -300,7 +321,7 @@ void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& or
     qreal centerDistance = dotSize + d->dotSpacing;
 
     qreal halfSize = dotSize * 0.5;
-    QPointF center(origin.x() + halfSize, origin.y() + halfSize);
+    QPointF center(halfSize, halfSize);
 
     int timeMs = d->currentTimeMs;
 
@@ -319,22 +340,14 @@ void QnBusyIndicatorPainter::paintIndicator(QPainter* painter, const QPointF& or
     }
 }
 
-void QnBusyIndicatorPainter::indicatorSizeChanged()
+void QnBusyIndicator::tick(int deltaMs)
 {
-}
-
-void QnBusyIndicatorPainter::updateIndicator()
-{
-}
-
-void QnBusyIndicatorPainter::tick(int deltaMs)
-{
-    Q_D(QnBusyIndicatorPainter);
+    Q_D(QnBusyIndicator);
     if (!d->totalTimeMs)
         return;
 
     d->currentTimeMs = (d->currentTimeMs + deltaMs) % d->totalTimeMs;
-    updateIndicator();
+    emit updated();
 }
 
 /*
@@ -342,15 +355,21 @@ void QnBusyIndicatorPainter::tick(int deltaMs)
 */
 
 QnBusyIndicatorWidget::QnBusyIndicatorWidget(QWidget* parent) :
-    QWidget(parent),
+    base_type(parent),
+    m_indicator(new QnBusyIndicator()),
     m_indicatorRole(QPalette::Foreground),
     m_borderRole(QPalette::NoRole)
 {
     setFocusPolicy(Qt::NoFocus);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    QAnimationTimer* animationTimer = new QAnimationTimer(this);
-    setTimer(animationTimer);
-    startListening();
+    connect(m_indicator, &QnBusyIndicator::sizeChanged, this, &QWidget::updateGeometry);
+    connect(m_indicator, &QnBusyIndicator::updated, this, &QnBusyIndicatorWidget::updateIndicator);
+}
+
+QnBusyIndicator* QnBusyIndicatorWidget::dots() const
+{
+    return m_indicator.data();
 }
 
 QPalette::ColorRole QnBusyIndicatorWidget::indicatorRole() const
@@ -385,7 +404,7 @@ QSize QnBusyIndicatorWidget::minimumSizeHint() const
 {
     QMargins margins = contentsMargins();
     QSize sizeOfMargins(margins.left() + margins.right(), margins.top() + margins.bottom());
-    return indicatorSize() + sizeOfMargins;
+    return m_indicator->size() + sizeOfMargins;
 }
 
 QSize QnBusyIndicatorWidget::sizeHint() const
@@ -410,12 +429,14 @@ void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)
     else
         painter.setPen(Qt::NoPen);
 
-    paintIndicator(&painter, indicatorRect().topLeft());
+    paint(&painter);
 }
 
-void QnBusyIndicatorWidget::indicatorSizeChanged()
+void QnBusyIndicatorWidget::paint(QPainter* painter)
 {
-    updateGeometry();
+    QnScopedPainterTransformRollback transformRollback(painter);
+    painter->translate(indicatorRect().topLeft());
+    m_indicator->paint(painter);
 }
 
 void QnBusyIndicatorWidget::updateIndicator()
@@ -425,7 +446,8 @@ void QnBusyIndicatorWidget::updateIndicator()
 
 QRect QnBusyIndicatorWidget::indicatorRect() const
 {
-    return QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, indicatorSize(), contentsRect());
+    return QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter,
+        m_indicator->size(), contentsRect());
 }
 
 /*
@@ -434,14 +456,16 @@ QRect QnBusyIndicatorWidget::indicatorRect() const
 
 QnBusyIndicatorGraphicsWidget::QnBusyIndicatorGraphicsWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
+    m_indicator(new QnBusyIndicator()),
     m_indicatorColor(palette().color(QPalette::Foreground)),
     m_borderColor(QColor())
 {
     setAcceptedMouseButtons(Qt::NoButton);
     setFocusPolicy(Qt::NoFocus);
+    setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    registerAnimation(this);
-    startListening();
+    connect(m_indicator, &QnBusyIndicator::sizeChanged, this, &QnBusyIndicatorGraphicsWidget::updateGeometry);
+    connect(m_indicator, &QnBusyIndicator::updated, this, &QnBusyIndicatorGraphicsWidget::updateIndicator);
 }
 
 void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -459,7 +483,15 @@ void QnBusyIndicatorGraphicsWidget::paint(QPainter* painter, const QStyleOptionG
         ? QPen(m_borderColor)
         : QPen(Qt::NoPen));
 
-    paintIndicator(painter, indicatorRect().topLeft());
+    QnScopedPainterTransformRollback transformRollback(painter);
+    painter->translate(indicatorRect().topLeft());
+
+    m_indicator->paint(painter);
+}
+
+QnBusyIndicator* QnBusyIndicatorGraphicsWidget::dots() const
+{
+    return m_indicator.data();
 }
 
 QColor QnBusyIndicatorGraphicsWidget::indicatorColor() const
@@ -499,7 +531,7 @@ QSizeF QnBusyIndicatorGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF&
         {
             MarginsF margins = contentsMargins();
             QSizeF sizeOfMargins(margins.left() + margins.right(), margins.top() + margins.bottom());
-            return QSizeF(indicatorSize() + sizeOfMargins).expandedTo(constraint);
+            return QSizeF(m_indicator->size() + sizeOfMargins).expandedTo(constraint);
         }
 
         default:
@@ -509,11 +541,6 @@ QSizeF QnBusyIndicatorGraphicsWidget::sizeHint(Qt::SizeHint which, const QSizeF&
     }
 }
 
-void QnBusyIndicatorGraphicsWidget::indicatorSizeChanged()
-{
-    updateGeometry();
-}
-
 void QnBusyIndicatorGraphicsWidget::updateIndicator()
 {
     update(indicatorRect());
@@ -521,5 +548,5 @@ void QnBusyIndicatorGraphicsWidget::updateIndicator()
 
 QRectF QnBusyIndicatorGraphicsWidget::indicatorRect() const
 {
-    return QnGeometry::aligned(QSizeF(indicatorSize()), contentsRect());
+    return QnGeometry::aligned(QSizeF(m_indicator->size()), contentsRect());
 }

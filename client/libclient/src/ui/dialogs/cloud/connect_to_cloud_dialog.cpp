@@ -104,7 +104,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     d->indicatorButton->setText(okButton->text()); // Title from OS theme
     d->indicatorButton->setIcon(okButton->icon()); // Icon from OS theme
     d->indicatorButton->setDefault(true);
-    d->indicatorButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(d->indicatorButton);
     ui->buttonBox->removeButton(okButton.data());
     ui->buttonBox->addButton(d->indicatorButton, QDialogButtonBox::AcceptRole);
 
@@ -244,20 +244,25 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     sysRegistrationData.name = qnGlobalSettings->systemName().toStdString();
     sysRegistrationData.customization = QnAppInfo::customizationName().toStdString();
 
-    cloudConnection->systemManager()->bindSystem(
-                sysRegistrationData,
-                [this, serverConnection](api::ResultCode result, api::SystemData systemData)
-    {
-        Q_Q(QnConnectToCloudDialog);
+    const auto guard = QPointer<QObject>(this);
+    const auto thread = guard->thread();
+    const auto completionHandler =
+        [this, serverConnection, guard, thread](api::ResultCode result, api::SystemData systemData)
+        {
+            if (!guard)
+                return;
 
-        executeDelayed(
-                [this, result, systemData, serverConnection]()
+            const auto timerCallback =
+                [this, guard, result, systemData, serverConnection]()
                 {
-                    at_bindFinished(result, systemData, serverConnection);
-                },
-                0, q->thread()
-        );
-    });
+                    if (guard)
+                        at_bindFinished(result, systemData, serverConnection);
+                };
+
+            executeDelayed(timerCallback, 0, thread);
+        };
+
+    cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
@@ -270,9 +275,9 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
         QDialogButtonBox::Ok,
         q->parentWidget());
 
-    messageBox.exec();
     linkedSuccessfully = true;
     q->accept();
+    messageBox.exec();
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
@@ -290,6 +295,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
         messageBox.setInformativeText(message);
 
     messageBox.exec();
+    lockUi(false);
 }
 
 void QnConnectToCloudDialogPrivate::at_bindFinished(
@@ -342,7 +348,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             {
                 qnClientCoreSettings->setCloudLogin(cloudLogin);
                 qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnCloudStatusWatcher->setCloudCredentials(QnCredentials(cloudLogin, cloudPassword));
+                qnCloudStatusWatcher->setCredentials(QnCredentials(cloudLogin, cloudPassword));
             }
 
             if (guard && parentGuard)

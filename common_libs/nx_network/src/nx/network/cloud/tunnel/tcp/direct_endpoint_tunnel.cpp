@@ -5,9 +5,9 @@
 
 #include "direct_endpoint_tunnel.h"
 
+#include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-
 
 namespace nx {
 namespace network {
@@ -41,17 +41,14 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
     auto connectionClosedHandler = std::move(m_connectionClosedHandler);
     m_connectionClosedHandler = nullptr;
 
-    auto connections = std::move(m_connections);
-    for (auto& connectionContext : connections)
-    {
-        connectionContext.handler(
-            SystemError::interrupted,
-            nullptr,
-            false);
-    }
+    m_connections.clear();
 
     if (connectionClosedHandler)
         connectionClosedHandler(SystemError::interrupted);
+}
+
+void DirectTcpEndpointTunnel::start()
+{
 }
 
 void DirectTcpEndpointTunnel::establishNewConnection(
@@ -149,7 +146,7 @@ void DirectTcpEndpointTunnel::reportConnectResult(
         m_connections.erase(connectionContextIter);
     }
     
-    if (!context.socketAttributes.applyTo(tcpSocket.get()))
+    if (tcpSocket && !context.socketAttributes.applyTo(tcpSocket.get()))
     {
         sysErrorCode = SystemError::getLastOSErrorCode();
         stillValid = false;

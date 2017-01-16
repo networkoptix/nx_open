@@ -135,6 +135,8 @@ private:
     nx_http::header::AuthScheme::Value m_prefferedAuthScheme;
     QString m_currentStreamUrl;
     QString m_rtpTransport;
+
+    int m_maxRtpRetryCount;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

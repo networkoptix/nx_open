@@ -69,7 +69,6 @@
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
-#include <media_server/serverutil.h>
 #include <media_server/server_update_tool.h>
 #include <media_server/server_connector.h>
 #include <media_server/file_connection_processor.h>
@@ -79,9 +78,12 @@
 
 #include <motion/motion_helper.h>
 
+#include <network/auth/time_based_nonce_provider.h>
 #include <network/authenticate_helper.h>
 #include <network/connection_validator.h>
 #include <network/default_tcp_connection_processor.h>
+#include <network/system_helpers.h>
+
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec_proto_version.h>
@@ -93,8 +95,6 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx/network/socket.h>
-
-#include <platform/platform_abstraction.h>
 
 #include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
@@ -138,6 +138,7 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/timezones_rest_handler.h>
 #include <rest/handlers/get_nonce_rest_handler.h>
 #include <rest/handlers/cookie_login_rest_handler.h>
 #include <rest/handlers/cookie_logout_rest_handler.h>
@@ -184,8 +185,9 @@
 #include <network/router.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
@@ -198,7 +200,7 @@
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
-#include <common/systemexcept.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include "platform/hardware_information.h"
 #include "platform/platform_abstraction.h"
@@ -234,13 +236,15 @@
 #include "crash_reporter.h"
 #include "rest/handlers/exec_script_rest_handler.h"
 #include "rest/handlers/script_list_rest_handler.h"
-#include "cloud/cloud_connection_manager.h"
+#include "cloud/cloud_manager_group.h"
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
+#include "misc/migrate_oldwin_dir.h"
+#include "media_server_process_aux.h"
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -256,6 +260,7 @@
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
+static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 
 static QString SERVICE_NAME = lit("%1 Server").arg(QnAppInfo::organizationName());
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
@@ -263,13 +268,13 @@ static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 //static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
-static const QByteArray NO_SETUP_WIZARD("noSetupWizard");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 
 class MediaServerProcess;
 static MediaServerProcess* serviceMainInstance = 0;
 void stopServer(int signal);
 bool restartFlag = false;
+
 
 namespace {
 const QString YES = lit("yes");
@@ -310,42 +315,11 @@ void addFakeVideowallUser()
 
 } // namespace
 
-
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
 #else
 static const int DEFAULT_MAX_CAMERAS = 128;
 #endif
-
-//TODO #ak have to do something with settings
-class CmdLineArguments
-{
-public:
-    QString logLevel;
-    //!Log level of http requests log
-    QString msgLogLevel;
-    QString ec2TranLogLevel;
-    QString permissionsLogLevel;
-    QString rebuildArchive;
-    QString devModeKey;
-    QString allowedDiscoveryPeers;
-    QString ifListFilter;
-    bool cleanupDb;
-
-    CmdLineArguments()
-    :
-        logLevel(
-#ifdef _DEBUG
-            lit("DEBUG")
-#else
-            lit("INFO")
-#endif
-        )
-    {
-    }
-};
-
-static CmdLineArguments cmdLineArguments;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -453,6 +427,18 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
+void calculateSpaceLimitOrLoadFromConfig(const QnFileStorageResourcePtr& fileStorage)
+{
+    const BeforeRestoreDbData& beforeRestoreData = qnCommon->beforeRestoreDbData();
+    if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(fileStorage->getUrl()))
+    {
+        fileStorage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(fileStorage->getUrl()));
+        return;
+    }
+
+    fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
+}
+
 QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
 {
     NX_LOG(lit("%1 Attempting to create storage %2")
@@ -463,6 +449,37 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
+
+    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
+    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
+    const auto it = std::find_if(partitions.begin(), partitions.end(),
+        [&](const QnPlatformMonitor::PartitionSpace& part)
+    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+
+    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
+    storage->setStorageType(QnLexical::serialized(storageType));
+
+    if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
+    {
+        const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
+        calculateSpaceLimitOrLoadFromConfig(fileStorage);
+
+        if (totalSpace < fileStorage->getSpaceLimit())
+        {
+            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
+                .arg(Q_FUNC_INFO)
+                .arg(path)
+                .arg(totalSpace)
+                .arg(storage->getSpaceLimit()), cl_logDEBUG1);
+            return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
+        }
+    }
+    else
+    {
+        NX_ASSERT(false);
+        NX_LOG(lit("%1 Failed to create to storage %2").arg(Q_FUNC_INFO).arg(path), cl_logWARNING);
+        return QnStorageResourcePtr();
+    }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
 
@@ -477,15 +494,6 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
         storage->setTypeId(resType->getId());
     storage->setParentId(serverGuid());
 
-    const auto storagePath = QnStorageResource::toNativeDirPath(storage->getPath());
-    const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
-    const auto it = std::find_if(partitions.begin(), partitions.end(),
-                                 [&](const QnPlatformMonitor::PartitionSpace& part)
-        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
-
-    const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-    storage->setStorageType(QnLexical::serialized(storageType));
-
     return storage;
 }
 
@@ -499,6 +507,37 @@ static int freeGB(QString drive)
     return freeBytes.HighPart * 4 + (freeBytes.LowPart>> 30);
 }
 #endif
+
+nx::mserver_aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+    m_mediaFolderName(mediaFolderName)
+{}
+
+QString nx::mserver_aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
+{
+    if (!url.endsWith(m_mediaFolderName))
+        return url;
+
+    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
+    NX_ASSERT(indexBeforeMediaFolderName > 0);
+    if (indexBeforeMediaFolderName <= 0)
+        return url;
+
+    return url.mid(0, indexBeforeMediaFolderName);
+}
+
+QnStorageResourceList nx::mserver_aux::UnmountedStoragesFilter::getUnmountedStorages(
+        const QnStorageResourceList& allStorages,
+        const QStringList& paths)
+{
+    QnStorageResourceList result;
+    for (const auto& storage: allStorages)
+    {
+        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
+            result.append(storage);
+    }
+
+    return result;
+}
 
 static QStringList listRecordFolders()
 {
@@ -568,7 +607,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         qint64 totalSpace = -1;
         auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
         if (fileStorage)
-            totalSpace = fileStorage->getTotalSpaceWithoutInit();
+            totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
         else
         {
             storage->initOrUpdate();
@@ -576,6 +615,13 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         }
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
+
+        NX_LOG(lit("%1 Candidate %2, isFileStorage = %3, totalSpace = %4, spaceLimit = %5")
+               .arg(Q_FUNC_INFO)
+               .arg(storage->getUrl())
+               .arg((bool)fileStorage)
+               .arg(totalSpace)
+               .arg(storage->getSpaceLimit()), cl_logDEBUG2);
     }
     return result;
 }
@@ -609,17 +655,8 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
         }
         // Create new storage because of new partition found that missing in the database
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
-        const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
-        {
-            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
-                    .arg(Q_FUNC_INFO)
-                    .arg(folderPath)
-                    .arg(totalSpace)
-                    .arg(storage->getSpaceLimit()), cl_logDEBUG1);
-            continue; // if storage size isn't known do not add it by default
-        }
-
+        if (!storage)
+            continue;
 
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
@@ -722,10 +759,32 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             if (m_needStop)
                 return;
         }
+
         for(const auto& storage: storages)
+        {
+            NX_LOG(lit("%1 Existing storage: %2, spaceLimit = %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage.url)
+                   .arg(storage.spaceLimit), cl_logDEBUG2);
             messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+        }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
+
+        nx::mserver_aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
+        auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
+                m_mediaServer->getStorages(),
+                listRecordFolders());
+
+        storagesToRemove.append(unMountedStorages);
+
+        NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
+        for (const auto& storage: storagesToRemove)
+            NX_LOG(lit("%1 Storage to remove: %2, id: %3")
+                   .arg(Q_FUNC_INFO)
+                   .arg(storage->getUrl())
+                   .arg(storage->getId().toString()), cl_logDEBUG2);
+
         if (!storagesToRemove.isEmpty())
         {
             ec2::ApiIdDataList idList;
@@ -799,7 +858,7 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, const QnMediaServerResourcePtr &server, bool isNewServerInstance)
 {
-    server->setStatus(Qn::Online, true);
+    server->setStatus(Qn::Online, Qn::StatusChangeReason::CreateInitialData);
 
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
@@ -961,8 +1020,8 @@ void initAppServerConnection(QSettings &settings)
             params.addQueryItem("cleanupDb", QString());
     }
 
-    // TODO: Actually appserverPassword is always empty. Remove?
-    QString userName = settings.value("appserverLogin", QnServer::kDefaultAdminPassword).toString();
+    // TODO: #rvasilenko Actually appserverPassword is always empty. Remove?
+    QString userName = settings.value("appserverLogin", helpers::kFactorySystemUser).toString();
     QString password = settings.value(APPSERVER_PASSWORD, QLatin1String("")).toString();
     QByteArray authKey = nx::ServerSetting::getAuthKey();
     QString appserverHostString = settings.value("appserverHost").toString();
@@ -993,7 +1052,94 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
+    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
+
+    parseCommandLineParameters(argc, argv);
+
+    if (!m_cmdLineArguments.configFilePath.isEmpty())
+        MSSettings::initializeROSettingsFromConfFile(m_cmdLineArguments.configFilePath);
+    else
+        MSSettings::initializeROSettings();
+
+    if (!m_cmdLineArguments.rwConfigFilePath.isEmpty())
+        MSSettings::initializeRunTimeSettingsFromConfFile(m_cmdLineArguments.rwConfigFilePath);
+    else
+        MSSettings::initializeRunTimeSettings();
+
+    addCommandLineParametersFromConfig();
+}
+
+void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
+{
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&m_cmdLineArguments.logLevel, "--log-level", NULL,
+        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
+#ifdef _DEBUG
+        "DEBUG"
+#else
+        "INFO"
+#endif
+    );
+    commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
+        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
+        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&m_cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
+        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&m_cmdLineArguments.rebuildArchive, "--rebuild", NULL,
+        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
+    commandLineParser.addParameter(&m_cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.ifListFilter, "--if", NULL,
+        "Strict media server network interface list (comma delimited list)");
+    commandLineParser.addParameter(&m_cmdLineArguments.configFilePath, "--conf-file", NULL,
+        "Path to config file. By default " + MSSettings::defaultROSettingsFilePath());
+    commandLineParser.addParameter(&m_cmdLineArguments.rwConfigFilePath, "--runtime-conf-file", NULL,
+        "Path to config file which is used to save some. By default " + MSSettings::defaultRunTimeSettingsFilePath());
+    commandLineParser.addParameter(&m_cmdLineArguments.showVersion, "--version", NULL,
+        lit("Print version info and exit"), true);
+    commandLineParser.addParameter(&m_cmdLineArguments.showHelp, "--help", NULL,
+        lit("This help message"), true);
+    commandLineParser.addParameter(&m_cmdLineArguments.engineVersion, "--override-version", NULL,
+        lit("Force the other engine version"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.enforceSocketType, "--enforce-socket", NULL,
+        lit("Enforces stream socket type (TCP, UDT)"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.enforcedMediatorEndpoint, "--enforce-mediator", NULL,
+        lit("Enforces mediator address"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
+        lit("Force ip version"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
+        lit("Deletes resources with NULL ids, "
+            "cleans dangling cameras' and servers' user attributes, "
+            "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
+
+    commandLineParser.parse(argc, argv, stderr);
+    if (m_cmdLineArguments.showHelp)
+    {
+        QTextStream stream(stdout);
+        commandLineParser.print(stream);
+    }
+    if (m_cmdLineArguments.showVersion)
+        std::cout << nx::utils::AppInfo::applicationFullVersion().toStdString() << std::endl;
+}
+
+void MediaServerProcess::addCommandLineParametersFromConfig()
+{
+    // move arguments from conf file / registry
+
+    if (m_cmdLineArguments.rebuildArchive.isEmpty())
+        m_cmdLineArguments.rebuildArchive = MSSettings::runTimeSettings()->value("rebuild").toString();
+
+    if (m_cmdLineArguments.msgLogLevel.isEmpty())
+        m_cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::HTTP_MSG_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL).toString();
+
+    if (m_cmdLineArguments.ec2TranLogLevel.isEmpty())
+        m_cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
+            nx_ms_conf::EC2_TRAN_LOG_LEVEL,
+            nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL).toString();
 }
 
 MediaServerProcess::~MediaServerProcess()
@@ -1016,7 +1162,11 @@ void MediaServerProcess::at_databaseDumped()
     if (isStopping())
         return;
 
-    saveAdminPswdHash();
+    nx::mserver_aux::savePersistentDataBeforeDbRestore(
+                qnResPool->getAdministrator(),
+                m_mediaServer,
+                nx::mserver_aux::createServerSettingsProxy().get()
+            ).saveToSettings(MSSettings::roSettings());
     restartServer(500);
 }
 
@@ -1030,8 +1180,11 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         // If system Id has been changed, reset 'database restore time' variable
-        nx::ServerSetting::setSysIdTime(0);
-        saveAdminPswdHash();
+        nx::mserver_aux::savePersistentDataBeforeDbRestore(
+                    qnResPool->getAdministrator(),
+                    m_mediaServer,
+                    nx::mserver_aux::createServerSettingsProxy().get()
+                ).saveToSettings(MSSettings::roSettings());
         restartServer(0);
     }
 }
@@ -1040,14 +1193,21 @@ void MediaServerProcess::stopSync()
 {
     qWarning()<<"Stopping server";
     NX_LOG( lit("Stopping server"), cl_logALWAYS );
+
+    const int kStopTimeoutMs = 100 * 1000;
+
     if (serviceMainInstance) {
         {
             QnMutexLocker lock( &m_stopMutex );
             m_stopping = true;
         }
         serviceMainInstance->pleaseStop();
-        serviceMainInstance->exit();
-        serviceMainInstance->wait();
+        serviceMainInstance->quit();
+        if (!serviceMainInstance->wait(kStopTimeoutMs))
+        {
+            serviceMainInstance->terminate();
+            serviceMainInstance->wait();
+        }
         serviceMainInstance = 0;
     }
     qApp->quit();
@@ -1310,6 +1470,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                 return;
         }
         qnCameraHistoryPool->resetServerFootageData(serverFootageData);
+        qnCameraHistoryPool->setHistoryCheckDelay(1000);
     }
 
     {
@@ -1387,15 +1548,15 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
     {
         //loading user roles
-        ec2::ApiUserGroupDataList roles;
-        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserGroupsSync(&roles)) != ec2::ErrorCode::ok)
+        ec2::ApiUserRoleDataList userRoles;
+        while ((rez = ec2Connection->getUserManager(Qn::kSystemAccess)->getUserRolesSync(&userRoles)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get roles. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
         }
-        messageProcessor->resetUserRoles(roles);
+        messageProcessor->resetUserRoles(userRoles);
     }
 
     {
@@ -1482,7 +1643,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (mappedAddress.port)
     {
         NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS)
+                .arg(address), cl_logALWAYS);
 
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
@@ -1497,7 +1658,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         if (oldIp != m_forwardedAddresses.end())
         {
             NX_LOGX(lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS)
+                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS);
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -1598,7 +1759,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudConnectionManager* const cloud)
+    CloudManagerGroup* cloudManagerGroup)
 {
     auto reg =
         [](const QString& path, QnRestRequestHandler* handler,
@@ -1610,7 +1771,6 @@ void MediaServerProcess::registerRestHandlers(
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
 
-    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     reg("api/storageStatus", new QnStorageStatusRestHandler());
     reg("api/storageSpace", new QnStorageSpaceRestHandler());
     reg("api/statistics", new QnStatisticsRestHandler());
@@ -1621,6 +1781,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/image", new QnImageRestHandler());
     reg("api/createEvent", new QnExternalBusinessEventRestHandler());
     reg("api/gettime", new QnTimeRestHandler());
+    reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
     reg("api/cookieLogout", new QnCookieLogoutRestHandler());
@@ -1644,17 +1805,20 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/installUpdate", new QnUpdateRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
-    reg("api/moduleInformation", new QnModuleInformationRestHandler() );
-    reg("api/iflist", new QnIfListRestHandler() );
-    reg("api/aggregator", new QnJsonAggregatorRestHandler() );
+    reg("api/moduleInformation", new QnModuleInformationRestHandler());
+    reg("api/iflist", new QnIfListRestHandler());
+    reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
-    reg("api/settime", new QnSetTimeRestHandler(), kAdmin);
-    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler() );
+
+    reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
+    reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
+
+    reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
     reg("api/configure", new QnConfigureRestHandler(), kAdmin);
-    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(cloud), kAdmin);
+    reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
     reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
-    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(*cloud), kAdmin);
+    reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudManagerGroup), kAdmin);
     reg("api/mergeSystems", new QnMergeSystemsRestHandler(), kAdmin);
     reg("api/backupDatabase", new QnBackupDbRestHandler());
     reg("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
@@ -1665,31 +1829,34 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/transmitAudio", new QnAudioTransmissionRestHandler());
 
-    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
+    // TODO: Introduce constants for API methods registered here, also use them in
+    // media_server_connection.cpp. Get rid of static/global urlPath passed to some handler ctors.
+
+    reg("api/RecordedTimePeriods", new QnRecordedChunksRestHandler()); //< deprecated
+    reg("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods")); //< new version
+
     reg("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
 
-    // TODO: #rvasilenko: This url is used in 3 different places. Where can we store it?
-    // Static member of QnThumbnailRequestData? New common module?
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
-    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(*cloud));
+    reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
     reg("api/dev-mode-key", new QnCrashServerHandler());
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 
-#ifdef _DEBUG
-    reg("api/debugEvent", new QnDebugEventsRestHandler());
-#endif
+    #ifdef _DEBUG
+        reg("api/debugEvent", new QnDebugEventsRestHandler());
+    #endif
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudConnectionManager* const cloudConnectionManager)
+    CloudManagerGroup* const cloudManagerGroup)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1699,7 +1866,7 @@ bool MediaServerProcess::initTcpListener(
         m_autoRequestForwarder.get(),
         std::placeholders::_1 ) );
 
-    registerRestHandlers(cloudConnectionManager);
+    registerRestHandlers(cloudManagerGroup);
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 #ifdef ENABLE_ACTI
@@ -1707,12 +1874,18 @@ bool MediaServerProcess::initTcpListener(
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
 
+    // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
+    // config value only affects server preference listed in moduleInformation.
+    bool acceptSslConnections = true;
+    int maxConnections = MSSettings::roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
+
     m_universalTcpListener = new QnUniversalTcpListener(
-        *cloudConnectionManager,
+        cloudManagerGroup->connectionManager,
         QHostAddress::Any,
         rtspPort,
-        QnTcpListener::DEFAULT_MAX_CONNECTIONS,
-        MSSettings::roSettings()->value( nx_ms_conf::ALLOW_SSL_CONNECTIONS, nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS ).toBool() );
+        maxConnections,
+        acceptSslConnections );
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
@@ -1730,6 +1903,11 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+
+    nx_hls::QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
+        MSSettings::roSettings()->value(
+        nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
+        nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
@@ -1747,21 +1925,6 @@ bool MediaServerProcess::initTcpListener(
 #endif   //ENABLE_DESKTOP_CAMERA
 
     return true;
-}
-
-void MediaServerProcess::saveAdminPswdHash()
-{
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin)
-    {
-        AdminPasswordData data;
-        data.digest = admin->getDigest();
-        data.hash = admin->getHash();
-        data.cryptSha512Hash = admin->getCryptSha512Hash();
-        data.realm = admin->getRealm().toUtf8();
-
-        data.saveToSettings(MSSettings::roSettings());
-    }
 }
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
@@ -1817,7 +1980,7 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
         serverFlags |= Qn::SF_HasLiteClient;
     }
 
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     if (compatibilityMode) // check compatibilityMode here for testing purpose
     {
         serverFlags |= Qn::SF_HasLiteClient;
@@ -1886,56 +2049,6 @@ void MediaServerProcess::setHardwareGuidList(const QVector<QString>& hardwareGui
     m_hardwareGuidList = hardwareGuidList;
 }
 
-void MediaServerProcess::setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
-{
-    m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
-}
-
-void MediaServerProcess::setEngineVersion(const QnSoftwareVersion& version)
-{
-    m_engineVersion = version;
-}
-
-void MediaServerProcess::migrateSystemNameFromConfig(CloudConnectionManager& cloudConnectionManager)
-{
-    nx::SystemName systemName;
-    systemName.loadFromConfig();
-
-    if (!qnGlobalSettings->systemName().isEmpty())
-    {
-        systemName.clear();
-        systemName.saveToConfig(); //< remove from config file
-        return; //< systemName already in database
-    }
-
-    if (systemName.value().isEmpty())
-        systemName.resetToDefault(); //< generate default value
-
-    // move data from config
-    qnGlobalSettings->setSystemName(systemName.value());
-
-    if (systemName.isDefault())
-    {
-        resetSystemState(cloudConnectionManager);
-    }
-    else
-    {
-        QString serverKey;
-        if (!MSSettings::roSettings()->value("systemIdFromSystemName").toInt())
-        {
-            for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
-                serverKey = qMax(serverKey, server->getAuthKey());
-        }
-        const auto generatedLocalSystemId = guidFromArbitraryData(systemName.value() + serverKey);
-
-        qnGlobalSettings->setLocalSystemId(generatedLocalSystemId);
-    }
-
-    systemName.clear();
-    systemName.saveToConfig(); //< remove from config file
-    qnGlobalSettings->synchronizeNow();
-}
-
 void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectionManager)
 {
     for (;;)
@@ -1958,16 +2071,75 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
     }
 }
 
+namespace {
+
+static const char* const kOnExitScriptName = "mediaserver_on_exit";
+
+} // namespace
+
+void MediaServerProcess::performActionsOnExit()
+{
+    // Call the script if it exists.
+
+    QString fileName = getDataDirectory() + "/scripts/" + kOnExitScriptName;
+    if (!QFile::exists(fileName))
+    {
+        NX_LOG(lit("Script '%1' is missing at the server").arg(fileName), cl_logDEBUG2);
+        return;
+    }
+
+    // Currently, no args are needed, hence the empty list.
+    QStringList args{};
+
+    NX_LOG(lit("Calling the script: %1 %2").arg(fileName).arg(args.join(" ")), cl_logDEBUG2);
+    if (!QProcess::startDetached(fileName, args))
+    {
+        NX_LOG(lit("Unable to start script '%1' because of a system error").arg(kOnExitScriptName),
+            cl_logDEBUG2);
+    }
+}
+
+void MediaServerProcess::updateAllowedInterfaces()
+{
+    // check registry
+    QString ifList = MSSettings::roSettings()->value(lit("if")).toString();
+    // check startup parameter
+    if (ifList.isEmpty())
+        ifList = m_cmdLineArguments.ifListFilter;
+
+    QList<QHostAddress> allowedInterfaces;
+    for (const QString& s : ifList.split(QLatin1Char(';'), QString::SkipEmptyParts))
+        allowedInterfaces << QHostAddress(s);
+
+    if (!allowedInterfaces.isEmpty())
+        qWarning() << "Using net IF filter:" << allowedInterfaces;
+    setInterfaceListFilter(allowedInterfaces);
+}
+
 void MediaServerProcess::run()
 {
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_enforcedMediatorEndpoint));
+    updateAllowedInterfaces();
 
-    if (!m_engineVersion.isNull())
-        qnCommon->setEngineVersion(m_engineVersion);
+    if (!m_cmdLineArguments.enforceSocketType.isEmpty())
+        SocketFactory::enforceStreamSocketType(m_cmdLineArguments.enforceSocketType);
+    auto ipVersion = m_cmdLineArguments.ipVersion;
+    if (ipVersion.isEmpty())
+        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
+
+    SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
+
+    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+
+    if (!m_cmdLineArguments.engineVersion.isNull())
+    {
+        qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
+        qnCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
+    }
 
     QnCallCountStart(std::chrono::milliseconds(5000));
-
+#ifdef Q_OS_WIN32
+    misc::migrateFilesFromWindowsOldDir(QDir::toNativeSeparators(getDataDirectory()));
+#endif
     ffmpegInit();
 
     QnFileStorageResource::removeOldDirs(); // cleanup temp folders;
@@ -2000,24 +2172,27 @@ void MediaServerProcess::run()
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
 
-    CloudConnectionManager cloudConnectionManager;
-    auto authHelper = std::make_unique<QnAuthHelper>(&cloudConnectionManager);
+    TimeBasedNonceProvider timeBasedNonceProvider;
+    CloudManagerGroup cloudManagerGroup(&timeBasedNonceProvider);
+    auto authHelper = std::make_unique<QnAuthHelper>(&timeBasedNonceProvider, &cloudManagerGroup);
     connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &MediaServerProcess::at_emptyDigestDetected);
 
     //TODO #ak following is to allow "OPTIONS * RTSP/1.0" without authentication
     QnAuthHelper::instance()->restrictionList()->allow( lit( "?" ), AuthMethod::noAuth );
 
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );   //allowed by default for now
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation"), AuthMethod::noAuth );
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/gettime"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/ping"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/camera_event*"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/showLog*"), AuthMethod::urlQueryParam);   //allowed by default for now
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/moduleInformation"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/gettime"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getTimeZones"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getNonce"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogin"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/cookieLogout"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/getCurrentUser"), AuthMethod::noAuth);
-    QnAuthHelper::instance()->restrictionList()->allow( lit("*/static/*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2076,16 +2251,16 @@ void MediaServerProcess::run()
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
-    qnCommon->setUseLowPriorityAdminPasswordHach(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
+    qnCommon->setUseLowPriorityAdminPasswordHack(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
-    AdminPasswordData passwordData;
-    passwordData.loadFromSettings(settings);
-    qnCommon->setAdminPasswordData(passwordData);
+    BeforeRestoreDbData beforeRestoreDbData;
+    beforeRestoreDbData.loadFromSettings(settings);
+    qnCommon->setBeforeRestoreData(beforeRestoreDbData);
 
     qnCommon->setModuleGUID(serverGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().designateSelfPeerId("ms", qnCommon->moduleGUID());
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ms", qnCommon->moduleGUID());
 
-    bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
+    bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
 
     qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
@@ -2197,8 +2372,6 @@ void MediaServerProcess::run()
         return;
     }
 
-    AdminPasswordData::clearSettings(settings);
-
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
@@ -2262,7 +2435,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudConnectionManager))
+    if (!initTcpListener(&cloudManagerGroup))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2282,8 +2455,7 @@ void MediaServerProcess::run()
             nx_ms_conf::ALLOW_SSL_CONNECTIONS,
             nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
 
-    bool isNewServerInstance = false;
-    bool noSetupWizardFlag = MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0;
+    bool foundOwnServerInDb = false;
     m_moduleFinder = new QnModuleFinder(false);
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
@@ -2293,15 +2465,18 @@ void MediaServerProcess::run()
         if (server)
         {
             fromResourceToApi(server, prevServerData);
+            foundOwnServerInDb = true;
         }
         else
         {
             server = QnMediaServerResourcePtr(new QnMediaServerResource());
             server->setId(serverGuid());
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
-            server->setName(getDefaultServerName());
-            if (!noSetupWizardFlag)
-                isNewServerInstance = true;
+
+            if (!beforeRestoreDbData.serverName.isEmpty())
+                server->setName(QString::fromLocal8Bit(beforeRestoreDbData.serverName));
+            else
+                server->setName(getDefaultServerName());
         }
 
         server->setServerFlags((Qn::ServerFlags) calcServerFlags());
@@ -2319,7 +2494,7 @@ void MediaServerProcess::run()
         server->setPrimaryAddress(
             SocketAddress(defaultLocalAddress(appserverHost), m_universalTcpListener->getPort()));
         server->setSslAllowed(sslAllowed);
-        cloudConnectionManager.setProxyVia(
+        cloudManagerGroup.connectionManager.setProxyVia(
             SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
 
 
@@ -2342,9 +2517,19 @@ void MediaServerProcess::run()
         ec2::ApiMediaServerData newServerData;
         fromResourceToApi(server, newServerData);
         if (prevServerData != newServerData)
-            m_mediaServer = registerServer(ec2Connection, server, isNewServerInstance);
+        {
+            m_mediaServer = registerServer(
+                ec2Connection,
+                server,
+                nx::mserver_aux::isNewServerInstance(
+                    qnCommon->beforeRestoreDbData(),
+                    foundOwnServerInDb,
+                    MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0));
+        }
         else
+        {
             m_mediaServer = server;
+        }
 
         const auto hwInfo = HardwareInformation::instance();
         server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
@@ -2352,7 +2537,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
 
         server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+        server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
         server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
         server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
@@ -2423,9 +2608,9 @@ void MediaServerProcess::run()
         qnGlobalSettings->cloudSystemId().isEmpty() ? "no" : "yes");
     MSSettings::roSettings()->setValue("cloudHost", selfInformation.cloudHost);
 
-    if (!cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
+    if (!m_cmdLineArguments.allowedDiscoveryPeers.isEmpty()) {
         QSet<QnUuid> allowedPeers;
-        for (const QString &peer: cmdLineArguments.allowedDiscoveryPeers.split(";")) {
+        for (const QString &peer: m_cmdLineArguments.allowedDiscoveryPeers.split(";")) {
             QnUuid peerId(peer);
             if (!peerId.isNull())
                 allowedPeers << peerId;
@@ -2475,7 +2660,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
-    if (cmdLineArguments.cleanupDb)
+    if (m_cmdLineArguments.cleanupDb)
     {
         const bool kCleanupDbObjects = true;
         const bool kCleanupTransactionLog = true;
@@ -2498,42 +2683,49 @@ void MediaServerProcess::run()
     qnResourceAccessManager->endUpdate();
     qDebug() << "permissions ready" << tt.elapsed();
 
-	qnGlobalSettings->initialize();
-    migrateSystemNameFromConfig(cloudConnectionManager);
+    qnGlobalSettings->initialize();
+
+    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
+    auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
+
+    nx::mserver_aux::setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
+
+    BeforeRestoreDbData::clearSettings(settings);
 
     addFakeVideowallUser();
     initStoragesAsync(messageProcessor.data());
 
     if (!QnPermissionsHelper::isSafeMode())
     {
-        bool isCloudInstanceChanged = !qnGlobalSettings->cloudHost().isEmpty() &&
-            qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
-        bool isConnectedToCloud = !qnGlobalSettings->cloudSystemId().isEmpty();
-        if (isNewServerInstance ||
-            (isCloudInstanceChanged && isConnectedToCloud))
+        if (nx::mserver_aux::needToResetSystem(
+                    nx::mserver_aux::isNewServerInstance(
+                        qnCommon->beforeRestoreDbData(),
+                        foundOwnServerInDb,
+                        MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0),
+                    settingsProxy.get()))
         {
-            if (isCloudInstanceChanged)
+            if (settingsProxy->isCloudInstanceChanged())
                 qWarning() << "Cloud instance changed from" << qnGlobalSettings->cloudHost() <<
                     "to" << QnAppInfo::defaultCloudHost() << ". Server goes to the new state";
 
-            resetSystemState(cloudConnectionManager);
+            resetSystemState(cloudManagerGroup.connectionManager);
         }
-        if (isCloudInstanceChanged)
+        if (settingsProxy->isCloudInstanceChanged())
         {
             ec2::ErrorCode errCode;
             do
             {
-            const bool kCleanupDbObjects = false;
-            const bool kCleanupTransactionLog = true;
+                const bool kCleanupDbObjects = false;
+                const bool kCleanupTransactionLog = true;
 
-            errCode = QnAppServerConnectionFactory::getConnection2()
-                ->getMiscManager(Qn::kSystemAccess)
-                ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
+                errCode = QnAppServerConnectionFactory::getConnection2()
+                    ->getMiscManager(Qn::kSystemAccess)
+                    ->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
 
                 if (errCode != ec2::ErrorCode::ok)
                 {
-                qWarning() << "Error while rebuild transaction log. Trying again...";
-                    msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+                    qWarning() << "Error while rebuild transaction log. Trying again...";
+                        msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
                 }
 
             } while (errCode != ec2::ErrorCode::ok && !m_needStop);
@@ -2709,6 +2901,10 @@ void MediaServerProcess::run()
     if (m_mediaServer)
         m_mediaServer->beforeDestroy();
     m_mediaServer.clear();
+
+    performActionsOnExit();
+
+    nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 }
 
 void MediaServerProcess::at_appStarted()
@@ -2769,23 +2965,14 @@ public:
         setServiceDescription(SERVICE_NAME);
     }
 
-    void setOverrideVersion(const QnSoftwareVersion &version) {
-        m_overrideVersion = version;
-    }
-
-    void setEnforcedMediatorEndpoint(const QString& enforcedMediatorEndpoint)
-    {
-        m_enforcedMediatorEndpoint = enforcedMediatorEndpoint;
-    }
-
 protected:
     virtual int executeApplication() override
     {
-        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-
         m_main.reset(new MediaServerProcess(m_argc, m_argv));
-        m_main->setEnforcedMediatorEndpoint(m_enforcedMediatorEndpoint);
-        m_main->setEngineVersion(m_overrideVersion);
+
+        const auto cmdParams = m_main->cmdLineArguments();
+        if (cmdParams.showHelp || cmdParams.showVersion)
+            return 0;
 
         int res = application()->exec();
 
@@ -2832,17 +3019,11 @@ protected:
 
         QDir::setCurrent(qApp->applicationDirPath());
 
-        if (cmdLineArguments.rebuildArchive.isEmpty()) {
-            cmdLineArguments.rebuildArchive = MSSettings::runTimeSettings()->value("rebuild").toString();
-        }
         MSSettings::runTimeSettings()->remove("rebuild");
 
-        initLog(cmdLineArguments.logLevel);
+        const auto cmdLineArguments = m_main->cmdLineArguments();
 
-        if( cmdLineArguments.msgLogLevel.isEmpty() )
-            cmdLineArguments.msgLogLevel = MSSettings::roSettings()->value(
-                nx_ms_conf::HTTP_MSG_LOG_LEVEL,
-                nx_ms_conf::DEFAULT_HTTP_MSG_LOG_LEVEL ).toString();
+        initLog(cmdLineArguments.logLevel);
 
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             logDir + QLatin1String("/http_log"),
@@ -2851,10 +3032,6 @@ protected:
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel));
 
         //preparing transaction log
-        if( cmdLineArguments.ec2TranLogLevel.isEmpty() )
-            cmdLineArguments.ec2TranLogLevel = MSSettings::roSettings()->value(
-                nx_ms_conf::EC2_TRAN_LOG_LEVEL,
-                nx_ms_conf::DEFAULT_EC2_TRAN_LOG_LEVEL ).toString();
         initTransactionLog(logDir, QnLog::logLevelFromString(cmdLineArguments.ec2TranLogLevel));
 
         QnLog::instance(QnLog::HWID_LOG)->create(
@@ -2992,8 +3169,6 @@ private:
     int m_argc;
     char **m_argv;
     QScopedPointer<MediaServerProcess> m_main;
-    QnSoftwareVersion m_overrideVersion;
-    QString m_enforcedMediatorEndpoint;
 };
 
 void stopServer(int /*signal*/)
@@ -3032,23 +3207,6 @@ void SIGUSR1_handler(int)
 }
 #endif
 
-void updateAllowedInterfaces(const CmdLineArguments& cmdLineArguments)
-{
-    // check registry
-    QString ifList = MSSettings::roSettings()->value(lit("if")).toString();
-    // check startup parameter
-    if (ifList.isEmpty())
-        ifList = cmdLineArguments.ifListFilter;
-
-    QList<QHostAddress> allowedInterfaces;
-    for (const QString& s: ifList.split(QLatin1Char(';'), QString::SkipEmptyParts))
-        allowedInterfaces << QHostAddress(s);
-
-    if (!allowedInterfaces.isEmpty())
-        qWarning() << "Using net IF filter:" << allowedInterfaces;
-    setInterfaceListFilter(allowedInterfaces);
-}
-
 int MediaServerProcess::main(int argc, char* argv[])
 {
 #if 0
@@ -3062,7 +3220,6 @@ int MediaServerProcess::main(int argc, char* argv[])
 # endif
 #endif
 #endif //__arm__
-    ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
     _tzset();
@@ -3072,111 +3229,14 @@ int MediaServerProcess::main(int argc, char* argv[])
     signal( SIGUSR1, SIGUSR1_handler );
 #endif
 
-    //parsing command-line arguments
-    QString configFilePath;
-    QString rwConfigFilePath;
-    bool showVersion = false;
-    bool showHelp = false;
-#ifdef __linux__
-    bool disableCrashHandler = false;
-#endif
-    QString engineVersion;
-    QString enforceSocketType;
-    QString enforcedMediatorEndpoint;
-    QString ipVersion;
-
-    QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
-        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
-#ifdef _DEBUG
-            "DEBUG"
-#else
-            "INFO"
-#endif
-            );
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
-        "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
-        "Log value for ec2_tran.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.permissionsLogLevel, "--permissions-log-level", NULL,
-        "Log value for permissions.log. Supported values same as above. Default is none (no logging)", "none");
-    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL,
-        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
-    commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.allowedDiscoveryPeers, "--allowed-peers", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.ifListFilter, "--if", NULL,
-        "Strict media server network interface list (comma delimited list)");
-    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL,
-        "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
-    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL,
-        "Path to config file which is used to save some. By default "+MSSettings::defaultRunTimeSettingsFilePath() );
-    commandLineParser.addParameter(&showVersion, "--version", NULL,
-        lit("Print version info and exit"), true);
-    commandLineParser.addParameter(&showHelp, "--help", NULL,
-        lit("This help message"), true);
-    commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
-        lit("Force the other engine version"), QString());
-    commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
-        lit("Enforces stream socket type (TCP, UDT)"), QString());
-    commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
-        lit("Enforces mediator address"), QString());
-    commandLineParser.addParameter(&ipVersion, "--ip-version", NULL,
-        lit("Force ip version"), QString());
-    commandLineParser.addParameter(&cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
-        lit("Deletes resources with NULL ids, "
-            "cleans dangling cameras' and servers' user attributes, "
-            "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
-
-    #ifdef __linux__
-        commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
-            lit("Disables crash signal handler (linux only)"), true);
-    #endif
-
-    commandLineParser.parse(argc, argv, stderr);
-    if( showVersion )
-    {
-        std::cout << QnAppInfo::applicationFullVersion().toStdString() << std::endl;
-        return 0;
-    }
-    if( showHelp )
-    {
-        QTextStream stream(stdout);
-        commandLineParser.print(stream);
-        return 0;
-    }
-
-    if( !configFilePath.isEmpty() )
-        MSSettings::initializeROSettingsFromConfFile( configFilePath );
-    if( !rwConfigFilePath.isEmpty() )
-        MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
-
-    updateAllowedInterfaces( cmdLineArguments );
-
-    #ifdef __linux__
-        if( !disableCrashHandler )
-            linux_exception::installCrashSignalHandler();
-    #endif
-
-    if (!enforceSocketType.isEmpty())
-        SocketFactory::enforceStreamSocketType(enforceSocketType);
-    if( ipVersion.isEmpty() )
-        ipVersion = MSSettings::roSettings()->value(QLatin1String("ipVersion")).toString();
-
-    SocketFactory::setIpVersion( ipVersion );
     QnVideoService service( argc, argv );
-
-    if (!engineVersion.isEmpty()) {
-        QnSoftwareVersion version(engineVersion);
-        if (!version.isNull()) {
-            qWarning() << "Starting with overridden version: " << version.toString();
-            service.setOverrideVersion(version);
-        }
-    }
-
-    service.setEnforcedMediatorEndpoint(enforcedMediatorEndpoint);
-
     int res = service.exec();
     if (restartFlag && res == 0)
         return 1;
     return 0;
+}
+
+const CmdLineArguments MediaServerProcess::cmdLineArguments() const
+{
+    return m_cmdLineArguments;
 }

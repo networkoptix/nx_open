@@ -43,11 +43,14 @@ hpm::MediatorFunctionalTest& TunnelConnector::mediator()
 TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
     std::chrono::milliseconds connectTimeout,
     MediaServerEmulator::ActionToTake actionOnConnectAckResponse,
-    boost::optional<SocketAddress> mediatorAddressForConnector)
+    boost::optional<SocketAddress> mediatorAddressForConnector,
+    std::function<void(nx::hpm::MediaServerEmulator*)> serverConfig)
 {
     ConnectResult connectResult;
     const auto system1 = mediator().addRandomSystem();
     const auto server1 = mediator().addRandomServer(system1);
+    if (serverConfig)
+        serverConfig(server1.get());
     doSimpleConnectTest(
         connectTimeout,
         actionOnConnectAckResponse,
@@ -78,11 +81,10 @@ TunnelConnector::ConnectResult TunnelConnector::doSimpleConnectTest(
 
 void TunnelConnector::generalTest()
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto connectResult = doSimpleConnectTest(
-        std::chrono::seconds::zero(),   //no timeout
+        std::chrono::seconds::zero(), //< No timeout.
         MediaServerEmulator::ActionToTake::proceedWithConnection);
 
     ASSERT_EQ(SystemError::noError, connectResult.errorCode);
@@ -100,7 +102,7 @@ void TunnelConnector::cancellationTest()
     const auto system = mediator().addRandomSystem();
     const auto server = mediator().addRandomServer(system);
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen().first);
 
     const auto t1 = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - t1 < totalTestTime)
@@ -115,7 +117,7 @@ void TunnelConnector::cancellationTest()
             {
             });
 
-        //implying random delay
+        // Implying random delay.
         std::this_thread::sleep_for(std::chrono::microseconds(
             nx::utils::random::number(0, 0xFFFF) * 10));
         connector.pleaseStopSync();
@@ -137,12 +139,13 @@ void TunnelConnector::doSimpleConnectTest(
             return actionOnConnectAckResponse;
         });
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen().first);
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(
         SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddressForConnector);
+    auto connectorGuard = makeScopedGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();
     connector.connect(
@@ -157,65 +160,15 @@ void TunnelConnector::doSimpleConnectTest(
             connectedPromise.set_value(std::move(result));
         });
     auto connectedFuture = connectedPromise.get_future();
-    ASSERT_EQ(
-        std::future_status::ready,
-        connectedFuture.wait_for(
-            connectTimeout == std::chrono::milliseconds::zero()
-            ? kDefaultTestTimeout
-            : connectTimeout * 2));
+    const auto actualConnectTimeout =
+        connectTimeout == std::chrono::milliseconds::zero()
+        ? kDefaultTestTimeout
+        : (connectTimeout * 2);
+    ASSERT_EQ(std::future_status::ready, connectedFuture.wait_for(actualConnectTimeout));
     *connectResult = connectedFuture.get();
     connectResult->executionTime =
         std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::steady_clock::now() - t1);
-
-    connector.pleaseStopSync();
-}
-
-
-class CrossNatConnector
-    :
-    public TunnelConnector
-{
-};
-
-TEST_F(CrossNatConnector, timeout)
-{
-    //starting mediator
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
-    const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
-
-    //timing out mediator response by providing incorrect mediator address to connector
-    const auto connectResult = doSimpleConnectTest(
-        connectTimeout,
-        MediaServerEmulator::ActionToTake::ignoreIndication,
-        SocketAddress(HostAddress::localhost, 10345));
-
-    ASSERT_EQ(SystemError::timedOut, connectResult.errorCode);
-    ASSERT_EQ(nullptr, connectResult.connection);
-    //ASSERT_TRUE(
-    //    connectResult.executionTime > connectTimeout*0.8 &&
-    //    connectResult.executionTime < connectTimeout*1.2);
-}
-
-TEST_F(CrossNatConnector, target_host_not_found)
-{
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
-    const auto system1 = mediator().addRandomSystem();
-    const auto server1 = mediator().addRandomServer(system1);
-
-    auto incorrectSystem = system1;
-    incorrectSystem.id += "_hren";
-
-    const auto connectResult = doSimpleConnectTest(
-        std::chrono::seconds::zero(),   //no timeout
-        MediaServerEmulator::ActionToTake::proceedWithConnection,
-        incorrectSystem,
-        server1);
-
-    ASSERT_EQ(SystemError::hostNotFound, connectResult.errorCode);
-    ASSERT_EQ(nullptr, connectResult.connection);
 }
 
 }   //namespace test

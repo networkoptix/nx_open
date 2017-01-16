@@ -57,7 +57,7 @@ TEST_F(DbRegress, general)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems("akolesnikov@networkoptix.com", "123", &systems));
-    ASSERT_EQ(6, systems.size());
+    ASSERT_EQ(6U, systems.size());
 
     const auto laOfficeTestSystemIter = std::find_if(
         systems.begin(), systems.end(),
@@ -106,7 +106,7 @@ TEST_F(DbFailure, basic)
 
     const auto account = addActivatedAccount2();
 
-    auto cdbConnection = connection(account.data.email, account.password);
+    auto cdbConnection = connection(account.email, account.password);
     api::AccountData accountData;
     accountData.email = generateRandomEmailAddress();
     accountData.passwordHa1 = "sdfdsfsdf";
@@ -125,7 +125,7 @@ TEST_F(DbFailure, basic)
     accountUpdate.fullName = "qweasd123";
     ASSERT_EQ(
         api::ResultCode::retryLater,
-        updateAccount(account.data.email, account.password, accountUpdate));
+        updateAccount(account.email, account.password, accountUpdate));
     ASSERT_EQ(
         api::ResultCode::ok,
         newAccountRegisteredPromise.get_future().get());

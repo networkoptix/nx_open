@@ -12,10 +12,9 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-AuthProvider::AuthProvider(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
-:
+AuthProvider::AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
@@ -35,7 +34,7 @@ void AuthProvider::getCdbNonce(
 {
     executeRequest(
         kAuthGetNoncePath,
-        api::SystemID(systemId),
+        api::SystemId(systemId),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
 }
@@ -51,6 +50,6 @@ void AuthProvider::getAuthenticationResponse(
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

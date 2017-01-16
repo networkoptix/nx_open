@@ -1,4 +1,3 @@
-
 #include "save_cloud_system_credentials.h"
 
 #include <cdb/connection.h>
@@ -7,6 +6,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
+#include <api/app_server_connection.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
@@ -19,15 +19,15 @@
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <cloud/cloud_connection_manager.h>
+#include <cloud/cloud_manager_group.h>
 
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
-
 QnSaveCloudSystemCredentialsHandler::QnSaveCloudSystemCredentialsHandler(
-    const CloudConnectionManager& cloudConnectionManager)
+    CloudManagerGroup* cloudManagerGroup)
 :
-    m_cloudConnectionManager(cloudConnectionManager)
+    m_cloudManagerGroup(cloudManagerGroup)
 {
 }
 
@@ -48,37 +48,88 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     const QnRestConnectionProcessor* owner)
 {
     using namespace nx::cdb;
-    using namespace nx::settings_names;
+
+    nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
+    if (!authorize(owner, &result, &statusCode))
+        return statusCode;
+
+    if (!validateInputData(data, &result))
+        return nx_http::StatusCode::badRequest;
+
+    if (!checkInternetConnection(&result))
+        return nx_http::StatusCode::badRequest;
+
+    if (!saveCloudData(data, &result))
+        return nx_http::StatusCode::internalServerError;
+
+    // Trying to connect to the cloud to activate system.
+    // We connect to the cloud after saving properties to DB because
+    // if server activates system in cloud and then save it to DB,
+    // crash can result in unsynchronized unrecoverable state: there
+    // is some system in cloud, but system does not know its credentials
+    // and there is no way to find them out.
+
+    if (!fetchNecessaryDataFromCloud(data, &result))
+    {
+        if (rollback())
+            return nx_http::StatusCode::serviceUnavailable;
+        else
+            return nx_http::StatusCode::internalServerError;
+    }
+
+    result.setError(QnJsonRestResult::NoError);
+    return nx_http::StatusCode::ok;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::authorize(
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult* result,
+    nx_http::StatusCode::Value* const authorizationStatusCode)
+{
+    using namespace nx_http;
 
     if (QnPermissionsHelper::isSafeMode())
-        return QnPermissionsHelper::safeModeError(result);
+    {
+        *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
+        return false;
+    }
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
-        return QnPermissionsHelper::notOwnerError(result);
+    {
+        *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::notOwnerError(*result);
+        return false;
+    }
 
-    NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::validateInputData(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    using namespace nx::settings_names;
 
     if (data.cloudSystemID.isEmpty())
     {
         NX_LOGX(lit("Missing required parameter CloudSystemID"), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudSystemId));
-        return nx_http::StatusCode::ok;
+        return false;
     }
 
     if (data.cloudAuthKey.isEmpty())
     {
         NX_LOGX(lit("Missing required parameter CloudAuthKey"), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudAuthKey));
-        return nx_http::StatusCode::ok;
+        return false;
     }
 
     if (data.cloudAccountName.isEmpty())
     {
         NX_LOGX(lit("Missing required parameter CloudAccountName"), cl_logDEBUG1);
-        result.setError(QnRestResult::ErrorDescriptor(
+        result->setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, kNameCloudAccountName));
-        return nx_http::StatusCode::ok;
+        return false;
     }
 
     const QString cloudSystemId = qnGlobalSettings->cloudSystemId();
@@ -86,22 +137,50 @@ int QnSaveCloudSystemCredentialsHandler::execute(
         !qnGlobalSettings->cloudAuthKey().isEmpty())
     {
         NX_LOGX(lit("Attempt to bind to cloud already-bound system"), cl_logDEBUG1);
-        result.setError(
+        result->setError(
             QnJsonRestResult::CantProcessRequest,
             tr("System already bound to cloud (id %1)").arg(cloudSystemId));
-        return nx_http::StatusCode::ok;
+        return false;
     }
 
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::checkInternetConnection(
+    QnJsonRestResult* result)
+{
     auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
     if (!hasPublicIP)
     {
-        result.setError(
+        result->setError(
             QnJsonRestResult::CantProcessRequest,
             tr("Server is not connected to the Internet."));
-        NX_LOGX(result.errorString, cl_logWARNING);
-        return nx_http::StatusCode::internalServerError;
+        NX_LOGX(result->errorString, cl_logWARNING);
+        return false;
     }
+
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::saveCloudData(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    if (!saveCloudCredentials(data, result))
+        return false;
+
+    if (!insertCloudOwner(data, result))
+        return false;
+
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::saveCloudCredentials(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
 
     qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
     qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
@@ -109,27 +188,92 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         NX_LOGX(lit("Error saving cloud credentials to the local DB"), cl_logWARNING);
-        result.setError(
-             QnJsonRestResult::CantProcessRequest,
-             tr("Failed to save cloud credentials to local DB"));
-         return nx_http::StatusCode::internalServerError;
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Failed to save cloud credentials to local DB"));
+        return false;
     }
 
-    //trying to connect to the cloud to activate system
-    //we connect to the cloud after saving properties to DB because
-    //if server activates system in cloud and then save it to DB,
-    //crash can result in unsynchronized unrecoverable state: there
-    //is some system in cloud, but system does not know its credentials
-    //and there is no way to find them out
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    ::ec2::ApiUserData userData;
+    userData.isCloud = true;
+    userData.id = guidFromArbitraryData(data.cloudAccountName);
+    userData.typeId = QnResourceTypePool::kUserTypeUuid;
+    userData.email = data.cloudAccountName;
+    userData.name = data.cloudAccountName;
+    userData.permissions = Qn::GlobalAdminPermissionSet;
+    userData.isAdmin = true;
+    userData.isEnabled = true;
+    userData.realm = QnAppInfo::realm();
+    userData.hash = "password_is_in_cloud";
+    userData.digest = "password_is_in_cloud";
+        
+    const auto resultCode =
+        QnAppServerConnectionFactory::getConnection2()
+            ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
+    if (resultCode != ec2::ErrorCode::ok)
+    {
+        NX_LOGX(
+            lm("Error inserting cloud owner to the local DB. %1").str(resultCode),
+            cl_logWARNING);
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Failed to save cloud owner to local DB"));
+        return false;
+    }
+
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    return saveLocalSystemIdToCloud(data, result) &&
+        initializeCloudRelatedManagers(result);
+}
+
+bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
+    QnJsonRestResult* result)
+{
+    using namespace nx::cdb;
+
+    api::ResultCode resultCode = 
+        m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();
+    if (resultCode != api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Failed to getch cloud nonce: %1")
+            .arg(api::toString(resultCode)), cl_logWARNING);
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Could not connect to cloud: %1")
+                .arg(QString::fromStdString(api::toString(resultCode))));
+        return false;
+    }
+
+    return true;
+}
+
+bool QnSaveCloudSystemCredentialsHandler::saveLocalSystemIdToCloud(
+    const CloudCredentialsData& data,
+    QnJsonRestResult* result)
+{
+    using namespace nx::cdb;
 
     ec2::ApiCloudSystemData opaque;
     opaque.localSystemId = qnGlobalSettings->localSystemId();
 
     api::SystemAttributesUpdate systemAttributesUpdate;
-    systemAttributesUpdate.systemID = data.cloudSystemID.toStdString();
+    systemAttributesUpdate.systemId = data.cloudSystemID.toStdString();
     systemAttributesUpdate.opaque = QJson::serialized(opaque).toStdString();
 
-    auto cloudConnection = m_cloudConnectionManager.getCloudConnection(
+    auto cloudConnection = m_cloudManagerGroup->connectionManager.getCloudConnection(
         data.cloudSystemID, data.cloudAuthKey);
     api::ResultCode cdbResultCode = api::ResultCode::ok;
     std::tie(cdbResultCode) =
@@ -139,34 +283,27 @@ int QnSaveCloudSystemCredentialsHandler::execute(
                 cloudConnection->systemManager(),
                 std::move(systemAttributesUpdate),
                 std::placeholders::_1));
-
     if (cdbResultCode != api::ResultCode::ok)
     {
         NX_LOGX(lm("Received error response from cloud: %1")
             .arg(api::toString(cdbResultCode)), cl_logWARNING);
-
-        //rolling back changes
-        qnGlobalSettings->resetCloudParams();
-        if (!qnGlobalSettings->synchronizeNowSync())
-        {
-            NX_LOGX(lit("Error resetting failed cloud credentials in the local DB"), cl_logWARNING);
-            //we saved cloud credentials to local DB but failed to connect to cloud and could not remove them!
-            //let's pretend we have registered successfully:
-            //hopefully, cloud will become available some time later
-            result.setError(QnJsonRestResult::NoError);
-            return nx_http::StatusCode::internalServerError;
-        }
-        else
-        {
-            result.setError(
-                QnJsonRestResult::CantProcessRequest,
-                tr("Could not connect to cloud: %1").
-                    arg(QString::fromStdString(nx::cdb::api::toString(cdbResultCode))));
-            return nx_http::StatusCode::ok;
-        }
+        result->setError(
+            QnJsonRestResult::CantProcessRequest,
+            tr("Could not connect to cloud: %1")
+                .arg(QString::fromStdString(api::toString(cdbResultCode))));
+        return false;
     }
 
-    result.setError(QnJsonRestResult::NoError);
+    return true;
+}
 
-    return nx_http::StatusCode::ok;
+bool QnSaveCloudSystemCredentialsHandler::rollback()
+{
+    qnGlobalSettings->resetCloudParams();
+    if (!qnGlobalSettings->synchronizeNowSync())
+    {
+        NX_LOGX(lit("Error resetting failed cloud credentials in the local DB"), cl_logWARNING);
+        return false;
+    }
+    return true;
 }

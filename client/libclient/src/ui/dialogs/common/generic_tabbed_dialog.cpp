@@ -7,7 +7,6 @@
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/scoped_value_rollback.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -20,8 +19,7 @@ namespace
 QnGenericTabbedDialog::QnGenericTabbedDialog(QWidget* parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),
     m_pages(),
-    m_tabWidget(nullptr),
-    m_updating(false)
+    m_tabWidget(nullptr)
 {
 }
 
@@ -109,11 +107,13 @@ bool QnGenericTabbedDialog::forcefullyClose()
 
 void QnGenericTabbedDialog::loadDataToUi()
 {
-    {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        for(const Page &page: m_pages)
-            page.widget->loadDataToUi();
-    }
+    Qn::updateGuarded(this,
+        [this]()
+        {
+            for(const Page &page: m_pages)
+                page.widget->loadDataToUi();
+        });
+
     retranslateUi();
     updateButtonBox();
 }
@@ -127,7 +127,7 @@ void QnGenericTabbedDialog::retranslateUi()
 void QnGenericTabbedDialog::applyChanges()
 {
     for(const Page &page: m_pages)
-        if (page.enabled && page.visible)
+        if (page.enabled && page.visible && page.widget->hasChanges())
             page.widget->applyChanges();
     updateButtonBox();
 }
@@ -345,7 +345,7 @@ void QnGenericTabbedDialog::initializeButtonBox()
 
 void QnGenericTabbedDialog::updateButtonBox()
 {
-    if (m_updating || !buttonBox())
+    if (isUpdating() || !buttonBox())
         return;
 
     bool changesPresent = hasChanges();

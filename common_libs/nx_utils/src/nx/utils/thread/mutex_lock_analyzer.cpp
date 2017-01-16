@@ -348,7 +348,7 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
         lockedThread = ::currentThreadSystemId();
     }
 
-    NX_ASSERT( !threadContext.currentLockPath.empty() );
+    NX_CRITICAL( !threadContext.currentLockPath.empty() );
     if( threadContext.currentLockPath.front().lockRecursionDepth > 0 )
     {
         --threadContext.currentLockPath.front().lockRecursionDepth;

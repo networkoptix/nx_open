@@ -1,4 +1,3 @@
-
 #include "cdb_launcher.h"
 
 #include <chrono>
@@ -16,78 +15,69 @@
 #include <utils/common/app_info.h>
 #include <utils/common/sync_call.h>
 
-#include "managers/email_manager.h"
+#include "business_data_generator.h"
 #include "cloud_db_process.h"
-
+#include "managers/email_manager.h"
 
 namespace nx {
 namespace cdb {
 
-namespace {
-QString sTemporaryDirectoryPath;
-nx::db::ConnectionOptions sConnectionOptions;
-}
+//-------------------------------------------------------------------------------------------------
+// CdbLauncher
 
-CdbLauncher::CdbLauncher(QString tmpDir)
-    :
-    m_tmpDir(tmpDir),
+CdbLauncher::CdbLauncher(QString tmpDir):
+    db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
-    if (m_tmpDir.isEmpty())
-        m_tmpDir =
-            (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
-            "/cdb_ut.data";
-    QDir(m_tmpDir).removeRecursively();
-
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/level"); addArg("DEBUG2");
-    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-syncroLog/level"); addArg("DEBUG2");
+    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-dataDir"); addArg(testDataDir().toLatin1().constData());
+    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
+
+    const auto dbConnectionOptionsToUse = dbConnectionOptions();
 
     addArg("-db/driverName");
     addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
-        sConnectionOptions.driverType).toLatin1().constData());
+        dbConnectionOptionsToUse.driverType).toLatin1().constData());
 
-    if (!sConnectionOptions.hostName.isEmpty())
+    if (!dbConnectionOptionsToUse.hostName.isEmpty())
     {
         addArg("-db/hostName");
-        addArg(sConnectionOptions.hostName.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.hostName.toUtf8().constData());
     }
 
-    if (sConnectionOptions.port != 0)
+    if (dbConnectionOptionsToUse.port != 0)
     {
         addArg("-db/port");
-        addArg(QByteArray::number(sConnectionOptions.port).constData());
+        addArg(QByteArray::number(dbConnectionOptionsToUse.port).constData());
     }
 
     addArg("-db/name");
-    if (!sConnectionOptions.dbName.isEmpty())
-        addArg(sConnectionOptions.dbName.toUtf8().constData());
-    else
-        addArg(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+    addArg(dbConnectionOptionsToUse.dbName.toUtf8().constData());
 
-    if (!sConnectionOptions.userName.isEmpty())
+    if (!dbConnectionOptionsToUse.userName.isEmpty())
     {
         addArg("-db/userName");
-        addArg(sConnectionOptions.userName.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.userName.toUtf8().constData());
     }
 
-    if (!sConnectionOptions.password.isEmpty())
+    if (!dbConnectionOptionsToUse.password.isEmpty())
     {
         addArg("-db/password");
-        addArg(sConnectionOptions.password.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.password.toUtf8().constData());
     }
 
-    if (!sConnectionOptions.connectOptions.isEmpty())
+    if (!dbConnectionOptionsToUse.connectOptions.isEmpty())
     {
         addArg("-db/connectOptions");
-        addArg(sConnectionOptions.connectOptions.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.connectOptions.toUtf8().constData());
     }
 
-    addArg("-db/maxConnections"); addArg("3");
+    addArg("-db/maxConnections");
+    addArg(QByteArray::number(dbConnectionOptionsToUse.maxConnectionCount).constData());
 
     EMailManagerFactory::setFactory(
         [](const conf::Settings& /*settings*/){
@@ -98,8 +88,6 @@ CdbLauncher::CdbLauncher(QString tmpDir)
 CdbLauncher::~CdbLauncher()
 {
     stop();
-
-    QDir(m_tmpDir).removeRecursively();
 }
 
 bool CdbLauncher::waitUntilStarted()
@@ -112,7 +100,7 @@ bool CdbLauncher::waitUntilStarted()
         return false;
     m_port = httpEndpoints.front().port;
 
-    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+    m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
     //retrieving module info
     auto connection = m_connectionFactory->createConnection();
@@ -147,11 +135,6 @@ std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
 api::ModuleInfo CdbLauncher::moduleInfo() const
 {
     return m_moduleInfo;
-}
-
-QString CdbLauncher::testDataDir() const
-{
-    return m_tmpDir;
 }
 
 api::ResultCode CdbLauncher::addAccount(
@@ -203,9 +186,7 @@ api::ResultCode CdbLauncher::addAccount(
 
 std::string CdbLauncher::generateRandomEmailAddress() const
 {
-    std::ostringstream ss;
-    ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
-    return ss.str();
+    return test::BusinessDataGenerator::generateRandomEmailAddress();
 }
 
 api::ResultCode CdbLauncher::activateAccount(
@@ -427,7 +408,7 @@ api::ResultCode CdbLauncher::bindRandomSystem(
 api::ResultCode CdbLauncher::unbindSystem(
     const std::string& login,
     const std::string& password,
-    const std::string& systemID)
+    const std::string& systemId)
 {
     auto connection = connectionFactory()->createConnection();
     connection->setCredentials(login, password);
@@ -439,7 +420,7 @@ api::ResultCode CdbLauncher::unbindSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::unbindSystem,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     return resCode;
@@ -469,7 +450,7 @@ api::ResultCode CdbLauncher::getSystems(
 api::ResultCode CdbLauncher::getSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::vector<api::SystemDataEx>* const systems)
 {
     auto connection = connectionFactory()->createConnection();
@@ -482,7 +463,7 @@ api::ResultCode CdbLauncher::getSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::getSystem,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
     *systems = std::move(systemDataList.systems);
 
@@ -492,11 +473,11 @@ api::ResultCode CdbLauncher::getSystem(
 api::ResultCode CdbLauncher::getSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     api::SystemDataEx* const system)
 {
     std::vector<api::SystemDataEx> systems;
-    const auto res = getSystem(email, password, systemID, &systems);
+    const auto res = getSystem(email, password, systemId, &systems);
     if (res != api::ResultCode::ok)
         return res;
 
@@ -529,7 +510,7 @@ api::ResultCode CdbLauncher::shareSystem(
 api::ResultCode CdbLauncher::shareSystem(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -538,16 +519,25 @@ api::ResultCode CdbLauncher::shareSystem(
 
     api::SystemSharing systemSharing;
     systemSharing.accountEmail = accountEmail;
-    systemSharing.systemID = systemID;
+    systemSharing.systemId = systemId;
     systemSharing.accessRole = accessRole;
 
     return shareSystem(email, password, std::move(systemSharing));
 }
 
+api::ResultCode CdbLauncher::shareSystem(
+    const AccountWithPassword& grantor,
+    const std::string& systemId,
+    const std::string& accountEmail,
+    api::SystemAccessRole accessRole)
+{
+    return shareSystem(grantor.email, grantor.password, systemId, accountEmail, accessRole);
+}
+
 api::ResultCode CdbLauncher::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -556,7 +546,7 @@ api::ResultCode CdbLauncher::updateSystemSharing(
 
     api::SystemSharing systemSharing;
     systemSharing.accountEmail = accountEmail;
-    systemSharing.systemID = systemID;
+    systemSharing.systemId = systemId;
     systemSharing.accessRole = newAccessRole;
 
     api::ResultCode resCode = api::ResultCode::ok;
@@ -574,13 +564,13 @@ api::ResultCode CdbLauncher::updateSystemSharing(
 api::ResultCode CdbLauncher::removeSystemSharing(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& accountEmail)
 {
     return updateSystemSharing(
         email,
         password,
-        systemID,
+        systemId,
         accountEmail,
         api::SystemAccessRole::none);
 }
@@ -613,7 +603,7 @@ api::ResultCode CdbLauncher::getSystemSharings(
 api::ResultCode CdbLauncher::getAccessRoleList(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::set<api::SystemAccessRole>* const accessRoles)
 {
     auto connection = connectionFactory()->createConnection();
@@ -626,7 +616,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
             std::bind(
                 &nx::cdb::api::SystemManager::getAccessRoleList,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     for (const auto& accessRoleData : accessRoleList.accessRoles)
@@ -637,7 +627,7 @@ api::ResultCode CdbLauncher::getAccessRoleList(
 api::ResultCode CdbLauncher::renameSystem(
     const std::string& login,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& newSystemName)
 {
     auto connection = connectionFactory()->createConnection();
@@ -649,7 +639,7 @@ api::ResultCode CdbLauncher::renameSystem(
             std::bind(
                 &nx::cdb::api::SystemManager::rename,
                 connection->systemManager(),
-                systemID,
+                systemId,
                 newSystemName,
                 std::placeholders::_1));
     return resCode;
@@ -676,7 +666,7 @@ api::ResultCode CdbLauncher::updateSystem(
 api::ResultCode CdbLauncher::getSystemSharings(
     const std::string& email,
     const std::string& password,
-    const std::string& systemID,
+    const std::string& systemId,
     std::vector<api::SystemSharingEx>* const sharings)
 {
     typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
@@ -693,15 +683,40 @@ api::ResultCode CdbLauncher::getSystemSharings(
                 static_cast<GetCloudUsersOfSystemType>(
                     &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
                 connection->systemManager(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
 
     *sharings = std::move(data.sharing);
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemId,
+    const std::string& userOfInterestEmail,
+    api::SystemSharingEx* sharing)
+{
+    std::vector<api::SystemSharingEx> sharings;
+    const auto resultCode = getSystemSharings(email, password, systemId, &sharings);
+    if (resultCode != api::ResultCode::ok)
+        return resultCode;
+    const auto it = std::find_if(
+        sharings.cbegin(), sharings.cend(),
+        [&userOfInterestEmail](const api::SystemSharingEx& value)
+        {
+            return value.accountEmail == userOfInterestEmail;
+        });
+
+    if (it == sharings.cend())
+        return api::ResultCode::notFound;
+
+    *sharing = *it;
+    return api::ResultCode::ok;
+}
+
 api::ResultCode CdbLauncher::getCdbNonce(
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& authKey,
     api::NonceData* const nonceData)
 {
@@ -709,7 +724,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
         (std::function<void(api::ResultCode, api::NonceData)>);
 
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
+    connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode, *nonceData) =
@@ -724,7 +739,7 @@ api::ResultCode CdbLauncher::getCdbNonce(
 api::ResultCode CdbLauncher::getCdbNonce(
     const std::string& accountEmail,
     const std::string& accountPassword,
-    const std::string& systemID,
+    const std::string& systemId,
     api::NonceData* const nonceData)
 {
     typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
@@ -739,17 +754,17 @@ api::ResultCode CdbLauncher::getCdbNonce(
             std::bind(
                 static_cast<GetCdbNonceType>(&nx::cdb::api::AuthProvider::getCdbNonce),
                 connection->authProvider(),
-                systemID,
+                systemId,
                 std::placeholders::_1));
     return resCode;
 }
 
 api::ResultCode CdbLauncher::ping(
-    const std::string& systemID,
+    const std::string& systemId,
     const std::string& authKey)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(systemID, authKey);
+    connection->setCredentials(systemId, authKey);
 
     api::ResultCode resCode = api::ResultCode::ok;
     nx::cdb::api::ModuleInfo cloudModuleInfo;
@@ -765,13 +780,13 @@ api::ResultCode CdbLauncher::ping(
 const api::SystemSharingEx& CdbLauncher::findSharing(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const std::string& systemID) const
+    const std::string& systemId) const
 {
     static const api::SystemSharingEx kDummySharing;
 
     for (const auto& sharing : sharings)
     {
-        if (sharing.accountEmail == accountEmail && sharing.systemID == systemID)
+        if (sharing.accountEmail == accountEmail && sharing.systemId == systemId)
             return sharing;
     }
 
@@ -781,9 +796,9 @@ const api::SystemSharingEx& CdbLauncher::findSharing(
 api::SystemAccessRole CdbLauncher::accountAccessRoleForSystem(
     const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
-    const std::string& systemID) const
+    const std::string& systemId) const
 {
-    return findSharing(sharings, accountEmail, systemID).accessRole;
+    return findSharing(sharings, accountEmail, systemId).accessRole;
 }
 
 api::ResultCode CdbLauncher::fetchSystemData(
@@ -812,7 +827,7 @@ api::ResultCode CdbLauncher::recordUserSessionStart(
     const std::string& systemId)
 {
     auto connection = connectionFactory()->createConnection();
-    connection->setCredentials(account.data.email, account.password);
+    connection->setCredentials(account.email, account.password);
 
     api::ResultCode resCode = api::ResultCode::ok;
     std::tie(resCode) =
@@ -864,28 +879,8 @@ bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
         QFileDevice::ReadUser | QFileDevice::WriteUser);
 }
 
-void CdbLauncher::setTemporaryDirectoryPath(const QString& path)
-{
-    sTemporaryDirectoryPath = path;
-}
-
-QString CdbLauncher::temporaryDirectoryPath()
-{
-    return sTemporaryDirectoryPath;
-}
-
-void CdbLauncher::setDbConnectionOptions(
-    const nx::db::ConnectionOptions& connectionOptions)
-{
-    sConnectionOptions = connectionOptions;
-}
-
-nx::db::ConnectionOptions CdbLauncher::dbConnectionOptions()
-{
-    return sConnectionOptions;
-}
-
 namespace api {
+
 bool operator==(const api::AccountData& left, const api::AccountData& right)
 {
     return
@@ -896,8 +891,27 @@ bool operator==(const api::AccountData& left, const api::AccountData& right)
         left.customization == right.customization &&
         left.statusCode == right.statusCode;
 }
+
+} // namespace api
+
+//-------------------------------------------------------------------------------------------------
+// EmailManagerStub
+
+EmailManagerStub::EmailManagerStub(nx::cdb::AbstractEmailManager* const target):
+    m_target(target)
+{
 }
 
-}   //cdb
-}   //nx
+void EmailManagerStub::sendAsync(
+    const AbstractNotification& notification,
+    std::function<void(bool)> completionHandler)
+{
+    if (!m_target)
+        return;
+    m_target->sendAsync(
+        notification,
+        std::move(completionHandler));
+}
 
+} // namespace cdb
+} // namespace nx

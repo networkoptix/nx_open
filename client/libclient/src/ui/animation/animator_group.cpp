@@ -71,9 +71,9 @@ AbstractAnimator *AnimatorGroup::takeAnimator(int index) {
     AbstractAnimator *animator = m_animators[index];
     animator->m_group = NULL;
     m_animators.removeAt(index);
-    
+
     /* Removing from list before doing setParent to avoid infinite recursion in ChildRemoved event. */
-    animator->setParent(0); 
+    animator->setParent(0);
 
     if (m_animators.isEmpty())
         stop();
@@ -83,7 +83,13 @@ AbstractAnimator *AnimatorGroup::takeAnimator(int index) {
     return animator;
 }
 
-void AnimatorGroup::clear() {
+QList<AbstractAnimator*> AnimatorGroup::animators() const
+{
+    return m_animators;
+}
+
+void AnimatorGroup::clear()
+{
     qDeleteAll(m_animators);
 }
 

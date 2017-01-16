@@ -35,12 +35,12 @@ public:
     {
     public:
         /*!
-            QnAbstractPictureDataRef implementation MUST increment this value at object instanciation and decrement at object destruction
+            QnAbstractPictureDataRef implementation MUST increment this value at object instantiation and decrement at object destruction
         */
         std::atomic<int> externalRefCounter;
         //!Sequence counter incremented by the decoder to invalidate references to the picture
         /*!
-            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved
+            QnAbstractPictureDataRef implementation should save sequence number at object instantiation and compare saved
             value this one to check, whether its reference is still valid
         */
         std::atomic<int> sequence;
@@ -203,6 +203,7 @@ public:
     QnMetaDataV1Ptr metadata; // addition data associated with video frame
 
 private:
+    bool invalidScaleParameters(const QSize& size) const;
     static void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height);
     static bool equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, int stride1, int stride2, int height, int max_diff);
 

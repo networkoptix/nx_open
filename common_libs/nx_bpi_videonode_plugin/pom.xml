@@ -16,7 +16,7 @@
     <properties>
         <guid>${nx_bpi_videonode_plugin.guid}</guid>
         <product.title>${company.name} nx_bpi_videonode_plugin</product.title>
-
+        <rdep.linux.packages>opengl-es-mali</rdep.linux.packages>
         <qt.libs>core quick multimedia-private qtmultimediaquicktools-private</qt.libs>
         <buildLib>sharedlib</buildLib>
     </properties>

@@ -104,6 +104,20 @@
                 <version>1.1.1</version>
                 <executions>
                     <execution>
+                        <id>additional-build-steps</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${init.python.dir}/${python.executable}</executable>
+                            <arguments>
+                                <argument>build-prepare.py</argument>
+                            </arguments>
+                            <workingDirectory>${project.build.directory}</workingDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>gen-qrc</id>
                         <phase>process-sources</phase>
                         <goals>
@@ -121,20 +135,6 @@
                                 <ANDROID_NDK_TOOLCHAIN_VERSION>${android.toolchain.version}</ANDROID_NDK_TOOLCHAIN_VERSION>
                                 <ANDROID_NDK_PLATFORM>${android.platform}</ANDROID_NDK_PLATFORM>
                             </environmentVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>additional-build-steps</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${init.python.dir}/${python.executable}</executable>
-                            <arguments>
-                                <argument>build-prepare.py</argument>
-                            </arguments>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -213,25 +213,21 @@
                                     <ignoreErrors>true</ignoreErrors>
                                     <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
                                     <replacements>
-
                                         <replacement>
                                             <token>
-                                                <![CDATA[</RootNamespace>]]></token>
+                                                <![CDATA[release</ProgramDataBaseFileName>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[</RootNamespace>
-    <TargetName>${project.artifactId}</TargetName>]]></value>
+                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]>
+                                            </value>
                                         </replacement>
                                         <replacement>
                                             <token>
-                                                <![CDATA[release</ProgramDataBaseFileName>]]></token>
+                                                <![CDATA[debug</ProgramDataBaseFileName>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[release.pdb</ProgramDataBaseFileName>]]></value>
-                                        </replacement>
-                                        <replacement>
-                                            <token>
-                                                <![CDATA[debug</ProgramDataBaseFileName>]]></token>
-                                            <value>
-                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]></value>
+                                                <![CDATA[debug.pdb</ProgramDataBaseFileName>]]>
+                                            </value>
                                         </replacement>
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
@@ -245,31 +241,27 @@
                                             <value>None</value>
                                         </replacement>
 
-                                        <!-- Replacing GUIDs to predefined ones -->
-                                        <replacement>
-                                            <xpath>//Project/PropertyGroup</xpath>
-                                            <token><![CDATA[<ProjectGuid>\{(.*)}]]></token>
-                                            <value><![CDATA[<ProjectGuid>\${guid}]]></value>
-                                        </replacement>
-
                                         <!-- Adding target machine for x86 -->
                                         <replacement>
                                             <xpath>//Project/ItemDefinitionGroup</xpath>
-                                            <token><![CDATA[</Lib>]]></token>
-                                            <value><![CDATA[
+                                            <token>
+                                                <![CDATA[</Lib>]]>
+                                            </token>
+                                            <value>
+                                                <![CDATA[
       <TargetMachine>Machine${machine.type}</TargetMachine>
-    </Lib>]]></value>
+    </Lib>]]>
+                                            </value>
                                         </replacement>
-
-
-
 
                                         <!-- Enabling SEH exceptions for crash stack dump -->
                                         <replacement>
                                             <token>
-                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]></token>
+                                                <![CDATA[<ExceptionHandling>Sync</ExceptionHandling>]]>
+                                            </token>
                                             <value>
-                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]></value>
+                                                <![CDATA[<ExceptionHandling>Async</ExceptionHandling>]]>
+                                            </value>
                                         </replacement>
 
                                     </replacements>
@@ -351,6 +343,91 @@
             </build>
             <properties>
                 <rdep.global.packages>qt any/boost android/android-sdk android/android-ndk</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>isd</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>isd_s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>tx1</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>tx1</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.global.packages>qt any/boost sysroot gcc</rdep.global.packages>
             </properties>
         </profile>
 

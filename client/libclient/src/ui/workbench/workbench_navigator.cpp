@@ -409,6 +409,8 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
         return;
 
     m_timeSlider->setBookmarksVisible(enabled);
+    if (enabled)
+        qnCameraBookmarksManager->setEnabled(true); //not disabling it anymore
     emit bookmarksModeEnabledChanged();
 }
 
@@ -547,7 +549,7 @@ bool QnWorkbenchNavigator::setLive(bool live)
     }
     else
     {
-        m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: #Elric need to save position here.
+        m_timeSlider->setValue(m_timeSlider->maximum() - 1, false);
     }
     return true;
 }
@@ -638,7 +640,7 @@ qreal QnWorkbenchNavigator::speed() const
 void QnWorkbenchNavigator::setSpeed(qreal speed)
 {
     speed = qBound(minimalSpeed(), speed, maximalSpeed());
-    if (qFuzzyCompare(speed, this->speed()))
+    if (qFuzzyEquals(speed, this->speed()))
         return;
 
     if (!m_currentMediaWidget)
@@ -649,6 +651,9 @@ void QnWorkbenchNavigator::setSpeed(qreal speed)
         reader->setSpeed(speed);
 
         setPlaying(!qFuzzyIsNull(speed));
+
+        if (speed <= 0.0)
+            setLive(false);
 
         updateSpeed();
     }
@@ -1158,13 +1163,15 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentMediaWidget)
     {
-        executeDelayed(
+        const auto callback =
             [this]()
-        {
-            //TODO: #rvasilenko why should we make these delayed calls at all?
-            updatePlaying();
-            updateSpeed();
-        });
+            {
+                //TODO: #rvasilenko why should we make these delayed calls at all?
+                updatePlaying();
+                updateSpeed();
+            };
+
+        executeDelayedParented(callback, kDefaultDelay, this);
     }
 
     updateLocalOffset();
@@ -1348,7 +1355,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
     if (m_timeSlider->isSliderDown())
         return;
 
-    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
+    auto reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 #ifdef Q_OS_MAC
@@ -1427,15 +1434,15 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
+
+            //TODO: #vkutin Change this later:
+            /* Temporary fix until we redesign "initializing recording" state: */
+            if (m_isRecording && m_syncedWidgets.contains(m_currentMediaWidget))
+                m_recordingStartUtcMs = startTimeMSec;
         }
     }
 
-    bool fullRangeWindow = m_timeSlider->minimum() == m_timeSlider->windowStart()
-        && m_timeSlider->maximum() == m_timeSlider->windowEnd();
-
-    bool brandNewRange = m_timeSlider->minimum() != startTimeMSec;
-
-    if (brandNewRange || fullRangeWindow)
+    if (m_sliderWindowInvalid)
     {
         m_timeSlider->finishAnimations();
         m_timeSlider->invalidateWindow();
@@ -1809,7 +1816,7 @@ void QnWorkbenchNavigator::updatePlayingSupported()
 void QnWorkbenchNavigator::updateSpeed()
 {
     qreal speed = this->speed();
-    if (qFuzzyCompare(m_lastSpeed, speed))
+    if (qFuzzyEquals(m_lastSpeed, speed))
         return;
 
     m_lastSpeed = speed;
@@ -1824,7 +1831,7 @@ void QnWorkbenchNavigator::updateSpeedRange()
 {
     qreal minimalSpeed = this->minimalSpeed();
     qreal maximalSpeed = this->maximalSpeed();
-    if (qFuzzyCompare(minimalSpeed, m_lastMinimalSpeed) && qFuzzyCompare(maximalSpeed, m_lastMaximalSpeed))
+    if (qFuzzyEquals(minimalSpeed, m_lastMinimalSpeed) && qFuzzyEquals(maximalSpeed, m_lastMaximalSpeed))
         return;
 
     m_lastMinimalSpeed = minimalSpeed;
@@ -1938,7 +1945,7 @@ void QnWorkbenchNavigator::setAutoPaused(bool autoPaused)
         for (QHash<QnResourceDisplayPtr, bool>::iterator itr = m_autoPausedResourceDisplays.begin(); itr != m_autoPausedResourceDisplays.end(); ++itr)
         {
             itr.key()->play();
-            if (itr.value())
+            if (itr.value() && itr.key()->archiveReader())
                 itr.key()->archiveReader()->jumpTo(DATETIME_NOW, 0);
         }
 

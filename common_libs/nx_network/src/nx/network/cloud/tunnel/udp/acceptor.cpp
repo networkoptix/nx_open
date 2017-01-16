@@ -17,8 +17,8 @@ TunnelAcceptor::TunnelAcceptor(
 :
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
-    m_udpRetransmissionTimeout(stun::UDPClient::kDefaultRetransmissionTimeOut),
-    m_udpMaxRetransmissions(stun::UDPClient::kDefaultMaxRetransmissions)
+    m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
+    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions)
 {
 }
 
@@ -46,8 +46,7 @@ void TunnelAcceptor::accept(AcceptHandler handler)
                     m_mediatorConnection->remoteAddress(),
                     m_mediatorConnection->credentialsProvider());
 
-            m_udpMediatorConnection->socket()->bindToAioThread(
-                m_mediatorConnection->getAioThread());
+            m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());
             if (!m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress))
                 return executeAcceptHandler(SystemError::getLastOSErrorCode());
 
@@ -180,10 +179,16 @@ void TunnelAcceptor::executeAcceptHandler(
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_ASSERT(m_acceptHandler);
 
-    if (code != SystemError::noError && (!m_sockets.empty() || !m_connections.empty()))
+    if (code == SystemError::noError)
+    {
+        // Drop all other connections, as we do not need them any more.
+        m_sockets.clear();
+        m_connections.clear();
+    }
+    else if (!m_sockets.empty() || !m_connections.empty())
     {
         // It is to early to give up, while some connections are in progress
-        // let's wait for more results
+        // let's wait for more results.
         return;
     }
 

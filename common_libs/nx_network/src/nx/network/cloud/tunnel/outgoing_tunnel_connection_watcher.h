@@ -26,6 +26,8 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
+    virtual void start() override;
+
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
@@ -41,8 +43,7 @@ private:
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onTunnelClosedHandler;
 
     void launchInactivityTimer();
-    void onInactivityTimoutExpired();
-    void onTunnelClosed(SystemError::ErrorCode reason);
+    void closeTunnel(SystemError::ErrorCode reason);
 };
 
 } // namespace cloud

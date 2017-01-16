@@ -35,6 +35,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <nx/client/ui/workbench/workbench_animations.h>
+
 #include <ui/workbench/workbench_welcome_screen.h>
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
@@ -56,7 +58,6 @@
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
-#include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
@@ -85,6 +86,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
+#include <watchers/server_address_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -151,18 +153,18 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
     /* And file open events on Mac. */
-    QnSingleEventSignalizer *fileOpenSignalizer = new QnSingleEventSignalizer(this);
-    fileOpenSignalizer->setEventType(QEvent::FileOpen);
-    qApp->installEventFilter(fileOpenSignalizer);
-    connect(fileOpenSignalizer,             SIGNAL(activated(QObject *, QEvent *)),         this,                                   SLOT(at_fileOpenSignalizer_activated(QObject *, QEvent *)));
+    installEventHandler(qApp, QEvent::FileOpen, this, &QnMainWindow::at_fileOpenSignalizer_activated);
 
     /* Set up dwm. */
     m_dwm = new QnDwm(this);
 
-    connect(m_dwm,                          SIGNAL(compositionChanged()),                   this,                                   SLOT(updateDwmState()));
+    connect(m_dwm, &QnDwm::compositionChanged, this, &QnMainWindow::updateDwmState);
 
     /* Set up properties. */
     setWindowTitle(QString());
+
+    /* Initialize animations manager. */
+    context->instance<nx::client::ui::workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
@@ -222,9 +224,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchExportHandler>();
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
-#ifdef _DEBUG
     context->instance<QnWorkbenchDebugHandler>();
-#endif
     context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchWebPageHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
@@ -235,7 +235,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
-    context->instance<QnWorkbenchServerAddressWatcher>();
+    context->instance<QnServerAddressWatcher>();
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
@@ -285,7 +285,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::ToggleTourModeAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
-    addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
     addAction(action(QnActions::SystemAdministrationAction));
     if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))

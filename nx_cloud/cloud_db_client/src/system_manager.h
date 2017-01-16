@@ -14,15 +14,14 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-class SystemManager
-:
+class SystemManager:
     public api::SystemManager,
     public AsyncRequestsExecutor
 {
 public:
-    SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
 
     virtual void bindSystem(
         api::SystemRegistrationData registrationData,
@@ -58,7 +57,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

@@ -117,9 +117,15 @@ public:
 
     void setToolTipParent(QGraphicsWidget* widget);
 
+    bool isScrollBarVisible() const;
+
+    void hideToolTip();
+    void showToolTip();
+
 signals:
     void currentTabChanged();
     void selectionChanged();
+    void scrollBarVisibleChanged();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent* ) override;
@@ -155,11 +161,8 @@ private:
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
-    void hideToolTip();
-    void showToolTip();
-    void updateIcons();
 
-    void forceUpdateFilter() { updateFilter(true); }
+    void updateIcons();
 
     void at_tabWidget_currentChanged(int index);
 

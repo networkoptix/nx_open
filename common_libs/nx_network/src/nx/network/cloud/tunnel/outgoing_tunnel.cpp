@@ -52,9 +52,6 @@ void OutgoingTunnel::stopWhileInAioThread()
     m_connector.reset();
     m_connection.reset();
     m_timer.reset();
-
-    for (auto& connectRequest : m_connectHandlers)
-        connectRequest.second.handler(SystemError::interrupted, nullptr);
     m_connectHandlers.clear();
 }
 
@@ -84,7 +81,7 @@ void OutgoingTunnel::establishNewConnection(
                 [handler = std::move(handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
+                    bool tunnelStillValid) mutable
                 {
                     onConnectFinished(
                         std::move(handler),
@@ -286,11 +283,12 @@ void OutgoingTunnel::onConnectorFinished(
     }
 
     // Reporting error to everyone who is waiting.
-    auto connectHandlers = std::move(m_connectHandlers);
+    decltype(m_connectHandlers) connectHandlers;
+    connectHandlers.swap(m_connectHandlers);
     m_state = State::closed;
     m_lastErrorCode = errorCode;
     lk.unlock();
-    for (auto& connectRequest : connectHandlers)
+    for (auto& connectRequest: connectHandlers)
         connectRequest.second.handler(errorCode, nullptr);
     // Reporting tunnel failure.
     onTunnelClosed(errorCode);
@@ -304,8 +302,10 @@ void OutgoingTunnel::setTunnelConnection(
         std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
     m_state = State::connected;
 
+    NX_ASSERT(m_connection->getAioThread() == getAioThread());
+
     // We've connected to the host. Requesting client connections.
-    for (auto& connectRequest : m_connectHandlers)
+    for (auto& connectRequest: m_connectHandlers)
     {
         using namespace std::placeholders;
         m_connection->establishNewConnection(
@@ -314,7 +314,7 @@ void OutgoingTunnel::setTunnelConnection(
             [handler = std::move(connectRequest.second.handler), this](
                 SystemError::ErrorCode errorCode,
                 std::unique_ptr<AbstractStreamSocket> socket,
-                bool tunnelStillValid)
+                bool tunnelStillValid) mutable
             {
                 onConnectFinished(
                     std::move(handler),

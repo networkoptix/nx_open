@@ -47,7 +47,7 @@ private:
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
         stun::Message requestMessage,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode, api::ListenResponse)> completionHandler);
 
     void resolveDomain(
         const ConnectionStrongRef& connection,
@@ -67,7 +67,7 @@ private:
         const ConnectionStrongRef& connection,
         api::ClientBindRequest requestData,
         stun::Message requestMessage,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler);
 
 private:
     struct ClientBindInfo

@@ -45,6 +45,9 @@ public:
         auto socket = std::make_unique<network::cloud::CloudServerSocket>(
             currentContext.mediatorConnector->systemConnection());
 
+        if (connectionMethonds)
+            socket->setSupportedConnectionMethods(*connectionMethonds);
+
         currentContext.socket = socket.get();
         return std::move(socket);
     }
@@ -147,6 +150,7 @@ public:
 
     std::vector<SocketContext> socketContexts;
     boost::optional<SocketAddress> forwardedAddress;
+    boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
 };
 
 int runInListenMode(const nx::utils::ArgumentParser& args)
@@ -196,6 +200,9 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     if (const auto address = args.get("forward-address"))
     {
+        // TODO: uncoment when CLOUD-730 is fixed
+        // cloudServerSocketGenerator.connectionMethonds = hpm::api::ConnectionMethod::none;
+
         cloudServerSocketGenerator.forwardedAddress =
             address->isEmpty() ? localAddress : SocketAddress(*address);
 
@@ -221,10 +228,10 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             args.read("server-id", &serverId);
             serverIds.push_back(serverId.toUtf8());
 
-            int serverCount = 1;
+            size_t serverCount = 1;
             args.read("server-count", &serverCount);
-            for (int i = serverIds.size(); i < serverCount; i++)
-                serverIds.push_back((serverId + QString::number(i)).toUtf8());
+            for (size_t i = serverIds.size(); i < serverCount; i++)
+                serverIds.push_back(makeServerName(serverId, i));
         }
 
         for (auto& id : serverIds)
@@ -362,6 +369,12 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
+}
+
+String makeServerName(const QString& prefix, size_t number)
+{
+    static const QString kFormat = QLatin1String("%1-%2");
+    return kFormat.arg(prefix).arg((uint) number, 5, 10, QLatin1Char('0')).toUtf8();
 }
 
 void limitStringList(QStringList* list)

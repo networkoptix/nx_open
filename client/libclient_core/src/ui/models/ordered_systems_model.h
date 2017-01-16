@@ -3,6 +3,7 @@
 #include <QtCore/QSortFilterProxyModel>
 #include <client/system_weights_manager.h>
 
+class QnSystemsModel;
 class QnOrderedSystemsModel: public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -38,6 +39,7 @@ private:
     void softInvalidate();
 
 private:
+    QnSystemsModel * const m_source;
     QnWeightsDataHash m_weights;
     qreal m_unknownSystemsWeight;
 };

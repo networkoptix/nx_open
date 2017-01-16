@@ -15,12 +15,15 @@
 #include <ui/style/resource_icon_cache.h>
 
 
-class QnUserRoleSettingsWidgetPrivate : public Connective<QObject>
+class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
 
+    Q_DECLARE_TR_FUNCTIONS(QnUserRoleSettingsWidgetPrivate)
 public:
-    QnUserRoleSettingsWidgetPrivate(QnUserRoleSettingsWidget* parent, QnUserRolesSettingsModel* model) :
+    QnUserRoleSettingsWidgetPrivate(
+        QnUserRoleSettingsWidget* parent, QnUserRolesSettingsModel* model)
+        :
         base_type(parent),
         q_ptr(parent),
         model(model),
@@ -31,7 +34,7 @@ public:
         changeRadioButton(nullptr),
         replacementComboBox(nullptr)
     {
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        for (const auto& user: qnResPool->getResources<QnUserResource>())
             connectUserSignals(user);
 
         connect(qnResPool, &QnResourcePool::resourceAdded, this,
@@ -43,7 +46,7 @@ public:
 
                 connectUserSignals(user);
 
-                if (user->userGroup() == this->model->selectedRole())
+                if (user->userRoleId() == this->model->selectedUserRoleId())
                     userAddedOrUpdated(user);
             });
 
@@ -56,7 +59,7 @@ public:
 
                 disconnect(user, nullptr, this, nullptr);
 
-                if (user->userGroup() == this->model->selectedRole())
+                if (user->userRoleId() == this->model->selectedUserRoleId())
                     userMaybeRemoved(user);
             });
     }
@@ -67,14 +70,14 @@ public:
             [this](const QnResourcePtr& resource)
             {
                 auto user = resource.staticCast<QnUserResource>();
-                if (user->userGroup() == model->selectedRole())
+                if (user->userRoleId() == model->selectedUserRoleId())
                     userAddedOrUpdated(user);
             });
 
-        connect(user, &QnUserResource::userGroupChanged, this,
+        connect(user, &QnUserResource::userRoleChanged, this,
             [this](const QnUserResourcePtr& user)
             {
-                if (user->userGroup() == model->selectedRole())
+                if (user->userRoleId() == model->selectedUserRoleId())
                     userAddedOrUpdated(user);
                 else
                     userMaybeRemoved(user);
@@ -85,7 +88,7 @@ public:
     {
         QnUserResourceList users = model->users(true);
         usersModel->clear();
-        for (const auto& user : users)
+        for (const auto& user: users)
             addUser(user);
 
         correctUsersTable();
@@ -93,7 +96,8 @@ public:
 
     void addUser(const QnUserResourcePtr& user)
     {
-        auto item = new QStandardItem(qnResIconCache->icon(QnResourceIconCache::User), user->getName());
+        auto item = new QStandardItem(
+            qnResIconCache->icon(QnResourceIconCache::User), user->getName());
         item->setData(QVariant::fromValue<QnResourcePtr>(user), Qn::ResourceRole);
         usersModel->appendRow(item);
     }
@@ -109,17 +113,17 @@ public:
         return usersModel->data(usersModel->index(0, 0), Qn::ResourceRole).isValid();
     }
 
-    void deleteCurrentGroup()
+    void deleteCurrentUserRole()
     {
-        QnUserRolesSettingsModel::RoleReplacement replacement;
+        QnUserRolesSettingsModel::UserRoleReplacement replacement;
         if (hasUsers() && !queryRoleReplacement(replacement))
             return;
 
-        model->removeRole(model->selectedRole(), replacement);
+        model->removeUserRole(model->selectedUserRoleId(), replacement);
 
         /* If selection was changed to the replacement group then we
          *   must update its users list to include all new candidates: */
-        if (replacement.role == model->selectedRole())
+        if (replacement.userRoleId == model->selectedUserRoleId())
             resetUsers();
 
         Q_Q(QnUserRoleSettingsWidget);
@@ -169,15 +173,15 @@ public:
             usersModel->appendRow(new QStandardItem(tr("No users have this role")));
     }
 
-    bool queryRoleReplacement(QnUserRolesSettingsModel::RoleReplacement& replacement)
+    bool queryRoleReplacement(QnUserRolesSettingsModel::UserRoleReplacement& replacement)
     {
         ensureReplacementHelpers();
 
-        auto roles = model->roles();
+        auto roles = model->userRoles();
         auto selectedRole = std::find_if(roles.begin(), roles.end(),
-            [selectedId = model->selectedRole()](const ec2::ApiUserGroupData& role)
+            [selectedId = model->selectedUserRoleId()](const ec2::ApiUserRoleData& userRole)
             {
-                return role.id == selectedId;
+                return userRole.id == selectedId;
             });
 
         Qn::GlobalPermissions oldPermissions = Qn::NoGlobalPermissions;
@@ -208,14 +212,14 @@ public:
 
         if (deleteRadioButton->isChecked())
         {
-            replacement = QnUserRolesSettingsModel::RoleReplacement();
+            replacement = QnUserRolesSettingsModel::UserRoleReplacement();
             return true;
         }
 
         QModelIndex index = replacementRolesModel->index(replacementComboBox->currentIndex(), 0);
         NX_ASSERT(index.isValid());
 
-        replacement = QnUserRolesSettingsModel::RoleReplacement(
+        replacement = QnUserRolesSettingsModel::UserRoleReplacement(
             index.data(Qn::UuidRole).value<QnUuid>(),
             index.data(Qn::GlobalPermissionsRole).value<Qn::GlobalPermissions>());
 
@@ -267,7 +271,8 @@ private:
         layout->addWidget(changeRadioButton);
         layout->addWidget(replacementComboBox);
 
-        connect(changeRadioButton, &QRadioButton::toggled, replacementComboBox, &QComboBox::setEnabled);
+        connect(changeRadioButton, &QRadioButton::toggled,
+            replacementComboBox, &QComboBox::setEnabled);
 
         replacementMessageBox->addCustomWidget(customWidget);
     }
@@ -287,7 +292,9 @@ private:
     QComboBox* replacementComboBox;
 };
 
-QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* model, QWidget* parent /*= 0*/) :
+QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
+    QnUserRolesSettingsModel* model, QWidget* parent /*= 0*/)
+    :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::UserRoleSettingsWidget()),
@@ -299,7 +306,8 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
     ui->usersListTreeView->setModel(d->usersModel);
 
     ui->usersListTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
-    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(QnIndents()));
+    ui->usersListTreeView->setProperty(style::Properties::kSideIndentation,
+        QVariant::fromValue(QnIndents()));
 
     ui->nameInputField->setValidator(
         [this](const QString& text)
@@ -309,19 +317,19 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
                 return Qn::ValidationResult(tr("Role name cannot be empty."));
 
             auto model = d_ptr->model;
-            for (const auto& role: model->roles())
+            for (const auto& userRole: model->userRoles())
             {
-                if (role.id == model->selectedRole())
+                if (userRole.id == model->selectedUserRoleId())
                     continue;
 
-                if (role.name.trimmed().toLower() != name)
+                if (userRole.name.trimmed().toLower() != name)
                     continue;
 
                 return Qn::ValidationResult(tr("Role with same name already exists."));
             }
 
             auto predefined = qnUserRolesManager->predefinedRoles();
-            predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserGroup;
+            predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
             for (auto role: predefined)
             {
                 if (qnUserRolesManager->userRoleName(role).trimmed().toLower() != name)
@@ -341,7 +349,7 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(QnUserRolesSettingsModel* mod
         });
 
     connect(ui->deleteGroupButton, &QPushButton::clicked, d,
-        &QnUserRoleSettingsWidgetPrivate::deleteCurrentGroup);
+        &QnUserRoleSettingsWidgetPrivate::deleteCurrentUserRole);
 }
 
 QnUserRoleSettingsWidget::~QnUserRoleSettingsWidget()
@@ -358,7 +366,7 @@ void QnUserRoleSettingsWidget::loadDataToUi()
     Q_D(QnUserRoleSettingsWidget);
 
     QSignalBlocker blocker(ui->nameInputField);
-    ui->nameInputField->setText(d->model->roleName());
+    ui->nameInputField->setText(d->model->userRoleName());
 
     d->resetUsers();
 }
@@ -366,6 +374,6 @@ void QnUserRoleSettingsWidget::loadDataToUi()
 void QnUserRoleSettingsWidget::applyChanges()
 {
     Q_D(QnUserRoleSettingsWidget);
-    d->model->setRoleName(ui->nameInputField->text());
+    d->model->setUserRoleName(ui->nameInputField->text());
     emit hasChangesChanged();
 }

@@ -10,6 +10,10 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource_access/resource_access_subjects_cache.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
@@ -570,7 +574,7 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 {
     NX_ASSERT( action );
 
-    QStringList recipients = getRecipients(action);
+    QStringList recipients = action->getParams().emailAddress.split(kNewEmailDelimiter);
 
     if( recipients.isEmpty() )
     {
@@ -661,8 +665,6 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
-	QStringList recipients = getRecipients(action);
-
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
@@ -670,7 +672,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
+    SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
+        action->getParams().emailAddress); // all recipients are already computed and packed here
+
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
@@ -923,48 +927,52 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     return detailsMap;
 }
 
-QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
+/*
+* This method is called once per action, calculates all recipients and packs them into
+* emailAddress action parameter with new delimiter.
+*/
+void QnMServerBusinessRuleProcessor::updateRecipientsList(
+    const QnSendMailBusinessActionPtr& action) const
 {
-    QString email = action->getParams().emailAddress;
-    if (email.isEmpty())
-        return QStringList();
-    return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
-}
+    QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
+        QString::SkipEmptyParts);
 
-void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
-{
-    QStringList unfiltered = getRecipients(action);
-    auto allUsers = qnResPool->getResources<QnUserResource>();
-
-    QMap<QnUuid, QnUserResourceList> groups;
-    for (const auto& user : allUsers)
-        groups[user->userGroup()].push_back(user);
-
-    auto addUserToList = [&unfiltered](const QnUuid& id)
-    {
-        if (auto user = qnResPool->getResourceById<QnUserResource>(id))
-        {
-            unfiltered << user->getEmail();
-            return true;
-        }
-        return false;
-    };
-
-    for (const QnUuid& id : action->getResources())
-    {
-        if (!addUserToList(id)) //< add user by id
-        {
-            for (const auto& nestedUser : groups.value(id))
-                addUserToList(nestedUser->getId());  //< add user by group id
-        }
-    }
+    const auto ids = action->getResources();
+    const auto userRoles = qnUserRolesManager->userRoles(ids);
+    const auto users = qnResPool->getResources<QnUserResource>(ids);
 
     QStringList recipients;
-    for (const auto &addr: unfiltered)
+    auto addRecipient = [&recipients](const QString& email)
+        {
+            const QString simplified = email.trimmed().toLower();
+            if (simplified.isEmpty()) //fast check
+                return;
+
+            if (nx::email::isValidAddress(simplified))
+                recipients.append(simplified);
+        };
+
+
+    for (const auto& email: additional)
+        addRecipient(email);
+
+    for (const auto& user: users)
     {
-        QnEmailAddress email(addr);
-        if (email.isValid())
-            recipients << email.value();
+        if (user->isEnabled())
+            addRecipient(user->getEmail());
     }
+
+    for (const auto& userRole: userRoles)
+    {
+        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        {
+            const auto& user = subject.user();
+            NX_ASSERT(user);
+            if (user && user->isEnabled())
+                addRecipient(user->getEmail());
+        }
+    }
+
+    recipients.removeDuplicates();
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }

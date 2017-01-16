@@ -633,7 +633,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 
     if (d->bufferingCnt > 0) {
         d->gotCacheTime = 0;
-        return d->lastJumpTime;
+        return d->bufferingTime != (qint64) AV_NOPTS_VALUE ? d->bufferingTime : d->lastJumpTime;
     }
 
     if (d->bufferingTime != qint64(AV_NOPTS_VALUE)) {
@@ -686,7 +686,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     }
 
     qint64 displayedTime =  getDisplayedTimeInternal();
-    if (displayedTime == qint64(AV_NOPTS_VALUE) || displayedTime == DATETIME_NOW)
+    if (displayedTime == qint64(AV_NOPTS_VALUE) || displayedTime == DATETIME_NOW || qFuzzyIsNull(d->speed))
         return displayedTime;
     if (d->speed >= 0)
         return qMin(expectTime, displayedTime + SYNC_EPS);

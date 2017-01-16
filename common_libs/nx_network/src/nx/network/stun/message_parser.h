@@ -15,6 +15,7 @@
 #include <nx/network/buffer.h>
 
 #include "../connection_server/base_protocol_message_types.h"
+#include "stun_message_parser_buffer.h"
 
 namespace nx {
 namespace stun {
@@ -89,7 +90,6 @@ namespace stun {
             m_state = HEADER_INITIAL_AND_TYPE;
         }
     private:
-        class MessageParserBuffer;
         // Attribute value parsing
         attrs::Attribute* parseXORMappedAddress();
         attrs::Attribute* parseErrorCode();

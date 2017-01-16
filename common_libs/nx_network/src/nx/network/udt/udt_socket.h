@@ -98,7 +98,7 @@ class NX_NETWORK_API UdtStreamSocket
     public UdtSocket<AbstractStreamSocket>
 {
 public:
-    explicit UdtStreamSocket(int ipVersion);
+    explicit UdtStreamSocket(int ipVersion = AF_INET);
     UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -109,10 +109,6 @@ public:
 
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
-        const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-
-    virtual bool connectToIp(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
 
@@ -150,6 +146,8 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
 
@@ -162,10 +160,11 @@ class NX_NETWORK_API UdtStreamServerSocket
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:
-    UdtStreamServerSocket(int ipVersion);
+    explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);

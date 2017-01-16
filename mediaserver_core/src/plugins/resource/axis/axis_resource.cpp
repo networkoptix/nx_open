@@ -1418,7 +1418,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 
 QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
 {
-    if (!isInitialized() && !m_audioTransmitter->isInitialized())
+    if (!isInitialized())
         return nullptr;
 
     return m_audioTransmitter;
@@ -1535,6 +1535,9 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
     for (const auto& query: queries)
     {
+        if (QnResource::isStopping())
+            break;
+
         status = httpClient.doGET(query);
         if ( status == CL_HTTP_SUCCESS )
         {

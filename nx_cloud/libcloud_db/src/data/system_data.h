@@ -108,9 +108,9 @@ public:
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
 
 //!for requests passing just system id
-class SystemID
+class SystemId
     :
-    public api::SystemID,
+    public api::SystemId,
     public stree::AbstractResourceReader
 {
 public:
@@ -137,7 +137,7 @@ class UserSessionDescriptor
 };
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemId),
     (sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

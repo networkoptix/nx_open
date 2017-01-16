@@ -10,8 +10,7 @@ Object
     property alias resourceId: resourceHelper.resourceId
 
     readonly property bool serverOffline:
-        connectionManager.connectionState == QnConnectionManager.Connecting
-        || connectionManager.connectionState == QnConnectionManager.Disconnected
+        connectionManager.connectionState === QnConnectionManager.Reconnecting
     readonly property bool cameraOffline:
         mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
     readonly property bool cameraUnauthorized:
@@ -41,7 +40,7 @@ Object
     {
         id: d
         property bool resumeOnActivate: false
-        property bool resumeAtLive: false
+        property bool resumeOnOnline: false
     }
 
     QnMediaResourceHelper
@@ -87,12 +86,24 @@ Object
     onFailedChanged:
     {
         if (failed)
+        {
+            d.resumeOnOnline = offline
             mediaPlayer.stop()
+        }
+    }
+
+    onOfflineChanged:
+    {
+        if (!offline && d.resumeOnOnline)
+        {
+            d.resumeOnOnline = false
+            mediaPlayer.play()
+        }
     }
 
     Component.onCompleted:
     {
-        if (cameraOffline || cameraUnauthorized)
+        if (cameraOffline || cameraUnauthorized || resourceId == "")
             return
 
         mediaPlayer.playLive()

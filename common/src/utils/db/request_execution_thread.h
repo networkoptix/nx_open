@@ -7,6 +7,7 @@
 #include <utils/common/long_runnable.h>
 
 #include "base_request_executor.h"
+#include "db_connection_holder.h"
 #include "request_executor.h"
 
 namespace nx {
@@ -16,15 +17,14 @@ namespace db {
  * Connection can be closed by timeout or due to error. 
  * Use DbRequestExecutionThread::isOpen to test it.
  */
-class DbRequestExecutionThread
-:
+class DbRequestExecutionThread:
     public BaseRequestExecutor
 {
 public:
     DbRequestExecutionThread(
         const ConnectionOptions& connectionOptions,
         QueryExecutorQueue* const queryExecutorQueue);
-    virtual ~DbRequestExecutionThread();
+    virtual ~DbRequestExecutionThread() override;
 
     virtual void pleaseStop() override;
     virtual void join() override;
@@ -33,24 +33,16 @@ public:
     virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void start() override;
 
-    /**
-     * Establishes connection to DB.
-     * This method MUST be called after class instanciation
-     * @note Method is needed because we do not use exceptions
-     */
-    bool open();
-
 private:
-    QSqlDatabase m_dbConnection;
     std::atomic<ConnectionState> m_state;
     nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
     nx::utils::thread m_queryExecutionThread;
     std::atomic<bool> m_terminated;
     int m_numberOfFailedRequestsInARow;
+    DbConnectionHolder m_dbConnectionHolder;
+    const nx::utils::QueueReaderId m_queueReaderId;
 
     void queryExecutionThreadMain();
-    bool tuneConnection();
-    bool tuneMySqlConnection();
     void processTask(std::unique_ptr<AbstractExecutor> task);
     void closeConnection();
 

@@ -19,6 +19,7 @@
 #include "http/custom_headers.h"
 #include "common/common_module.h"
 #include "utils/gzip/gzip_compressor.h"
+#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -173,6 +174,21 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = 0;
         sended = d->socket->send(data, size);
+
+        if (sended < 0 && SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+        {
+            unsigned int sendTimeout = 0;
+            if (!d->socket->getSendTimeout(&sendTimeout))
+                return false;
+            const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
+            nx::network::aio::UnifiedPollSet pollSet;
+            if (!pollSet.add(d->socket->pollable(), nx::network::aio::etWrite))
+                return false;
+            if (pollSet.poll(kPollTimeout) < 1)
+                return false;
+            continue; //< socket in async mode
+        }
+
         if( sended <= 0 )
             break;
         data += sended;
@@ -199,7 +215,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -248,7 +264,14 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
 
-    QnMutexLocker lock( &d->sockMutex );
+    return response;
+}
+
+void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+{
+    Q_D(QnTCPConnectionProcessor);
+    auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary, displayDebug);
+    QnMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
 }
 
@@ -449,6 +472,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->accessRights = d->accessRights;
+    other.d_ptr->authenticatedOnce = d->authenticatedOnce;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

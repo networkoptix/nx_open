@@ -27,7 +27,7 @@ public:
 class SystemAttributesUpdate
 {
 public:
-    std::string systemID;
+    std::string systemId;
     boost::optional<std::string> name;
     boost::optional<std::string> opaque;
 };
@@ -37,7 +37,7 @@ enum class SystemStatus
     // TODO: #ak remove "ss" prefix.
     ssInvalid = 0,
     /**
-     * System has been bound but not a single request from 
+     * System has been bound but not a single request from
      * that system has been received by cloud.
      */
     ssNotActivated,
@@ -116,9 +116,9 @@ class SystemSharing
 {
 public:
     std::string accountEmail;
-    std::string systemID;
+    std::string systemId;
     SystemAccessRole accessRole;
-    std::string groupID;
+    std::string userRoleId;
     std::string customPermissions;
     bool isEnabled;
     //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
@@ -135,14 +135,14 @@ public:
     {
         if (accountEmail != rhs.accountEmail)
             return accountEmail < rhs.accountEmail;
-        return systemID < rhs.systemID;
+        return systemId < rhs.systemId;
     }
     bool operator==(const SystemSharing& rhs) const
     {
         return accountEmail == rhs.accountEmail
-            && systemID == rhs.systemID
+            && systemId == rhs.systemId
             && accessRole == rhs.accessRole
-            && groupID == rhs.groupID
+            && userRoleId == rhs.userRoleId
             && customPermissions == rhs.customPermissions
             && isEnabled == rhs.isEnabled;
     }
@@ -169,7 +169,7 @@ public:
     }
 
     /** Globally unique account id. */
-    std::string accountID;
+    std::string accountId;
     std::string accountFullName;
     /** Shows how often user accesses given system in comparison to other user's systems. */
     float usageFrequency;
@@ -178,7 +178,7 @@ public:
     bool operator==(const SystemSharingEx& rhs) const
     {
         return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
-            && accountID == rhs.accountID
+            && accountId == rhs.accountId
             && accountFullName == rhs.accountFullName;
     }
 };
@@ -230,7 +230,7 @@ public:
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
     /**
-     * This number shows how often user, performing request, 
+     * This number shows how often user, performing request,
      * uses this system in comparision to other systems.
      */
     float usageFrequency;

@@ -34,7 +34,6 @@
 #include <ui/style/custom_style.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
-#include <ui/widgets/properties/camera_settings_tab.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
@@ -42,9 +41,12 @@
 
 #include <ui/common/geometry.h>
 #include <ui/common/palette.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
+#include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
@@ -89,17 +91,12 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     setTabShape(ui->mainTabWidget->tabBar(), style::TabShape::Compact);
     setTabShape(ui->detailsTabWidget->tabBar(), style::TabShape::Compact);
 
-    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, &QnAuditLogDialog::updateTabWidgetSize);
+    autoResizePagesToContents(ui->mainTabWidget,
+        { QSizePolicy::Fixed, QSizePolicy::Preferred }, true);
 
     /* Setup details label and its aligning by detailsTabWidget: */
-    QnSingleEventSignalizer* resizeSignalizer = new QnSingleEventSignalizer(this);
-    resizeSignalizer->setEventType(QEvent::Resize);
-    ui->detailsTabWidget->installEventFilter(resizeSignalizer);
-
     m_detailsLabel = new QLabel(ui->detailsTabWidget);
-    m_detailsLabel->installEventFilter(resizeSignalizer);
-
-    connect(resizeSignalizer, &QnAbstractEventSignalizer::activated, this,
+    installEventHandler({ ui->detailsTabWidget, m_detailsLabel }, QEvent::Resize, this,
         [this]()
         {
             m_detailsLabel->move(
@@ -124,7 +121,6 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->clearFilterButton->setIcon(qnSkin->icon("buttons/clear.png"));
-    ui->loadingProgressBar->hide();
 
     connect(ui->mainTabWidget,  &QTabWidget::currentChanged,    this, &QnAuditLogDialog::at_currentTabChanged);
 
@@ -161,6 +157,32 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
         {
             ui->gridDetails->unsetCursor();
         });
+
+    /*
+    * Create auto-hiders which will hide empty tables and show a message instead.
+    * Tables will be reparented. Snapped scrollbars are already created
+    * and will stay in correct parents.
+    */
+    QnItemViewAutoHider::create(ui->gridMaster, tr("No sessions"));
+    QnItemViewAutoHider::create(ui->gridCameras, tr("No cameras"));
+
+    auto detailsAutoHider = QnItemViewAutoHider::create(ui->gridDetails);
+
+    auto updateDetailsEmptyMessage =
+        [detailsAutoHider](int currentTab)
+        {
+            detailsAutoHider->setEmptyViewMessage(currentTab == SessionTab
+                ? tr("Select sessions to see their details")
+                : tr("Select cameras to see their details"));
+        };
+
+    connect(ui->mainTabWidget, &QTabWidget::currentChanged, this, updateDetailsEmptyMessage);
+    updateDetailsEmptyMessage(ui->mainTabWidget->currentIndex());
+
+    connect(detailsAutoHider, &QnItemViewAutoHider::viewVisibilityChanged,
+        m_detailsLabel, &QWidget::setHidden);
+
+    m_detailsLabel->setHidden(detailsAutoHider->isViewHidden());
 }
 
 QnAuditLogDialog::~QnAuditLogDialog()
@@ -474,6 +496,10 @@ void QnAuditLogDialog::at_filterChanged()
         }
         m_camerasModel->setData(cameras);
     }
+
+    ui->mainTabWidget->resize(
+        ui->mainTabWidget->sizeHint().width(),
+        ui->mainTabWidget->height());
 }
 
 void QnAuditLogDialog::at_updateDetailModel()
@@ -513,9 +539,6 @@ void QnAuditLogDialog::at_updateDetailModel()
     }
 
     ui->gridDetails->setUpdatesEnabled(true);
-    ui->gridDetails->update();
-
-    updateTabWidgetSize();
 }
 
 void QnAuditLogDialog::at_updateCheckboxes()
@@ -737,12 +760,6 @@ void QnAuditLogDialog::reset()
     enableUpdateData();
 }
 
-void QnAuditLogDialog::updateTabWidgetSize()
-{
-    auto widget = ui->mainTabWidget->currentWidget();
-    ui->mainTabWidget->setFixedWidth(widget->sizeHint().width());
-}
-
 void QnAuditLogDialog::updateData()
 {
     if (m_updateDisabled)
@@ -759,11 +776,8 @@ void QnAuditLogDialog::updateData()
 
     if (!m_requests.isEmpty())
     {
-        ui->gridMaster->setDisabled(true);
-        ui->gridCameras->setDisabled(true);
-        ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
+        ui->stackedWidget->setCurrentWidget(ui->progressPage);
     }
     else
     {
@@ -869,19 +883,8 @@ void QnAuditLogDialog::requestFinished()
 
     at_filterChanged();
 
-    ui->gridMaster->setDisabled(false);
-    ui->gridCameras->setDisabled(false);
+    ui->stackedWidget->setCurrentWidget(ui->gridPage);
     setCursor(Qt::ArrowCursor);
-    /*
-    if (ui->dateEditFrom->dateTime() != ui->dateEditTo->dateTime())
-        ui->statusLabel->setText(tr("Audit trail for period from %1 to %2 - %n session(s) found", "", m_sessionModel->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate))
-        .arg(ui->dateEditTo->dateTime().date().toString(Qt::SystemLocaleLongDate)));
-    else
-        ui->statusLabel->setText(tr("Audit trail for %1 - %n session(s) found", "", m_sessionModel->rowCount())
-        .arg(ui->dateEditFrom->dateTime().date().toString(Qt::SystemLocaleLongDate)));
-    */
-    ui->loadingProgressBar->hide();
 }
 
 void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)

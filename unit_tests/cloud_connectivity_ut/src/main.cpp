@@ -1,4 +1,6 @@
+#include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
+#include <utils/db/test_support/test_with_db_helper.h>
 
 #define USE_GMOCK
 #include <nx/utils/test_support/run_test.h>
@@ -7,9 +9,10 @@ int main(int argc, char **argv)
 {
     return nx::utils::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser&)
+        [](const nx::utils::ArgumentParser& args)
         {
-            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-                SocketAddress::anyAddress);
+            nx::network::SslEngine::useRandomCertificate("cloud_connect_ut");
+            if (const auto value = args.get("tmp"))
+                nx::db::test::TestWithDbHelper::setTemporaryDirectoryPath(*value);
         });
 }
