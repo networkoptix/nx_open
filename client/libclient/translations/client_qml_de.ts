@@ -12,7 +12,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check your network connection or press &quot;Connect to System&quot; button to enter known server address</source>
+        <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -71,19 +71,15 @@
         <source>New System</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UNREACHABLE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>WelcomeScreen</name>
     <message>
         <source>Nothing found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to Another System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -93,6 +89,14 @@
     <message>
         <source>Loading...</source>
         <translation type="unfinished">Lade...</translation>
+    </message>
+    <message>
+        <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
