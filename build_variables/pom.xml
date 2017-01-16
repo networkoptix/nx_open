@@ -208,9 +208,15 @@
                                 <configuration>
                                     <executable>${init.python.dir}/${python.executable}</executable>
                                     <arguments>
-                                        <argument>${project.build.directory}/get_cloud_url.py</argument>
+                                        <argument>get_cloud_url.py</argument>
+                                        <argument>--target=${project.build.directory}/cloud_instance.properties</argument>
+                                        <argument>--instance=${cloud.group}</argument>
+                                        <argument>--customization=${customization}</argument>
+                                        <argument>--verbose</argument>
+                                        <argument>--host=${cloud.host}</argument>                                        
+                                        <argument>--timeout=10</argument>
                                     </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                    <workingDirectory>${root.dir}/build_utils/python</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
