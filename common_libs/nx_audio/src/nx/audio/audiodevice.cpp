@@ -42,7 +42,7 @@ struct ALCdevice_struct
 
 int AudioDevice::internalBufferInSamples(ALCdevice* device)
 {
-#if defined(Q_OS_MACX)
+#if defined(Q_OS_MACX) || defined(Q_OS_IOS)
     /**
      * Looks like Mac OS has a bug in the standard OpenAL implementation.
      * It returns invalid pointer with alcOpenDevice (0x18) and alcCreateContext(0x19).
