@@ -30,7 +30,11 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
+#ifdef Q_OS_ANDROID
     m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+#else
+    m_size = 0;
+#endif
     if (m_size == 0)
     {
         m_size = bitRate() / 32; // use 30+ ms buffers
