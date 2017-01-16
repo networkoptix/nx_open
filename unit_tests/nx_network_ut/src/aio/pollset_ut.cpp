@@ -19,10 +19,6 @@ public:
         setPollset(&m_pollset);
     }
 
-    ~PollSet()
-    {
-    }
-
 protected:
     virtual void simulateSocketEvents(int /*events*/) override
     {

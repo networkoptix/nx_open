@@ -5,14 +5,6 @@ namespace network {
 namespace aio {
 namespace test {
 
-CommonPollSetTest::CommonPollSetTest()
-{
-}
-
-CommonPollSetTest::~CommonPollSetTest()
-{
-}
-
 void CommonPollSetTest::setPollset(AbstractPollSet* pollset)
 {
     m_pollset = pollset;

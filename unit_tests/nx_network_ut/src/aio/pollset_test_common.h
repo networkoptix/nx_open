@@ -23,9 +23,6 @@ class CommonPollSetTest
     typedef void(SelfType::*TestFuncType)();
 
 public:
-    CommonPollSetTest();
-    ~CommonPollSetTest();
-
     void setPollset(AbstractPollSet* pollset);
 
     template<typename ActualTestClassImplementation>
