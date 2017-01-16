@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <QtCore/QElapsedTimer>
@@ -7,7 +6,7 @@
 #include <network/base_system_description.h>
 #include <nx/utils/uuid.h>
 
-class QnSystemDescription : public QnBaseSystemDescription
+class QnSystemDescription: public QnBaseSystemDescription
 {
     Q_OBJECT
 
@@ -43,7 +42,7 @@ public: // overrides
 
     bool isReachable() const override;
 
-    bool isConnectible() const override;
+    bool isConnectable() const override;
 
     bool safeMode() const override;
 

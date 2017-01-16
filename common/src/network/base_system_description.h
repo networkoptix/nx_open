@@ -64,7 +64,7 @@ public:
 
     virtual bool isReachable() const = 0;
 
-    virtual bool isConnectible() const = 0;
+    virtual bool isConnectable() const = 0;
 
     virtual bool safeMode() const = 0;
 
@@ -83,7 +83,7 @@ signals:
 
     void reachableStateChanged();
 
-    void connectibleStateChanged();
+    void connectableStateChanged();
 
     void safeModeStateChanged();
 

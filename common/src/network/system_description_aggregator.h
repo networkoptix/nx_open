@@ -43,7 +43,7 @@ public: // overrides
 
     bool isReachable() const override;
 
-    bool isConnectible() const override;
+    bool isConnectable() const override;
 
     ServersList servers() const override;
 
@@ -70,7 +70,7 @@ private:
 
     void handleServerChanged(const QnUuid& serverId, QnServerFields fields);
 
-    bool invalidSystem() const;
+    bool isEmptyAggregator() const;
 
 private:
     typedef QMap<int, QnSystemDescriptionPtr> SystemsMap;

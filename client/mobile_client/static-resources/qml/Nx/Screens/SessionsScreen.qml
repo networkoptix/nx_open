@@ -78,7 +78,7 @@ Page
             localId: model.localId
             cloudSystem: model.isCloudSystem
             ownerDescription: cloudSystem ? model.ownerDescription : ""
-            online: model.isConnectible
+            online: model.isConnectable
             compatible: model.isCompatible
             invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
         }

@@ -233,7 +233,7 @@ Rectangle
 
                         isRunning: model.isRunning;
                         isReachable: model.isReachable;
-                        isConnectible: model.isConnectible;
+                        isConnectable: model.isConnectable;
 
                         Component.onCompleted:
                         {
