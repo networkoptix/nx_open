@@ -123,6 +123,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_userEnabledButton->setVisible(false);
     setHelpTopic(m_userEnabledButton, Qn::UserSettings_DisableUser_Help);
 
+    ui->alertBar->setReservedSpace(false);
+
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 
@@ -295,7 +297,6 @@ void QnUserSettingsDialog::loadDataToUi()
     m_userEnabledButton->setChecked(userIsEnabled);
     if (!userIsEnabled)
         ui->alertBar->setText(tr("User is disabled"));
-    ui->alertBar->setVisible(!ui->alertBar->text().isEmpty());
 }
 
 void QnUserSettingsDialog::forcedUpdate()
