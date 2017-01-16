@@ -54,6 +54,11 @@ static const GLfloat g_texture_data[] = {
     0.f, 1.f
 };
 
+
+/**
+ * Convert codec from ffmpeg enum to Android codec string representation.
+ * Only codeccs listed below are supported by AndroidVideoDecoder.
+ */
 static QString codecToString(AVCodecID codecId)
 {
     switch(codecId)
@@ -476,7 +481,7 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
     const QSize maxSize = AndroidVideoDecoderPrivate::maxResolutions[codec];
 
     if (maxSize.isEmpty())
-        return true;
+        return false;
 
     if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
     {
