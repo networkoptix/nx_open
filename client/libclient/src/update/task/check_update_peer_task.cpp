@@ -186,6 +186,32 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
         : QnCheckForUpdateResult::NoNewerVersion;
 }
 
+bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
+{
+    if (qnRuntime->isDevMode())
+        return true;
+
+    // Check if all server's version is not higher then target. Server downgrade is prohibited.
+    return boost::algorithm::all_of(m_target.targets,
+        [targetVersion = m_target.version]
+        (const QnUuid& serverId)
+        {
+            const auto server = qnResPool->getIncompatibleResourceById(serverId, true)
+                .dynamicCast<QnMediaServerResource>();
+            if (!server)
+                return true;
+
+            const auto status = server->getStatus();
+
+            // Ignore invalid servers, they will not be updated
+            if (status == Qn::Offline || status == Qn::Unauthorized)
+                return true;
+
+            return server->getVersion() <= targetVersion;
+        }
+    );
+}
+
 void QnCheckForUpdatesPeerTask::checkBuildOnline()
 {
     QUrl url(lit("%1/%2/%3")
@@ -363,32 +389,10 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
 
     m_cloudHost = buildInformation.cloudHost;
 
-    const bool checkDowngrade = !qnRuntime->isDevMode();
-    if (checkDowngrade)
+    if (!isDowngradeAllowed())
     {
-        QnSoftwareVersion highestVersion;
-        for (const auto& serverId : m_target.targets)
-        {
-            const auto server = qnResPool->getIncompatibleResourceById(serverId, true)
-                .dynamicCast<QnMediaServerResource>();
-            if (!server)
-                continue;
-
-            const auto status = server->getStatus();
-            if (status == Qn::Offline || status == Qn::Unauthorized)
-                continue;
-
-            const auto version = server->getVersion();
-            if (version > highestVersion)
-                highestVersion = version;
-        }
-
-        /* Server downgrade is prohibited. Client could be downgraded with no limits. */
-        if (!highestVersion.isNull() && m_target.version < highestVersion)
-        {
-            finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
-            return;
-        }
+        finishTask(QnCheckForUpdateResult::DowngradeIsProhibited);
+        return;
     }
 
     const auto urlPrefix = lit("%1/%2/").arg(m_updateLocationPrefix).arg(m_target.version.build());
