@@ -250,7 +250,7 @@ bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolu
     if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
         return true;
 
-    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %1 x %2")
+    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
         .arg(maxRes.width()).arg(maxRes.height())
         .arg(resolution.width()).arg(resolution.height()),
         cl_logWARNING);
