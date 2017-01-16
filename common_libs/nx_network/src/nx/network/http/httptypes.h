@@ -324,6 +324,7 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        BufferType toString() const;
     };
 
     class NX_NETWORK_API StatusLine
@@ -342,6 +343,7 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        BufferType toString() const;
     };
 
     void NX_NETWORK_API serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
@@ -366,7 +368,7 @@ namespace nx_http
         */
         void serialize( BufferType* const dstBuffer ) const;
         BufferType serialized() const;
-
+        BufferType toString() const;
         BufferType getCookieValue(const BufferType& name) const;
     };
 
