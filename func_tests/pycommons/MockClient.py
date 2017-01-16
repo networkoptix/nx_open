@@ -13,21 +13,27 @@ DEFAULT_PASSWORD = 'admin'
 
 HTTP_OK = 200
 
+def params2url(params):
+    def param2str(r):
+        name, val = r
+        return "%s=%s" % (name, val)
+    return "&".join(map(param2str, params.items()))
+
+class ServerResponse:
+    
+    def __init__(self, status, error = None, headers = {}):
+        self.status = status
+        self.headers = headers
+        self.error = error
+
 class Client:
 
     currentIdx = 0
 
-    class ServerResponse:
-
-        def __init__(self, status, error = None, headers = {}):
-            self.status = status
-            self.headers = headers
-            self.error = error
-
     class ServerResponseData(ServerResponse):
 
         def __init__(self, request, response):
-            Client.ServerResponse.__init__(
+            ServerResponse.__init__(
                 self, response.getcode(), headers = response.info())
             self.request = request
             self.response = response
@@ -47,19 +53,13 @@ class Client:
         Client.currentIdx += 1
         self.index = Client.currentIdx
 
-    def _params2url(self, params):
-        def param2str(r):
-            name, val = r
-            return "%s=%s" % (name, val)
-        return "&".join(map(param2str, params.items()))
-
     def _processRequest(self, request):
         return urllib2.urlopen(request, timeout = self._timeout)
 
     def httpRequest(
         self, address, method, data = None, headers={},  **kw):
         url = "http://%s/%s" % (address, method)
-        params = self._params2url(kw)
+        params = params2url(kw)
         if params:
             url+= '?' + params
         if data:
@@ -74,10 +74,10 @@ class Client:
             return response
         except urllib2.HTTPError, x:
             FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET HTTP error '%s'" % (self.index, str(x)))
-            return Client.ServerResponse(x.code, x.reason, x.hdrs)
+            return ServerResponse(x.code, x.reason, x.hdrs)
         except urllib2.URLError, x:
             FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d GET URL error '%s'" % (self.index, str(x)))
-            return Client.ServerResponse(None, x.reason, {})
+            return ServerResponse(None, x.reason, {})
 
 class BasicAuthClient(Client):
 
@@ -137,6 +137,8 @@ class DigestAuthClient(BasicAuthClient):
                     raise
                 FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d got unexpected HTTP status BadStatusLine %s" % (self.index, str(x)))
 
+
+
 class ClientMixin(ComparisonMixin):
 
     def setUp(self):
@@ -175,5 +177,3 @@ class ClientMixin(ComparisonMixin):
             address, method, data, headers, **kw)
         self.checkResponseError(response, method, status)
         return response
-
-                

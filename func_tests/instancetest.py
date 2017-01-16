@@ -22,10 +22,10 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
     _test_key = 'instance'
     # Test suites
     _suites = ( ('SingeServerInstanceSuits', [
-        # 'testCreateAndCheck',
-        # 'testNonExistUserGroup',
-        # 'testRemoveChildObjects',
-        # 'testServerHeader',
+        'testCreateAndCheck',
+        'testNonExistUserGroup',
+        'testRemoveChildObjects',
+        'testServerHeader',
         'testStaticVulnerability']), )
 
     def setUp(self):
