@@ -60,6 +60,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 namespace
 {
@@ -190,6 +191,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
+
+    // Wait while deleteLater objects will be freed
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+    waitingForObjectsToBeFreed.join();
 
     return result;
 }
