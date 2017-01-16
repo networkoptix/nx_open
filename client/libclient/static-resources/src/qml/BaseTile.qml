@@ -447,19 +447,24 @@ Item
                 {
                     id: areaLoader;
 
+                    property bool visibleIndicators:
+                        (primaryIndicator.visible || otherIndicator.visible);
                     anchors.left: parent.left;
-                    anchors.right: parent.right;
+                    anchors.right: (visibleIndicators
+                        ? indicatorsRow.left
+                        : parent.right);
                     anchors.top: systemNameLabel.bottom;
 
                     anchors.leftMargin: 12;
-                    anchors.rightMargin: 16;
+                    anchors.rightMargin: (visibleIndicators ? 0 : 16);
 
                     sourceComponent: control.centralAreaDelegate;
                 }
 
-
                 Row
                 {
+                    id: indicatorsRow;
+
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.rightMargin: 14;
