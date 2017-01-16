@@ -115,12 +115,13 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
 
         self.stopCameraRecording(self.serverAddr1, serverGuid1)
 
-        # https://networkoptix.atlassian.net/browse/VMS-4180`
+        # https://networkoptix.atlassian.net/browse/VMS-4180
         # HLS m3u list request with duration
         client = HlsClient(timeout = 30.0)
         response = client.requestM3U(
             self.serverAddr1,
-            "{%s}" % self.guids[0], self.cameraData)
+            "{%s}" % self.guids[0], self.cameraData, duration = 3000)
+        
         self.assertTrue(len(response.m3uList) > 0,
           "Unexpected M3U playlist size: %d" % len(response.m3uList))
         
