@@ -416,7 +416,7 @@ class TestSocket:
     public TCPSocket
 {
 public:
-    TestSocket(std::tuple<SocketAddress, nx::utils::promise<void>*, nx::utils::promise<void>*> args):
+    TestSocket(std::tuple<SocketAddress, nx::utils::promise<void>*, nx::utils::promise<bool>*> args):
         TCPSocket(SocketFactory::tcpClientIpVersion())
     {
         m_socketInRecv = std::get<1>(args);
@@ -435,27 +435,34 @@ public:
 
         const auto result = TCPSocket::recv(buffer, bufferLen, flags);
 
-        NX_GTEST_ASSERT_FALSE(objectDestructionFlag.objectDestroyed());
+        assertIfThisHasBeenDestroyed(objectDestructionFlag);
+
         return result;
     }
 
 private:
     nx::utils::promise<void>* m_socketInRecv;
-    nx::utils::promise<void>* m_continueReadingSocket;
+    nx::utils::promise<bool>* m_continueReadingSocket;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
+
+    void assertIfThisHasBeenDestroyed(
+        const nx::utils::ObjectDestructionFlag::Watcher& objectDestructionFlag)
+    {
+        ASSERT_FALSE(objectDestructionFlag.objectDestroyed());
+    }
 };
 
 using TestOutgoingTunnelConnection = test::OutgoingTunnelConnection<
     TestSocket,
     SocketAddress,
     nx::utils::promise<void>*,
-    nx::utils::promise<void>*>;
+    nx::utils::promise<bool>*>;
 
 using TestCrossNatConnector = test::CrossNatConnector<
     TestOutgoingTunnelConnection,
     SocketAddress,
     nx::utils::promise<void>*,
-    nx::utils::promise<void>*>;
+    nx::utils::promise<bool>*>;
 
 } // namespace
 
@@ -522,7 +529,7 @@ protected:
 
     void assertThatSocketHasBeenShutdownCorrectly()
     {
-        m_continueReadingSocket.set_value();
+        m_continueReadingSocket.set_value(true);
 
         m_terminated = true;
         m_socketReadThread.join();
@@ -534,7 +541,7 @@ private:
     bool m_terminated;
     ConnectorFactory::FactoryFunc m_oldFactory;
     nx::utils::promise<void> m_socketInRecv;
-    nx::utils::promise<void> m_continueReadingSocket;
+    nx::utils::promise<bool> m_continueReadingSocket;
 
     std::unique_ptr<AbstractCrossNatConnector> connectorFactoryFunc(
         const AddressEntry& /*targetAddress*/)

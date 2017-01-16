@@ -43,7 +43,7 @@ public:
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         ASSERT_TRUE(socket->setSendTimeout(timeout.count()));
 
-        auto serverAddress = std::get<SocketAddress>(m_args);
+        auto serverAddress = std::get<0>(m_args);
 
         auto socketPtr = socket.get();
         socketPtr->connectAsync(
