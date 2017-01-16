@@ -102,7 +102,7 @@ public:
 
     virtual std::unique_ptr<AbstractPollSetIterator> getSocketEventsIterator() override
     {
-        using OldIterator = OldPollSetImplementation::const_iterator;
+        using OldIterator = typename OldPollSetImplementation::const_iterator;
 
         return std::make_unique<PollSetIteratorWrapper<OldIterator>>(
             m_oldPollSet.begin(),
