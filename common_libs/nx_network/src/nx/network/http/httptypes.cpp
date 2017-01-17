@@ -242,10 +242,12 @@ namespace nx_http
                     return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
-                case moved:
-                    return StringType("Moved");
                 case movedPermanently:
                     return StringType("Moved Permanently");
+                case found:
+                    return StringType("Found");
+                case seeOther:
+                    return StringType("See Other");
                 case notModified:
                     return StringType("Not Modified");
                 case badRequest:

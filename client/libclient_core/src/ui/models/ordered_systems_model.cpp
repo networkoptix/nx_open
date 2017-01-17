@@ -143,8 +143,8 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
     if (!index.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsOnlineRoleId).toBool())
-        return true;    //< Skips every online system
+    if (index.data(QnSystemsModel::IsConnectableRoleId).toBool())
+        return true;    //< Skips every connectable system
 
     const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
     if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))

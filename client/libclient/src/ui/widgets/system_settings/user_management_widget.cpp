@@ -445,7 +445,9 @@ void QnUserManagementWidget::at_usersTable_clicked(const QModelIndex& index)
 
         default:
             menu()->trigger(QnActions::UserSettingsAction, QnActionParameters(user)
-                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage));
+                .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
+                .withArgument(Qn::ForceRole, true)
+            );
     }
 }
 

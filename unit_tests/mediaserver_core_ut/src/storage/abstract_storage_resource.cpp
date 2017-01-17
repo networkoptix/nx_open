@@ -75,6 +75,8 @@ protected:
 
     void prepare()
     {
+        MSSettings::initializeROSettings();
+
         this->ftpStorageUrl = config.ftpUrl;
         this->smbStorageUrl = config.smbUrl;
 
@@ -503,6 +505,7 @@ struct OccupiedSpaceAccess
 
 TEST(Storage_load_balancing_algorithm_test, Main)
 {
+    MSSettings::initializeROSettings();
     std::unique_ptr<QnCommonModule> commonModule;
     if (!qnCommon) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);

@@ -188,9 +188,6 @@ QnClientModule::~QnClientModule()
 
 void QnClientModule::initThread()
 {
-    // these functions should be called in every thread that wants to use rand() and qrand()
-    srand(::time(NULL));
-    qsrand(::time(NULL));
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 }
 
@@ -528,7 +525,9 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        QApplication::setWindowIcon(qnSkin->icon(":/logo.png"));
+        
+        // Window icon is taken from 'icons' customization project. Suppress check.
+        QApplication::setWindowIcon(qnSkin->icon(":/logo.png")); // _IGNORE_VALIDATION_
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 

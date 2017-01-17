@@ -1279,6 +1279,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
     switch (transport->getState())
     {
         case QnTransactionTransport::Error:
+            lock.unlock();
             transport->close();
             break;
         case QnTransactionTransport::Connected:
@@ -1319,9 +1320,14 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
 
             m_runtimeTransactionLog->clearOldRuntimeData(QnTranStateKey(transport->remotePeer().id, transport->remotePeer().instanceId));
             if (sendInitialData(transport))
+            {
                 connectToPeerEstablished(transport->remotePeer());
+            }
             else
+            {
+                lock.unlock();
                 transport->close();
+            }
             break;
         }
         case QnTransactionTransport::ReadyForStreaming:

@@ -239,57 +239,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>QTimeSpanPrivate</name>
-    <message numerus="yes">
-        <source>%n millisecond(s)</source>
-        <translation>
-            <numerusform>%n 毫秒(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n second(s)</source>
-        <translation>
-            <numerusform>%n 秒(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s)</source>
-        <translation>
-            <numerusform>%n 分鐘(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation>
-            <numerusform>%n 小時(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation>
-            <numerusform>%n 天(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation>
-            <numerusform>%n 週(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n month(s)</source>
-        <translation>
-            <numerusform>%n 月(s)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation>
-            <numerusform>%n 年(s)</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>QnAboutDialog</name>
     <message>
         <source>Copy to Clipboard</source>
@@ -316,10 +265,6 @@ to view more bookmarks</source>
         <translation>OpenGL最大組成大小</translation>
     </message>
     <message>
-        <source>Support</source>
-        <translation>支援</translation>
-    </message>
-    <message>
         <source>%1 version %2 (%3).</source>
         <translation>%1 version %2 (%3).</translation>
     </message>
@@ -329,6 +274,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Client is not connected to any system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customer Support</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -411,10 +360,6 @@ to view more bookmarks</source>
     <message>
         <source>Selection Changed</source>
         <translation>選項已變更</translation>
-    </message>
-    <message>
-        <source>Reconnect to Server</source>
-        <translation>重新連接至伺服器</translation>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
@@ -1280,14 +1225,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage account...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create account...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop Sharing Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1305,6 +1242,22 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Hide Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1328,25 +1281,6 @@ to view more bookmarks</source>
     <message>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation type="unfinished">目錄 &apos;%1&apos; 不存在。</translation>
-    </message>
-</context>
-<context>
-    <name>QnAggregationWidget</name>
-    <message>
-        <source>sec</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation>分</translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <translation>時</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>日</translation>
     </message>
 </context>
 <context>
@@ -1432,6 +1366,22 @@ to view more bookmarks</source>
     <message>
         <source>These resources are already removed from the system</source>
         <translation type="unfinished">此資源已於系統中移除</translation>
+    </message>
+    <message>
+        <source>No sessions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select sessions to see their details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select cameras to see their details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1599,12 +1549,12 @@ to view more bookmarks</source>
         <translation>攝影機名稱</translation>
     </message>
     <message>
-        <source>Red mark means that the archive is still available</source>
-        <translation>紅色標記表示歷史影像仍有效</translation>
-    </message>
-    <message>
         <source>Email settings changed</source>
         <translation type="unfinished">E-mail設定已變更</translation>
+    </message>
+    <message>
+        <source>Filled circle mark means the archive is still available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1713,6 +1663,10 @@ to view more bookmarks</source>
         <source>The password is incorrect.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select Build</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
@@ -1754,12 +1708,12 @@ to view more bookmarks</source>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
-        <source>For All Users</source>
-        <translation>對所有使用者</translation>
-    </message>
-    <message>
         <source>For Administrators Only</source>
         <translation>僅針對管理者</translation>
+    </message>
+    <message>
+        <source>For Users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1786,30 +1740,6 @@ to view more bookmarks</source>
         <source>Instant</source>
         <translation>立即</translation>
     </message>
-    <message numerus="yes">
-        <source>Every %n days</source>
-        <translation>
-            <numerusform>每 %n 天</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n hours</source>
-        <translation>
-            <numerusform>每 %n 小時</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n minutes</source>
-        <translation>
-            <numerusform>每 %n 分鐘</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n seconds</source>
-        <translation>
-            <numerusform>每 %n 秒</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Stops</source>
         <translation>停止</translation>
@@ -1821,10 +1751,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>僅管理者</translation>
-    </message>
-    <message>
-        <source>All Users</source>
-        <translation>全部使用者</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1859,6 +1785,14 @@ to view more bookmarks</source>
     <message>
         <source>N/A</source>
         <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">使用者</translation>
+    </message>
+    <message>
+        <source>Every %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1917,14 +1851,6 @@ to view more bookmarks</source>
         <translation>儲存規則時發生錯誤.</translation>
     </message>
     <message>
-        <source>Hide Advanced</source>
-        <translation>不顯示進階</translation>
-    </message>
-    <message>
-        <source>Show Advanced</source>
-        <translation>顯示進階</translation>
-    </message>
-    <message>
         <source>&amp;New...</source>
         <translation>&amp;新增...</translation>
     </message>
@@ -1965,15 +1891,19 @@ to view more bookmarks</source>
         <translation>確認退出</translation>
     </message>
     <message>
-        <source>filter by devices...</source>
-        <translation>以裝置篩選...</translation>
+        <source>Restore All Rules to Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>filter by cameras...</source>
-        <translation>以攝影機篩選...</translation>
+        <source>No event rules</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restore all Rules to Default</source>
+        <source>Filter by devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by cameras...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2168,15 +2098,39 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL is not available. Open video stream and try again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Secondary Stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This I/O module has no advanced settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera has no advanced settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2345,6 +2299,10 @@ to view more bookmarks</source>
         <translation>
             <numerusform>已找到 %n 個 I/O 模組</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>No cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2520,22 +2478,6 @@ to view more bookmarks</source>
         <source>Cameras Settings</source>
         <translation>攝影機設定</translation>
     </message>
-    <message>
-        <source>Device Rules</source>
-        <translation>裝置規則</translation>
-    </message>
-    <message>
-        <source>Devices Rules</source>
-        <translation>裝置規則</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>攝影機規則</translation>
-    </message>
-    <message>
-        <source>Cameras Rules</source>
-        <translation>攝影機規則</translation>
-    </message>
     <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
         <translation>
@@ -2560,14 +2502,6 @@ to view more bookmarks</source>
         <source>I/O Modules Settings</source>
         <translation>I/O 模組設定</translation>
     </message>
-    <message>
-        <source>I/O Module Rules</source>
-        <translation>I/O 模組規則</translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules</source>
-        <translation>I/O 模組規則</translation>
-    </message>
     <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
         <translation>
@@ -2579,8 +2513,32 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <source>Event Log...</source>
+        <translation type="unfinished">事件記錄...</translation>
+    </message>
+    <message>
+        <source>Device Rules...</source>
+        <translation type="unfinished">裝置規則...</translation>
+    </message>
+    <message>
+        <source>Devices Rules...</source>
+        <translation type="unfinished">裝置規則...</translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation type="unfinished">攝影機規則...</translation>
+    </message>
+    <message>
+        <source>Cameras Rules...</source>
+        <translation type="unfinished">攝影機規則...</translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished">I/O 模組規則...</translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished">I/O 模組規則...</translation>
     </message>
 </context>
 <context>
@@ -2679,10 +2637,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect to System...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Logging in...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2690,11 +2644,15 @@ devices</source>
         <source>Log in to %1...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished">連線至伺服器...</translation>
+    </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
-        <source>Manage account</source>
+        <source>Account Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2855,6 +2813,10 @@ devices</source>
     </message>
     <message>
         <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3139,6 +3101,10 @@ devices</source>
         <source>Any Action</source>
         <translation>任何動作</translation>
     </message>
+    <message>
+        <source>No events</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
@@ -3175,10 +3141,6 @@ devices</source>
         <translation>僅管理者</translation>
     </message>
     <message>
-        <source>All Users</source>
-        <translation>全部使用者</translation>
-    </message>
-    <message>
         <source>&lt;User removed&gt;</source>
         <translation>&lt;移除使用者&gt;</translation>
     </message>
@@ -3202,6 +3164,10 @@ devices</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">使用者</translation>
     </message>
 </context>
 <context>
@@ -3232,50 +3198,6 @@ devices</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>某些裝置不相容於排程設定.</translation>
-    </message>
-</context>
-<context>
-    <name>QnExportTimelapseDialog</name>
-    <message>
-        <source>sec</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation>分</translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <translation>時</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>日</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
-        <translation>毫秒</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds in rapid review dialog</comment>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes in rapid review dialog</comment>
-        <translation>分</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours in rapid review dialog</comment>
-        <translation>時</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days in rapid review dialog</comment>
-        <translation>日</translation>
     </message>
 </context>
 <context>
@@ -3451,34 +3373,7 @@ devices</source>
     </message>
 </context>
 <context>
-    <name>QnIOPortItemDelegate</name>
-    <message>
-        <source>Disabled</source>
-        <translation>停用</translation>
-    </message>
-    <message>
-        <source>Input</source>
-        <translation>輸入</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation>輸出</translation>
-    </message>
-    <message>
-        <source>Open circuit</source>
-        <translation>斷路</translation>
-    </message>
-    <message>
-        <source>Grounded circuit</source>
-        <translation>接地電路</translation>
-    </message>
-</context>
-<context>
     <name>QnIOPortsViewModel</name>
-    <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
     <message>
         <source>Type</source>
         <translation>類型</translation>
@@ -3490,10 +3385,6 @@ devices</source>
     <message>
         <source>Name</source>
         <translation>名稱</translation>
-    </message>
-    <message>
-        <source>Pulse time(ms)</source>
-        <translation>脈衝時間(ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -3521,11 +3412,6 @@ devices</source>
         <translation>無效</translation>
     </message>
     <message>
-        <source>Open Circuit</source>
-        <comment>IO Port State</comment>
-        <translation>斷路</translation>
-    </message>
-    <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
         <translation>接地電路</translation>
@@ -3534,6 +3420,33 @@ devices</source>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
         <translation>無效狀態</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished">持續時間</translation>
+    </message>
+    <message>
+        <source>Open circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished">斷路</translation>
+    </message>
+    <message>
+        <source>Toggle state</source>
+        <comment>IO Output Port Action</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Impulse</source>
+        <comment>IO Output Port Action</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3554,16 +3467,16 @@ devices</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>開啟 IO 埠 &apos;%1&apos; 失敗</translation>
+        <source>Failed to turn off I/O port &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>關閉 IO 埠 &apos;%1&apos; 失敗</translation>
+        <source>Failed to turn on I/O port &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO port error</source>
-        <translation>IO 埠錯誤</translation>
+        <source>I/O port error</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3718,6 +3631,18 @@ devices</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Update Screen...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will lose access to following resources:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from videowall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to videowall again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4028,10 +3953,6 @@ devices</source>
         <translation>成功</translation>
     </message>
     <message>
-        <source>Hardware ID copied to clipboard.</source>
-        <translation>將硬體ID複製至剪貼簿.</translation>
-    </message>
-    <message>
         <source>Open License File</source>
         <translation>開啟授權檔案</translation>
     </message>
@@ -4050,6 +3971,10 @@ devices</source>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished">請將序號以及硬體ID email給 %1 以取得啟動檔案.</translation>
+    </message>
+    <message>
+        <source>Hardware ID has been copied to clipboard.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4103,10 +4028,6 @@ devices</source>
     <message>
         <source>Screen Recording</source>
         <translation type="unfinished">螢幕錄影</translation>
-    </message>
-    <message>
-        <source>Audio Settings</source>
-        <translation type="unfinished">聲音設定</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -4324,10 +4245,6 @@ devices</source>
         <translation>此網址無效.</translation>
     </message>
     <message>
-        <source>The password cannot be empty.</source>
-        <translation>密碼不可為空.</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>請輸入具體的主機位址或IP, 而不是 %1.</translation>
     </message>
@@ -4369,6 +4286,10 @@ devices</source>
     </message>
     <message>
         <source>The login cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4446,9 +4367,9 @@ devices</source>
 <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
-        <source>%n more item(s)</source>
-        <translation>
-            <numerusform>多 %n 項</numerusform>
+        <source>%n more notifications</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -4516,13 +4437,6 @@ devices</source>
     <message>
         <source>&lt;Uploading sound...&gt;</source>
         <translation>&lt;上傳聲音&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnNotificationWidget</name>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">關閉</translation>
     </message>
 </context>
 <context>
@@ -4870,12 +4784,6 @@ devices</source>
         <source>Instant</source>
         <translation>立即</translation>
     </message>
-    <message numerus="yes">
-        <source>%n seconds</source>
-        <translation>
-            <numerusform>%n 秒</numerusform>
-        </translation>
-    </message>
     <message>
         <source>&lt;Invalid&gt;</source>
         <translation>&lt;無效&gt;</translation>
@@ -4907,33 +4815,45 @@ devices</source>
         <source>Select folder...</source>
         <translation>選擇資料夾...</translation>
     </message>
+    <message>
+        <source>Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Native</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quarter Native</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1920x1080</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1280x720</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>640x480</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320x240</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
-    <message numerus="yes">
-        <source>%n years</source>
-        <translation>
-            <numerusform>%n 年</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n months</source>
-        <translation>
-            <numerusform>%n 月</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n days</source>
-        <translation>
-            <numerusform>%n 日</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hours</source>
-        <translation>
-            <numerusform>%n 時</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Average bitrate for the recorded period</source>
         <translation>平均錄影流量</translation>
@@ -5107,10 +5027,6 @@ devices</source>
 <context>
     <name>QnResourceTreeModelNode</name>
     <message>
-        <source>Local</source>
-        <translation type="unfinished">本地</translation>
-    </message>
-    <message>
         <source>Servers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5148,6 +5064,10 @@ devices</source>
     </message>
     <message>
         <source>Shared Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Files</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5213,6 +5133,10 @@ devices</source>
     <message>
         <source>Export Bookmark...</source>
         <translation>匯出書籤...</translation>
+    </message>
+    <message>
+        <source>No bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5388,10 +5312,6 @@ devices</source>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Open Web Page...</source>
-        <translation>開啟網頁界面...</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>一般</translation>
     </message>
@@ -5561,10 +5481,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select Specific Build...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Selected Version</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5665,6 +5581,22 @@ devices</source>
     </message>
     <message>
         <source>Installing updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specific Build...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update to Specific Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel update?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5888,10 +5820,6 @@ devices</source>
         <translation>處理中...</translation>
     </message>
     <message>
-        <source>Failed</source>
-        <translation>失敗</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>成功</translation>
     </message>
@@ -5902,6 +5830,22 @@ devices</source>
     <message>
         <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP Error %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error</source>
+        <translation type="unfinished">網路問題.</translation>
     </message>
 </context>
 <context>
@@ -6418,21 +6362,6 @@ devices</source>
         <source>Time</source>
         <translation type="unfinished">時間</translation>
     </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds of server time offset</comment>
-        <translation type="unfinished">秒</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes of server time offset</comment>
-        <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours of server time offset</comment>
-        <translation type="unfinished">時</translation>
-    </message>
 </context>
 <context>
     <name>QnTimeServerSelectionWidget</name>
@@ -6448,64 +6377,11 @@ devices</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>NO THUMBNAILS AVAILABLE</source>
-        <translation>無可用縮圖</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>毫秒</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>分</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>時</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>日</translation>
-    </message>
-    <message>
-        <source>M</source>
-        <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>M</translation>
-    </message>
-    <message>
-        <source>y</source>
-        <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation>年</translation>
-    </message>
-    <message>
         <source>Live</source>
         <translation type="unfinished">即時</translation>
     </message>
-</context>
-<context>
-    <name>QnTranslationListModel</name>
     <message>
-        <source>%1 (built-in)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (external)</source>
+        <source>No thumbnails available</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6802,10 +6678,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6852,6 +6724,14 @@ devices</source>
     </message>
     <message>
         <source>User Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished">啟用</translation>
+    </message>
+    <message>
+        <source>User is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7261,6 +7141,14 @@ devices</source>
         <source>Could not execute initial server query</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot move devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot move I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -7580,6 +7468,10 @@ devices</source>
     <message>
         <source>Merge failed.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot merge systems.</source>
+        <translation type="unfinished">無法合併系統.</translation>
     </message>
 </context>
 <context>
@@ -7967,12 +7859,6 @@ devices</source>
         <source>A Video Wall with the same name already exists.</source>
         <translation>已有相同名稱的電視牆.</translation>
     </message>
-    <message numerus="yes">
-        <source>%n items</source>
-        <translation>
-            <numerusform>%n 個物件</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation>是否確定要停止電視牆?</translation>
@@ -7986,25 +7872,11 @@ devices</source>
         <translation>變更無法套用. 無預期的錯誤發生.</translation>
     </message>
     <message>
-        <source>New Layout</source>
-        <translation type="unfinished">新佈局</translation>
-    </message>
-    <message>
         <source>Confirm items deleting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 - Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Screen of %1</source>
-        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -109,8 +109,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -185,8 +185,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -224,8 +224,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -263,8 +263,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -339,8 +339,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -373,8 +373,8 @@
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided.
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -383,6 +383,113 @@
                     <result>
                         <caption>Return the amount of free space available for update files in bytes
                             for each online server in the system, in the specified format.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>recordedTimePeriods</name>
+                    <description>Return the recorded chunks info for the specified cameras.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                 MAC address (not supported for certain cameras).
+                                 Parameter can be used several times to define a list of cameras.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <description>Start time of the interval (in milliseconds since epoch,
+                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
+                                auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>endTime</name>
+                            <description>End time of the interval (in milliseconds since epoch,
+                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
+                                auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>filter</name>
+                            <description>This parameter is used for motion search ("periodsType" must be 1).
+                                Match motion on a video by specified rectangle.
+                                <br/>Format: <code>&lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;</code>
+                                <br/>Each "rectI" format: <code>&lt;x,y,width,height&gt;</code>
+                                <br/>All values are measured in relative portions of a video frame,
+                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>periods</name>
+                                    <description>Internal comperssed binary format.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>detail</name>
+                            <description>Chunk detail level, in microseconds. Time periods
+                                that are shorter than the detail level are discarded. You can treat
+                                the detail level as the amount of microseconds per screen pixel.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>periodsType</name>
+                            <description>Chunk type.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>All records.</description>
+                                </value>
+                                <value>
+                                    <name>1</name>
+                                    <description>Only chunks with motion (parameter "motionRegions" is required).</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>keepSmallChunks</name>
+                            <optional>true</optional>
+                            <description>If specified, standalone chunks smaller than the detail
+                            level are not removed from the result.</description>
+                        </param>
+                        <param>
+                            <name>limit</name>
+                            <optional>true</optional>
+                            <description>Maximum number of chunks to return.</description>
+                        </param>
+                        <param>
+                            <name>flat</name>
+                            <optional>true</optional>
+                            <description>If specified, do not group chunk lists by server.</description>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:
+                          if no "flat" parameter is specified,
+                          "reply" field is the list which contains for each server its GUID (as "guid"
+                          field) and the list of chunks (as "periods" field); if "flat" parameter
+                          is specified, "reply" field is just the list of chunks.
+                          <br/>Each chunk is a pair of <code>(durationMs, startTimeMs)</code>.
+                          Chunks are merged for all requested cameras.
+                          Start time and duration are in milliseconds since epoch.
+                          Duration of -1 means the last chunk is being recorded now.</caption>
                     </result>
                 </function>
             </functions>
@@ -768,7 +875,7 @@
                 </function>
                 <function>
                     <name>getEvents</name>
-                    <description>Returns event log information in the requested format.</description>
+                    <description>Returns event log information.</description>
                     <permissions>At least Advanced Viewer.</permissions>
                     <method>GET</method>
                     <params>
@@ -817,7 +924,7 @@
                 </function>
                 <function>
                     <name>auditLog</name>
-                    <description>Returns audit log information at requested format.</description>
+                    <description>Returns audit log information in the requested format.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1207,76 +1314,6 @@ content type "application/json". Example of such object:
                     </result>
                 </function>
                 <function>
-                    <name>RecordedTimePeriods</name>
-                    <description>Recorded chunk info by specified cameras.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>cameraId</name>
-                            <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
-                                 MAC address (not supported for certain cameras).
-                                 Parameter can be used several times to define a list of cameras.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>startTime</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>endTime</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>filter</name>
-                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle.
-                                Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
-                                rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
-                            </description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Allowed values: "json", "xml", "txt", "bin".
-                                Default value "json"</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>detail</name>
-                            <description>Chunk detail level, in microseconds. Time periods/chunks
-                                that are shorter than the detail level are discarded. You can use
-                                detail level as amount of microseconds per screen
-                                pixel.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>periodsType</name>
-                            <description>Chunk type.</description>
-                            <optional>false</optional>
-                            <values>
-                                <value>
-                                    <name>0</name>
-                                    <description>All records</description>
-                                </value>
-                                <value>
-                                    <name>1</name>
-                                    <description>Only chunk with motion (parameter motionRegions required)</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Chunks data in requested format. Chunks are merged for all requested
-                        cameras. Time and duration defined in UTC milliseconds. Response contains pairs [begin,duration]. Duration=-1 means last chunk is recording now.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>restart</name>
                     <description>Restarts the server.</description>
                     <permissions>Administrator.</permissions>
@@ -1619,9 +1656,8 @@ content type "application/json". Example of such object:
                             <name>exec_cmd</name>
                             <description>
                               HTTP url path to execute. This parameter could be repeated several times to execute several nested methods.
-							                All additions parameters after current "exec_cmd" and before next "exec_cmd" are passed as parameters
-							                to the nested method.
-							              </description>
+                              All additions parameters after current "exec_cmd" and before next "exec_cmd" are passed as parameters
+                              to the nested method.</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -2045,13 +2081,13 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
                                          Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>codec</name>
-                            <description>Defines video codec used for transcoding. Default value H263.</description>
+                            <description>Defines video codec used for transcoding. Default value is H263.</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -2134,7 +2170,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2149,7 +2185,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                     </params>
                     <result>
-                        <caption>Video stream in requested format</caption>
+                        <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
                 <function>
@@ -2224,7 +2260,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                     </params>
                     <result>
-                        <caption>Video stream in requested format</caption>
+                        <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
             </functions>

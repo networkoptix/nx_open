@@ -105,8 +105,8 @@ void AsyncClientUser::disconnectFromClient()
         guardPtr,
         [guard = std::move(guard)]() mutable
         {
-            // Guard shell be kept here up to the end of cancelation to prevent reuse of the
-            // same address (new subscriptions might be excidentelly removed).
+            // Guard shall be kept here up to the end of cancellation to prevent reuse of the
+            // same address (new subscriptions might be accidently removed).
             guard.reset();
         });
 
@@ -114,5 +114,5 @@ void AsyncClientUser::disconnectFromClient()
     NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
 }
 
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

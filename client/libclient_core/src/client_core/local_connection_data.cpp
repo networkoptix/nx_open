@@ -42,7 +42,6 @@ bool helpers::storeLocalSystemConnection(
     QnLocalConnectionData& result)
 {
     const bool connectionToCloud = nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
-    NX_ASSERT(!connectionToCloud, "Can't store connection to cloud as recent local");
     if (connectionToCloud)
         return false;
 

@@ -12,6 +12,12 @@ GenericProduct
 
     Group
     {
+        condition: qbs.targetOS.contains("ios")
+        files: ["src/nx/utils/log/log_ios.mm"]
+    }
+
+    Group
+    {
         files: "maven/filter-resources/app_info_impl.cpp"
         fileTags: "configure.input"
         configure.outputTags: "cpp"

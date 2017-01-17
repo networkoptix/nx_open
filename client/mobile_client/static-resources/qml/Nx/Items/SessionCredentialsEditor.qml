@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Dialogs 1.0
 import com.networkoptix.qml 1.0
 
 import "private"
@@ -86,6 +87,7 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
+            rightPadding: chooseUserButton.visible ? chooseUserButton.width : 8
 
             IconButton
             {
@@ -142,19 +144,19 @@ Pane
     {
         id: hostSelectionDialog
         title: qsTr("Hosts")
-        activeItem: address
-        onActiveItemChanged: addressField.text = activeItem
+        currentItem: address
+        onCurrentItemChanged: addressField.text = currentItem
     }
 
     ItemSelectionDialog
     {
         id: userSelectionDialog
         title: qsTr("Users")
-        activeItem: login
-        onItemChanged:
+        currentItem: login
+        onItemActivated:
         {
-            loginField.text = activeItem
-            passwordField.text = model.getData("password", activeItemRow)
+            loginField.text = currentItem
+            passwordField.text = model.getData("password", currentIndex)
             passwordField.forceActiveFocus()
         }
     }

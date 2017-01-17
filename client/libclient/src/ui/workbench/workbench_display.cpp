@@ -68,7 +68,6 @@
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/grid/grid_background_item.h>
-#include <ui/graphics/items/grid/grid_raised_cone_item.h>
 
 #include <ui/graphics/opengl/gl_hardware_checker.h>
 
@@ -95,6 +94,8 @@
 
 #include "camera/thumbnails_loader.h" // TODO: remove?
 #include "watchers/workbench_server_time_watcher.h"
+
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -720,17 +721,6 @@ QnResourceWidget *QnWorkbenchDisplay::zoomTargetWidget(QnResourceWidget *widget)
     return m_zoomTargetWidgetByWidget.value(widget);
 }
 
-void QnWorkbenchDisplay::ensureRaisedConeItem(QnResourceWidget *widget)
-{
-    NX_ASSERT(canShowLayoutBackground(), Q_FUNC_INFO, "This item is only used when layout background is active");
-    QnGridRaisedConeItem* item = raisedConeItem(widget);
-    if (item->scene() == m_scene)
-        return;
-    m_scene->addItem(item);
-    setLayer(item, Qn::RaisedConeBgLayer);
-    item->setOpacity(0.0);
-}
-
 QRectF QnWorkbenchDisplay::raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const
 {
     QRectF occupiedGeometry = QnGeometry::rotated(widgetGeometry, rotation);
@@ -784,28 +774,11 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             if (oldWidget != NULL)
             {
                 synchronize(oldWidget, true);
-
-                if (canShowLayoutBackground())
-                {
-                    ensureRaisedConeItem(oldWidget);
-                    raisedConeItem(oldWidget)->setEffectEnabled(false);
-                    setLayer(raisedConeItem(oldWidget), Qn::RaisedConeBgLayer);
-                }
             }
 
             if (newWidget != NULL)
             {
                 bringToFront(newWidget);
-
-                if (canShowLayoutBackground())
-                {
-                    auto layout = workbench()->currentLayout()->resource();
-
-                    ensureRaisedConeItem(newWidget);
-                    setLayer(raisedConeItem(newWidget), Qn::RaisedConeLayer);
-                    raisedConeItem(newWidget)->setEffectEnabled(layout && !layout->backgroundImageFilename().isEmpty());
-                }
-
                 synchronize(newWidget, true);
             }
             break;
@@ -866,14 +839,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 newWidget->setOption(QnResourceWidget::ActivityPresence, true);
             }
 
-            /* Hide / show other items when zoomed. */
-            if (newWidget)
-                opacityAnimator(newWidget)->animateTo(1.0);
-            qreal opacity = newWidget ? 0.0 : 1.0;
-            foreach(QnResourceWidget *widget, m_widgets)
-                if (widget != newWidget)
-                    opacityAnimator(widget)->animateTo(opacity);
-
             /* Update margin flags. */
             updateCurrentMarginFlags();
 
@@ -928,13 +893,6 @@ void QnWorkbenchDisplay::updateBackground(const QnLayoutResourcePtr &layout)
 
     static const bool kDontAnimate = false;
     fitInView(kDontAnimate);
-
-    QnResourceWidget* raisedWidget = m_widgetByRole[Qn::RaisedRole];
-    if (raisedWidget)
-    {
-        ensureRaisedConeItem(raisedWidget);
-        raisedConeItem(raisedWidget)->setEffectEnabled(!layout->backgroundImageFilename().isEmpty());
-    }
 }
 
 void QnWorkbenchDisplay::updateSelectionFromTree()
@@ -1080,6 +1038,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (m_widgets.size() >= maxItems)
     {
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
+            .arg(maxItems), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1087,6 +1047,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     /* Invalid items may lead to very strange behavior bugs. */
     if (item->uuid().isNull())
     {
+	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: null item uuid"), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1094,6 +1055,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     QnResourcePtr resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     if (!resource)
     {
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: invalid resource id %1")
+            .arg(item->resourceUid()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1104,6 +1067,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (!accessController()->hasPermissions(resource, requiredPermission))
     {
+	    NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: insufficient permissions"), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1128,6 +1092,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     if (!widget)
     {
+        NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: unsupported resource type %1")
+            .arg(resource->flags()), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
@@ -1251,7 +1217,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
     const auto resource = widget->resource();
 
     auto widgetsForResource = m_widgetsByResource.find(resource);
-    NX_ASSERT(widgetsForResource != m_widgetsByResource.end());
+    // We may have already clean the widget in permissionsChange handler
     if (widgetsForResource != m_widgetsByResource.end())
     {
         widgetsForResource->removeOne(widget);
@@ -1693,11 +1659,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if (widget == raisedWidget && widget != zoomedWidget && m_view != NULL)
     {
         QRectF targetGeometry = widget->calculateGeometry(enclosingGeometry, rotation);
-        if (!qnRuntime->isActiveXMode())
-        {
-            ensureRaisedConeItem(widget);
-            raisedConeItem(widget)->setOriginGeometry(rotated(targetGeometry, rotation));
-        }
         QRectF raisedGeometry = this->raisedGeometry(targetGeometry, rotation);
         qreal scale = scaleFactor(targetGeometry.size(), raisedGeometry.size(), Qt::KeepAspectRatio);
         enclosingGeometry = scaled(enclosingGeometry, scale, enclosingGeometry.center());

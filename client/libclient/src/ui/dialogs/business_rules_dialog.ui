@@ -81,7 +81,7 @@
        <item>
         <widget class="QPushButton" name="eventLogButton">
          <property name="text">
-          <string>Event log</string>
+          <string>Event Log...</string>
          </property>
         </widget>
        </item>

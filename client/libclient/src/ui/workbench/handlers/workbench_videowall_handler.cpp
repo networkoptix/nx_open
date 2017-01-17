@@ -77,6 +77,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -90,11 +91,13 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
-
+#include <utils/unity_launcher_workaround.h>
 #include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
+
+using nx::client::desktop::utils::UnityLauncherWorkaround;
 
 namespace {
 #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
@@ -679,7 +682,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
 #endif
-    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+    UnityLauncherWorkaround::startDetached(qApp->applicationFilePath(), arguments);
 }
 
 void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr &videoWall)
@@ -1491,7 +1494,7 @@ void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered()
         if (const auto layout = qnResPool->getResourceById<QnLayoutResource>(existingItem.layout))
         {
             auto removedResources = qnResPool->getResources(layout->layoutResourceIds());
-            if (!confirmRemoveResourcesFromLayout(removedResources))
+            if (!confirmRemoveResourcesFromLayout(layout, removedResources))
                 break;
         }
 
@@ -1915,7 +1918,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         const auto newResources = targetLayout->layoutResourceIds();
 
         const auto removedResources = qnResPool->getResources(oldResources - newResources);
-        if (!confirmRemoveResourcesFromLayout(removedResources))
+        if (!confirmRemoveResourcesFromLayout(currentLayout, removedResources))
             return;
     }
 
@@ -3023,38 +3026,11 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
 }
 
 bool QnWorkbenchVideoWallHandler::confirmRemoveResourcesFromLayout(
+    const QnLayoutResourcePtr& layout,
     const QnResourceList& resources) const
 {
-    //just in case
-    if (!context()->user())
-        return true;
-
-    //quick check
-    if (accessController()->hasGlobalPermission(Qn::GlobalAccessAllMediaPermission))
-        return true;
-
-    QnResourceList inaccessible = resources.filtered(
-        [this](const QnResourcePtr& resource) -> bool
-        {
-            QnResourceList providers;
-            const auto accessSource = qnResourceAccessProvider->accessibleVia(
-                context()->user(), resource, &providers);
-
-            // We need to get only resources which are accessible only by this layout
-            if (accessSource != QnAbstractResourceAccessProvider::Source::videowall)
-                return false;
-
-            // Check if providers list contains only this layout and videowall
-            if (providers.size() > 2)
-                return false;
-
-            return true;
-        });
-
-    if (inaccessible.isEmpty())
-        return true;
-
-    return QnLayoutsHandlerMessages::replaceVideoWallResources(mainWindow(), inaccessible);
+    QnWorkbenchLayoutsChangeValidator validator(context());
+    return validator.confirmChangeVideoWallLayout(layout, resources);
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout)

@@ -10,3 +10,5 @@ win* {
 }    
 
 SOURCES += ${project.build.directory}/app_info_impl.cpp
+
+ios: OBJECTIVE_SOURCES += ${basedir}/src/nx/utils/log/log_ios.mm

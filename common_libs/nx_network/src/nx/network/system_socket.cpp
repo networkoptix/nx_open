@@ -513,6 +513,22 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     int set = 1;
     setsockopt(m_fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
 #endif
+
+    // We do not want child processes created by exec() to inherit socket descriptors.
+#ifdef FD_CLOEXEC
+    int flags = fcntl( m_fd, F_GETFD, 0 );
+    if( flags < 0 )
+    {
+        NX_LOGX(lm("Can not read options by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+    }
+    else if( fcntl( m_fd, F_SETFD, flags | FD_CLOEXEC ) < 0 )
+    {
+        NX_LOGX(lm("Can not set FD_CLOEXEC by fcntl: %1")
+            .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
+    }
+#endif
+
     return true;
 }
 
@@ -1452,6 +1468,11 @@ UDPSocket::UDPSocket(int ipVersion)
     }
 }
 
+SocketAddress UDPSocket::getForeignAddress() const
+{
+    return m_destAddr;
+}
+
 void UDPSocket::setBroadcast() {
     // If this fails, we'll hear about it when we try to send.  This will allow
     // system that cannot broadcast to continue if they don't plan to broadcast
@@ -1731,7 +1752,16 @@ int UDPSocket::recvFrom(
     socklen_t addrLen = sizeof( clntAddr );
 
 #ifdef _WIN32
-    int rtn = recvfrom( handle(), (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+    const auto h = handle();
+    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+    if ((rtn == SOCKET_ERROR) &&
+        (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
+    {
+        // Win32 can return connectionReset for UDP(!) socket 
+        //   sometimes on receiving ICMP error response.
+        SystemError::setLastErrorCode(SystemError::again);
+        return -1;
+    }
 #else
     unsigned int recvTimeout = 0;
     if( !getRecvTimeout( &recvTimeout ) )

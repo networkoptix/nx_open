@@ -28,6 +28,8 @@ class TranslatableProject():
             self.name, self.path, self.extensions, self.locations, self.sources)            
 
 translatableProjects = [   
+    TranslatableProject("qt", "common"),
+    TranslatableProject("qtbase", "common"),
     TranslatableProject("common"),
     TranslatableProject("traytool"),
     TranslatableProject("client_base", "client/libclient"),
@@ -42,14 +44,13 @@ def getTranslatableProjects():
     return translatableProjects
 
 class CustomizableProject():
-    name = ""
-    sources = None
-    static_icons_root = None
 
-    def __init__(self, name, sources, static_icons_root = None):
+    def __init__(self, name, sources, static_files, customized_files, prefix = ""):
         self.name = name
         self.sources = sources
-        self.static_icons_root = static_icons_root
+        self.static_files = static_files
+        self.customized_files = customized_files
+        self.prefix = prefix
                
     def __repr__(self):
         return "<CustomizableProject name:%s sources:%s>" % (
@@ -59,17 +60,35 @@ class CustomizableProject():
         return "Project %s %s" % (
             self.name, "at {0}".format(self.sources) if self.sources else "")
 
+#Skins will be added as separate projects - this will siplify checking logic a lot            
 customizableProjects = [   
-    CustomizableProject("common", ["common/src"]),
-    CustomizableProject("icons", None),
+    CustomizableProject(
+        "common",
+        ["common/src"], 
+        None, 
+        ["common/resources/skin"],
+        "skin"
+        ),
+    CustomizableProject(
+        "icons", 
+        None, 
+        None, 
+        ["icons"]
+        ),
     CustomizableProject(
         "client", 
         ["client/libclient/src", "client/libclient/static-resources/src"], 
-        "client/libclient/static-resources/skin"),
+        ["client/libclient/static-resources/skin"],
+        ["client/resources/skin"],
+        "skin"
+        ),
     CustomizableProject(
         "mobile_client", 
         ["client/mobile_client/src", "client/mobile_client/static-resources/qml"], 
-        "client/mobile_client/static-resources/images")
+        ["client/mobile_client/static-resources/images"],
+        ["mobile_client/resources/images"],
+        "images"
+        )
 ]
 
 def getCustomizableProjects():

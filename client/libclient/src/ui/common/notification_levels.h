@@ -7,22 +7,22 @@
 
 namespace QnNotificationLevel {
 
-    /**
-     * Importance level of a notification. 
-     */
-    enum class Value {
-        NoNotification,
-        OtherNotification,
-        CommonNotification,
-        ImportantNotification,
-        CriticalNotification,
-        SystemNotification,
-        LevelCount
-    };
-
-    Value valueOf(const QnAbstractBusinessActionPtr &businessAction);
-    Value valueOf(QnSystemHealth::MessageType messageType);
-
-    QColor notificationColor(Value level);
+/**
+ * Importance level of a notification.
+ */
+enum class Value
+{
+    NoNotification,
+    OtherNotification,
+    CommonNotification,
+    ImportantNotification,
+    CriticalNotification,
+    LevelCount
 };
 
+Value valueOf(const QnAbstractBusinessActionPtr &businessAction);
+Value valueOf(QnSystemHealth::MessageType messageType);
+
+QColor notificationColor(Value level);
+
+};

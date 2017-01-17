@@ -21,14 +21,14 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
             const auto checkOnlineSystem =
                 [this, id = system->id(), localId = system->localId(), rawSystem = system.data()]()
                 {
-                    if (rawSystem->isOnline())
+                    if (rawSystem->isConnectable())
                     {
                         rememberSystem(id);
                         rememberSystem(localId.toString());
                     }
                 };
 
-            connect(system.data(), &QnBaseSystemDescription::onlineStateChanged,
+            connect(system.data(), &QnBaseSystemDescription::connectableStateChanged,
                 this, checkOnlineSystem);
             checkOnlineSystem();
         };
@@ -83,7 +83,9 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 void QnForgottenSystemsManager::forgetSystem(const QString& id)
 {
     const auto system = qnSystemsFinder->getSystem(id);
-    if (system && system->isOnline())  // Do not hide online systems and do not clear its weights
+
+    // Do not hide online reachable systems and do not clear its weights
+    if (system && system->isConnectable())
         return;
 
     const bool contains = m_systems.contains(id);

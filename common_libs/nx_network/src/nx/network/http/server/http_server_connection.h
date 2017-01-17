@@ -21,9 +21,12 @@ namespace stree
     class ResourceContainer;
 }   //namespace stree
 
-namespace nx_http
-{
-    class AbstractAuthenticationManager;
+namespace nx_http {
+
+    namespace server {
+        class AbstractAuthenticationManager;
+    } // namespace server
+
     class NX_NETWORK_API HttpServerConnection;
     class MessageDispatcher;
 
@@ -72,8 +75,7 @@ namespace nx_http
         nx_http::MessageParser,
         nx_http::MessageSerializer> AsyncMessagePipeline;
 
-    class NX_NETWORK_API HttpServerConnection
-    :
+    class NX_NETWORK_API HttpServerConnection:
         public BaseConnection<HttpServerConnection>,
         public std::enable_shared_from_this<HttpServerConnection>
     {
@@ -83,7 +85,7 @@ namespace nx_http
         HttpServerConnection(
             StreamConnectionHolder<HttpServerConnection>* socketServer,
             std::unique_ptr<AbstractCommunicatingSocket> sock,
-            nx_http::AbstractAuthenticationManager* const authenticationManager,
+            nx_http::server::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher);
         virtual ~HttpServerConnection();
 
@@ -96,7 +98,7 @@ namespace nx_http
         void setPersistentConnectionEnabled(bool value);
 
     private:
-        nx_http::AbstractAuthenticationManager* const m_authenticationManager;
+        nx_http::server::AbstractAuthenticationManager* const m_authenticationManager;
         nx_http::MessageDispatcher* const m_httpMessageDispatcher;
         std::unique_ptr<nx_http::AbstractMsgBodySource> m_currentMsgBody;
         bool m_isPersistent;

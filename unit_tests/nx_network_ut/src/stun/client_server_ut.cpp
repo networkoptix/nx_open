@@ -184,7 +184,7 @@ TEST_F(StunClientServerTest, RequestResponse)
         ASSERT_EQ(response.header.messageClass, MessageClass::errorResponse);
         ASSERT_EQ(response.header.method, 0xFFF);
 
-        const auto error = response.getAttribute<stun::attrs::ErrorDescription>();
+        const auto error = response.getAttribute<stun::attrs::ErrorCode>();
         ASSERT_NE(error, nullptr);
         ASSERT_EQ(error->getCode(), 404);
         ASSERT_EQ(error->getString(), String("Method is not supported"));

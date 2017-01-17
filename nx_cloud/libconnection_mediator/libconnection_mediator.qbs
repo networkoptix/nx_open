@@ -4,6 +4,7 @@ GenericProduct
 {
     name: "libconnection_mediator"
     targetName: "connection_mediator"
+    condition: project.withClouds
 
     Depends { name: "cloud_db_client" }
     Depends { name: "nx_network" }

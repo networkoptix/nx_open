@@ -12,11 +12,47 @@
 #include <nx/network/http/server/handler/http_server_handler_static_data.h>
 #include <nx/utils/random.h>
 
-TestHttpServer::TestHttpServer()
+//-------------------------------------------------------------------------------------------------
+
+TestAuthenticationManager::TestAuthenticationManager(
+    nx_http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
+    :
+    BaseType(authenticationDataProvider),
+    m_authenticationEnabled(false)
 {
+}
+
+void TestAuthenticationManager::authenticate(
+    const nx_http::HttpServerConnection& connection,
+    const nx_http::Request& request,
+    nx_http::server::AuthenticationCompletionHandler completionHandler)
+{
+    if (m_authenticationEnabled)
+    {
+        BaseType::authenticate(connection, request, std::move(completionHandler));
+    }
+    else
+    {
+        completionHandler(
+            true, stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
+    }
+}
+
+void TestAuthenticationManager::setAuthenticationEnabled(bool value)
+{
+    m_authenticationEnabled = value;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TestHttpServer::TestHttpServer():
+    m_authenticationManager(&m_credentialsProvider)
+{
+    m_authenticationManager.setAuthenticationEnabled(false);
+
     m_httpServer.reset(
         new nx_http::HttpStreamSocketServer(
-            nullptr,
+            &m_authenticationManager,
             &m_httpMessageDispatcher,
             true,
             nx::network::NatTraversalSupport::disabled));
@@ -46,6 +82,18 @@ void TestHttpServer::setPersistentConnectionEnabled(bool value)
 void TestHttpServer::addModRewriteRule(QString oldPrefix, QString newPrefix)
 {
     m_httpMessageDispatcher.addModRewriteRule(std::move(oldPrefix), std::move(newPrefix));
+}
+
+void TestHttpServer::setAuthenticationEnabled(bool value)
+{
+    m_authenticationManager.setAuthenticationEnabled(value);
+}
+
+void TestHttpServer::registerUserCredentials(
+    const nx::String& userName,
+    const nx::String& password)
+{
+    m_credentialsProvider.addCredentials(userName, password);
 }
 
 bool TestHttpServer::registerStaticProcessor(

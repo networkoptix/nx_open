@@ -15,7 +15,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/fusion_data_http_client.h>
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "data/account_data.h"
@@ -26,7 +26,7 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 /** Executes HTTP requests asynchronously.
     On object destruction all not yet completed requests are cancelled
@@ -35,10 +35,10 @@ class AsyncRequestsExecutor
 {
 public:
     AsyncRequestsExecutor(
-        network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
+        network::cloud::CloudModuleUrlFetcher* const cdbEndPointFetcher)
     :
         m_cdbEndPointFetcher(
-            std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+            std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
                 cdbEndPointFetcher))
     {
     }
@@ -161,7 +161,7 @@ private:
     nx_http::AuthInfo m_auth;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
     std::unique_ptr<
-        network::cloud::CloudModuleEndPointFetcher::ScopedOperation
+        network::cloud::CloudModuleUrlFetcher::ScopedOperation
     > m_cdbEndPointFetcher;
 
     /*!
@@ -269,7 +269,7 @@ private:
     }
 };
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx
 

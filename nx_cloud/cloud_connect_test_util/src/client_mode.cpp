@@ -33,7 +33,7 @@ void printConnectOptions(std::ostream* const outStream)
         "  --ssl                Use SSL on top of client sockets\n";
 }
 
-std::vector<SocketAddress> resolveTargets(
+static std::vector<SocketAddress> resolveTargets(
     SocketAddress targetAddress,
     const nx::utils::ArgumentParser& args)
 {
@@ -51,11 +51,8 @@ std::vector<SocketAddress> resolveTargets(
     {
         const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
         targets.push_back(SocketAddress(serverId + systemSuffix, 0));
-        for (std::size_t i = 1; i < serverCount; ++i)
-        {
-            targets.push_back(SocketAddress(
-                serverId + QString::number(i).toUtf8() + systemSuffix, 0));
-        }
+        for (size_t i = 1; i < serverCount; ++i)
+            targets.push_back(SocketAddress(makeServerName(serverId, i) + systemSuffix));
 
         return targets;
     }
@@ -79,6 +76,9 @@ std::vector<SocketAddress> resolveTargets(
 
 int runInConnectMode(const nx::utils::ArgumentParser& args)
 {
+    auto& mediatorResultCounter = network::cloud::CrossNatConnector::mediatorResponseCounter();
+    mediatorResultCounter.enable();
+
     QString target;
     if (!args.read("target", &target))
     {
@@ -87,6 +87,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cc-tu-connect", QnUuid::createUuid());
 
     int totalConnections = kDefaultTotalConnections;
     args.read("total-connections", &totalConnections);
@@ -183,11 +185,6 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - startTime);
 
-    QStringList returnCodes;
-    for (const auto& code : connectionsGenerator.returnCodes())
-        returnCodes << lm("%2 [%1 time(s)]").arg(code.second)
-            .arg(SystemError::toString(code.first));
-
     std::cout << "\n\nConnect summary:\n"
         "  total time: " << testDuration.count() << " s\n"
         "  total connections: " <<
@@ -198,8 +195,11 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
             nx::utils::bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
         "  total incomplete tasks: " <<
             connectionsGenerator.totalIncompleteTasks() << "\n"
-        "  return codes: " << returnCodes.join(QLatin1Literal("; ")).toStdString() << "\n" <<
-            std::endl;
+        "  mediator results: " <<
+            mediatorResultCounter.stringStatus().toStdString() << "\n" <<
+        "  connect results: " <<
+            connectionsGenerator.results().stringStatus().toStdString() << "\n" <<
+        std::endl;
 
     return 0;
 }
@@ -223,7 +223,7 @@ int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
     nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
-        "cloud_connectivity_test_util", QnUuid::createUuid());
+        "cc-tu-http", QnUuid::createUuid());
 
     NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 

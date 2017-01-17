@@ -64,7 +64,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_openButton = new QPushButton(tr("Show on Layout"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
-    m_diagnoseButton = new QPushButton(tr("Event Log"));
+    m_diagnoseButton = new QPushButton(tr("Event Log..."));
     m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
 
     m_rulesButton = new QPushButton();
@@ -126,9 +126,9 @@ void QnCameraSettingsDialog::retranslateUi()
     ), cameras);
 
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-        tr("Device Rules"), tr("Devices Rules"),
-        tr("Camera Rules"), tr("Cameras Rules"),
-        tr("I/O Module Rules"), tr("I/O Modules Rules")
+        tr("Device Rules..."), tr("Devices Rules..."),
+        tr("Camera Rules..."), tr("Cameras Rules..."),
+        tr("I/O Module Rules..."), tr("I/O Modules Rules...")
     ), cameras);
 
     setWindowTitle(windowTitle);

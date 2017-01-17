@@ -115,6 +115,7 @@ public:
     bool operator<(const SocketAddress& rhs) const;
 
     QString toString() const;
+    std::string toStdString() const;
     QUrl toUrl(const QString& scheme = QString()) const;
     bool isNull() const;
 

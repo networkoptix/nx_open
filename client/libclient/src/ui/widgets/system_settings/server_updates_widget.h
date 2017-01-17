@@ -65,6 +65,7 @@ private:
     void updateButtonText();
     void updateButtonAccent();
     void updateDownloadButton();
+    void updateVersionPage();
 
     void autoCheckForUpdates();
     void checkForUpdates(bool fromInternet);

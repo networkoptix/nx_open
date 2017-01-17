@@ -20,6 +20,11 @@ Product
 
     Properties
     {
+        condition: qbs.targetOS.contains("android")
+        qbs.optimization: qbs.buildVariant == "release" ? "fast" : "none"
+    }
+    Properties
+    {
         condition: product.type.contains("application") && qbs.targetOS.contains("linux")
         overrideListProperties: !project.developerBuild // Leaving Qt RPATH for developer builds.
         cpp.rpaths: ["$ORIGIN/../lib"]

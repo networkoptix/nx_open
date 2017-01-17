@@ -31,8 +31,10 @@ QtObject
 
             currentItem = item;
         }
-        else
+        else if (currentItem == item)
+        {
             currentItem = null;
+        }
     }
 
     function resetCurrentItem()

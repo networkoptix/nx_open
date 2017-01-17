@@ -1,5 +1,4 @@
-#ifndef QN_LOG_H
-#define QN_LOG_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -56,6 +55,8 @@ public:
 
     void log(const QString &msg, QnLogLevel logLevel);
     void log(QnLogLevel logLevel, const char *format, ...);
+
+    static void writeToStdout(const QString& str, QnLogLevel logLevel);
 
 #define QN_LOG_BODY(ARGS)                                                       \
         if(!isActive(logLevel))                                                 \
@@ -160,14 +161,3 @@ private:
 #define cl_log (*QnLog::instance())
 
 NX_UTILS_API void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
-
-
-template<class T>
-QString toDebugString(const T &value) {
-    QString result;
-    QDebug stream(&result);
-    stream << value;
-    return result;
-}
-
-#endif // QN_LOG_H

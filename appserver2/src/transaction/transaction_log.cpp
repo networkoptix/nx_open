@@ -16,20 +16,14 @@
 namespace ec2
 {
 
-static QnTransactionLog* globalInstance = nullptr;
-
 QnTransactionLog::QnTransactionLog(detail::QnDbManager* db): m_dbManager(db)
 {
-    NX_ASSERT(!globalInstance);
-    globalInstance = this;
     m_lastTimestamp = Timestamp::fromInteger(0);
     m_baseTime = 0;
 }
 
 QnTransactionLog::~QnTransactionLog()
 {
-    NX_ASSERT(globalInstance == this);
-    globalInstance = nullptr;
 }
 
 bool QnTransactionLog::clear()
@@ -191,11 +185,6 @@ int QnTransactionLog::currentSequenceNoLock() const
 {
     QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
-}
-
-QnTransactionLog* QnTransactionLog::instance()
-{
-    return globalInstance;
 }
 
 QnUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2)

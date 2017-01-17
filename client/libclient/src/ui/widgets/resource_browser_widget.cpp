@@ -627,7 +627,8 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
     m_hoverProcessor->setHoverEnterDelay(250);
     m_hoverProcessor->setHoverLeaveDelay(250);
-    connect(m_hoverProcessor, SIGNAL(hoverLeft()), this, SLOT(hideToolTip()));
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        &QnResourceBrowserWidget::hideToolTip);
 
     updateToolTipPosition();
 }
@@ -652,14 +653,23 @@ QnActionParameters QnResourceBrowserWidget::currentParameters(Qn::ActionScope sc
             return parameters.withArgument(Qn::NodeTypeRole, nodeType);
         };
 
-    if (nodeType == Qn::VideoWallItemNode)
-        return withNodeType(selectedVideoWallItems());
-
-    if (nodeType == Qn::VideoWallMatrixNode)
-        return withNodeType(selectedVideoWallMatrices());
-
-    if (!index.data(Qn::ItemUuidRole).value<QnUuid>().isNull()) /* If it's a layout item. */
-        return withNodeType(selectedLayoutItems());
+    switch (nodeType)
+    {
+        case Qn::VideoWallItemNode:
+            return withNodeType(selectedVideoWallItems());
+        case Qn::VideoWallMatrixNode:
+            return withNodeType(selectedVideoWallMatrices());
+        case Qn::CloudSystemNode:
+        {
+            QnActionParameters result;
+            result.setArgument(Qn::CloudSystemIdRole, index.data(Qn::CloudSystemIdRole).toString());
+            return withNodeType(result);
+        }
+        case Qn::LayoutItemNode:
+            return withNodeType(selectedLayoutItems());
+        default:
+            break;
+    }
 
     QnActionParameters result(selectedResources());
 

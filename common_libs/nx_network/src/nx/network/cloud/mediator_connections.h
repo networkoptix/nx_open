@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/stun/async_client_user.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/udp_client.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
@@ -67,6 +67,7 @@ public:
     void connect(
         nx::hpm::api::ConnectRequest connectData,
         utils::MoveOnlyFunc<void(
+            stun::TransportHeader /*stunTransportHeader*/,
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler)
     {
@@ -88,15 +89,14 @@ public:
 };
 
 typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;
-typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
+typedef MediatorClientConnection<stun::UdpClient> MediatorClientUdpConnection;
 
 /**
  * Provides access to mediator functions to be used by servers.
  * @note All server requests MUST be authorized by cloudId and cloudAuthenticationKey.
  */
 template<class NetworkClientType>
-class MediatorServerConnection
-:
+class MediatorServerConnection:
     public BaseMediatorClient<NetworkClientType>
 {
 public:
@@ -119,7 +119,7 @@ public:
             nx::hpm::api::PingResponse)> completionHandler)
     {
         this->doAuthRequest(
-            stun::cc::methods::ping,
+            stun::extension::methods::ping,
             std::move(requestData),
             std::move(completionHandler));
     }
@@ -187,8 +187,8 @@ protected:
 
         if (auto credentials = m_connector->getSystemCredentials())
         {
-            request.newAttribute<stun::cc::attrs::SystemId>(credentials->systemId);
-            request.newAttribute<stun::cc::attrs::ServerId>(credentials->serverId);
+            request.newAttribute<stun::extension::attrs::SystemId>(credentials->systemId);
+            request.newAttribute<stun::extension::attrs::ServerId>(credentials->serverId);
             request.insertIntegrity(credentials->systemId, credentials->key);
         }
 
@@ -201,11 +201,10 @@ private:
     AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
+typedef MediatorServerConnection<stun::UdpClient> MediatorServerUdpConnection;
 
 
-class MediatorServerTcpConnection
-:
+class MediatorServerTcpConnection:
     public MediatorServerConnection<stun::AsyncClientUser>
 {
 public:
@@ -223,7 +222,7 @@ public:
         std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
     {
         setIndicationHandler(
-            nx::stun::cc::indications::connectionRequested,
+            nx::stun::extension::indications::connectionRequested,
             [handler = std::move(handler)](nx::stun::Message msg)
             {
                 ConnectionRequestedEvent indicationData;

@@ -48,6 +48,7 @@
 
 namespace {
 
+// TODO: Introduce constants for API methods registered in media_server_process.cpp.
 QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (StorageStatusObject, "storageStatus")
     (StorageSpaceObject, "storageSpace")
@@ -129,11 +130,11 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
 }
 #endif // 0
 
-    void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
+void trace(const QString& serverId, int handle, int obj, const QString& message = QString())
 {
     RequestObject object = static_cast<RequestObject>(obj);
-        NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
-            .arg(serverId)
+    NX_LOG(lit("QnMediaServerConnection %1 <%2>: %3 %4")
+        .arg(serverId)
         .arg(handle)
         .arg(message)
         .arg(QnLexical::serialized(object)),
@@ -315,7 +316,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply(this, response, handle);
             break;
         default:
-            NX_ASSERT(false); /* We should never get here. */
+            NX_ASSERT(false);
             break;
     }
 

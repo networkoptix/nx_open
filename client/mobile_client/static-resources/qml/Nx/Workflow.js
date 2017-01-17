@@ -106,9 +106,15 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
     return item
 }
 
-function openSettingsScreen(systemName)
+function openSettingsScreen()
 {
     var item = stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
+    item.forceActiveFocus()
+}
+
+function openDeveloperSettingsScreen()
+{
+    var item = stackView.push(Qt.resolvedUrl("Screens/DeveloperSettingsScreen.qml"))
     item.forceActiveFocus()
 }
 

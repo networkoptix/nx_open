@@ -123,6 +123,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     m_userEnabledButton->setVisible(false);
     setHelpTopic(m_userEnabledButton, Qn::UserSettings_DisableUser_Help);
 
+    ui->alertBar->setReservedSpace(false);
+
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     auto applyButton = ui->buttonBox->button(QDialogButtonBox::Apply);
 

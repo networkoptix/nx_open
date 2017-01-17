@@ -43,7 +43,7 @@ namespace aio {
 class NX_NETWORK_API AIOService
 {
     /*!
-        After object instanciation one must call \a isInitialized to check whether instanciation was a success
+        After object instantiation one must call \a isInitialized to check whether instantiation was a success
         \param threadCount This is minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
         If zero, thread count is choosed automatically
     */

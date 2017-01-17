@@ -21,11 +21,9 @@ static stun::AbstractAsyncClient::Settings s_stunClientSettings
 
 } // namespace
 
-MediatorConnector::MediatorConnector()
-:
+MediatorConnector::MediatorConnector():
     m_stunClient(std::make_shared<stun::AsyncClient>(s_stunClientSettings)),
-    m_endpointFetcher(std::make_unique<nx::network::cloud::CloudModuleEndPointFetcher>(
-        lit("hpm"),
+    m_endpointFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>(
         std::make_unique<nx::network::cloud::RandomEndpointSelector>())),
     m_fetchEndpointRetryTimer(
         std::make_unique<nx::network::RetryTimer>(
@@ -156,7 +154,7 @@ static bool isReady(nx::utils::future<bool> const& f)
 void MediatorConnector::fetchEndpoint()
 {
     m_endpointFetcher->get(
-        [ this ]( nx_http::StatusCode::Value status, SocketAddress address )
+        [ this ]( nx_http::StatusCode::Value status, QUrl url )
     {
         if( status != nx_http::StatusCode::ok )
         {
@@ -172,7 +170,9 @@ void MediatorConnector::fetchEndpoint()
         else
         {
             NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logDEBUG1 );
+                     .arg(url.toString() ), cl_logDEBUG1 );
+
+            auto address = SocketAddress(url.host(), url.port());
 
             {
                 QnMutexLocker lk(&m_mutex);

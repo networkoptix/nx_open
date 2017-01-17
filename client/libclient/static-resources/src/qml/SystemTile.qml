@@ -16,6 +16,9 @@ BaseTile
     property bool safeMode: false;
     property bool isFactoryTile: impl.isFactoryTile;
 
+    property bool isRunning: false;
+    property bool isReachable: false;
+
     property string wrongVersion;
     property string compatibleVersion;
 
@@ -40,7 +43,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isOnline;
+        return control.isConnectable;
     }
 
     tileColor:
@@ -74,7 +77,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !control.isOnline || !isCompatibleInternal);
+                || !control.isConnectable || !isCompatibleInternal);
         }
 
         text:
@@ -85,8 +88,10 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!control.isOnline)
+            if (!control.isRunning)
                 return qsTr("OFFLINE");
+            if (!control.isReachable)
+                return qsTr("UNREACHABLE");
 
             return "";
         }
@@ -238,7 +243,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
+                currentAreaItem.isConnectable = Qt.binding( function() { return control.isConnectable; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }

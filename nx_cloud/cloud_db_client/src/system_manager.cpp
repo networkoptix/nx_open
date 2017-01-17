@@ -12,10 +12,9 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-SystemManager::SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
-:
+SystemManager::SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
@@ -146,6 +145,6 @@ void SystemManager::recordUserSessionStart(
         completionHandler);
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

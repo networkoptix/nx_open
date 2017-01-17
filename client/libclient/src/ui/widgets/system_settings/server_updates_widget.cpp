@@ -41,39 +41,41 @@
 
 namespace {
 
-    const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
-    // Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
-    const quint32 kProcessTerminateTimeoutMs = 15000;
+const int kLongInstallWarningTimeoutMs = 2 * 60 * 1000; // 2 minutes
+// Time that is given to process to exit. After that, applauncher (if present) will try to terminate it.
+const quint32 kProcessTerminateTimeoutMs = 15000;
 
-    const int kTooLateDayOfWeek = Qt::Thursday;
+const int kTooLateDayOfWeek = Qt::Thursday;
 
-    const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
+const int kAutoCheckIntervalMs = 60 * 60 * 1000;  // 1 hour
 
-    const int kMaxLabelWidth = 400; // pixels
+const int kMaxLabelWidth = 400; // pixels
 
-    const int kVersionLabelFontSizePixels = 24;
+const int kVersionLabelFontSizePixels = 24;
+const int kVersionLabelFontWeight = QFont::DemiBold;
 
-    const int kVersionLabelFontWeight = QFont::DemiBold;
+constexpr auto kLatestVersionBannerLabelFontSizePixels = 22;
+constexpr auto kLatestVersionBannerLabelFontWeight = QFont::Light;
 
-    const int kLinkCopiedMessageTimeoutMs = 2000;
+const int kLinkCopiedMessageTimeoutMs = 2000;
 
-    /* N-dash 5 times: */
-    const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
+/* N-dash 5 times: */
+const QString kNoVersionNumberText = QString::fromWCharArray(L"\x2013\x2013\x2013\x2013\x2013");
 
-    QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
+QString elidedText(const QString& text, const QFontMetrics& fontMetrics)
+{
+    QString result;
+
+    for (const auto& line : text.split(L'\n', QString::KeepEmptyParts))
     {
-        QString result;
+        if (result.isEmpty())
+            result += L'\n';
 
-        for (const auto& line: text.split(L'\n', QString::KeepEmptyParts))
-        {
-            if (result.isEmpty())
-                result += L'\n';
-
-            result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
-        }
-
-        return result;
+        result += fontMetrics.elidedText(line, Qt::ElideMiddle, kMaxLabelWidth);
     }
+
+    return result;
+}
 
 } // anonymous namespace
 
@@ -85,12 +87,22 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 {
     ui->setupUi(this);
 
-    QFont font;
-    font.setPixelSize(kVersionLabelFontSizePixels);
-    font.setWeight(kVersionLabelFontWeight);
-    ui->targetVersionLabel->setFont(font);
+    QFont versionLabelFont;
+    versionLabelFont.setPixelSize(kVersionLabelFontSizePixels);
+    versionLabelFont.setWeight(kVersionLabelFontWeight);
+    ui->targetVersionLabel->setFont(versionLabelFont);
     ui->targetVersionLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->targetVersionLabel->setForegroundRole(QPalette::Text);
+
+    QFont latestVersionBannerFont;
+    latestVersionBannerFont.setPixelSize(kLatestVersionBannerLabelFontSizePixels);
+    latestVersionBannerFont.setWeight(kLatestVersionBannerLabelFontWeight);
+    ui->latestVersionBannerLabel->setFont(latestVersionBannerFont);
+    ui->latestVersionBannerLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
+    ui->latestVersionBannerLabel->setForegroundRole(QPalette::Text);
+
+    ui->latestVersionIconLabel->setPixmap(qnSkin->pixmap("system_settings/update_checkmark.png",
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     ui->linkCopiedIconLabel->setPixmap(qnSkin->pixmap("buttons/checkmark.png",
         QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
@@ -100,6 +112,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(m_updateTool, this);
+    connect(m_updatesModel, &QnServerUpdatesModel::lowestInstalledVersionChanged, this,
+        &QnServerUpdatesWidget::updateVersionPage);
 
     QnSortedServerUpdatesModel* sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
     sortedUpdatesModel->setSourceModel(m_updatesModel);
@@ -190,6 +204,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     updateButtonText();
     updateButtonAccent();
     updateDownloadButton();
+    updateVersionPage();
 }
 
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)
@@ -213,6 +228,7 @@ void QnServerUpdatesWidget::setMode(Mode mode)
     updateButtonText();
     updateButtonAccent();
     updateDownloadButton();
+    updateVersionPage();
 }
 
 void QnServerUpdatesWidget::initDropdownActions()
@@ -339,22 +355,31 @@ void QnServerUpdatesWidget::updateButtonAccent()
 
 void QnServerUpdatesWidget::updateDownloadButton()
 {
-    switch (m_mode)
-    {
-        case QnServerUpdatesWidget::Mode::LatestVersion:
-            ui->downloadButton->setText(tr("Download the Latest Version Update File"));
-            ui->downloadButton->show();
-            break;
-        case QnServerUpdatesWidget::Mode::SpecificBuild:
-            ui->downloadButton->setText(tr("Download Update File"));
-            ui->downloadButton->hide();
-            break;
-        case QnServerUpdatesWidget::Mode::LocalFile:
-            ui->downloadButton->hide();
-            break;
-        default:
-            break;
-    }
+    bool hasLatestVersion = m_mode == Mode::LatestVersion
+        && !m_latestVersion.isNull()
+        && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
+
+    bool showButton = m_mode == QnServerUpdatesWidget::Mode::LatestVersion
+        && !hasLatestVersion;
+
+    ui->downloadButton->setVisible(showButton);
+    ui->downloadButton->setText(ui->targetVersionLabel->text() == kNoVersionNumberText
+        ? tr("Download the Latest Version Update File")
+        : tr("Download Update File"));
+}
+
+void QnServerUpdatesWidget::updateVersionPage()
+{
+    bool hasLatestVersion = m_mode == Mode::LatestVersion
+        && !m_latestVersion.isNull()
+        && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
+
+    ui->versionStackedWidget->setCurrentWidget(hasLatestVersion
+        ? ui->latestVersionPage
+        : ui->versionPage);
+
+    if (hasLatestVersion)
+        ui->infoStackedWidget->setCurrentWidget(ui->emptyInfoPage);
 }
 
 bool QnServerUpdatesWidget::cancelUpdate()
@@ -579,9 +604,9 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
 
     ui->targetVersionLabel->setText(versionText);
 
-    ui->versionStackedWidget->setCurrentWidget(ui->versionPage);
-
+    updateDownloadButton();
     updateButtonAccent();
+    updateVersionPage();
 }
 
 bool QnServerUpdatesWidget::restartClient(const QnSoftwareVersion& version)

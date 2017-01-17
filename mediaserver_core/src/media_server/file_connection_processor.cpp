@@ -17,7 +17,7 @@
 #include <network/tcp_listener.h>
 
 namespace {
-    static const qint64 CACHE_SIZE = 1024 * 256;
+    static const qint64 CACHE_SIZE = 1024 * 1024;
 
     struct CacheEntry
     {
@@ -29,6 +29,7 @@ namespace {
 
 
     static QCache<QString, CacheEntry> cachedFiles(CACHE_SIZE);
+    static QCache<QString, void> externalPackageNameMiss(CACHE_SIZE);
     static QnMutex cacheMutex;
 
     static QHash<QString, QByteArray> contentTypes = {
@@ -53,11 +54,17 @@ namespace {
 
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
-        {   /* Check external package. */
-            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-            if (result->open(QuaZipFile::ReadOnly))
-                return result;
+        if (!externalPackageNameMiss.contains(relativePath))
+        {
+
+            {   /* Check external package. */
+                static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
+                QIODevicePtr result(new QuaZipFile(packageName, relativePath));
+                if (result->open(QuaZipFile::ReadOnly))
+                    return result;
+
+                externalPackageNameMiss.insert(relativePath, nullptr);
+            }
         }
 
         {   /* Check internal resources. */
