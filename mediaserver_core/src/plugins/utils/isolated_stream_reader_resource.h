@@ -20,6 +20,10 @@ public:
         const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
+    virtual void saveParams() override;
+    virtual void saveParamsAsync() override;
+    virtual int saveAsync() override;
+
 private:
     mutable QnMutex m_propertyMutex;
     std::map<QString, QString> m_properties;

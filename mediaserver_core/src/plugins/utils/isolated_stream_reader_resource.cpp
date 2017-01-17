@@ -38,6 +38,22 @@ bool IsolatedStreamReaderResource::setProperty(
     return true;
 }
 
+void IsolatedStreamReaderResource::saveParams()
+{
+    // Do nothing.
+}
+
+void IsolatedStreamReaderResource::saveParamsAsync()
+{
+    // Do nothing.
+}
+
+int IsolatedStreamReaderResource::saveAsync()
+{
+    // Do nothing.
+    return 0;
+}
+
 } // namespace utils
 } // namespace plugins
 } // namespace nx
