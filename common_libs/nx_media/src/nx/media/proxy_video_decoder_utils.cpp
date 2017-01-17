@@ -10,7 +10,9 @@ namespace nx {
 namespace media {
 
 namespace proxy_video_decoder {
-    FlagConfig conf("ProxyVideoDecoder");
+
+FlagConfig conf("ProxyVideoDecoder");
+
 } // namespace proxy_video_decoder
 
 void debugDrawCheckerboardArgb(

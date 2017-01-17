@@ -419,6 +419,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    BufferType RequestLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class StatusLine
@@ -479,6 +485,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    BufferType StatusLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class Request
@@ -573,6 +585,13 @@ namespace nx_http
     }
 
     BufferType Request::serialized() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
+    BufferType Request::toString() const
     {
         BufferType buf;
         serialize( &buf );

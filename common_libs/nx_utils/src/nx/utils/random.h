@@ -24,7 +24,7 @@ public:
     result_type operator()();
     double entropy() const;
 
-    static constexpr result_type min() { return 0; }
+    static constexpr result_type min() { return std::random_device::min(); }
     static constexpr result_type max() { return std::random_device::max(); }
 };
 

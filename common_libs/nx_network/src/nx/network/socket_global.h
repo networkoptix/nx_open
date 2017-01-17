@@ -33,6 +33,7 @@ public:
         NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
         NX_FLAG(0, addressResolver, "Extra debug info from cloud::AddressResolver");
         NX_FLAG(0, sslSocketWrappers, "Extra debug info from SslSocket* classes");
+        NX_FLAG(0, httpClientTraffic, "Trace HTTP traffic for nx_http::AsyncHttpClient");
     };
 
     struct NX_NETWORK_API Config: nx::utils::FlagConfig
