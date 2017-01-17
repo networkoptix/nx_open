@@ -419,7 +419,7 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
-    BufferType RequestLine::toString() const
+    StringType RequestLine::toString() const
     {
         BufferType buf;
         serialize( &buf );
@@ -485,7 +485,7 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
-    BufferType StatusLine::toString() const
+    StringType StatusLine::toString() const
     {
         BufferType buf;
         serialize( &buf );
@@ -591,7 +591,7 @@ namespace nx_http
         return buf;
     }
 
-    BufferType Request::toString() const
+    StringType Request::toString() const
     {
         BufferType buf;
         serialize( &buf );
@@ -651,14 +651,14 @@ namespace nx_http
     }
 
 
-    BufferType Response::toString() const
+    StringType Response::toString() const
     {
         BufferType buf;
         serialize( &buf );
         return buf;
     }
 
-    BufferType Response::toMultipartString(const ConstBufferRefType& boundary) const
+    StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     {
         BufferType buf;
         serializeMultipartResponse( &buf, boundary );
@@ -777,7 +777,7 @@ namespace nx_http
         type = MessageType::none;
     }
 
-    BufferType Message::toString() const
+    StringType Message::toString() const
     {
         BufferType str;
         switch( type )
