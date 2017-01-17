@@ -136,7 +136,7 @@ void MediaServerEmulator::bindToAioThread(network::aio::AbstractAioThread* aioTh
     if (m_httpServer)
         m_httpServer->bindToAioThread(aioThread);
     if (m_mediatorUdpClient)
-        m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+        m_mediatorUdpClient->bindToAioThread(aioThread);
     if (m_mediatorConnector)
         m_mediatorConnector->bindToAioThread(aioThread);
 }

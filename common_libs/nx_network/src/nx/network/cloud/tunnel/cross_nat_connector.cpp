@@ -70,7 +70,7 @@ CrossNatConnector::CrossNatConnector(
 {
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
-    m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
+    m_mediatorUdpClient->bindToAioThread(getAioThread());
 
     m_timer = std::make_unique<aio::Timer>();
     m_timer->bindToAioThread(getAioThread());
@@ -84,7 +84,7 @@ CrossNatConnector::~CrossNatConnector()
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+    m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
 }
 
