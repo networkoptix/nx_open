@@ -98,31 +98,6 @@
      <property name="editable">
       <bool>true</bool>
      </property>
-     <item>
-      <property name="text">
-       <string>Auto</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>text/plain</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>application/json</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>application/xml</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>application/html</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item row="2" column="0">
