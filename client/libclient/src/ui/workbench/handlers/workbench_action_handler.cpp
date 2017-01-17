@@ -2258,9 +2258,8 @@ void QnWorkbenchActionHandler::openInBrowser(const QnMediaServerResourcePtr& ser
 {
     if (!server || !context()->user())
         return;
-
-    QUrl serverUrl(server->getApiUrl().toString());
-    serverUrl.setPath(path);
+    // path may contains path + url query params
+    QUrl serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
     QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
