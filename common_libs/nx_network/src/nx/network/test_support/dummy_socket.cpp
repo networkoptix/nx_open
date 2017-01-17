@@ -1,22 +1,16 @@
-/**********************************************************
-* 26 feb 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "dummy_socket.h"
-#include <nx/utils/random.h>
 
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
 
-DummySocket::DummySocket()
-:
-    m_localAddress( HostAddress::localhost, nx::utils::random::number<quint16>(5000, 50000) )
+DummySocket::DummySocket():
+    m_localAddress(HostAddress::localhost, nx::utils::random::number<quint16>(5000, 50000))
 {
 }
 
-bool DummySocket::bind( const SocketAddress& localAddress )
+bool DummySocket::bind(const SocketAddress& localAddress)
 {
     m_localAddress = localAddress;
     return true;
@@ -27,77 +21,77 @@ SocketAddress DummySocket::getLocalAddress() const
     return m_localAddress;
 }
 
-bool DummySocket::setReuseAddrFlag( bool /*reuseAddr*/ )
+bool DummySocket::setReuseAddrFlag(bool /*reuseAddr*/)
 {
     return true;
 }
 
-bool DummySocket::getReuseAddrFlag( bool* /*val*/ ) const
+bool DummySocket::getReuseAddrFlag(bool* /*val*/) const
 {
     return true;
 }
 
-bool DummySocket::setNonBlockingMode( bool /*val*/ )
+bool DummySocket::setNonBlockingMode(bool /*val*/)
 {
     return true;
 }
 
-bool DummySocket::getNonBlockingMode( bool* /*val*/ ) const
+bool DummySocket::getNonBlockingMode(bool* /*val*/) const
 {
     return true;
 }
 
-bool DummySocket::getMtu( unsigned int* mtuValue ) const
+bool DummySocket::getMtu(unsigned int* mtuValue) const
 {
     *mtuValue = 1500;
     return true;
 }
 
-bool DummySocket::setSendBufferSize( unsigned int /*buffSize*/ )
+bool DummySocket::setSendBufferSize(unsigned int /*buffSize*/)
 {
     return true;
 }
 
-bool DummySocket::getSendBufferSize( unsigned int* buffSize ) const
-{
-    *buffSize = 8192;
-    return true;
-}
-
-bool DummySocket::setRecvBufferSize( unsigned int /*buffSize*/ )
-{
-    return true;
-}
-
-bool DummySocket::getRecvBufferSize( unsigned int* buffSize ) const
+bool DummySocket::getSendBufferSize(unsigned int* buffSize) const
 {
     *buffSize = 8192;
     return true;
 }
 
-bool DummySocket::setRecvTimeout( unsigned int /*millis*/ )
+bool DummySocket::setRecvBufferSize(unsigned int /*buffSize*/)
 {
     return true;
 }
 
-bool DummySocket::getRecvTimeout( unsigned int* millis ) const
+bool DummySocket::getRecvBufferSize(unsigned int* buffSize) const
+{
+    *buffSize = 8192;
+    return true;
+}
+
+bool DummySocket::setRecvTimeout(unsigned int /*millis*/)
+{
+    return true;
+}
+
+bool DummySocket::getRecvTimeout(unsigned int* millis) const
 {
     *millis = 0;
     return true;
 }
 
-bool DummySocket::setSendTimeout( unsigned int /*ms*/ )
+bool DummySocket::setSendTimeout(unsigned int /*ms*/)
 {
     return true;
 }
 
-bool DummySocket::getSendTimeout( unsigned int* millis ) const
+bool DummySocket::getSendTimeout(unsigned int* millis) const
 {
     *millis = 0;
     return true;
 }
 
-bool DummySocket::getLastError( SystemError::ErrorCode* /*errorCode*/ ) const
+bool DummySocket::getLastError(SystemError::ErrorCode* /*errorCode*/) const
 {
     return false;
 }
@@ -114,7 +108,7 @@ Pollable* DummySocket::pollable()
 
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
-    unsigned int /*timeoutMillis*/ )
+    unsigned int /*timeoutMillis*/)
 {
     m_remotePeerAddress = remoteSocketAddress;
     return true;
@@ -138,68 +132,68 @@ void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
 
 bool DummySocket::reopen()
 {
-    return connect( m_remotePeerAddress );
+    return connect(m_remotePeerAddress);
 }
 
-bool DummySocket::setNoDelay( bool /*value*/ )
+bool DummySocket::setNoDelay(bool /*value*/)
 {
     return true;
 }
 
-bool DummySocket::getNoDelay( bool* /*value*/ ) const
+bool DummySocket::getNoDelay(bool* /*value*/) const
 {
     return true;
 }
 
-bool DummySocket::toggleStatisticsCollection( bool /*val*/ )
+bool DummySocket::toggleStatisticsCollection(bool /*val*/)
 {
     return false;
 }
 
-bool DummySocket::getConnectionStatistics( StreamSocketInfo* /*info*/ )
+bool DummySocket::getConnectionStatistics(StreamSocketInfo* /*info*/)
 {
     return false;
 }
 
-bool DummySocket::setKeepAlive( boost::optional< KeepAliveOptions > /*info*/ )
+bool DummySocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
 {
     return true;
 }
 
-bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ ) const
+bool DummySocket::getKeepAlive(boost::optional< KeepAliveOptions >* /*result*/) const
 {
     return false;
 }
 
-void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
+void DummySocket::post(nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
 }
 
-void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/ )
+void DummySocket::dispatch(nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
 }
 
 void DummySocket::connectAsync(
     const SocketAddress& /*addr*/,
-    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> /*handler*/ )
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
 }
 
 void DummySocket::readSomeAsync(
     nx::Buffer* const /*buf*/,
-    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
 {
 }
 
 void DummySocket::sendAsync(
     const nx::Buffer& /*buf*/,
-    std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
+    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
 {
 }
 
 void DummySocket::registerTimer(
     std::chrono::milliseconds /*timeoutMs*/,
-    nx::utils::MoveOnlyFunc<void()> /*handler*/ )
+    nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
 }
 
@@ -212,66 +206,5 @@ void DummySocket::bindToAioThread(aio::AbstractAioThread* /*aioThread*/)
 {
 }
 
-////////////////////////////////////////////////////////////
-//// parse utils
-////////////////////////////////////////////////////////////
-
-BufferSocket::BufferSocket( const std::string& data )
-:
-    m_data( data ),
-    m_isOpened( false ),
-    m_curPos( 0 )
-{
-}
-
-bool BufferSocket::close()
-{
-    m_isOpened = false;
-    return true;
-}
-
-bool BufferSocket::shutdown()
-{
-    m_isOpened = false;
-    return true;
-}
-
-bool BufferSocket::isClosed() const
-{
-    return !m_isOpened;
-}
-
-bool BufferSocket::connect(
-    const SocketAddress& remoteSocketAddress,
-    unsigned int timeoutMillis )
-{
-    if( !DummySocket::connect( remoteSocketAddress, timeoutMillis ) )
-        return false;
-
-    m_isOpened = true;
-    m_curPos = 0;
-    return true;
-}
-
-int BufferSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
-{
-    const size_t bytesToCopy = std::min<size_t>( bufferLen, m_data.size() - m_curPos );
-    memcpy( buffer, m_data.data() + m_curPos, bytesToCopy );
-    m_curPos += bytesToCopy;
-    return bytesToCopy;
-}
-
-int BufferSocket::send( const void* /*buffer*/, unsigned int bufferLen )
-{
-    if( !m_isOpened )
-        return -1;
-    return bufferLen;
-}
-
-bool BufferSocket::isConnected() const
-{
-    return m_isOpened;
-}
-
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx
