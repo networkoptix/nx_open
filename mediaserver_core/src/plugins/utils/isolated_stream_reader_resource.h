@@ -6,9 +6,9 @@
 
 namespace nx {
 namespace plugins {
-namespace pelco {
+namespace utils {
 
-class OpteraStreamReaderResource: public QnPlOnvifResource
+class IsolatedStreamReaderResource: public QnPlOnvifResource
 {
 
 public:
@@ -25,7 +25,7 @@ private:
     std::map<QString, QString> m_properties;
 };
 
-} // namespace pelco
+} // namespace utils
 } // namespace plugins
 } // namespace nx
 

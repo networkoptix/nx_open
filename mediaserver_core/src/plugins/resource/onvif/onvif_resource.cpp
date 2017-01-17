@@ -48,6 +48,8 @@
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/resource/resource_data_structures.h>
 
+#include <plugins/utils/multisensor_data_provider.h>
+
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
@@ -471,6 +473,14 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODECS c)
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool shouldAppearAsSingleChannel = resData.value<bool>(
+        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+
+    if (shouldAppearAsSingleChannel)
+        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
+
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
