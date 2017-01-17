@@ -240,7 +240,9 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
     milliseconds effectiveConnectTimeout(0);
     if (m_connectTimeout)
     {
-        effectiveConnectTimeout = duration_cast<milliseconds>(m_timer->timeToEvent());
+        if (const auto timeToEvent = m_timer->timeToEvent())
+            effectiveConnectTimeout = duration_cast<milliseconds>(*timeToEvent);
+
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //< Zero timeout is infinity.
     }

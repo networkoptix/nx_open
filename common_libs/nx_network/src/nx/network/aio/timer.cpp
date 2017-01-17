@@ -44,9 +44,12 @@ void Timer::start(
     m_aioService.registerTimerNonSafe(&lock, &pollable(), timeout, this);
 }
 
-std::chrono::nanoseconds Timer::timeToEvent() const
+boost::optional<std::chrono::nanoseconds> Timer::timeToEvent() const
 {
-    const auto elapsed = std::chrono::steady_clock::now() - m_timerStartClock;
+    if (!m_timerStartClock)
+        return boost::none;
+
+    const auto elapsed = std::chrono::steady_clock::now() - *m_timerStartClock;
     return elapsed >= m_timeout
         ? std::chrono::nanoseconds::zero()
         : m_timeout - elapsed;
@@ -93,6 +96,7 @@ void Timer::eventTriggered(Pollable* sock, aio::EventType eventType) throw()
     nx::utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
     const int internalTimerId = m_internalTimerId;
 
+    m_timerStartClock = boost::none;
     handler();
 
     if (watcher.objectDestroyed())
