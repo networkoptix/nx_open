@@ -115,10 +115,10 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
     static const QByteArray kDefaultContentType("text/plain");
     static const QByteArray kJsonContentType("application/json");
     static const QByteArray kXMLContentType("application/xml");
-    static const QByteArray kHTMLContentType("application/html");
+    static const QByteArray kHTMLContentType("text/html; charset=utf-8");
 
     if (msgBody.isEmpty())
-        return kDefaultContentType;
+        return QByteArray();
 
     QJsonParseError error;
     QJsonDocument document = QJsonDocument::fromJson(msgBody, &error);
@@ -131,10 +131,10 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
     while (pos >= 0)
     {
         // Check that <html pattern found not inside string
-        int quoteCount = msgBody.left(pos).count("\"");
+        int quoteCount = QByteArray::fromRawData(msgBody.data(), pos).count('\"');
         if (quoteCount % 2 == 0)
             return kHTMLContentType;
-        pos = regExpr.indexIn(QString::fromUtf8(msgBody), pos+1);
+        pos = regExpr.indexIn(msgBody, pos+1);
     }
 
     QDomDocument xmlDoc;
