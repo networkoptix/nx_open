@@ -21,6 +21,7 @@ MediatorAddressPublisher::MediatorAddressPublisher(
     m_mediatorConnection->setOnReconnectedHandler(
         [this]()
         {
+            NX_LOGX(lm("Mediator client reported reconnect"), cl_logDEBUG2);
             m_publishedAddresses.clear();
             publishAddressesIfNeeded();
         });
