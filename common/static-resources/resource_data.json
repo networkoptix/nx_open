@@ -1712,16 +1712,16 @@
             },
             "multiresourceVideoChannelMapping": [
                 {
-                    "resourceChannel": 2,
+                    "resourceChannel": 1,
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [2]
+                            "mappedChannels": [0]
                         }
                     ]
                 },
                 {
-                    "resourceChannel": 3,
+                    "resourceChannel": 2,
                     "channelMap": [
                         {
                             "originalChannel": 0,
@@ -1730,11 +1730,11 @@
                     ]
                 },
                 {
-                    "resourceChannel": 4,
+                    "resourceChannel": 3,
                     "channelMap": [
                         {
                             "originalChannel": 0,
-                            "mappedChannels": [0]
+                            "mappedChannels": [2]
                         }
                     ]
                 }

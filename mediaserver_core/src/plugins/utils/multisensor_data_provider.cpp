@@ -92,6 +92,8 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         if (!doNotConfigureCamera)
             reader->setDesiredLiveParams(params);
 
+        reader->setRole(getRole());
+
         doNotConfigureCamera = true;
         m_dataSource.addDataSource(source);
 

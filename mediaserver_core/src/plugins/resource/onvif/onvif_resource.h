@@ -238,6 +238,9 @@ public:
 
     void updateToChannel(int value);
 
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const override;
+
     bool detectVideoSourceCount();
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
@@ -536,6 +539,7 @@ private:
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
+    mutable QnResourceVideoLayoutPtr m_videoLayout;
 protected:
     QnCameraAdvancedParams m_advancedParameters;
     int m_onvifRecieveTimeout;
