@@ -56,7 +56,8 @@ void MediatorAddressPublisher::updateAddresses(
         [this, addresses = std::move(addresses), handler = std::move(updateHandler)]() mutable
         {
             m_serverAddresses = std::move(addresses);
-            m_updateHandlers.push_back(std::move(handler));
+            if (handler)
+                m_updateHandlers.push_back(std::move(handler));
             NX_LOGX(lm("New addresses: %1").container(m_serverAddresses), cl_logDEBUG1);
             publishAddressesIfNeeded();
         });
