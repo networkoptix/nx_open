@@ -2,7 +2,8 @@
 
 #include "health/system_health.h"
 
-class QnSystemHealthStringsHelper: public QObject {
+class QnSystemHealthStringsHelper: public QObject
+{
     Q_OBJECT
 public:
     /** Text that is used where the most short common title is required, e.g. in settings. */
