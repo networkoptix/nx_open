@@ -54,6 +54,10 @@ public:
         return &m_socket;
     }
 
+    virtual void close() override
+    {
+    }
+
 private:
     Socket m_socket;
 };
