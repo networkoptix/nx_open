@@ -18,7 +18,7 @@
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
             <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo_102x102.png" />
+            <Payload SourceFile="logo-102x102.png" />
             <Payload SourceFile="logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication

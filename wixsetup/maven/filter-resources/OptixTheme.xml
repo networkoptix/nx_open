@@ -23,7 +23,7 @@
   <Page Name="Install">
     <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">Accept and Install</Button>
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo_102x102.png"/>
+    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
     <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">By clicking "Accept and Install" you are agreeing to our</Text>
