@@ -48,7 +48,7 @@ void QnSettings::initializeSystemSettings()
     else
     {
         #ifdef _WIN32
-            m_systemSettings.reset(new QSettings(scope, organizationName, applicationName));
+            m_systemSettings.reset(new QSettings(m_scope, m_organizationName, m_applicationName));
         #else
             m_systemSettings.reset(new QSettings(lit("/opt/%1/%2/etc/%2.conf")
                 .arg(m_organizationName).arg(m_moduleName), QSettings::IniFormat));
