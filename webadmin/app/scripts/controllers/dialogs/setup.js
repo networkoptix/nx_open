@@ -613,12 +613,13 @@ angular.module('webadminApp')
                 0: {},
                 start: {
                     cancel: $scope.settings.thickClient,
+                    skip: 'merge',
                     next: 'systemName'
                 },
                 systemName: {
                     back: 'start',
                     skip: 'merge',
-                    next: 'chooseCloudOrLocal',
+                    next: 'localLogin',
                     valid: function () {
                         return checkForm($scope.forms.systemNameForm);
                     }
@@ -716,7 +717,7 @@ angular.module('webadminApp')
                     }
                 },
                 merge: {
-                    back: 'systemName',
+                    back: 'start',
                     // onShow: discoverSystems,
                     next: 'mergeProcess',
                     valid: function () {
@@ -728,7 +729,7 @@ angular.module('webadminApp')
                 },
                 mergeFailure: {
                     back: 'merge',
-                    skip: 'systemName',
+                    skip: 'start',
                     retry: function () {
                         $scope.next('merge');
                     }
@@ -738,7 +739,7 @@ angular.module('webadminApp')
                     back: function () {
                         $scope.settings.localPassword = '';
                         $scope.settings.localPasswordConfirmation = '';
-                        $scope.next('chooseCloudOrLocal', true);
+                        $scope.next('start', true);
                     },
                     next: initOfflineSystem,
                     valid: function () {
