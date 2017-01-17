@@ -1114,7 +1114,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
         QTextStream stream(stdout);

@@ -2802,6 +2802,9 @@ QRect QnNxStyle::subControlRect(
                                 else
                                     rect = QRect(rect.left(), rect.top(), pos, rect.height());
                                 break;
+
+                            default:
+                                break;
                         }
 
                         break;

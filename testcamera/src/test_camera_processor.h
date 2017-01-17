@@ -8,7 +8,7 @@ class QnTestCameraProcessorPrivate;
 class QnTestCameraProcessor: public QnTCPConnectionProcessor
 {
 public:
-    QnTestCameraProcessor(const QSharedPointer<AbstractStreamSocket>& socket, QnTcpListener* owner);
+    QnTestCameraProcessor(const QSharedPointer<AbstractStreamSocket>& socket);
     virtual ~QnTestCameraProcessor();
     virtual void run() override;
 private:

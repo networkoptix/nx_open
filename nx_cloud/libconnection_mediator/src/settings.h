@@ -94,7 +94,7 @@ public:
     /**
      * Loads settings from both command line and conf file (or win32 registry).
      */
-    void load(int argc, char **argv);
+    void load(int argc, const char **argv);
     void printCmdLineArgsHelp();
 
 private:
