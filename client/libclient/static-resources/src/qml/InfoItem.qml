@@ -39,6 +39,7 @@ MaskedComboBox
 
     areaDelegate: Item
     {
+
         height: Math.max(imageItem.height, textItem.height, pencilImage.height);
         Image
         {
@@ -58,9 +59,9 @@ MaskedComboBox
             id: textItem;
 
             anchors.left: imageItem.right;
-            anchors.right: pencilImage.left;
-            anchors.leftMargin: 4;
-            anchors.rightMargin: 4;
+            anchors.right: (control.isAvailable ? pencilImageHolder.left : parent.right);
+            leftPadding: 4;
+            rightPadding: 4;
             anchors.verticalCenter: parent.verticalCenter;
 
             disableable: control.isAvailable;
@@ -79,17 +80,27 @@ MaskedComboBox
             }
         }
 
-        Image
+        Item
         {
-            id: pencilImage;
+            id: pencilImageHolder;
 
-            anchors.right: parent.right;
+            property real xPosition: (imageItem.x + imageItem.width + textItem.contentWidth
+                + textItem.leftPadding + textItem.rightPadding);
+            x: ((xPosition + width) > parent.width
+                ? parent.width - pencilImage.width
+                : xPosition + textItem.rightPadding);
             anchors.verticalCenter: parent.verticalCenter;
+            width: pencilImage.width;
+            height: pencilImage.height;
 
-            visible: hoverArea.containsMouse && isAvailable;
-            source: hoverExtraIconUrl;
+            Image
+            {
+                id: pencilImage;
+
+                visible: hoverArea.containsMouse && isAvailable;
+                source: hoverExtraIconUrl;
+            }
         }
-
         MouseArea
         {
             id: hoverArea;
