@@ -12,8 +12,8 @@
 
 namespace
 {
-    const int kOpteraReceiveTimout = 30;
-    const int kOpteraSendTimeout = 30;
+    const int kDefaultReceiveTimout = 30;
+    const int kDefaultSendTimeout = 30;
     const quint16 kStreamOpenWaitingTimeMs = 40000;
     const quint16 kSingleWaitingIterationMs = 20;
 }
@@ -42,9 +42,6 @@ QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
         return getMetaData();
 
     auto data = m_dataSource.retrieveData();
-
-    if (data)
-        data->dataProvider = this;
 
     return data;
 }
@@ -82,8 +79,8 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
         auto resource = initSubChannelResource(
             resourceChannelMapping.resourceChannel);
 
-        resource->setOnvifRequestsRecieveTimeout(kOpteraReceiveTimout);
-        resource->setOnvifRequestsSendTimeout(kOpteraSendTimeout);
+        resource->setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
+        resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
 
         auto reader = new QnOnvifStreamReader(resource);
         reader->setMustNotConfigureResource(doNotConfigureCamera);
