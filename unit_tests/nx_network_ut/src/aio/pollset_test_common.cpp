@@ -14,7 +14,7 @@ std::unique_ptr<Pollable> CommonPollSetTest::createRegularSocket()
 {
     auto udpSocket = std::make_unique<UDPSocket>(AF_INET);
     NX_GTEST_ASSERT_TRUE(udpSocket->bind(SocketAddress(HostAddress::localhost, 0)));
-    return udpSocket;
+    return std::move(udpSocket);
 }
 
 std::unique_ptr<Pollable> CommonPollSetTest::createSocketOfRandomType()

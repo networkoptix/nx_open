@@ -6,6 +6,7 @@
     #include <gmock/gmock.h>
 #endif
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
 
