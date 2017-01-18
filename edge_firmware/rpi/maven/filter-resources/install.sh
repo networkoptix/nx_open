@@ -38,6 +38,10 @@ update () {
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
 
+    #making /tmp tmpfs (hosted in RAM)
+    tmp=$(df -h | grep "/tmp")
+    if [ -z $tmp ]; then echo "tmpfs /tmp tmpfs rw,nosuid,nodev" | tee -a /etc/fstab; fi
+    
     LIBVDPAU=$(dpkg -l | grep libvdpau | grep 0.4.1 | awk '{print $3}')
     if [ -z $LIBVDPAU ]; then dpkg -i /opt/deb/libvdpau/*.deb; fi
 
