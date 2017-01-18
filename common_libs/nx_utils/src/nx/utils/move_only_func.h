@@ -117,7 +117,7 @@ public:
 };
 
 template<typename Function, typename ... Args>
-void moveAndCall(Function& function, Args ... args)
+void moveAndCall(Function& function, Args&& ... args)
 {
     const auto handler = std::move(function);
     function = nullptr;
@@ -125,7 +125,7 @@ void moveAndCall(Function& function, Args ... args)
 }
 
 template<typename Function, typename ... Args>
-void moveAndCallOptional(Function& function, Args ... args)
+void moveAndCallOptional(Function& function, Args&& ... args)
 {
     if (!function)
         return;
