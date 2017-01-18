@@ -195,10 +195,24 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
+    // local settings
     connect(action(QnActions::PreferencesGeneralTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesGeneralTabAction_triggered()));
-    connect(action(QnActions::PreferencesLicensesTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesLicensesTabAction_triggered()));
-    connect(action(QnActions::PreferencesSmtpTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesSmtpTabAction_triggered()));
     connect(action(QnActions::PreferencesNotificationTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesNotificationTabAction_triggered()));
+
+    // system administration
+    connect(action(QnActions::SystemAdministrationAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::GeneralPage); });
+    connect(action(QnActions::PreferencesLicensesTabAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::LicensesPage); });
+    connect(action(QnActions::PreferencesSmtpTabAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::SmtpPage); });
+    connect(action(QnActions::PreferencesCloudTabAction), &QAction::triggered, this,
+        [this]{ openSystemAdministrationDialog(QnSystemAdministrationDialog::CloudManagement); });
+    connect(action(QnActions::SystemUpdateAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesPage); });
+    connect(action(QnActions::UserManagementAction), &QAction::triggered, this,
+        [this] { openSystemAdministrationDialog(QnSystemAdministrationDialog::UserManagement); });
+
     connect(action(QnActions::BusinessEventsAction), SIGNAL(triggered()), this, SLOT(at_businessEventsAction_triggered()));
     connect(action(QnActions::OpenBusinessRulesAction), SIGNAL(triggered()), this, SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(QnActions::OpenFailoverPriorityAction), &QAction::triggered, this, &QnWorkbenchActionHandler::openFailoverPriorityDialog);
@@ -214,9 +228,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::WebAdminAction), &QAction::triggered, this,
         &QnWorkbenchActionHandler::at_webAdminAction_triggered);
 
-    connect(action(QnActions::SystemAdministrationAction), SIGNAL(triggered()), this, SLOT(at_systemAdministrationAction_triggered()));
-    connect(action(QnActions::SystemUpdateAction), SIGNAL(triggered()), this, SLOT(at_systemUpdateAction_triggered()));
-    connect(action(QnActions::UserManagementAction), SIGNAL(triggered()), this, SLOT(at_userManagementAction_triggered()));
     connect(action(QnActions::NextLayoutAction), SIGNAL(triggered()), this, SLOT(at_nextLayoutAction_triggered()));
     connect(action(QnActions::PreviousLayoutAction), SIGNAL(triggered()), this, SLOT(at_previousLayoutAction_triggered()));
     connect(action(QnActions::OpenInLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInLayoutAction_triggered()));
@@ -999,7 +1010,15 @@ void QnWorkbenchActionHandler::openBackupCamerasDialog() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
+void QnWorkbenchActionHandler::openSystemAdministrationDialog(int page)
+{
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(
+        m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(page);
+}
+
+void QnWorkbenchActionHandler::at_showcaseAction_triggered()
+{
     QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
 
@@ -1014,16 +1033,6 @@ void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
     dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::LicensesPage);
-}
-
-void QnWorkbenchActionHandler::at_preferencesSmtpTabAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::SmtpPage);
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
@@ -1082,21 +1091,6 @@ void QnWorkbenchActionHandler::at_webAdminAction_triggered()
 #else
     openInBrowserDirectly(server, kPath, kFragment);
 #endif
-}
-
-void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::GeneralPage);
-}
-
-void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UpdatesPage);
-}
-
-void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
 }
 
 qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
@@ -2230,9 +2224,9 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
     menu()->trigger(QnActions::DelayedForcedExitAction);
 }
 
-void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered() {
-    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::TimeServerSelection);
+void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
+{
+    openSystemAdministrationDialog(QnSystemAdministrationDialog::TimeServerSelection);
 }
 
 void QnWorkbenchActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server,

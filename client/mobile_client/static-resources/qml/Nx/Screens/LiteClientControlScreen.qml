@@ -69,7 +69,8 @@ Page
         {
             Workflow.openInformationDialog(
                 qsTr("Cannot start client"),
-                qsTr("Please make sure that display is connected to Nx1."))
+                qsTr("Please make sure that display is connected to %1.")
+                    .arg(applicationInfo.nx1CustomizedName()))
         }
 
         onClientStopError:
@@ -141,7 +142,7 @@ Page
     {
         id: offlineDummy
         anchors.fill: parent
-        title: qsTr("Nx1 is offline")
+        title: qsTr("%1 is offline").arg(applicationInfo.nx1CustomizedName())
         image: lp("/images/alert_nx1_offline.png")
         visible: !liteClientController.serverOnline
     }

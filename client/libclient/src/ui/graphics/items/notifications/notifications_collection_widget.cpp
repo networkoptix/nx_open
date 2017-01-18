@@ -549,7 +549,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
 {
-    QString messageText = QnSystemHealthStringsHelper::messageName(message);
+    QString messageText = QnSystemHealthStringsHelper::messageText(message);
     NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
     if (messageText.isEmpty())
         return;
@@ -655,20 +655,28 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             );
             break;
 
+        case QnSystemHealth::CloudPromo:
+            item->addActionButton(
+                qnSkin->icon("events/cloud_promo.png"),
+                tr("Try it free..."),
+                QnActions::PreferencesCloudTabAction);
+            break;
+
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
             break;
     }
 
     QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
-    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+    item->setText(QnSystemHealthStringsHelper::messageText(message, resourceName));
+    item->setTooltipText(QnSystemHealthStringsHelper::messageTooltip(message, resourceName));
     item->setNotificationLevel(QnNotificationLevel::valueOf(message));
     item->setProperty(kItemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this,
+        &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
     m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
     m_itemsByMessageType.insert(message, item);
