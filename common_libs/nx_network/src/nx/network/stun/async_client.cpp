@@ -313,6 +313,8 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
             [ this ]( SystemError::ErrorCode code ) mutable
             {
                 QnMutexLocker lock( &m_mutex );
+                // TODO #mu following code looks redundant since handler will be triggered 
+                //   on connection closure (which is imminent).
                 if( code != SystemError::noError )
                     dispatchRequestsInQueue( &lock );
             } );
