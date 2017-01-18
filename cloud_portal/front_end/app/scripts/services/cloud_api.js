@@ -56,13 +56,8 @@ angular.module('cloudApp')
         }
 
         var getSystems = cacheGet(apiBase + '/systems');
-        var modules = cacheGet(apiBase + '/modules');
-        modules().then(function(result){
-            Config.gatewayUrl = window.location.protocol + '//' + result.data.vms_gateway_host +':' + result.data.vms_gateway_port;
-        });
 
         return {
-            modules:modules,
             checkResponseHasError:function(data){
                 if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
                     return data;
