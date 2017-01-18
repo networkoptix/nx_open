@@ -278,7 +278,7 @@ angular.module('webadminApp')
                     }
                 }
             }).result.then(function(){
-                dialogs.alert(L.settings.connectedSuccess).then(function(){
+                dialogs.alert(L.settings.connectedSuccess).finally(function(){
                     window.location.reload();
                 });
             },errorHandler);
@@ -304,7 +304,7 @@ angular.module('webadminApp')
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).then(function(){
+                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
                         window.location.reload();
                     });
                 }, function(error){
