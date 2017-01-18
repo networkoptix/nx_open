@@ -67,6 +67,9 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
 {
     switch (messageType)
     {
+        case QnSystemHealth::CloudPromo:
+            return QnNotificationLevel::Value::OtherNotification;
+
         /* Green notifications */
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveFastScanFinished: //this one is never displayed though

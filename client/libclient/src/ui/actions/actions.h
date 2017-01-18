@@ -65,6 +65,11 @@ enum IDType
     PreferencesNotificationTabAction,
 
     /**
+    * Opens notifications settings preferences tab.
+    */
+    PreferencesCloudTabAction,
+
+    /**
      * Shows / hides FPS display.
      */
     ShowFpsAction,

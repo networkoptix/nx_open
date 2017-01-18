@@ -193,13 +193,13 @@ void QnWorkbenchNotificationsHandler::forcedUpdate()
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
+    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message)
 {
     switch (message)
     {
-
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::ConnectionLost:
             return false;
@@ -215,6 +215,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::ArchiveFastScanFinished:
         case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::CloudPromo:
             return true;
 
         default:
@@ -285,17 +286,19 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message)
 {
-
     switch (message)
     {
         case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::NoPrimaryTimeServer:
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveRebuildCanceled:
             return;
 
         case QnSystemHealth::SystemIsReadOnly:
-            setSystemHealthEventVisible(QnSystemHealth::SystemIsReadOnly, context()->user() && qnCommon->isReadOnly());
+            setSystemHealthEventVisible(message, context()->user() && qnCommon->isReadOnly());
             return;
 
         case QnSystemHealth::EmailIsEmpty:
@@ -308,16 +311,15 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::NoLicenses:
-            setSystemHealthEventVisible(QnSystemHealth::NoLicenses, context()->user() && qnLicensePool->isEmpty());
+            setSystemHealthEventVisible(message, context()->user() && qnLicensePool->isEmpty());
             return;
 
         case QnSystemHealth::SmtpIsNotSet:
             at_emailSettingsChanged();
             return;
 
-        case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::CloudPromo:
+            setSystemHealthEventVisible(message, context()->user());
             return;
 
         default:
@@ -404,7 +406,7 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageVisible(messageType))
+        if (!QnSystemHealth::isMessageOptional(messageType))
             continue;
 
         bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));

@@ -1,5 +1,8 @@
 #include "system_health_helper.h"
+
 #include "business/actions/abstract_business_action.h"
+
+#include <utils/common/app_info.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -37,24 +40,43 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
 }
 
 
-QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType messageType, QString resourceName)
+QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
+    const QString& resourceName)
 {
     switch (messageType)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
             return tr("Email address is not set for user %1").arg(resourceName);
+        case QnSystemHealth::CloudPromo:
+        {
+            const QString kTryText = tr("Try it free");
+            const QString kLearnMoreText = tr("Learn more");
+            const QString kMessage = tr("Check out %1 Beta", "%1 is name of cloud (like 'Nx Cloud')")
+                .arg(QnAppInfo::cloudName());
+
+            const QString kTemplate = lit("<p>%1</p><p><a href=\"\">%2</a> <a href=\"%3\">%4</a></p>");
+            return kTemplate.arg(
+                kMessage,
+                kTryText,
+                QnAppInfo::defaultCloudPortalUrl(),
+                kLearnMoreText);
+        }
         default:
             break;
     }
     return messageTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName)
+QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType messageType, QString resourceName)
 {
     QStringList messageParts;
 
     switch (messageType)
     {
+        // disable tooltip for promo
+        case QnSystemHealth::CloudPromo:
+            return QString();
+
         case QnSystemHealth::EmailIsEmpty:
             messageParts << tr("Email address is not set.") << tr("You cannot receive system notifications via email.");
             break;
@@ -92,5 +114,5 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         return messageParts.join(L'\n');
 
     /* Description is ended with a dot, title is not. */
-    return messageName(messageType, resourceName) + L'.';
+    return messageText(messageType, resourceName) + L'.';
 }
