@@ -521,6 +521,10 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("events/filter.png")).
         text(tr("Filter..."));
 
+    factory(QnActions::PreferencesCloudTabAction).
+        flags(Qn::NoTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
+
     factory(QnActions::ConnectAction).
         flags(Qn::NoTarget);
 

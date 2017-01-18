@@ -448,7 +448,8 @@ Item
                     id: areaLoader;
 
                     property bool visibleIndicators:
-                        (primaryIndicator.visible || otherIndicator.visible);
+                        ((primaryIndicator.visible && (primaryIndicator.opacity == 1.0))
+                         || (otherIndicator.visible && (otherIndicator.opacity == 1.0)));
                     anchors.left: parent.left;
                     anchors.right: (visibleIndicators
                         ? indicatorsRow.left
