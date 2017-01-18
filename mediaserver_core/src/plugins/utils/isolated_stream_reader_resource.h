@@ -8,6 +8,11 @@ namespace nx {
 namespace plugins {
 namespace utils {
 
+/**
+ * Isolated resource does not put its properties to the database. 
+ * It can be safely used in places where creation of temporary/proxy resources is needed. 
+ */
+
 class IsolatedStreamReaderResource: public QnPlOnvifResource
 {
 
