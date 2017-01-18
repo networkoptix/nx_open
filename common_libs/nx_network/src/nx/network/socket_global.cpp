@@ -4,6 +4,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
+#include "aio/pollset_factory.h"
+
 const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 
 namespace nx {
@@ -37,9 +39,14 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
     return false;
 }
 
-SocketGlobals::SocketGlobals():
+SocketGlobals::SocketGlobals(int initializationFlags):
+    m_initializationFlags(initializationFlags),
     m_log(QnLog::logs())
 {
+    if (m_initializationFlags & InitializationFlags::disableUdt)
+        m_pollSetFactory.disableUdt();
+
+    m_aioService = std::make_unique<aio::AIOService>();
 }
 
 SocketGlobals::~SocketGlobals()
@@ -73,14 +80,15 @@ SocketGlobals::~SocketGlobals()
     }
 }
 
-void SocketGlobals::init()
+void SocketGlobals::init(int initializationFlags)
 {
     QnMutexLocker lock(&s_mutex);
     if (++s_counter == 1) //< First in.
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
-        s_instance = new SocketGlobals;
+        s_instance = new SocketGlobals(initializationFlags);
         
+        // TODO: #ak disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
 
         s_initState = InitState::done;

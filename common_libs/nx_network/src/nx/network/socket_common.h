@@ -47,6 +47,12 @@ static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
 static const size_t kTypicalMtuSize = 1500;
 
+enum InitializationFlags
+{
+    disableUdt = 0x01,
+    disableCloudConnect = 0x02
+};
+
 } // network
 } // nx
 

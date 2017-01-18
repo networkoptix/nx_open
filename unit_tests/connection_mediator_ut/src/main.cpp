@@ -14,5 +14,6 @@ int main(int argc, char **argv)
         {
             if (const auto value = args.get("tmp"))
                 nx::db::test::TestWithDbHelper::setTemporaryDirectoryPath(*value);
-        });
+        },
+        nx::network::InitializationFlags::disableUdt);
 }

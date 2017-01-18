@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pollset.h"
+#include "event_type.h"
 #include "../socket.h"
 
 namespace nx {

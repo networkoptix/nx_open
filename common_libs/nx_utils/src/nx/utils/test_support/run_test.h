@@ -6,6 +6,7 @@
     #include <gmock/gmock.h>
 #endif
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
 
@@ -16,7 +17,8 @@ namespace utils {
 
 inline int runTest(
     int argc, const char* argv[],
-    std::function<void(const ArgumentParser& args)> extraInit = nullptr)
+    std::function<void(const ArgumentParser& args)> extraInit = nullptr,
+    int socketInitializationFlags = 0)
 {
     nx::utils::setErrorMonitor([&](const QnLogMessage& m) { FAIL() << m.toStdString(); });
     nx::utils::FlagConfig::setOutputAllowed(false);
@@ -32,12 +34,10 @@ inline int runTest(
     TestOptions::applyArguments(args);
     QnLog::applyArguments(args);
 
-    #ifdef NX_NETWORK_SOCKET_GLOBALS
-        network::SocketGlobalsHolder sgGuard;
-        network::SocketGlobals::applyArguments(args);
-        network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
-        network::cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
-    #endif
+    network::SocketGlobalsHolder sgGuard(socketInitializationFlags);
+    network::SocketGlobals::applyArguments(args);
+    network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());
+    network::cloud::OutgoingTunnelPool::allowOwnPeerIdChange();
 
     if (extraInit)
         extraInit(args);
@@ -48,9 +48,10 @@ inline int runTest(
 
 inline int runTest(
     int argc, char* argv[],
-    std::function<void(const ArgumentParser& args)> extraInit = nullptr)
+    std::function<void(const ArgumentParser& args)> extraInit = nullptr,
+    int socketInitializationFlags = 0)
 {
-    return runTest(argc, (const char**)argv, std::move(extraInit));
+    return runTest(argc, (const char**)argv, std::move(extraInit), socketInitializationFlags);
 }
 
 } // namespace utils
