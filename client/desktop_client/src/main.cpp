@@ -199,7 +199,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     return result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
