@@ -177,11 +177,7 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            if($scope.settingsForm.$valid) {
-                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
-            }else{
-                dialogs.alert('form is not valid');
-            }
+            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
         };
 
 // execute/scryptname&mode
