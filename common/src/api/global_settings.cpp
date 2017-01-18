@@ -477,6 +477,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings)
     m_supportLinkAdaptor->setValue(settings.supportEmail);
     m_simpleAdaptor->setValue(settings.simple);
     m_timeoutAdaptor->setValue(settings.timeout);
+    qnGlobalSettings->synchronizeNow();
 }
 
 void QnGlobalSettings::synchronizeNow()
