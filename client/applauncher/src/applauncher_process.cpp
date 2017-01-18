@@ -592,9 +592,9 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
         m_killProcessTasks.erase(it);
     }
 
-    //stopping process if needed
-    SystemError::ErrorCode code = nx::killProcessByPid(task.processID);
-    code = 0;
+    // Stopping process if needed.
+    const auto code = nx::killProcessByPid(task.processID);
+    static_cast<void>(code);
 }
 
 void ApplauncherProcess::onInstallationDone(InstallationProcess* installationProcess)

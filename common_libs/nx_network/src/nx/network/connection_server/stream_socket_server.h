@@ -79,6 +79,12 @@ public:
         m_cond.wakeAll();
     }
 
+    std::size_t connectionCount() const
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_connections.size();
+    }
+
 protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
@@ -87,7 +93,7 @@ protected:
     }
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?

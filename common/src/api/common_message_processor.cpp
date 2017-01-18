@@ -595,7 +595,14 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
     qnStatusDictionary->clear();
     for(const QnUuid& id: keys) {
         if (QnResourcePtr resource = qnResPool->getResourceById(id))
+        {
+            NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                    .arg(QString::fromLatin1(Q_FUNC_INFO))
+                    .arg(resource->getId().toString())
+                    .arg(resource->getName())
+                    .arg(resource->getUrl()), cl_logDEBUG2);
             emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
+        }
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)

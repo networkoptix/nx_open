@@ -30,8 +30,8 @@ class TestConnection:
 {
 public:
     virtual void sendMessage(
-        nx::stun::Message message,
-        std::function<void(SystemError::ErrorCode)> handler = nullptr) override
+        nx::stun::Message /*message*/,
+        std::function<void(SystemError::ErrorCode)> /*handler*/ = nullptr) override
     {
     }
 
@@ -45,13 +45,17 @@ public:
         return SocketAddress();
     }
 
-    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override
+    virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> /*handler*/) override
     {
     }
 
     virtual AbstractCommunicatingSocket* socket() override
     {
         return &m_socket;
+    }
+
+    virtual void close() override
+    {
     }
 
 private:

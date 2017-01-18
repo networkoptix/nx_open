@@ -611,7 +611,8 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
         init();
 
     auto sharedThis = toSharedPointer(this);
-    NX_LOG(lit("%1 Emit statusChanged signal for resource %1, %2, %3")
+    NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+            .arg(QString::fromLatin1(Q_FUNC_INFO))
             .arg(sharedThis->getId().toString())
             .arg(sharedThis->getName())
             .arg(sharedThis->getUrl()), cl_logDEBUG2);

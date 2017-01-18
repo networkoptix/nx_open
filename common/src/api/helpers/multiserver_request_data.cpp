@@ -36,7 +36,7 @@ void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
-    format = QnLexical::deserialized(kFormatParam, kDefaultFormat);
+    QnLexical::deserialize(params.value(kFormatParam), &format);
 }
 
 void QnMultiserverRequestData::loadFromParams(const QnRequestParams& params)

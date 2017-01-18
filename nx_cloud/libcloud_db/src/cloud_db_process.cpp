@@ -111,7 +111,7 @@ int CloudDBProcess::exec()
         //reading settings
         conf::Settings settings;
         //parsing command line arguments
-        settings.load( m_argc, m_argv );
+        settings.load( m_argc, (const char**) m_argv );
         if( settings.showHelp() )
         {
             settings.printCmdLineArgsHelpToCout();
