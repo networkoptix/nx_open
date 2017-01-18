@@ -397,10 +397,4 @@ angular.module('webadminApp')
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
         };
-
-        $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
-            $event.stopPropagation();
-            $event.preventDefault();
-        };
     });
