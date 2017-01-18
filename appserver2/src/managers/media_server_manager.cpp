@@ -164,7 +164,7 @@ namespace ec2
         {
             handler->done( reqID, errorCode, storages );
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ParentId, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
         return reqID;
     }

@@ -835,7 +835,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value false
      *         %value true
      */
-    regGet<QnUuid, ApiStorageDataList>(p, ApiCommand::getStorages);
+    regGet<ParentId, ApiStorageDataList>(p, ApiCommand::getStorages);
 
     // AbstractLicenseManager::addLicenses
     regUpdate<ApiLicenseDataList>(p, ApiCommand::addLicenses);

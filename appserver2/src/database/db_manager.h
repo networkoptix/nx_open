@@ -212,7 +212,10 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
 
         //getStorages
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
+        ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(
+            const ParentId& parentId, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList);
 
         //get resource status
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
