@@ -26,14 +26,18 @@ TEST(AutodetectHttpContentType, main)
     ASSERT_EQ(result, QByteArray("text/plain"));
 
     QByteArray kHTMLext =
-        "\"<html>\" <html lang=\"en_US\"> <body> test </body> </html>";
+        "<html lang=\"en_US\"> <body> test </body> </html>";
     result = autoDetectHttpContentType(kHTMLext);
+    ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
+    QByteArray kHTMLext2 =
+        "<\"some string with <html>\ tag\" <html lang=\"en_US\"> <body> test </body> </html>";
+    result = autoDetectHttpContentType(kHTMLext2);
     ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
 
     QByteArray kInvalidHTMLext =
-        "\"<html>\" lang=\"en_US\"> <body> test </body> </html>";
+        "{ \"data\": [{ \"keys\": [\"<html></html>\"] }] }";
     result = autoDetectHttpContentType(kInvalidHTMLext);
-    ASSERT_EQ(result, QByteArray("text/plain"));
+    ASSERT_EQ(result, QByteArray("application/json"));
 
     return;
 }
