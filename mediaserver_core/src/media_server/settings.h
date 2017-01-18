@@ -108,6 +108,8 @@ namespace nx_ms_conf
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
 
     static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
+
+    static const QLatin1String ENABLE_MULTIPLE_INSTANCES("enableMultipleInstances");
 }
 
 /*!

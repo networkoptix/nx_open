@@ -64,7 +64,6 @@
 
 #include <events/mserver_business_rule_processor.h>
 
-#include <media_server/media_server_module.h>
 #include <media_server/media_server_app_info.h>
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -596,6 +595,11 @@ static QStringList listRecordFolders()
     }
 #endif
 
+    if (MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() != 0)
+    {
+        for (auto& path: folderPaths)
+            path += lit("/") + serverGuid().toString();
+    }
     return folderPaths;
 }
 
@@ -2128,7 +2132,10 @@ void MediaServerProcess::run()
 
     SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
 
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+    std::unique_ptr<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+
+    if (!m_obsoleteGuid.isNull())
+        qnCommon->setObsoleteServerGuid(m_obsoleteGuid);
 
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
@@ -2997,7 +3004,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-        if (application->isRunning())
+        if (application->isRunning() && 
+            MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
             NX_LOG("Server already started", cl_logERROR);
             qApp->quit();
@@ -3131,7 +3139,7 @@ private:
 
         QnUuid obsoleteGuid = QnUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
         if (!obsoleteGuid.isNull()) {
-            qnCommon->setObsoleteServerGuid(obsoleteGuid);
+            m_main->setObsoleteGuid(obsoleteGuid);
         }
     }
 
