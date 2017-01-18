@@ -32,25 +32,31 @@
     <div ng-class="{'vertical-center':!settings.liteClient,'master-description':settings.liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
         <p>You need to configure your server before using it.<br>
-        Don't worry. This won't take long.</p>
-        <div class="row" ng-if="settings.liteClient">
-            <div class="col-xs-12">
-               <p>
-                   You also can set it up from another computer by connecting<br>
-                   to this device by one of the next ways:
-               </p>
-            </div>
-            <div class="col-xs-6">
-                <div class="text-center"><b>Using web browser</b></div>
-                <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
-            </div>
-            <div class="col-xs-6">
-                <div class="text-center"><b>Using {{Config.productName}} application</b></div>
-                <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-                <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-                <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-                <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
-            </div>
+        Don't worry, this won't take long.</p>
+    </div>
+
+    <p ng-class="{'vertical-bottom':!settings.liteClient}">
+        Already have Nx Witness?<br>
+        <a href="" ng-click="skip()">Merge server with existing system</a>
+    </p>
+
+    <div class="row lite-client-instruction panel-footer" ng-if="settings.liteClient">
+        <div class="col-xs-12">
+            <p>
+                You also can set it up from another computer by connecting<br>
+                to this device by one of the next ways:
+            </p>
+        </div>
+        <div class="col-xs-6">
+            <div class="text-center"><b>Using web browser</b></div>
+            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="text-center"><b>Using {{Config.productName}} application</b></div>
+            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 
@@ -59,7 +65,7 @@
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
     <h2>Give your System a name</h2>
     <p class="master-description">
-        It'll help you identify or find your system.
+        It'll help you identify or find your System.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
@@ -75,8 +81,7 @@
 
     </form>
     <p class="vertical-bottom">
-        <a href="" ng-click="next('advanced', true)">Advanced system settings</a><br>
-        <a href="" ng-click="skip()">Merge server with existing system</a>
+        <a href="" ng-click="next('advanced', true)">Advanced system settings</a>
     </p>
 </div>
 
