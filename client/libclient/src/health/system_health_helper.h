@@ -11,7 +11,7 @@ public:
 
     /** Text that is in notifications. */
     static QString messageText(QnSystemHealth::MessageType messageType,
-        const QString& resourceName = QString());
+        const QString& resourceName);
 
     /** Text that is used where the full description is required, e.g. in notification hints. */
     static QString messageTooltip(QnSystemHealth::MessageType messageType, QString resourceName);
