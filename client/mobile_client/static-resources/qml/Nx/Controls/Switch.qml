@@ -1,10 +1,12 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import Qt.labs.templates 1.0
 import Nx 1.0
 
-Switch
+Control
 {
     id: control
+
+    property bool checked: false
 
     property color uncheckedColor: ColorTheme.base13
     property color uncheckedIndicatorColor: ColorTheme.base17
@@ -13,6 +15,8 @@ Switch
     property color handleColor: ColorTheme.base5
 
     property int animationDuration: 150
+
+    signal clicked()
 
     padding: 6
     leftPadding: 8
@@ -26,7 +30,7 @@ Switch
 
     background: null
 
-    indicator: Rectangle
+    Rectangle
     {
         id: uncheckedLayer
 
@@ -98,12 +102,13 @@ Switch
 
     contentItem: null
 
-    onCheckedChanged:
+    MouseArea
     {
-        /* Workaroud for a Qt bug.
-           When the switch is disabled during onCheckedChanged handler setting checked to false
-           its check state will be returned to true. */
-        if (!checked)
-            position = 0
+        anchors.fill: parent
+        onClicked:
+        {
+            control.checked = !control.checked
+            control.clicked()
+        }
     }
 }
