@@ -138,26 +138,14 @@ QAuthenticator QnNetworkResource::getAuth() const
     if (value.isNull())
         value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    return getAuthenticatorFromEncodedString(value);
-}
-
-QAuthenticator QnNetworkResource::getDefaultAuth() const
-{
-    auto value = getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME);
-
-    return getAuthenticatorFromEncodedString(value);
-}
-
-QAuthenticator QnNetworkResource::getAuthenticatorFromEncodedString(const QString& encodedString) const
-{
-    auto value = nx::utils::decodeStringFromHexStringAES128CBC(encodedString);
+    value = nx::utils::decodeStringFromHexStringAES128CBC(value);
 
     const QStringList& credentialsList = value.split(lit(":"));
     QAuthenticator auth;
-    if (credentialsList.size() >= 1)
-        auth.setUser(credentialsList[0]);
-    if (credentialsList.size() >= 2)
-        auth.setPassword(credentialsList[1]);
+    if( credentialsList.size() >= 1 )
+        auth.setUser( credentialsList[0] );
+    if( credentialsList.size() >= 2 )
+        auth.setPassword( credentialsList[1] );
     return auth;
 }
 
@@ -262,13 +250,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     if (!source->getMAC().isNull() && source->getMAC() != getMAC())
     {
         setMAC(source->getMAC());
-        mergedSomething = true;
-    }
-
-    auto newDefaultAuth = source->getDefaultAuth();
-    if (!newDefaultAuth.isNull() && newDefaultAuth != getDefaultAuth())
-    {
-        setDefaultAuth(newDefaultAuth);
         mergedSomething = true;
     }
 

@@ -402,7 +402,6 @@ private:
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     bool m_removedFromPool;
     bool m_initInProgress;
-    std::atomic<bool> m_propertiesFlushed;
 };
 
 template<class Resource>

@@ -46,7 +46,6 @@ public:
 
     static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
-    QAuthenticator getDefaultAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
     bool isAuthenticated() const;
@@ -104,9 +103,6 @@ public:
 
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual void initializationDone() override;
-
-private:
-    QAuthenticator getAuthenticatorFromEncodedString(const QString& encodedString) const;
 
 private:
     //QAuthenticator m_auth;
