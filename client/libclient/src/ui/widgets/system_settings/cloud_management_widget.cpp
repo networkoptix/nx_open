@@ -53,15 +53,27 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
 
     // TODO: #help Set help topic
 
-    ui->unlinkButton->setText(tr("Disconnect System from %1").arg(QnAppInfo::cloudName()));
-    ui->goToCloudButton->setText(tr("Open %1 Portal", "Open Nx Cloud Portal").arg(QnAppInfo::cloudName()));
+    ui->unlinkButton->setText(tr("Disconnect System from %1",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->goToCloudButton->setText(tr("Open %1 Portal",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
 
-    ui->createAccountButton->setText(tr("Create %1 Account").arg(QnAppInfo::cloudName()));
-    ui->linkButton->setText(tr("Connect System to %1").arg(QnAppInfo::cloudName()));
+    ui->createAccountButton->setText(tr("Create %1 Account",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->linkButton->setText(tr("Connect System to %1...",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
 
-    ui->promo1TextLabel->setText(tr("1. Create %1\naccount").arg(QnAppInfo::cloudName()));
-    ui->promo2TextLabel->setText(tr("2. Connect system\nto %1").arg(QnAppInfo::cloudName()));
-    ui->promo3TextLabel->setText(tr("3. Connect to your systems\nfrom anywhere with any\ndevices"));
+    ui->promo1TextLabel->setText(tr("Create %1\naccount",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->promo2TextLabel->setText(tr("Connect System\nto %1",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+    ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
+
+    const QString kIssuesLink = makeHref(tr("known issues"), QnAppInfo::defaultCloudPortalUrl());
+    const QString kPromoText = tr("Nx Cloud is in Beta yet. See %1", "%1 is a link to known issues")
+        .arg(kIssuesLink);
+
+    ui->promoBar->setText(kPromoText);
 
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
@@ -69,7 +81,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         SystemUri::ReferralContext::SettingsDialog);
 
     ui->learnMoreLabel->setText(
-        makeHref(tr("Learn more about %1").arg(
+        makeHref(tr("Learn more about %1", "%1 is name of cloud (like 'Nx Cloud')").arg(
             QnAppInfo::cloudName()), urlHelper.aboutUrl()));
 
     connect(ui->goToCloudButton, &QPushButton::clicked, this,
