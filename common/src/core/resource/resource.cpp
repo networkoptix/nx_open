@@ -183,7 +183,8 @@ QnResource::QnResource():
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
     m_removedFromPool(false),
-    m_initInProgress(false)
+    m_initInProgress(false),
+    m_propertiesFlushed(false)
 {
 }
 
@@ -206,7 +207,8 @@ QnResource::QnResource(const QnResource& right)
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
     m_removedFromPool(right.m_removedFromPool),
-    m_initInProgress(right.m_initInProgress)
+    m_initInProgress(right.m_initInProgress),
+    m_propertiesFlushed(right.m_propertiesFlushed.load())
 {
 }
 
@@ -837,8 +839,9 @@ QString QnResource::getProperty(const QString &key) const
 {
     QString value;
     {
+        auto resPool = resourcePool();
         QnMutexLocker lk(&m_mutex);
-        if (m_id.isNull())
+        if (m_id.isNull() || (!m_propertiesFlushed && !resPool))
         {
             auto itr = m_locallySavedProperties.find(key);
             if (itr != m_locallySavedProperties.end())
@@ -1163,6 +1166,10 @@ int QnResource::initializationAttemptCount() const
 
 void QnResource::flushProperties()
 {
+    NX_ASSERT(
+        !m_propertiesFlushed,
+        lit("Properties should be flushed only once - just before adding resource to resource pool"));
+
     std::map<QString, LocalPropertyValue> locallySavedProperties;
     QnUuid id;
 
@@ -1185,6 +1192,8 @@ void QnResource::flushProperties()
             emitPropertyChanged(prop.first);
         }
     }
+
+    m_propertiesFlushed = true;
 }
 
 bool QnResource::isInitialized() const
