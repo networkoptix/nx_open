@@ -50,7 +50,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    addPage(ProfilePage, m_profilePage, tr("Profile"));
+    addPage(ProfilePage, m_profilePage, tr("User Information"));
     addPage(SettingsPage, m_settingsPage, tr("User Information"));
     addPage(PermissionsPage, m_permissionsPage, tr("Permissions"));
     addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
@@ -282,8 +282,6 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
                             && m_model->mode() != QnUserSettingsModel::Invalid;
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(cancelButtonVisible);
 
-    ui->tabWidget->setTabBarAutoHide(m_model->mode() == QnUserSettingsModel::OwnProfile
-                                  || m_model->mode() == QnUserSettingsModel::OtherProfile);
     forcedUpdate();
 }
 

@@ -136,6 +136,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setupInputFields();
 
     m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
+        QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(false);
 }
 
@@ -241,6 +243,8 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         m_aligner->addWidget(ui->userTypeLabel);
+    else if (m_model->user()->isCloud())
+        m_aligner->addWidget(ui->cloudPanelWidget);
 }
 
 QString QnUserSettingsWidget::passwordPlaceholder() const
