@@ -165,6 +165,7 @@ int QnUpdateInformationRestHandler::executeGet(
             loadFreeSpaceRemotely(path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+        return nx_http::StatusCode::ok;
     }
     else if (path.endsWith(lit("/checkCloudHost")))
     {
@@ -180,7 +181,11 @@ int QnUpdateInformationRestHandler::executeGet(
             checkCloudHostRemotely(path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+        return nx_http::StatusCode::ok;
     }
 
-    return nx_http::StatusCode::ok;
+    return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        lit("Unknown operation"),
+        &result, &contentType, Qn::SerializationFormat::JsonFormat, /*extraFormatting*/ false,
+        QnRestResult::CantProcessRequest);
 }
