@@ -28,6 +28,11 @@ angular.module('webadminApp')
             });
         }
 
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
+
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 

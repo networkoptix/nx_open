@@ -104,7 +104,7 @@
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
-                                <a class="btn btn-default"
+                                <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
                                    ng-click="openLink($event)"
                                    target="_blank">Create {{Config.cloud.productName}} Account</a></p>
