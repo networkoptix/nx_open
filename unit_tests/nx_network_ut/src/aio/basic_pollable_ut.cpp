@@ -1,3 +1,5 @@
+#include <atomic>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/aioservice.h>
@@ -180,6 +182,46 @@ TEST_F(BasicPollable, pleaseStop)
 TEST_F(BasicPollable, pleaseStopSync)
 {
     // TODO
+}
+
+//-------------------------------------------------------------------------------------------------
+// FtBasicPollable
+
+class FtBasicPollable:
+    public BasicPollable
+{
+};
+
+TEST_F(FtBasicPollable, postPerformance)
+{
+    constexpr auto testDuration = std::chrono::seconds(3);
+
+    std::atomic<int> postCallCounter(0);
+
+    aio::BasicPollable aioObject;
+
+    int prevCallCounter = -1;
+    const auto endTime = std::chrono::steady_clock::now() + testDuration;
+    while (std::chrono::steady_clock::now() < endTime)
+    {
+        if (prevCallCounter != postCallCounter)
+        {
+            prevCallCounter = postCallCounter;
+            aioObject.post(
+                [&postCallCounter]()
+                {
+                    ++postCallCounter;
+                });
+        }
+
+        std::this_thread::yield();
+    }
+
+    aioObject.pleaseStopSync();
+
+    std::cout<<"post performance. Total "<< postCallCounter<<" calls made in "
+        << testDuration.count() << " seconds. "
+        "That gives "<<(postCallCounter / testDuration.count()) << " calls per second"<<std::endl;
 }
 
 } // namespace test
