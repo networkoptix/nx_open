@@ -23,12 +23,15 @@ QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
     connect(ui->contentTextEdit,      &QPlainTextEdit::textChanged,   this, &QnExecHttpRequestActionWidget::paramsChanged);
     connect(ui->comboBoxContentType,  &QComboBox::currentTextChanged, this, &QnExecHttpRequestActionWidget::paramsChanged);
 
-    ui->comboBoxContentType->addItem(tr("Auto"));
+    ui->comboBoxContentType->addItem(tr("Auto")); //< should have kAutoContentItemIndex position.
+
     ui->comboBoxContentType->addItem(lit("text/plain"));
     ui->comboBoxContentType->addItem(lit("text/html"));
     ui->comboBoxContentType->addItem(lit("application/html"));
     ui->comboBoxContentType->addItem(lit("application/json"));
     ui->comboBoxContentType->addItem(lit("application/xml"));
+
+    Q_ASSERT(ui->comboBoxContentType->itemText(kAutoContentItemIndex) == tr("Auto"));
 }
 
 QnExecHttpRequestActionWidget::~QnExecHttpRequestActionWidget()

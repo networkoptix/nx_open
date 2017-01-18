@@ -10,10 +10,10 @@ TEST(AutodetectHttpContentType, main)
     QByteArray result = autoDetectHttpContentType(kJsonText);
     ASSERT_EQ(result, QByteArray("application/json"));
 
-    QByteArray kinvalidJsonText =
+    QByteArray kInvalidJsonText =
         "{ \"data\": [ \"keys\": [\"Sony|SNC-VM772R\"] }] }";
-    result = autoDetectHttpContentType(kJsonText);
-    ASSERT_EQ(result, QByteArray("application/json"));
+    result = autoDetectHttpContentType(kInvalidJsonText);
+    ASSERT_EQ(result, QByteArray("text/plain"));
 
     QByteArray kXMLText =
         "<resources> <oem name = \"Axis\"> <resource name = \"AXISP7216Group1\" public = \"AXIS_ENCODER\"/> </oem> </resources>";
@@ -25,18 +25,18 @@ TEST(AutodetectHttpContentType, main)
     result = autoDetectHttpContentType(kInvalidXMLText);
     ASSERT_EQ(result, QByteArray("text/plain"));
 
-    QByteArray kHTMLext =
+    QByteArray kHTMLText =
         "<html lang=\"en_US\"> <body> test </body> </html>";
-    result = autoDetectHttpContentType(kHTMLext);
+    result = autoDetectHttpContentType(kHTMLText);
     ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
-    QByteArray kHTMLext2 =
+    QByteArray kHTMLText2 =
         "<\"some string with <html>\ tag\" <html lang=\"en_US\"> <body> test </body> </html>";
-    result = autoDetectHttpContentType(kHTMLext2);
+    result = autoDetectHttpContentType(kHTMLText2);
     ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
 
-    QByteArray kInvalidHTMLext =
+    QByteArray kInvalidHTMLText =
         "{ \"data\": [{ \"keys\": [\"<html></html>\"] }] }";
-    result = autoDetectHttpContentType(kInvalidHTMLext);
+    result = autoDetectHttpContentType(kInvalidHTMLText);
     ASSERT_EQ(result, QByteArray("application/json"));
 
     return;
