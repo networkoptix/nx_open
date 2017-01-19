@@ -2154,19 +2154,24 @@ void QnStorageManager::writeCameraInfoFiles()
 
         auto composeInfoFileData  = [] (const QnSecurityCamResourcePtr& camResource)
         {
-            auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
+            auto formatStringForConfig = [](QString s)
+            {
+                QRegExp symbolsToRemove("\\n|\\r");
+                s.replace(symbolsToRemove, QString());
+                return lit("\"") + s + lit("\"");
+            };
 
             QByteArray result;
             QTextStream outStream(&result);
 
-            outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraNameKey) << "=" << formatStringForConfig(camResource->getUserDefinedName()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraModelKey) << "=" << formatStringForConfig(camResource->getModel()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraGroupIdKey) << "=" << formatStringForConfig(camResource->getGroupId()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraGroupNameKey) << "=" << formatStringForConfig(camResource->getGroupName()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraUrlKey) << "=" << formatStringForConfig(camResource->getUrl()) << endl;
 
             for (const auto &prop : camResource->getAllProperties())
-                outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
+                outStream << formatStringForConfig(prop.name) << "=" << formatStringForConfig(prop.value) << endl;
 
             return result;
         };
