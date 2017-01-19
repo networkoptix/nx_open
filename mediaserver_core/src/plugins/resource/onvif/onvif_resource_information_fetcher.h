@@ -45,6 +45,25 @@ struct EndpointAdditionalInfo
     }
 };
 
+class EndpointInfoHookChain
+{
+public:
+    void registerHook(std::function<void(EndpointAdditionalInfo*)> hook)
+    {
+        m_hookChain.push_back(hook);
+    };
+    void applyHooks(EndpointAdditionalInfo* outInfo) const
+    {
+        for (const auto& hook: m_hookChain)
+        {
+            hook(outInfo);
+        }
+    };
+
+private:
+    std::vector<std::function<void(EndpointAdditionalInfo*)>> m_hookChain;
+};
+
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
 class OnvifResourceInformationFetcher
@@ -82,6 +101,7 @@ private:
     //PasswordHelper& passwordsData;
     NameHelper &camersNamesData;
     bool m_shouldStop;
+    EndpointInfoHookChain m_hookChain;
 };
 
 #endif //ENABLE_ONVIF
