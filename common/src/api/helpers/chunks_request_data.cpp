@@ -96,8 +96,21 @@ QnRequestParamList QnChunksRequestData::toParams() const
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, QnLexical::serialized(format));
 
-    for (const auto& camera: resList)
-        result.insert(kCameraIdParam, QnLexical::serialized(camera->getId().toString()));
+    switch (requestVersion)
+    {
+        case RequestVersion::v2_6:
+            for (const auto& resource: resList)
+                result.insert(kDeprecatedPhysicalIdParam, resource->getPhysicalId());
+            break;
+
+        case RequestVersion::v3_0:
+            for (const auto& resource: resList)
+                result.insert(kCameraIdParam, resource->getId().toString());
+            break;
+
+        default:
+            break;
+    }
 
     return result;
 }

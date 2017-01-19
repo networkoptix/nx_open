@@ -344,6 +344,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+            QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
             QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
@@ -399,9 +400,10 @@ void QnConnectionManagerPrivate::doDisconnect()
 
     disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
 
-    QnMobileClientMessageProcessor::instance()->init(NULL);
+    QnMobileClientMessageProcessor::instance()->init(nullptr);
     QnAppServerConnectionFactory::setUrl(QUrl());
-    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setEc2Connection(nullptr);
+    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
     QnSessionManager::instance()->stop();
 
     connectionVersion = QnSoftwareVersion();
