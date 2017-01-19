@@ -1030,10 +1030,10 @@ void QnResourceTreeModelNode::setModified(bool modified)
 
 void QnResourceTreeModelNode::setName(const QString& name)
 {
-    if (m_name == name)
-        return;
+    bool changed = m_name != name;
 
     setNameInternal(name);
+
     if (m_displayName.isEmpty())
     {
         switch (m_type)
@@ -1041,12 +1041,15 @@ void QnResourceTreeModelNode::setName(const QString& name)
             case Qn::SystemNode:
             case Qn::CloudSystemNode:
                 m_displayName = tr("<Unnamed system>");
+                changed = true;
                 break;
             default:
                 break;
         }
     }
-    changeInternal();
+
+    if (changed)
+        changeInternal();
 }
 
 void QnResourceTreeModelNode::setIcon(const QIcon& icon)

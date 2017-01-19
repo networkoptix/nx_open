@@ -65,7 +65,6 @@ NxTextEdit
 
         hoverEnabled: true;
         visible: (control.state == "masked");
-        cursorShape: Qt.PointingHandCursor;
         acceptedButtons: (control.state == "editable" ? Qt.NoButton : Qt.AllButtons);
         onClicked:
         {

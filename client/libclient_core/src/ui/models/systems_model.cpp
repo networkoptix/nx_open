@@ -29,7 +29,7 @@ namespace
         result.insert(QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem");
         result.insert(QnSystemsModel::IsRunningRoleId, "isRunning");
         result.insert(QnSystemsModel::IsReachableRoleId, "isReachable");
-        result.insert(QnSystemsModel::IsConnectibleRoleId, "isConnectible");
+        result.insert(QnSystemsModel::IsConnectableRoleId, "isConnectable");
         result.insert(QnSystemsModel::IsCompatibleRoleId, "isCompatible");
         result.insert(QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion");
         result.insert(QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal");
@@ -203,8 +203,8 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return system->isRunning();
         case IsReachableRoleId:
             return system->isReachable();
-        case IsConnectibleRoleId:
-            return system->isConnectible();
+        case IsConnectableRoleId:
+            return system->isConnectable();
         case IsCompatibleRoleId:
             return d->isCompatibleSystem(system);
         case IsCompatibleInternalRoleId:
@@ -354,10 +354,10 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::connectibleStateChanged, this,
+        << connect(systemDescription, &QnBaseSystemDescription::connectableStateChanged, this,
             [this, systemDescription]()
             {
-                emitDataChanged(systemDescription, QnSystemsModel::IsConnectibleRoleId);
+                emitDataChanged(systemDescription, QnSystemsModel::IsConnectableRoleId);
             });
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());

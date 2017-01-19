@@ -32,3 +32,8 @@ QString QnMobileClientAppInfo::oldAndroidAppId()
 {
     return QStringLiteral("${android.oldPackageName}");
 }
+
+QString QnMobileClientAppInfo::nx1CustomizedName()
+{
+    return QStringLiteral("${mobile.nx1_customized_name}");
+}

@@ -32,20 +32,22 @@ QString QnLog::logLevelToString(QnLogLevel value) {
 }
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
-    void QnLog::writeToStdout(const QString& str, QnLogLevel logLevel)
-    {
-        switch (logLevel)
-        {
-            case cl_logERROR:
-            case cl_logWARNING:
-                std::cerr << str.toStdString() << std::endl;
-                break;
 
-            default:
-                std::cout << str.toStdString() << std::endl;
-                break;
-        }
+void QnLog::writeToStdout(const QString& str, QnLogLevel logLevel)
+{
+    switch (logLevel)
+    {
+        case cl_logERROR:
+        case cl_logWARNING:
+            std::cerr << str.toStdString() << std::endl;
+            break;
+
+        default:
+            std::cout << str.toStdString() << std::endl;
+            break;
     }
+}
+
 #endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
 
 // -------------------------------------------------------------------------- //

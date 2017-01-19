@@ -52,13 +52,11 @@ QnSystemDescriptionAggregator::QnSystemDescriptionAggregator(int priority,
     mergeSystem(priority, systemDescription);
 }
 
-bool QnSystemDescriptionAggregator::invalidSystem() const
+bool QnSystemDescriptionAggregator::isEmptyAggregator() const
 {
-    if (!m_systems.empty())
-        return false;
-
-    NX_ASSERT(true, "Invalid aggregator");
-    return true;
+    const bool emptySystemsList = m_systems.empty();
+    NX_ASSERT(!emptySystemsList, "Empty systems aggregator detected");
+    return emptySystemsList;
 }
 
 bool QnSystemDescriptionAggregator::isAggregator() const
@@ -114,8 +112,8 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnBaseSystemDescription::runningStateChanged);
     connect(system, &QnBaseSystemDescription::reachableStateChanged,
         this, &QnBaseSystemDescription::reachableStateChanged);
-    connect(system, &QnBaseSystemDescription::connectibleStateChanged,
-        this, &QnBaseSystemDescription::connectibleStateChanged);
+    connect(system, &QnBaseSystemDescription::connectableStateChanged,
+        this, &QnBaseSystemDescription::connectableStateChanged);
 
     updateServers();
     emitSystemChanged();
@@ -128,7 +126,7 @@ void QnSystemDescriptionAggregator::emitSystemChanged()
     emit systemNameChanged();
     emit runningStateChanged();
     emit reachableStateChanged();
-    emit connectibleStateChanged();
+    emit connectableStateChanged();
     emit safeModeStateChanged();
     emit newSystemStateChanged();
 }
@@ -145,10 +143,7 @@ void QnSystemDescriptionAggregator::handleServerChanged(const QnUuid& serverId,
 
 void QnSystemDescriptionAggregator::onSystemNameChanged(const QnSystemDescriptionPtr& system)
 {
-    if (m_systems.empty() || !system)
-        return;
-
-    if (invalidSystem())
+    if (isEmptyAggregator() || !system)
         return;
 
     if (isSameSystem(*system, *m_systems.first()))
@@ -176,27 +171,27 @@ void QnSystemDescriptionAggregator::removeSystem(int priority)
 
 QString QnSystemDescriptionAggregator::id() const
 {
-    return (invalidSystem() ? QString() : m_systems.first()->id());
+    return (isEmptyAggregator() ? QString() : m_systems.first()->id());
 }
 
 QnUuid QnSystemDescriptionAggregator::localId() const
 {
-    return (invalidSystem() ? QnUuid() : m_systems.first()->localId());
+    return (isEmptyAggregator() ? QnUuid() : m_systems.first()->localId());
 }
 
 QString QnSystemDescriptionAggregator::name() const
 {
-    return (invalidSystem() ? QString() : m_systems.first()->name());
+    return (isEmptyAggregator() ? QString() : m_systems.first()->name());
 }
 
 bool QnSystemDescriptionAggregator::isCloudSystem() const
 {
-    return (invalidSystem() ? false : m_systems.first()->isCloudSystem());
+    return (isEmptyAggregator() ? false : m_systems.first()->isCloudSystem());
 }
 
 bool QnSystemDescriptionAggregator::isNewSystem() const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),
@@ -206,12 +201,12 @@ bool QnSystemDescriptionAggregator::isNewSystem() const
 
 QString QnSystemDescriptionAggregator::ownerAccountEmail() const
 {
-    return (invalidSystem() ? QString() : m_systems.first()->ownerAccountEmail());
+    return (isEmptyAggregator() ? QString() : m_systems.first()->ownerAccountEmail());
 }
 
 QString QnSystemDescriptionAggregator::ownerFullName() const
 {
-    return (invalidSystem() ? QString() : m_systems.first()->ownerFullName());
+    return (isEmptyAggregator() ? QString() : m_systems.first()->ownerFullName());
 }
 
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() const
@@ -221,7 +216,7 @@ QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::servers() co
 
 bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),
@@ -233,7 +228,7 @@ bool QnSystemDescriptionAggregator::isReachableServer(const QnUuid& serverId) co
 
 bool QnSystemDescriptionAggregator::safeMode() const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
     return std::any_of(m_systems.begin(), m_systems.end(),
@@ -242,7 +237,7 @@ bool QnSystemDescriptionAggregator::safeMode() const
 
 bool QnSystemDescriptionAggregator::isRunning() const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
     // Returns running state of most valuable system (by priority)
@@ -251,7 +246,7 @@ bool QnSystemDescriptionAggregator::isRunning() const
 
 bool QnSystemDescriptionAggregator::isReachable() const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
     // TODO: #ynikitenkov Make "reachable" flag depends on any system in 3.1
@@ -260,15 +255,15 @@ bool QnSystemDescriptionAggregator::isReachable() const
     return m_systems.first()->isReachable();
 }
 
-bool QnSystemDescriptionAggregator::isConnectible() const
+bool QnSystemDescriptionAggregator::isConnectable() const
 {
-    if (invalidSystem())
+    if (isEmptyAggregator())
         return false;
 
-    // TODO: #ynikitenkov Make "connectible" flag depends on any system in 3.1
+    // TODO: #ynikitenkov Make "connectable" flag depends on any system in 3.1
 
-    // Returns connectible state of most valuable system (by priority)
-    return m_systems.first()->isConnectible();
+    // Returns connectable state of most valuable system (by priority)
+    return m_systems.first()->isConnectable();
 }
 
 void QnSystemDescriptionAggregator::updateServers()

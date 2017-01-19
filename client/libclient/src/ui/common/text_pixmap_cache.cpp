@@ -134,22 +134,29 @@ const QnTextPixmap& QnTextPixmapCache::pixmap(const QString& text, const QFont& 
             if (requestLimit > result->size().width() && requestLimit <= resultLimit)
                 return *result;
         }
+
+        /* To ensure there's no deep copying: */
+        d->pixmapByKey.remove(key);
     }
 
-    result = new QnTextPixmap(renderText(
+    const auto r = renderText(
         text,
         QPen(localColor, 0),
         font,
         width,
-        elideMode));
+        elideMode);
 
-    const auto cost = result->pixmap.height() * result->pixmap.width() * result->pixmap.depth() / 8;
-    if (d->pixmapByKey.insert(key, result, cost))
+    static const QnTextPixmap kEmptyTextPixmap;
+
+    if (r.pixmap.isNull())
+        return kEmptyTextPixmap;
+
+    const auto cost = r.pixmap.height() * r.pixmap.width() * r.pixmap.depth() / 8;
+    if (d->pixmapByKey.insert(key, result = new QnTextPixmap(r), cost))
         return *result;
 
     NX_ASSERT(false, Q_FUNC_INFO, "Too huge text pixmap");
-    static const QnTextPixmap emptyTextPixmap;
-    return emptyTextPixmap;
+    return kEmptyTextPixmap;
 }
 
 Q_GLOBAL_STATIC(QnTextPixmapCache, qn_textPixmapCache_instance)

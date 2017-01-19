@@ -90,12 +90,23 @@
 <context>
     <name>CustomConnectionScreen</name>
     <message>
-        <source>Connect to System</source>
+        <source>Delete</source>
+        <translation type="unfinished">刪除</translation>
+    </message>
+    <message>
+        <source>Connect to Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DeveloperSettingsScreen</name>
+    <message>
+        <source>Developer Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation type="unfinished">刪除</translation>
+        <source>Log Level</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -178,13 +189,6 @@
     <message>
         <source>Close</source>
         <translation type="unfinished">關閉</translation>
-    </message>
-</context>
-<context>
-    <name>HostSelectionDialog</name>
-    <message>
-        <source>Hosts</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -293,6 +297,14 @@
         <source>Nothing found</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot connect to server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SearchToolBar</name>
@@ -322,6 +334,14 @@
         <source>Password</source>
         <translation type="unfinished">密碼</translation>
     </message>
+    <message>
+        <source>Hosts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -331,14 +351,6 @@
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to Another System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -361,6 +373,14 @@
         <source>Check your network connection or contact a system administrator</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SettingsScreen</name>
@@ -376,10 +396,6 @@
         <translation type="unfinished">建立新的連線</translation>
     </message>
     <message>
-        <source>Disconnect from system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Settings</source>
         <translation type="unfinished">設定</translation>
     </message>
@@ -389,6 +405,10 @@
     </message>
     <message>
         <source>Stop test</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect from Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -421,6 +441,25 @@
     <name>TestSelectionDialog</name>
     <message>
         <source>Select Test</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TextField</name>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -474,6 +513,14 @@
     </message>
     <message>
         <source>Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press Ctrl + Arrow or use mouse wheel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
