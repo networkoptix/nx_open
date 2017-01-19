@@ -96,6 +96,9 @@ QnRequestParamList QnChunksRequestData::toParams() const
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, QnLexical::serialized(format));
 
+    // TODO: #mshevchenko #3.1 The request format changed in 3.0, so Mobile Client cannot
+    // read chunks from 2.6 server. This is a temporary in-place fix which should be refactored
+    // when API versioning is implemented.
     switch (requestVersion)
     {
         case RequestVersion::v2_6:
