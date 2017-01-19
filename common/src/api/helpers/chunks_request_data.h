@@ -7,6 +7,7 @@
 
 struct QnChunksRequestData
 {
+    // Versions here are server versions.
     enum class RequestVersion
     {
         v2_6,

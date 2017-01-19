@@ -107,11 +107,9 @@ QnRequestParamList QnChunksRequestData::toParams() const
             break;
 
         case RequestVersion::v3_0:
+        default:
             for (const auto& resource: resList)
                 result.insert(kCameraIdParam, resource->getId().toString());
-            break;
-
-        default:
             break;
     }
 
