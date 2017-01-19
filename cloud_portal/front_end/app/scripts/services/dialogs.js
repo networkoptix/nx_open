@@ -35,6 +35,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                             cancellable: settings.cancellable,
                             params: settings.params,
                             actionLabel: settings.actionLabel || L.dialogs.okButton,
+                            cancelLabel: settings.cancelLabel || L.dialogs.cancelButton,
                             closable: settings.closable || settings.cancellable,
                             buttonClass: settings.buttonType? 'btn-'+ settings.buttonType : 'btn-primary'
                         };
@@ -96,7 +97,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     cancellable:true,
                     closable:true}).result;
             },
-            confirm:function(message, title, actionLabel, actionType){
+            confirm:function(message, title, actionLabel, actionType, cancelLabel){
                 //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
                 return openDialog({
                     title: title,
@@ -105,6 +106,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     cancellable:false,
                     closable: false,
                     actionLabel:actionLabel,
+                    cancelLabel:cancelLabel,
                     buttonType:actionType
                 }).result;
             },
