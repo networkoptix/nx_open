@@ -27,10 +27,12 @@ const ConnectionOptions& DbConnectionHolder::connectionOptions() const
 
 bool DbConnectionHolder::open()
 {
-    // Using guid as a unique connection name.
+    // Using uuid as a unique connection name.
+    m_connectionName = QUuid::createUuid().toString();
     m_dbConnection = QSqlDatabase::addDatabase(
         QnLexical::serialized<RdbmsDriverType>(connectionOptions().driverType),
-        QUuid::createUuid().toString());
+        m_connectionName);
+
     m_dbConnection.setConnectOptions(connectionOptions().connectOptions);
     m_dbConnection.setDatabaseName(connectionOptions().dbName);
     m_dbConnection.setHostName(connectionOptions().hostName);
@@ -47,10 +49,7 @@ bool DbConnectionHolder::open()
     }
 
     if (!tuneConnection())
-    {
-        m_dbConnection.close();
-        return false;
-    }
+        return close();
 
     return true;
 }
@@ -63,6 +62,7 @@ QSqlDatabase* DbConnectionHolder::dbConnection()
 void DbConnectionHolder::close()
 {
     m_dbConnection.close();
+    QSqlDatabase::removeDatabase(m_connectionName);
 }
 
 std::shared_ptr<nx::db::QueryContext> DbConnectionHolder::begin()
