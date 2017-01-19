@@ -3203,7 +3203,7 @@ ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList&
 {
     QSqlQuery queryStorage(m_sdb);
     queryStorage.setForwardOnly(true);
-    queryStorage.prepare(lit(R"sql(
+    queryStorage.prepare(lm(R"sql(
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name,
             r.url, s.space_limit as spaceLimit, s.used_for_writing as usedForWriting,
             s.storage_type as storageType, s.backup as isBackup

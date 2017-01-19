@@ -24,7 +24,7 @@ public:
         m_stunClient.pleaseStopSync();
         if (m_server)
         {
-            m_server->pleaseStop();
+            m_server->pleaseStopSync();
             m_server.reset();
         }
     }
@@ -55,7 +55,7 @@ protected:
 
     void whenServerTerminatedAbruptly()
     {
-        m_server->pleaseStop();
+        m_server->pleaseStopSync();
         m_server.reset();
     }
 

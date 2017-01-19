@@ -29,7 +29,7 @@ public:
 
     virtual ~TestServer() override
     {
-        pleaseStop();
+        pleaseStopSync();
         for (auto& connection: connections)
         {
             connection->pleaseStopSync();
@@ -72,7 +72,7 @@ protected:
         if (client)
             client->pleaseStopSync();
         if (server)
-            server->pleaseStop();
+            server->pleaseStopSync();
     }
 
     SystemError::ErrorCode sendTestRequestSync()
