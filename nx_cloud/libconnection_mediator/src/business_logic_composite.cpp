@@ -11,7 +11,7 @@ BusinessLogicComposite::BusinessLogicComposite(
     m_cloudDataProvider(
         settings.cloudDB().runWithCloud
         ? AbstractCloudDataProviderFactory::create(
-            settings.cloudDB().endpoint.toStdString(),
+            settings.cloudDB().url,
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),
             settings.cloudDB().updateInterval)

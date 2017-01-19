@@ -14,6 +14,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/url_builder.h>
 
 #include <utils/common/app_info.h>
 
@@ -31,6 +32,9 @@ const QLatin1String kDefaultDataDir("");
 //CloudDB settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
+
+const QLatin1String kCdbUrl("cloud_db/url");
+const QLatin1String kDefaultCdbUrl("");
 
 const QLatin1String kCdbEndpoint("cloud_db/endpoint");
 const QLatin1String kDefaultCdbEndpoint("");
@@ -213,7 +217,28 @@ void Settings::loadConfiguration()
     m_logging.load(m_settings);
 
     m_cloudDB.runWithCloud = m_settings.value(kRunWithCloud, kDefaultRunWithCloud).toBool();
-    m_cloudDB.endpoint = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
+    const auto cdbUrlStr = m_settings.value(kCdbUrl, kDefaultCdbUrl).toString();
+    if (!cdbUrlStr.isEmpty())
+    {
+        m_cloudDB.url = QUrl(cdbUrlStr);
+    }
+    else
+    {
+        // Reading endpoint for backward compatibility.
+        const auto endpointString = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
+        if (!endpointString.isEmpty())
+        {
+            // Supporting both url and host:port here.
+            m_cloudDB.url = QUrl(endpointString);
+            if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
+            {
+                const SocketAddress endpoint(endpointString);
+                *m_cloudDB.url = nx::utils::UrlBuilder()
+                    .setScheme("http").setHost(endpoint.address.toString())
+                    .setPort(endpoint.port).toUrl();
+            }
+        }
+    }
     m_cloudDB.user = m_settings.value(kCdbUser, kDefaultCdbUser).toString();
     m_cloudDB.password = m_settings.value(kCdbPassword, kDefaultCdbPassword).toString();
     m_cloudDB.updateInterval = duration_cast<seconds>(

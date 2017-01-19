@@ -101,7 +101,6 @@
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
         "successTextColor": "green_l2",
-        "notificationColorSystem": "red_l2",
         "notificationColorCritical": "red_l2",
         "notificationColorImportant": "yellow_core",
         "notificationColorCommon": "green_l2"
@@ -258,6 +257,16 @@
             }
         }
     },
+    
+    "QnPromoBar": {
+        "palette": { 
+            "default": {
+                "window": "brand_d5",
+                "link": "light1",
+                "linkVisited": "light1"
+            }
+        }
+    },    
 
     "QHeaderView": {
         "palette": {

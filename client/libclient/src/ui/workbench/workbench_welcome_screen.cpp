@@ -170,8 +170,8 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     if (qnSettings->autoLogin())
         return; // Do nothing in case of auto-login option set
 
-    if (system->isCloudSystem() || !system->isConnectible())
-        return; // Do nothing with cloud and not connectible systems
+    if (system->isCloudSystem() || !system->isConnectable())
+        return; // Do nothing with cloud and not connectable systems
 
     static const auto wrongServers =
         [](const QnSystemDescriptionPtr& system) -> bool

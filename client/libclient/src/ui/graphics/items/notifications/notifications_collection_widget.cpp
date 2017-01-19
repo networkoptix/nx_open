@@ -549,11 +549,6 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
 {
-    QString messageText = QnSystemHealthStringsHelper::messageName(message);
-    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
-    if (messageText.isEmpty())
-        return;
-
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
@@ -572,6 +567,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QnNotificationWidget* item = findItem(message, resource);
     if (item)
         return;
+
+    const QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
+    const QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
+    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
+    qDebug() << messageText;
 
     item = new QnNotificationWidget(m_list);
 
@@ -655,22 +657,30 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             );
             break;
 
+        case QnSystemHealth::CloudPromo:
+            item->addActionButton(
+                qnSkin->icon("events/cloud_promo.png"),
+                tr("Try it free..."),
+                QnActions::PreferencesCloudTabAction);
+            break;
+
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
             break;
     }
 
-    QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
-    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+
+    item->setText(messageText);
+    item->setTooltipText(QnSystemHealthStringsHelper::messageTooltip(message, resourceName));
     item->setNotificationLevel(QnNotificationLevel::valueOf(message));
     item->setProperty(kItemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this,
+        &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
+    m_list->addItem(item, QnSystemHealth::isMessageLocked(message));
     m_itemsByMessageType.insert(message, item);
 }
 

@@ -143,6 +143,34 @@
     </message>
 </context>
 <context>
+    <name>ApplauncherControlDialog</name>
+    <message>
+        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">הוסף אחסון חיצוני...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check</source>
+        <translation type="unfinished">בדוק</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Not Checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Installed Versions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -211,11 +239,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>כל השרתים אינם זמינים. מידע הבדיקה אינו זמין.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Filter</source>
         <translation type="unfinished">מחק פילטר</translation>
     </message>
@@ -223,6 +246,11 @@
         <location/>
         <source>Email settings</source>
         <translation type="unfinished">הגדרות דואר אלקטרוני</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -239,16 +267,6 @@
     </message>
     <message>
         <location/>
-        <source>Finish:</source>
-        <translation>סיום:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start:</source>
-        <translation>התחלה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Limit Bandwidth to:</source>
         <translation>הגבל רוחב פס ל:</translation>
     </message>
@@ -260,6 +278,16 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -447,22 +475,12 @@
     </message>
     <message>
         <location/>
-        <source>Event log</source>
-        <translation>תיעוד אירועים</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Advanced...</source>
-        <translation>מתקדם...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Log...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -598,11 +616,6 @@
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
         <translation>about:blank</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This camera has no advanced settings</source>
-        <translation>למצלמה זו אין הגדרות מתקדמות</translation>
     </message>
     <message>
         <location/>
@@ -896,14 +909,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>CloudUserPanelWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1020,7 +1025,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Event Rules</source>
+        <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1155,16 +1160,6 @@ to the cloud&gt;</source>
     <name>GeneralPreferencesWidget</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
-        <source>Main Media Folder</source>
-        <translation>תיקיית מדיה ראשית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Extra Media Folders</source>
-        <translation>תיקיות מדיה נוספות</translation>
-    </message>
-    <message>
-        <location/>
         <source>Misc</source>
         <translation>הגדרות שונות</translation>
     </message>
@@ -1185,11 +1180,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Browse...</source>
-        <translation type="unfinished">סייר...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add...</source>
         <translation type="unfinished">&amp;הוסף...</translation>
     </message>
@@ -1200,8 +1190,33 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots</source>
-        <translation type="unfinished">הפעל את התוכנה כשהמחשב עולה:</translation>
+        <source>Local Media Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>First Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished">ללא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Second Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run application when PC Boots</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1340,16 +1355,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Search Base:</source>
-        <translation>בסיס החיפוש:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Filter:</source>
-        <translation>פילטר חיפוש:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Optional</source>
         <translation>אופציונלי</translation>
     </message>
@@ -1365,18 +1370,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Server URL:</source>
-        <translation type="unfinished">כתובת שרת:</translation>
+        <source>Server URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Admin DN:</source>
-        <translation type="unfinished">ש&amp;ם מנהל דומיין:</translation>
+        <source>Admin DN</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation type="unfinished">סיסמה:</translation>
+        <source>Password</source>
+        <translation type="unfinished">סיסמא</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1632,11 +1647,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Restart required.</source>
-        <translation>דורש אתחול.</translation>
-    </message>
-    <message>
-        <location/>
         <source> seconds</source>
         <translation>שניות</translation>
     </message>
@@ -1672,16 +1682,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Show extra info in tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time</source>
-        <translation type="unfinished">זמן מחזור הסיור:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Image</source>
         <translation type="unfinished">תמונה:</translation>
     </message>
@@ -1694,6 +1694,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Intensity</source>
         <translation type="unfinished">חוזק:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show additional info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1926,6 +1936,11 @@ to the cloud&gt;</source>
         <source>Form</source>
         <translation>טופס</translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
@@ -2084,12 +2099,12 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Update System</source>
+        <source>Link copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Link copied</source>
+        <source>You have the latest version installed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2258,11 +2273,6 @@ to the cloud&gt;</source>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
-        <source>Video Recording</source>
-        <translation>הקלטת וידאו</translation>
-    </message>
-    <message>
-        <location/>
         <source>Temporary Folder</source>
         <translation>תיקיה זמנית</translation>
     </message>
@@ -2303,61 +2313,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Native</source>
-        <translation>מקורית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quarter Native</source>
-        <translation>רבע מהמקורית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1920x1080</source>
-        <translation>1920x1080</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1280x720</source>
-        <translation>1280x720</translation>
-    </message>
-    <message>
-        <location/>
-        <source>640x480</source>
-        <translation>640x480</translation>
-    </message>
-    <message>
-        <location/>
-        <source>320x240</source>
-        <translation>320x240</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Best</source>
-        <translation>מיטבית</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Average</source>
-        <translation>ממוצעת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Performance</source>
-        <translation>ביצועים</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio Grabber</source>
-        <translation>לוכד אודיו</translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
-        <translation>ללא</translation>
-    </message>
-    <message>
-        <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>על מנת להשתמש באיכות וברזולוציה המיטביים, מומלץ להשתמש במחשב עוצמתי.</translation>
     </message>
@@ -2375,16 +2330,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Recording Quality</source>
         <translation type="unfinished">איכות הקלטה:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Device</source>
-        <translation type="unfinished">מכשיר עקרי:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device</source>
-        <translation type="unfinished">מכשיר חיצוני:</translation>
     </message>
 </context>
 <context>
@@ -2814,8 +2759,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished">השרתים אינם מקוונים. הסטטיסטיקות אינן זמינות.</translation>
+        <source>Server is offline. Statistics are not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2842,12 +2787,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
-פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Reindex Archive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2864,6 +2803,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2989,17 +2933,17 @@ Click &quot;New role&quot; button to create one.</source>
     <name>UserSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>User Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

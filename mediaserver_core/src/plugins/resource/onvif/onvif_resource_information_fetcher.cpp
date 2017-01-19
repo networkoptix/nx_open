@@ -176,7 +176,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
-    if (existResource) {
+    if (existResource && existResource->getStatus() >= Qn::Online) {
         QAuthenticator auth = existResource->getAuth();
 
         if (!auth.isNull())

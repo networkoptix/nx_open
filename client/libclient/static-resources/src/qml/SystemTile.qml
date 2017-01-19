@@ -43,7 +43,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isConnectible;
+        return control.isConnectable;
     }
 
     tileColor:
@@ -77,7 +77,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !control.isConnectible || !isCompatibleInternal);
+                || !control.isConnectable || !isCompatibleInternal);
         }
 
         text:
@@ -243,7 +243,7 @@ BaseTile
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isConnectible = Qt.binding( function() { return control.isConnectible; });
+                currentAreaItem.isConnectable = Qt.binding( function() { return control.isConnectable; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }

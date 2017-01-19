@@ -27,7 +27,7 @@
 #include "libconnection_mediator_app_info.h"
 #include "settings.h"
 #include "statistics/stats_manager.h"
-#include "stun_server_composite.h"
+#include "stun_server.h"
 
 namespace nx {
 namespace hpm {
@@ -92,7 +92,7 @@ int MediatorProcess::exec()
 
     nx::utils::TimerManager timerManager;
 
-    auto stunServerComposite = std::make_unique<StunServerComposite>(settings);
+    auto stunServerComposite = std::make_unique<StunServer>(settings);
     if (!stunServerComposite->bind())
         return 3;
     m_stunServerComposite = stunServerComposite.get();

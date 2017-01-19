@@ -233,7 +233,7 @@ Rectangle
 
                         isRunning: model.isRunning;
                         isReachable: model.isReachable;
-                        isConnectible: model.isConnectible;
+                        isConnectable: model.isConnectable;
 
                         Component.onCompleted:
                         {
@@ -283,7 +283,7 @@ Rectangle
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
-                anchors.topMargin: 8;
+                anchors.topMargin: 22;
 
                 pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
@@ -333,8 +333,8 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to Another Server")
-                : qsTr("Connect to Server")
+                ? qsTr("Connect to Another Server...")
+                : qsTr("Connect to Server...")
 
             onClicked: context.connectToAnotherSystem();
         }

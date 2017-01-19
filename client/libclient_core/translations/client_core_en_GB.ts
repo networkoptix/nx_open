@@ -24,31 +24,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal server error. Please contact support team.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network operation failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Requested feature is not implemented.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown realm.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bad username.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -60,10 +40,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Service is unavailable.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Credentials are no longer valid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -72,11 +48,38 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please retry later.</source>
+        <source>Unknown error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error.</source>
+        <source>Internal %1 error. Please contact support team.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected network error. Please check your Internet connection and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid login.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service is temporary unavailable. We&apos;re doing our best to restore it. Please try again later.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sorry, %1 Service couldn&apos;t process your request. Please try again in a few moments.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requested object is not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Object already exists.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

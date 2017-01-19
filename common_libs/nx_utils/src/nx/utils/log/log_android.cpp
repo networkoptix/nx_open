@@ -23,8 +23,9 @@ android_LogPriority toAndroidLogLevel(QnLogLevel logLevel)
         case cl_logINFO:
             return ANDROID_LOG_INFO;
         case cl_logDEBUG1:
-        case cl_logDEBUG2:
             return ANDROID_LOG_DEBUG;
+        case cl_logDEBUG2:
+            return ANDROID_LOG_VERBOSE;
         default:
             return ANDROID_LOG_DEFAULT;
     }

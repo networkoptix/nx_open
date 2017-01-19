@@ -1,4 +1,3 @@
-
 #include "system_description.h"
 
 #include <nx/utils/log/log.h>
@@ -47,9 +46,9 @@ QnSystemDescription::QnSystemDescription(
     connect(this, &QnBaseSystemDescription::serverRemoved, this, updateData);
 
     connect(this, &QnBaseSystemDescription::reachableStateChanged,
-        this, &QnBaseSystemDescription::connectibleStateChanged);
+        this, &QnBaseSystemDescription::connectableStateChanged);
     connect(this, &QnBaseSystemDescription::runningStateChanged,
-        this, &QnBaseSystemDescription::connectibleStateChanged);
+        this, &QnBaseSystemDescription::connectableStateChanged);
 
     connect(this, &QnBaseSystemDescription::serverChanged, this,
         [this](const QnUuid& /*id*/, QnServerFields fields)
@@ -173,7 +172,7 @@ bool QnSystemDescription::isReachable() const
     return !m_reachableServers.isEmpty();
 }
 
-bool QnSystemDescription::isConnectible() const
+bool QnSystemDescription::isConnectable() const
 {
     return (isReachable() && isRunning());
 }

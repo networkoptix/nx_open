@@ -211,6 +211,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QPoint textPos = textRect.topLeft() + QPoint(textPadding, option.fontMetrics.ascent()
             + qCeil((textRect.height() - option.fontMetrics.height()) / 2.0));
 
+        NX_ASSERT(textEnd > textPos.x());
         const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
             textEnd - textPos.x(), option.textElideMode);
 
@@ -220,7 +221,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
         }
 
-        if (!main.elided() && !extraInfo.isEmpty())
+        if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
         {
             option.font.setWeight(QFont::Normal);
 

@@ -187,7 +187,16 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_textLabel->setOpenExternalLinks(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+    connect(m_textLabel, &QnProxyLabel::linkHovered, this, [this](const QString& link)
+        {
+            qDebug() << "link " << link << "was hovered";
+        });
+    connect(m_textLabel, &QnProxyLabel::linkActivated, this, [this](const QString& link)
+        {
+            qDebug() << "link " << link << "was activated";
+        });
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
     m_layout->addItem(m_textLabel);

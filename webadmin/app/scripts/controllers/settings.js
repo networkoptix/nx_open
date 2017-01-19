@@ -28,6 +28,11 @@ angular.module('webadminApp')
             });
         }
 
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
+
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 
@@ -172,11 +177,7 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            if($scope.settingsForm.$valid) {
-                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
-            }else{
-                dialogs.alert('form is not valid');
-            }
+            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
         };
 
 // execute/scryptname&mode
@@ -277,7 +278,7 @@ angular.module('webadminApp')
                     }
                 }
             }).result.then(function(){
-                dialogs.alert(L.settings.connectedSuccess).then(function(){
+                dialogs.alert(L.settings.connectedSuccess).finally(function(){
                     window.location.reload();
                 });
             },errorHandler);
@@ -303,7 +304,7 @@ angular.module('webadminApp')
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).then(function(){
+                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
                         window.location.reload();
                     });
                 }, function(error){
@@ -395,11 +396,5 @@ angular.module('webadminApp')
         $scope.saveDateTime = function(){
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
-        };
-
-        $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
-            $event.stopPropagation();
-            $event.preventDefault();
         };
     });

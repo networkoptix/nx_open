@@ -155,12 +155,7 @@ protected:
     void at_webAdminAction_triggered();
     void at_webClientAction_triggered();
 
-    void at_systemAdministrationAction_triggered();
-    void at_systemUpdateAction_triggered();
-    void at_userManagementAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
-    void at_preferencesLicensesTabAction_triggered();
-    void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
 
     void at_mediaFileSettingsAction_triggered();
@@ -218,6 +213,7 @@ private:
 
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
+    void openSystemAdministrationDialog(int page);
 
     QnAdjustVideoDialog* adjustVideoDialog();
 

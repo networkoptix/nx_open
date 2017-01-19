@@ -30,7 +30,7 @@ class Settings;
 
 class BusinessLogicComposite;
 class ListeningPeerPool;
-class StunServerComposite;
+class StunServer;
 
 class MediatorProcess:
     public QnStoppable
@@ -58,7 +58,7 @@ private:
     std::vector<SocketAddress> m_httpEndpoints;
     nx::utils::promise<void> m_processTerminationEvent;
     BusinessLogicComposite* m_businessLogicComposite;
-    StunServerComposite* m_stunServerComposite;
+    StunServer* m_stunServerComposite;
 
     QString getDataDirectory();
     int printHelp();

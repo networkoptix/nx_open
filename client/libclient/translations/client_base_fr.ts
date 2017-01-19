@@ -240,65 +240,6 @@ pour voir plus de signets</translation>
     </message>
 </context>
 <context>
-    <name>QTimeSpanPrivate</name>
-    <message numerus="yes">
-        <source>%n millisecond(s)</source>
-        <translation>
-            <numerusform>%n milliseconde</numerusform>
-            <numerusform>%n millisecondes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n second(s)</source>
-        <translation>
-            <numerusform>%n seconde</numerusform>
-            <numerusform>%n secondes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n minute(s)</source>
-        <translation>
-            <numerusform>%n minute</numerusform>
-            <numerusform>%n minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation>
-            <numerusform>%n heure</numerusform>
-            <numerusform>%n heures</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation>
-            <numerusform>%n jour</numerusform>
-            <numerusform>%n jours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation>
-            <numerusform>%n semaine</numerusform>
-            <numerusform>%n semaines</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n month(s)</source>
-        <translation>
-            <numerusform>%n mois</numerusform>
-            <numerusform>%n mois</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation>
-            <numerusform>%n an</numerusform>
-            <numerusform>%n ans</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>QnAboutDialog</name>
     <message>
         <source>Copy to Clipboard</source>
@@ -325,10 +266,6 @@ pour voir plus de signets</translation>
         <translation>Taille Texture Max OpenGL</translation>
     </message>
     <message>
-        <source>Support</source>
-        <translation>Support</translation>
-    </message>
-    <message>
         <source>%1 version %2 (%3).</source>
         <translation>%1 version %2 (%3).</translation>
     </message>
@@ -338,6 +275,10 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Client is not connected to any system</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Customer Support</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -417,10 +358,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Selection Changed</source>
         <translation>Sélection modifiée</translation>
-    </message>
-    <message>
-        <source>Reconnect to Server</source>
-        <translation>Reconnecter au Serveur</translation>
     </message>
     <message>
         <source>Go to Freespace Mode</source>
@@ -1291,14 +1228,6 @@ pour voir plus de signets</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage account...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create account...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop Sharing Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1316,6 +1245,22 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Hide Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1339,25 +1284,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Folder &apos;%1&apos; does not exist.</source>
         <translation type="unfinished">Dossier %1 n&apos;existe pas.</translation>
-    </message>
-</context>
-<context>
-    <name>QnAggregationWidget</name>
-    <message>
-        <source>sec</source>
-        <translation>sec</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation>min</translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <translation>hrs</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>jours</translation>
     </message>
 </context>
 <context>
@@ -1443,6 +1369,22 @@ pour voir plus de signets</translation>
     <message>
         <source>These resources are already removed from the system</source>
         <translation type="unfinished">Ces ressources sont déjà retirées du système</translation>
+    </message>
+    <message>
+        <source>No sessions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select sessions to see their details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select cameras to see their details</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1611,12 +1553,12 @@ pour voir plus de signets</translation>
         <translation>Nom caméra</translation>
     </message>
     <message>
-        <source>Red mark means that the archive is still available</source>
-        <translation>Une marque rouge signifie que l&apos;archive est toujours disponible</translation>
-    </message>
-    <message>
         <source>Email settings changed</source>
         <translation type="unfinished">Paramètres courriel changé</translation>
+    </message>
+    <message>
+        <source>Filled circle mark means the archive is still available</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1726,6 +1668,10 @@ pour voir plus de signets</translation>
         <source>The password is incorrect.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select Build</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
@@ -1770,12 +1716,12 @@ pour voir plus de signets</translation>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
-        <source>For All Users</source>
-        <translation>Pour tous les Usagers</translation>
-    </message>
-    <message>
         <source>For Administrators Only</source>
         <translation>Pour Adminstrateurs Seulement</translation>
+    </message>
+    <message>
+        <source>For Users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1800,34 +1746,6 @@ pour voir plus de signets</translation>
         <source>Instant</source>
         <translation>immédiat</translation>
     </message>
-    <message numerus="yes">
-        <source>Every %n days</source>
-        <translation>
-            <numerusform>Tous les %n jour</numerusform>
-            <numerusform>Tous les %n jours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n hours</source>
-        <translation>
-            <numerusform>Toutes les %n heure</numerusform>
-            <numerusform>Toutes les %n heures</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n minutes</source>
-        <translation>
-            <numerusform>Toutes les %n minute</numerusform>
-            <numerusform>Toutes les %n minutes</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Every %n seconds</source>
-        <translation>
-            <numerusform>Toutes les %n seconde</numerusform>
-            <numerusform>Toutes les %n secondes</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Error: %1</source>
         <translation>Erreur: %1</translation>
@@ -1843,10 +1761,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Administrators Only</source>
         <translation>Administrateurs Seulement</translation>
-    </message>
-    <message>
-        <source>All Users</source>
-        <translation>Tous les usagers</translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1882,6 +1796,14 @@ pour voir plus de signets</translation>
     <message>
         <source>N/A</source>
         <translation>N/A</translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">Usagers</translation>
+    </message>
+    <message>
+        <source>Every %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1928,14 +1850,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Unsaved changes will be lost. Save?</source>
         <translation>Les modifications non sauvegardées seront perdues. Sauvegarder?</translation>
-    </message>
-    <message>
-        <source>Hide Advanced</source>
-        <translation>Cacher le mode avancé</translation>
-    </message>
-    <message>
-        <source>Show Advanced</source>
-        <translation>Afficher le mode avancé</translation>
     </message>
     <message>
         <source>&amp;New...</source>
@@ -1990,15 +1904,19 @@ pour voir plus de signets</translation>
         <translation>Confirmer pour quitter</translation>
     </message>
     <message>
-        <source>filter by devices...</source>
-        <translation>Filtrer par Périphériques...</translation>
+        <source>Restore All Rules to Default</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>filter by cameras...</source>
-        <translation>Filtrer par Caméras...</translation>
+        <source>No event rules</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restore all Rules to Default</source>
+        <source>Filter by devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by cameras...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2197,15 +2115,39 @@ pour voir plus de signets</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>URL is not available. Open video stream and try again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Secondary Stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This I/O module has no advanced settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This camera has no advanced settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is not available. Open video stream and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O module has no audio stream</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2381,6 +2323,10 @@ pour voir plus de signets</translation>
             <numerusform>%n module I/O trouvé</numerusform>
             <numerusform>%n modules IO trouvés</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>No cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2563,22 +2509,6 @@ pour voir plus de signets</translation>
         <source>Cameras Settings</source>
         <translation>Paramètres Caméras</translation>
     </message>
-    <message>
-        <source>Device Rules</source>
-        <translation>Règles Périphérique</translation>
-    </message>
-    <message>
-        <source>Devices Rules</source>
-        <translation>Règles Périphériques</translation>
-    </message>
-    <message>
-        <source>Camera Rules</source>
-        <translation>Règles Caméra</translation>
-    </message>
-    <message>
-        <source>Cameras Rules</source>
-        <translation>Règles Caméras</translation>
-    </message>
     <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
         <translation>
@@ -2605,14 +2535,6 @@ pour voir plus de signets</translation>
         <source>I/O Modules Settings</source>
         <translation>Paramètres Modules I/O</translation>
     </message>
-    <message>
-        <source>I/O Module Rules</source>
-        <translation>Règles Module I/O</translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules</source>
-        <translation>Règles Modules IO</translation>
-    </message>
     <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
         <translation>
@@ -2625,8 +2547,32 @@ pour voir plus de signets</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <source>Event Log...</source>
+        <translation type="unfinished">Journal d&apos;événement...</translation>
+    </message>
+    <message>
+        <source>Device Rules...</source>
+        <translation type="unfinished">Règles Périphérique...</translation>
+    </message>
+    <message>
+        <source>Devices Rules...</source>
+        <translation type="unfinished">Règles Périphériques...</translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation type="unfinished">Règles Caméra...</translation>
+    </message>
+    <message>
+        <source>Cameras Rules...</source>
+        <translation type="unfinished">Règles Caméras...</translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished">Règles Module I/O...</translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished">Règles Modules I/O...</translation>
     </message>
 </context>
 <context>
@@ -2725,10 +2671,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect to System...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Logging in...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2736,11 +2678,15 @@ devices</source>
         <source>Log in to %1...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished">Connexion au serveur...</translation>
+    </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
-        <source>Manage account</source>
+        <source>Account Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2901,6 +2847,10 @@ devices</source>
     </message>
     <message>
         <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3187,6 +3137,10 @@ devices</source>
         <source>Any Action</source>
         <translation>N&apos;importe quel action</translation>
     </message>
+    <message>
+        <source>No events</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
@@ -3223,10 +3177,6 @@ devices</source>
         <translation>Administrateurs Seulement</translation>
     </message>
     <message>
-        <source>All Users</source>
-        <translation>Tous les usagers</translation>
-    </message>
-    <message>
         <source>&lt;User removed&gt;</source>
         <translation>&lt;Usager retiré&gt;</translation>
     </message>
@@ -3252,6 +3202,10 @@ devices</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished">Usagers</translation>
     </message>
 </context>
 <context>
@@ -3282,50 +3236,6 @@ devices</source>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
         <translation>Paramètres d&apos;horaire ne sont pas compatible avec certain périphériques.</translation>
-    </message>
-</context>
-<context>
-    <name>QnExportTimelapseDialog</name>
-    <message>
-        <source>sec</source>
-        <translation>sec</translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation>min</translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <translation>hrs</translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation>jours</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
-        <translation>ms</translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds in rapid review dialog</comment>
-        <translation>s</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes in rapid review dialog</comment>
-        <translation>m</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours in rapid review dialog</comment>
-        <translation>h</translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days in rapid review dialog</comment>
-        <translation>j</translation>
     </message>
 </context>
 <context>
@@ -3501,34 +3411,7 @@ devices</source>
     </message>
 </context>
 <context>
-    <name>QnIOPortItemDelegate</name>
-    <message>
-        <source>Disabled</source>
-        <translation>Désactivé</translation>
-    </message>
-    <message>
-        <source>Input</source>
-        <translation>Entrée</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation>Sortie</translation>
-    </message>
-    <message>
-        <source>Open circuit</source>
-        <translation>Circuit ouvert</translation>
-    </message>
-    <message>
-        <source>Grounded circuit</source>
-        <translation>Circuit à la terre</translation>
-    </message>
-</context>
-<context>
     <name>QnIOPortsViewModel</name>
-    <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
     <message>
         <source>Type</source>
         <translation>Type</translation>
@@ -3540,10 +3423,6 @@ devices</source>
     <message>
         <source>Name</source>
         <translation>Nom</translation>
-    </message>
-    <message>
-        <source>Pulse time(ms)</source>
-        <translation>Temps d&apos;impulsion(ms)</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -3571,11 +3450,6 @@ devices</source>
         <translation>Invalide</translation>
     </message>
     <message>
-        <source>Open Circuit</source>
-        <comment>IO Port State</comment>
-        <translation>Circuit Ouvert</translation>
-    </message>
-    <message>
         <source>Grounded circuit</source>
         <comment>IO Port State</comment>
         <translation>Circuit à la terre</translation>
@@ -3584,6 +3458,33 @@ devices</source>
         <source>Invalid state</source>
         <comment>IO Port State</comment>
         <translation>État invalide</translation>
+    </message>
+    <message>
+        <source>ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On click</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Duration</source>
+        <translation type="unfinished">Duration</translation>
+    </message>
+    <message>
+        <source>Open circuit</source>
+        <comment>IO Port State</comment>
+        <translation type="unfinished">Circuit ouvert</translation>
+    </message>
+    <message>
+        <source>Toggle state</source>
+        <comment>IO Output Port Action</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Impulse</source>
+        <comment>IO Output Port Action</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3604,16 +3505,16 @@ devices</source>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
-        <source>Failed to turn on IO port &apos;%1&apos;</source>
-        <translation>Échec d&apos;ouverture du port IO &apos;%1&apos;</translation>
+        <source>Failed to turn off I/O port &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to turn off IO port &apos;%1&apos;</source>
-        <translation>Échec de fermeture du port IO &apos;%1&apos;</translation>
+        <source>Failed to turn on I/O port &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IO port error</source>
-        <translation>Erreur port IO</translation>
+        <source>I/O port error</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3774,6 +3675,18 @@ devices</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Update Screen...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will lose access to following resources:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from videowall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to videowall again.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4080,10 +3993,6 @@ devices</source>
         <translation>Succès</translation>
     </message>
     <message>
-        <source>Hardware ID copied to clipboard.</source>
-        <translation>Matériel ID copier vers presse-papier.</translation>
-    </message>
-    <message>
         <source>Open License File</source>
         <translation>Ouvrir Fichier de licence</translation>
     </message>
@@ -4110,6 +4019,10 @@ devices</source>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished">S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
+    </message>
+    <message>
+        <source>Hardware ID has been copied to clipboard.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4167,10 +4080,6 @@ devices</source>
     <message>
         <source>Screen Recording</source>
         <translation type="unfinished">Enregistrement d&apos;écran</translation>
-    </message>
-    <message>
-        <source>Audio Settings</source>
-        <translation type="unfinished">Paramètres Audio</translation>
     </message>
     <message>
         <source>Notifications</source>
@@ -4389,10 +4298,6 @@ devices</source>
         <translation>Le URL est invalide.</translation>
     </message>
     <message>
-        <source>The password cannot be empty.</source>
-        <translation>Le mot de passe ne peut pas être vide.</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>Utiliser un nom d&apos;hôte précis ou l&apos;adresse IP plutôt que %1.</translation>
     </message>
@@ -4434,6 +4339,10 @@ devices</source>
     </message>
     <message>
         <source>The login cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4513,10 +4422,10 @@ devices</source>
 <context>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
-        <source>%n more item(s)</source>
-        <translation>
-            <numerusform>%n élément de plus</numerusform>
-            <numerusform>%n éléments de plus</numerusform>
+        <source>%n more notifications</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -4588,13 +4497,6 @@ devices</source>
         <source>&lt;Uploading sound...&gt;</source>
         <translatorcomment>?</translatorcomment>
         <translation>&lt;Uploading sound...&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnNotificationWidget</name>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
     </message>
 </context>
 <context>
@@ -4945,13 +4847,6 @@ devices</source>
         <source>Instant</source>
         <translation>Immédiat</translation>
     </message>
-    <message numerus="yes">
-        <source>%n seconds</source>
-        <translation>
-            <numerusform>%n seconde</numerusform>
-            <numerusform>%n secondes</numerusform>
-        </translation>
-    </message>
     <message>
         <source>&lt;Invalid&gt;</source>
         <translation>&lt;Invalide&gt;</translation>
@@ -4983,37 +4878,45 @@ devices</source>
         <source>Select folder...</source>
         <translation>Sélectionner Dossier...</translation>
     </message>
+    <message>
+        <source>Best</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Performance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Native</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quarter Native</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1920x1080</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1280x720</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>640x480</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>320x240</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatsModel</name>
-    <message numerus="yes">
-        <source>%n years</source>
-        <translation>
-            <numerusform>%n an</numerusform>
-            <numerusform>%n ans</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n months</source>
-        <translation>
-            <numerusform>%n mois</numerusform>
-            <numerusform>%n mois</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n days</source>
-        <translation>
-            <numerusform>%n jour</numerusform>
-            <numerusform>%n jours</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n hours</source>
-        <translation>
-            <numerusform>%n heure</numerusform>
-            <numerusform>%n heures</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Average bitrate for the recorded period</source>
         <translation>Débit moyen pour la période enregistrée</translation>
@@ -5190,10 +5093,6 @@ devices</source>
 <context>
     <name>QnResourceTreeModelNode</name>
     <message>
-        <source>Local</source>
-        <translation type="unfinished">Locale</translation>
-    </message>
-    <message>
         <source>Servers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5231,6 +5130,10 @@ devices</source>
     </message>
     <message>
         <source>Shared Layouts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Files</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5296,6 +5199,10 @@ devices</source>
     <message>
         <source>Export Bookmark...</source>
         <translation>Exporter Signet...</translation>
+    </message>
+    <message>
+        <source>No bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5478,10 +5385,6 @@ devices</source>
 <context>
     <name>QnServerSettingsDialog</name>
     <message>
-        <source>Open Web Page...</source>
-        <translation>Ouvrir Page Web...</translation>
-    </message>
-    <message>
         <source>General</source>
         <translation>Général</translation>
     </message>
@@ -5651,10 +5554,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Select Specific Build...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Selected Version</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5756,6 +5655,22 @@ devices</source>
     </message>
     <message>
         <source>Installing updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specific Build...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update to Specific Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel update?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5981,10 +5896,6 @@ devices</source>
         <translation>En cours...</translation>
     </message>
     <message>
-        <source>Failed</source>
-        <translation>Échec</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>Succès</translation>
     </message>
@@ -5995,6 +5906,22 @@ devices</source>
     <message>
         <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Authentication failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SMTP Error %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network error</source>
+        <translation type="unfinished">Erreur Réseau.</translation>
     </message>
 </context>
 <context>
@@ -6511,21 +6438,6 @@ devices</source>
         <source>Time</source>
         <translation type="unfinished">Temps</translation>
     </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds of server time offset</comment>
-        <translation type="unfinished">s</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes of server time offset</comment>
-        <translation type="unfinished">m</translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours of server time offset</comment>
-        <translation type="unfinished">h</translation>
-    </message>
 </context>
 <context>
     <name>QnTimeServerSelectionWidget</name>
@@ -6541,64 +6453,11 @@ devices</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>NO THUMBNAILS AVAILABLE</source>
-        <translation>AUCUNE VIGNETTE DISPONIBLE</translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>M</source>
-        <comment>Suffix for displaying months on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>y</source>
-        <comment>Suffix for displaying years on timeline.</comment>
-        <extracomment>Do not translate this string unless you know what you&apos;re doing.</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Live</source>
         <translation type="unfinished">Direct</translation>
     </message>
-</context>
-<context>
-    <name>QnTranslationListModel</name>
     <message>
-        <source>%1 (built-in)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 (external)</source>
+        <source>No thumbnails available</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6901,10 +6760,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Profile</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6951,6 +6806,14 @@ devices</source>
     </message>
     <message>
         <source>User Settings - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished">Activé</translation>
+    </message>
+    <message>
+        <source>User is disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7375,6 +7238,14 @@ devices</source>
         <source>Could not execute initial server query</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Cannot move devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot move I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -7697,6 +7568,10 @@ devices</source>
     <message>
         <source>Merge failed.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot merge systems.</source>
+        <translation type="unfinished">Impossible d&apos;unir les Systèmes.</translation>
     </message>
 </context>
 <context>
@@ -8091,13 +7966,6 @@ devices</source>
         <source>A Video Wall with the same name already exists.</source>
         <translation>Mur Vidéo avec le même nom existe déjà.</translation>
     </message>
-    <message numerus="yes">
-        <source>%n items</source>
-        <translation>
-            <numerusform>%n élément</numerusform>
-            <numerusform>%n éléments</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation>Êtes-vous sûr que vous voulez arrêter le mur vidéo?</translation>
@@ -8111,25 +7979,11 @@ devices</source>
         <translation>Impossible d&apos;appliquer les changements. Erreur inattendue s&apos;est produite.</translation>
     </message>
     <message>
-        <source>New Layout</source>
-        <translation type="unfinished">Nouvelle mise en page</translation>
-    </message>
-    <message>
         <source>Confirm items deleting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Confirm matrices deleting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 - Copy</source>
-        <comment>%1 is original layout name</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Screen of %1</source>
-        <comment>%1 means user&apos;s name</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

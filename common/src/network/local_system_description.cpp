@@ -1,4 +1,3 @@
-
 #include "local_system_description.h"
 
 #include <network/system_helpers.h>

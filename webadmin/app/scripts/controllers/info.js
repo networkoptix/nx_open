@@ -45,4 +45,8 @@ angular.module('webadminApp')
                 getStorages();
             }
         });
+
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
     });

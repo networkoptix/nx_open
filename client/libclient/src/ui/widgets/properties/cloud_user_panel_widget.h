@@ -8,6 +8,8 @@ namespace Ui {
 class CloudUserPanelWidget;
 }
 
+class AbstractAccessor;
+
 /** Widget for displaying cloud user heading. */
 class QnCloudUserPanelWidget: public QnPanel
 {
@@ -26,6 +28,8 @@ public:
 
     QString fullName() const;
     void setFullName(const QString& value);
+
+    static AbstractAccessor* createIconWidthAccessor();
 
 private:
     QScopedPointer<Ui::CloudUserPanelWidget> ui;
