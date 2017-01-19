@@ -5,10 +5,13 @@
   "clientDomain": "{{portalDomain}}",
   "dialogs": {
     "okButton": "Ok",
+    "cancelButton": "Cancel",
     "loginTitle": "Log in to PRODUCT_NAME",
-    "logoutConfirmText": "Log out to continue, or cancel to go to your systems",
-    "logoutConfirmTitle": "You are already logged in to portal.",
-    "logoutConfirmButton": "Log out"
+
+    "logoutAuthorisedText": null,
+    "logoutAuthorisedTitle": "You are already logged in",
+    "logoutAuthorisedContinueButton": "Continue with current account",
+    "logoutAuthorisedLogoutButton": "Log out"
   },
   "pageTitles": {
     "template": "{{title}} PRODUCT_NAME",

@@ -86,12 +86,16 @@ angular.module('cloudApp')
             logoutAuthorised:function(){
                 var self = this;
                 this.get().then(function(){
-                    dialogs.confirm(L.dialogs.logoutConfirmText,
-                        L.dialogs.logoutConfirmTitle,
-                        L.dialogs.logoutConfirmButton, 'danger').then(function(){
-                        self.logout(true);
-                    },function(){
+                    // logoutAuthorisedLogoutButton
+                    dialogs.confirm(L.dialogs.logoutAuthorisedText,
+                        L.dialogs.logoutAuthorisedTitle,
+                        L.dialogs.logoutAuthorisedContinueButton,
+                        null,
+                        L.dialogs.logoutAuthorisedLogoutButton
+                        ).then(function(){
                         self.redirectAuthorised();
+                    },function(){
+                        self.logout(true);
                     });
                 });
             },
