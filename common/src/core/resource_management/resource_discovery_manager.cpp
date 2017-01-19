@@ -519,6 +519,13 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     if (!camRes)
         return QnNetworkResourcePtr();
 
+    {
+        auto existResource = qnResPool->getResourceByUniqueId<QnNetworkResource>(camRes->getUniqueId());
+        if (existResource)
+            return existResource;
+    }
+
+
     DLOG(lit("%1 Checking resource %2")
         .arg(QString::fromLatin1(Q_FUNC_INFO))
         .arg(NetResString(netRes)));
@@ -572,9 +579,6 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
         bool sameMACs = !existRes->getMAC().isNull() && !netRes->getMAC().isNull()
             && existRes->getMAC() == netRes->getMAC();
 
-        bool sameIds = !existRes->getUniqueId().isEmpty() && !netRes->getUniqueId().isEmpty()
-            && existRes->getUniqueId() == netRes->getUniqueId();
-
         QUrl url1(existRes->getUrl());
         QUrl url2(netRes->getUrl());
 
@@ -591,7 +595,7 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
                      .arg(sameIds)
                      .arg(samePorts));
 
-        bool isSameResource = sameIds || ((sameMACs || samePorts) && sameChannels); 
+        bool isSameResource = (sameMACs || samePorts) && sameChannels;
         if (isSameResource)
             return existRes; // camera found by different drivers on the same port
     }
