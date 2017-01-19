@@ -13,3 +13,16 @@ bool QnSystemHealth::isMessageOptional(MessageType message)
 
     return message != QnSystemHealth::CloudPromo;
 }
+
+bool QnSystemHealth::isMessageLocked(MessageType message)
+{
+    switch (message)
+    {
+        case QnSystemHealth::ConnectionLost:
+        case QnSystemHealth::CloudPromo:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}

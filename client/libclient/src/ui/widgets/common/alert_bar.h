@@ -32,3 +32,11 @@ private:
     QLabel* m_label;
     bool m_reservedSpace;
 };
+
+/* This class is a helper for the easy customization option. */
+class QnPromoBar: public QnAlertBar
+{
+    Q_OBJECT
+public:
+    QnPromoBar(QWidget* parent = nullptr): QnAlertBar(parent) {}
+};

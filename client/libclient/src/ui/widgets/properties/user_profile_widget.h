@@ -15,6 +15,7 @@ namespace Ui
 }
 
 class QnUserSettingsModel;
+class QnAligner;
 
 class QnUserProfileWidget : public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
@@ -35,11 +36,11 @@ public:
 
 private:
     void updateControlsAccess();
-    void updateAccessRightsPresets();
-
     bool validMode() const;
+
 private:
     QScopedPointer<Ui::UserProfileWidget> ui;
     QnUserSettingsModel* const m_model;
     QString m_newPassword;
+    QnAligner* m_aligner;
 };

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Writes cloud url to target file (or std output if not given).
-If cloud url is not provided, it is automatically received from cloud host finder.
+Cloud url is automatically received from cloud host finder.
 """
 
 import os
@@ -49,7 +49,6 @@ def main():
     parser.add_argument('-v', '--verbose', action='store_true', help="verbose output")
     parser.add_argument('-i', '--instance', metavar="instance", default="", help="cloud instance name (default is empty)", required = True)
     parser.add_argument('-c', '--customization', help="customization name", required = True)    
-    parser.add_argument('--host', help="fixed cloud host")
     parser.add_argument('-t', '--target', help="output to file")
     parser.add_argument('--timeout', default=10, type=int, help="request timeout")
 
@@ -57,15 +56,12 @@ def main():
 
     print "Requesting cloud host for customization {0}, instance {1}".format(args.customization, args.instance)
 
-    if args.host:
-        print "Cloud host is provided: {0}".format(args.host)
-
     global verbose
     verbose = args.verbose
     if verbose and args.target:
         print "Result will be saved to {0}".format(args.target)
 
-    host = args.host if args.host else getHostOnline(args.instance, args.customization, args.timeout)
+    host = getHostOnline(args.instance, args.customization, args.timeout)
     if host:
         writeToTarget(host, args.target)
     else:

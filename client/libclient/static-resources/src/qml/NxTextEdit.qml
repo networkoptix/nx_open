@@ -66,6 +66,8 @@ FocusScope
 
         onAccepted: control.accepted();
         Keys.enabled: false;
+        KeyNavigation.tab: control.KeyNavigation.tab;
+        KeyNavigation.backtab: control.KeyNavigation.backtab;
 
         Component
         {

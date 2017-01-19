@@ -63,7 +63,7 @@ namespace style
     const int Metrics::kCalendarHeaderFontPixelSize = 11;
 
     const qreal Hints::kDisabledItemOpacity = 0.3;
-    const int Hints::kMinimumFormLabelWidth = 64;
+    const int Hints::kMinimumFormLabelWidth = 64 - Metrics::kDefaultTopLevelMargin;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";

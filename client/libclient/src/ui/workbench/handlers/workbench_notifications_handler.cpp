@@ -37,8 +37,14 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
 
+    //TODO: #GDM #future
+    /*
+     * Some messages must be displayed before bunch of 'user email is invalid'.
+     * Correct approach is to extend QnNotificationListWidget functionality with reordering.
+     * Postponed to the future.
+     */
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,
-        this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
+        this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged, Qt::QueuedConnection);
 
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
@@ -189,11 +195,11 @@ bool QnWorkbenchNotificationsHandler::tryClose(bool force)
 
 void QnWorkbenchNotificationsHandler::forcedUpdate()
 {
+    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo); //must be displayed first
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
-    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo);
 }
 
 bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageType message)
@@ -329,8 +335,13 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     qnWarning("Unknown system health message");
 }
 
-void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid)
+void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user,
+    bool isValid)
 {
+    /* Some checks are required as we making this call via queued connection. */
+    if (!context()->user())
+        return;
+
     /* Checking that we are allowed to see this message */
     bool visible = !isValid && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
     auto message = context()->user() == user

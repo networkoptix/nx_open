@@ -257,6 +257,16 @@
             }
         }
     },
+    
+    "QnPromoBar": {
+        "palette": { 
+            "default": {
+                "window": "brand_d5",
+                "link": "light1",
+                "linkVisited": "light1"
+            }
+        }
+    },    
 
     "QHeaderView": {
         "palette": {
