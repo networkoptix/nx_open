@@ -49,7 +49,10 @@ bool DbConnectionHolder::open()
     }
 
     if (!tuneConnection())
-        return close();
+    {
+        close();
+        return false;
+    }
 
     return true;
 }
