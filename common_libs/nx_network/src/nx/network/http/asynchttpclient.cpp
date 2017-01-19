@@ -28,6 +28,15 @@ static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 
 using std::make_pair;
 
+namespace {
+
+static bool logTraffic()
+{
+    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+}
+
+} // namespace
+
 namespace nx_http
 {
     static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
@@ -351,8 +360,8 @@ namespace nx_http
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
         const auto buffer = m_httpStreamReader.fetchMessageBody();
-        if (nx::network::SocketGlobals::debugConfiguration().httpClientTraffic)
-            NX_LOGX(lm("Response message body buffer: \n%1\n\n").str(buffer), cl_logDEBUG2);
+        if (logTraffic())
+            NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
 
         return buffer;
     }
@@ -528,10 +537,9 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lm("Request has been successfully sent to %1: %2")
-            .strs(m_contentLocationUrl.toString(QUrl::RemovePassword),
-                nx::network::SocketGlobals::debugConfiguration().httpClientTraffic
-                    ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
+        NX_LOGX(lm("Request has been successfully sent to %1: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -863,10 +871,10 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lm("Response from %1 has been successfully read: %2")
-            .strs(m_contentLocationUrl.toString(QUrl::RemovePassword),
-                nx::network::SocketGlobals::debugConfiguration().httpClientTraffic
-                    ? response()->toString() : response()->statusLine.toString()), cl_logDEBUG2);
+        NX_LOGX(lm("Response from %1 has been successfully read: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? response()->toString() : response()->statusLine.toString()),
+            cl_logDEBUG2);
 
         if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
             return;
