@@ -13,10 +13,10 @@ namespace hpm {
 
 namespace conf { class Settings; };
 
-class StunServerComposite
+class StunServer
 {
 public:
-    StunServerComposite(const conf::Settings& settings);
+    StunServer(const conf::Settings& settings);
 
     bool bind();
     bool listen();

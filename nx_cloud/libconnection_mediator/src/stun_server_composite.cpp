@@ -8,7 +8,7 @@
 namespace nx {
 namespace hpm {
 
-StunServerComposite::StunServerComposite(const conf::Settings& settings):
+StunServer::StunServer(const conf::Settings& settings):
     m_settings(settings),
     m_tcpStunServer(std::make_unique<MultiAddressServer<stun::SocketServer>>(
         &m_stunMessageDispatcher,
@@ -19,7 +19,7 @@ StunServerComposite::StunServerComposite(const conf::Settings& settings):
 {
 }
 
-bool StunServerComposite::bind()
+bool StunServer::bind()
 {
     //accepting STUN requests by both tcp and udt
 
@@ -47,7 +47,7 @@ bool StunServerComposite::bind()
     return true;
 }
 
-bool StunServerComposite::listen()
+bool StunServer::listen()
 {
     if (!m_tcpStunServer->listen())
     {
@@ -66,18 +66,18 @@ bool StunServerComposite::listen()
     return true;
 }
 
-void StunServerComposite::stopAcceptingNewRequests()
+void StunServer::stopAcceptingNewRequests()
 {
     m_tcpStunServer->pleaseStopSync();
     m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
 }
 
-const std::vector<SocketAddress>& StunServerComposite::endpoints() const
+const std::vector<SocketAddress>& StunServer::endpoints() const
 {
     return m_endpoints;
 }
 
-nx::stun::MessageDispatcher& StunServerComposite::dispatcher()
+nx::stun::MessageDispatcher& StunServer::dispatcher()
 {
     return m_stunMessageDispatcher;
 }
