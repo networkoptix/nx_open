@@ -32,6 +32,8 @@ public:
     virtual boost::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
+    void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
+
     bool boundToCloud() const;
     /** Returns \a nullptr if not connected to the cloud */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
