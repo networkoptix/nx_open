@@ -96,21 +96,26 @@ Q_DECLARE_FLAGS(LabelStyleFlags, LabelStyleFlag)
 
 LabelStyleFlags getCaptionStyle(bool isError)
 {
-    return (isError ? LabelStyleFlag::kErrorStyle : LabelStyleFlag::kNormalStyle);
+    return static_cast<LabelStyleFlags>(isError
+        ? LabelStyleFlag::kErrorStyle
+        : LabelStyleFlag::kNormalStyle);
 }
 
 LabelStyleFlags getDescriptionStyle(bool isError)
 {
-    return (LabelStyleFlag::kDescriptionStyle
-        | (isError ? LabelStyleFlag::kErrorStyle : LabelStyleFlag::kNormalStyle));
+    const LabelStyleFlag errorFlag = static_cast<LabelStyleFlag>(isError
+        ? LabelStyleFlag::kErrorStyle
+        : LabelStyleFlag::kNormalStyle);
+
+    return static_cast<LabelStyleFlags>(LabelStyleFlag::kDescriptionStyle | errorFlag);
 }
 
 void setupLabel(QLabel* label, LabelStyleFlags style)
 {
     auto font = label->font();
-    const auto pixelSize = (style.testFlag(kDescriptionStyle)
+    const int pixelSize = (style.testFlag(kDescriptionStyle)
         ? 36
-        : (style.testFlag(LabelStyleFlag::kErrorStyle) ? 88 : 80));
+        : (style.testFlag(kErrorStyle) ? 88 : 80));
 
     font.setPixelSize(pixelSize);
     font.setWeight(style.testFlag(kDescriptionStyle) ? QFont::Normal : QFont::Light);
