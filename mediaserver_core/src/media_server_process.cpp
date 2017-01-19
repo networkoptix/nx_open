@@ -598,7 +598,7 @@ static QStringList listRecordFolders()
     if (MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() != 0)
     {
         for (auto& path: folderPaths)
-            path += lit("/") + serverGuid().toString();
+            path = closeDirPath(path) + serverGuid().toString();
     }
     return folderPaths;
 }
