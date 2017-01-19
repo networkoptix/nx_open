@@ -130,13 +130,13 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 {
     AbstractCloudDataProviderFactory::setFactoryFunc(
         [cloudDataProvider](
-            const std::string& /*address*/,
+            const boost::optional<QUrl>& /*cdbUrl*/,
             const std::string& /*user*/,
             const std::string& /*password*/,
             std::chrono::milliseconds /*updateInterval*/)
-    {
-        return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
-    });
+        {
+            return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+        });
 }
 
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
