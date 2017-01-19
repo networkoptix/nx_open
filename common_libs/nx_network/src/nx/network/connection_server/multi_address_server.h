@@ -117,7 +117,7 @@ public:
     }
 
     template<typename ... Args>
-    void forEachListener(void(SocketServerType::*function)(Args&&... args))
+    void forEachListener(void(SocketServerType::*function)(Args...), Args&& ... args)
     {
         for (auto& listener: m_listeners)
             (listener.get()->*function)(std::forward<Args>(args)...);
