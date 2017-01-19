@@ -167,10 +167,8 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
 
     if (!existing.isEmpty())
     {
-        if (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
-            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
-                return;
+        if (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow()) != QDialogButtonBox::Yes)
+            return;
         removeLayouts(existing);
     }
 
@@ -298,9 +296,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
-                switch (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-                    QDialogButtonBox::Yes))
+
+                switch (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow()))
                 {
                     case QDialogButtonBox::Cancel:
                         return;
@@ -325,9 +322,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             button = QDialogButtonBox::Yes;
             if (!existing.isEmpty())
             {
-                button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-                    QDialogButtonBox::Yes);
+                button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow());
                 if (button == QDialogButtonBox::Cancel)
                     return;
                 if (button == QDialogButtonBox::Yes)

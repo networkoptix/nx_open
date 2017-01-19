@@ -439,6 +439,7 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
+        Empty                       = 0x000,
         PtzPresetInUse              = 0x001,    /**< Delete ptz preset which is used in the tour. */
         SharedLayoutEdit            = 0x002,    /**< Edit shared layout. */
         ChangeUserLocalLayout       = 0x004,    /**< Items are removed from user's layout, but access still persist. */

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QString>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialogButtonBox>
 
@@ -12,22 +13,28 @@ class MessageBox;
 
 class QnMessageBoxPrivate;
 
+enum class QnMessageBoxIcon
+{
+    NoIcon,
+    Information,
+    Warning,
+    Critical,
+    Question,
+    Success
+};
+
+enum class QnMessageBoxCustomButton
+{
+    Overwrite,      //< Uses QDialogButtonBox::YesRole
+    Delete          //< Uses QDialogButtonBox::YesRole
+};
+
 class QnMessageBox: public QnDialog
 {
     Q_OBJECT
     typedef QnDialog base_type;
 
 public:
-    enum Icon
-    {
-        NoIcon = 0,
-        Information,
-        Warning,
-        Critical,
-        Question,
-        Success
-    };
-
     /* Positions of custom widgets in the message box. */
     enum class Layout
     {
@@ -36,19 +43,58 @@ public:
     };
 
 public:
-
-    QnMessageBox(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    QnMessageBox(
+        QWidget* parent = nullptr,
+        Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     QnMessageBox(
-            Icon icon,
-            int helpTopicId,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::NoButton,
-            QWidget *parent = nullptr,
-            Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras,
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton,
+        QWidget* parent = nullptr,
+        Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
+    static QDialogButtonBox::StandardButton _information(
+        QWidget* parent,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    static QDialogButtonBox::StandardButton _warning(
+        QWidget* parent,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    static QDialogButtonBox::StandardButton _question(
+        QWidget* parent,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    static QDialogButtonBox::StandardButton _critical(
+        QWidget* parent,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    static QDialogButtonBox::StandardButton _success(
+        QWidget* parent,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+public:
     virtual ~QnMessageBox();
+
+    void addCustomButton(QnMessageBoxCustomButton button);
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton *addButton(const QString &text, QDialogButtonBox::ButtonRole role);
@@ -76,8 +122,8 @@ public:
     QString text() const;
     void setText(const QString &text);
 
-    Icon icon() const;
-    void setIcon(Icon);
+    QnMessageBoxIcon icon() const;
+    void setIcon(QnMessageBoxIcon icon);
 
     Qt::TextFormat textFormat() const;
     void setTextFormat(Qt::TextFormat format);
@@ -104,76 +150,6 @@ public:
 
     virtual int exec() override;
 
-    static QDialogButtonBox::StandardButton information(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-    static QDialogButtonBox::StandardButton information(
-            QWidget *parent,
-            int helpTopicId,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-
-    static QDialogButtonBox::StandardButton question(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-    static QDialogButtonBox::StandardButton question(
-            QWidget *parent,
-            int helpTopicId,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-
-    static QDialogButtonBox::StandardButton warning(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-    static QDialogButtonBox::StandardButton warning(
-            QWidget *parent,
-            int helpTopicId,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-
-    static QDialogButtonBox::StandardButton critical(
-            QWidget *parent,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-    static QDialogButtonBox::StandardButton critical(
-            QWidget *parent,
-            int helpTopicId,
-            const QString &title,
-            const QString &text,
-            QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-            QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-
-    static QDialogButtonBox::StandardButton success(
-        QWidget *parent,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-    static QDialogButtonBox::StandardButton success(
-        QWidget *parent,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
-        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
-
 protected:
     virtual void showEvent(QShowEvent* event) override;
     virtual void closeEvent(QCloseEvent* event) override;
@@ -182,8 +158,21 @@ protected:
     virtual void afterLayout() override;
 
 private:
-    QScopedPointer<Ui::MessageBox> ui;
+    static QDialogButtonBox::StandardButton execute(
+        QWidget* parent,
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras = QString(),
+        QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
+        QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
+
+    void initialize();
+
+    QPixmap getPixmapByIconId(QnMessageBoxIcon icon);
+
+private:
+    const QScopedPointer<Ui::MessageBox> ui;
 
     Q_DECLARE_PRIVATE(QnMessageBox)
-    QScopedPointer<QnMessageBoxPrivate> d_ptr;
+    const QScopedPointer<QnMessageBoxPrivate> d_ptr;
 };

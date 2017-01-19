@@ -217,7 +217,6 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     const auto errorCode = qnCloudStatusWatcher->error();
     qnCloudStatusWatcher->disconnect(this);
 
-    QString message;
     switch (errorCode)
     {
         case QnCloudStatusWatcher::NoError:
@@ -230,21 +229,11 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
-            message = tr("Can not login to %1").arg(QnAppInfo::cloudName());
+            Q_Q(QnLoginToCloudDialog);
+
+            QnMessageBox::_critical(q, tr("Failed to login to %1").arg(QnAppInfo::cloudName()));
             break;
         }
     }
-
-    Q_Q(QnLoginToCloudDialog);
-
-    if (!message.isEmpty())
-    {
-        QnMessageBox::critical(q,
-            helpTopic(q),
-            tr("Error"),
-            message,
-            QDialogButtonBox::Ok);
-    }
-
     unlockUi();
 }

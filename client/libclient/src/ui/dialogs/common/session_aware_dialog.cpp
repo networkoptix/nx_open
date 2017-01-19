@@ -62,17 +62,16 @@ void QnSessionAwareTabbedDialog::forcedUpdate() {
 }
 
 
-QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::showConfirmationDialog() {
-    auto confirmMessageText = [this]{
-        QStringList details;
-        for(const Page &page: modifiedPages())
-            details << tr("* %1").arg(page.title);
-        return tr("Unsaved changes will be lost. Save the following pages?") + L'\n' + details.join(L'\n');
-    };
+QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::showConfirmationDialog()
+{
+    QStringList details;
+    for(const Page &page: modifiedPages())
+        details << lit("* %1").arg(page.title);
 
-    return QnMessageBox::question(this,
-        tr("Confirm exit"),
-        confirmMessageText(),
+    static const auto kDelimiter = L'\n';
+    const auto extraMessage = tr("Unsaved changes:") + kDelimiter + details.join(kDelimiter);
+
+    return QnMessageBox::_question(this, tr("Save changes before exit?"), extraMessage,
         QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Cancel);
+        QDialogButtonBox::Yes);
 }

@@ -214,17 +214,9 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnDisconnectFromCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Can not disconnect the system from %1").arg(QnAppInfo::cloudName()),
-                            QDialogButtonBox::Ok,
-                            q);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
+    QnMessageBox::_critical(q,
+        tr("Failed to disconnect the System from %1").arg(QnAppInfo::cloudName()),
+        message);
 
     lockUi(false);
 }

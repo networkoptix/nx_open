@@ -47,10 +47,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Error"),
-            tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::information(mainWindow(),
+            tr("Systems will be merged shortly"),
+            tr("Servers from the other System will appear in the resource tree."));
         return;
     }
 

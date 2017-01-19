@@ -268,33 +268,22 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
 {
     Q_Q(QnConnectToCloudDialog);
-    QnMessageBox messageBox(QnMessageBox::Success,
-        helpTopic(q),
-        q->windowTitle(),
-        tr("The system is successfully connected to %1").arg(cloudLogin),
-        QDialogButtonBox::Ok,
-        q->parentWidget());
 
     linkedSuccessfully = true;
     q->accept();
-    messageBox.exec();
+
+    QnMessageBox::_success(q->parentWidget(),
+        tr("The System connected to %1").arg(QnAppInfo::cloudName()));
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnConnectToCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::Warning,
-        helpTopic(q),
-        tr("Error"),
-        tr("Could not connect the system to %1").arg(QnAppInfo::cloudName()),
-        QDialogButtonBox::Ok,
-        q);
+    QnMessageBox::_critical(q,
+        tr("Failed to connect the System to %1").arg(QnAppInfo::cloudName()),
+        message);
 
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
     lockUi(false);
 }
 
