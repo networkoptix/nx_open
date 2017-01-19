@@ -8,8 +8,7 @@
 namespace nx {
 namespace hpm {
 
-StunServerComposite::StunServerComposite(const conf::Settings& settings)
-    :
+StunServerComposite::StunServerComposite(const conf::Settings& settings):
     m_settings(settings),
     m_tcpStunServer(std::make_unique<MultiAddressServer<stun::SocketServer>>(
         &m_stunMessageDispatcher,
