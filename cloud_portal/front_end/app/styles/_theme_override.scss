@@ -394,3 +394,7 @@ select {
     border-top-right-radius: 0;
     border-top-left-radius: 0;
 }
+
+.btn:disabled *{
+    pointer-events: none;
+}

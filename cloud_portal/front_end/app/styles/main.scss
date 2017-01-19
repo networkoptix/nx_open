@@ -663,3 +663,10 @@ h2.version-number{
       border-left:1px solid $common-border-color;
     }
 }
+
+.conditions-note{
+    display:inline-block;
+    padding-left: 10px;
+    line-height:16px;
+    color:$dark16;
+}
