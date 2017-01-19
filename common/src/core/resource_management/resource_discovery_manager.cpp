@@ -519,85 +519,16 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     if (!camRes)
         return QnNetworkResourcePtr();
 
+    auto existResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
+    if (existResource)
+        return existResource;
+
+    for (const auto& existRes: qnResPool->getResources<QnVirtualCameraResource>())
     {
-        auto existResource = qnResPool->getResourceByUniqueId<QnNetworkResource>(camRes->getUniqueId());
-        if (existResource)
-            return existResource;
-    }
-
-
-    DLOG(lit("%1 Checking resource %2")
-        .arg(QString::fromLatin1(Q_FUNC_INFO))
-        .arg(NetResString(netRes)));
-
-    QnNetworkResourceList existResList = qnResPool->getResources<QnNetworkResource>();
-    existResList = existResList.filtered(
-        [&netRes](const QnNetworkResourcePtr& existRes)
-        {
-            DLOG(lit("%1 Existing candidate: %2").arg(FL1(Q_FUNC_INFO)).arg(NetResString(existRes)));
-
-            bool sameHostAddress = !netRes->getHostAddress().isEmpty() 
-                && !existRes->getHostAddress().isEmpty() 
-                && netRes->getHostAddress() == existRes->getHostAddress();
-
-            auto netUrlHost = QUrl(netRes->getUrl()).host();
-            auto existUrlHost = QUrl(existRes->getUrl()).host();
-
-            bool sameUrlHost = !netUrlHost.isEmpty() 
-                && !existUrlHost.isEmpty() 
-                && existUrlHost == netUrlHost;
-
-            bool sameIp = sameHostAddress || sameUrlHost;
-
-            DLOG(lit("%1 sameIp = %2, parent = %3, getStatus() == online = %4")
-                .arg(FL1(Q_FUNC_INFO))
-                .arg(sameIp)
-                .arg((bool)qnResPool->getResourceById(existRes->getParentId()))
-                .arg(existRes->getStatus() != Qn::Offline));
-                
-            return sameIp && (bool)qnResPool->getResourceById(existRes->getParentId()); 
-        });
-
-    if (existResList.isEmpty())
-    {
-        DLOG(lit("%1 existRes list is empty").arg(QString::fromLatin1(Q_FUNC_INFO)));
-    }
-
-    for(const QnNetworkResourcePtr& existRes: existResList)
-    {
-        QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
-        if (!existCam)
-            continue;
-
-        bool newIsRtsp = (camRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-        bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-        if (newIsRtsp && !existIsRtsp)
-            continue;
-
         bool sameChannels = netRes->getChannel() == existRes->getChannel();
-
-        bool sameMACs = !existRes->getMAC().isNull() && !netRes->getMAC().isNull()
-            && existRes->getMAC() == netRes->getMAC();
-
-        QUrl url1(existRes->getUrl());
-        QUrl url2(netRes->getUrl());
-
-        bool samePorts = !url1.isEmpty() && !url2.isEmpty() && url1.port() == url2.port();
-
-        DLOG(lit("%1 Checking if resources are the same\n \
-                \t existRes: %2\n \
-                \t MAC1 == MAC2: %3\n \
-                \t UniqueId1 == UniqueId2: %4\n \
-                \t port1 == port2: %5\n")
-                     .arg(QString::fromLatin1(Q_FUNC_INFO))
-                     .arg(NetResString(existRes))
-                     .arg(sameMACs)
-                     .arg(sameIds)
-                     .arg(samePorts));
-
-        bool isSameResource = (sameMACs || samePorts) && sameChannels;
-        if (isSameResource)
-            return existRes; // camera found by different drivers on the same port
+        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
+        if (sameChannels && sameMACs)
+            return existRes;
     }
 
     return QnNetworkResourcePtr();
