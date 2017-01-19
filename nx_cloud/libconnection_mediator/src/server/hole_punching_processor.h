@@ -38,6 +38,8 @@ public:
         stats::AbstractCollector* statisticsCollector);
     virtual ~HolePunchingProcessor();
 
+    void stop();
+
     void connect(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,

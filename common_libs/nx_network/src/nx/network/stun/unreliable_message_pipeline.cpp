@@ -47,6 +47,11 @@ void DatagramPipeline::startReceivingMessages()
         &m_readBuffer, std::bind(&DatagramPipeline::onBytesRead, this, _1, _2, _3));
 }
 
+void DatagramPipeline::stopReceivingMessagesSync()
+{
+    m_socket->cancelIOSync(aio::etRead);
+}
+
 const std::unique_ptr<network::UDPSocket>& DatagramPipeline::socket()
 {
     return m_socket;
