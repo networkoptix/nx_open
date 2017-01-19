@@ -1044,7 +1044,7 @@ int QnMediaServerConnection::recordedTimePeriods(
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
 
-    if (connectionVersion < QnSoftwareVersion(3, 0))
+    if (!connectionVersion.isNull() && connectionVersion < QnSoftwareVersion(3, 0))
         fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
 
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
