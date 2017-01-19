@@ -89,8 +89,8 @@ public:
         const QString& path, const QnRequestParamList& params, QByteArray& result,
         QByteArray& contentType, const QnRestConnectionProcessor* processor) override;
 
-protected:
-    static int genericError(
-        int errCode, const QString &error, QByteArray& result, QByteArray& contentType,
-        Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false );
+    static int makeError(
+        int httpStatusCode, const QString &errorMessage, QByteArray* outBody,
+        QByteArray* outContentType, Qn::SerializationFormat format, bool extraFormatting = false,
+        QnRestResult::Error error = QnRestResult::CantProcessRequest);
 };

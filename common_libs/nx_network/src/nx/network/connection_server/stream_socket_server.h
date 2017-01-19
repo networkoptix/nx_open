@@ -108,7 +108,7 @@ template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
     public StreamServerConnectionHolder<ConnectionType>,
-    public QnStoppable
+    public QnStoppableAsync
 {
     typedef StreamServerConnectionHolder<ConnectionType> BaseType;
     typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
@@ -127,12 +127,17 @@ public:
 
     ~StreamSocketServer()
     {
-        pleaseStop();
+        pleaseStopSync(false);
     }
 
-    virtual void pleaseStop()
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
-        m_socket->pleaseStopSync(false);
+        m_socket->pleaseStop(std::move(completionHandler));
+    }
+
+    virtual void pleaseStopSync(bool assertIfCalledUnderMutex = true) override
+    {
+        m_socket->pleaseStopSync(assertIfCalledUnderMutex);
     }
 
     //!Binds to specified addresses

@@ -23,6 +23,7 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 #include <media_server/serverutil.h>
+#include <media_server/media_server_module.h>
 
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
@@ -98,6 +99,7 @@ public:
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
 
     const CmdLineArguments cmdLineArguments() const;
+    void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
 
 signals:
     void started();
@@ -168,6 +170,7 @@ private:
     nx::SystemName m_systemName;
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
+    QnUuid m_obsoleteGuid;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

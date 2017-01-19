@@ -430,7 +430,7 @@ void MediaServerEmulator::stopWhileInAioThread()
     m_udtStreamServerSocket.reset();
 
     // NOTE: m_httpServer does not support non-blocking destruction
-    m_httpServer->pleaseStop();
+    m_httpServer->pleaseStopSync();
 }
 
 } // namespace hpm

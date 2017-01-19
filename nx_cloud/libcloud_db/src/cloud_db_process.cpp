@@ -285,7 +285,7 @@ int CloudDBProcess::exec()
 
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
-            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStop(); });
+            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());

@@ -44,7 +44,7 @@ bool ReverseAcceptor::start(
 void ReverseAcceptor::pleaseStop()
 {
     m_connectHandler = nullptr;
-    m_httpServer->pleaseStop();
+    m_httpServer->pleaseStopSync();
 }
 
 SocketAddress ReverseAcceptor::address() const

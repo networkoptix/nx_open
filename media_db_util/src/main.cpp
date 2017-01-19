@@ -128,7 +128,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &/*context*/, const
     }
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     QCoreApplication app(argc, argv);
     QCoreApplication::setApplicationName("Media db util");

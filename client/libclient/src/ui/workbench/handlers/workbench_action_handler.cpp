@@ -2259,6 +2259,7 @@ void QnWorkbenchActionHandler::openInBrowser(const QnMediaServerResourcePtr& ser
     if (!server || !context()->user())
         return;
     // path may contains path + url query params
+    // TODO: #akolesnikov #3.1 VMS-2806
     QUrl serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 

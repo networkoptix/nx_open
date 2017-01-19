@@ -796,8 +796,9 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 {
     NX_ASSERT(target.dynamicCast<QnStorageResource>());
 
-    /* Storages cannot be moved from one server to another. */
-    if (target->getParentId() != update.parentId)
+    // Storages cannot be moved from one server to another.
+    // Null parentId is allowed because this check is performed before possible API Merge.
+    if (!update.parentId.isNull() && target->getParentId() != update.parentId)
         return false;
 
     /* Otherwise - default behavior. */
