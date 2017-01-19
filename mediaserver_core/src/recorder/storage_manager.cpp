@@ -510,15 +510,8 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     {
         ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
-                camera.coreData
+                camera.coreData, camera.properties
             );
-        if (errCode == ec2::ErrorCode::ok)
-        {   // Camera has successfully been added to the resource pool and propagated
-            // to other peers. Adding properties.
-            for (const auto &prop : camera.properties)
-                propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
-            propertyDictionary->saveParams(camera.coreData.id);
-        }
     }
 
     updateCameraHistory();
@@ -1027,7 +1020,7 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         else if (keyValue.first.contains(kArchiveCameraUrlKey))
             newCamera.coreData.url = keyValue.second;
         else
-            newCamera.properties.emplace_back(cameraGuid, keyValue.first, keyValue.second);
+            newCamera.properties.emplace_back(keyValue.first, keyValue.second);
     }
 
     archiveCameraList.push_back(newCamera);

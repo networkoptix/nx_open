@@ -52,7 +52,7 @@ class QnStorageManager: public QObject
     struct ArchiveCameraData
     {
         ec2::ApiCameraData coreData;
-        ec2::ApiResourceParamWithRefDataList properties;
+        ec2::ApiResourceParamDataList properties;
     };
 
     typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;

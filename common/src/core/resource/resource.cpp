@@ -244,6 +244,11 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
+bool QnResource::useLocalProperties() const
+{
+    return m_id.isNull();
+}
+
 void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     // unique id MUST be the same
@@ -285,7 +290,7 @@ void QnResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& no
     }
 
     m_locallySavedProperties = other->m_locallySavedProperties;
-    if (m_id.isNull() && !other->m_id.isNull())
+    if (useLocalProperties() && !other->useLocalProperties())
     {
         for (const auto& p : other->getRuntimeProperties())
             m_locallySavedProperties.emplace(p.name, LocalPropertyValue(p.value, true, true));
@@ -315,7 +320,7 @@ void QnResource::update(const QnResourcePtr& other)
 
     {
         QnMutexLocker lk(&m_mutex);
-        if (!m_id.isNull() && !m_locallySavedProperties.empty())
+        if (!useLocalProperties() && !m_locallySavedProperties.empty())
         {
             std::map<QString, LocalPropertyValue> locallySavedProperties;
             std::swap(locallySavedProperties, m_locallySavedProperties);
@@ -838,7 +843,7 @@ QString QnResource::getProperty(const QString &key) const
     QString value;
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_id.isNull())
+        if (useLocalProperties())
         {
             auto itr = m_locallySavedProperties.find(key);
             if (itr != m_locallySavedProperties.end())
@@ -887,7 +892,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
 
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_id.isNull())
+        if (useLocalProperties())
         {
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
@@ -909,7 +914,7 @@ bool QnResource::removeProperty(const QString& key)
 {
     {
         QnMutexLocker lk(&m_mutex);
-        if (m_id.isNull())
+        if (useLocalProperties())
         {
             m_locallySavedProperties.erase(key);
             return false;
@@ -940,7 +945,17 @@ void QnResource::emitPropertyChanged(const QString& key)
 
 ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
 {
-    return propertyDictionary->allProperties(getId());
+    if (useLocalProperties())
+    {
+        ec2::ApiResourceParamDataList result;
+        for (auto itr = m_locallySavedProperties.begin(); itr != m_locallySavedProperties.end(); ++itr)
+            result.push_back(ec2::ApiResourceParamData(itr->first, itr->second.value));
+        return result;
+    }
+    else
+    {
+        return propertyDictionary->allProperties(getId());
+    }
 }
 
 ec2::ApiResourceParamDataList QnResource::getAllProperties() const
@@ -1159,32 +1174,6 @@ CameraDiagnostics::Result QnResource::prevInitializationResult() const
 int QnResource::initializationAttemptCount() const
 {
     return m_initializationAttemptCount.load();
-}
-
-void QnResource::flushProperties()
-{
-    std::map<QString, LocalPropertyValue> locallySavedProperties;
-    QnUuid id;
-
-    {
-        QnMutexLocker mutexLocker(&m_mutex);
-        NX_ASSERT(!m_id.isNull(), lit("Id should be set before flushing properties"));
-        std::swap(locallySavedProperties, m_locallySavedProperties);
-        id = m_id;
-    }
-
-    for (auto prop : locallySavedProperties)
-    {
-        if (propertyDictionary->setValue(
-            id,
-            prop.first,
-            prop.second.value,
-            prop.second.markDirty,
-            prop.second.replaceIfExists))   //isModified?
-        {
-            emitPropertyChanged(prop.first);
-        }
-    }
 }
 
 bool QnResource::isInitialized() const
