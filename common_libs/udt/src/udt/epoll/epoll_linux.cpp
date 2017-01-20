@@ -1,4 +1,4 @@
-#include "epoll_impl_linux.h"
+#include "epoll_linux.h"
 
 #ifdef __linux__
 
@@ -11,7 +11,7 @@
 #   define EPOLLRDHUP 0x2000 //< Android doesn't define EPOLLRDHUP, but it still works if defined properly.
 #endif
 
-CEPollDescLinux::CEPollDescLinux():
+EpollLinux::EpollLinux():
     m_epollFd(-1),
     m_interruptEventFd(-1)
 {
@@ -40,7 +40,7 @@ CEPollDescLinux::CEPollDescLinux():
     }
 }
 
-CEPollDescLinux::~CEPollDescLinux()
+EpollLinux::~EpollLinux()
 {
     ::close(m_epollFd);
     m_epollFd = -1;
@@ -49,7 +49,7 @@ CEPollDescLinux::~CEPollDescLinux()
     m_interruptEventFd = -1;
 }
 
-void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
+void EpollLinux::add(const SYSSOCKET& s, const int* events)
 {
     epoll_event ev;
     memset(&ev, 0, sizeof(epoll_event));
@@ -75,7 +75,7 @@ void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
     eventMask |= *events;
 }
 
-void CEPollDescLinux::remove(const SYSSOCKET& s)
+void EpollLinux::remove(const SYSSOCKET& s)
 {
     epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
     if (::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, s, &ev) < 0)
@@ -84,12 +84,12 @@ void CEPollDescLinux::remove(const SYSSOCKET& s)
     m_sLocals.erase(s);
 }
 
-std::size_t CEPollDescLinux::socketsPolledCount() const
+std::size_t EpollLinux::socketsPolledCount() const
 {
     return m_sLocals.size();
 }
 
-int CEPollDescLinux::poll(
+int EpollLinux::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -140,7 +140,7 @@ int CEPollDescLinux::poll(
     return total;
 }
 
-void CEPollDescLinux::interrupt()
+void EpollLinux::interrupt()
 {
     uint64_t val = 1;
     write(m_interruptEventFd, &val, sizeof(val));
