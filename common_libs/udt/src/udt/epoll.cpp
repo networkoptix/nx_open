@@ -139,7 +139,8 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
 
 int CEPoll::wait(
     const int eid,
-    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
+    std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds,
+    int64_t msTimeOut,
     std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
     // if all fields is NULL and waiting time is infinite, then this would be a deadlock

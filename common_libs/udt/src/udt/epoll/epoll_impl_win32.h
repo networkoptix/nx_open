@@ -25,7 +25,8 @@ public:
     virtual void remove(const SYSSOCKET& s) override;
     virtual int doSystemPoll(
         std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds) override;
+        std::map<SYSSOCKET, int>* lwfds,
+        std::chrono::microseconds timeout) override;
 
 private:
     CustomFdSet* m_readfds;
@@ -34,6 +35,10 @@ private:
     size_t m_writefdsCapacity;
     CustomFdSet* m_exceptfds;
     size_t m_exceptfdsCapacity;
+
+    void prepareForPolling(
+        std::map<SYSSOCKET, int>* lrfds,
+        std::map<SYSSOCKET, int>* lwfds);
 
     CEPollDescWin32(const CEPollDescWin32&) = delete;
     CEPollDescWin32& operator=(const CEPollDescWin32&) = delete;

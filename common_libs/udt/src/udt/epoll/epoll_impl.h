@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -21,26 +22,24 @@ public:
     virtual void remove(const SYSSOCKET& s) = 0;
 
     int wait(
-        std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds,
-        int64_t msTimeOut,
-        std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds);
+        std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
+        int64_t msTimeout,
+        std::map<SYSSOCKET, int>* systemReadFds, std::map<SYSSOCKET, int>* systemWriteFds);
 
     void updateEpollSets(int events, const UDTSOCKET& socketId, bool enable);
 
 protected:
     /** map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>. */
     std::map<SYSSOCKET, int> m_sLocals;
-    /**
-     * Local system epoll ID.
-     */
-    int m_iLocalID;
 
     /**
-     * @return Number of events triggered. -1 in case of error.
+     * @param std::chrono::microseconds::max() means no timeout.
+     * @return Number of events triggered. -1 in case of error. 0 in case of timeout expiration.
      */
     virtual int doSystemPoll(
         std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds) = 0;
+        std::map<SYSSOCKET, int>* lwfds,
+        std::chrono::microseconds timeout) = 0;
 
 private:
     std::mutex m_mutex;
@@ -58,4 +57,7 @@ private:
         const std::set<UDTSOCKET>& watch,
         std::set<UDTSOCKET>& result,
         bool enable);
+    int addUdtSocketEvents(
+        std::map<UDTSOCKET, int>* udtReadFds,
+        std::map<UDTSOCKET, int>* udtWriteFds);
 };

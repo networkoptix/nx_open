@@ -7,19 +7,21 @@
 #include <sys/epoll.h>
 
 #ifndef EPOLLRDHUP
-#   define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
+#   define EPOLLRDHUP 0x2000 //< Android doesn't define EPOLLRDHUP, but it still works if defined properly.
 #endif
 
-CEPollDescLinux::CEPollDescLinux()
+CEPollDescLinux::CEPollDescLinux():
+    m_epollFd(-1)
 {
-    m_iLocalID = epoll_create(1024);    //Since Linux 2.6.8, the size argument is ignored, but must be greater than zero
-    if (m_iLocalID < 0)
+    // Since Linux 2.6.8, the size argument is ignored, but must be greater than zero.
+    m_epollFd = epoll_create(1024);
+    if (m_epollFd < 0)
         throw CUDTException(-1, 0, errno);
 }
 
 CEPollDescLinux::~CEPollDescLinux()
 {
-    ::close(m_iLocalID);
+    ::close(m_epollFd);
 }
 
 void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
@@ -41,7 +43,7 @@ void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
     }
 
     ev.data.fd = s;
-    if (::epoll_ctl(m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
+    if (::epoll_ctl(m_epollFd, EPOLL_CTL_ADD, s, &ev) < 0)
         throw CUDTException();
 
     int& eventMask = m_sLocals[s];
@@ -51,7 +53,7 @@ void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
 void CEPollDescLinux::remove(const SYSSOCKET& s)
 {
     epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
-    if (::epoll_ctl(m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
+    if (::epoll_ctl(m_epollFd, EPOLL_CTL_DEL, s, &ev) < 0)
         throw CUDTException();
 
     m_sLocals.erase(s);
@@ -59,11 +61,24 @@ void CEPollDescLinux::remove(const SYSSOCKET& s)
 
 int CEPollDescLinux::doSystemPoll(
     std::map<SYSSOCKET, int>* lrfds,
-    std::map<SYSSOCKET, int>* lwfds)
+    std::map<SYSSOCKET, int>* lwfds,
+    std::chrono::microseconds timeout)
 {
+    using namespace std::chrono;
+
     const int max_events = 1024;
     epoll_event ev[max_events];
-    int nfds = ::epoll_wait(m_iLocalID, ev, max_events, 0);
+
+    int systemTimeout = -1;
+    const bool isTimeoutSpecified = timeout != microseconds::max();
+    if (isTimeoutSpecified)
+        systemTimeout = duration_cast<milliseconds>(timeout).count();
+
+    int nfds = ::epoll_wait(
+        m_epollFd,
+        ev,
+        max_events,
+        systemTimeout);
 
     int total = 0;
     for (int i = 0; i < nfds; ++i)

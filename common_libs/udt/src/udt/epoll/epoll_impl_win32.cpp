@@ -82,31 +82,22 @@ void CEPollDescWin32::remove(const SYSSOCKET& s)
 
 int CEPollDescWin32::doSystemPoll(
     std::map<SYSSOCKET, int>* lrfds,
-    std::map<SYSSOCKET, int>* lwfds)
+    std::map<SYSSOCKET, int>* lwfds,
+    std::chrono::microseconds timeout)
 {
-    m_readfds->fd_count = 0;
-    m_writefds->fd_count = 0;
-    m_exceptfds->fd_count = 0;
+    using namespace std::chrono;
 
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_readfdsCapacity, &m_readfds);
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_writefdsCapacity, &m_writefds);
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_exceptfdsCapacity, &m_exceptfds);
+    prepareForPolling(lrfds, lwfds);
 
-    for (const std::pair<SYSSOCKET, int>& fdAndEventMask: m_sLocals)
-    {
-        if (lrfds && (fdAndEventMask.second & UDT_EPOLL_IN) > 0)
-        {
-            m_readfds->fd_array[m_readfds->fd_count++] = fdAndEventMask.first;
-        }
-        if (lwfds && (fdAndEventMask.second & UDT_EPOLL_OUT) > 0)
-        {
-            m_writefds->fd_array[m_writefds->fd_count++] = fdAndEventMask.first;
-        }
-        m_exceptfds->fd_array[m_exceptfds->fd_count++] = fdAndEventMask.first;
-    }
-
+    const bool isTimeoutSpecified = timeout != microseconds::max();
     timeval tv;
     memset(&tv, 0, sizeof(tv));
+    if (isTimeoutSpecified)
+    {
+        const auto fullSeconds = duration_cast<seconds>(timeout);
+        tv.tv_sec = fullSeconds.count();
+        tv.tv_usec = duration_cast<microseconds>(timeout - fullSeconds).count();
+    }
 
     const int eventCount = ::select(
         0,
@@ -119,9 +110,10 @@ int CEPollDescWin32::doSystemPoll(
         m_exceptfds->fd_count > 0
             ? reinterpret_cast<fd_set*>(m_exceptfds)
             : NULL,
-        &tv);
+        isTimeoutSpecified ? &tv : NULL);
     if (eventCount < 0)
         return -1;
+
     //select sets fd_count to number of sockets triggered and 
     //moves those descriptors to the beginning of fd_array
     if (eventCount == 0)
@@ -143,6 +135,32 @@ int CEPollDescWin32::doSystemPoll(
     }
 
     return eventCount;
+}
+
+void CEPollDescWin32::prepareForPolling(
+    std::map<SYSSOCKET, int>* lrfds,
+    std::map<SYSSOCKET, int>* lwfds)
+{
+    m_readfds->fd_count = 0;
+    m_writefds->fd_count = 0;
+    m_exceptfds->fd_count = 0;
+
+    reallocFdSetIfNeeded(m_sLocals.size(), &m_readfdsCapacity, &m_readfds);
+    reallocFdSetIfNeeded(m_sLocals.size(), &m_writefdsCapacity, &m_writefds);
+    reallocFdSetIfNeeded(m_sLocals.size(), &m_exceptfdsCapacity, &m_exceptfds);
+
+    for (const std::pair<SYSSOCKET, int>& fdAndEventMask : m_sLocals)
+    {
+        if (lrfds && (fdAndEventMask.second & UDT_EPOLL_IN) > 0)
+        {
+            m_readfds->fd_array[m_readfds->fd_count++] = fdAndEventMask.first;
+        }
+        if (lwfds && (fdAndEventMask.second & UDT_EPOLL_OUT) > 0)
+        {
+            m_writefds->fd_array[m_writefds->fd_count++] = fdAndEventMask.first;
+        }
+        m_exceptfds->fd_array[m_exceptfds->fd_count++] = fdAndEventMask.first;
+    }
 }
 
 #endif // _WIN32

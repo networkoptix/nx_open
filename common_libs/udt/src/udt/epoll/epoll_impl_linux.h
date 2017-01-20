@@ -15,7 +15,11 @@ public:
     virtual void remove(const SYSSOCKET& s) override;
     virtual int doSystemPoll(
         std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds) override;
+        std::map<SYSSOCKET, int>* lwfds,
+        std::chrono::microseconds timeout) override;
+
+private:
+    int m_epollFd;
 };
 
 #endif // __linux__
