@@ -28,6 +28,7 @@ angular.module('webadminApp')
             return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
                 var data = r.data.reply;
                 if(!Config.cloud.portalUrl) {
+                    Config.cloud.host = data.cloudHost;
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
                 }
 
