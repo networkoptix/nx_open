@@ -71,7 +71,6 @@ const QString kArchiveCameraModelKey = lit("cameraModel");
 const QString kArchiveCameraGroupIdKey = lit("groupId");
 const QString kArchiveCameraGroupNameKey = lit("groupName");
 
-const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 const std::chrono::minutes kWriteInfoFilesInterval(5);
 
 struct TasksQueueInfo {
