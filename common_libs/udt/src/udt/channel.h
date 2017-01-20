@@ -145,6 +145,8 @@ public:
 
    int recvfrom(sockaddr* addr, CPacket& packet) const;
 
+   int shutdown();
+
 private:
    void setUDPSockOpt();
 
