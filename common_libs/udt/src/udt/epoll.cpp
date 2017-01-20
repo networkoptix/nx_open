@@ -97,7 +97,7 @@ int CEPoll::add_usock(const int eid, const UDTSOCKET& u, const int* events)
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
-    return p->second->add_usock(u, events);
+    return p->second->addUdtSocket(u, events);
 }
 
 int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
@@ -121,7 +121,7 @@ int CEPoll::remove_usock(const int eid, const UDTSOCKET& u)
     if (p == m_mPolls.end())
         throw CUDTException(5, 13);
 
-    return p->second->remove_usock(u);
+    return p->second->removeUdtSocket(u);
 }
 
 int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
@@ -142,6 +142,10 @@ int CEPoll::wait(
     std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
     std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
+    // if all fields is NULL and waiting time is infinite, then this would be a deadlock
+    if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
+        throw CUDTException(5, 3, 0);
+
     EpollImpl* epollContext = nullptr;
     {
         //NOTE calls with same eid MUST be synchronized by caller!
@@ -154,92 +158,7 @@ int CEPoll::wait(
         epollContext = it->second.get();
     }
 
-
-    // if all fields is NULL and waiting time is infinite, then this would be a deadlock
-    if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
-        throw CUDTException(5, 3, 0);
-
-    // Clear these sets in case the app forget to do it.
-    if (readfds) readfds->clear();
-    if (writefds) writefds->clear();
-    if (lrfds) lrfds->clear();
-    if (lwfds) lwfds->clear();
-
-    int total = 0;
-
-    uint64_t entertime = CTimer::getTime();
-    while (true)
-    {
-        {
-            CGuard lk(m_EPollLock);
-            if (epollContext->m_sUDTSocksIn.empty() && epollContext->m_sUDTSocksOut.empty() && epollContext->m_sLocals.empty() && (msTimeOut < 0))
-            {
-                // no socket is being monitored, this may be a deadlock
-                throw CUDTException(5, 3);
-            }
-
-            // Sockets with exceptions are returned to both read and write sets.
-            if ((NULL != readfds) && (!epollContext->m_sUDTReads.empty() || !epollContext->m_sUDTExcepts.empty()))
-            {
-                readfds->clear();
-                for (const auto& handle: epollContext->m_sUDTReads)
-                    readfds->emplace(handle, UDT_EPOLL_IN);
-                for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    (*readfds)[*i] |= UDT_EPOLL_ERR;
-                total += epollContext->m_sUDTReads.size() + epollContext->m_sUDTExcepts.size();
-            }
-            if ((NULL != writefds) && (!epollContext->m_sUDTWrites.empty() || !epollContext->m_sUDTExcepts.empty()))
-            {
-                for (const auto& handle : epollContext->m_sUDTWrites)
-                    writefds->emplace(handle, UDT_EPOLL_OUT);
-                for (set<UDTSOCKET>::const_iterator i = epollContext->m_sUDTExcepts.begin(); i != epollContext->m_sUDTExcepts.end(); ++i)
-                    (*writefds)[*i] |= UDT_EPOLL_ERR;
-                total += epollContext->m_sUDTWrites.size() + epollContext->m_sUDTExcepts.size();
-            }
-
-            lk.unlock();
-
-            for (auto& socketHandleAndEventMask: *writefds)
-            {
-                if ((socketHandleAndEventMask.second & UDT_EPOLL_ERR) > 0)
-                    continue;
-
-                //somehow, connection failure event can be not reported
-                int socketEventMask = 0;
-                int socketEventMaskSize = sizeof(socketEventMask);
-                const int result = UDT::getsockopt(
-                    socketHandleAndEventMask.first,
-                    0,
-                    UDT_EVENT,
-                    &socketEventMask,
-                    &socketEventMaskSize);
-                if (result == 0)
-                {
-                    if ((socketEventMask & UDT_EPOLL_ERR) > 0)
-                        socketHandleAndEventMask.second |= UDT_EPOLL_ERR;
-                }
-            }
-        }
-
-        if (lrfds || lwfds)
-        {
-            const int eventCount = epollContext->doSystemPoll(lrfds, lwfds);
-            if (eventCount < 0)
-                return -1;
-            total += eventCount;
-        }
-
-        if (total > 0)
-            return total;
-
-        auto now = CTimer::getTime();
-        if (msTimeOut >= 0 && now - entertime >= (uint64_t) msTimeOut * 1000)
-            return 0;
-
-        CTimer::waitForEvent();
-    }
-
-    return 0;
+    return epollContext->wait(readfds, writefds, msTimeOut, lrfds, lwfds);
 }
 
 int CEPoll::release(const int eid)
@@ -280,5 +199,5 @@ void CEPoll::RemoveEPollEvent(UDTSOCKET socket)
 {
     CGuard pg(m_EPollLock);
     for (CEPollDescMap::iterator p = m_mPolls.begin(); p != m_mPolls.end(); ++p)
-        p->second->removeSocketEvents(socket);
+        p->second->removeUdtSocketEvents(socket);
 }
