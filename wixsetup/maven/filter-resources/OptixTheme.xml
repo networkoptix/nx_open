@@ -91,8 +91,8 @@
     <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo_small.png"/>
     <Text X="24" Y="104" Width="-12" Height="32" FontId="6">#(loc.FailureHeader)</Text>
     <Hypertext Name="FailureLogFileLink" X="24" Y="145" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
-    <Hypertext Name="FailureMessageText" X="24" Y="195" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes" />
-    <Text Name="FailureRestartText" X="24" Y="225" Width="-164" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Text>
+    <Hypertext Name="FailureMessageText" X="24" Y="195" Width="-164" Height="71" FontId="7" TabStop="yes" HideWhenDisabled="yes" />
+    <Text Name="FailureRestartText" X="24" Y="245" Width="-164" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Text>
     <Button Name="FailureRestartButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FailureRestartButton)</Button>
     <Button Name="FailureCloseButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.FailureCloseButton)</Button>
   </Page>
