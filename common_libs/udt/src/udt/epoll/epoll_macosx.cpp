@@ -2,8 +2,10 @@
 
 #ifdef __APPLE__
 
-#include <unistd.h>
+#include <sys/types.h>
 #include <sys/event.h>
+#include <sys/time.h>
+#include <unistd.h>
 
 EpollMacosx::EpollMacosx():
     m_kqueueFd(-1)
@@ -11,11 +13,22 @@ EpollMacosx::EpollMacosx():
     m_kqueueFd = kqueue();
     if (m_kqueueFd < 0)
         throw CUDTException(-1, 0, errno);
+
+    //registering filter for interrupting poll
+    struct kevent _newEvent;
+    EV_SET(&_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_ADD | EV_ENABLE | EV_CLEAR, 0, 0, NULL);
+    if (kevent(m_kqueueFd, &_newEvent, 1, NULL, 0, NULL) != 0)
+    {
+        ::close(m_kqueueFd);
+        m_kqueueFd = -1;
+        throw CUDTException(-1, 0, errno);
+    }
 }
 
 EpollMacosx::~EpollMacosx()
 {
     ::close(m_kqueueFd);
+    m_kqueueFd = -1;
 }
 
 void EpollMacosx::add(const SYSSOCKET& s, const int* events)
@@ -81,7 +94,7 @@ int EpollMacosx::poll(
         timeout.tv_nsec = duration_cast<nanoseconds>(timeout - fullSeconds).count();
     }
 
-    int nfds = kevent(
+    const int nfds = kevent(
         m_kqueueFd,
         NULL,
         0,
@@ -89,8 +102,15 @@ int EpollMacosx::poll(
         MAX_EVENTS_TO_READ,
         isTimeoutSpecified ? &systemTimeout : NULL);
 
+    int result = nfds;
     for (int i = 0; i < nfds; ++i)
     {
+        if (ev[i].filter == EVFILT_USER)
+        {
+            --result;
+            continue;
+        }
+
         const bool failure = (ev[i].flags & EV_ERROR) > 0;
         if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
         {
@@ -105,12 +125,15 @@ int EpollMacosx::poll(
                 UDT_EPOLL_OUT | (failure ? UDT_EPOLL_ERR : 0));
         }
     }
-    return nfds;
+
+    return result;
 }
 
 void EpollMacosx::interrupt()
 {
-    // TODO
+    struct kevent _newEvent;
+    EV_SET(&_newEvent, USER_EVENT_IDENT, EVFILT_USER, EV_CLEAR, NOTE_TRIGGER, 0, NULL);
+    kevent(m_kqueueFd, &_newEvent, 1, NULL, 0, NULL);
 }
 
 #endif // __APPLE__
