@@ -53,24 +53,28 @@ written by
       #include <wspiapi.h>
    #endif
 #endif
+
+#include <cassert>
+
 #include "channel.h"
 #include "packet.h"
 
 #ifdef _WIN32
-   #define socklen_t int
+#   define socklen_t int
 #endif
 
 #ifndef _WIN32
-   #define NET_ERROR errno
+#   define NET_ERROR errno
+#   define INVALID_SOCKET -1
 #else
-   #define NET_ERROR WSAGetLastError()
+#   define NET_ERROR WSAGetLastError()
 #endif
 
 
 CChannel::CChannel():
 m_iIPversion(AF_INET),
 m_iSockAddrSize(sizeof(sockaddr_in)),
-m_iSocket(),
+m_iSocket(INVALID_SOCKET),
 m_iSndBufSize(65536),
 m_iRcvBufSize(65536)
 {
@@ -78,7 +82,7 @@ m_iRcvBufSize(65536)
 
 CChannel::CChannel(int version):
 m_iIPversion(version),
-m_iSocket(),
+m_iSocket(INVALID_SOCKET),
 m_iSndBufSize(65536),
 m_iRcvBufSize(65536)
 {
@@ -87,6 +91,7 @@ m_iRcvBufSize(65536)
 
 CChannel::~CChannel()
 {
+    closeSocket();
 }
 
 void CChannel::open(const sockaddr* addr)
@@ -94,12 +99,8 @@ void CChannel::open(const sockaddr* addr)
    // construct an socket
    m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
 
-   #ifdef _WIN32
-      if (INVALID_SOCKET == m_iSocket)
-   #else
-      if (m_iSocket < 0)
-   #endif
-      throw CUDTException(1, 0, NET_ERROR);
+   if (INVALID_SOCKET == m_iSocket)
+       throw CUDTException(1, 0, NET_ERROR);
 
    if (NULL != addr)
    {
@@ -181,13 +182,18 @@ void CChannel::setUDPSockOpt()
    #endif
 }
 
-void CChannel::close() const
+void CChannel::closeSocket()
 {
+    if (m_iSocket == INVALID_SOCKET)
+        return;
+
    #ifndef _WIN32
       ::close(m_iSocket);
    #else
       ::closesocket(m_iSocket);
    #endif
+
+    m_iSocket = INVALID_SOCKET;
 }
 
 int CChannel::getSndBufSize()
@@ -228,7 +234,9 @@ void CChannel::getPeerAddr(sockaddr* addr) const
 
 int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
 {
-   // convert control information into network order
+    assert(m_iSocket != INVALID_SOCKET);
+    
+    // convert control information into network order
    if (packet.getFlag())
       for (int i = 0, n = packet.getLength() / 4; i < n; ++ i)
          *((uint32_t *)packet.m_pcData + i) = htonl(*((uint32_t *)packet.m_pcData + i));
@@ -282,7 +290,9 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
 
 int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
 {
-   #ifndef _WIN32
+    assert(m_iSocket != INVALID_SOCKET);
+
+#ifndef _WIN32
       msghdr mh;   
       mh.msg_name = addr;
       mh.msg_namelen = m_iSockAddrSize;
