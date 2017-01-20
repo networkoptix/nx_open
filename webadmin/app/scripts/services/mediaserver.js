@@ -30,6 +30,8 @@ angular.module('webadminApp')
                 if(!Config.cloud.portalUrl) {
                     Config.cloud.host = data.cloudHost;
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                    Config.cloud.systemId = data.cloudSystemId;
+                    Config.protoVersion = data.protoVersion;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){

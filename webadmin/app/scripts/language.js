@@ -67,8 +67,13 @@ var L = {
         connectionFailed: 'Connection failed: ',
         unknownError: 'Unknown error',
         mergeFailed: 'Merge failed: ',
-        mergeSucceed: 'Merge succeed.'
-    },
+        mergeSucceed: 'Merge succeed.',
+        newSystemDisplayName: 'New system',
+        incompatibleProtocol:'incompatible version',
+        incompatibleCloudHost: 'cloud conflict',
+        incompatibleCloudState:'cloud connected'
+
+},
     login:{
         incorrectPassword: 'Login or password is incorrect'
     },
