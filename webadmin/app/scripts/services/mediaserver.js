@@ -467,7 +467,7 @@ angular.module('webadminApp')
                 return cacheCurrentUser;
             },
             getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime');
+                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
