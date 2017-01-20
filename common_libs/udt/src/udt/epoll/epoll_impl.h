@@ -26,6 +26,7 @@ public:
         std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
         int64_t msTimeout,
         std::map<SYSSOCKET, int>* systemReadFds, std::map<SYSSOCKET, int>* systemWriteFds);
+    int interruptWait();
 
     void updateEpollSets(int events, const UDTSOCKET& socketId, bool enable);
 
@@ -47,7 +48,14 @@ private:
         const std::set<UDTSOCKET>& watch,
         std::set<UDTSOCKET>& result,
         bool enable);
+
     int addUdtSocketEvents(
         std::map<UDTSOCKET, int>* udtReadFds,
         std::map<UDTSOCKET, int>* udtWriteFds);
+
+    int addReportedEvents(
+        std::map<UDTSOCKET, int>* udtReadFds,
+        std::map<UDTSOCKET, int>* udtWriteFds);
+
+    void addMissingEvents(std::map<UDTSOCKET, int>* udtWriteFds);
 };

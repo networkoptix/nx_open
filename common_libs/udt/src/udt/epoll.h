@@ -132,6 +132,16 @@ public: // for CUDTUnited API
        std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds);
 
       // Functionality:
+      //    Interrupt one wait call: the one running simultaneously 
+      //    in another thread or the next one to be made.
+      // Parameters:
+      //    0) [in] eid: EPoll ID.
+      // Returned value:
+      //    0 if success, otherwise an error number.
+
+   int interruptWait(const int eid);
+
+      // Functionality:
       //    close and release an EPoll.
       // Parameters:
       //    0) [in] eid: EPoll ID.
@@ -167,7 +177,9 @@ private:
    pthread_mutex_t m_SeedLock;
 
    CEPollDescMap m_mPolls;       // all epolls
-   pthread_mutex_t m_EPollLock;
+   mutable pthread_mutex_t m_EPollLock;
+
+   EpollImpl* getEpollById(int eid) const;
 };
 
 #endif

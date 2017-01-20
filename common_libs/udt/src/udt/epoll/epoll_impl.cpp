@@ -3,6 +3,8 @@
 #include "../common.h"
 #include "epoll_factory.h"
 
+#define WAIT_ON_SYSTEM_EPOLL 1
+
 EpollImpl::EpollImpl()
 {
     m_systemEpoll = EpollFactory::instance()->create();
@@ -61,16 +63,6 @@ int EpollImpl::wait(
     int64_t msTimeout,
     std::map<SYSSOCKET, int>* systemReadFds, std::map<SYSSOCKET, int>* systemWriteFds)
 {
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_sUDTSocksIn.empty() && m_sUDTSocksOut.empty() &&
-            m_systemEpoll->socketsPolledCount() == 0 && (msTimeout < 0))
-        {
-            // No socket is being monitored, this may be a deadlock.
-            throw CUDTException(5, 3);
-        }
-    }
-
     // Clear these sets in case the app forget to do it.
     if (udtReadFds)
         udtReadFds->clear();
@@ -81,7 +73,7 @@ int EpollImpl::wait(
     if (systemWriteFds)
         systemWriteFds->clear();
 
-#if 1
+#ifdef WAIT_ON_SYSTEM_EPOLL
     const std::chrono::microseconds timeout = 
         msTimeout < 0
         ? std::chrono::microseconds::max()
@@ -93,9 +85,7 @@ int EpollImpl::wait(
 
     eventCount += addUdtSocketEvents(udtReadFds, udtWriteFds);
     return eventCount;
-
 #else
-
     int total = 0;
 
     uint64_t entertime = CTimer::getTime();
@@ -128,6 +118,12 @@ int EpollImpl::wait(
 #endif
 }
 
+int EpollImpl::interruptWait()
+{
+    m_systemEpoll->interrupt();
+    return 0;
+}
+
 void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enable)
 {
     bool modified = false;
@@ -147,9 +143,11 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
     
     if (modified)
     {
+#ifdef WAIT_ON_SYSTEM_EPOLL
         m_systemEpoll->interrupt();
-        // TODO Triggering events.
+#else
         CTimer::triggerEvent();
+#endif
     }
 }
 
@@ -180,33 +178,45 @@ int EpollImpl::addUdtSocketEvents(
 {
     // Sockets with exceptions are returned to both read and write sets.
 
+    const int total = addReportedEvents(udtReadFds, udtWriteFds);
+    addMissingEvents(udtWriteFds);
+
+    return total;
+}
+
+int EpollImpl::addReportedEvents(
+    std::map<UDTSOCKET, int>* udtReadFds,
+    std::map<UDTSOCKET, int>* udtWriteFds)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
     int total = 0;
-
+    if ((NULL != udtReadFds) && (!m_sUDTReads.empty() || !m_sUDTExcepts.empty()))
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-
-        if ((NULL != udtReadFds) && (!m_sUDTReads.empty() || !m_sUDTExcepts.empty()))
-        {
-            udtReadFds->clear();
-            for (const auto& handle : m_sUDTReads)
-                udtReadFds->emplace(handle, UDT_EPOLL_IN);
-            for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
-                (*udtReadFds)[*i] |= UDT_EPOLL_ERR;
-            total += m_sUDTReads.size() + m_sUDTExcepts.size();
-        }
-
-        if ((NULL != udtWriteFds) && (!m_sUDTWrites.empty() || !m_sUDTExcepts.empty()))
-        {
-            for (const auto& handle : m_sUDTWrites)
-                udtWriteFds->emplace(handle, UDT_EPOLL_OUT);
-            for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
-                (*udtWriteFds)[*i] |= UDT_EPOLL_ERR;
-            total += m_sUDTWrites.size() + m_sUDTExcepts.size();
-        }
+        udtReadFds->clear();
+        for (const auto& handle: m_sUDTReads)
+            udtReadFds->emplace(handle, UDT_EPOLL_IN);
+        for (auto i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
+            (*udtReadFds)[*i] |= UDT_EPOLL_ERR;
+        total += m_sUDTReads.size() + m_sUDTExcepts.size();
     }
 
+    if ((NULL != udtWriteFds) && (!m_sUDTWrites.empty() || !m_sUDTExcepts.empty()))
+    {
+        for (const auto& handle: m_sUDTWrites)
+            udtWriteFds->emplace(handle, UDT_EPOLL_OUT);
+        for (auto i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
+            (*udtWriteFds)[*i] |= UDT_EPOLL_ERR;
+        total += m_sUDTWrites.size() + m_sUDTExcepts.size();
+    }
+
+    return total;
+}
+
+void EpollImpl::addMissingEvents(std::map<UDTSOCKET, int>* udtWriteFds)
+{
     // Somehow, connection failure event can be not reported, so checking additionally.
-    for (auto& socketHandleAndEventMask: *udtWriteFds)
+    for (auto& socketHandleAndEventMask : *udtWriteFds)
     {
         if ((socketHandleAndEventMask.second & UDT_EPOLL_ERR) > 0)
             continue;
@@ -225,6 +235,4 @@ int EpollImpl::addUdtSocketEvents(
                 socketHandleAndEventMask.second |= UDT_EPOLL_ERR;
         }
     }
-
-    return total;
 }

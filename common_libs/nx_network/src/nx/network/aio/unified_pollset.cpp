@@ -246,6 +246,8 @@ bool UnifiedPollSet::const_iterator::operator!=(
 UnifiedPollSet
 **********************************/
 
+//#define USE_SOCKET_FOR_INTERRUPTING_EPOLL_WAIT
+
 UnifiedPollSet::UnifiedPollSet():
     UnifiedPollSet(nullptr)
 {
@@ -259,10 +261,13 @@ UnifiedPollSet::UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper> udtEpoll
         m_udtEpollWrapper = std::make_unique<UdtEpollWrapper>();
 
     m_epollFd = UDT::epoll_create();
+
+#ifdef USE_SOCKET_FOR_INTERRUPTING_EPOLL_WAIT
     m_interruptSocket.setNonBlockingMode(true);
     m_interruptSocket.bind(SocketAddress(HostAddress::localhost, 0));
     if (!add(&m_interruptSocket, aio::etRead))
         m_interruptSocket.close();
+#endif
 }
 
 UnifiedPollSet::~UnifiedPollSet()
@@ -272,13 +277,21 @@ UnifiedPollSet::~UnifiedPollSet()
 
 bool UnifiedPollSet::isValid() const
 {
-    return (m_epollFd != -1) && (m_interruptSocket.handle() != INVALID_SOCKET);
+    return (m_epollFd != -1)
+#ifdef USE_SOCKET_FOR_INTERRUPTING_EPOLL_WAIT
+        && (m_interruptSocket.handle() != INVALID_SOCKET)
+#endif
+        ;
 }
 
 void UnifiedPollSet::interrupt()
 {
+#ifdef USE_SOCKET_FOR_INTERRUPTING_EPOLL_WAIT
     static const quint8 buffer[kInterruptBufferSize] = { 0 };
     m_interruptSocket.sendTo(buffer, sizeof(buffer), m_interruptSocket.getLocalAddress());
+#else
+    UDT::epoll_interrupt_wait(m_epollFd);
+#endif
 }
 
 bool UnifiedPollSet::add(Pollable* const sock, EventType eventType, void* /*userData*/)
@@ -357,6 +370,7 @@ int UnifiedPollSet::poll(int millisToWait)
         return -1;
     }
 
+#ifdef USE_SOCKET_FOR_INTERRUPTING_EPOLL_WAIT
     auto it = m_readSysFds.find(m_interruptSocket.handle());
     if (it != m_readSysFds.end())
     {
@@ -366,6 +380,7 @@ int UnifiedPollSet::poll(int millisToWait)
         --result;
         m_readSysFds.erase(it);
     }
+#endif
 
     removePhantomSockets(&m_readUdtFds);
     removePhantomSockets(&m_writeUdtFds);

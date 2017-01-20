@@ -146,19 +146,15 @@ int CEPoll::wait(
     if (!readfds && !writefds && !lrfds && lwfds && (msTimeOut < 0))
         throw CUDTException(5, 3, 0);
 
-    EpollImpl* epollContext = nullptr;
-    {
-        //NOTE calls with same eid MUST be synchronized by caller!
-        //That is, while we are in this method no calls with same eid are possible
-        CGuard lk(m_EPollLock);
-
-        CEPollDescMap::iterator it = m_mPolls.find(eid);
-        if (it == m_mPolls.end())
-            throw CUDTException(5, 13);
-        epollContext = it->second.get();
-    }
-
+    //NOTE calls with same eid MUST be synchronized by caller!
+    //That is, while we are in this method no calls with same eid are possible
+    EpollImpl* epollContext = getEpollById(eid);
     return epollContext->wait(readfds, writefds, msTimeOut, lrfds, lwfds);
+}
+
+int CEPoll::interruptWait(const int eid)
+{
+    return getEpollById(eid)->interruptWait();
 }
 
 int CEPoll::release(const int eid)
@@ -200,4 +196,14 @@ void CEPoll::RemoveEPollEvent(UDTSOCKET socket)
     CGuard pg(m_EPollLock);
     for (CEPollDescMap::iterator p = m_mPolls.begin(); p != m_mPolls.end(); ++p)
         p->second->removeUdtSocketEvents(socket);
+}
+
+EpollImpl* CEPoll::getEpollById(int eid) const
+{
+    CGuard lk(m_EPollLock);
+
+    auto it = m_mPolls.find(eid);
+    if (it == m_mPolls.end())
+        throw CUDTException(5, 13);
+    return it->second.get();
 }
