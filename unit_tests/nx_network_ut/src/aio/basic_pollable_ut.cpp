@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/aioservice.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/socket_global.h>
 
@@ -190,38 +190,74 @@ TEST_F(BasicPollable, pleaseStopSync)
 class FtBasicPollable:
     public BasicPollable
 {
+protected:
+    struct Result
+    {
+        std::chrono::milliseconds testDuration;
+        std::size_t asyncCallsMade;
+    };
+
+    void givenAioServiceWithRegularPollSet()
+    {
+
+    }
+
+    void runTest()
+    {
+        constexpr auto testDuration = std::chrono::seconds(3);
+
+        std::atomic<std::size_t> postCallCounter(0);
+
+        aio::BasicPollable aioObject;
+
+        int prevCallCounter = -1;
+        const auto endTime = std::chrono::steady_clock::now() + testDuration;
+        while (std::chrono::steady_clock::now() < endTime)
+        {
+            if (prevCallCounter != postCallCounter)
+            {
+                prevCallCounter = postCallCounter;
+                aioObject.post(
+                    [&postCallCounter]()
+                    {
+                        ++postCallCounter;
+                    });
+            }
+
+            std::this_thread::yield();
+        }
+
+        aioObject.pleaseStopSync();
+
+        m_result.testDuration = testDuration;
+        m_result.asyncCallsMade = postCallCounter;
+    }
+
+    void printResult()
+    {
+        using namespace std::chrono;
+
+        std::cout << "post performance. Total " << m_result.asyncCallsMade << " calls made in "
+            << m_result.testDuration.count() << " ms. That gives "
+            << (m_result.asyncCallsMade * 1000 / m_result.testDuration.count()) << " calls per second"
+            << std::endl;
+    }
+
+private:
+    Result m_result;
 };
 
 TEST_F(FtBasicPollable, postPerformance)
 {
-    constexpr auto testDuration = std::chrono::seconds(3);
+    runTest();
+    printResult();
+}
 
-    std::atomic<int> postCallCounter(0);
-
-    aio::BasicPollable aioObject;
-
-    int prevCallCounter = -1;
-    const auto endTime = std::chrono::steady_clock::now() + testDuration;
-    while (std::chrono::steady_clock::now() < endTime)
-    {
-        if (prevCallCounter != postCallCounter)
-        {
-            prevCallCounter = postCallCounter;
-            aioObject.post(
-                [&postCallCounter]()
-                {
-                    ++postCallCounter;
-                });
-        }
-
-        std::this_thread::yield();
-    }
-
-    aioObject.pleaseStopSync();
-
-    std::cout<<"post performance. Total "<< postCallCounter<<" calls made in "
-        << testDuration.count() << " seconds. "
-        "That gives "<<(postCallCounter / testDuration.count()) << " calls per second"<<std::endl;
+TEST_F(FtBasicPollable, postPerformanceWithRegularPollSet)
+{
+    givenAioServiceWithRegularPollSet();
+    runTest();
+    printResult();
 }
 
 } // namespace test

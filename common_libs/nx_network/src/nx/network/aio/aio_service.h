@@ -11,8 +11,8 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
 
-#include "aioeventhandler.h"
-#include "aiothread.h"
+#include "aio_event_handler.h"
+#include "aio_thread.h"
 
 namespace nx {
 namespace network {

@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "aiothread.h"
+#include "aio_thread.h"
 
 #include <nx/utils/log/log.h>
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/aiothread.h>
+#include <nx/network/aio/aio_thread.h>
 #include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/system_socket.h>
