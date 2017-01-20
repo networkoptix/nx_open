@@ -80,6 +80,11 @@ void CEPollDescWin32::remove(const SYSSOCKET& s)
     m_sLocals.erase(s);
 }
 
+std::size_t CEPollDescWin32::socketsPolledCount() const
+{
+    return m_sLocals.size();
+}
+
 int CEPollDescWin32::doSystemPoll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,

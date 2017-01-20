@@ -55,6 +55,11 @@ void CEPollDescMacosx::remove(const SYSSOCKET& s)
     m_sLocals.erase(s);
 }
 
+std::size_t CEPollDescMacosx::socketsPolledCount() const
+{
+    return m_sLocals.size();
+}
+
 int CEPollDescMacosx::doSystemPoll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,

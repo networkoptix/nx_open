@@ -55,7 +55,6 @@ Yunhong Gu, last updated 01/01/2011
 
 #include "common.h"
 #include "epoll/epoll_impl.h"
-#include "epoll/epoll_impl_factory.h"
 #include "udt.h"
 
 using namespace std;
@@ -79,7 +78,7 @@ int CEPoll::create()
 {
     CGuard pg(m_EPollLock);
 
-    auto desc = EpollImplFactory::instance()->create();
+    std::unique_ptr<EpollImpl> desc(new EpollImpl());
 
     if (++m_iIDSeed >= 0x7FFFFFFF)
         m_iIDSeed = 0;

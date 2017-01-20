@@ -8,21 +8,21 @@
 #include "epoll_impl_macosx.h"
 #endif
 
-std::unique_ptr<EpollImpl> EpollImplFactory::create()
+std::unique_ptr<AbstractEpoll> EpollFactory::create()
 {
 #ifdef _WIN32
-    return std::unique_ptr<EpollImpl>(new CEPollDescWin32());
+    return std::unique_ptr<AbstractEpoll>(new CEPollDescWin32());
 #elif defined(__linux__)
-    return std::unique_ptr<EpollImpl>(new CEPollDescLinux());
+    return std::unique_ptr<AbstractEpoll>(new CEPollDescLinux());
 #elif defined(__APPLE__)
-    return std::unique_ptr<EpollImpl>(new CEPollDescMacosx());
+    return std::unique_ptr<AbstractEpoll>(new CEPollDescMacosx());
 #else
     #error "Missing epoll implementation for the current platform"
 #endif
 }
 
-EpollImplFactory* EpollImplFactory::instance()
+EpollFactory* EpollFactory::instance()
 {
-    static EpollImplFactory s_instance;
+    static EpollFactory s_instance;
     return &s_instance;
 }

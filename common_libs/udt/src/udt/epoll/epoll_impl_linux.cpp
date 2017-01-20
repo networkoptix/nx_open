@@ -59,6 +59,11 @@ void CEPollDescLinux::remove(const SYSSOCKET& s)
     m_sLocals.erase(s);
 }
 
+std::size_t CEPollDescLinux::socketsPolledCount() const
+{
+    return m_sLocals.size();
+}
+
 int CEPollDescLinux::doSystemPoll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,

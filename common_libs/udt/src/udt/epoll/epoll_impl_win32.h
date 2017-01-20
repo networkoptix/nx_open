@@ -1,6 +1,6 @@
 #pragma once
 
-#include "epoll_impl.h"
+#include "abstract_epoll.h"
 
 #ifdef _WIN32
 
@@ -15,7 +15,7 @@ typedef struct CustomFdSet
 } CustomFdSet;
 
 class CEPollDescWin32:
-    public EpollImpl
+    public AbstractEpoll
 {
 public:
     CEPollDescWin32();
@@ -23,12 +23,16 @@ public:
 
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
+    virtual std::size_t socketsPolledCount() const override;
     virtual int doSystemPoll(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds,
         std::chrono::microseconds timeout) override;
 
 private:
+    /** map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>. */
+    std::map<SYSSOCKET, int> m_sLocals;
+
     CustomFdSet* m_readfds;
     size_t m_readfdsCapacity;
     CustomFdSet* m_writefds;

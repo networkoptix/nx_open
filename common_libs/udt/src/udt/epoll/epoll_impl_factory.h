@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include "epoll_impl.h"
+#include "abstract_epoll.h"
 
-class EpollImplFactory
+class EpollFactory
 {
 public:
-    std::unique_ptr<EpollImpl> create();
+    std::unique_ptr<AbstractEpoll> create();
 
-    static EpollImplFactory* instance();
+    static EpollFactory* instance();
 };

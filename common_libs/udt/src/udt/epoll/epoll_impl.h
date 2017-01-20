@@ -6,20 +6,21 @@
 #include <mutex>
 #include <set>
 
+#include "abstract_epoll.h"
 #include "../udt.h"
 
 class EpollImpl
 {
 public:
     EpollImpl();
-    virtual ~EpollImpl() = default;
+    virtual ~EpollImpl();
 
     int addUdtSocket(const UDTSOCKET& u, const int* events);
     int removeUdtSocket(const UDTSOCKET& u);
     void removeUdtSocketEvents(const UDTSOCKET& socket);
 
-    virtual void add(const SYSSOCKET& s, const int* events) = 0;
-    virtual void remove(const SYSSOCKET& s) = 0;
+    void add(const SYSSOCKET& s, const int* events);
+    void remove(const SYSSOCKET& s);
 
     int wait(
         std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
@@ -28,21 +29,10 @@ public:
 
     void updateEpollSets(int events, const UDTSOCKET& socketId, bool enable);
 
-protected:
-    /** map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>. */
-    std::map<SYSSOCKET, int> m_sLocals;
-
-    /**
-     * @param std::chrono::microseconds::max() means no timeout.
-     * @return Number of events triggered. -1 in case of error. 0 in case of timeout expiration.
-     */
-    virtual int doSystemPoll(
-        std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds,
-        std::chrono::microseconds timeout) = 0;
-
 private:
     std::mutex m_mutex;
+
+    std::unique_ptr<AbstractEpoll> m_systemEpoll;
 
     std::set<UDTSOCKET> m_sUDTSocksOut;       // set of UDT sockets waiting for write events
     std::set<UDTSOCKET> m_sUDTSocksIn;        // set of UDT sockets waiting for read events

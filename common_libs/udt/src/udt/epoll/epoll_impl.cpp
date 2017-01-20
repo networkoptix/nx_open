@@ -1,8 +1,14 @@
 #include "epoll_impl.h"
 
 #include "../common.h"
+#include "epoll_impl_factory.h"
 
 EpollImpl::EpollImpl()
+{
+    m_systemEpoll = EpollFactory::instance()->create();
+}
+
+EpollImpl::~EpollImpl()
 {
 }
 
@@ -38,6 +44,18 @@ void EpollImpl::removeUdtSocketEvents(const UDTSOCKET& socket)
     m_sUDTExcepts.erase(socket);
 }
 
+void EpollImpl::add(const SYSSOCKET& s, const int* events)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_systemEpoll->add(s, events);
+}
+
+void EpollImpl::remove(const SYSSOCKET& s)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_systemEpoll->remove(s);
+}
+
 int EpollImpl::wait(
     std::map<UDTSOCKET, int>* udtReadFds, std::map<UDTSOCKET, int>* udtWriteFds,
     int64_t msTimeout,
@@ -45,7 +63,8 @@ int EpollImpl::wait(
 {
     {
         std::lock_guard<std::mutex> lock(m_mutex);
-        if (m_sUDTSocksIn.empty() && m_sUDTSocksOut.empty() && m_sLocals.empty() && (msTimeout < 0))
+        if (m_sUDTSocksIn.empty() && m_sUDTSocksOut.empty() &&
+            m_systemEpoll->socketsPolledCount() == 0 && (msTimeout < 0))
         {
             // No socket is being monitored, this may be a deadlock.
             throw CUDTException(5, 3);
@@ -68,7 +87,7 @@ int EpollImpl::wait(
         ? std::chrono::microseconds::max()
         : std::chrono::milliseconds(msTimeOut);
 
-    int eventCount = doSystemPoll(systemReadFds, systemWriteFds, timeout);
+    int eventCount = m_systemEpoll->doSystemPoll(systemReadFds, systemWriteFds, timeout);
     if (eventCount < 0)
         return -1;
 
@@ -86,7 +105,7 @@ int EpollImpl::wait(
         
         if (systemReadFds || systemWriteFds)
         {
-            const int eventCount = doSystemPoll(
+            const int eventCount = m_systemEpoll->doSystemPoll(
                 systemReadFds,
                 systemWriteFds,
                 std::chrono::microseconds::zero());
