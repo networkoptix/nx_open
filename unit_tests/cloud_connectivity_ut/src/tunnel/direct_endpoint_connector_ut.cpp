@@ -94,8 +94,6 @@ TEST_F(TcpTunnelConnector, connectedToWrongServer)
         {
             const auto& peerIdTestContext = testPeerIdArray[j];
 
-            std::cout<<"test debug: "<<i<<", "<<j<<std::endl;
-
             ConnectResult connectResult;
             auto server1 = mediator().addRandomServer(system1, peerId);
 

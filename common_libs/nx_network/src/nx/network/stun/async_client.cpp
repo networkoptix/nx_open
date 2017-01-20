@@ -139,25 +139,16 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            if (m_baseConnection)
-            {
-                if (const auto socket = dynamic_cast<AbstractStreamSocket*>(
-                    m_baseConnection->socket().get()))
-                {
-                    NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
-                    const auto isKeepAliveSet = socket->setKeepAlive(std::move(options));
-                    NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
-                }
-                else
-                {
-                    NX_ASSERT(false, lm("Trying to set keep alive for non-stream socket"));
-                }
-            }
-            else
+            if (!m_baseConnection)
             {
                 NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
                     cl_logDEBUG1);
+                return;
             }
+
+            NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
+            const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
+            NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
 }
 
