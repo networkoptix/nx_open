@@ -81,13 +81,13 @@ int EpollImpl::wait(
     if (systemWriteFds)
         systemWriteFds->clear();
 
-#if 0
+#if 1
     const std::chrono::microseconds timeout = 
         msTimeout < 0
         ? std::chrono::microseconds::max()
-        : std::chrono::milliseconds(msTimeOut);
+        : std::chrono::milliseconds(msTimeout);
 
-    int eventCount = m_systemEpoll->doSystemPoll(systemReadFds, systemWriteFds, timeout);
+    int eventCount = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
     if (eventCount < 0)
         return -1;
 
@@ -105,7 +105,7 @@ int EpollImpl::wait(
         
         if (systemReadFds || systemWriteFds)
         {
-            const int eventCount = m_systemEpoll->doSystemPoll(
+            const int eventCount = m_systemEpoll->poll(
                 systemReadFds,
                 systemWriteFds,
                 std::chrono::microseconds::zero());
@@ -147,6 +147,7 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
     
     if (modified)
     {
+        m_systemEpoll->interrupt();
         // TODO Triggering events.
         CTimer::triggerEvent();
     }

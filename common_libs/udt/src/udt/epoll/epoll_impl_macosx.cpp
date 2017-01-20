@@ -60,7 +60,7 @@ std::size_t CEPollDescMacosx::socketsPolledCount() const
     return m_sLocals.size();
 }
 
-int CEPollDescMacosx::doSystemPoll(
+int CEPollDescMacosx::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -106,6 +106,11 @@ int CEPollDescMacosx::doSystemPoll(
         }
     }
     return nfds;
+}
+
+void CEPollDescMacosx::interrupt()
+{
+    // TODO
 }
 
 #endif // __APPLE__

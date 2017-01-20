@@ -11,17 +11,41 @@
 #endif
 
 CEPollDescLinux::CEPollDescLinux():
-    m_epollFd(-1)
+    m_epollFd(-1),
+    m_interruptEventFd(-1)
 {
     // Since Linux 2.6.8, the size argument is ignored, but must be greater than zero.
     m_epollFd = epoll_create(1024);
     if (m_epollFd < 0)
         throw CUDTException(-1, 0, errno);
+    
+    m_interruptEventFd = eventfd(0, EFD_NONBLOCK);
+    if (m_interruptEventFd < 0)
+    {
+        ::close(m_epollFd);
+        throw CUDTException(-1, 0, errno);
+    }
+
+    epoll_event _event;
+    memset(&_event, 0, sizeof(_event));
+    _event.data.fd = m_interruptEventFd;
+    _event.events = EPOLLIN | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
+    if (epoll_ctl(m_epollFd, EPOLL_CTL_ADD, m_interruptEventFd, &_event) != 0)
+    {
+        ::close(m_epollFd);
+        m_epollFd = -1;
+        ::close(m_interruptEventFd);
+        m_interruptEventFd = -1;
+    }
 }
 
 CEPollDescLinux::~CEPollDescLinux()
 {
     ::close(m_epollFd);
+    m_epollFd = -1;
+
+    ::close(m_interruptEventFd);
+    m_interruptEventFd = -1;
 }
 
 void CEPollDescLinux::add(const SYSSOCKET& s, const int* events)
@@ -64,7 +88,7 @@ std::size_t CEPollDescLinux::socketsPolledCount() const
     return m_sLocals.size();
 }
 
-int CEPollDescLinux::doSystemPoll(
+int CEPollDescLinux::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -88,6 +112,13 @@ int CEPollDescLinux::doSystemPoll(
     int total = 0;
     for (int i = 0; i < nfds; ++i)
     {
+        if (ev[i].data.fd == m_interruptEventFd)
+        {
+            uint64_t val = 0;
+            read(m_interruptEventFd, &val, sizeof(val));
+            continue;
+        }
+
         const bool hangup = (ev[i].events & (EPOLLHUP | EPOLLRDHUP)) > 0;
 
         if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
@@ -106,6 +137,12 @@ int CEPollDescLinux::doSystemPoll(
     }
 
     return total;
+}
+
+void CEPollDescLinux::interrupt()
+{
+    uint64_t val = 1;
+    write(m_interruptEventFd, &val, sizeof(val));
 }
 
 #endif // __linux__

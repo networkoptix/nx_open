@@ -24,14 +24,17 @@ public:
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
-    virtual int doSystemPoll(
+    virtual int poll(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds,
         std::chrono::microseconds timeout) override;
+    virtual void interrupt() override;
 
 private:
     /** map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>. */
     std::map<SYSSOCKET, int> m_sLocals;
+    SYSSOCKET m_interruptionSocket;
+    sockaddr_in m_interruptionSocketLocalAddress;
 
     CustomFdSet* m_readfds;
     size_t m_readfdsCapacity;
@@ -43,6 +46,13 @@ private:
     void prepareForPolling(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds);
+    void prepareOutEvents(
+        std::map<SYSSOCKET, int>* lrfds,
+        std::map<SYSSOCKET, int>* lwfds,
+        bool* receivedInterruptEvent);
+
+    void initializeInterruptSocket();
+    void freeInterruptSocket();
 
     CEPollDescWin32(const CEPollDescWin32&) = delete;
     CEPollDescWin32& operator=(const CEPollDescWin32&) = delete;

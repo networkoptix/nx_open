@@ -50,6 +50,7 @@ static void reallocFdSetIfNeeded(
 } // namespace
 
 CEPollDescWin32::CEPollDescWin32():
+    m_interruptionSocket(INVALID_SOCKET),
     m_readfds(allocFDSet(kInitialFdSetSize)),
     m_readfdsCapacity(kInitialFdSetSize),
     m_writefds(allocFDSet(kInitialFdSetSize)),
@@ -57,6 +58,8 @@ CEPollDescWin32::CEPollDescWin32():
     m_exceptfds(allocFDSet(kInitialFdSetSize)),
     m_exceptfdsCapacity(kInitialFdSetSize)
 {
+    memset(&m_interruptionSocketLocalAddress, 0, sizeof(m_interruptionSocketLocalAddress));
+    initializeInterruptSocket();
 }
 
 CEPollDescWin32::~CEPollDescWin32()
@@ -67,6 +70,8 @@ CEPollDescWin32::~CEPollDescWin32()
     m_writefds = NULL;
     freeFDSet(m_exceptfds);
     m_exceptfds = NULL;
+
+    freeInterruptSocket();
 }
 
 void CEPollDescWin32::add(const SYSSOCKET& s, const int* events)
@@ -85,7 +90,7 @@ std::size_t CEPollDescWin32::socketsPolledCount() const
     return m_sLocals.size();
 }
 
-int CEPollDescWin32::doSystemPoll(
+int CEPollDescWin32::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -104,7 +109,7 @@ int CEPollDescWin32::doSystemPoll(
         tv.tv_usec = duration_cast<microseconds>(timeout - fullSeconds).count();
     }
 
-    const int eventCount = ::select(
+    int eventCount = ::select(
         0,
         m_readfds->fd_count > 0
             ? reinterpret_cast<fd_set*>(m_readfds)
@@ -124,22 +129,23 @@ int CEPollDescWin32::doSystemPoll(
     if (eventCount == 0)
         return eventCount;
 
-    //using win32-specific select features to get O(1) here
-    for (size_t i = 0; i < m_readfds->fd_count; ++i)
-        (*lrfds)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
-
-    for (size_t i = 0; i < m_writefds->fd_count; ++i)
-        (*lwfds)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
-
-    for (size_t i = 0; i < m_exceptfds->fd_count; ++i)
-    {
-        if (lrfds)
-            (*lrfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
-        if (lwfds)
-            (*lwfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
-    }
+    bool receivedInterruptEvent = false;
+    prepareOutEvents(lrfds, lwfds, &receivedInterruptEvent);
+    if (receivedInterruptEvent)
+        --eventCount;
 
     return eventCount;
+}
+
+void CEPollDescWin32::interrupt()
+{
+    char buf[128];
+    sendto(
+        m_interruptionSocket,
+        buf, sizeof(buf),
+        0,
+        (const sockaddr*)&m_interruptionSocketLocalAddress,
+        sizeof(m_interruptionSocketLocalAddress));
 }
 
 void CEPollDescWin32::prepareForPolling(
@@ -150,9 +156,11 @@ void CEPollDescWin32::prepareForPolling(
     m_writefds->fd_count = 0;
     m_exceptfds->fd_count = 0;
 
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_readfdsCapacity, &m_readfds);
+    reallocFdSetIfNeeded(m_sLocals.size()+1, &m_readfdsCapacity, &m_readfds); //< +1 is for m_interruptionSocket
     reallocFdSetIfNeeded(m_sLocals.size(), &m_writefdsCapacity, &m_writefds);
     reallocFdSetIfNeeded(m_sLocals.size(), &m_exceptfdsCapacity, &m_exceptfds);
+
+    m_readfds->fd_array[m_readfds->fd_count++] = m_interruptionSocket;
 
     for (const std::pair<SYSSOCKET, int>& fdAndEventMask : m_sLocals)
     {
@@ -166,6 +174,85 @@ void CEPollDescWin32::prepareForPolling(
         }
         m_exceptfds->fd_array[m_exceptfds->fd_count++] = fdAndEventMask.first;
     }
+}
+
+void CEPollDescWin32::prepareOutEvents(
+    std::map<SYSSOCKET, int>* lrfds,
+    std::map<SYSSOCKET, int>* lwfds,
+    bool* receivedInterruptEvent)
+{
+    // Using win32-specific select features to get O(1) here.
+    for (size_t i = 0; i < m_readfds->fd_count; ++i)
+    {
+        if (m_readfds->fd_array[i] == m_interruptionSocket)
+        {
+            char buf[128];
+            recv(m_interruptionSocket, buf, sizeof(buf), 0);
+            *receivedInterruptEvent = true;
+            continue;
+        }
+        (*lrfds)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
+    }
+
+    for (size_t i = 0; i < m_writefds->fd_count; ++i)
+        (*lwfds)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
+
+    for (size_t i = 0; i < m_exceptfds->fd_count; ++i)
+    {
+        if (lrfds)
+            (*lrfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+        if (lwfds)
+            (*lwfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+    }
+}
+
+void CEPollDescWin32::initializeInterruptSocket()
+{
+    m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (m_interruptionSocket < 0)
+        throw CUDTException(-1, 0, GetLastError());
+
+    u_long val = 1;
+    if (ioctlsocket(m_interruptionSocket, FIONBIO, &val) != 0)
+    {
+        ::closesocket(m_interruptionSocket);
+        m_interruptionSocket = INVALID_SOCKET;
+        throw CUDTException(-1, 0, GetLastError());
+    }
+
+    sockaddr_in localEndpoint;
+    memset(&localEndpoint, 0, sizeof(localEndpoint));
+    localEndpoint.sin_family = AF_INET;
+    localEndpoint.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    if (::bind(
+            m_interruptionSocket,
+            (SOCKADDR*)&localEndpoint,
+            sizeof(localEndpoint)) == SOCKET_ERROR)
+    {
+        ::closesocket(m_interruptionSocket);
+        m_interruptionSocket = INVALID_SOCKET;
+        throw CUDTException(-1, 0, GetLastError());
+    }
+
+    int addrLen = sizeof(m_interruptionSocketLocalAddress);
+    if (::getsockname(
+            m_interruptionSocket,
+            (sockaddr*)&m_interruptionSocketLocalAddress,
+            &addrLen) < 0)
+    {
+        ::closesocket(m_interruptionSocket);
+        m_interruptionSocket = INVALID_SOCKET;
+        throw CUDTException(-1, 0, GetLastError());
+    }
+}
+
+void CEPollDescWin32::freeInterruptSocket()
+{
+    if (m_interruptionSocket == INVALID_SOCKET)
+        return;
+    ::closesocket(m_interruptionSocket);
+    m_interruptionSocket = INVALID_SOCKET;
 }
 
 #endif // _WIN32

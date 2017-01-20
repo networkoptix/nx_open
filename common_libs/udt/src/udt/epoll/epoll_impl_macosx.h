@@ -14,10 +14,11 @@ public:
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
-    virtual int doSystemPoll(
+    virtual int poll(
         std::map<SYSSOCKET, int>* lrfds,
         std::map<SYSSOCKET, int>* lwfds,
         std::chrono::microseconds timeout) override;
+    virtual void interrupt() override;
 
 private:
     int m_kqueueFd;
