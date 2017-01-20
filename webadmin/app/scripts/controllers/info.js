@@ -2,8 +2,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('InfoCtrl', function ($scope, mediaserver) {
-
+    .controller('InfoCtrl', function ($scope, mediaserver, nativeClient) {
 
         $scope.logUrl = mediaserver.logUrl();
 

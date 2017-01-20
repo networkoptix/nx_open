@@ -739,7 +739,7 @@ angular.module('webadminApp')
                     back: function () {
                         $scope.settings.localPassword = '';
                         $scope.settings.localPasswordConfirmation = '';
-                        $scope.next('start', true);
+                        $scope.next('systemName', true);
                     },
                     next: initOfflineSystem,
                     valid: function () {
