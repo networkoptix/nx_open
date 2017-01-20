@@ -180,26 +180,29 @@ int EpollImpl::addUdtSocketEvents(
 {
     // Sockets with exceptions are returned to both read and write sets.
 
-    std::lock_guard<std::mutex> lock(m_mutex);
-
     int total = 0;
-    if ((NULL != udtReadFds) && (!m_sUDTReads.empty() || !m_sUDTExcepts.empty()))
-    {
-        udtReadFds->clear();
-        for (const auto& handle : m_sUDTReads)
-            udtReadFds->emplace(handle, UDT_EPOLL_IN);
-        for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
-            (*udtReadFds)[*i] |= UDT_EPOLL_ERR;
-        total += m_sUDTReads.size() + m_sUDTExcepts.size();
-    }
 
-    if ((NULL != udtWriteFds) && (!m_sUDTWrites.empty() || !m_sUDTExcepts.empty()))
     {
-        for (const auto& handle : m_sUDTWrites)
-            udtWriteFds->emplace(handle, UDT_EPOLL_OUT);
-        for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
-            (*udtWriteFds)[*i] |= UDT_EPOLL_ERR;
-        total += m_sUDTWrites.size() + m_sUDTExcepts.size();
+        std::lock_guard<std::mutex> lock(m_mutex);
+
+        if ((NULL != udtReadFds) && (!m_sUDTReads.empty() || !m_sUDTExcepts.empty()))
+        {
+            udtReadFds->clear();
+            for (const auto& handle : m_sUDTReads)
+                udtReadFds->emplace(handle, UDT_EPOLL_IN);
+            for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
+                (*udtReadFds)[*i] |= UDT_EPOLL_ERR;
+            total += m_sUDTReads.size() + m_sUDTExcepts.size();
+        }
+
+        if ((NULL != udtWriteFds) && (!m_sUDTWrites.empty() || !m_sUDTExcepts.empty()))
+        {
+            for (const auto& handle : m_sUDTWrites)
+                udtWriteFds->emplace(handle, UDT_EPOLL_OUT);
+            for (std::set<UDTSOCKET>::const_iterator i = m_sUDTExcepts.begin(); i != m_sUDTExcepts.end(); ++i)
+                (*udtWriteFds)[*i] |= UDT_EPOLL_ERR;
+            total += m_sUDTWrites.size() + m_sUDTExcepts.size();
+        }
     }
 
     // Somehow, connection failure event can be not reported, so checking additionally.
