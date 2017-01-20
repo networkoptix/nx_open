@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 
 #ifndef EPOLLRDHUP
 #   define EPOLLRDHUP 0x2000 //< Android doesn't define EPOLLRDHUP, but it still works if defined properly.
