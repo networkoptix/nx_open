@@ -43,11 +43,21 @@
             Result="state"
             Variable="ServerInstalled" />
 
+        <util:ProductSearch
+            Id="ServerMsiVersion"
+            UpgradeCode="$(var.serverUpgradeCode)"
+            Result="version"
+            Variable="InstalledServerVersion" />
+
         <?define CloudHostIsDifferent="(CloudHost <> "" AND CloudHost <> "$(var.cloudHost)")" ?>
 
         <!-- Exit if upgrading and cloud hosts differ -->
         <bal:Condition Message="!(loc.Product_CloudHostMismatch)">
             <![CDATA[ (NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent))) OR WixBundleAction = 3 ]]>
+        </bal:Condition>
+
+        <bal:Condition Message="!(loc.Product_ServerIsTooOld)">
+            <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "3.0" ]]>
         </bal:Condition>
     </Fragment>
 
