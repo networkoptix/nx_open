@@ -189,7 +189,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloud.host</name>
+                    <value>auto</value>
                 </property>
             </activation>
             <build>
@@ -213,14 +214,13 @@
                                         <argument>--instance=${cloud.group}</argument>
                                         <argument>--customization=${customization}</argument>
                                         <argument>--verbose</argument>
-                                        <argument>--host=${cloud.host}</argument>                                        
                                         <argument>--timeout=10</argument>
                                     </arguments>
                                     <workingDirectory>${root.dir}/build_utils/python</workingDirectory>
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>              
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>properties-maven-plugin</artifactId>
@@ -231,9 +231,9 @@
                                 <phase>none</phase>
                             </execution>
                         </executions>
-                    </plugin>                     
+                    </plugin>
                 </plugins>
-            </build> 
-        </profile>                 
+            </build>
+        </profile>
     </profiles>
 </project>

@@ -549,11 +549,6 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
 {
-    QString messageText = QnSystemHealthStringsHelper::messageText(message);
-    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
-    if (messageText.isEmpty())
-        return;
-
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
@@ -572,6 +567,13 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     QnNotificationWidget* item = findItem(message, resource);
     if (item)
         return;
+
+    const QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
+    const QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
+    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
+    qDebug() << messageText;
 
     item = new QnNotificationWidget(m_list);
 
@@ -667,8 +669,8 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             break;
     }
 
-    QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    item->setText(QnSystemHealthStringsHelper::messageText(message, resourceName));
+
+    item->setText(messageText);
     item->setTooltipText(QnSystemHealthStringsHelper::messageTooltip(message, resourceName));
     item->setNotificationLevel(QnNotificationLevel::valueOf(message));
     item->setProperty(kItemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
@@ -678,7 +680,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     connect(item, &QnNotificationWidget::actionTriggered, this,
         &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
+    m_list->addItem(item, QnSystemHealth::isMessageLocked(message));
     m_itemsByMessageType.insert(message, item);
 }
 
