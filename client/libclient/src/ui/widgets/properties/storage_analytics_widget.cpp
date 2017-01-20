@@ -448,8 +448,8 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
         return 0;
 
     int idx = value / kTicksPerInterval;
-    if (idx >= kExtraDataBase.size() - 1)
-        return kExtraDataBase.back();
+    if (idx >= (qint64) kExtraDataBase.size() - 1)
+        return (qint64) kExtraDataBase.back();
 
     qint64 k1 = kExtraDataBase[idx];
     qint64 k2 = kExtraDataBase[idx+1];
@@ -462,7 +462,7 @@ qint64 QnStorageAnalyticsWidget::sliderPositionToBytes(int value) const
 int QnStorageAnalyticsWidget::bytesToSliderPosition (qint64 value) const
 {
     int idx = 0;
-    for (; idx < kExtraDataBase.size() - 1; ++idx)
+    for (; idx < (qint64) kExtraDataBase.size() - 1; ++idx)
     {
         if (kExtraDataBase[idx+1] >= value)
             break;

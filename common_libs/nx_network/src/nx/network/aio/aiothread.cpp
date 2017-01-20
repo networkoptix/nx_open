@@ -9,7 +9,6 @@
 
 #include "aio_thread_impl.h"
 
-
 //TODO #ak memory order semantic used with std::atomic
 //TODO #ak move task queues to socket for optimization
 //TODO #ak should add some sequence which will be incremented when socket is started polling on any event
@@ -17,23 +16,15 @@
     //before async stop completion socket is polled again. In this case remove task should not remove tasks 
     //from new polling "session"? Something needs to be done about it
 
-
 namespace nx {
 namespace network {
 namespace aio {
 
-AbstractAioThread::~AbstractAioThread()
+AIOThread::AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
+    QnLongRunnable(false),
+    m_impl(new detail::AIOThreadImpl(std::move(pollSet)))
 {
-}
-
-
-
-AIOThread::AIOThread()
-:
-    QnLongRunnable( false ),
-    m_impl( new detail::AIOThreadImpl() )
-{
-    setObjectName(QString::fromLatin1("AIOThread") );
+    setObjectName(QString::fromLatin1("AIOThread"));
 }
 
 AIOThread::~AIOThread()
@@ -45,17 +36,12 @@ AIOThread::~AIOThread()
     m_impl = NULL;
 }
 
-//!Implementation of QnLongRunnable::pleaseStop
 void AIOThread::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
-    m_impl->pollSet.interrupt();
+    m_impl->pollSet->interrupt();
 }
 
-//!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
-/*!
-    \note MUST be called with \a mutex locked
-*/
 void AIOThread::watchSocket(
     Pollable* const sock,
     aio::EventType eventToWatch,
@@ -82,13 +68,9 @@ void AIOThread::watchSocket(
     else if (eventToWatch == aio::etWrite)
         ++m_impl->newWriteMonitorTaskCount;
     if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
-//!Change timeout of existing polling \a sock for \a eventToWatch to \a timeoutMS. \a eventHandler is changed also
-/*!
-    \note If \a sock is not polled, undefined behaviour can occur
-*/
 void AIOThread::changeSocketTimeout(
     Pollable* const sock,
     aio::EventType eventToWatch,
@@ -119,17 +101,9 @@ void AIOThread::changeSocketTimeout(
         nullptr,
         std::move(socketAddedToPollHandler)));
     if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
-//!Do not monitor \a sock for event \a eventType
-/*!
-    Garantees that no \a eventTriggered will be called after return of this method.
-    If \a eventTriggered is running and \a removeFromWatch called not from \a eventTriggered, method blocks till \a eventTriggered had returned
-    \param waitForRunningHandlerCompletion See comment to \a aio::AIOService::removeFromWatch
-    \note Calling this method with same parameters simultaneously from multiple threads can cause undefined behavour
-    \note MUST be called with \a mutex locked
-*/
 void AIOThread::removeFromWatch(
     Pollable* const sock,
     aio::EventType eventType,
@@ -173,7 +147,7 @@ void AIOThread::removeFromWatch(
             0,
             &taskCompletedCondition));
 
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 
         //we can be sure that socket will be removed before next poll
 
@@ -206,11 +180,10 @@ void AIOThread::removeFromWatch(
             0,
             nullptr,
             std::move(pollingStoppedHandler)));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
     }
 }
 
-//!Queues \a functor to be executed from within this aio thread as soon as possible
 void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor )
 {
     QnMutexLocker lk(&m_impl->mutex);
@@ -221,10 +194,9 @@ void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> func
             std::move(functor)));
     //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
     if (currentThreadSystemId() != systemThreadId())
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 }
 
-//!If called in this aio thread, then calls \a functor immediately, otherwise queues \a functor in same way as \a aio::AIOThread::post does
 void AIOThread::dispatch( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> functor )
 {
     if (currentThreadSystemId() == systemThreadId())  //if called from this aio thread
@@ -236,7 +208,6 @@ void AIOThread::dispatch( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> 
     post(sock, std::move(functor));
 }
 
-//!Cancels calls scheduled with \a aio::AIOThread::post and \a aio::AIOThread::dispatch
 void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHandlerCompletion )
 {
     QnMutexLocker lk(&m_impl->mutex);
@@ -261,7 +232,7 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
                 sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
                                                 //before posted call is actually cancelled
                 nullptr));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
 
         //we can be sure that socket will be removed before next poll
 
@@ -282,14 +253,13 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     {
         m_impl->pollSetModificationQueue.push_back(
             typename detail::AIOThreadImpl::CancelPostedCallsTask(sock->impl()->socketSequence));
-        m_impl->pollSet.interrupt();
+        m_impl->pollSet->interrupt();
     }
 }
 
-//!Returns number of sockets handled by this object
 size_t AIOThread::socketsHandled() const
 {
-    return m_impl->pollSet.size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
+    return m_impl->pollSet->size() + m_impl->newReadMonitorTaskCount + m_impl->newWriteMonitorTaskCount;
 }
 
 void AIOThread::run()
@@ -325,12 +295,12 @@ void AIOThread::run()
 
         //calculating delay to the next periodic task
         const int millisToTheNextPeriodicEvent = nextPeriodicEventClock == 0
-            ? aio::INFINITE_TIMEOUT    //no periodic task
+            ? aio::kInfiniteTimeout    //no periodic task
             : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
         //if there are posted calls, just checking sockets state in non-blocking mode
         const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
-        const int triggeredSocketCount = m_impl->pollSet.poll(pollTimeout);
+        const int triggeredSocketCount = m_impl->pollSet->poll(pollTimeout);
 
         if (needToStop())
             break;
@@ -364,6 +334,6 @@ void AIOThread::run()
     NX_LOG(QLatin1String("AIO thread stopped"), cl_logDEBUG1);
 }
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

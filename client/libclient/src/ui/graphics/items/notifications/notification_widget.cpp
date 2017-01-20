@@ -300,8 +300,9 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
     m_closeButton->setGeometry(buttonGeometry);
 }
 
-void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& tooltip, QnActions::IDType actionId,
-                                         const QnActionParameters& parameters, bool defaultAction)
+void QnNotificationWidget::addActionButton(
+    const QIcon& icon, const QString& /*tooltip*/, QnActions::IDType actionId,
+    const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);

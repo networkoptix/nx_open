@@ -46,8 +46,7 @@ void TunnelAcceptor::accept(AcceptHandler handler)
                     m_mediatorConnection->remoteAddress(),
                     m_mediatorConnection->credentialsProvider());
 
-            m_udpMediatorConnection->socket()->bindToAioThread(
-                m_mediatorConnection->getAioThread());
+            m_udpMediatorConnection->bindToAioThread(m_mediatorConnection->getAioThread());
             if (!m_udpMediatorConnection->socket()->bind(SocketAddress::anyAddress))
                 return executeAcceptHandler(SystemError::getLastOSErrorCode());
 

@@ -1,12 +1,15 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/aio/aiothread.h>
+#include <nx/network/aio/pollset_wrapper.h>
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket_impl.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
+
+#include "pollset_test_common.h"
 
 namespace nx {
 namespace network {
@@ -89,7 +92,7 @@ private:
 };
 
 class UnifiedPollSet:
-    public ::testing::Test
+    public CommonPollSetTest
 {
 public:
     UnifiedPollSet():
@@ -97,6 +100,7 @@ public:
         m_epollWrapperPtr(m_epollWrapper.get()),
         m_pollset(std::move(m_epollWrapper))
     {
+        setPollset(&m_pollset);
     }
 
     ~UnifiedPollSet()
@@ -104,38 +108,9 @@ public:
     }
 
 protected:
-    void initializeRegularSocket()
+    virtual void simulateSocketEvents(int events) override
     {
-        m_sockets.push_back(std::make_unique<UDPSocket>(AF_INET));
-    }
-
-    void initializeUdtSocket()
-    {
-        m_sockets.push_back(std::make_unique<UdtStreamSocket>(AF_INET));
-    }
-
-    void subscribeSocketToEvents(int events)
-    {
-        for (const auto& socket: m_sockets)
-        {
-            if (events & aio::etRead)
-                m_pollset.add(socket.get(), aio::etRead);
-            if (events & aio::etWrite)
-                m_pollset.add(socket.get(), aio::etWrite);
-        }
-    }
-
-    void unsubscribeSocketFromEvents(Pollable* const socket, int events)
-    {
-        if (events & aio::etRead)
-            m_pollset.remove(socket, aio::etRead);
-        if (events & aio::etWrite)
-            m_pollset.remove(socket, aio::etWrite);
-    }
-
-    void simulateSocketEvents(int events)
-    {
-        for (const auto& socket : m_sockets)
+        for (const auto& socket : sockets())
         {
             if (events & aio::etRead)
                 m_epollWrapperPtr->markAsReadable(socket.get());
@@ -144,80 +119,15 @@ protected:
         }
     }
 
-    template<typename EventHandler>
-    void handleSocketEvents(EventHandler handler)
-    {
-        ASSERT_GT(m_pollset.poll(), 0);
-
-        for (auto it = m_pollset.begin(); it != m_pollset.end(); ++it)
-            handler(it.socket(), it.eventType());
-    }
-
-    void initializeBunchOfSocketsOfRandomType()
-    {
-        constexpr int socketCount = 100;
-
-        for (int i = 0; i < socketCount; ++i)
-        {
-            if (nx::utils::random::number<int>(0, 1) > 0)
-                initializeUdtSocket();
-            else
-                initializeRegularSocket();
-        }
-    }
-
-    void runRemoveSocketWithMultipleEventsTest()
-    {
-        subscribeSocketToEvents(aio::etRead | aio::etWrite);
-        simulateSocketEvents(aio::etRead | aio::etWrite);
-        int numberOfEventsReported = 0;
-        handleSocketEvents(
-            [&](Pollable* const socket, aio::EventType /*eventType*/)
-            {
-                ++numberOfEventsReported;
-
-                const int seed = nx::utils::random::number<int>(0, 2);
-                const auto eventsToRemove = 
-                    seed == 0 ? (aio::etRead | aio::etWrite) :
-                    seed == 1 ? (aio::etRead) :
-                    seed == 2 ? (aio::etWrite) : 0;
-
-                unsubscribeSocketFromEvents(socket, eventsToRemove);
-                unsubscribeSocketFromEvents(
-                    m_sockets[nx::utils::random::number<size_t>(0, m_sockets.size() - 1)].get(),
-                    eventsToRemove);
-            });
-    }
-
-    aio::UnifiedPollSet& pollset()
-    {
-        return m_pollset;
-    }
-
-    const aio::UnifiedPollSet& pollset() const
-    {
-        return m_pollset;
-    }
-
 private:
     std::unique_ptr<TestUdtEpollWrapper> m_epollWrapper;
     TestUdtEpollWrapper* m_epollWrapperPtr;
-    aio::UnifiedPollSet m_pollset;
-    std::vector<std::unique_ptr<Pollable>> m_sockets;
+    aio::PollSetWrapper<aio::UnifiedPollSet> m_pollset;
 };
 
-TEST_F(UnifiedPollSet, removing_socket_with_multiple_events)
+TEST(UnifiedPollSet, all_tests)
 {
-    initializeBunchOfSocketsOfRandomType();
-    runRemoveSocketWithMultipleEventsTest();
-}
-
-TEST_F(UnifiedPollSet, multiple_pollset_iterators)
-{
-    const auto additionalPollsetIteratorInstance = pollset().end();
-
-    initializeRegularSocket();
-    runRemoveSocketWithMultipleEventsTest();
+    UnifiedPollSet::runTests<UnifiedPollSet>();
 }
 
 } // namespace test

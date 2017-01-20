@@ -544,8 +544,11 @@ void CloudStreamSocket::stopWhileInAioThread()
     m_timer.pleaseStopSync();
     m_readIoBinder.pleaseStopSync();
     m_writeIoBinder.pleaseStopSync();
-    m_socketDelegate.reset();
-    setDelegate(nullptr);
+    if (m_socketDelegate)
+    {
+        m_socketDelegate->pleaseStopSync();
+        setDelegate(nullptr);
+    }
 }
 
 } // namespace cloud

@@ -4,6 +4,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
+#include "aio/pollset_factory.h"
+
 const std::chrono::seconds kReloadDebugConfigurationInterval(10);
 
 namespace nx {
@@ -37,9 +39,14 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
     return false;
 }
 
-SocketGlobals::SocketGlobals():
+SocketGlobals::SocketGlobals(int initializationFlags):
+    m_initializationFlags(initializationFlags),
     m_log(QnLog::logs())
 {
+    if (m_initializationFlags & InitializationFlags::disableUdt)
+        m_pollSetFactory.disableUdt();
+
+    m_aioService = std::make_unique<aio::AIOService>();
 }
 
 SocketGlobals::~SocketGlobals()
@@ -50,7 +57,7 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        m_debugConfigurationTimer->pleaseStop(barrier.fork());
+        m_debugConfigTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         //m_mediatorConnector->pleaseStop(barrier.fork());
@@ -73,14 +80,15 @@ SocketGlobals::~SocketGlobals()
     }
 }
 
-void SocketGlobals::init()
+void SocketGlobals::init(int initializationFlags)
 {
     QnMutexLocker lock(&s_mutex);
     if (++s_counter == 1) //< First in.
     {
         s_initState = InitState::inintializing; //< Allow creating Pollable(s) in constructor.
-        s_instance = new SocketGlobals;
+        s_instance = new SocketGlobals(initializationFlags);
         
+        // TODO: #ak disable cloud based on m_initializationFlags.
         s_instance->initializeCloudConnectivity();
 
         s_initState = InitState::done;
@@ -138,11 +146,11 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer->start(
+    m_debugConfigTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
         {
-            m_debugConfiguration.reload(utils::FlagConfig::OutputType::silent);
+            m_debugConfig.reload(utils::FlagConfig::OutputType::silent);
             setDebugConfigurationTimer();
         });
 }
@@ -157,7 +165,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_mediatorConnector->clientConnection());
     m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_mediatorConnector->clientConnection());
-    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
+    m_debugConfigTimer = std::make_unique<aio::Timer>();
 }
 
 QnMutex SocketGlobals::s_mutex;

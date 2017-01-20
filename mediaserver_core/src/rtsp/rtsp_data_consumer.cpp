@@ -96,7 +96,7 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
     auto videoLayout = camera->getVideoLayout();
     if (!videoLayout)
         return;
-    m_videoChannels = videoLayout->channelCount();
+    m_videoChannels = (quint32) videoLayout->channelCount();
 }
 
 QnRtspDataConsumer::~QnRtspDataConsumer()
@@ -214,7 +214,7 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
 
 static const int MAX_DATA_QUEUE_SIZE = 120;
 
-void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, int ch)
+void QnRtspDataConsumer::cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch)
 {
     int currentIndex = lastIndex;
     if (m_videoChannels == 1)
@@ -263,9 +263,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 
         // try to reduce queue by removed packets in specified quality
         bool somethingDeleted = false;
-        for (int ch = 0; ch < m_videoChannels; ++ch)
+        for (quint32 ch = 0; ch < m_videoChannels; ++ch)
         {
-            for (int i = unsafeQueue.size()-1; i >=0; --i)
+            for (quint32 i = (quint32) unsafeQueue.size() - 1; i >=0; --i)
             {
                 const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(unsafeQueue.at(i).get() );
                 if (video && (video->flags & AV_PKT_FLAG_KEY) && video->channelNumber == ch)
@@ -283,9 +283,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         // try to reduce queue by removed video packets at any quality
         if (!somethingDeleted)
         {
-            for (int ch = 0; ch < m_videoChannels; ++ch)
+            for (quint32 ch = 0; ch < m_videoChannels; ++ch)
             {
-                for (int i = unsafeQueue.size()-1; i >=0; --i)
+                for (int i = unsafeQueue.size() - 1; i >=0 ; --i)
                 {
                     const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(unsafeQueue.at(i).get() );
                     if (video && (video->flags & AV_PKT_FLAG_KEY) && video->channelNumber == ch)
@@ -299,7 +299,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
     }
 
     // Queue to large. Clear data anyway causing video artifacts
-    while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * m_videoChannels)
+    while(m_dataQueue.size() > MAX_DATA_QUEUE_SIZE * (int) m_videoChannels)
     {
         QnAbstractDataPacketPtr tmp;
         m_dataQueue.pop(tmp);

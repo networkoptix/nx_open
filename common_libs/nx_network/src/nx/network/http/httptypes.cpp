@@ -419,6 +419,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType RequestLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class StatusLine
@@ -479,6 +485,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType StatusLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class Request
@@ -579,6 +591,13 @@ namespace nx_http
         return buf;
     }
 
+    StringType Request::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
     BufferType Request::getCookieValue(const BufferType& name) const
     {
         nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );
@@ -632,14 +651,14 @@ namespace nx_http
     }
 
 
-    BufferType Response::toString() const
+    StringType Response::toString() const
     {
         BufferType buf;
         serialize( &buf );
         return buf;
     }
 
-    BufferType Response::toMultipartString(const ConstBufferRefType& boundary) const
+    StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     {
         BufferType buf;
         serializeMultipartResponse( &buf, boundary );
@@ -758,7 +777,7 @@ namespace nx_http
         type = MessageType::none;
     }
 
-    BufferType Message::toString() const
+    StringType Message::toString() const
     {
         BufferType str;
         switch( type )

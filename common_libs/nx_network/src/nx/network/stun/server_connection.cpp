@@ -63,6 +63,12 @@ AbstractCommunicatingSocket* ServerConnection::socket()
     return BaseType::socket().get();
 }
 
+void ServerConnection::close()
+{
+    auto socket = BaseType::takeSocket();
+    socket.reset();
+}
+
 void ServerConnection::processMessage( Message message )
 {
     switch( message.header.messageClass )
@@ -83,6 +89,10 @@ void ServerConnection::processMessage( Message message )
         default:
             NX_ASSERT( false );  //not supported yet
     }
+
+    // Message handler has closed connection.
+    if (!socket())
+        closeConnection(SystemError::noError);
 }
 
 void ServerConnection::setDestructHandler( std::function< void() > handler )

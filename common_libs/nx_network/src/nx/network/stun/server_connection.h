@@ -18,14 +18,12 @@
 
 #include "abstract_server_connection.h"
 
-
 namespace nx {
 namespace stun {
 
 class MessageDispatcher;
 
-class NX_NETWORK_API ServerConnection
-:
+class NX_NETWORK_API ServerConnection:
     public nx_api::BaseStreamProtocolConnection<
         stun::ServerConnection,
         Message,
@@ -48,18 +46,14 @@ public:
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
 
-    //!Implementation of \a AbstractServerConnection::sendMessage
     virtual void sendMessage(
         nx::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
-    //!Implementation of \a AbstractServerConnection::transportProtocol
     virtual nx::network::TransportProtocol transportProtocol() const override;
-    //!Implementation of \a AbstractServerConnection::getSourceAddress
     virtual SocketAddress getSourceAddress() const override;
-    //!Implementation of \a AbstractServerConnection::addOnConnectionCloseHandler
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of \a AbstractServerConnection::socket
     virtual AbstractCommunicatingSocket* socket() override;
+    virtual void close() override;
 
     void processMessage(Message message);
     void setDestructHandler(std::function< void() > handler = nullptr);

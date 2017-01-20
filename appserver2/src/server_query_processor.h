@@ -49,17 +49,23 @@ struct ScopeHandlerGuard
 template<typename Handler>
 ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler handler)
 {
-    return ScopeHandlerGuard<Handler>(&errorCode, handler); 
+    return ScopeHandlerGuard<Handler>(&errorCode, handler);
 }
 
 struct AuditData
-{ 
+{
     ECConnectionAuditManager* auditManager;
     QnAuthSession authSession;
+    Qn::UserAccessData userAccessData;
 
-    AuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession) :
+    AuditData(
+        ECConnectionAuditManager* auditManager,
+        const QnAuthSession& authSession,
+        const Qn::UserAccessData& userAccessData)
+        :
         auditManager(auditManager),
-        authSession(authSession)
+        authSession(authSession),
+        userAccessData(userAccessData)
     {}
 };
 
@@ -69,7 +75,8 @@ void triggerNotification(
     const QnTransaction<DataType>& tran)
 {
     // Add audit record before notification to ensure removed resource is still alive.
-    if (auditData.auditManager)
+    if (auditData.auditManager &&
+        auditData.userAccessData != Qn::kSystemAccess) //< don't add to audit log if it's server side update
     {
         auditData.auditManager->addAuditRecord(
             tran.command,
@@ -77,7 +84,7 @@ void triggerNotification(
             auditData.authSession);
     }
 
-    QnAppServerConnectionFactory::getConnection2() 
+    QnAppServerConnectionFactory::getConnection2()
         ->notificationManager()
         ->triggerNotification(tran);
 }
@@ -321,7 +328,7 @@ private:
 
     aux::AuditData createAuditDataCopy()
     {
-        return aux::AuditData(m_auditManager, m_authSession);
+        return aux::AuditData(m_auditManager, m_authSession, m_userAccessData);
     }
 
     /**

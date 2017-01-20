@@ -1091,10 +1091,6 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getAggregationText() const
 {
-    const int MINUTE = 60;
-    const int HOUR = MINUTE * 60;
-    const int DAY = HOUR * 24;
-
     if (!QnBusiness::allowsAggregation(m_actionType))
         return tr("N/A");
 

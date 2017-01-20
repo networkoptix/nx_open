@@ -11,6 +11,55 @@
 namespace nx {
 namespace mserver_aux {
 
+UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+    m_mediaFolderName(mediaFolderName)
+{}
+
+QString UnmountedStoragesFilter::stripMediaFolderFromPath(const QString& path)
+{
+    if (!path.endsWith(m_mediaFolderName))
+        return path;
+
+    int indexBeforeMediaFolderName = path.indexOf(m_mediaFolderName) - 1;
+    NX_ASSERT(indexBeforeMediaFolderName > 0);
+    if (indexBeforeMediaFolderName <= 0)
+        return path;
+
+    return path.mid(0, indexBeforeMediaFolderName);
+}
+
+QStringList UnmountedStoragesFilter::stripMediaFolderFromPaths(const QStringList& paths)
+{
+    QStringList result;
+    std::transform(
+          paths.cbegin(),
+          paths.cend(),
+          std::back_inserter(result),
+          [this](const QString& path)
+          {
+            return stripMediaFolderFromPath(path);
+          });
+
+    return result;
+}
+
+QnStorageResourceList UnmountedStoragesFilter::getUnmountedStorages(
+        const QnStorageResourceList& allStorages,
+        const QStringList& paths)
+{
+    QStringList strippedPaths = stripMediaFolderFromPaths(paths);
+    QnStorageResourceList result;
+
+    for (const auto& storage: allStorages)
+    {
+        if (!strippedPaths.contains(stripMediaFolderFromPath(storage->getUrl())))
+            result.append(storage);
+    }
+
+    return result;
+}
+
+
 LocalSystemIndentityHelper::LocalSystemIndentityHelper(
         const BeforeRestoreDbData& restoreData,
         SystemNameProxyPtr systemName,

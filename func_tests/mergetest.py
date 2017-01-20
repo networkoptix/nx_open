@@ -30,6 +30,12 @@ SYSTEM_SETTINGS_1 = {
    }
 }
 
+def getAdminGuid(response):
+    for d in response.data:
+        if d['name'] == 'admin':
+            return d['id']
+    return None
+        
 class MergeSystemTest(FuncTestCase, ClientMixin):
     "Merge systems test"
 
@@ -43,9 +49,9 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
               'testMergeTakeLocalSettings',
               'testMergeTakeRemoteSettings',
               'testRestartOneServer',
-              'testMergeCloudWithLocal',
-              'testMergeCloudSystems',
-              'testCloudMergeAfterDisconnect'
+              # 'testMergeCloudWithLocal',
+              # 'testMergeCloudSystems',
+              # 'testCloudMergeAfterDisconnect'
           ]),
       )
 
@@ -359,6 +365,22 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         self.__mergeSystems(True,
             apiErrorCode = 3,
             apiErrorString = 'BOTH_SYSTEM_BOUND_TO_CLOUD')
+
+        # Test default (admin) user disabled
+        srvInfo = self.servers[self.serverAddr1]
+        client = Client(srvInfo.user, srvInfo.password)
+        response = client.httpRequest(self.serverAddr1, "ec2/getUsers")
+        self.checkResponseError(response, "ec2/getUsers")
+        adminGuid = getAdminGuid(response)
+        self.assertTrue(adminGuid)
+        response = client.httpRequest(
+            self.serverAddr1, "ec2/saveUser",
+            headers={'Content-Type': 'application/json'},
+            data=json.dumps({'id': adminGuid,
+                             'isEnabled': True}))
+        self.checkResponseError(response, "ec2/saveUser")
+        
+        
         
     def testCloudMergeAfterDisconnect(self):
         "Merge after disconnect from cloud"

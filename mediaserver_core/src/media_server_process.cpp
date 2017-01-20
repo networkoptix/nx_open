@@ -64,7 +64,6 @@
 
 #include <events/mserver_business_rule_processor.h>
 
-#include <media_server/media_server_module.h>
 #include <media_server/media_server_app_info.h>
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -508,37 +507,6 @@ static int freeGB(QString drive)
 }
 #endif
 
-nx::mserver_aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
-    m_mediaFolderName(mediaFolderName)
-{}
-
-QString nx::mserver_aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
-{
-    if (!url.endsWith(m_mediaFolderName))
-        return url;
-
-    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
-    NX_ASSERT(indexBeforeMediaFolderName > 0);
-    if (indexBeforeMediaFolderName <= 0)
-        return url;
-
-    return url.mid(0, indexBeforeMediaFolderName);
-}
-
-QnStorageResourceList nx::mserver_aux::UnmountedStoragesFilter::getUnmountedStorages(
-        const QnStorageResourceList& allStorages,
-        const QStringList& paths)
-{
-    QnStorageResourceList result;
-    for (const auto& storage: allStorages)
-    {
-        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
-            result.append(storage);
-    }
-
-    return result;
-}
-
 static QStringList listRecordFolders()
 {
     QStringList folderPaths;
@@ -596,6 +564,11 @@ static QStringList listRecordFolders()
     }
 #endif
 
+    if (MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() != 0)
+    {
+        for (auto& path: folderPaths)
+            path = closeDirPath(path) + serverGuid().toString();
+    }
     return folderPaths;
 }
 
@@ -1114,7 +1087,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
         QTextStream stream(stdout);
@@ -1643,7 +1616,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (mappedAddress.port)
     {
         NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS)
+                .arg(address), cl_logALWAYS);
 
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
@@ -1658,7 +1631,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         if (oldIp != m_forwardedAddresses.end())
         {
             NX_LOGX(lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS)
+                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS);
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -2128,7 +2101,10 @@ void MediaServerProcess::run()
 
     SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
 
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+    std::unique_ptr<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+
+    if (!m_obsoleteGuid.isNull())
+        qnCommon->setObsoleteServerGuid(m_obsoleteGuid);
 
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
@@ -2997,7 +2973,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-        if (application->isRunning())
+        if (application->isRunning() && 
+            MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
             NX_LOG("Server already started", cl_logERROR);
             qApp->quit();
@@ -3131,7 +3108,7 @@ private:
 
         QnUuid obsoleteGuid = QnUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
         if (!obsoleteGuid.isNull()) {
-            qnCommon->setObsoleteServerGuid(obsoleteGuid);
+            m_main->setObsoleteGuid(obsoleteGuid);
         }
     }
 

@@ -7,18 +7,23 @@
 
 #include <nx/utils/log/log.h>
 
+#include "pollset_factory.h"
 
 namespace nx {
 namespace network {
 namespace aio {
 namespace detail {
 
-AIOThreadImpl::AIOThreadImpl()
-:
+AIOThreadImpl::AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSetToUse):
     newReadMonitorTaskCount(0),
     newWriteMonitorTaskCount(0),
     processingPostedCalls(0)
 {
+    if (pollSetToUse)
+        pollSet = std::move(pollSetToUse);
+    else
+        pollSet = PollSetFactory::instance()->create();
+
     m_monotonicClock.restart();
 }
 
@@ -164,7 +169,7 @@ void AIOThreadImpl::addSockToPollset(
     bool failedToAddToPollset = false;
     if (eventType != aio::etTimedOut)
     {
-        if (!pollSet.add(socket, eventType, handlingData.get()))
+        if (!pollSet->add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             failedToAddToPollset = true;
@@ -206,7 +211,7 @@ void AIOThreadImpl::removeSocketFromPollSet(Pollable* sock, aio::EventType event
         delete static_cast<AIOEventHandlingDataHolder*>(userData);
     userData = nullptr;
     if (eventType == aio::etRead || eventType == aio::etWrite)
-        pollSet.remove(sock, eventType);
+        pollSet->remove(sock, eventType);
 }
 
 void AIOThreadImpl::removeSocketsFromPollSet()
@@ -285,13 +290,11 @@ bool AIOThreadImpl::removeReverseTask(
 //!Processes events from \a pollSet
 void AIOThreadImpl::processSocketEvents(const qint64 curClock)
 {
-    for (typename UnifiedPollSet::const_iterator
-        it = pollSet.begin();
-        it != pollSet.end();
-        )
+    auto it = pollSet->getSocketEventsIterator();
+    while (it->next())
     {
-        Pollable* const socket = it.socket();
-        const aio::EventType sockEventType = it.eventType();
+        Pollable* const socket = it->socket();
+        const aio::EventType sockEventType = it->eventReceived();
         const aio::EventType handlerToInvokeType =
             (sockEventType == aio::etRead || sockEventType == aio::etWrite)
             ? sockEventType
@@ -319,7 +322,6 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //socket has been removed from watch
         {
             --handlingData->beingProcessed;
-            ++it;
             continue;
         }
         //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
@@ -330,7 +332,6 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
         --handlingData->beingProcessed;
         //NOTE element, this iterator points to, could be removed in eventTriggered call,
         //but it is still safe to increment this iterator
-        ++it;
     }
 }
 
