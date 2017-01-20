@@ -628,7 +628,7 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
     QnActionParameters params(resList);
     if (resList.isEmpty())
     {
-        QnMessageBox::information(this, tr("Information"), tr("No archive data for that position left"));
+        QnMessageBox::_warning(this, tr("No archive for this position"));
         return;
     }
 
@@ -715,7 +715,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
     QnActionParameters params(resList);
     if (resList.isEmpty())
     {
-        QnMessageBox::information(this, tr("Information"), tr("These resources are already removed from the system"));
+        QnMessageBox::_warning(this, tr("These devices are removed from the System"));
         return;
     }
 

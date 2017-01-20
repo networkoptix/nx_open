@@ -295,6 +295,21 @@ void QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
     case QnMessageBoxCustomButton::Delete:
         addButton(tr("Delete"), QDialogButtonBox::YesRole);
         break;
+    case QnMessageBoxCustomButton::RestartNow:
+        addButton(tr("Restart Now"), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::RestartLater:
+        addButton(tr("Restart Later"), QDialogButtonBox::NoRole);
+        break;
+    case QnMessageBoxCustomButton::AddStorage:
+        addButton(tr("Add Storage"), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::SetRecordingToAlways:
+        addButton(tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::EnableSecondaryStream:
+        addButton(tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
+        break;
     default:
         NX_ASSERT(false, "Unknown custom button");
         break;

@@ -39,18 +39,19 @@ bool QnSessionAwareTabbedDialog::tryClose( bool force ) {
     if (isHidden() || !hasChanges())
         return true;
 
-    switch (showConfirmationDialog()) {
-    case QDialogButtonBox::Yes:
-        if (!canApplyChanges())
-            return false;   // e.g. cancel was pressed in the confirmation dialog
+    switch (showConfirmationDialog())
+    {
+        case QDialogButtonBox::Yes:
+            if (!canApplyChanges())
+                return false;   // e.g. cancel was pressed in the confirmation dialog
 
-        applyChanges();
-        break;
-    case QDialogButtonBox::No:
-        loadDataToUi();
-        break;
-    default:
-        return false;   // Cancel was pressed
+            applyChanges();
+            break;
+        case QDialogButtonBox::No:
+            loadDataToUi();
+            break;
+        default:
+            return false;   // Cancel was pressed
     }
 
     return true;

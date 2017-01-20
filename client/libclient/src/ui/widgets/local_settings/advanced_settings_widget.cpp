@@ -112,10 +112,9 @@ void QnAdvancedSettingsWidget::at_browseLogsButton_clicked()
 {
     const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
         + lit("/log");
-    if (!QDir(logsLocation).exists()) {
-        QnMessageBox::information(this,
-                                 tr("Information"),
-                                 tr("Folder '%1' does not exist.").arg(logsLocation));
+    if (!QDir(logsLocation).exists())
+    {
+        QnMessageBox::_warning(this, tr("Folder not found"), logsLocation);
         return;
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);

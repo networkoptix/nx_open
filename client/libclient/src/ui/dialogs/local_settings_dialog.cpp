@@ -19,6 +19,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
+#include <utils/common/app_info.h>
+
 QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -97,13 +99,15 @@ void QnLocalSettingsDialog::accept()
 
     if (isRestartRequired())
     {
-        QDialogButtonBox::StandardButton result = QnMessageBox::information(
-            this,
-            tr("Information"),
-            tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
-        switch (result)
+        QnMessageBox dialog(this);
+        dialog.setText(tr("Some changes will take effect only after  Client restart")
+            .arg(QnAppInfo::productNameLong()));
+        dialog.setStandardButtons(QDialogButtonBox::Cancel);
+        dialog.addCustomButton(QnMessageBoxCustomButton::RestartNow);
+        dialog.addCustomButton(QnMessageBoxCustomButton::RestartLater);
+        dialog.setDefaultButton(QDialogButtonBox::Yes);
+
+        switch (dialog.exec())
         {
             case QDialogButtonBox::Cancel:
                 return;

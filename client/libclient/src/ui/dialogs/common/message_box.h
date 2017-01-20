@@ -25,8 +25,16 @@ enum class QnMessageBoxIcon
 
 enum class QnMessageBoxCustomButton
 {
-    Overwrite,      //< Uses QDialogButtonBox::YesRole
-    Delete          //< Uses QDialogButtonBox::YesRole
+    Overwrite,                  //< Uses QDialogButtonBox::YesRole
+    Delete,                     //< Uses QDialogButtonBox::YesRole
+
+    AddStorage,                 //< Uses QDialogButtonBox::YesRole
+
+    RestartNow,                 //< Uses QDialogButtonBox::YesRole
+    RestartLater,               //< Uses QDialogButtonBox::NoRole
+
+    SetRecordingToAlways,       //< Uses QDialogButtonBox::YesRole
+    EnableSecondaryStream,      //< Uses QDialogButtonBox::NoRole
 };
 
 class QnMessageBox: public QnDialog

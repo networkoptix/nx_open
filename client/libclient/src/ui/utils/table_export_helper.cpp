@@ -39,26 +39,24 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
 
             if (QFile::exists(fileName))
             {
-                QDialogButtonBox::StandardButton button = QnMessageBox::information(
-                    parent,
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-                );
+                QnMessageBox dialog(QnMessageBoxIcon::Question,
+                    tr("Overwrite existing file?"), QFileInfo(fileName).completeBaseName(),
+                    QDialogButtonBox::Cancel);
 
-                if (button == QDialogButtonBox::Cancel || button == QDialogButtonBox::No)
+                dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
+                dialog.setDefaultButton(QDialogButtonBox::Yes);
+
+                if (dialog.exec() != QDialogButtonBox::Yes)
                     return;
             }
         }
 
         if (QFile::exists(fileName) && !QFile::remove(fileName))
         {
-            QnMessageBox::critical(
-                parent,
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
-                QDialogButtonBox::Ok
-            );
+            const auto extras = QFileInfo(fileName).completeBaseName() + L'\n'
+                + tr("Close all programs which may use this file and try again");
+
+            QnMessageBox::_warning(parent, tr("File used by another process"), extras);
             continue;
         }
 

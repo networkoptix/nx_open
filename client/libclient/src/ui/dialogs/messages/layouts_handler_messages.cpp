@@ -8,7 +8,7 @@
 
 void QnLayoutsHandlerMessages::layoutAlreadyExists(QWidget* parent)
 {
-    QnSessionAwareMessageBox::warning(parent,
+    QnSessionAwareMessageBox::_warning(parent,
         tr("There is another layout with the same name"),
         tr("You don't have permission to overwrite it."));
 }
