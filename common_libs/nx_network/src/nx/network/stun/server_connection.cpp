@@ -15,7 +15,7 @@ namespace stun {
 
 ServerConnection::ServerConnection(
     StreamConnectionHolder<ServerConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock,
+    std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
     BaseType(socketServer, std::move(sock)),
