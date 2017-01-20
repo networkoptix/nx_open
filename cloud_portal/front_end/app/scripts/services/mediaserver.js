@@ -7,7 +7,7 @@ angular.module('cloudApp')
             return Config.apiBase + '/systems/' + serverId  + '/proxy';
         }
         function direct_gateway(serverId){
-            return Config.gatewayUrl + '/' + serverId;
+            return Config.gatewayUrl + '/' + serverId + '/web';
         }
 
         function emulateResponse(data){
