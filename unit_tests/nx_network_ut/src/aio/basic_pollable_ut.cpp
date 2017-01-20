@@ -4,7 +4,9 @@
 
 #include <nx/network/aio/aio_service.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/pollset_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -199,7 +201,10 @@ protected:
 
     void givenAioServiceWithRegularPollSet()
     {
-
+        PollSetFactory::instance()->disableUdt();
+        m_customAioService = std::make_unique<aio::AIOService>();
+        PollSetFactory::instance()->enableUdt();
+        ASSERT_TRUE(m_customAioService->isInitialized());
     }
 
     void runTest()
@@ -208,7 +213,11 @@ protected:
 
         std::atomic<std::size_t> postCallCounter(0);
 
-        aio::BasicPollable aioObject;
+        std::unique_ptr<aio::BasicPollable> aioObject;
+        if (m_customAioService)
+            aioObject = std::make_unique<aio::BasicPollable>(m_customAioService.get(), nullptr);
+        else
+            aioObject = std::make_unique<aio::BasicPollable>();
 
         int prevCallCounter = -1;
         const auto endTime = std::chrono::steady_clock::now() + testDuration;
@@ -217,7 +226,7 @@ protected:
             if (prevCallCounter != postCallCounter)
             {
                 prevCallCounter = postCallCounter;
-                aioObject.post(
+                aioObject->post(
                     [&postCallCounter]()
                     {
                         ++postCallCounter;
@@ -227,7 +236,7 @@ protected:
             std::this_thread::yield();
         }
 
-        aioObject.pleaseStopSync();
+        aioObject->pleaseStopSync();
 
         m_result.testDuration = testDuration;
         m_result.asyncCallsMade = postCallCounter;
@@ -245,6 +254,7 @@ protected:
 
 private:
     Result m_result;
+    std::unique_ptr<aio::AIOService> m_customAioService;
 };
 
 TEST_F(FtBasicPollable, postPerformance)
