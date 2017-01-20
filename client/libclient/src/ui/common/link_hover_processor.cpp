@@ -91,7 +91,7 @@ void QnLinkHoverProcessor::linkHovered(const QString& href)
     }
 
     /* Find anchor position: */
-    int pos = m_originalText.toHtmlEscaped().indexOf(href.toHtmlEscaped());
+    int pos = m_originalText.indexOf(href);
     if (pos == -1)
         return;
 
