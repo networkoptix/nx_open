@@ -134,10 +134,19 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     return true; //< Just ignore unknown frame type.
 }
 
-bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/)
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    if(++m_emptyPacketCounter > kEmptyPacketThreshold)
-        emit onEOF();
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
+        return true; //< Ignore locally generated packets. It occurs when TCP connection is closed.
+
+    ++m_emptyPacketCounter;
+    if (m_emptyPacketCounter > kEmptyPacketThreshold)
+    {
+        QVideoFramePtr eofPacket(new QVideoFrame());
+        FrameMetadata metadata = FrameMetadata(data);
+        metadata.serialize(eofPacket);
+        enqueueVideoFrame(eofPacket);
+    }
     return true;
 }
 
