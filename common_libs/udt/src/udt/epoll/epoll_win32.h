@@ -14,12 +14,12 @@ typedef struct CustomFdSet
     SOCKET fd_array[kInitialFdSetSize];
 } CustomFdSet;
 
-class CEPollDescWin32:
+class EpollWin32:
     public AbstractEpoll
 {
 public:
-    CEPollDescWin32();
-    virtual ~CEPollDescWin32() override;
+    EpollWin32();
+    virtual ~EpollWin32() override;
 
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
@@ -54,8 +54,8 @@ private:
     void initializeInterruptSocket();
     void freeInterruptSocket();
 
-    CEPollDescWin32(const CEPollDescWin32&) = delete;
-    CEPollDescWin32& operator=(const CEPollDescWin32&) = delete;
+    EpollWin32(const EpollWin32&) = delete;
+    EpollWin32& operator=(const EpollWin32&) = delete;
 };
 
 #endif // _WIN32

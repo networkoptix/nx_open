@@ -1,4 +1,4 @@
-#include "epoll_impl_win32.h"
+#include "epoll_win32.h"
 
 #ifdef _WIN32
 
@@ -49,7 +49,7 @@ static void reallocFdSetIfNeeded(
 
 } // namespace
 
-CEPollDescWin32::CEPollDescWin32():
+EpollWin32::EpollWin32():
     m_interruptionSocket(INVALID_SOCKET),
     m_readfds(allocFDSet(kInitialFdSetSize)),
     m_readfdsCapacity(kInitialFdSetSize),
@@ -62,7 +62,7 @@ CEPollDescWin32::CEPollDescWin32():
     initializeInterruptSocket();
 }
 
-CEPollDescWin32::~CEPollDescWin32()
+EpollWin32::~EpollWin32()
 {
     freeFDSet(m_readfds);
     m_readfds = NULL;
@@ -74,23 +74,23 @@ CEPollDescWin32::~CEPollDescWin32()
     freeInterruptSocket();
 }
 
-void CEPollDescWin32::add(const SYSSOCKET& s, const int* events)
+void EpollWin32::add(const SYSSOCKET& s, const int* events)
 {
     int& eventMask = m_sLocals[s];
     eventMask |= *events;
 }
 
-void CEPollDescWin32::remove(const SYSSOCKET& s)
+void EpollWin32::remove(const SYSSOCKET& s)
 {
     m_sLocals.erase(s);
 }
 
-std::size_t CEPollDescWin32::socketsPolledCount() const
+std::size_t EpollWin32::socketsPolledCount() const
 {
     return m_sLocals.size();
 }
 
-int CEPollDescWin32::poll(
+int EpollWin32::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -137,7 +137,7 @@ int CEPollDescWin32::poll(
     return eventCount;
 }
 
-void CEPollDescWin32::interrupt()
+void EpollWin32::interrupt()
 {
     char buf[128];
     sendto(
@@ -148,7 +148,7 @@ void CEPollDescWin32::interrupt()
         sizeof(m_interruptionSocketLocalAddress));
 }
 
-void CEPollDescWin32::prepareForPolling(
+void EpollWin32::prepareForPolling(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds)
 {
@@ -176,7 +176,7 @@ void CEPollDescWin32::prepareForPolling(
     }
 }
 
-void CEPollDescWin32::prepareOutEvents(
+void EpollWin32::prepareOutEvents(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     bool* receivedInterruptEvent)
@@ -206,7 +206,7 @@ void CEPollDescWin32::prepareOutEvents(
     }
 }
 
-void CEPollDescWin32::initializeInterruptSocket()
+void EpollWin32::initializeInterruptSocket()
 {
     m_interruptionSocket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (m_interruptionSocket < 0)
@@ -247,7 +247,7 @@ void CEPollDescWin32::initializeInterruptSocket()
     }
 }
 
-void CEPollDescWin32::freeInterruptSocket()
+void EpollWin32::freeInterruptSocket()
 {
     if (m_interruptionSocket == INVALID_SOCKET)
         return;

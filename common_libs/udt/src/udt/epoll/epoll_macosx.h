@@ -4,12 +4,12 @@
 
 #ifdef __APPLE__
 
-class CEPollDescMacosx:
+class EpollMacosx:
     public AbstractEpoll
 {
 public:
-    CEPollDescMacosx();
-    virtual ~CEPollDescMacosx() override;
+    EpollMacosx();
+    virtual ~EpollMacosx() override;
 
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;

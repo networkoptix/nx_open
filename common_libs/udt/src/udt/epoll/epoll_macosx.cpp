@@ -1,11 +1,11 @@
-#include "epoll_impl_macosx.h"
+#include "epoll_macosx.h"
 
 #ifdef __APPLE__
 
 #include <unistd.h>
 #include <sys/event.h>
 
-CEPollDescMacosx::CEPollDescMacosx():
+EpollMacosx::EpollMacosx():
     m_kqueueFd(-1)
 {
     m_kqueueFd = kqueue();
@@ -13,12 +13,12 @@ CEPollDescMacosx::CEPollDescMacosx():
         throw CUDTException(-1, 0, errno);
 }
 
-CEPollDescMacosx::~CEPollDescMacosx()
+EpollMacosx::~EpollMacosx()
 {
     ::close(m_kqueueFd);
 }
 
-void CEPollDescMacosx::add(const SYSSOCKET& s, const int* events)
+void EpollMacosx::add(const SYSSOCKET& s, const int* events)
 {
     struct kevent ev[2];
     size_t evCount = 0;
@@ -43,7 +43,7 @@ void CEPollDescMacosx::add(const SYSSOCKET& s, const int* events)
     eventMask |= *events;
 }
 
-void CEPollDescMacosx::remove(const SYSSOCKET& s)
+void EpollMacosx::remove(const SYSSOCKET& s)
 {
     //not calling kevent with two events since if one of them is not being listened, whole kevent call fails
     struct kevent ev;
@@ -55,12 +55,12 @@ void CEPollDescMacosx::remove(const SYSSOCKET& s)
     m_sLocals.erase(s);
 }
 
-std::size_t CEPollDescMacosx::socketsPolledCount() const
+std::size_t EpollMacosx::socketsPolledCount() const
 {
     return m_sLocals.size();
 }
 
-int CEPollDescMacosx::poll(
+int EpollMacosx::poll(
     std::map<SYSSOCKET, int>* lrfds,
     std::map<SYSSOCKET, int>* lwfds,
     std::chrono::microseconds timeout)
@@ -108,7 +108,7 @@ int CEPollDescMacosx::poll(
     return nfds;
 }
 
-void CEPollDescMacosx::interrupt()
+void EpollMacosx::interrupt()
 {
     // TODO
 }

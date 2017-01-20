@@ -4,12 +4,12 @@
 
 #ifdef __linux__
 
-class CEPollDescLinux:
+class EpollLinux:
     public AbstractEpoll
 {
 public:
-    CEPollDescLinux();
-    virtual ~CEPollDescLinux() override;
+    EpollLinux();
+    virtual ~EpollLinux() override;
     
     virtual void add(const SYSSOCKET& s, const int* events) override;
     virtual void remove(const SYSSOCKET& s) override;
