@@ -3,6 +3,7 @@
 #ifdef __linux__
 
 #include <unistd.h>
+#include <string.h>
 #include <sys/epoll.h>
 
 #ifndef EPOLLRDHUP
@@ -64,7 +65,6 @@ int CEPollDescLinux::doSystemPoll(
     epoll_event ev[max_events];
     int nfds = ::epoll_wait(m_iLocalID, ev, max_events, 0);
 
-    CGuard lk(m_EPollLock);
     int total = 0;
     for (int i = 0; i < nfds; ++i)
     {
@@ -76,27 +76,6 @@ int CEPollDescLinux::doSystemPoll(
             ++total;
         }
         if ((NULL != lwfds) && (ev[i].events & EPOLLOUT))
-        {
-            //hangup - is an error when connecting, so adding error flag just for case
-            lwfds->emplace(
-                (SYSSOCKET)ev[i].data.fd,
-                int(ev[i].events | (hangup ? UDT_EPOLL_ERR : 0)));
-            ++total;
-        }
-
-        if (ev[i].events & (EPOLLIN | EPOLLOUT))
-            continue;
-
-        //event has not been returned yet
-        if (lrfds != NULL &&
-            m_sUDTSocksIn.find(ev[i].data.fd) != m_sUDTSocksIn.end())
-        {
-            lrfds->emplace((SYSSOCKET)ev[i].data.fd, (int)ev[i].events);
-            ++total;
-        }
-
-        if (lwfds != NULL &&
-            m_sUDTSocksOut.find(ev[i].data.fd) != m_sUDTSocksOut.end())
         {
             //hangup - is an error when connecting, so adding error flag just for case
             lwfds->emplace(
