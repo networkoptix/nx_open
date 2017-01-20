@@ -6,7 +6,7 @@
 
 #include "aio/pollset_factory.h"
 
-const std::chrono::seconds kReloadDebugConfigurationInterval(10);
+const std::chrono::seconds kReloadDebugConfigInterval(10);
 
 namespace nx {
 namespace network {
@@ -94,7 +94,7 @@ void SocketGlobals::init(int initializationFlags)
         s_initState = InitState::done;
 
         lock.unlock();
-        s_instance->setDebugConfigurationTimer();
+        s_instance->setDebugConfigTimer();
     }
 }
 
@@ -144,14 +144,14 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
         init();
 }
 
-void SocketGlobals::setDebugConfigurationTimer()
+void SocketGlobals::setDebugConfigTimer()
 {
     m_debugConfigTimer->start(
-        kReloadDebugConfigurationInterval,
+        kReloadDebugConfigInterval,
         [this]()
         {
             m_debugConfig.reload(utils::FlagConfig::OutputType::silent);
-            setDebugConfigurationTimer();
+            setDebugConfigTimer();
         });
 }
 
