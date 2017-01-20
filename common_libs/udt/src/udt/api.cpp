@@ -1230,10 +1230,11 @@ void CUDTUnited::checkBrokenSockets()
    // Removing multiplexer with no mutex locked since it implies waiting for send/receive thread to exit
    for (auto& multiplexer: multiplexersToRemove)
    {
-      delete multiplexer.m_pSndQueue;
-      delete multiplexer.m_pRcvQueue;
-      delete multiplexer.m_pTimer;
-      delete multiplexer.m_pChannel;
+       multiplexer.m_pChannel->shutdown();
+       delete multiplexer.m_pSndQueue;
+       delete multiplexer.m_pRcvQueue;
+       delete multiplexer.m_pTimer;
+       delete multiplexer.m_pChannel;
    }
 }
 
@@ -1400,6 +1401,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET*
    }
    catch (CUDTException& e)
    {
+      m.m_pChannel->shutdown();
       delete m.m_pChannel;
       throw e;
    }

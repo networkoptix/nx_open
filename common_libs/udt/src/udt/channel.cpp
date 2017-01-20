@@ -182,20 +182,6 @@ void CChannel::setUDPSockOpt()
    #endif
 }
 
-void CChannel::closeSocket()
-{
-    if (m_iSocket == INVALID_SOCKET)
-        return;
-
-   #ifndef _WIN32
-      ::close(m_iSocket);
-   #else
-      ::closesocket(m_iSocket);
-   #endif
-
-    m_iSocket = INVALID_SOCKET;
-}
-
 int CChannel::getSndBufSize()
 {
    socklen_t size = sizeof(socklen_t);
@@ -347,4 +333,30 @@ int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
    }
 
    return packet.getLength();
+}
+
+int CChannel::shutdown()
+{
+    if (m_iSocket == INVALID_SOCKET)
+        return 0;
+
+#ifdef _WIN32
+    return ::shutdown(m_iSocket, SD_BOTH);
+#else
+    return ::shutdown(m_iSocket, SHUT_RDWR);
+#endif
+}
+
+void CChannel::closeSocket()
+{
+    if (m_iSocket == INVALID_SOCKET)
+        return;
+
+#ifndef _WIN32
+    ::close(m_iSocket);
+#else
+    ::closesocket(m_iSocket);
+#endif
+
+    m_iSocket = INVALID_SOCKET;
 }
