@@ -53,7 +53,7 @@ public:
     typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
     static Config& config() { return s_instance->m_config; }
-    static DebugConfiguration& debugConfiguration() { return s_instance->m_debugConfiguration; }
+    static DebugConfiguration& debugConfig() { return s_instance->m_debugConfig; }
     static aio::AIOService& aioService() { return *s_instance->m_aioService; }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
@@ -111,7 +111,7 @@ private:
 
     const int m_initializationFlags;
     Config m_config;
-    DebugConfiguration m_debugConfiguration;
+    DebugConfiguration m_debugConfig;
     std::shared_ptr<QnLog::Logs> m_log;
 
     // Is unique_ptr because it should be initiated after m_aioService but removed after.
@@ -119,7 +119,7 @@ private:
 
     aio::PollSetFactory m_pollSetFactory;
     std::unique_ptr<aio::AIOService> m_aioService;
-    std::unique_ptr<aio::Timer> m_debugConfigurationTimer;
+    std::unique_ptr<aio::Timer> m_debugConfigTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;

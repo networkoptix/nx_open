@@ -507,37 +507,6 @@ static int freeGB(QString drive)
 }
 #endif
 
-nx::mserver_aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
-    m_mediaFolderName(mediaFolderName)
-{}
-
-QString nx::mserver_aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
-{
-    if (!url.endsWith(m_mediaFolderName))
-        return url;
-
-    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
-    NX_ASSERT(indexBeforeMediaFolderName > 0);
-    if (indexBeforeMediaFolderName <= 0)
-        return url;
-
-    return url.mid(0, indexBeforeMediaFolderName);
-}
-
-QnStorageResourceList nx::mserver_aux::UnmountedStoragesFilter::getUnmountedStorages(
-        const QnStorageResourceList& allStorages,
-        const QStringList& paths)
-{
-    QnStorageResourceList result;
-    for (const auto& storage: allStorages)
-    {
-        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
-            result.append(storage);
-    }
-
-    return result;
-}
-
 static QStringList listRecordFolders()
 {
     QStringList folderPaths;

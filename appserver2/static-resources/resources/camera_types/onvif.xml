@@ -23,5 +23,6 @@
 				<param name="VideoLayout" default_value="width=5;height=1;sensors=0,1,2,3,4"/>
 			</params>
 		</resource>
+        <resource name="Hikvision"/>
     </oem>
 </resources>

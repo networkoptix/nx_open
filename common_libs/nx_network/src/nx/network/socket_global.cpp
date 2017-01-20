@@ -57,7 +57,7 @@ SocketGlobals::~SocketGlobals()
     nx::utils::promise< void > promise;
     {
         utils::BarrierHandler barrier([&](){ promise.set_value(); });
-        m_debugConfigurationTimer->pleaseStop(barrier.fork());
+        m_debugConfigTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
         //m_mediatorConnector->pleaseStop(barrier.fork());
@@ -146,11 +146,11 @@ void SocketGlobals::customInit(CustomInit init, CustomDeinit deinit)
 
 void SocketGlobals::setDebugConfigurationTimer()
 {
-    m_debugConfigurationTimer->start(
+    m_debugConfigTimer->start(
         kReloadDebugConfigurationInterval,
         [this]()
         {
-            m_debugConfiguration.reload(utils::FlagConfig::OutputType::silent);
+            m_debugConfig.reload(utils::FlagConfig::OutputType::silent);
             setDebugConfigurationTimer();
         });
 }
@@ -165,7 +165,7 @@ void SocketGlobals::initializeCloudConnectivity()
         m_mediatorConnector->clientConnection());
     m_addressResolver = std::make_unique<cloud::AddressResolver>(
         m_mediatorConnector->clientConnection());
-    m_debugConfigurationTimer = std::make_unique<aio::Timer>();
+    m_debugConfigTimer = std::make_unique<aio::Timer>();
 }
 
 QnMutex SocketGlobals::s_mutex;

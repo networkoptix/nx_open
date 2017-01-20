@@ -75,19 +75,24 @@ TEST_F(UnmountedStoragesFilterTest , main)
 {
     QString url1 = lit("/media/stor1/") + mediaFolderName;
     QString url2 = lit("/opt/mediaserver/data");
+    QString url3 = lit("/some/other/data/") + mediaFolderName;
+    QString url4 = lit("/media/stor2/");
 
     QnStorageResourceList storages;
     storages.append(storageTestHelper.createStorage(url1, spaceLimit));
     storages.append(storageTestHelper.createStorage(url2, spaceLimit));
+    storages.append(storageTestHelper.createStorage(url3, spaceLimit));
+    storages.append(storageTestHelper.createStorage(url4, spaceLimit));
 
     QStringList paths;
-    paths << url2;
+    paths << url2 << url3;
 
     auto unmountedStorages = unmountedFilter.getUnmountedStorages(storages, paths);
-    ASSERT_EQ(unmountedStorages.size(), 1);
+    ASSERT_EQ(unmountedStorages.size(), 2);
     ASSERT_TRUE(unmountedStorages[0]->getUrl() == url1);
+    ASSERT_TRUE(unmountedStorages[1]->getUrl() == url4);
 
-    paths << lit("/media/stor1");
+    paths << lit("/media/stor1") << url4;
 
     unmountedStorages = unmountedFilter.getUnmountedStorages(storages, paths);
     ASSERT_EQ(unmountedStorages.size(), 0);

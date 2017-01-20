@@ -10,7 +10,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+    if (nx::network::SocketGlobals::debugConfig().multipleServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 

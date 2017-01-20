@@ -65,6 +65,7 @@ QSqlDatabase* DbConnectionHolder::dbConnection()
 void DbConnectionHolder::close()
 {
     m_dbConnection.close();
+    m_dbConnection = QSqlDatabase();
     QSqlDatabase::removeDatabase(m_connectionName);
 }
 
