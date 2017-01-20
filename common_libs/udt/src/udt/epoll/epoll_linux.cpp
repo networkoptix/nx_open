@@ -37,6 +37,7 @@ EpollLinux::EpollLinux():
         m_epollFd = -1;
         ::close(m_interruptEventFd);
         m_interruptEventFd = -1;
+        throw CUDTException(-1, 0, errno);
     }
 }
 
@@ -104,7 +105,7 @@ int EpollLinux::poll(
     if (isTimeoutSpecified)
         systemTimeout = duration_cast<milliseconds>(timeout).count();
 
-    int nfds = ::epoll_wait(
+    const int nfds = ::epoll_wait(
         m_epollFd,
         ev,
         max_events,
