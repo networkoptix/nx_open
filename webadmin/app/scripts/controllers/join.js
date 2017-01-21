@@ -124,6 +124,18 @@ angular.module('webadminApp')
                         return;
                     }
                 }
+                if(r.data.reply.cloudSystemId && Config.cloud.systemId){
+                    dialogs.alert(L.join.cloudBothError);
+                    return;
+                }
+
+                if(r.data.reply.cloudSystemId){
+                    $scope.settings.keepMySystem = false;
+                }
+                if(Config.cloud.systemId){
+                    $scope.settings.keepMySystem = true;
+                }
+
                 $scope.systems.systemFound = true;
                 $scope.systems.joinSystemName = r.data.reply.systemName;
                 $scope.systems.remoteSystemIsNew = r.data.reply.serverFlags.indexOf(Config.newServerFlag)>=0;
