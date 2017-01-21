@@ -370,19 +370,19 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     {
-        CAtlString params, fromFile, versionPath, versionName;
+        CAtlString params, fromDir, fromFile, versionPath, versionName;
         params = GetProperty(hInstall, L"CustomActionData");
 
         // Extract "from" and "to" files from filesString
         int curPos = 0;
-        fromFile = params.Tokenize(_T(";"), curPos);
+        fromDir = params.Tokenize(_T(";"), curPos);
         versionPath = params.Tokenize(_T(";"), curPos);
         versionName = params.Tokenize(_T(";"), curPos);
 
         CString localAppDataFolder = GetAppDataLocalFolderPath();
-        fromFile.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+        fromDir.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
-        WcaLog(LOGMSG_STANDARD, "DB file: %S", fromFile);
+        WcaLog(LOGMSG_STANDARD, "DB dir: %S", fromDir);
         CRegKey key;
         static const int MAX_VERSION_SIZE = 50;
         TCHAR szBuffer[MAX_VERSION_SIZE + 1];
@@ -403,6 +403,11 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
             key.Close();
 
             if (!version.IsEmpty()) {
+                fromFile = fromDir + "\\ecs.sqlite";
+                WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
+                CopyFile(fromFile, fromFile + "." + version, FALSE);
+
+                fromFile = fromDir + "\\mserver.sqlite";
                 WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
                 CopyFile(fromFile, fromFile + "." + version, FALSE);
             }

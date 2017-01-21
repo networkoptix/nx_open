@@ -36,6 +36,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
 
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
+    static_cast<void>(sessionDelegate); //< Debug?
 
     //TODO: #GDM #future
     /*
@@ -187,7 +188,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
 }
 
-bool QnWorkbenchNotificationsHandler::tryClose(bool force)
+bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
 {
     clear();
     return true;

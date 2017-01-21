@@ -66,20 +66,8 @@ TEST(Random, Numbers)
 
     testNumberGeneration<uint64_t>(
         0, std::numeric_limits<uint64_t>::max(), 100,
-        [](uint64_t a) { return a > std::numeric_limits<uint64_t>::max() / 2; },
-        [](uint64_t a) { return a < std::numeric_limits<uint64_t>::max() / 2; });
-}
-
-TEST(Random, Array)
-{
-    const auto array = nx::utils::random::word(10);
-    ASSERT_EQ(10, array.size());
-
-    for (const auto& number: array)
-    {
-        ASSERT_GE(number, 'a');
-        ASSERT_LE(number, 'z');
-    }
+        [](uint64_t a) { return a > (std::numeric_limits<uint64_t>::max() / 10) * 8; },
+        [](uint64_t a) { return a < (std::numeric_limits<uint64_t>::max() / 10) * 2; });
 }
 
 } // namespace test

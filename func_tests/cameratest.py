@@ -9,6 +9,7 @@ from pycommons.ComparisonMixin import ComparisonMixin
 from pycommons.TestCamera import TestCameraMixin
 from pycommons.Utils import secs2str
 from pycommons.Logger import log, LOGLEVEL
+from pycommons.HlsClient import HlsClient
 
 WAIT_CHUNK = 2*60
 
@@ -22,7 +23,7 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
     # Test suites
     _suites = (
           ('VirtualCameraSuits', [
-        'testCameraHistory',
+        'testCameraHistory'
           ]),
       )
 
@@ -113,3 +114,14 @@ class VirtualCameraTest(FuncTestCase, TestCameraMixin):
             [serverGuid1, serverGuid2, serverGuid1])
 
         self.stopCameraRecording(self.serverAddr1, serverGuid1)
+
+        # https://networkoptix.atlassian.net/browse/VMS-4180
+        # HLS m3u list request with duration
+        client = HlsClient(timeout = 30.0)
+        response = client.requestM3U(
+            self.serverAddr1,
+            "{%s}" % self.guids[0], self.cameraData, duration = 3000)
+        
+        self.assertTrue(len(response.m3uList) > 0,
+          "Unexpected M3U playlist size: %d" % len(response.m3uList))
+        

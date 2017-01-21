@@ -7,6 +7,7 @@
 #include "transaction/transaction.h"
 #include <core/resource_management/resource_pool.h>
 #include "nx_ec/data/api_conversion_functions.h"
+#include <nx/utils/log/log.h>
 
 
 namespace ec2
@@ -16,7 +17,11 @@ namespace ec2
     public:
         QnResourceNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) 
+        {
+            NX_LOG(lit("%1 Emit statusChanged signal for id %2")
+                    .arg(QString::fromLatin1(Q_FUNC_INFO))
+                    .arg(tran.params.id.toString()), cl_logDEBUG2);
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
         }
 

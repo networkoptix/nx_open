@@ -1,20 +1,14 @@
-/**********************************************************
-* 26 feb 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef DUMMY_SOCKET_H
-#define DUMMY_SOCKET_H
+#pragma once 
 
 #include <nx/network/abstract_socket.h>
-
 
 namespace nx {
 namespace network {
 
-//!Base class for socket, reading/writing data from/to any source (e.g., file)
-class DummySocket
-:
+/**
+ * Base class for socket, reading/writing data from/to any source (e.g., file).
+ */
+class NX_NETWORK_API DummySocket:
     public AbstractStreamSocket
 {
 public:
@@ -84,33 +78,5 @@ private:
     SocketAddress m_remotePeerAddress;
 };
 
-//!Reads data from buffer. Sent data is ignored
-class BufferSocket
-:
-    public DummySocket
-{
-public:
-    BufferSocket( const std::string& data );
-
-    virtual bool close() override;
-    virtual bool shutdown() override;
-    virtual bool isClosed() const override;
-
-    virtual bool connect(
-        const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
-
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
-    virtual int send( const void* buffer, unsigned int bufferLen ) override;
-    virtual bool isConnected() const override;
-
-private:
-    const std::string& m_data;
-    bool m_isOpened;
-    size_t m_curPos;
-};
-
-}   //network
-}   //nx
-
-#endif  //DUMMY_SOCKET_H
+} // namespace network
+} // namespace nx

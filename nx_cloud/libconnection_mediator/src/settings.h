@@ -4,6 +4,10 @@
 #include <list>
 #include <map>
 
+#include <boost/optional.hpp>
+
+#include <QtCore/QUrl> 
+
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
@@ -27,7 +31,7 @@ struct General
 struct CloudDB
 {
     bool runWithCloud;
-    QString endpoint;
+    boost::optional<QUrl> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval;
@@ -94,7 +98,7 @@ public:
     /**
      * Loads settings from both command line and conf file (or win32 registry).
      */
-    void load(int argc, char **argv);
+    void load(int argc, const char **argv);
     void printCmdLineArgsHelp();
 
 private:

@@ -1,12 +1,6 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "udp_message_response_sender.h"
 
 #include "udp_server.h"
-
 
 namespace nx {
 namespace stun {
@@ -56,5 +50,10 @@ AbstractCommunicatingSocket* UDPMessageResponseSender::socket()
     return m_udpServer->socket().get();
 }
 
-}   //stun
-}   //nx
+void UDPMessageResponseSender::close()
+{
+    // Doing nothing, since it is UDP.
+}
+
+} // namespace stun
+} // namespace nx

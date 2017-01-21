@@ -5,6 +5,7 @@
 import time, sys, string, traceback, StringIO, thread, os, codecs, types, Utils
 from threading import Lock, currentThread
 
+
 if sys.platform != 'win32':
     import syslog
 
@@ -40,6 +41,9 @@ class LOGLEVEL:
             return "DEBUG%d" % (level - cls.DEBUG)
         return cls._printNames[level if level >= 0 else 0]
 
+def getThreadName():
+    return currentThread().getName()
+
 def makePrefix(level, useTime):
     if useTime:
         t = time.time()
@@ -47,7 +51,7 @@ def makePrefix(level, useTime):
         timeStr = '%s.%03d ' % (time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(t)), ms)
     else:
         timeStr = ''
-    threadName = currentThread().getName()
+    threadName = getThreadName()
     return '%s[%s] [%s]' % (timeStr, threadName, LOGLEVEL.str(level))
     #return '%s[%s|%d-%d] %02d' % (timeStr, threadName, os.getpid(), thread.get_ident(), level)
     #return '%s[%d][%s] %02d' % (timeStr, os.getpid(), threadName, level)

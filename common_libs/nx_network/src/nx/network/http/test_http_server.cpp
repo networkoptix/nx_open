@@ -60,7 +60,7 @@ TestHttpServer::TestHttpServer():
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStop();
+    m_httpServer->pleaseStopSync();
 }
 
 bool TestHttpServer::bindAndListen()

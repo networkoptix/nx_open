@@ -135,21 +135,25 @@ private:
 #define GET_NX_LOG_MACRO(_1, _2, _3, NAME, ...) NAME
 #define NX_LOG(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOG_3, NX_LOG_2)(__VA_ARGS__))
 
-#define NX_LOG_2(msg, level)                    \
-    if( auto _nx_logs = QnLog::logs() )         \
-    {                                           \
-        auto& _nx_log = _nx_logs->get();        \
-        if( level <= _nx_log->logLevel() )      \
-            _nx_log->log( msg, level );         \
-    }
+#define NX_LOG_2(msg, level) do                     \
+    {                                               \
+        if (auto _nx_logs = QnLog::logs())          \
+        {                                           \
+            auto& _nx_log = _nx_logs->get();        \
+            if (level <= _nx_log->logLevel())       \
+                _nx_log->log(msg, level);           \
+        }                                           \
+    } while (0)
 
-#define NX_LOG_3(logID, msg, level)             \
-    if( auto _nx_logs = QnLog::logs() )         \
-    {                                           \
-        auto& _nx_log = _nx_logs->get( logID ); \
-        if( level <= _nx_log->logLevel() )      \
-            _nx_log->log( msg, level );         \
-    }
+#define NX_LOG_3(logID, msg, level) do              \
+    {                                               \
+        if (auto _nx_logs = QnLog::logs())          \
+        {                                           \
+            auto& _nx_log = _nx_logs->get(logID);   \
+            if (level <= _nx_log->logLevel())       \
+                _nx_log->log(msg, level);           \
+        }                                           \
+    } while (0)
 
 #define NX_CLASS_NAME QString::fromStdString(boost::core::demangle(typeid(*this).name()))
 #define NX_OBJECT_MESSAGE lm("%1(%2) %3").arg(NX_CLASS_NAME).arg(this)

@@ -23,6 +23,7 @@ const QString kLocalParam(lit("local"));
 const QString kFormatParam(lit("format"));
 const QString kDeprecatedPhysicalIdParam(lit("physicalId"));
 const QString kDeprecatedMacParam(lit("mac"));
+const QString kDeprecatedIdParam(lit("id"));
 const QString kCameraIdParam(lit("cameraId"));
 const QString kLimitParam(lit("limit"));
 const QString kFlatParam(lit("flat"));
@@ -75,7 +76,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
     QnLexical::deserialize(params.value(kFormatParam), &request.format);
 
     nx::camera_id_helper::findAllCamerasByFlexibleIds(&request.resList, params,
-        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
+        {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
     return request;
 }

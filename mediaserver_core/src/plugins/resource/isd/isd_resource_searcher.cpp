@@ -427,9 +427,10 @@ bool QnPlISDResourceSearcher::processPacket(
     QAuthenticator cameraAuth;
 
     if ( existingRes )
-    {
         cameraMAC = existingRes->getMAC();
 
+    if (existingRes && existingRes->getStatus() >= Qn::Online)
+    {
         auto existAuth = existingRes->getAuth();
         cameraAuth = existAuth;
     }

@@ -147,40 +147,37 @@ int QnUpdateInformationRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
-    Q_UNUSED(path)
+    const auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
+
+    QnMultiserverRequestContext<QnEmptyRequestData> context(
+        request, processor->owner()->getPort());
 
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
         QnUpdateFreeSpaceReply reply;
-
-        auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
-        QnMultiserverRequestContext<QnEmptyRequestData> context(
-            request, processor->owner()->getPort());
-
         const auto moduleGuid = qnCommon->moduleGUID();
-
         reply.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)
             loadFreeSpaceRemotely(path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+        return nx_http::StatusCode::ok;
     }
     else if (path.endsWith(lit("/checkCloudHost")))
     {
         QnCloudHostCheckReply reply;
-
-        auto request = QnMultiserverRequestData::fromParams<QnEmptyRequestData>(params);
-        QnMultiserverRequestContext<QnEmptyRequestData> context(
-            request, processor->owner()->getPort());
-
         reply.cloudHost = qnGlobalSettings->cloudHost();
 
         if (!request.isLocal)
             checkCloudHostRemotely(path, reply, &context);
 
         QnFusionRestHandlerDetail::serialize(reply, result, contentType, request.format);
+        return nx_http::StatusCode::ok;
     }
 
-    return nx_http::StatusCode::ok;
+    return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+        lit("Unknown operation"),
+        &result, &contentType, request.format, request.extraFormatting,
+        QnRestResult::CantProcessRequest);
 }

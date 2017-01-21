@@ -28,7 +28,10 @@ angular.module('webadminApp')
             return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
                 var data = r.data.reply;
                 if(!Config.cloud.portalUrl) {
+                    Config.cloud.host = data.cloudHost;
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                    Config.cloud.systemId = data.cloudSystemId;
+                    Config.protoVersion = data.protoVersion;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){
@@ -467,7 +470,7 @@ angular.module('webadminApp')
                 return cacheCurrentUser;
             },
             getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime');
+                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');

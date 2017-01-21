@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 
+#include "abstract_pollset.h"
 #include "event_type.h"
 #include "nx/network/abstract_socket.h"
 #include "nx/network/system_socket.h"
@@ -116,7 +117,7 @@ public:
      * will be present as a single element when iterating.
      * @note Invalidates iterators.
      */
-    int poll(int millisToWait = INFINITE_TIMEOUT);
+    int poll(int millisToWait = kInfiniteTimeout);
     int poll(std::chrono::milliseconds timeout) { return poll(timeout.count()); }
 
     /**

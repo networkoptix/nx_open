@@ -152,7 +152,7 @@
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="BackupDatabaseFile_Cmd" Property="BackupDatabaseFile" Execute="immediate"
-                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}\ecs.sqlite;Software\[Manufacturer]\version;"/>
+                      Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name};Software\[Manufacturer]\version;"/>
 
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate"
                       Value="#LocalAppDataFolder#\${company.name}\${mediaserver.name}"/>

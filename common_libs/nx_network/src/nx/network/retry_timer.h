@@ -80,12 +80,14 @@ public:
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    /** Returns \a false, if maximum retries have been done */
+    /** Returns false, if maximum retries have been done. */
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
 
+    unsigned int retriesLeft() const;
+    boost::optional<std::chrono::nanoseconds> timeToEvent() const;
     std::chrono::milliseconds currentDelay() const;
 
-    /** Resets internal state to default values */
+    /** Resets internal state to default values. */
     void reset();
 
 protected:

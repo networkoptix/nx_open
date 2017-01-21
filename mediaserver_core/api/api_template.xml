@@ -394,7 +394,7 @@
                             <name>cameraId</name>
                             <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
                                  MAC address (not supported for certain cameras).
-                                 Parameter can be used several times to define a list of cameras.</description>
+                                 This parameter can be used several times to define a list of cameras.</description>
                             <optional>false</optional>
                         </param>
                         <param>

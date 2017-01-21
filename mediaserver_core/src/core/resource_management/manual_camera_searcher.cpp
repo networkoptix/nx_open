@@ -28,6 +28,42 @@ static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROG
 
 namespace {
 
+    bool strictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
+    {
+        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+        existResList = existResList.filtered(
+            [&netRes](const QnNetworkResourcePtr& existRes)
+        {
+            bool sameParent = netRes->getParentId() == existRes->getParentId();
+            return sameParent && existRes->getStatus() != Qn::Offline;
+        });
+
+        for (const QnNetworkResourcePtr& existRes: existResList)
+        {
+            QnSecurityCamResourcePtr existCam = existRes.dynamicCast<QnSecurityCamResource>();
+            if (!existCam)
+                continue;
+
+            bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+            bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
+            if (newIsRtsp && !existIsRtsp)
+                return false; //< allow to stack RTSP and non RTSP cameras with same IP:port
+
+            if (!existCam->isManuallyAdded())
+                return true; //< block manual and auto camera at same IP
+
+            if (existRes->getTypeId() != netRes->getTypeId())
+            {
+                // allow several manual cameras with the same IP if cameras have different ports
+                QUrl url1(existRes->getUrl());
+                QUrl url2(netRes->getUrl());
+                if (url1.port() == url2.port())
+                    return true; //< camera found by different drivers with the same port
+            }
+        }
+        return false;
+    }
+
     QnManualResourceSearchEntry entryFromCamera(const QnSecurityCamResourcePtr &camera)
     {
         return QnManualResourceSearchEntry(
@@ -36,7 +72,8 @@ namespace {
             , qnResTypePool->getResourceType(camera->getTypeId())->getName()
             , camera->getVendor()
             , camera->getUniqueId()
-            , false
+            , QnResourceDiscoveryManager::findSameResource(camera)
+              || strictNewManualCameraByIP(camera)
             );
     }
 
