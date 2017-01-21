@@ -189,7 +189,7 @@ int QnUserRolesSettingsModel::rowCount(const QModelIndex& parent) const
 
 QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() >= m_userRoles.size())
+    if (!index.isValid() || (size_t) index.row() >= m_userRoles.size())
         return QVariant();
 
     auto userRole = m_userRoles[index.row()];

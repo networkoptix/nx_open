@@ -10,7 +10,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 
-#include "aio/pollset.h"
+#include "aio/event_type.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
@@ -20,6 +20,9 @@
 // forward
 namespace nx {
 namespace network {
+
+class Pollable;
+
 namespace aio {
 
 class AbstractAioThread;

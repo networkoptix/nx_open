@@ -172,6 +172,14 @@ class ECConnectionNotificationManager;
             );
         }
 
+        ErrorCode saveSync(const QnUuid& resourceId, const ec2::ApiResourceParamDataList& properties)
+        {
+            ApiResourceParamWithRefDataList kvPairs;
+            for (const auto& p: properties)
+                kvPairs.push_back(ApiResourceParamWithRefData(resourceId, p.name, p.value));
+            ApiResourceParamWithRefDataList dummy;
+            return saveSync(kvPairs, &dummy);
+        }
 
         //!Convenient method to remove resource of any type
         /*!

@@ -510,15 +510,8 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     {
         ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
-                camera.coreData
+                camera.coreData, camera.properties
             );
-        if (errCode == ec2::ErrorCode::ok)
-        {   // Camera has successfully been added to the resource pool and propagated
-            // to other peers. Adding properties.
-            for (const auto &prop : camera.properties)
-                propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
-            propertyDictionary->saveParams(camera.coreData.id);
-        }
     }
 
     updateCameraHistory();
@@ -1027,7 +1020,7 @@ void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo 
         else if (keyValue.first.contains(kArchiveCameraUrlKey))
             newCamera.coreData.url = keyValue.second;
         else
-            newCamera.properties.emplace_back(cameraGuid, keyValue.first, keyValue.second);
+            newCamera.properties.emplace_back(keyValue.first, keyValue.second);
     }
 
     archiveCameraList.push_back(newCamera);
@@ -2161,19 +2154,24 @@ void QnStorageManager::writeCameraInfoFiles()
 
         auto composeInfoFileData  = [] (const QnSecurityCamResourcePtr& camResource)
         {
-            auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
+            auto formatStringForConfig = [](QString s)
+            {
+                QRegExp symbolsToRemove("\\n|\\r");
+                s.replace(symbolsToRemove, QString());
+                return lit("\"") + s + lit("\"");
+            };
 
             QByteArray result;
             QTextStream outStream(&result);
 
-            outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraNameKey) << "=" << formatStringForConfig(camResource->getUserDefinedName()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraModelKey) << "=" << formatStringForConfig(camResource->getModel()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraGroupIdKey) << "=" << formatStringForConfig(camResource->getGroupId()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraGroupNameKey) << "=" << formatStringForConfig(camResource->getGroupName()) << endl;
+            outStream << formatStringForConfig(kArchiveCameraUrlKey) << "=" << formatStringForConfig(camResource->getUrl()) << endl;
 
             for (const auto &prop : camResource->getAllProperties())
-                outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
+                outStream << formatStringForConfig(prop.name) << "=" << formatStringForConfig(prop.value) << endl;
 
             return result;
         };

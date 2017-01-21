@@ -184,7 +184,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aspectRatio = defaultAspectRatio();
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
-        this, [this, itemId = item->uuid()](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        this, [this, itemId = item->uuid()](
+            const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
         {
             if (id != itemId)
                 return;

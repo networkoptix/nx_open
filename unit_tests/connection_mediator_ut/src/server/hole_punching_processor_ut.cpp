@@ -29,7 +29,7 @@ class FtHolePunchingProcessor:
     public MediatorFunctionalTest
 {
 public:
-    enum StartPolicy
+    enum class StartPolicy
     {
         immediately,
         delayed,
@@ -37,7 +37,7 @@ public:
 
     FtHolePunchingProcessor(StartPolicy startPolicy = StartPolicy::immediately)
     {
-        if (startPolicy == immediately)
+        if (startPolicy == StartPolicy::immediately)
         {
             NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
         }
@@ -345,7 +345,7 @@ public:
             &m_listeningPeerPool,
             &m_statisticsCollector)
     {
-        char* args[] = {
+        const char* args[] = {
             "--cloudConnect/connectionAckAwaitTimeout=0s",
             "--cloudConnect/connectionResultWaitTimeout=1000m"  //< Equivalent of inifinite session.
         };

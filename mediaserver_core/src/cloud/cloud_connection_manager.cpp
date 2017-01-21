@@ -65,6 +65,58 @@ boost::optional<nx::hpm::api::SystemCredentials>
     return cloudCredentials;
 }
 
+void CloudConnectionManager::setCloudCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    if (cloudSystemId == m_cloudSystemId &&
+        cloudAuthKey == m_cloudAuthKey)
+    {
+        return;
+    }
+
+    m_cloudSystemId = cloudSystemId;
+    m_cloudAuthKey = cloudAuthKey;
+    const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
+    if (!boundToCloud)
+    {
+        m_cloudSystemId.clear();
+        m_cloudAuthKey.clear();
+    }
+
+    lock.unlock();
+
+    if (boundToCloud)
+    {
+        nx::hpm::api::SystemCredentials credentials(
+            cloudSystemId.toUtf8(),
+            qnCommon->moduleGUID().toSimpleString().toUtf8(),
+            cloudAuthKey.toUtf8());
+
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(std::move(credentials));
+
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
+    }
+    else
+    {
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(boost::none);
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+    }
+
+    if (!boundToCloud)
+        detachSystemFromCloud();
+
+    emit cloudBindingStatusChanged(boundToCloud);
+    if (boundToCloud)
+        emit connectedToCloud();
+    else
+        emit disconnectedFromCloud();
+}
+
 bool CloudConnectionManager::boundToCloud() const
 {
     QnMutexLocker lk(&m_mutex);
@@ -183,52 +235,7 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::cloudSettingsChanged()
 {
-    const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
-    const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
-
-    QnMutexLocker lk(&m_mutex);
-    if (cloudSystemId == m_cloudSystemId &&
-        cloudAuthKey == m_cloudAuthKey)
-    {
-        return;
-    }
-
-    m_cloudSystemId = cloudSystemId;
-    m_cloudAuthKey = cloudAuthKey;
-    const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
-    if (!boundToCloud)
-    {
-        m_cloudSystemId.clear();
-        m_cloudAuthKey.clear();
-    }
-
-    lk.unlock();
-
-    if (boundToCloud)
-    {
-        nx::hpm::api::SystemCredentials credentials(
-            cloudSystemId.toUtf8(),
-            qnCommon->moduleGUID().toSimpleString().toUtf8(),
-            cloudAuthKey.toUtf8());
-
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(std::move(credentials));
-
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
-    }
-    else
-    {
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(boost::none);
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
-    }
-
-    if (!boundToCloud)
-        detachSystemFromCloud();
-
-    emit cloudBindingStatusChanged(boundToCloud);
-    if (boundToCloud)
-        emit connectedToCloud();
-    else
-        emit disconnectedFromCloud();
+    setCloudCredentials(
+        qnGlobalSettings->cloudSystemId(),
+        qnGlobalSettings->cloudAuthKey());
 }

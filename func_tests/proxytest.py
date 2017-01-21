@@ -103,7 +103,7 @@ class ServerProxyTest(object):
         log(LOGLEVEL.INFO, "Proxy Test Start")
         try:
             self.getUids()
-            func = 'ec2/getResourceParams'
+            func = 'ec2/getFullInfo?extraFormatting'
             time.sleep(0.1)
             res1 = self._performRequest(func, self.mainHost)
             time.sleep(0.1)

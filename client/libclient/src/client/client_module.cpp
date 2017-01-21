@@ -268,6 +268,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
     auto clientSettingsWatcher = new QnClientSettingsWatcher(clientInstanceManager);
+    static_cast<void>(clientSettingsWatcher); //< Debug?
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()

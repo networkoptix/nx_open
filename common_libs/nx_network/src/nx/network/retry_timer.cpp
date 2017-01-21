@@ -116,11 +116,8 @@ void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
 
 bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
 {
-    if (m_retryPolicy.maxRetryCount() != RetryPolicy::kInfiniteRetries &&
-        m_triesMade >= m_retryPolicy.maxRetryCount())
-    {
+    if (retriesLeft() == 0)
         return false;
-    }
 
     if ((m_triesMade > 0) &&
         (m_retryPolicy.delayMultiplier() > 0) &&
@@ -142,6 +139,19 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     ++m_triesMade;
     m_timer->start(m_currentDelay, std::move(doAnotherTryFunc));
     return true;
+}
+
+unsigned int RetryTimer::retriesLeft() const
+{
+    if (m_retryPolicy.maxRetryCount() == RetryPolicy::kInfiniteRetries)
+        return RetryPolicy::kInfiniteRetries;
+
+    return m_retryPolicy.maxRetryCount() - m_triesMade;
+}
+
+boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
+{
+    return m_timer->timeToEvent();
 }
 
 std::chrono::milliseconds RetryTimer::currentDelay() const

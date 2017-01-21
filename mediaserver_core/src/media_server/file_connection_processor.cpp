@@ -29,7 +29,7 @@ namespace {
 
 
     static QCache<QString, CacheEntry> cachedFiles(CACHE_SIZE);
-    static QCache<QString, void> externalPackageNameMiss(CACHE_SIZE);
+    static QCache<QString, int> externalPackageNameMiss(CACHE_SIZE);
     static QnMutex cacheMutex;
 
     static QHash<QString, QByteArray> contentTypes = {

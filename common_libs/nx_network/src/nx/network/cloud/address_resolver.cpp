@@ -9,7 +9,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().addressResolver) \
+    if (nx::network::SocketGlobals::debugConfig().addressResolver) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 

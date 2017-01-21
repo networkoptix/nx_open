@@ -38,6 +38,9 @@ void IncomingReverseTunnelConnection::accept(AcceptHandler handler)
     m_timer->dispatch(
         [this, handler = std::move(handler)]()
         {
+            if (isExhausted())
+                return handler(SystemError::notConnected, nullptr);
+
             m_acceptHandler = std::move(handler);
             NX_LOGX(lm("Monitor sockets(%1) on accept").container(m_sockets), cl_logDEBUG1);
             for (auto it = m_sockets.begin(); it != m_sockets.end(); ++it)
@@ -82,18 +85,15 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
             if (code != SystemError::noError
                 && m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); }))
             {
-                return; //< ignore, better luck next time
+                return; //< Ignore, better luck next time.
             }
 
-            if (m_startHandler)
-            {
-                const auto handler = std::move(m_startHandler);
-                m_startHandler = nullptr;
-                handler(code);
-            }
-
+            utils::moveAndCallOptional(m_startHandler, code);
             if (code == SystemError::noError)
-                saveConnection(std::move(connector));
+                return saveConnection(std::move(connector));
+
+            if (isExhausted())
+                utils::moveAndCallOptional(m_acceptHandler, code, nullptr);
         });
 }
 
@@ -166,15 +166,24 @@ void IncomingReverseTunnelConnection::monitorSocket(
 
             spawnConnectorIfNeeded();
             if (code != SystemError::noError)
-                return;
+            {
+                if (isExhausted())
+                    utils::moveAndCall(m_acceptHandler, code, nullptr);
 
-            const auto handler = std::move(m_acceptHandler);
-            m_acceptHandler = nullptr;
+                return;
+            }
+
             if (socket->setNonBlockingMode(false))
-                handler(SystemError::noError, std::move(socket));
+                utils::moveAndCall(m_acceptHandler, SystemError::noError, std::move(socket));
             else
-                handler(SystemError::getLastOSErrorCode(), nullptr);
+                utils::moveAndCall(m_acceptHandler, SystemError::getLastOSErrorCode(), nullptr);
         });
+}
+
+bool IncomingReverseTunnelConnection::isExhausted() const
+{
+    return (m_connectors.size() == 0) && (m_sockets.size() == 0)
+        && (m_timer->retriesLeft() == 0) && !m_timer->timeToEvent();
 }
 
 } // namespace tcp
