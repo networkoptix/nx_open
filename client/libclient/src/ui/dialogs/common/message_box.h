@@ -30,6 +30,8 @@ enum class QnMessageBoxCustomButton
 
     AddStorage,                 //< Uses QDialogButtonBox::YesRole
 
+    Reset,                      //< Uses QDialogButtonBox::YesRole
+
     RestartNow,                 //< Uses QDialogButtonBox::YesRole
     RestartLater,               //< Uses QDialogButtonBox::NoRole
 

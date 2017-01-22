@@ -310,6 +310,9 @@ void QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
     case QnMessageBoxCustomButton::EnableSecondaryStream:
         addButton(tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
         break;
+    case QnMessageBoxCustomButton::Reset:
+        addButton(tr("Reset"), QDialogButtonBox::YesRole);
+        break;
     default:
         NX_ASSERT(false, "Unknown custom button");
         break;

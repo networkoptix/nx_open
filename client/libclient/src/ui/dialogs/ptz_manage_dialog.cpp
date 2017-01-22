@@ -320,12 +320,11 @@ void QnPtzManageDialog::clear()
 
 void QnPtzManageDialog::showSetPositionWarning()
 {
-    QnMessageBox::critical(
-        this,
-        tr("Could not set position for camera."),
-        tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n'
-        + tr("Please wait for the camera to go online.")
-    );
+    const auto extras =
+        tr("Can't set the current position for camera \"%1\"").arg(m_resource->getName())
+            + L'\n' + tr("Please wait for the camera to go online.");
+
+    QnMessageBox::_critical(this, tr("Failed to set current position"), extras);
 }
 
 void QnPtzManageDialog::saveData()
@@ -441,12 +440,10 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            this,
-            tr("Could not get position from camera."),
-            tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        const auto extras =
+            tr("Can't get the current position from camera \"%1\"").arg(m_resource->getName())
+                + L'\n' + tr("Please wait for the camera to go online.");
+        QnMessageBox::_critical(this, tr("Failed to get current position"), extras);
         return;
     }
 
@@ -566,28 +563,23 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                 Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
                 if (!messagesFilter.testFlag(Qn::ShowOnceMessage::PtzPresetInUse))
                 {
-                    QnMessageBox messageBox(
-                        QnMessageBox::Warning,
-                        Qn::Empty_Help,
-                        tr("Remove Preset"),
-                        tr("This preset is used in some tours.") + L'\n'
-                        + tr("These tours will become invalid if you remove it."),
-                        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                        this
-                    );
-                    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-                    messageBox.setCheckBoxText(tr("Do not show again."));
+                    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+                        tr("Preset used by some tours. Delete it anyway?"),
+                        tr("These tours will become invalid."),
+                        QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-                    int result = messageBox.exec();
+                    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+                    dialog.setCheckBoxText(tr("Don't show this message again"));
 
-                    if (messageBox.isChecked())
+                    const auto result = dialog.exec();
+                    if (dialog.isChecked())
                     {
                         messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
                         qnSettings->setShowOnceMessages(messagesFilter);
                         qnSettings->save();
                     }
 
-                    if (result != QDialogButtonBox::Ok)
+                    if (result == QDialogButtonBox::Cancel)
                         break;
                 }
             }
@@ -787,27 +779,22 @@ bool QnPtzManageDialog::tryClose(bool force)
 bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/)
 {
 
-    QDialogButtonBox::StandardButtons allowedButtons = QDialogButtonBox::Yes | QDialogButtonBox::No;
+    QDialogButtonBox::StandardButtons allowedButtons =
+        (QDialogButtonBox::Apply | QDialogButtonBox::Discard);
     if (cancelIsAllowed)
         allowedButtons |= QDialogButtonBox::Cancel;
 
-    QDialogButtonBox::StandardButton button = QnMessageBox::question(
-        this,
-        0,
-        tr("PTZ configuration has not been saved."),
-        tr("Changes have not been saved. Would you like to save them?"),
-        allowedButtons,
-        QDialogButtonBox::Yes);
+    const auto button = QnMessageBox::_question(this,
+        tr("Apply changes before exit?"), QString(),
+        allowedButtons, QDialogButtonBox::Apply);
 
     switch (button)
     {
-        case QDialogButtonBox::Yes:
+        case QDialogButtonBox::Apply:
             saveChanges();
             return true;
         case QDialogButtonBox::Cancel:
-            if (cancelIsAllowed)
-                return false;
-            return true;
+            return (cancelIsAllowed ? false : true);
         default:
             return true;
     }
