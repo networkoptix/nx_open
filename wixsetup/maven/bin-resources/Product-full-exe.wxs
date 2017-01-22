@@ -27,7 +27,8 @@
                 SuppressRepair="yes"
                 ShowFilesInUse="yes"
                 LicenseUrl="License.html"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
+            />
         </BootstrapperApplicationRef>
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
