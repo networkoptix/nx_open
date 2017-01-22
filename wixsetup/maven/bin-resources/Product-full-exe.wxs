@@ -13,6 +13,8 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ServerMsiSearch' />
+        <util:ProductSearchRef Id='ClientMsiSearch' />
 
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
@@ -34,6 +36,9 @@
         <Variable Name="InstallClientAndServer" Type="numeric" Value="1" />
         <Variable Name="InstallClientOnly" Type="numeric" Value="0" />
         <Variable Name="InstallServerOnly" Type="numeric" Value="0" />
+
+        <util:RegistrySearch Condition="ServerInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallClientOnly" />
+        <util:RegistrySearch Condition="ClientInstalled = 5" Root="HKLM" Key="SOFTWARE\**NoValue**" Value="**NoValue**" Variable="InstallServerOnly" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>
