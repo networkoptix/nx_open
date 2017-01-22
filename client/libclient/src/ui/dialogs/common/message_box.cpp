@@ -313,6 +313,9 @@ void QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
     case QnMessageBoxCustomButton::Reset:
         addButton(tr("Reset"), QDialogButtonBox::YesRole);
         break;
+    case QnMessageBoxCustomButton::ForceUpdate:
+        addButton(tr("Force Update"), QDialogButtonBox::YesRole);
+        break;
     default:
         NX_ASSERT(false, "Unknown custom button");
         break;

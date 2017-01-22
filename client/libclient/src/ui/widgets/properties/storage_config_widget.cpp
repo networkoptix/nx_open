@@ -706,14 +706,15 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
     if (!m_server)
         return;
 
-    int warnResult = QnMessageBox::warning(
-        this,
-        tr("Warning!"),
-        tr("You are about to launch the archive re-synchronization routine.") + L'\n'
-        + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
-        + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
-        + tr("Are you sure you want to continue?"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    const auto extras =
+        tr("Depending on the total size of the archive, reindexing can take up to several hours.")
+        + L'\n' +tr("Reindexing is only necessary if your archive folders have been moved, renamed or deleted.")
+        + L'\n' +tr("You can cancel this operation at any moment without data loss.")
+        + L'\n' +tr("Continue anyway?");
+
+    const auto warnResult = QnMessageBox::_warning(this,
+        tr("Hard disk load will increase significantly"), extras,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
     if (warnResult != QDialogButtonBox::Ok)
         return;
@@ -1110,11 +1111,11 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished(const QnMediaServerR
 
     if (!storagePool.rebuildCancelled)
     {
-        QnMessageBox::information(this,
-            tr("Finished"),
-            isMain
-                ? tr("Rebuilding archive index is completed.")
-                : tr("Rebuilding backup index is completed."));
+        const auto text = (isMain
+            ? tr("Archive reindexing completed")
+            : tr("Backup reindexing completed"));
+
+        QnMessageBox::_success(this, text);
     }
 
     storagePool.rebuildCancelled = false;
@@ -1134,9 +1135,7 @@ void QnStorageConfigWidget::at_serverBackupFinished(const QnMediaServerResourceP
         return;
     }
 
-    QnMessageBox::information(this,
-        tr("Finished"),
-        tr("Backup is finished"));
+    QnMessageBox::_success(this, tr("Backup completed"));
 }
 
 void QnStorageConfigWidget::invokeBackupSettings()

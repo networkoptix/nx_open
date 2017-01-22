@@ -65,6 +65,7 @@ private:
 
     void exportLicenses();
 
+    void showNetworkErrorMessage();
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 

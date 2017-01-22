@@ -58,6 +58,13 @@ bool QnLayoutsHandlerMessages::showCompositeDialog(
     messageBox.setDefaultButton(QDialogButtonBox::Ok);
 
     const auto result = messageBox.exec();
+
+    /**
+     * TODO: #ynikitenkov  Very strange logic. Do we have to store
+     * answer of dialog to use instead of asking?
+     *
+     * Moreover. Develop helpers to check and set flags
+     */
     if (messageBox.isChecked())
     {
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();

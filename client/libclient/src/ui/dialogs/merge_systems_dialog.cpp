@@ -347,7 +347,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
     if (!message.isEmpty())
         message.prepend(lit("\n"));
 
-    QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+    QnMessageBox::_critical(this, tr("Failed to merge Systems"), message);
 
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 

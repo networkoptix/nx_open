@@ -32,6 +32,8 @@ enum class QnMessageBoxCustomButton
 
     Reset,                      //< Uses QDialogButtonBox::YesRole
 
+    ForceUpdate,                //< Uses QDialogButtonBox::YesRole
+
     RestartNow,                 //< Uses QDialogButtonBox::YesRole
     RestartLater,               //< Uses QDialogButtonBox::NoRole
 

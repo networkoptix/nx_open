@@ -246,7 +246,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     {
         case Scenario::LocalOwner:
         {
-            q->setIcon(QnMessageBox::Question);
+            q->setIcon(QnMessageBoxIcon::Question);
             q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
@@ -259,7 +259,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         }
         case Scenario::CloudOwner:
         {
-            q->setIcon(QnMessageBox::Question);
+            q->setIcon(QnMessageBoxIcon::Question);
             q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
@@ -286,7 +286,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         }
         default:
             NX_ASSERT(false, "Invalid scenario");
-            q->setIcon(QnMessageBox::Warning);
+            q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(tr("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
             q->setDefaultButton(okButton);
@@ -404,7 +404,7 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
     Q_Q(QnDisconnectFromCloudDialog);
 
-    q->setIcon(QnMessageBox::Question);
+    q->setIcon(QnMessageBoxIcon::Question);
     q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
     q->setInformativeText(allUsersDisabledMessage()
         + L'\n'

@@ -343,10 +343,9 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
         if (!existing.isEmpty())
         {
-            if (QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
-                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
-                    return;
+            const auto result = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow());
+            if (result == QDialogButtonBox::Cancel)
+                return;
             removeLayouts(existing);
         }
     }
@@ -405,21 +404,26 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
 void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
 {
-    if (items.size() > 1)
+    if ((items.size() > 1)
+        && !qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::RemoveItemsFromLayout))
     {
-        const auto question = tr("Are you sure you want to remove these %n items from layout?",
-            "", items.size());
-
         QnSessionAwareMessageBox messageBox(mainWindow());
-        setHelpTopic(&messageBox, Qn::RemoveItems_Help);
-        messageBox.setIcon(QnMessageBox::Icon::Warning);
-        messageBox.setWindowTitle(tr("Remove Items"));
-        messageBox.setText(tr("Confirm items removing"));
-        messageBox.setInformativeText(question);
-        messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        messageBox.setIcon(QnMessageBoxIcon::Warning);
+        messageBox.setText(tr("Remove %n items from layout?", "", items.size()));
+        messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+        messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
         messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.addCustomWidget(new QnResourceListView(QnActionParameterTypes::resources(items), true));
-        auto result = messageBox.exec();
+        messageBox.addCustomWidget(
+            new QnResourceListView(QnActionParameterTypes::resources(items), true));
+        messageBox.setCheckBoxText(tr("Don't show this message again"));
+        const auto result = messageBox.exec();
+        if (messageBox.isChecked())
+        {
+            Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+            messagesFilter |= Qn::ShowOnceMessage::RemoveItemsFromLayout;
+            qnSettings->setShowOnceMessages(messagesFilter);
+            qnSettings->save();
+        }
         if (result != QDialogButtonBox::Yes)
             return;
     }
@@ -922,9 +926,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
                 break;
             }
 
-            button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow(),
-                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-                QDialogButtonBox::Yes);
+            button = QnLayoutsHandlerMessages::askOverrideLayout(mainWindow());
             if (button == QDialogButtonBox::Cancel)
                 return;
             if (button == QDialogButtonBox::Yes)

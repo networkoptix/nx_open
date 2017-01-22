@@ -652,18 +652,23 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     int maxValidFps = fpsLimits.first;
     int maxDualStreamingValidFps = fpsLimits.second;
 
+    static const auto text = tr("FPS too high");
     if (maxValidFps < maxFps)
     {
-        QnMessageBox::warning(this, tr("FPS value is too high"),
-                              tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2.").arg(maxFps).arg(maxValidFps));
+        const auto extras = tr("FPS in the schedule was lowered from %1 to %2,"
+            " which is the maximum for this camera.").arg(maxFps).arg(maxValidFps);
+        QnMessageBox::_warning(this, text, extras);
         hasChanges = true;
     }
 
     if (maxDualStreamingValidFps < maxDualStreamFps)
     {
-        QnMessageBox::warning(this, tr("FPS value is too high"),
-                              tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2.")
-                              .arg(maxDualStreamFps).arg(maxDualStreamingValidFps));
+        const auto extras =
+            tr("For software motion detection, 2 FPS are reserved for the secondary stream.")
+            + L'\n' + tr("FPS in the schedule was lowered from %1 to %2.")
+                .arg(maxDualStreamFps).arg(maxDualStreamingValidFps);
+
+        QnMessageBox::_warning(this, text, extras);
         hasChanges = true;
     }
 
@@ -762,13 +767,14 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QnMessageBox::warning(this,
-                                        tr("Invalid Schedule"),
-                                        tr("Second stream is disabled on this camera. Motion + LQ option has no effect. "
-                                           "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-                                        QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel),
-                                        QDialogButtonBox::Yes);
-    switch (button)
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+        tr("Secondary stream disabled for this camera"),
+        tr("\"Motion + Low - Res\" recording option can't be set."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
+    dialog.addCustomButton(QnMessageBoxCustomButton::SetRecordingToAlways);
+    dialog.addCustomButton(QnMessageBoxCustomButton::EnableSecondaryStream);
+
+    switch (dialog.exec())
     {
         case QDialogButtonBox::Yes:
             ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
@@ -779,7 +785,6 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
         default:
             return false;
     }
-
 }
 
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)
@@ -897,11 +902,14 @@ void QnSingleCameraSettingsWidget::updateWebPageText()
 
 void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
 {
-    if (QnMessageBox::warning(this,
-                              tr("Confirm motion regions reset"),
-                              tr("Are you sure you want to reset motion regions to the defaults?") + L'\n' + tr("This action CANNOT be undone!"),
-                              QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
-                              QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Reset motion regions to default?"),
+        tr("This action can't be undone."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        this);
+
+    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     if (m_motionWidget)

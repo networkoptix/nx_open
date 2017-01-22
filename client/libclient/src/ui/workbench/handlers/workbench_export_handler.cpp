@@ -148,23 +148,20 @@ QString QnWorkbenchExportHandler::binaryFilterName() const
 
 bool QnWorkbenchExportHandler::lockFile(const QString &filename)
 {
+    static const auto kText = tr("Failed to overwrite file");
     if (m_filesIsUse.contains(filename))
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("File is in use."),
-            tr("File '%1' is used for recording already. Please enter another name.").arg(QFileInfo(filename).completeBaseName())
-        );
+        QnMessageBox::_warning(mainWindow(), kText,
+            QFileInfo(filename).completeBaseName() + L'\n'
+                + tr("File is used for recording already."));
         return false;
     }
 
     if (QFile::exists(filename) && !QFile::remove(filename))
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Could not overwrite file"),
-            tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(filename).completeBaseName())
-        );
+        QnMessageBox::_warning(mainWindow(), kText,
+            QFileInfo(filename).completeBaseName() + L'\n'
+                + tr("File is used by another process."));
         return false;
     }
 

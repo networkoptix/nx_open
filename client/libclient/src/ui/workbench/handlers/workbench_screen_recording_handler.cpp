@@ -305,11 +305,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QString message = tr("Could not overwrite file '%1'. Please try a different name.").arg(filePath);
-                QnMessageBox::warning(
-                    mainWindow(),
-                    tr("Warning"),
-                    message);
+                QnMessageBox::_critical(mainWindow(), tr("Failed to overwrite file"), filePath);
                 continue;
             }
 
@@ -328,8 +324,5 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::warning(
-        mainWindow(),
-        tr("Warning"),
-        tr("Unable to start recording due to the following error: %1").arg(reason));
+    QnMessageBox::_critical(mainWindow(), tr("Failed to start recording"), reason);
 }

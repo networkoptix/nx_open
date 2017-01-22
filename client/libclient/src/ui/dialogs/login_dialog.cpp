@@ -620,8 +620,7 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::question(
-            this,
+        const auto button = QnMessageBox::_question(this,
             tr("Overwrite existing connection?"),
             tr("There is an another connection with the same name."),
             QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
@@ -686,12 +685,8 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::question(
-        this,
-        tr("Delete connection?"),
-//         tr("Are you sure you want to delete this connection: %1?")
-//         + L'\n' + connection.name,
-        connection.name,
+    const auto result = QnMessageBox::_question(this,
+        tr("Delete connection?"), connection.name,
         QDialogButtonBox::Yes | QDialogButtonBox::No,
         QDialogButtonBox::Yes);
 

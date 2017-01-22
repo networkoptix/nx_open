@@ -300,8 +300,9 @@ void QnLicenseManagerWidget::updateLicenses()
 
 void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message)
 {
+    // TODO: #ynikitenkov make it!
     QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-    messageBox->setIcon(QnMessageBox::Warning);
+    messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setWindowTitle(title);
     messageBox->setText(message);
     QPushButton* copyButton = messageBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
@@ -519,20 +520,16 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
     QnLicenseListHelper licenseListHelper(licenses);
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
 
-    QString message;
     if (!license || (errorCode != ec2::ErrorCode::ok))
-        message = tr("There was a problem activating your license key. A network error has occurred.");
+        showNetworkErrorMessage();
     else if (license)
-        message = tr("License was successfully activated.");
+        QnMessageBox::_success(this, tr("License activated"));
 
     if (!licenses.isEmpty())
     {
         m_licenses.append(licenses);
         qnLicensePool->addLicenses(licenses);
     }
-
-    if (!message.isEmpty())
-        QnMessageBox::information(this, tr("License Activation"), message);
 
     ui->licenseWidget->setSerialKey(QString());
 
@@ -689,4 +686,11 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
 
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
+}
+
+void QnLicenseManagerWidget::showNetworkErrorMessage()
+{
+    QnMessageBox::_critical(this,
+        tr("Network error"),
+        tr("Please contact Customer Support to activate license key manually."));
 }
