@@ -176,7 +176,7 @@ BaseTile
     }
 
     titleLabel.text: (control.impl.tileType == control.impl.kFactorySystemTileType
-        ? qsTr("New System") : systemName);
+        ? qsTr("New Server") : systemName);
 
     menuButton
     {
