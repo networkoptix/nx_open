@@ -321,7 +321,7 @@ TEST_F(WriterTest, IntervalTest)
     writer.write();
     thenWrittenFiles(0);
 
-    std::this_thread::sleep_for(kWriteInterval/2);
+    std::this_thread::sleep_for(kWriteInterval/2 + std::chrono::milliseconds(5));
     writer.write();
     thenWrittenFiles(12);
     thenAllFilesContainsPatternData(PatternData::WithAdditionalProp);
