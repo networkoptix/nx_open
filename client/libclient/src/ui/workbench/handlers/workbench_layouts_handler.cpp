@@ -177,7 +177,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     layout->setName(newName);
 
     if (!changed)
-        snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
+        snapshotManager()->save(layout);
 }
 
 void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
@@ -205,7 +205,6 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
                 {
                     Q_UNUSED(reqId);
                     snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-                    at_layout_saved(errorCode == ec2::ErrorCode::ok, layout);
                     if (errorCode != ec2::ErrorCode::ok)
                         return;
                     snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
@@ -228,11 +227,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
             if (user)
                 grantMissingAccessRights(user, change);
 
-            snapshotManager()->save(layout,
-                [this](bool success, const QnLayoutResourcePtr& layout)
-                {
-                    at_layout_saved(success, layout);
-                });
+            snapshotManager()->save(layout);
         }
         else
         {
@@ -397,7 +392,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         }
     }
 
-    snapshotManager()->save(newLayout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
+    snapshotManager()->save(newLayout);
     if (shouldDelete)
         removeLayouts(QnLayoutResourceList() << layout);
 }
@@ -942,7 +937,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     layout->setParentId(user->getId());
     qnResPool->addResource(layout);
 
-    snapshotManager()->save(layout, [this](bool success, const QnLayoutResourcePtr &layout) { at_layout_saved(success, layout); });
+    snapshotManager()->save(layout);
 
     menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
 }
@@ -1123,38 +1118,6 @@ void QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered()
 {
     const auto layoutItems = menu()->currentParameters(sender()).layoutItems();
     removeLayoutItems(layoutItems, false);
-}
-
-void QnWorkbenchLayoutsHandler::at_layout_saved(bool success, const QnLayoutResourcePtr &layout)
-{
-    if (success)
-        return;
-
-    if (!layout->hasFlags(Qn::local) || QnWorkbenchLayout::instance(layout))
-        return;
-
-    const auto question = tr("Could not save the following layout to Server. Do you want to restore it?");
-
-    QnSessionAwareMessageBox messageBox(mainWindow());
-    messageBox.setIcon(QnMessageBox::Icon::Warning);
-    messageBox.setWindowTitle(tr("Error"));
-    messageBox.setText(tr("Cannot save layout"));
-    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
-    messageBox.setInformativeText(question);
-    messageBox.addCustomWidget(new QnResourceListView(QnResourceList() << layout));
-    auto result = messageBox.exec();
-
-    if (result == QDialogButtonBox::Yes)
-    {
-        workbench()->addLayout(new QnWorkbenchLayout(layout, this));
-        workbench()->setCurrentLayout(workbench()->layouts().back());
-    }
-    else
-    {
-        qnResPool->removeResource(layout);
-    }
-
 }
 
 bool QnWorkbenchLayoutsHandler::tryClose(bool force)

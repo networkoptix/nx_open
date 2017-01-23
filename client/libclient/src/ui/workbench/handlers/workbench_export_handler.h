@@ -70,6 +70,8 @@ private:
     void at_layout_exportFinished(bool success, const QString &filename);
     void at_camera_exportFinished(bool success, const QString &fileName);
 
+    void showExportCompleteMessage();
+
 private:
     QSet<QString> m_filesIsUse;
 };

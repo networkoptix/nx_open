@@ -392,9 +392,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         if (info.uuid < qnCommon->moduleGUID())
         {
             setControlMode(false);
-            QnMessageBox::warning(mainWindow(),
-                tr("A control session is already running."),
-                tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
+            showControlledByAnotherUserMessage();
         }
 
     });
@@ -498,7 +496,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
             [this, items, reset](bool success, const QnLayoutResourcePtr &layout)
             {
                 if (!success)
-                    QnMessageBox::warning(mainWindow(), tr("Error"), tr("The changes cannot be applied. Unexpected error occurred."));
+                    showFailedToApplyChanges();
                 else
                     reset(items, layout);
                 updateMode();
@@ -544,7 +542,7 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
         {
             Q_UNUSED(layout);
             if (!success)
-                QnMessageBox::warning(mainWindow(), tr("Error"), tr("The changes cannot be applied. Unexpected error occurred."));
+                showFailedToApplyChanges();
             else
                 swap(firstIndex, firstLayout, secondIndex, secondLayout);
         };
@@ -634,24 +632,21 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    QDialogButtonBox::StandardButton button =
-        QnMessageBox::question(
-            mainWindow(),
-            Qn::Videowall_VwModeWarning_Help,
-            tr("Switch to Video Wall Mode..."),
-            tr("Video Wall is about to start. Would you like to close this %1 Client instance?")
-            .arg(QnAppInfo::productNameLong()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes
-        );
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Close %1 Client before starting Video Wall?").arg(QnAppInfo::productNameLong()),
+        QString(),
+        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        mainWindow());
 
-    if (button == QDialogButtonBox::Cancel)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Close);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Keep);
+    const auto result = dialog.exec();
+
+    if (result == QDialogButtonBox::Cancel)
         return;
 
-    if (button == QDialogButtonBox::Yes)
-    {
+    if (result == QDialogButtonBox::Yes)
         closeInstanceDelayed();
-    }
 
     QnUuid pcUuid = qnSettings->pcUuid();
     foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
@@ -1062,11 +1057,12 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
-        QnMessageBox::warning(mainWindow(),
-            tr("Additional licenses required."),
-            tr("To enable this feature please activate at least one Video Wall license."));
+        QnMessageBox::_warning(mainWindow(),
+            tr("Video Wall license required"),
+            tr("To enable this feature, please activate a Video Wall license."));
         return false;
     }
+
 
     QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
     if (!validateLicenses(tr("Could not start Video Wall control session.")))
@@ -1085,15 +1081,24 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
         if (info.uuid == QnRuntimeInfoManager::instance()->localInfo().uuid)
             continue;
 
-        QnMessageBox::warning(mainWindow(),
-            tr("A control session is already running."),
-            tr("Could not start control session.") + L'\n' + tr("Another user is already controlling this screen."));
+        showControlledByAnotherUserMessage();
 
         return false;
     }
 
-
     return true;
+}
+
+void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
+{
+    QnMessageBox::_critical(mainWindow(), tr("Failed to apply changes"));
+}
+
+void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
+{
+    QnMessageBox::_warning(mainWindow(),
+        tr("Screen controlled by another user"),
+        tr("Control session can't be started."));
 }
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)

@@ -37,17 +37,10 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
         {
             fileName += selectedExtension;
 
-            if (QFile::exists(fileName))
+            if (QFile::exists(fileName)
+                && !QnMessageBox::overwriteFileQuestion(parent, QFileInfo(fileName).completeBaseName()))
             {
-                QnMessageBox dialog(QnMessageBoxIcon::Question,
-                    tr("Overwrite existing file?"), QFileInfo(fileName).completeBaseName(),
-                    QDialogButtonBox::Cancel);
-
-                dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
-                dialog.setDefaultButton(QDialogButtonBox::Yes);
-
-                if (dialog.exec() != QDialogButtonBox::Yes)
-                    return;
+                return;
             }
         }
 

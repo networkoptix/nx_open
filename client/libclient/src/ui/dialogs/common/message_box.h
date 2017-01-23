@@ -34,6 +34,16 @@ enum class QnMessageBoxCustomButton
 
     ForceUpdate,                //< Uses QDialogButtonBox::YesRole
 
+    Update,                     //< Uses QDialogButtonBox::YesRole
+
+    Export,                     //< Uses QDialogButtonBox::YesRole
+
+    Move,                       //< Uses QDialogButtonBox::YesRole
+    Skip,                       //< Uses QDialogButtonBox::NoRole
+
+    Close,                      //< Uses QDialogButtonBox::YesRole
+    Keep,                       //< Uses QDialogButtonBox::NoRole
+
     RestartNow,                 //< Uses QDialogButtonBox::YesRole
     RestartLater,               //< Uses QDialogButtonBox::NoRole
 
@@ -53,6 +63,30 @@ public:
         Main,
         Content
     };
+
+public: // TODO: #ynikitenkov Move to distinct class
+    static QDialogButtonBox::StandardButton showCustomDialog(
+        QWidget* parent,
+        QnMessageBoxIcon icon,
+        QnMessageBoxCustomButton yesCustomButon,
+        const QString& text,
+        const QString& extras);
+
+    static bool overwriteFileQuestion(
+        QWidget* parent,
+        const QString& fileName);
+
+    static void showFailedToOverwriteMessage(
+        QWidget* parent,
+        const QString& fileName);
+
+    static void showFailedToGetPosition(
+        QWidget* parent,
+        const QString& cameraName);
+
+    static void showFailedToSetPosition(
+        QWidget* parent,
+        const QString& cameraName);
 
 public:
     QnMessageBox(

@@ -80,6 +80,4 @@ private:
         const QnLayoutResourceList& saveResources);
     bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
-
-    void at_layout_saved(bool success, const QnLayoutResourcePtr &layout);
 };

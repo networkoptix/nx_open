@@ -305,7 +305,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QnMessageBox::_critical(mainWindow(), tr("Failed to overwrite file"), filePath);
+                QnMessageBox::showFailedToOverwriteMessage(mainWindow(), filePath);
                 continue;
             }
 

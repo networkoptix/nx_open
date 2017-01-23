@@ -770,33 +770,18 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (status != 0)
     {
-        const auto title = QnDeviceDependentStrings::getNameFromSet(
+        const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Cannot move devices"),
-                tr("Cannot move cameras"),
-                tr("Cannot move I/O modules")
-            ),
-            modifiedResources
-        );
+                tr("Failed to move %n devices", "", modifiedResources.size()),
+                tr("Failed to move %n cameras", "", modifiedResources.size()),
+                tr("Failed to move %n I/O Modules", "", modifiedResources.size())),
+            modifiedResources);
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
-            ),
-            modifiedResources
-        ).arg(server->getName());
-
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            title,
-            QDialogButtonBox::Ok,
+        const auto extras = tr("Server \"%1\" is not responding.").arg(server->getName());
+        QnMessageBox messageBox(QnMessageBoxIcon::Critical,
+            text, extras, QDialogButtonBox::Ok, QDialogButtonBox::Ok,
             mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Ok);
-        messageBox.setInformativeText(question);
+
         messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
         messageBox.exec();
         return;
@@ -818,35 +803,25 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (!errorResources.empty())
     {
-        const auto title = QnDeviceDependentStrings::getNameFromSet(
+        const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Cannot move devices"),
-                tr("Cannot move cameras"),
-                tr("Cannot move I/O modules")
-            ),
-            errorResources
-        );
+                tr("Server \"%1\" can't access %n devices. Move them anyway?",
+                    "", errorResources.size()),
+                tr("Server \"%1\" can't access %n cameras. Move them anyway?",
+                    "", errorResources.size()),
+                tr("Server \"%1\" can't access %n I/O modules. Move them anyway?",
+                    "", errorResources.size())),
+            errorResources).arg(server->getName());
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
-                tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
-            ),
-            errorResources
-        ).arg(server->getName());
-
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            title,
-            QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+            text, QString(), QDialogButtonBox::Cancel| QDialogButtonBox::Yes,
             mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.setInformativeText(question);
+
+        messageBox.addCustomButton(QnMessageBoxCustomButton::Move);
+        messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
-        auto result = messageBox.exec();
+
+        const auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
         if (result == QDialogButtonBox::Yes)
@@ -1143,10 +1118,6 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
             cameras
             );
     }
-
-    int helpId = Qn::Empty_Help;
-    if (boost::algorithm::any_of(resources, [](const QnResourcePtr& res) { return res->hasFlags(Qn::live_cam); }))
-        helpId = Qn::DeletingCamera_Help;
 
     QnMessageBox messageBox(
         QnMessageBox::Warning,

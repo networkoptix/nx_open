@@ -318,15 +318,6 @@ void QnPtzManageDialog::clear()
     ui->tourStackedWidget->setCurrentIndex(ui->tourStackedWidget->indexOf(ui->noTourPage));
 }
 
-void QnPtzManageDialog::showSetPositionWarning()
-{
-    const auto extras =
-        tr("Can't set the current position for camera \"%1\"").arg(m_resource->getName())
-            + L'\n' + tr("Please wait for the camera to go online.");
-
-    QnMessageBox::_critical(this, tr("Failed to set current position"), extras);
-}
-
 void QnPtzManageDialog::saveData()
 {
     QN_SCOPED_VALUE_ROLLBACK(&m_submitting, true);
@@ -440,10 +431,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        const auto extras =
-            tr("Can't get the current position from camera \"%1\"").arg(m_resource->getName())
-                + L'\n' + tr("Please wait for the camera to go online.");
-        QnMessageBox::_critical(this, tr("Failed to get current position"), extras);
+        QnMessageBox::showFailedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -462,7 +450,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        showSetPositionWarning();
+        QnMessageBox::showFailedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -503,7 +491,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        showSetPositionWarning();
+        QnMessageBox::showFailedToSetPosition(this, m_resource->getName());
         return;
     }
 

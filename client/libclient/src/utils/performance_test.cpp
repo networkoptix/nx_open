@@ -54,15 +54,19 @@ void QnPerformanceTest::detectLightMode() {
     }
 #endif
 
-    if (poorCpu && poorGpu) {
+    if (poorCpu && poorGpu)
+    {
         qnSettings->setLightMode(Qn::LightModeFull);
-        QString message = QCoreApplication::translate("QnPerformanceTest",
-                                                      "Performance of this computer allows running %1 in configuration mode only.")
-                          .arg(QnAppInfo::productNameLong());
-        message += lit(" ");
-        message += QCoreApplication::translate("QnPerformanceTest", "For full-featured mode please use another computer.");
-        QnMessageBox::warning(NULL, 0,
-                              QCoreApplication::translate("QnPerformanceTest", "Warning!"), message,
-                              QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok), QDialogButtonBox::Ok);
+
+        const auto text = QCoreApplication::translate("QnPerformanceTest",
+            "%1 Client can work in configuration mode only").arg(QnAppInfo::productNameLong());
+
+        QString extras = QCoreApplication::translate("QnPerformanceTest",
+            "Performance of this computer allows running %1"
+            " Client in configuration mode only.").arg(QnAppInfo::productNameLong());
+        extras += L'\n' + QCoreApplication::translate("QnPerformanceTest",
+            "For full - featured mode, please use another computer");
+
+        QnMessageBox::_warning(nullptr, text, extras);
     }
 }

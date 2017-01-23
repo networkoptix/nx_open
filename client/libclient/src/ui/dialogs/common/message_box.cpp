@@ -316,6 +316,24 @@ void QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
     case QnMessageBoxCustomButton::ForceUpdate:
         addButton(tr("Force Update"), QDialogButtonBox::YesRole);
         break;
+    case QnMessageBoxCustomButton::Update:
+        addButton(tr("Update..."), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::Move:
+        addButton(tr("Move"), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::Skip:
+        addButton(tr("Skip"), QDialogButtonBox::NoRole);
+        break;
+    case QnMessageBoxCustomButton::Export:
+        addButton(tr("Export"), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::Close:
+        addButton(tr("Close"), QDialogButtonBox::YesRole);
+        break;
+    case QnMessageBoxCustomButton::Keep:
+        addButton(tr("Keep"), QDialogButtonBox::NoRole);
+        break;
     default:
         NX_ASSERT(false, "Unknown custom button");
         break;
@@ -781,4 +799,58 @@ void QnMessageBox::afterLayout()
         /* This dialog must have height-for-width, but just in case handle otherwise: */
         setFixedHeight(sizeHint().height());
     }
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::showCustomDialog(
+    QWidget* parent,
+    QnMessageBoxIcon icon,
+    QnMessageBoxCustomButton yesCustomButon,
+    const QString& text,
+    const QString& extras)
+{
+    QnMessageBox dialog(QnMessageBoxIcon::Warning, text, extras,
+        QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parent);
+    dialog.addCustomButton(yesCustomButon);
+    return static_cast<QDialogButtonBox::StandardButton>(dialog.exec());
+
+}
+
+bool QnMessageBox::overwriteFileQuestion(
+    QWidget* parent,
+    const QString& fileName)
+{
+    const auto result = showCustomDialog(parent,
+        QnMessageBoxIcon::Question, QnMessageBoxCustomButton::Overwrite,
+        tr("Overwrite existing file?"), fileName);
+
+    return (result == QDialogButtonBox::Yes);
+}
+
+void QnMessageBox::showFailedToOverwriteMessage(
+    QWidget* parent,
+    const QString& fileName)
+{
+    QnMessageBox::_critical(parent, tr("Failed to overwrite file"), fileName);
+}
+
+void QnMessageBox::showFailedToGetPosition(
+    QWidget* parent,
+    const QString& cameraName)
+{
+    const auto extras =
+        tr("Can't get the current position from camera \"%1\"").arg(cameraName)
+        + L'\n' + tr("Please wait for the camera to go online.");
+    QnMessageBox::_critical(parent, tr("Failed to get current position"), extras);
+
+}
+
+void QnMessageBox::showFailedToSetPosition(
+    QWidget* parent,
+    const QString& cameraName)
+{
+    const auto extras =
+        tr("Can't set the current position for camera \"%1\"").arg(cameraName)
+        + L'\n' + tr("Please wait for the camera to go online.");
+    QnMessageBox::_critical(parent, tr("Failed to set current position"), extras);
+
 }

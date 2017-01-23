@@ -70,7 +70,7 @@ void QnDatabaseManagementWidget::backupDb()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
-        QnMessageBox::_critical(this, tr("Failed to overwrite file"), fileName);
+        QnMessageBox::showFailedToOverwriteMessage(this, fileName);
         return;
     }
 
