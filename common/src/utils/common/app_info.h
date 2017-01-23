@@ -18,8 +18,8 @@ public:
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
-    static Q_INVOKABLE QString applicationPlatform();
 
+    static Q_INVOKABLE QString applicationPlatform();
     static Q_INVOKABLE QString applicationArch();
     static Q_INVOKABLE QString applicationPlatformModification();
     static Q_INVOKABLE QString applicationCompiler();

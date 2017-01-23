@@ -7,7 +7,7 @@
     #include <sys/time.h>
     #include <QtCore/QFile>
     #include <QtCore/QProcess>
-    #include <utils/common/app_info.h>
+    #include <nx/utils/app_info.h>
 #endif
 
 using namespace std::chrono;
@@ -103,7 +103,7 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
             return false;
         }
 
-        if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+        if (AppInfo::isBpi() || AppInfo::isNx1())
         {
             // On NX1, we have to execute "hwclock -w" to save the time, and this command sometimes
             // failes, hence several attempts.
