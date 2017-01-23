@@ -825,8 +825,6 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                QString message = result.errorMessage();
-
                 const bool clientUpdated = (result.targetVersion != qnCommon->engineVersion());
                 if (clientUpdated)
                 {
@@ -856,9 +854,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     if (!restartClient(result.targetVersion))
                     {
                         unholdConnection = true;
-                        QnMessageBox::_critical(this,
-                            tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
-                            tr("Please close the application and start it again using the shortcut in the start menu."));
+                        QnMessageBox::showFailedRestartClient(this);
                     }
                     else
                     {

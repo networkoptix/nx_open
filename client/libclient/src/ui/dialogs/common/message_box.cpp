@@ -285,58 +285,52 @@ QDialogButtonBox::StandardButton QnMessageBox::_success(
 
 ///
 
-void QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
+QAbstractButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
 {
     switch (button)
     {
     case QnMessageBoxCustomButton::Overwrite:
-        addButton(tr("Overwrite"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Overwrite"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Delete:
-        addButton(tr("Delete"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Delete"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::RestartNow:
-        addButton(tr("Restart Now"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Restart Now"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::RestartLater:
-        addButton(tr("Restart Later"), QDialogButtonBox::NoRole);
-        break;
+        return addButton(tr("Restart Later"), QDialogButtonBox::NoRole);
     case QnMessageBoxCustomButton::AddStorage:
-        addButton(tr("Add Storage"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Add Storage"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::SetRecordingToAlways:
-        addButton(tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::EnableSecondaryStream:
-        addButton(tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
-        break;
+        return addButton(tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
     case QnMessageBoxCustomButton::Reset:
-        addButton(tr("Reset"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Reset"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::ForceUpdate:
-        addButton(tr("Force Update"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Force Update"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Update:
-        addButton(tr("Update..."), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Update..."), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Move:
-        addButton(tr("Move"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Move"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Skip:
-        addButton(tr("Skip"), QDialogButtonBox::NoRole);
-        break;
+        return addButton(tr("Skip"), QDialogButtonBox::NoRole);
     case QnMessageBoxCustomButton::Export:
-        addButton(tr("Export"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Export"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Close:
-        addButton(tr("Close"), QDialogButtonBox::YesRole);
-        break;
+        return addButton(tr("Close"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Keep:
-        addButton(tr("Keep"), QDialogButtonBox::NoRole);
-        break;
+        return addButton(tr("Keep"), QDialogButtonBox::NoRole);
+    case QnMessageBoxCustomButton::Download:
+        return addButton(tr("Download"), QDialogButtonBox::YesRole);
+    case QnMessageBoxCustomButton::Stop:
+        return addButton(tr("Stop"), QDialogButtonBox::YesRole);
+    case QnMessageBoxCustomButton::Restore:
+        return addButton(tr("Restore"), QDialogButtonBox::YesRole);
+    case QnMessageBoxCustomButton::CopyToClipboard:
+        return addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
+
     default:
         NX_ASSERT(false, "Unknown custom button");
-        break;
+        return nullptr;
     }
 }
 
@@ -854,3 +848,16 @@ void QnMessageBox::showFailedToSetPosition(
     QnMessageBox::_critical(parent, tr("Failed to set current position"), extras);
 
 }
+
+void QnMessageBox::showFailedRestartClient(QWidget* parent)
+{
+    QnMessageBox::_critical(parent,
+        tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
+        tr("Please close the application and start it again using the shortcut in the start menu."));
+}
+
+void QnMessageBox::showAnotherVideoWallExist(QWidget* parent)
+{
+    QnMessageBox::_warning(parent, tr("There is another Video Wall with the same name"));
+}
+

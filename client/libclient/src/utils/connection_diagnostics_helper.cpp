@@ -164,19 +164,41 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
     return false;
 }
 
-Qn::ConnectionResult QnConnectionDiagnosticsHelper::showApplauncherError(QWidget* parentWidget,
-    const QString& details)
+Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidget* parentWidget)
 {
-    QnMessageBox::warning(
-        parentWidget,
-        helpTopic(Qn::IncompatibleProtocolConnectionResult),
-        getErrorString(ErrorStrings::UnableConnect),
-        tr("Selected Server has a different version:") + L'\n'
-        + details
-        + tr("An error has occurred while trying to restart in compatibility mode.") + L'\n'
-        + tr("Please close the application and start it again using the shortcut in the start menu."),
-        QDialogButtonBox::Ok);
+    showApplauncherError(parentWidget);
+
     return Qn::IncompatibleVersionConnectionResult;
+}
+
+void QnConnectionDiagnosticsHelper::showApplauncherError(QWidget* parentWidget)
+{
+    QnMessageBox::_critical(parentWidget,
+        tr("Failed to restart %1 Client in compatibility mode")
+            .arg(QnAppInfo::productNameLong()),
+        tr("Please close %1 Client and start it again using the shortcut in the start menu.")
+            .arg(QnAppInfo::productNameLong()));
+}
+
+QString QnConnectionDiagnosticsHelper::getDiffVersionsText()
+{
+    return tr("Client and Server have different versions")
+}
+
+QString QnConnectionDiagnosticsHelper::getDiffVersionsExtra(
+    const QString& clientVersion,
+    const QString& serverVersion)
+{
+    return tr("Client - %1", "%1 is version").arg(clientVersion)
+        + L'\n' + tr("Server - %1", "%1 is version").arg(serverVersion);
+}
+
+QString QnConnectionDiagnosticsHelper::getDiffVersionsFullText(
+    const QString& clientVersion,
+    const QString& serverVersion)
+{
+    return getDiffVersionsText() + lit(".\n")
+        + getDiffVersionsExtra(clientVersion, serverVersion);
 }
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
@@ -194,7 +216,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
     QList<QnSoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
-        return showApplauncherError(parentWidget, versionDetails);
+        return handleApplauncherError(parentWidget);
     bool isInstalled = versions.contains(connectionInfo.version);
 
     while (true)
@@ -206,21 +228,18 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 ? QnSoftwareVersion::FullFormat
                 : QnSoftwareVersion::MinorFormat);
 
-            int selectedButton = QnMessageBox::warning(
-                parentWidget,
-                helpTopicId,
-                getErrorString(ErrorStrings::UnableConnect),
-                tr("You are about to connect to Server which has a different version:") + L'\n'
-                + tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
-                + tr(" - Server version: %1.").arg(versionString) + L'\n'
-                + tr("Client version %1 is required to connect to this Server.").arg(versionString) + L'\n'
-                + tr("Download version %1?").arg(versionString),
+            const auto extras =
+                getDiffVersionsFullText(qnCommon->engineVersion().toString(), versionString)
+                + L'\n'
+                + tr("You have to download another version of"
+                    " %1 Client to connect to this Server.").arg(QnAppInfo::productNameLong());
 
-                QDialogButtonBox::StandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::Cancel),
-                QDialogButtonBox::Cancel
-            );
+            QnMessageBox dialog(QnMessageBoxIcon::Question,
+                tr("Download Client version %1?").arg(versionString), extras,
+                QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parentWidget);
 
-            if (selectedButton == QDialogButtonBox::Yes)
+            dialog.addCustomButton(QnMessageBoxCustomButton::Download);
+            if (dialog.exec() == QDialogButtonBox::Yes)
             {
                 QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
                     new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
@@ -256,27 +275,23 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 return Qn::IncompatibleProtocolConnectionResult;
 
             case applauncher::api::ResultType::connectError:
-                QnMessageBox::critical(
-                    parentWidget,
-                    tr("Launcher process not found."),
-                    tr("Cannot restart the Client in compatibility mode.") + L'\n'
-                    + tr("Please close the application and start it again using the shortcut in the start menu.")
-                );
-                return Qn::IncompatibleVersionConnectionResult;
+                return handleCompatibilityMode(parentWidget);
 
             default:
             {
                 //trying to restore installation
-                int selectedButton = QnMessageBox::warning(
-                    parentWidget,
-                    helpTopicId,
-                    tr("Failure"),
-                    tr("Failed to launch compatibility version %1").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)) + L'\n'
-                    + tr("Try to restore version %1?").arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
-                    QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
-                    QDialogButtonBox::Cancel
-                );
-                if (selectedButton == QDialogButtonBox::Ok)
+                // TODO: #ynikitenkov same version ??
+                const auto version = connectionInfo.version.toString(QnSoftwareVersion::MinorFormat);
+                QnMessageBox dialog(QnMessageBoxIcon::Critical,
+                    tr("Failed to launch version %1").arg(version)
+                        + L'\n' + tr("Try to restore version %1?").arg(version),
+                    QString(),
+                    QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+                    parentWidget);
+
+                dialog.addCustomButton(QnMessageBoxCustomButton::Restore);
+
+                if (dialog.exec() == QDialogButtonBox::Yes)
                 {
                     //starting installation
                     QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));

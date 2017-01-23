@@ -298,18 +298,23 @@ void QnLicenseManagerWidget::updateLicenses()
     updateButtons();
 }
 
-void QnLicenseManagerWidget::showMessage(const QString &title, const QString &message)
+void QnLicenseManagerWidget::showMessage(
+    QnMessageBoxIcon icon,
+    const QString& text,
+    const QString& extras,
+    bool copyToClipbordButton)
 {
     // TODO: #ynikitenkov make it!
     QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
-    messageBox->setIcon(QnMessageBoxIcon::Warning);
-    messageBox->setWindowTitle(title);
-    messageBox->setText(message);
-    QPushButton* copyButton = messageBox->addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
-    connect(copyButton, &QPushButton::clicked, this, [this, message]
+    messageBox->setIcon(icon);
+    messageBox->setText(text);
+
+    if (copyToClipbordButton)
     {
-        qApp->clipboard()->setText(message);
-    });
+        const auto button = messageBox->addCustomButton(QnMessageBoxCustomButton::CopyToClipboard);
+        connect(button, &QPushButton::clicked, this,
+            [this, extras] { qApp->clipboard()->setText(extras); });
+    }
     messageBox->setStandardButtons(QDialogButtonBox::Ok);
     messageBox->setEscapeButton(QDialogButtonBox::Ok);
     messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -322,12 +327,9 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull())
     {
-        emit showMessageLater(
-            tr("License Activation"),
-            tr("Network error has occurred during automatic license activation.")
-            + L'\n'
-            + tr("Try to activate your license manually.")
-        );
+        emit showMessageLater(QnMessageBoxIcon::Critical,
+            networkErrorText(), networkErrorExtras(), false);
+
         ui->licenseWidget->setOnline(false);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
@@ -433,14 +435,15 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     if (!keyLicense)
     {
         /* QNetworkReply slots should not start event loop. */
-        emit showMessageLater(tr("License Activation"),
-                              tr("You are trying to activate an incompatible license with your software. "
-                                 "Please contact support team to get a valid license key."));
+        emit showMessageLater(QnMessageBoxIcon::Warning,
+            tr("Incompatible license"),
+            tr("License you are trying to activate is incompatible with your software."
+                " Please contact Customer Support to get a valid license key."), false);
     }
     else if (licenseListHelper.getLicenseByKey(licenseKey))
     {
-        emit showMessageLater(tr("License Activation"),
-                              tr("License has already been activated."));
+        emit showMessageLater(QnMessageBoxIcon::Information,
+            tr("You already activated this license"), QString(), false);
     }
 }
 
@@ -521,7 +524,7 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
 
     if (!license || (errorCode != ec2::ErrorCode::ok))
-        showNetworkErrorMessage();
+        QnMessageBox::_critical(this, networkErrorText(), networkErrorExtras());
     else if (license)
         QnMessageBox::_success(this, tr("License activated"));
 
@@ -544,9 +547,8 @@ void QnLicenseManagerWidget::at_downloadError()
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation ") + reply->errorString(),
-                              tr("Network error has occurred during automatic license activation. "
-                                 "Please contact support to activate your license key manually."));
+        emit showMessageLater(QnMessageBoxIcon::Critical,
+            networkErrorText(), networkErrorExtras(), false);
 
         ui->licenseWidget->setOnline(false);
     }
@@ -566,8 +568,7 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
     {
         QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation"),
-                              message);
+        emit showMessageLater(QnMessageBoxIcon::Warning, message, QString(), false);
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
         return;
     }
@@ -588,9 +589,8 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         {
             if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired)
             {
-                emit showMessageLater(
-                    tr("License Activation"),
-                    tr("Unable to activate license:  %1").arg(QnLicense::errorMessage(errCode)));
+                emit showMessageLater(QnMessageBoxIcon::Critical,
+                    tr("Failed to activate license"), QnLicense::errorMessage(errCode), false);
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else
@@ -631,9 +631,8 @@ void QnLicenseManagerWidget::at_licenseRemoved(int reqID, ec2::ErrorCode errorCo
     }
     else
     {
-        showMessage(
-            tr("Remove license"),
-            tr("Unable to remove license from server:  %1").arg(ec2::toString(errorCode)));
+        showMessage(QnMessageBoxIcon::Critical,
+            tr("Failed to remove license from Server"), ec2::toString(errorCode), false);
     }
 }
 
@@ -688,9 +687,12 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     }
 }
 
-void QnLicenseManagerWidget::showNetworkErrorMessage()
+QString QnLicenseManagerWidget::networkErrorText()
 {
-    QnMessageBox::_critical(this,
-        tr("Network error"),
-        tr("Please contact Customer Support to activate license key manually."));
+    return tr("Network error");
+}
+
+QString QnLicenseManagerWidget::networkErrorExtras()
+{
+    return tr("Please contact Customer Support to activate license key manually.");
 }

@@ -38,11 +38,19 @@ enum class QnMessageBoxCustomButton
 
     Export,                     //< Uses QDialogButtonBox::YesRole
 
+    Download,                   //< Uses QDialogButtonBox::YesRole
+
     Move,                       //< Uses QDialogButtonBox::YesRole
     Skip,                       //< Uses QDialogButtonBox::NoRole
 
     Close,                      //< Uses QDialogButtonBox::YesRole
     Keep,                       //< Uses QDialogButtonBox::NoRole
+
+    Stop,                       //< Uses QDialogButtonBox::YesRole
+
+    Restore,                    //< Uses QDialogButtonBox::YesRole
+
+    CopyToClipboard,            //< Uses QDialogButtonBox::HelpRole
 
     RestartNow,                 //< Uses QDialogButtonBox::YesRole
     RestartLater,               //< Uses QDialogButtonBox::NoRole
@@ -87,6 +95,10 @@ public: // TODO: #ynikitenkov Move to distinct class
     static void showFailedToSetPosition(
         QWidget* parent,
         const QString& cameraName);
+
+    static void showFailedRestartClient(QWidget* parent);
+
+    static void showAnotherVideoWallExist(QWidget* parent);
 
 public:
     QnMessageBox(
@@ -140,7 +152,7 @@ public:
 public:
     virtual ~QnMessageBox();
 
-    void addCustomButton(QnMessageBoxCustomButton button);
+    QAbstractButton* addCustomButton(QnMessageBoxCustomButton button);
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton *addButton(const QString &text, QDialogButtonBox::ButtonRole role);

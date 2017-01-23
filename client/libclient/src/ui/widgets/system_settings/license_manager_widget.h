@@ -47,11 +47,20 @@ private slots:
 
     void licenseDetailsRequested(const QModelIndex& index);
 
-    void showMessage(const QString &title, const QString &message);
+    void showMessage(
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras,
+        bool copyToClipbordButton);
+
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
 signals:
-    void showMessageLater(const QString &title, const QString &message);
+    void showMessageLater(
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras,
+        bool copyToClipbordButton);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
@@ -65,7 +74,9 @@ private:
 
     void exportLicenses();
 
-    void showNetworkErrorMessage();
+    static QString networkErrorText();
+    static QString networkErrorExtras();
+
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 

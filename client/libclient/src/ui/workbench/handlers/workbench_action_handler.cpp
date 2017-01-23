@@ -814,7 +814,8 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             errorResources).arg(server->getName());
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
-            text, QString(), QDialogButtonBox::Cancel| QDialogButtonBox::Yes,
+            text, QString(),
+            QDialogButtonBox::Cancel| QDialogButtonBox::Yes, QDialogButtonBox::Yes,
             mainWindow());
 
         messageBox.addCustomButton(QnMessageBoxCustomButton::Move);
@@ -1088,47 +1089,39 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
     /* Check that we are deleting online auto-found cameras */
-    auto onlineAutoDiscoveredCameras = cameras.filtered(
+    const auto onlineAutoDiscoveredCameras = cameras.filtered(
         [](const QnVirtualCameraResourcePtr& camera)
-    {
-        return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
-    });
+        {
+            return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
+        });
 
-    const auto question = (cameras.size() == resources.size())
+    const auto text = (cameras.size() == resources.size()
         ? QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Do you really want to delete the following %n devices?", "", cameras.size()),
-                tr("Do you really want to delete the following %n cameras?", "", cameras.size()),
-                tr("Do you really want to delete the following %n I/O modules?", "", cameras.size())
-            ), cameras)
-        : tr("Do you really want to delete the following %n items?", "", resources.size());
+                tr("Delete %n devices?", "", cameras.size()),
+                tr("Delete %n cameras?", "", cameras.size()),
+                tr("Delete %n I/O Modules?", "", cameras.size())),
+            cameras)
+        : tr("Delete %n items?", "", resources.size()));
 
-    QString information;
-    if (!onlineAutoDiscoveredCameras.isEmpty())
-    {
-        information = QnDeviceDependentStrings::getNameFromSet(
+    const auto extras = (!onlineAutoDiscoveredCameras.isEmpty()
+        ? QString()
+        : QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("%n devices are auto-discovered. They may be auto-discovered again after removing.",
+                tr("%n of them are auto-discovered.",
                     "", onlineAutoDiscoveredCameras.size()),
-                tr("%n cameras are auto-discovered. They may be auto-discovered again after removing.",
+                tr("%n cameras are auto-discovered.",
                     "", onlineAutoDiscoveredCameras.size()),
-                tr("%n I/O modules are auto-discovered. They may be auto-discovered again after removing.",
-                    "", onlineAutoDiscoveredCameras.size())
-                ),
-            cameras
-            );
-    }
+                tr("%n I/O modules are auto-discovered.",
+                    "", onlineAutoDiscoveredCameras.size())),
+            cameras) + L' ' + tr("They may be auto-discovered again after removing."));
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        helpId,
-        tr("Delete Resources..."),
-        question,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(information);
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.setCheckBoxText(tr("Don't show this message again"));
     messageBox.addCustomWidget(new QnResourceListView(resources));
 
     auto result = messageBox.exec();
@@ -1140,7 +1133,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         qnSettings->save();
     }
 
-    return result == QDialogButtonBox::Ok;
+    return result == QDialogButtonBox::Yes;
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
@@ -1289,10 +1282,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
 
     if (period.durationMs < steps[1])
     {
-        QnMessageBox::warning(
-            mainWindow(),
-            tr("Unable to perform preview search."),
-            tr("Selected time period is too short to perform preview search. Please select a longer period."));
+        QnMessageBox::_warning(mainWindow(),
+            tr("Too short period selected"),
+            tr("Can't perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
     }
 
@@ -1482,15 +1474,12 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered() {
         if (dialog->state() == QnCameraAdditionDialog::Searching
             || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            int result = QnMessageBox::warning(
-                mainWindow(),
-                tr("Process in progress..."),
-                tr("Device addition is already in progress. "
-                    "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
-                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                QDialogButtonBox::Cancel
-                );
-            if (result != QDialogButtonBox::Ok)
+            const auto result = QnMessageBox::_question(mainWindow(),
+                tr("Cancel device adding?"), QString(),
+                QDialogButtonBox::Yes | QDialogButtonBox::No,
+                QDialogButtonBox::No);
+
+            if (result != QDialogButtonBox::Yes)
                 return;
         }
         dialog->setServer(server);
@@ -1547,18 +1536,17 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered()
 {
     auto resources = menu()->currentParameters(sender()).resources().toSet().toList();
 
-    const auto question = tr("Are you sure you want to permanently delete these %n files?",
-        "", resources.size());
-
+    /**
+     * #ynikitenkov According to specs this functionality is disabled
+     * Change texts and dialog when it is enabled
+     */
     QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::MainWindow_Tree_DragCameras_Help,
-        tr("Delete Files"),
+        QnMessageBoxIcon::Warning,
         tr("Confirm files deleting"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        tr("Are you sure you want to permanently delete these %n files?", "", resources.size()),
+        QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::Yes,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
-    messageBox.setInformativeText(question);
+
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
@@ -1582,25 +1570,16 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
-        QString title = checkedFlags == Qn::user
-            ? tr("User already exists.")
-            : tr("Video Wall already exists");
+        if (checkedFlags == Qn::user)
+            QnMessageBox::_warning(mainWindow(), tr("There is another user with the same name"));
+        else
+            QnMessageBox::showAnotherVideoWallExist(mainWindow());
 
-        QString message = checkedFlags == Qn::user
-            ? tr("User with the same name already exists")
-            : tr("Video Wall with the same name already exists.");
-
-        QnMessageBox::warning(
-            mainWindow(),
-            title,
-            message
-            );
         return false;
     }
 
     return true;
 }
-
 
 void QnWorkbenchActionHandler::at_renameAction_triggered()
 {
@@ -1842,19 +1821,16 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Error"),
-                tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024 * 1024)));
+            const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
+            QnMessageBox::_warning(mainWindow(),
+                tr("Image too big"),
+                tr("Maximum size is %1 MB.").arg(maxFileSize));
             return;
         }
 
         if (status != QnAppServerFileCache::OperationResult::ok)
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Error"),
-                tr("Error while uploading picture."));
+            QnMessageBox::_critical(mainWindow(), tr("Failed to upload image"));
             return;
         }
 
@@ -2112,10 +2088,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    QnMessageBox::warning(mainWindow(),
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::BetaVersion))
+        return;
+
+    QnMessageBox dialog(QnMessageBoxIcon::Information,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("This is a beta version of %1.")
-        .arg(qApp->applicationDisplayName()));
+        tr("Some functionality may be unavailable or not working properly."),
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
+
+    dialog.setCheckBoxText(tr("Don't show this message again"));
+    dialog.exec();
+
+    if (dialog.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::BetaVersion;
+        qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
+    }
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
@@ -2141,13 +2131,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QnMessageBox::information(
-        mainWindow(),
-        tr("Anonymous Usage Statistics"),
-        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.")
-            + L'\n'
-            + tr("If you would like to disable this feature you can do so in the System Administration dialog.")
-        );
+    QnMessageBox::_information(mainWindow(),
+        tr("The System sends anonymous usage statistics"),
+        tr("It will be used by software development team to improve your user experience.")
+            + L'\n' + tr("To disable it, go to the System Administration dialog."));
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
@@ -2184,12 +2171,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
 
     if (!tryToRestartClient())
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Launcher process not found."),
-            tr("Cannot restart the client.") + L'\n'
-            + tr("Please close the application and start it again using the shortcut in the start menu.")
-            );
+        QnMessageBox::showFailedRestartClient(mainWindow());
         return;
     }
     menu()->trigger(QnActions::DelayedForcedExitAction);
@@ -2264,9 +2246,7 @@ void QnWorkbenchActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
-        QnMessageBox::warning(mainWindow(),
-            tr("Cannot open server web page"),
-            tr("Could not execute initial server query"));
+        QnMessageBox::_critical(mainWindow(), tr("Failed to open server web page"));
 
         return;
     }
