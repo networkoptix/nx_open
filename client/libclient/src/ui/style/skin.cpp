@@ -62,8 +62,8 @@ void QnSkin::init(const QStringList& paths)
     }
 
     const qreal dpr = qApp->devicePixelRatio();
-    const int cacheLimit = 64 * 1024 // 64 MB
-        * qRound(dpr * dpr); // dpi-dcaled
+    const int cacheLimit = qRound(64 * 1024 // 64 MB
+        * dpr * dpr); // dpi-dcaled
     if (QPixmapCache::cacheLimit() < cacheLimit)
         QPixmapCache::setCacheLimit(cacheLimit);
 }
