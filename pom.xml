@@ -195,7 +195,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloud.group>dev</cloud.group>
-        <cloud.host>cloud-test.hdw.mx</cloud.host>
+        <cloudHostAutoDetect>false</cloudHostAutoDetect>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -1215,7 +1215,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudHostAutoDetect</name>
+                    <value>true</value>
                 </property>
             </activation>
             <build>
@@ -1251,12 +1252,12 @@
                 <property>
                     <name>artifactsValidator</name>
                 </property>
-            </activation>            
+            </activation>
             <modules>
                 <module>artifacts_validator</module>
             </modules>
         </profile>
-        
+
         <!-- Artifact naming profiles -->
 
         <profile>
