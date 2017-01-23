@@ -332,6 +332,7 @@ void QnLoginDialog::accept()
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
+                case Qn::IncompatibleCloudHostConnectionResult:
                     menu()->trigger(QnActions::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
@@ -466,8 +467,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         /* Do not show servers with incompatible customization or cloud host */
         if (!qnRuntime->isDevMode()
-            && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
-                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
+            && compatibilityCode == Qn::IncompatibleInternalConnectionResult)
         {
             continue;
         }

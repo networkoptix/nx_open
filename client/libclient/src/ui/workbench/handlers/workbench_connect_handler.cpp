@@ -449,6 +449,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             }
             break;
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
         default:    //error
@@ -980,6 +981,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     switch (status)
     {
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             // Do not store connection if applauncher is offline
             if (!applauncher::checkOnline(false))
                 break;
@@ -998,6 +1000,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
             connectToServer(url);
             break;
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
         default:

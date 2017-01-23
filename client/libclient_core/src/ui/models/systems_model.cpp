@@ -468,9 +468,8 @@ QString QnSystemsModelPrivate::getCompatibleVersion(
         switch (result)
         {
             case Qn::IncompatibleProtocolConnectionResult:
-                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
             case Qn::IncompatibleCloudHostConnectionResult:
-                return serverInfo.version.toString();
+                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
             default:
                 break;
         }
@@ -534,7 +533,6 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
                 return true;
 
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult != Qn::IncompatibleInternalConnectionResult
-                && connectionResult != Qn::IncompatibleCloudHostConnectionResult;
+            return connectionResult != Qn::IncompatibleInternalConnectionResult;
         });
 }

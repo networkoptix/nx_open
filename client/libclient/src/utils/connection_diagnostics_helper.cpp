@@ -33,9 +33,9 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::LdapTemporaryUnauthorizedConnectionResult:
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
         case Qn::IncompatibleInternalConnectionResult:
-        case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::ForbiddenConnectionResult:
             return Qn::Login_Help;
+        case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
         case Qn::IncompatibleProtocolConnectionResult:
             return Qn::VersionMismatch_Help;
@@ -80,13 +80,6 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::IncompatibleInternalConnectionResult:
         return tr("You are trying to connect to incompatible Server.");
-    case Qn::IncompatibleCloudHostConnectionResult:
-    {
-        return tr("This client is intended to work with the different cloud instance") + lit("<br>")
-            + htmlBold(QnAppInfo::defaultCloudHost()) + lit("<br>")
-            + tr("Target server works with cloud instance") + lit("<br>")
-            + htmlBold(connectionInfo.cloudHost);
-    }
     case Qn::IncompatibleVersionConnectionResult:
     {
         return tr("Server has a different version:") + L'\n'
@@ -94,6 +87,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + tr("Compatibility mode for versions lower than %1 is not supported.")
             .arg(QnConnectionValidator::minSupportedVersion().toString());
     }
+    case Qn::IncompatibleCloudHostConnectionResult:
     case Qn::IncompatibleProtocolConnectionResult:
         return tr("Server has a different version:") + L'\n'
             + versionDetails
@@ -117,8 +111,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     const auto helpTopicId = helpTopic(result);
     const QString description = getErrorDescription(result, connectionInfo);
 
-    if (result == Qn::IncompatibleProtocolConnectionResult)
+    if (result == Qn::IncompatibleProtocolConnectionResult
+        || result == Qn::IncompatibleCloudHostConnectionResult)
+    {
         return handleCompatibilityMode(connectionInfo, parentWidget);
+    }
 
     QnMessageBox::warning(
         parentWidget,
