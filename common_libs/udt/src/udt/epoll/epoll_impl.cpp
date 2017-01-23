@@ -34,16 +34,15 @@ int EpollImpl::removeUdtSocket(const UDTSOCKET& u)
     m_sUDTSocksOut.erase(u);
     m_sUDTSocksEx.erase(u);
 
+    removeUdtSocketEvents(lock, u);
+
     return 0;
 }
 
 void EpollImpl::removeUdtSocketEvents(const UDTSOCKET& socket)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-
-    m_sUDTReads.erase(socket);
-    m_sUDTWrites.erase(socket);
-    m_sUDTExcepts.erase(socket);
+    removeUdtSocketEvents(lock, socket);
 }
 
 void EpollImpl::add(const SYSSOCKET& s, const int* events)
@@ -74,10 +73,16 @@ int EpollImpl::wait(
         systemWriteFds->clear();
 
 #ifdef WAIT_ON_SYSTEM_EPOLL
-    const std::chrono::microseconds timeout = 
+    std::chrono::microseconds timeout = 
         msTimeout < 0
         ? std::chrono::microseconds::max()
         : std::chrono::milliseconds(msTimeout);
+
+    if (areThereSignalledUdtSockets())
+    {
+        // Going through system poll call anyway to check state of system sockets.
+        timeout = std::chrono::microseconds::zero();
+    }
 
     int eventCount = m_systemEpoll->poll(systemReadFds, systemWriteFds, timeout);
     if (eventCount < 0)
@@ -235,4 +240,19 @@ void EpollImpl::addMissingEvents(std::map<UDTSOCKET, int>* udtWriteFds)
                 socketHandleAndEventMask.second |= UDT_EPOLL_ERR;
         }
     }
+}
+
+void EpollImpl::removeUdtSocketEvents(
+    const std::lock_guard<std::mutex>& /*lock*/,
+    const UDTSOCKET& socket)
+{
+    m_sUDTReads.erase(socket);
+    m_sUDTWrites.erase(socket);
+    m_sUDTExcepts.erase(socket);
+}
+
+bool EpollImpl::areThereSignalledUdtSockets() const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    return !m_sUDTWrites.empty() || !m_sUDTReads.empty() || !m_sUDTExcepts.empty();
 }

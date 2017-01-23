@@ -31,7 +31,7 @@ public:
     void updateEpollSets(int events, const UDTSOCKET& socketId, bool enable);
 
 private:
-    std::mutex m_mutex;
+    mutable std::mutex m_mutex;
 
     std::unique_ptr<AbstractEpoll> m_systemEpoll;
 
@@ -58,4 +58,10 @@ private:
         std::map<UDTSOCKET, int>* udtWriteFds);
 
     void addMissingEvents(std::map<UDTSOCKET, int>* udtWriteFds);
+
+    void removeUdtSocketEvents(
+        const std::lock_guard<std::mutex>& lock,
+        const UDTSOCKET& socket);
+
+    bool areThereSignalledUdtSockets() const;
 };
