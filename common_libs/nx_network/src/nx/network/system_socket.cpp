@@ -242,8 +242,9 @@ bool Socket<InterfaceToImplement>::close()
     if( m_fd == -1 )
         return true;
 
-    //checking that socket is not registered in aio
-    NX_ASSERT(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
+    NX_ASSERT(
+        !nx::network::SocketGlobals::isInitialized() ||
+        !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(this)));
 
     auto fd = m_fd;
     m_fd = -1;
@@ -1348,6 +1349,7 @@ TCPServerSocket::~TCPServerSocket()
     }
 
     NX_CRITICAL(
+        !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
             .isSocketBeingWatched(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
