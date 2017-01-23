@@ -6,6 +6,14 @@
  * A proxy widget that can be forced to draw only part of the source widget.
  * This is useful when animating source widget's size, as constantly re-rendering
  * it into cache may be very slow.
+ *
+ * Later this class evolved into an optimized graphics proxy that repaints its
+ * internal buffer only when embedded widget changes. The best compatibility
+ * is with cacheMode == ItemCoordinateCache, but it cannot benefit from
+ * our sharp pixmap painting mechanism.
+ *
+ * WARNING! Without caching (cacheMode == NoCache) it does not support embedded
+ * widget scroll operations, unless used with patched Qt!
  */
 class QnMaskedProxyWidget: public QGraphicsProxyWidget
 {
