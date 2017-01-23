@@ -50,7 +50,7 @@ protected:
 
 private:
     bool ensurePixmap(const QSize& logicalSize, int devicePixelRatio); //< returns true if pixmap was changed
-    void updatePixmapRect(const QRect& logicalRect, int devicePixelRatio);
+    void renderWidgetRect(const QRect& logicalRect, int devicePixelRatio);
     void updateDirtyRect();
 
 public slots:
