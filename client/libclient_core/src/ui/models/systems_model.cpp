@@ -534,6 +534,7 @@ bool QnSystemsModelPrivate::isCompatibleInternal(
                 return true;
 
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
-            return connectionResult != Qn::IncompatibleInternalConnectionResult;
+            return connectionResult != Qn::IncompatibleInternalConnectionResult
+                && connectionResult != Qn::IncompatibleCloudHostConnectionResult;
         });
 }

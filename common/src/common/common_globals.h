@@ -870,7 +870,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         UnauthorizedConnectionResult,               /*< Invalid login/password. */
         LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
         CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
-        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization. */
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/

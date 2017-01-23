@@ -18,6 +18,7 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
+#include <utils/common/html.h>
 
 namespace {
 
@@ -78,8 +79,14 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::IncompatibleInternalConnectionResult:
-    case Qn::IncompatibleCloudHostConnectionResult:
         return tr("You are trying to connect to incompatible Server.");
+    case Qn::IncompatibleCloudHostConnectionResult:
+    {
+        return tr("This client is intended to work with the different cloud instance") + lit("<br>")
+            + htmlBold(QnAppInfo::defaultCloudHost()) + lit("<br>")
+            + tr("Target server works with cloud instance") + lit("<br>")
+            + htmlBold(connectionInfo.cloudHost);
+    }
     case Qn::IncompatibleVersionConnectionResult:
     {
         return tr("Server has a different version:") + L'\n'
@@ -110,11 +117,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
     const auto helpTopicId = helpTopic(result);
     const QString description = getErrorDescription(result, connectionInfo);
 
-    if (result == Qn::IncompatibleProtocolConnectionResult
-        || result == Qn::IncompatibleCloudHostConnectionResult)
-    {
+    if (result == Qn::IncompatibleProtocolConnectionResult)
         return handleCompatibilityMode(connectionInfo, parentWidget);
-    }
 
     QnMessageBox::warning(
         parentWidget,
