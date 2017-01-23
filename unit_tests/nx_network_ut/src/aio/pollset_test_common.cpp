@@ -119,9 +119,8 @@ void CommonPollSetTest::runRemoveSocketWithMultipleEventsTest()
     simulateSocketEvents(aio::etRead | aio::etWrite);
     int numberOfEventsReported = 0;
     handleSocketEvents(
-        [this, &numberOfEventsReported](Pollable* const socket, aio::EventType eventType)
+        [this, &numberOfEventsReported](Pollable* const socket, aio::EventType /*eventType*/)
         {
-            static_cast<void*>(&eventType);
             ++numberOfEventsReported;
 
             const int seed = nx::utils::random::number<int>(0, 2);
