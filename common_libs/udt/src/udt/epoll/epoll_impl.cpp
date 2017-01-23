@@ -132,13 +132,13 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
         std::lock_guard<std::mutex> lock(m_mutex);
 
         if ((events & UDT_EPOLL_IN) != 0)
-            modified |= updateEpollSets(socketId, m_sUDTSocksIn, m_sUDTReads, enable);
+            modified |= recordSocketEvent(socketId, m_sUDTSocksIn, m_sUDTReads, enable);
 
         if ((events & UDT_EPOLL_OUT) != 0)
-            modified |= updateEpollSets(socketId, m_sUDTSocksOut, m_sUDTWrites, enable);
+            modified |= recordSocketEvent(socketId, m_sUDTSocksOut, m_sUDTWrites, enable);
 
         if ((events & UDT_EPOLL_ERR) != 0)
-            modified |= updateEpollSets(socketId, m_sUDTSocksEx, m_sUDTExcepts, enable);
+            modified |= recordSocketEvent(socketId, m_sUDTSocksEx, m_sUDTExcepts, enable);
     }
     
     if (modified)
@@ -151,21 +151,21 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
     }
 }
 
-bool EpollImpl::updateEpollSets(
+bool EpollImpl::recordSocketEvent(
     const UDTSOCKET& uid,
-    const std::set<UDTSOCKET>& watch,
-    std::set<UDTSOCKET>& result,
+    const std::set<UDTSOCKET>& polledSockets,
+    std::set<UDTSOCKET>& triggeredSockets,
     bool enable)
 {
     bool modified = false;
-    if (enable && (watch.find(uid) != watch.end()))
+    if (enable && (polledSockets.find(uid) != polledSockets.end()))
     {
-        result.insert(uid);
+        triggeredSockets.insert(uid);
         modified = true;
     }
     else if (!enable)
     {
-        if (result.erase(uid) > 0)
+        if (triggeredSockets.erase(uid) > 0)
             modified = true;
     }
 

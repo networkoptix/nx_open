@@ -43,10 +43,10 @@ private:
     std::set<UDTSOCKET> m_sUDTReads;          // UDT sockets ready for read
     std::set<UDTSOCKET> m_sUDTExcepts;        // UDT sockets with exceptions (connection broken, etc.)
 
-    bool updateEpollSets(
+    bool recordSocketEvent(
         const UDTSOCKET& uid,
-        const std::set<UDTSOCKET>& watch,
-        std::set<UDTSOCKET>& result,
+        const std::set<UDTSOCKET>& polledSockets,
+        std::set<UDTSOCKET>& triggeredSockets,
         bool enable);
 
     int addUdtSocketEvents(
