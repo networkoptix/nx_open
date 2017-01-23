@@ -28,6 +28,7 @@
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <recorder/camera_info.h>
 
 #include <atomic>
 #include <future>
@@ -49,6 +50,8 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
     friend class TestHelper;
+    friend class nx::caminfo::ServerHandler;
+
     struct ArchiveCameraData
     {
         ec2::ApiCameraData coreData;
@@ -309,8 +312,8 @@ private:
     mutable QnMutex m_occupiedSpaceInfoMutex;
     StorageSpaceInfoMap m_occupiedSpaceInfo;
 
-    QMap<QString, QByteArray> m_storageUrlToCameraInfo;
-    QElapsedTimer m_cameraInfoWriteTimer;
+    nx::caminfo::ServerHandler m_camInfoWriterHandler;
+    nx::caminfo::Writer m_camInfoWriter;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
