@@ -36,11 +36,6 @@ int sceneDevicePixelRatio(const QGraphicsScene* scene)
     return ratio;
 }
 
-QRectF scaleRect(const QRectF& source, qreal scale)
-{
-    return QRectF(source.topLeft() * scale, source.size() * scale);
-}
-
 } // namespace
 
 
