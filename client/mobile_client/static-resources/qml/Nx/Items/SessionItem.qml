@@ -95,9 +95,6 @@ Pane
             return
         }
 
-        if (!contentItem.enabled)
-            return
-
         if (cloudSystem)
         {
             if (!hostsModel.isEmpty)

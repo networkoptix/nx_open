@@ -356,8 +356,8 @@ QnTimeline::QnTimeline(QQuickItem* parent):
     QLocale locale;
     for (int i = 1; i <= 12; ++i)
     {
-        d->suffixList.append(locale.standaloneMonthName(i));
-        d->suffixList.append(locale.monthName(i));
+        d->suffixList.append(locale.standaloneMonthName(i, QLocale::ShortFormat));
+        d->suffixList.append(locale.monthName(i, QLocale::ShortFormat));
     }
 
     d->updateTextHelper();
@@ -1102,8 +1102,8 @@ void QnTimelinePrivate::updateMaxZoomLevelTextLengths()
                 maxZoomLevelTextLength[i] = qMax(
                     maxZoomLevelTextLength[i],
                     fm.size(0, level.type == QnTimelineZoomLevel::Days
-                        ? locale.monthName(month)
-                        : locale.standaloneMonthName(month)).width());
+                        ? locale.monthName(month, QLocale::ShortFormat)
+                        : locale.standaloneMonthName(month, QLocale::ShortFormat)).width());
             }
 
             if (level.type == QnTimelineZoomLevel::Days)
