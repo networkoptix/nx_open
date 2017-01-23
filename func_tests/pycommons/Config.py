@@ -2,6 +2,7 @@
 # Artem V. Nikitin
 # Functests configuration
 
+import os
 from ConfigParser import RawConfigParser
 from ProxyObj import ProxyObj
 
