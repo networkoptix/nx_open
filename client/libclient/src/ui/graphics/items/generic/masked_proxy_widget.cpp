@@ -236,8 +236,21 @@ bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == widget())
     {
-        if (event->type() == QEvent::UpdateRequest && cacheMode() == NoCache)
-            updateDirtyRect();
+        switch (event->type())
+        {
+            case QEvent::UpdateRequest:
+                if (cacheMode() != NoCache)
+                    break;
+                updateDirtyRect();
+                break;
+
+            case QEvent::CursorChange:
+                setCursor(widget()->cursor());
+                break;
+
+            default:
+                break;
+        }
     }
 
     return base_type::eventFilter(watched, event);
