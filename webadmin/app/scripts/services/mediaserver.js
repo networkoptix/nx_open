@@ -391,6 +391,9 @@ angular.module('webadminApp')
                 // 1. get remote nonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
@@ -408,17 +411,16 @@ angular.module('webadminApp')
                         takeRemoteSettings: !keepMySystem
                     });
                 },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
+                    return $q.reject(error);
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data) {
+
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
                     var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
@@ -433,12 +435,7 @@ angular.module('webadminApp')
                         url: url
                     }));
                 },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
+                    return $q.reject(error);
                 });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
