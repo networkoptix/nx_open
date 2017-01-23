@@ -37,6 +37,14 @@ public:
 signals:
     void paintRectChanged();
 
+protected:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
+private:
+    bool ensurePixmap(const QSize& logicalSize, int devicePixelRatio); //< returns true if pixmap was changed
+    void updatePixmapRect(const QRect& logicalRect, int devicePixelRatio);
+    void updateDirtyRect();
+
 public slots:
     void setUpdatesEnabled(bool updatesEnabled);
     void enableUpdates() { setUpdatesEnabled(true); }
@@ -47,4 +55,7 @@ private:
     bool m_updatesEnabled;
     QPixmap m_pixmap;
     QRect m_pixmapRect;
+    bool m_itemCached;
+    bool m_fullRepaintPending;
+    QRect m_dirtyRect;
 };
