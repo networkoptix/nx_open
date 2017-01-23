@@ -18,7 +18,6 @@
 #include <utils/applauncher_utils.h>
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
-#include <utils/common/html.h>
 
 namespace {
 
