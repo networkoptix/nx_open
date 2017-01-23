@@ -182,6 +182,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     if (!m_multipleServerSocket)
         return;
 
+    NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
     if (m_boundToCloud)
     {
         NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);
