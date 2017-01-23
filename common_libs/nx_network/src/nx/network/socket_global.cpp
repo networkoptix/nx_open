@@ -100,14 +100,18 @@ void SocketGlobals::init(int initializationFlags)
 
 void SocketGlobals::deinit()
 {
-    QnMutexLocker lock(&s_mutex);
-    if (--s_counter == 0) //< Last out.
+    SocketGlobals* instanceToDelete = nullptr;
     {
-        delete s_instance;
-        s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
-        s_instance = nullptr;
-        s_initState = InitState::none;
+        QnMutexLocker lock(&s_mutex);
+        if (--s_counter == 0) //< Last out.
+        {
+            instanceToDelete = s_instance;
+            s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
+            s_instance = nullptr;
+            s_initState = InitState::none;
+        }
     }
+    delete instanceToDelete;
 }
 
 void SocketGlobals::verifyInitialization()
