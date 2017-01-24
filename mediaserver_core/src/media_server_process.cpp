@@ -2742,6 +2742,13 @@ void MediaServerProcess::run()
         this,
         &MediaServerProcess::updateAddressesList);
 
+    connect(
+        m_mediaServer.data(),
+        &QnMediaServerResource::primaryAddressChanged,
+        this,
+        &MediaServerProcess::updateAddressesList);
+
+
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
     m_crashReporter.reset(new ec2::CrashReporter);
