@@ -1116,8 +1116,8 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
         if( info )
         {
             ka.onoff = TRUE;
-            ka.keepalivetime = info->timeSec * 1000; // s to ms
-            ka.keepaliveinterval = info->intervalSec * 1000; // s to ms
+            ka.keepalivetime = (int) info->time.count() * 1000; // s to ms
+            ka.keepaliveinterval = (int) info->interval.count() * 1000; // s to ms
 
             // the value can not be changed, 0 means default
             info->probeCount = 0;
@@ -1132,28 +1132,27 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
             m_keepAlive = std::move( *info );
     #else
         int isEnabled = info ? 1 : 0;
-        if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
-                        &isEnabled, sizeof(isEnabled) ) != 0 )
+        if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE, &isEnabled, sizeof(isEnabled) ) != 0 )
             return false;
 
         if( !info )
             return true;
 
         #if defined( Q_OS_LINUX )
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
-                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+            const int time = (int) info->time.count();
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE, &time, sizeof(time) ) < 0 )
                 return false;
 
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
-                            &info->intervalSec, sizeof(info->intervalSec) ) < 0 )
+            const int interval = (int) info->interval.count();
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(interval) ) < 0 )
                 return false;
 
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
-                            &info->probeCount, sizeof(info->probeCount) ) < 0 )
+            const int count = (int) info->probeCount;
+            if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count) ) < 0 )
                 return false;
         #elif defined( Q_OS_MACX )
-            if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE,
-                            &info->timeSec, sizeof(info->timeSec) ) < 0 )
+            const int time = (int) info->time.count();
+            if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, sizeof(time) ) < 0 )
                 return false;
         #endif
     #endif
@@ -1177,23 +1176,31 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) cons
 
     #if defined(Q_OS_WIN)
         *result = m_keepAlive;
-    #elif defined(Q_OS_LINUX)
-        KeepAliveOptions info;
-        if( getsockopt( handle(), SOL_TCP, TCP_KEEPIDLE,
-                        &info.timeSec, &length ) < 0 )
-            return false;
-
-        if( getsockopt( handle(), SOL_TCP, TCP_KEEPINTVL,
-                        &info.intervalSec, &length ) < 0 )
-            return false;
-
-        if( getsockopt( handle(), SOL_TCP, TCP_KEEPCNT,
-                        &info.probeCount, &length ) < 0 )
-            return false;
-
-        *result = std::move( info );
     #else
         *result = KeepAliveOptions();
+        #if defined(Q_OS_LINUX)
+            int time;
+            if( getsockopt( handle(), SOL_TCP, TCP_KEEPIDLE, &time, &length ) < 0 )
+                return false;
+
+            int interval;
+            if( getsockopt( handle(), SOL_TCP, TCP_KEEPINTVL, &interval, &length ) < 0 )
+                return false;
+
+            int count;
+            if( getsockopt( handle(), SOL_TCP, TCP_KEEPCNT, &count, &length ) < 0 )
+                return false;
+
+            (*result)->time = std::chrono::seconds(time);
+            (*result)->interval = std::chrono::seconds(interval);
+            (*result)->probeCount = (size_t) count;
+        #elif defined( Q_OS_MACX )
+            int time;
+            if( getsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, &length ) < 0 )
+                return false;
+
+            (*result)->time = std::chrono::seconds(time);
+        #endif
     #endif
 
     return true;
