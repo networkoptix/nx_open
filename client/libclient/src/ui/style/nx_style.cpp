@@ -620,15 +620,15 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
             {
-                mainColor = this->mainColor(Colors::kBrand);
+                mainColor = this->mainColor(Colors::kRed);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
-            else if (isWarningStyle(widget))
+            else if (isAccented(widget))
             {
-                mainColor = this->mainColor(Colors::kRed);
+                mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
@@ -699,15 +699,15 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
             {
-                mainColor = this->mainColor(Colors::kBrand);
+                mainColor = this->mainColor(Colors::kRed);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
-            else if (isWarningStyle(widget))
+            else if (isAccented(widget))
             {
-                mainColor = this->mainColor(Colors::kRed);
+                mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
@@ -2372,10 +2372,10 @@ void QnNxStyle::drawControl(
                     return;
                 }
 
-                if (isDefaultForegroundRole && isAccented(widget))
-                    foregroundRole = QPalette::HighlightedText;
-                else if (isDefaultForegroundRole && isWarningStyle(widget))
+                if (isDefaultForegroundRole && isWarningStyle(widget))
                     foregroundRole = QPalette::BrightText;
+                else if (isDefaultForegroundRole && isAccented(widget))
+                    foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
