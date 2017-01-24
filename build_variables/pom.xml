@@ -189,8 +189,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>cloud.host</name>
-                    <value>auto</value>
+                    <name>cloudHostAutoDetect</name>
+                    <value>true</value>
                 </property>
             </activation>
             <build>

@@ -132,7 +132,8 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
 
     if (m_currentButton != Qn::ResourceOverlayButton::Empty)
         result |= QnStatusOverlayWidget::Control::kButton;
-    else if (!descriptionText(overlay).isEmpty())
+
+    if (!descriptionText(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kDescription;
 
     return result;
@@ -224,10 +225,11 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
     return extractValue(overlay, kCaptions);
 }
 
-QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay /*overlay*/)
+QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay overlay)
 {
-    // TODO: add description and state for no access rights situation
-    return QString();
+    return (overlay == Qn::UnauthorizedOverlay
+        ? tr("Please check authentication information")
+        : QString());
 }
 
 QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)

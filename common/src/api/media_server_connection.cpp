@@ -1039,8 +1039,14 @@ int QnMediaServerConnection::cameraHistory(
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
+    const auto connectionVersion = QnAppServerConnectionFactory::connectionInfo().version;
+
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;
+
+    if (!connectionVersion.isNull() && connectionVersion < QnSoftwareVersion(3, 0))
+        fixedFormatRequest.requestVersion = QnChunksRequestData::RequestVersion::v2_6;
+
     return sendAsyncGetRequestLogged(ec2RecordedTimePeriodsObject,
         fixedFormatRequest.toParams(), QN_STRINGIZE_TYPE(MultiServerPeriodDataList), target, slot);
 }
