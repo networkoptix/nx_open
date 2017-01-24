@@ -206,7 +206,7 @@ TEST_F(PerformanceMultipleServerSocket, single_tcp_socket_blocking_accept)
     printResults(testResult);
 }
 
-TEST_F(PerformanceMultipleServerSocket, just_tcp_server_socket)
+TEST_F(PerformanceMultipleServerSocket, regular_tcp_server_socket)
 {
     givenTcpServerSocket();
     const auto testResult = measurePerformance();
