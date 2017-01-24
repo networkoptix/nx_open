@@ -207,14 +207,19 @@ angular.module('webadminApp')
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
-                var systems = _.map(r.data.reply, function(module)
+                var systems  = _.filter(r.data.reply, function(module){
+                    return !module.serverFlags.indexOf(Config.newServerFlag)>=0 && module.cloudHost == Config.cloud.host;
+                });
+
+                systems = _.map(systems, function(module)
                 {
                     var system = {
                         url: module.remoteAddresses[0] + ':' + module.port,
                         systemName: module.systemName,
                         ip: module.remoteAddresses[0],
                         name: module.name,
-                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0
+                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0,
+                        compatibleCloudHost: module.cloudHost == Config.cloud.host
                     };
 
                     system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';

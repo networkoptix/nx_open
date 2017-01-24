@@ -117,6 +117,8 @@ run_watchdog()
 {
     while true; do
         start
+        #avioding sleep mode
+        echo 0 > /sys/class/graphics/fb0/blank
         sleep 20
     done
 }

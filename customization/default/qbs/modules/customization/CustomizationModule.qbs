@@ -18,6 +18,8 @@ Module
     property string cloudHost: "cloud-test.hdw.mx"
     property string cloudName: "Nx Cloud"
 
+    property string liteDeviceName: "Nx1"
+
     property string helpUrl: "http://networkoptix.com/files/help"
     property string settingsUrl: "http://networkoptix.com/files/settings"
     property string showcaseUrl: "http://networkoptix.com/files/showcase"

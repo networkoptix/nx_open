@@ -361,7 +361,26 @@ angular.module('webadminApp')
 
             var zones = reply.data.reply;
             zones = _.sortBy(zones,function(zone){
-                return zone.comment;
+
+                var offsetString = '(UTC)';
+                if(zone.offsetFromUtc != 0){
+                    offsetString = zone.offsetFromUtc > 0?'(UTC +':'(UTC -';
+
+                    var absOffset = Math.abs(zone.offsetFromUtc);
+                    var zoneHours = Math.floor(absOffset/3600);
+                    var zoneMinutes = Math.floor( (absOffset % 3600) / 60);
+
+                    if(zoneHours<10){
+                        zoneHours = '0' + zoneHours;
+                    }
+                    if(zoneMinutes<10){
+                        zoneMinutes = '0' + zoneMinutes;
+                    }
+                    offsetString += zoneHours  + ":" + zoneMinutes +")";
+                }
+
+                zone.name = offsetString +' ' + zone.id;
+                return zone.offsetFromUtc;
             });
             /*$scope.alltimeZones = _.indexBy(zones,function(zone){
                 return zone.id;

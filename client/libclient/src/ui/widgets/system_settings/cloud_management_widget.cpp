@@ -70,8 +70,9 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
     const QString kIssuesLink = makeHref(tr("known issues"), QnAppInfo::defaultCloudPortalUrl());
-    const QString kPromoText = tr("Nx Cloud is in Beta yet. See %1", "%1 is a link to known issues")
-        .arg(kIssuesLink);
+    const QString kPromoText = tr("%1 is in Beta yet. See %2", 
+        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
+        .arg(QnAppInfo::cloudName()).arg(kIssuesLink);
 
     ui->promoBar->setText(kPromoText);
 
