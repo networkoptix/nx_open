@@ -600,7 +600,7 @@ angular.module('webadminApp')
 
             timeSettings:function(dateTime, timeZone){
                 if(!dateTime || !timeZone) {
-                    return wrapGet(proxy + '/web/api/gettime');
+                    return wrapGet(proxy + '/web/api/gettime?local');
                 }
                 return wrapPost(proxy + '/web/api/setTime', stringifyValues({
                     timeZoneId: timeZone,
