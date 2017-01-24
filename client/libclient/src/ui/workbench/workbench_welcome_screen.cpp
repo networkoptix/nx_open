@@ -209,7 +209,7 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
         const auto serverHost = system->getServerHost(firstServerId);
 
         connectToLocalSystem(system->id(), serverHost.toString(),
-            credentials.user, credentials.password,
+            credentials.user, credentials.password.value(),
             kAlwaysStorePassword, kNeverAutologin);
 
         return;
@@ -436,7 +436,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 
             QUrl url = serverUrl;
             if (!credentials.password.isEmpty())
-                url.setPassword(credentials.password);
+                url.setPassword(credentials.password.value());
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
@@ -498,7 +498,7 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                 if (dialog->savePassword())
                 {
                     qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                    qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+                    qnClientCoreSettings->setCloudPassword(cloudCredentials.password.value());
                 }
 
                 qnCloudStatusWatcher->setCredentials(cloudCredentials, true);

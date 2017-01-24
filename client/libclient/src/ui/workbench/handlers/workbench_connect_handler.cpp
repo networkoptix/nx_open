@@ -864,7 +864,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     QUrl url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
-    url.setPassword(credentials.password);
+    url.setPassword(credentials.password.value());
 
     menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
 }
