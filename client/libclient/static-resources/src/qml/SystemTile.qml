@@ -228,9 +228,9 @@ BaseTile
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
-                currentAreaItem.host = control.impl.hostsModelAccessor.getData("url", 0) || "";
+                currentAreaItem.host = control.impl.hostsModelAccessor.getData(0, "url") || "";
                 currentAreaItem.displayHost =
-                    control.impl.hostsModelAccessor.getData("display", 0) || "";
+                    control.impl.hostsModelAccessor.getData(0, "display") || "";
             }
             else // Cloud system
             {
