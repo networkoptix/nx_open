@@ -10,7 +10,7 @@ namespace ec2
     class QnMiscNotificationManager : public AbstractMiscNotificationManager
     {
     public:
-        void triggerNotification(const QnTransaction<ApiSystemIdData> &transaction);
+        void triggerNotification(const QnTransaction<ApiSystemIdData> &transaction, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnMiscNotificationManager> QnMiscNotificationManagerPtr;

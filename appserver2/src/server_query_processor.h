@@ -86,7 +86,7 @@ void triggerNotification(
 
     QnAppServerConnectionFactory::getConnection2()
         ->notificationManager()
-        ->triggerNotification(tran);
+        ->triggerNotification(tran, NotificationSource::Local);
 }
 }
 
