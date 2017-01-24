@@ -849,6 +849,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     switch (params.eventType) {
     case CameraDisconnectEvent: {
         detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+        detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
         break;
     }
 
@@ -860,6 +861,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     case NetworkIssueEvent:
         {
             detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }
