@@ -77,13 +77,13 @@ private:
     {
         m_server->bindToAioThread(aioThread);
         ASSERT_TRUE(m_server->setNonBlockingMode(true))
-            << SystemError::getLastOsErrorTest().toStdString();
+            << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->setReuseAddrFlag(true))
-            << SystemError::getLastOsErrorTest().toStdString();
+            << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
-            << SystemError::getLastOsErrorTest().toStdString();
+            << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(m_server->listen())
-            << SystemError::getLastOsErrorTest().toStdString();
+            << SystemError::getLastOSErrorText().toStdString();
 
         auto address = m_server->getLocalAddress();
         NX_LOGX(lm("listening %1 for %2 sockets")
