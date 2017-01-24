@@ -624,13 +624,13 @@ void QnNxStyle::drawPrimitive(
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
-                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
             else if (isWarningStyle(widget))
             {
                 mainColor = this->mainColor(Colors::kRed);
                 if (!enabled)
-                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;

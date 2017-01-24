@@ -56,6 +56,7 @@ namespace style
     {
     public:
         static const qreal kDisabledItemOpacity;        /**< Default disabled item opacity */
+        static const qreal kDisabledBrandedButtonOpacity; /**< Branded buttons disabled opacity */
         static const int kMinimumFormLabelWidth;        /**< Minimal text label width in forms */
     };
 
