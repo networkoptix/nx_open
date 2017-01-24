@@ -600,7 +600,7 @@ void QnNxStyle::drawPrimitive(
                 return;
 
             QColor color = isAccented(widget) || isWarningStyle(widget)
-                ? option->palette.color(QPalette::HighlightedText)
+                ? option->palette.color(QPalette::BrightText)
                 : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
