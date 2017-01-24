@@ -22,7 +22,9 @@
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
+#include <helpers/url_helper.h>
 #include <helpers/system_helpers.h>
+#include <settings/last_connection.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -379,7 +381,10 @@ void QnConnectionManagerPrivate::doConnect()
             updateWeightData(localId);
             qnClientCoreSettings->save();
 
-            nx::client::core::SingleConnectionData connectionData{connectionInfo.systemName, url};
+            LastConnectionData connectionData{
+                connectionInfo.systemName,
+                QnUrlHelper(url).cleanUrl(),
+                QnCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 

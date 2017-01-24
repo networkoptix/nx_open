@@ -7,7 +7,7 @@ namespace client {
 namespace core {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (LocalConnectionData)(SingleConnectionData)(WeightData),
+    (LocalConnectionData)(WeightData),
     (eq)(json), _Fields)
 
 } // namespace core

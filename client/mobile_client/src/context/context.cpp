@@ -18,6 +18,7 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <settings/last_connection.h>
 #include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
@@ -174,7 +175,7 @@ void QnContext::removeSavedConnection(const QString& localSystemId)
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedConnection(nx::client::core::SingleConnectionData());
+    qnSettings->setLastUsedConnection(LastConnectionData());
 }
 
 QString QnContext::getLastUsedSystemName() const
@@ -184,7 +185,7 @@ QString QnContext::getLastUsedSystemName() const
 
 QUrl QnContext::getLastUsedUrl() const
 {
-    return qnSettings->lastUsedConnection().url;
+    return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
 QUrl QnContext::getInitialUrl() const

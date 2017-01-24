@@ -5,6 +5,9 @@
 #include <mobile_client/mobile_client_meta_types.h>
 #include <mobile_client/mobile_client_startup_parameters.h>
 #include <client_core/local_connection_data.h>
+#include <settings/last_connection.h>
+
+using nx::client::mobile::settings::LastConnectionData;
 
 class QnMobileClientSettings : public QnPropertyStorage, public Singleton<QnMobileClientSettings>
 {
@@ -61,9 +64,9 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         settingsVersion,            setSettingsVersion,         SettingsVersion,            0)
 
         QN_DECLARE_RW_PROPERTY(
-            nx::client::core::SingleConnectionData,
+            LastConnectionData,
             lastUsedConnection, setLastUsedConnection,
-            LastUsedConnection, nx::client::core::SingleConnectionData())
+            LastUsedConnection, LastConnectionData())
 
         QN_DECLARE_RW_PROPERTY(int,                         autoLoginMode,              setAutoLoginMode,           AutoLogin,                  (int) AutoLoginMode::Auto)
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
