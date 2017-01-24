@@ -3,8 +3,6 @@
 #include "../common.h"
 #include "epoll_factory.h"
 
-#define WAIT_ON_SYSTEM_EPOLL 1
-
 EpollImpl::EpollImpl()
 {
     m_systemEpoll = EpollFactory::instance()->create();
@@ -72,7 +70,6 @@ int EpollImpl::wait(
     if (systemWriteFds)
         systemWriteFds->clear();
 
-#ifdef WAIT_ON_SYSTEM_EPOLL
     std::chrono::microseconds timeout = 
         msTimeout < 0
         ? std::chrono::microseconds::max()
@@ -90,37 +87,6 @@ int EpollImpl::wait(
 
     eventCount += addUdtSocketEvents(udtReadFds, udtWriteFds);
     return eventCount;
-#else
-    int total = 0;
-
-    uint64_t entertime = CTimer::getTime();
-    for (;;)
-    {
-        total += addUdtSocketEvents(udtReadFds, udtWriteFds);
-        
-        if (systemReadFds || systemWriteFds)
-        {
-            const int eventCount = m_systemEpoll->poll(
-                systemReadFds,
-                systemWriteFds,
-                std::chrono::microseconds::zero());
-            if (eventCount < 0)
-                return -1;
-            total += eventCount;
-        }
-
-        if (total > 0)
-            return total;
-
-        auto now = CTimer::getTime();
-        if (msTimeout >= 0 && now - entertime >= (uint64_t)msTimeout * 1000)
-            return 0;
-
-        CTimer::waitForEvent();
-    }
-
-    return 0;
-#endif
 }
 
 int EpollImpl::interruptWait()
@@ -147,13 +113,7 @@ void EpollImpl::updateEpollSets(int events, const UDTSOCKET& socketId, bool enab
     }
     
     if (modified)
-    {
-#ifdef WAIT_ON_SYSTEM_EPOLL
         m_systemEpoll->interrupt();
-#else
-        CTimer::triggerEvent();
-#endif
-    }
 }
 
 bool EpollImpl::recordSocketEvent(
