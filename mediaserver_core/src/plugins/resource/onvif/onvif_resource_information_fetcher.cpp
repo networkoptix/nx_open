@@ -96,6 +96,7 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
         qCritical() << "Can't find " << ONVIF_ANALOG_RT << " resource type in resource type pool";
     }
 
+    m_hookChain.registerHook(searcher_hooks::commonHooks);
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
 }
 

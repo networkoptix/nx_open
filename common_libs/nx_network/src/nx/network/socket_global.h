@@ -25,9 +25,9 @@ namespace network {
 class NX_NETWORK_API SocketGlobals
 {
 public:
-    struct NX_NETWORK_API DebugConfiguration: nx::utils::FlagConfig
+    struct NX_NETWORK_API DebugConfig: nx::utils::FlagConfig
     {
-        DebugConfiguration(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
+        DebugConfig(): nx::utils::FlagConfig("nx_network_debug") { reload(); }
 
         NX_FLAG(0, multipleServerSocket, "Extra debug info from MultipleServerSocket");
         NX_FLAG(0, cloudServerSocket, "Extra debug info from cloud::CloudServerSocket");
@@ -53,7 +53,7 @@ public:
     typedef cloud::tcp::ReverseConnectionPool TcpReversePool;
 
     static Config& config() { return s_instance->m_config; }
-    static DebugConfiguration& debugConfig() { return s_instance->m_debugConfig; }
+    static DebugConfig& debugConfig() { return s_instance->m_debugConfig; }
     static aio::AIOService& aioService() { return *s_instance->m_aioService; }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
@@ -94,7 +94,7 @@ private:
      */
     SocketGlobals(int initializationFlags);
     ~SocketGlobals();
-    void setDebugConfigurationTimer();
+    void setDebugConfigTimer();
 
     enum class InitState { none, inintializing, done, deinitializing };
 
@@ -111,7 +111,7 @@ private:
 
     const int m_initializationFlags;
     Config m_config;
-    DebugConfiguration m_debugConfig;
+    DebugConfig m_debugConfig;
     std::shared_ptr<QnLog::Logs> m_log;
 
     // Is unique_ptr because it should be initiated after m_aioService but removed after.

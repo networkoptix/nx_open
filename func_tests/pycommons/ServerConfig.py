@@ -10,12 +10,12 @@ RuntimeCfgFileName   = 'mediaserver_runtime.conf'
 DEFAULT_CONFIG = {
   'noSetupWizard': 1,
   'removeDbOnStartup': 1,
-  'systemIdFromSystemName': 1,
+#  'systemIdFromSystemName': 1,
   'port': 7001,
   'appserverPassword': '',
   'rtspTransport': '',
   'logLevel': 'DEBUG2',
-  'systemName':'functesting',
+#  'systemName':'functesting',
   'cameraSettingsOptimization': 'true',
   'statisticsReportAllowed':'true' }
 

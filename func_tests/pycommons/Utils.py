@@ -334,7 +334,3 @@ def importClassByName(path, name):
         mod = getattr(mod, comp)
     cls = getattr(mod, name)
     return cls
-
-def generateGuid(quoted=True):
-    guid = str(uuid.uuid4())
-    return quoted and "{%s}" % guid or guid

@@ -4,61 +4,52 @@
 
 import time, os, json, random, urllib
 from hashlib import md5
-from pycommons.MockClient import ClientMixin, Client
-from pycommons.SingleServerTest import MediaServerInstanceTest
+from pycommons.MockClient import ClientMixin, Client, DigestAuthClient
+from pycommons.ServerTest import MediaServerInstanceTest
 from pycommons.Logger import LOGLEVEL, log
 from pycommons.Config import config
-from pycommons.Utils import generateGuid
 from pycommons.Rec import Rec
-from pycommons.GenData import generateServerData, generateStorageData, generateCameraData, \
-     generateServerUserAttributesData, generateCameraUserAttributesData, generateResourceData, \
-     generateUserData
+from pycommons.GenData import generateUserData, BasicGenerator, GeneratorMixin, generateGuid
+from pycommons.FillStorage import FillSettings, StorageMixin
 
-class InstanceTest(MediaServerInstanceTest, ClientMixin):
+class InstanceTest(MediaServerInstanceTest, ClientMixin, StorageMixin, GeneratorMixin):
     "Single server instance test"
 
     helpStr = 'Single server instance test'
     _test_name = 'Single server instance'
     _test_key = 'instance'
+    
     # Test suites
     _suites = ( ('SingeServerInstanceSuits', [
         'testCreateAndCheck',
         'testNonExistUserGroup',
         'testRemoveChildObjects',
         'testServerHeader',
-        'testStaticVulnerability']), )
+        'testStaticVulnerability',
+        'testGetTimePeriods'
+        ]), )
+
+    @classmethod
+    def prepareEnv(cls, server):
+        MediaServerInstanceTest.prepareEnv(server)
+        cls.archiveCameraMac = BasicGenerator.generateMac()
+        cls.archiveStartTime = time.time()
+        cls.expPeriods = server.fillStorage(
+            cls.archiveCameraMac,
+            FillSettings(startTime = cls.archiveStartTime,
+                         step = 1, count = 3))
 
     def setUp(self):
         MediaServerInstanceTest.setUp(self)
         ClientMixin.setUp(self)
+        self.archiveCamera = self.createCamera(
+            parentId = self.server.guid,
+            physicalId = self.archiveCameraMac)
+        self.rebuildArchive(self.server)
         
     def tearDown(self):
         MediaServerInstanceTest.tearDown(self)
         ClientMixin.tearDown(self)
-
-
-    # Create user with resource
-    def __createUser(self, **kw):
-        userData = generateUserData(**kw)
-                
-        self.sendAndCheckRequest(
-           self.server.address, "ec2/saveUser",
-           headers={'Content-Type': 'application/json'},
-           data=json.dumps(userData.get()))
-
-        userResourceData = generateResourceData(
-            resourceId = userData.id)
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/setResourceParams",
-            data=json.dumps([userResourceData.get()]))
-
-        self.__checkPresent("ec2/getUsers",
-                            'User', id=userData.id)
-
-        self.__checkPresent("ec2/getResourceParams",
-                           'UserResource', resourceId=userData.id)
-        return userData
 
     # Remove user
     def __removeUser(self, userGuid):
@@ -67,107 +58,22 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
             headers={'Content-Type': 'application/json'},
             data=json.dumps({'id': userGuid}))
 
-        self.__checkAbsent("ec2/getUsers",  'User', id = userGuid )
-        self.__checkAbsent("ec2/getResourceParams",
+        self.checkAbsent("ec2/getUsers",  'User', id = userGuid )
+        self.checkAbsent("ec2/getResourceParams",
                            'UserResource', resourceId=userGuid)
         
-    # Check entity (server, camera, user, etc) present
-    def __checkPresent(self, __method, __name, **kw):
-        response = self.sendAndCheckRequest(
-            self.server.address, __method)
-        
-        self.assertHasItem(kw, response.data, __name)
-
-    # Check entity (server, camera, user, etc) absent
-    def __checkAbsent(self, __method, __name, **kw):
-        response = self.sendAndCheckRequest(
-            self.server.address, __method)
-        
-        self.assertHasNotItem(kw, response.data, __name)
-
-    # Create camera with attributes & resource
-    def __createCamera(self, serverGuid):
-        cameraData = generateCameraData(parentId = serverGuid)
-        
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/saveCamera",
-            data=json.dumps(cameraData.get()))
-        
-        cameraUserAttrData = generateCameraUserAttributesData(
-            cameraId = cameraData.id)
-        
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/saveCameraUserAttributes",
-            data=json.dumps(cameraUserAttrData.get()))
-       
-        cameraResourceData = generateResourceData(
-            resourceId = cameraData.id)
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/setResourceParams",
-            data=json.dumps([cameraResourceData.get()]))
-
-        self.__checkPresent("ec2/getCameras", 'Camera', id=cameraData.id)
-        self.__checkPresent("ec2/getCameraUserAttributesList", 'CameraAttributes',
-                            cameraId=cameraData.id)
-        self.__checkPresent("ec2/getResourceParams",
-                            'CameraResource', resourceId=cameraData.id)
-        
-        return cameraData
-
     # Check camera & child object was removed
     def __checkCameraRemoved(self, cameraId):
-        self.__checkAbsent("ec2/getCameras", 'Camera', id = cameraId)
-        self.__checkAbsent("ec2/getCameraUserAttributesList", 'Camera',
+        self.checkAbsent("ec2/getCameras", 'Camera', id = cameraId)
+        self.checkAbsent("ec2/getCameraUserAttributesList", 'Camera',
                             cameraId=cameraId)
-        self.__checkAbsent("ec2/getResourceParams",
+        self.checkAbsent("ec2/getResourceParams",
                            'ServerResource', resourceId=cameraId)
-
-    # Create storage
-    def __createStorage(self, serverGuid):
-        storageData = generateStorageData(parentId = serverGuid)
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/saveStorage",
-            data=json.dumps(storageData.get()))
-
-        self.__checkPresent("ec2/getStorages", 'Storage', id=storageData.id)
-
-        return storageData
-
-    # Create server with attributes & resource
-    def __createServer(self):
-        serverData = generateServerData()
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/saveMediaServer",
-            data=json.dumps(serverData.get()))
-
-        serverUserAttrData = generateServerUserAttributesData(
-            serverId = serverData.id)
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/saveMediaServerUserAttributes",
-            data=json.dumps(serverUserAttrData.get()))
-
-        serverResourceData = generateResourceData(
-            resourceId = serverData.id)
-
-        self.sendAndCheckRequest(
-            self.server.address, "ec2/setResourceParams",
-            data=json.dumps([serverResourceData.get()]))
-
-        self.__checkPresent("ec2/getMediaServers", 'Server', id=serverData.id)
-        self.__checkPresent("ec2/getMediaServerUserAttributesList",
-                              'ServerAttributes', serverId=serverData.id)
-        self.__checkPresent("ec2/getResourceParams",
-                            'ServerResource', resourceId=serverData.id)
-        return serverData
 
     # https://networkoptix.atlassian.net/browse/VMS-2246
     def testCreateAndCheck(self):
         "Create and check user"
-        userData = self.__createUser(
+        userData = self.createUser(
             name = "user1", email = "user1@example.com", permissions = "2432",
             cryptSha512Hash = "", digest = "", hash = "", isAdmin = False,
             isEnabled = True, isLdap = False, realm = "")
@@ -176,7 +82,7 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
         
         # To make sure 
         time.sleep(2.0)
-        self.__checkPresent("ec2/getUsers", 'User', **expData)
+        self.checkPresent("ec2/getUsers", 'User', **expData)
 
         self.__removeUser(userData.id)
 
@@ -184,7 +90,7 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
     def testNonExistUserGroup(self):
         "Unexisting user role"
         unexistsUserRole = generateGuid()
-        userData1 = self.__createUser(
+        userData1 = self.createUser(
             name = "user2", email = "user2@example.com")
         
         userData2 = generateUserData(
@@ -217,16 +123,16 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
     def testRemoveChildObjects(self):
         "Remove child objects"
         # Create server
-        serverData = self.__createServer()
+        serverData = self.createServer()
 
         # Create storage
-        storageData = self.__createStorage(serverData.id)
+        storageData = self.createStorage(parentId = serverData.id)
 
-        self.__checkPresent("ec2/getStorages", 'Storage', id=storageData.id)
+        self.checkPresent("ec2/getStorages", 'Storage', id=storageData.id)
 
         # Create cameras
-        cameraData1 = self.__createCamera(serverData.id)
-        cameraData2 = self.__createCamera(serverData.id)
+        cameraData1 = self.createCamera(parentId = serverData.id)
+        cameraData2 = self.createCamera(parentId = serverData.id)
 
         # Remove camera#1
         self.sendAndCheckRequest(
@@ -240,12 +146,12 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
             self.server.address, "ec2/removeMediaServer",
             data=json.dumps({'id': serverData.id}))
 
-        self.__checkAbsent("ec2/getMediaServers", 'Server', id = serverData.id)
-        self.__checkAbsent("ec2/getStorages", 'Storage', id = storageData.id)
-        self.__checkAbsent("ec2/getMediaServerUserAttributesList",
-                              'ServerAttributes', serverId=serverData.id)
-        self.__checkAbsent("ec2/getResourceParams",
-                            'ServerResource', resourceId=serverData.id)
+        self.checkAbsent("ec2/getMediaServers", 'Server', id = serverData.id)
+        self.checkAbsent("ec2/getStorages", 'Storage', id = storageData.id)
+        self.checkAbsent("ec2/getMediaServerUserAttributesList",
+                         'ServerAttributes', serverId=serverData.id)
+        self.checkAbsent("ec2/getResourceParams",
+                         'ServerResource', resourceId=serverData.id)
 
         self.__checkCameraRemoved(cameraData2.id)
 
@@ -273,6 +179,19 @@ class InstanceTest(MediaServerInstanceTest, ClientMixin):
         response = self.client.httpRequest(
             self.server.address, urllib.quote("static/../../test.file"))
         self.assertEqual(403, response.status)
-        
-        
+
+    def testGetTimePeriods(self):
+        'Get time periods check'
+        response = self.sendAndCheckRequest(
+            self.server.address,
+            'ec2/recordedTimePeriods',
+            cameraId = self.archiveCamera.id,
+            startTime = '0',
+            endTime='now')
+
+        gotPeriods = filter(lambda x: x['guid'] == self.server.guid, response.data['reply'])
+        gotPeriods = map(lambda x: x['periods'], gotPeriods)
+        gotPeriods = [Rec(item) for sublist in gotPeriods for item in sublist]
+        self.compare(self.expPeriods, gotPeriods)
+
         
