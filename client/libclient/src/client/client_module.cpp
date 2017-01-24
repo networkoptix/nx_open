@@ -266,7 +266,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     auto clientInstanceManager = common->store(new QnClientInstanceManager());
 
     /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
-    common->store(new QnClientSettingsWatcher(clientInstanceManager));
+    common->store(new QnClientSettingsWatcher());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
@@ -523,7 +523,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        
+
         // Window icon is taken from 'icons' customization project. Suppress check.
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png")); // _IGNORE_VALIDATION_
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
