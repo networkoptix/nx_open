@@ -323,11 +323,12 @@ QAbstractButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
         return addButton(tr("Download"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::Stop:
         return addButton(tr("Stop"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Restore:
-        return addButton(tr("Restore"), QDialogButtonBox::YesRole);
+    case QnMessageBoxCustomButton::TryAgain:
+        return addButton(tr("Try Again"), QDialogButtonBox::YesRole);
     case QnMessageBoxCustomButton::CopyToClipboard:
         return addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
-
+    case QnMessageBoxCustomButton::Restart:
+        return addButton(tr("Restart"), QDialogButtonBox::YesRole);
     default:
         NX_ASSERT(false, "Unknown custom button");
         return nullptr;

@@ -1572,7 +1572,7 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Stop)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Stop);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
@@ -2059,21 +2059,14 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         resources.append(proxyResource);
     }
 
-    const auto question = tr("Are you sure you want to permanently delete these %n matrices?",
-        "", resources.size());
-
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Matrices"),
-        tr("Confirm matrices deleting"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
+    QnMessageBox messageBox(QnMessageBoxIcon::Question,
+        tr("Delete %n matrices?", "", resources.size()), QString(),
+        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
-    messageBox.setInformativeText(question);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
-    auto result = messageBox.exec();
 
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomWidget(new QnResourceListView(resources));
+    const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
         return;
 

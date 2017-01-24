@@ -431,12 +431,15 @@ void QnServerUpdatesWidget::discardChanges()
 
     if (canCancelUpdate())
     {
-        const auto button = QnMessageBox::_question(this,
-            tr("Cancel update?"), QString(),
-            QDialogButtonBox::Yes | QDialogButtonBox::No,
-            QDialogButtonBox::Yes);
+        QnMessageBox dialog(QnMessageBoxIcon::Information,
+            tr("System update in process"), QString(),
+            QDialogButtonBox::NoButton | QDialogButtonBox::Yes, QDialogButtonBox::Yes,
+            this);
 
-        if (button == QDialogButtonBox::Yes)
+        dialog.addCustomButton(QnMessageBoxCustomButton::CancelUpdate);
+        dialog.addCustomButton(QnMessageBoxCustomButton::ContinueInBackground);
+
+        if (dialog.exec() == QDialogButtonBox::Yes)
             cancelUpdate();
     }
     else

@@ -35,7 +35,6 @@ public:
 
 private:
     static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
-    static void showApplauncherError(QWidget* parentWidget);
     static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);
 
     static QString getDiffVersionsText();
@@ -45,6 +44,12 @@ private:
     static QString getDiffVersionsFullText(
         const QString& clientVersion,
         const QString& serverVersion);
+
+    static QString getDiffVersionFullExtras(
+        const QString& clientVersion,
+        const QString& serverVersion,
+        const QString& extraText);
+
 
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,

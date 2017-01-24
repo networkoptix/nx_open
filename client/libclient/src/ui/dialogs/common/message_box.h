@@ -28,11 +28,7 @@ enum class QnMessageBoxCustomButton
     Overwrite,                  //< Uses QDialogButtonBox::YesRole
     Delete,                     //< Uses QDialogButtonBox::YesRole
 
-    AddStorage,                 //< Uses QDialogButtonBox::YesRole
-
     Reset,                      //< Uses QDialogButtonBox::YesRole
-
-    ForceUpdate,                //< Uses QDialogButtonBox::YesRole
 
     Update,                     //< Uses QDialogButtonBox::YesRole
 
@@ -48,15 +44,24 @@ enum class QnMessageBoxCustomButton
 
     Stop,                       //< Uses QDialogButtonBox::YesRole
 
-    Restore,                    //< Uses QDialogButtonBox::YesRole
+    TryAgain,                   //< Uses QDialogButtonBox::YesRole
 
     CopyToClipboard,            //< Uses QDialogButtonBox::HelpRole
+
+    Restart,                    //< Uses QDialogButtonBox::YesRole
 
     RestartNow,                 //< Uses QDialogButtonBox::YesRole
     RestartLater,               //< Uses QDialogButtonBox::NoRole
 
     SetRecordingToAlways,       //< Uses QDialogButtonBox::YesRole
     EnableSecondaryStream,      //< Uses QDialogButtonBox::NoRole
+
+    AddStorage,                 //< Uses QDialogButtonBox::YesRole
+
+    ForceUpdate,                //< Uses QDialogButtonBox::YesRole
+
+    CancelUpdate,               //< Uses QDialogButtonBox::YesRole
+    ContinueInBackground,       //< Uses QDialogButtonBox::NoRole
 };
 
 class QnMessageBox: public QnDialog

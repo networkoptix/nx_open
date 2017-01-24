@@ -2010,6 +2010,9 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     if (qnRuntime->ignoreVersionMismatch())
         return;
 
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::VersionMismatchDialog))
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (!watcher->hasMismatches())
         return;
@@ -2022,9 +2025,6 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         latestMsVersion = latestVersion;
 
     QStringList messageParts;
-    messageParts << tr("Some components of the system are not updated");
-    messageParts << QString();
-
     for (const QnAppInfoMismatchData &data : watcher->mismatchData())
     {
         QString componentName;
@@ -2046,13 +2046,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         if (componentName.isEmpty())
             continue;
 
-        QString version = L'v' + data.version.toString();
-
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
-        if (updateRequested)
-            version = setWarningStyleHtml(version);
+        const QString version = (updateRequested
+            ? setWarningStyleHtml(data.version.toString())
+            : data.version.toString());
 
         /* Consistency with 'About' dialog. */
         QString component = lit("%1: %2").arg(componentName, version);
@@ -2060,27 +2059,34 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     }
 
     messageParts << QString();
-    messageParts << tr("Please update all components to the latest version %1.").arg(latestMsVersion.toString());
+    messageParts << tr("Please update all components to the version %1").arg(latestMsVersion.toString());
 
-    QString message = messageParts.join(lit("<br/>"));
-
+    const QString extras = messageParts.join(lit("<br/>"));
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindow()));
-    messageBox->setIcon(QnMessageBox::Warning);
-    messageBox->setWindowTitle(tr("Version Mismatch"));
-    messageBox->setText(message);
-    messageBox->setTextFormat(Qt::RichText);
-    messageBox->setStandardButtons(QDialogButtonBox::Cancel);
-    setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
+    messageBox->setIcon(QnMessageBoxIcon::Warning);
+    messageBox->setText(tr("Components of the System have different versions:"));
+    messageBox->setInformativeText(extras);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this, dialog = messageBox.data()]
-    {
-        dialog->accept();
-    menu()->trigger(QnActions::SystemUpdateAction);
-    });
+    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
+    const auto updateButton = messageBox->addCustomButton(QnMessageBoxCustomButton::Update);
+    messageBox->setDefaultButton(QDialogButtonBox::Yes);
+
+    connect(updateButton, &QPushButton::clicked, this,
+        [this, dialog = messageBox.data()]
+        {
+            dialog->accept();
+            menu()->trigger(QnActions::SystemUpdateAction);
+        });
 
     messageBox->exec();
+
+    if (messageBox->isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::VersionMismatchDialog;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()

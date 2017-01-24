@@ -620,19 +620,16 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::_question(this,
+        QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
             tr("There is an another connection with the same name."),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
+            QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-        switch (button)
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
+        switch (dialog.exec())
         {
             case QDialogButtonBox::Cancel:
                 return;
-            case QDialogButtonBox::No:
-                name = connections.generateUniqueName(name);
-                break;
             case QDialogButtonBox::Yes:
                 connections.removeOne(name);
                 break;
@@ -685,12 +682,13 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::_question(this,
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete connection?"), connection.name,
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        this);
 
-    if (result != QDialogButtonBox::Yes)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+    if (dialog.exec() != QDialogButtonBox::Yes)
         return;
 
     connections.removeOne(connection.name);

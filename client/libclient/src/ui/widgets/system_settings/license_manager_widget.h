@@ -47,11 +47,17 @@ private slots:
 
     void licenseDetailsRequested(const QModelIndex& index);
 
+    enum class CopyToClipboardButton
+    {
+        Hide,
+        Show
+    };
+
     void showMessage(
         QnMessageBoxIcon icon,
         const QString& text,
         const QString& extras,
-        bool copyToClipbordButton);
+        CopyToClipboardButton button);
 
     void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
 
@@ -60,7 +66,7 @@ signals:
         QnMessageBoxIcon icon,
         const QString& text,
         const QString& extras,
-        bool copyToClipbordButton);
+        CopyToClipboardButton button);
 
 private:
     void updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url);
@@ -76,6 +82,15 @@ private:
 
     static QString networkErrorText();
     static QString networkErrorExtras();
+    static QString getContactSupportMessage();
+    static QString getProblemPersistMessage();
+
+    void showFailedToActivateLicenseLater(const QString& extras);
+    void showIncompatibleLicenceMessageLater();
+    void showActivationMessageLater(const QJsonObject& errorMessage);
+    void showAlreadyActivatedLater(
+        const QString& hwid,
+        const QString& time = QString());
 
 private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
