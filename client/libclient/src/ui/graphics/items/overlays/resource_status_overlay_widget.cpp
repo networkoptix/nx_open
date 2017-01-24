@@ -216,7 +216,9 @@ void QnStatusOverlayWidget::setIconOverlayPixmap(const QPixmap& pixmap)
 
 void QnStatusOverlayWidget::setIcon(const QPixmap& pixmap)
 {
-    const auto size = pixmap.size() / pixmap.devicePixelRatio();
+    const auto size = pixmap.isNull()
+        ? QSize(0, 0)
+        : pixmap.size() / pixmap.devicePixelRatio();
     m_centralAreaImage->setPixmap(pixmap);
     m_centralAreaImage->setFixedSize(size);
     m_centralAreaImage->setVisible(!pixmap.isNull());
@@ -392,8 +394,9 @@ void QnStatusOverlayWidget::updateAreasSizes()
     m_extrasHolder->setPos(0, height - extrasHeight);
     m_extrasHolder->setFixedSize(QSizeF(rect.width(), extrasHeight));
 
-    const QSizeF imageSize = QSizeF(m_imageItem.pixmap().size())
-        / m_imageItem.pixmap().devicePixelRatioF();
+    const QSizeF imageSize = m_imageItem.pixmap().isNull()
+        ? QSizeF(0, 0)
+        : QSizeF(m_imageItem.pixmap().size()) / m_imageItem.pixmap().devicePixelRatioF();
     auto imageSceneSize = imageSize * scale;
     const auto aspect = (imageSceneSize.isNull() || !imageSceneSize.height() || !imageSceneSize.width()
         ? 1
