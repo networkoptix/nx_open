@@ -800,16 +800,16 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (hasChanges())
         return error(tr("Apply changes to start backup."));
 
-    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-        return true;
-
-    if (!selectedCamerasCount)
+    if (selectedCamerasCount == 0)
     {
         const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Select at least one device to start backup."),
-            tr("Select at least one camera to start backup."));
+            tr("Select at least one device in the Backup Settings to start backup."),
+            tr("Select at least one camera in the Backup Settings to start backup."));
         return error(text);
     }
+
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return true;
 
     const auto rebuildStatusState = [this](QnServerStoragesPool type)
     {
