@@ -941,10 +941,14 @@ void socketAcceptCancelAsync(
     for (size_t i = 0; i < serverCount; ++i)
     {
         auto server = serverMaker();
-        ASSERT_TRUE(server->setNonBlockingMode(true));
-        ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()));
-        ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
-        ASSERT_TRUE(server->listen(5));
+        ASSERT_TRUE(server->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count()))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(server->listen(5))
+            << SystemError::getLastOSErrorText().toStdString();
 
         server->acceptAsync(
             [&](SystemError::ErrorCode, AbstractStreamSocket*) { NX_CRITICAL(false); });
