@@ -112,7 +112,7 @@ public:
 
     RandomlyFailingHttpConnection(
         StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
-        std::unique_ptr<AbstractCommunicatingSocket> sock);
+        std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
     void setResponseBuffer(const QByteArray& buf);

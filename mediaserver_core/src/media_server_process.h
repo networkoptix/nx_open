@@ -75,6 +75,7 @@ public:
 #else
         lit("INFO")),
 #endif
+        cleanupDb(false),
         showVersion(false),
         showHelp(false)
     {

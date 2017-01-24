@@ -43,7 +43,17 @@ int QnCookieLoginRestHandler::executePost(
         *owner->response(),
         &accessRights);
     const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
-    if (authResult != Qn::Auth_OK)
+    if (authResult == Qn::Auth_CloudConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult == Qn::Auth_LDAPConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, "LDAP server is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult != Qn::Auth_OK)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
         return nx_http::StatusCode::ok;

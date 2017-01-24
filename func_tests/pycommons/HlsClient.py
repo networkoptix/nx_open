@@ -1,13 +1,13 @@
 # $Id$
 # Artem V. Nikitin
-# HLS, RTSP mediaserver clients
+# HLS mediaserver client
 
-import urllib2, FuncTest
+import urllib2, FuncTest, socket
 from MockClient import DEFAULT_TIMEOUT, DEFAULT_USER, DEFAULT_PASSWORD, params2url, ServerResponse
 from Config import config
-from Logger import LOGLEVEL, initLog
+from Logger import LOGLEVEL, logException
 
-class HlsClient:
+class HlsClient(object):
 
     class ResponseData(ServerResponse):
 
@@ -39,6 +39,7 @@ class HlsClient:
         self.__password = password or config.get_safe("General", "password", DEFAULT_PASSWORD)
         self.__handler = None
         self.__urlOpener = None
+        self.m3uList = []
 
     def __update(self):
         passwordMgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -75,6 +76,12 @@ class HlsClient:
         if params:
             url += "?" + params
         request = urllib2.Request(url, headers=hdrs)
-        return self.__processRequest(request, self.M3UResponseData)
+        response = self.__processRequest(request, self.M3UResponseData)
+        self.m3uList = response.m3uList
+        return response        
+                
+            
+    
+        
        
         

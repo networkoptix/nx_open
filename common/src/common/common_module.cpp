@@ -188,6 +188,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::resetCachedValue);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::resetCachedValue);
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
+    connect(server.data(),  &QnMediaServerResource::primaryAddressChanged,  this,   &QnCommonModule::resetCachedValue);
 
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
     connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
