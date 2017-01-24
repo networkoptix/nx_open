@@ -1,6 +1,7 @@
 #include <functional>
 #include <thread>
 #include <algorithm>
+#include <array>
 #include <gtest/gtest.h>
 #include <recorder/camera_info.h>
 #include <recorder/device_file_catalog.h>
