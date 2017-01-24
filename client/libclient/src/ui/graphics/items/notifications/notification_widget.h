@@ -101,6 +101,7 @@ signals:
     void closeTriggered();
     void actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters);
     void buttonClicked(const QString& alias);
+    void linkActivated(const QString& link);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
