@@ -400,8 +400,6 @@ TimerManager::TaskContext::TaskContext(
 {
 }
 
-
-
 std::chrono::milliseconds parseTimerDuration(
     const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
@@ -441,6 +439,21 @@ std::chrono::milliseconds parseTimerDuration(
         res = std::chrono::seconds(toUInt(0));
 
     return ok ? res : defaultValue;
+}
+
+boost::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
+    const QString& durationNotTrimmed,
+    std::chrono::milliseconds defaultValue)
+{
+    QString duration = durationNotTrimmed.trimmed().toLower();
+    if (duration == lit("none") || duration == lit("disabled"))
+        return boost::none;
+
+    const auto value = parseTimerDuration(duration, defaultValue);
+    if (value.count() == 0)
+        return boost::none;
+    else
+        return value;
 }
 
 } // namespace utils

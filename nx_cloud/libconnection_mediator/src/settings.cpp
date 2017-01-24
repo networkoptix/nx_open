@@ -55,12 +55,18 @@ const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
+const QLatin1String kStunInactivityTimeout("stun/inactivityTimeout");
+const std::chrono::hours kDefaultStunInactivityTimeout(10);
+
 //HTTP
 const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
 const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
 const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
 const QLatin1String kDefaultHttpKeepAliveOptions("");
+
+const QLatin1String kHttpInactivityTimeout("stun/inactivityTimeout");
+const std::chrono::hours kDefaultHttpInactivityTimeout(1);
 
 const QString kModuleName = lit("connection_mediator");
 
@@ -253,12 +259,18 @@ void Settings::loadConfiguration()
     m_stun.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
 
+    m_stun.inactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kStunInactivityTimeout).toString(), kDefaultStunInactivityTimeout);
+
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
 
     m_http.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
+
+    m_http.inactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kHttpInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
 
     m_dbConnectionOptions.loadFromSettings(&m_settings);
 

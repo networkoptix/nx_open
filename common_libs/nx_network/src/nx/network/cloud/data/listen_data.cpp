@@ -28,7 +28,8 @@ bool ListenRequest::parseAttributes(const nx::stun::Message& message)
 }
 
 ListenResponse::ListenResponse():
-    StunResponseData(kMethod)
+    StunResponseData(kMethod),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
 }
 
@@ -38,6 +39,7 @@ void ListenResponse::serializeAttributes(nx::stun::Message* const message)
 {
     if (tcpConnectionKeepAlive)
         message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
 }
 
 bool ListenResponse::parseAttributes(const nx::stun::Message& message)
@@ -52,6 +54,9 @@ bool ListenResponse::parseAttributes(const nx::stun::Message& message)
     {
         tcpConnectionKeepAlive = boost::none;
     }
+
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
 
     return true;
 }

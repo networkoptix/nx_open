@@ -35,6 +35,7 @@ public:
     constexpr static const auto kMethod = stun::extension::methods::listen;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
+    CloudConnectVersion cloudConnectVersion;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);
