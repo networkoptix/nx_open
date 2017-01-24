@@ -37,6 +37,13 @@ public:
 protected:
     virtual void showEvent(QShowEvent *event) override;
 
+private:
+    enum class CopyToClipboardButton
+    {
+        Hide,
+        Show
+    };
+
 private slots:
     void updateLicenses();
     void updateButtons();
@@ -46,12 +53,6 @@ private slots:
     void at_licenseWidget_stateChanged();
 
     void licenseDetailsRequested(const QModelIndex& index);
-
-    enum class CopyToClipboardButton
-    {
-        Hide,
-        Show
-    };
 
     void showMessage(
         QnMessageBoxIcon icon,

@@ -108,22 +108,84 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::validateConnection(
         return result;
 
     const auto helpTopicId = helpTopic(result);
-    const QString description = getErrorDescription(result, connectionInfo);
-
     if (result == Qn::IncompatibleProtocolConnectionResult
         || result == Qn::IncompatibleCloudHostConnectionResult)
     {
         return handleCompatibilityMode(connectionInfo, parentWidget);
     }
 
-    QnMessageBox::warning(
-        parentWidget,
-        helpTopicId,
-        getErrorString(ErrorStrings::UnableConnect),
-        description);
-
+    showValidateConnectionErrorMessage(parentWidget,
+        result, connectionInfo.version.toString());
     return result;
 }
+
+QString QnConnectionDiagnosticsHelper::ldapServerTimeoutMessage()
+{
+    return tr("LDAP Server connection timed out.");
+}
+
+void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
+    QWidget* parentWidget,
+    Qn::ConnectionResult result,
+    const QString& serverVersion)
+{
+    static const auto kFailedToConnectText = tr("Failed to connect to Server");
+
+    switch (result)
+    {
+        case Qn::UnauthorizedConnectionResult:
+            QnMessageBox::_warning(parentWidget, tr("Incorrect username or password"));
+            break;
+        case Qn::LdapTemporaryUnauthorizedConnectionResult:
+            QnMessageBox::_critical(parentWidget,
+                kFailedToConnectText,
+                ldapServerTimeoutMessage() + L'\n'
+                    + getErrorString(ErrorStrings::ContactAdministrator));
+            break;
+        case Qn::CloudTemporaryUnauthorizedConnectionResult:
+            QnMessageBox::_critical(parentWidget,
+                kFailedToConnectText,
+                tr("Connection to %1 is not established.",
+                    "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
+                    + L'\n' + tr("Check Server internet connection or try again later.")
+                    + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
+            break;
+        case Qn::ForbiddenConnectionResult:
+            QnMessageBox::_warning(parentWidget,
+                tr("Operation is not permitted now"),
+                tr("It could happen due to media server is restarting now. Please try again later.")
+                    + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
+            break;
+        case Qn::NetworkErrorConnectionResult:
+            QnMessageBox::_critical(parentWidget,
+                kFailedToConnectText,
+                tr("Please check access credentials and try again.")
+                    + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
+            break;
+        case Qn::IncompatibleInternalConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
+            QnMessageBox::_warning(parentWidget,
+                tr("Incompatible Server"));
+            break;
+        case Qn::IncompatibleVersionConnectionResult:
+            QnMessageBox::_critical(parentWidget,
+                getDiffVersionsText(),
+                getDiffVersionsExtra(qnCommon->engineVersion().toString(), serverVersion) + L'\n'
+                    + tr("Compatibility mode for versions lower than %1 is not supported.")
+                        .arg(QnConnectionValidator::minSupportedVersion().toString()));
+            break;
+        case Qn::IncompatibleProtocolConnectionResult:
+            QnMessageBox::_warning(parentWidget,
+                getDiffVersionsText(),
+                getDiffVersionsExtra(qnCommon->engineVersion().toString(), serverVersion)
+                    + L'\n' + tr("Restart %1 Client in compatibility mode "
+                        "will be required.").arg(QnAppInfo::productNameLong()));
+            break;
+        default:
+            break;
+    }
+}
+
 
 QnConnectionDiagnosticsHelper::TestConnectionResult
 QnConnectionDiagnosticsHelper::validateConnectionTest(
@@ -168,9 +230,9 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidg
 {
     QnMessageBox::_critical(parentWidget,
         tr("Failed to restart %1 Client in compatibility mode")
-        .arg(QnAppInfo::productNameLong()),
+            .arg(QnAppInfo::productNameLong()),
         tr("Please close %1 Client and start it again using the shortcut in the start menu.")
-        .arg(QnAppInfo::productNameLong()));
+            .arg(QnAppInfo::productNameLong()));
 
     return Qn::IncompatibleVersionConnectionResult;
 }
@@ -201,7 +263,7 @@ QString QnConnectionDiagnosticsHelper::getDiffVersionsFullText(
     const QString& clientVersion,
     const QString& serverVersion)
 {
-    return getDiffVersionsText() + lit(".\n")
+    return getDiffVersionsText() + lit(":\n")
         + getDiffVersionsExtra(clientVersion, serverVersion);
 }
 
@@ -227,10 +289,9 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 : QnSoftwareVersion::MinorFormat);
 
             const auto extras =
-                getDiffVersionsFullText(qnCommon->engineVersion().toString(), versionString)
-                + L'\n'
-                + tr("You have to download another version of"
-                    " %1 Client to connect to this Server.").arg(QnAppInfo::productNameLong());
+                getDiffVersionFullExtras(qnCommon->engineVersion().toString(), versionString,
+                    tr("You have to download another version of %1 Client to "
+                        "connect to this Server.").arg(QnAppInfo::productNameLong()));
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,

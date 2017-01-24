@@ -50,6 +50,12 @@ private:
         const QString& serverVersion,
         const QString& extraText);
 
+    static void showValidateConnectionErrorMessage(
+        QWidget* parentWidget,
+        Qn::ConnectionResult result,
+        const QString& serverVersion);
+
+    static QString ldapServerTimeoutMessage();
 
     static Qn::ConnectionResult handleCompatibilityMode(
         const QnConnectionInfo &connectionInfo,

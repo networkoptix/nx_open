@@ -202,10 +202,7 @@ QnMessageBox::QnMessageBox(
     if (!extras.isEmpty())
         setInformativeText(extras);
 
-    if (buttons & defaultButton)
-        setDefaultButton(defaultButton);
-    else if (defaultButton)
-        NX_ASSERT(false, "Default button does not exist");
+    setDefaultButton(defaultButton);
 }
 
 QnMessageBox::~QnMessageBox()
