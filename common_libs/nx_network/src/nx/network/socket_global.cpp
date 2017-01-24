@@ -103,7 +103,10 @@ void SocketGlobals::deinit()
     QnMutexLocker lock(&s_mutex);
     if (--s_counter == 0) //< Last out.
     {
-        delete s_instance;
+        {
+            QnMutexUnlocker unlock(&lock);
+            delete s_instance;
+        }
         s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
         s_instance = nullptr;
         s_initState = InitState::none;
