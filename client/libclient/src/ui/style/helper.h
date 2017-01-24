@@ -64,7 +64,8 @@ namespace style
     public:
         static const char* kHoveredRowProperty;     /**< Name of a property to hold index of hovered itemview row (int). */
         static const char* kHoveredIndexProperty;   /**< Name of a property to hold hovered itemview item index (QPersistentModelIndex). */
-        static const char* kAccentStyleProperty;
+        static const char* kAccentStyleProperty;    /**< Name of a property to make button brand-colored. */
+        static const char* kWarningStyleProperty;   /**< Name of a property to make button warning-colored. */
         static const char* kSliderLength;           /**< Name of a property to change default width of the slider handle. */
         static const char* kSliderFeatures;         /**< Name of a property to add extra slider features. */
         static const char* kDontPolishFontProperty;

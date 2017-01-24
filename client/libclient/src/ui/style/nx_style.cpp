@@ -163,6 +163,11 @@ namespace
         return widget && widget->property(Properties::kAccentStyleProperty).toBool();
     }
 
+    bool isWarningStyle(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kWarningStyleProperty).toBool();
+    }
+
     bool isSwitchButtonCheckbox(const QWidget* widget)
     {
         return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
@@ -594,7 +599,7 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = isAccented(widget)
+            QColor color = isAccented(widget) || isWarningStyle(widget)
                 ? option->palette.color(QPalette::HighlightedText)
                 : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
@@ -618,6 +623,12 @@ void QnNxStyle::drawPrimitive(
             if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+            }
+            else if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
@@ -691,6 +702,12 @@ void QnNxStyle::drawPrimitive(
             if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+            }
+            else if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
                 if (!enabled)
                     mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
             }
@@ -2357,6 +2374,8 @@ void QnNxStyle::drawControl(
 
                 if (isDefaultForegroundRole && isAccented(widget))
                     foregroundRole = QPalette::HighlightedText;
+                else if (isDefaultForegroundRole && isWarningStyle(widget))
+                    foregroundRole = QPalette::BrightText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
                 QRect textRect = option->rect.adjusted(margin, 0, -margin, 0);
