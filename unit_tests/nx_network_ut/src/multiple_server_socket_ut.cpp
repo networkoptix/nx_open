@@ -100,11 +100,11 @@ TEST_F(MultipleServerSocketTest, add_remove)
     connectionGenerator.pleaseStopSync();
 }
 
-class MultipleServerSocketPerformance:
+class PerformanceMultipleServerSocket:
     public ::testing::Test
 {
 public:
-    ~MultipleServerSocketPerformance()
+    ~PerformanceMultipleServerSocket()
     {
         m_serverSocket->pleaseStopSync();
     }
@@ -199,14 +199,14 @@ private:
     }
 };
 
-TEST_F(MultipleServerSocketPerformance, single_tcp_socket_blocking_accept)
+TEST_F(PerformanceMultipleServerSocket, single_tcp_socket_blocking_accept)
 {
     givenMultipleServerSocketWithATcpServerSocket();
     const auto testResult = measurePerformance();
     printResults(testResult);
 }
 
-TEST_F(MultipleServerSocketPerformance, just_tcp_server_socket)
+TEST_F(PerformanceMultipleServerSocket, just_tcp_server_socket)
 {
     givenTcpServerSocket();
     const auto testResult = measurePerformance();

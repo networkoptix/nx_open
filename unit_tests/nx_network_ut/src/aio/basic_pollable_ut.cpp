@@ -187,9 +187,9 @@ TEST_F(BasicPollable, pleaseStopSync)
 }
 
 //-------------------------------------------------------------------------------------------------
-// FtBasicPollable
+// PerformanceBasicPollable
 
-class FtBasicPollable:
+class PerformanceBasicPollable:
     public BasicPollable
 {
 protected:
@@ -257,13 +257,13 @@ private:
     std::unique_ptr<aio::AIOService> m_customAioService;
 };
 
-TEST_F(FtBasicPollable, postPerformance)
+TEST_F(PerformanceBasicPollable, post)
 {
     runTest();
     printResult();
 }
 
-TEST_F(FtBasicPollable, postPerformanceWithRegularPollSet)
+TEST_F(PerformanceBasicPollable, postWithRegularPollSet)
 {
     givenAioServiceWithRegularPollSet();
     runTest();
