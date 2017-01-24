@@ -13,6 +13,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/utils/disconnect_helper.h>
+
 class QComboBox;
 class QLineEdit;
 class QTabWidget;
@@ -186,6 +188,7 @@ private:
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
+    QnDisconnectHelperPtr m_disconnectHelper;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H
