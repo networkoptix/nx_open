@@ -11,6 +11,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/test_support/utils.h>
 #include <utils/common/guard.h>
 #include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
@@ -68,6 +69,12 @@ template<typename ServerSocketType>
 class SyncSocketServer
 {
 public:
+    struct ServerStartResult
+    {
+        bool hasSucceeded;
+        SocketAddress address;
+    };
+
     SyncSocketServer(ServerSocketType server):
         m_server(std::move(server))
     {
@@ -91,9 +98,10 @@ public:
     SocketAddress start()
     {
         m_thread = std::make_unique<nx::utils::thread>([this](){ run(); });
-        const auto address = m_startedPromise.get_future().get();
+        const auto result = m_startedPromise.get_future().get();
+        NX_GTEST_ASSERT_TRUE(result.hasSucceeded);
         std::this_thread::sleep_for(std::chrono::seconds(1));
-        return address;
+        return result.address;
     }
 
     ~SyncSocketServer()
@@ -106,6 +114,9 @@ public:
 private:
     void run()
     {
+        auto startedPromiseGuard = makeScopedGuard(
+            [this]() { m_startedPromise.set_value({false, SocketAddress()}); });
+
         ASSERT_TRUE(m_server->setReuseAddrFlag(true)) << lastError();
         ASSERT_TRUE(m_server->bind(m_endpointToBindTo)) << lastError();
         ASSERT_TRUE(m_server->listen(testClientCount())) << lastError();
@@ -116,8 +127,10 @@ private:
         ASSERT_EQ(SystemError::timedOut, SystemError::getLastOSErrorCode());
 
         auto serverAddress = m_server->getLocalAddress();
+
         NX_LOGX(lm("Started on %1").arg(serverAddress.toString()), cl_logINFO);
-        m_startedPromise.set_value(std::move(serverAddress));
+        startedPromiseGuard.disarm();
+        m_startedPromise.set_value({true, std::move(serverAddress)});
 
         const auto startTime = std::chrono::steady_clock::now();
         const auto maxTimeout = kTestTimeout * testClientCount();
@@ -174,7 +187,7 @@ private:
     ServerSocketType m_server;
     SocketAddress m_endpointToBindTo = SocketAddress::anyPrivateAddress;
     Buffer m_testMessage = kTestMessage;
-    nx::utils::promise<SocketAddress> m_startedPromise;
+    nx::utils::promise<ServerStartResult> m_startedPromise;
     ErrorHandling m_errorHandling{ErrorHandling::triggerAssert};
     std::atomic<bool> m_needToStop{false};
     std::unique_ptr<nx::utils::thread> m_thread;
