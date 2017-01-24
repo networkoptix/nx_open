@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include <QtCore/QObject>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
