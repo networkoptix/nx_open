@@ -107,6 +107,9 @@ angular.module('webadminApp')
             if(url.indexOf("//")<0){
                 url = "http://" + url;
             }
+            if(url.indexOf(":")<0){
+                url = url + ":7001";
+            }
             return url;
         }
         $scope.test = function () {
