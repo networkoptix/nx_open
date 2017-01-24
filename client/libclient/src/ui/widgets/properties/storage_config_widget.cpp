@@ -124,19 +124,7 @@ namespace
 
             /* Set proper color for links: */
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
-            {
-                if (auto style = QnNxStyle::instance())
-                {
-                    QnPaletteColor color = style->findColor(QPalette().color(QPalette::Link));
-                    if (!hovered)
-                        color = color.darker(2);
-                    opt.palette.setColor(QPalette::Text, color);
-                }
-                else
-                {
-                    opt.palette.setColor(QPalette::Text, QPalette().color(QPalette::Link));
-                }
-            }
+                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)

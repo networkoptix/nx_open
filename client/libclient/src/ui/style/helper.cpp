@@ -84,27 +84,32 @@ namespace style
     const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
 
 
-    bool isDark(const QColor &color)
+    bool isDark(const QColor& color)
     {
         return color.toHsl().lightness() < 128;
     }
 
+    QColor linkColor(const QPalette& palette, bool hovered)
+    {
+        return palette.color(hovered ? QPalette::LinkVisited : QPalette::Link);
+    }
 
-    RectCoordinates::RectCoordinates(const QRectF &rect)
-        : rect(rect)
-    {}
+    RectCoordinates::RectCoordinates(const QRectF& rect):
+        rect(rect)
+    {
+    }
 
     qreal RectCoordinates::x(qreal x)
     {
-        if (rect.isEmpty())
-            return 0;
-        return rect.left() + rect.width() * x;
+        return rect.isEmpty()
+            ? 0
+            : rect.left() + rect.width() * x;
     }
 
     qreal RectCoordinates::y(qreal y)
     {
-        if (rect.isEmpty())
-            return 0;
-        return rect.top() + rect.height() * y;
+        return rect.isEmpty()
+            ? 0
+            : rect.top() + rect.height() * y;
     }
 }

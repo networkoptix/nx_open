@@ -92,6 +92,8 @@ namespace style
 
     bool isDark(const QColor &color);
 
+    QColor linkColor(const QPalette& palette, bool hovered);
+
     class RectCoordinates
     {
         QRectF rect;
