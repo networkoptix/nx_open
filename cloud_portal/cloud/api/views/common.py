@@ -22,16 +22,20 @@ def get_cloud_modules():
 
     cloud_portal_host = os.environ['CLOUD_PORTAL_HOST']
     cloud_portal_port = os.environ['CLOUD_PORTAL_PORT']
+    cloud_portal_sport = os.environ['CLOUD_PORTAL_SPORT']
     cloud_db_host = os.environ['CLOUD_DB_HOST']
     cloud_db_port = os.environ['CLOUD_DB_PORT']
+    cloud_db_sport = os.environ['CLOUD_DB_SPORT']
     vms_gateway_host = os.environ['VMS_GATEWAY_HOST']
     vms_gateway_port = os.environ['VMS_GATEWAY_PORT']
 
     return {
                'cloud_db_host': cloud_db_host,
                'cloud_db_port': cloud_db_port,
+               'cloud_db_sport': cloud_db_sport,
                'cloud_portal_host': cloud_portal_host,
                'cloud_portal_port': cloud_portal_port,
+               'cloud_portal_sport': cloud_portal_sport,
                'vms_gateway_host': vms_gateway_host,
                'vms_gateway_port': vms_gateway_port,
                'connection_mediator_hosts': connection_mediator_hosts,
