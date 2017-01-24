@@ -15,7 +15,7 @@ def printError(error):
     print >> sys.stderr, "ERROR: {0}".format(error)
 
 def getHostOnline(instance, customization, timeout):
-    url = 'http://la.hdw.mx:8005/api/v1/cloudhostfinder/?group={0}&vms_customization={1}'.format(instance, customization)
+    url = 'https://ireg.hdw.mx:8005/api/v1/cloudhostfinder/?group={0}&vms_customization={1}'.format(instance, customization)
     global verbose
     if verbose:
         print url
