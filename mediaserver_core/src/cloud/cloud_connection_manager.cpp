@@ -108,7 +108,7 @@ void CloudConnectionManager::setCloudCredentials(
     }
 
     if (!boundToCloud)
-        detachSystemFromCloud();
+        makeSystemLocal();
 
     emit cloudBindingStatusChanged(boundToCloud);
     if (boundToCloud)
@@ -178,7 +178,13 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
-bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
+bool CloudConnectionManager::detachSystemFromCloud()
+{
+    qnGlobalSettings->resetCloudParams();
+    return qnGlobalSettings->synchronizeNowSync();
+}
+
+bool CloudConnectionManager::resetCloudData()
 {
     qnGlobalSettings->resetCloudParams();
 
@@ -213,7 +219,7 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
     return true;
 }
 
-bool CloudConnectionManager::detachSystemFromCloud()
+bool CloudConnectionManager::makeSystemLocal()
 {
     auto adminUser = qnResPool->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
@@ -225,7 +231,7 @@ bool CloudConnectionManager::detachSystemFromCloud()
         }
     }
 
-    return cleanUpCloudDataInLocalDb();
+    return resetCloudData();
 }
 
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const

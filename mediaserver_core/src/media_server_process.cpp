@@ -2026,7 +2026,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 {
     for (;;)
     {
-        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
+        if (!cloudConnectionManager.resetCloudData())
         {
             qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
