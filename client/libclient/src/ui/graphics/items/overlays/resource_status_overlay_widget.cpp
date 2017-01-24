@@ -312,9 +312,20 @@ void QnStatusOverlayWidget::setupExtrasControls()
     setupButton(*m_button);
     m_button->setVisible(false);
 
+    /* Even though there's only one button in the extras holder,
+     * a container widget with a layout must be created, otherwise
+     * graphics proxy doesn't handle size hint changes at all. */
+
+    const auto container = new QWidget();
+    container->setObjectName(lit("extrasContainer"));
+
+    const auto layout = new QHBoxLayout(container);
+    layout->setContentsMargins(QMargins());
+    layout->addWidget(m_button);
+
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(m_button, m_extrasHolder, false));
+    horizontalLayout->addItem(makeMaskedProxy(container, m_extrasHolder, false));
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
