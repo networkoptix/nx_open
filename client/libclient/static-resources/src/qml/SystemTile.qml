@@ -1,6 +1,5 @@
-
 import QtQuick 2.6;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 
 import "."
 
@@ -220,7 +219,7 @@ BaseTile
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
-                currentAreaItem.recentLocalConnectionsModel = control.impl.recentConnectionsModel;
+                currentAreaItem.authenticationDataModel = control.impl.authenticationDataModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
@@ -229,16 +228,9 @@ BaseTile
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
-                currentAreaItem.host = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("url", 0): "");
-                });
-                currentAreaItem.displayHost = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("display", 0): "");
-                });
+                currentAreaItem.host = control.impl.hostsModelAccessor.getData("url", 0) || "";
+                currentAreaItem.displayHost =
+                    control.impl.hostsModelAccessor.getData("display", 0) || "";
             }
             else // Cloud system
             {
@@ -269,8 +261,12 @@ BaseTile
 
     property QtObject impl: QtObject
     {
-        property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.localId; }
+        property var hostsModel: SystemHostsModel { systemId: control.systemId; }
+        property var hostsModelAccessor: ModelDataAccessor { model: control.impl.hostsModel; }
+        property var authenticationDataModel: AuthenticationDataModel
+        {
+            systemId: control.localId;
+        }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;

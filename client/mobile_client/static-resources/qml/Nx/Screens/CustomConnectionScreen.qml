@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 Page
@@ -12,7 +13,7 @@ Page
     onLeftButtonClicked: Workflow.popCurrentScreen()
 
     property alias systemId: systemHostsModel.systemId
-    property alias localSystemId: recentLocalConnectionsModel.systemId
+    property alias localSystemId: authenticationDataModel.systemId
     property string systemName
     property alias address: credentialsEditor.address
     property alias login: credentialsEditor.login
@@ -39,14 +40,14 @@ Page
         {
             id: credentialsEditor
 
-            hostsModel: QnSystemHostsModel
+            hostsModel: SystemHostsModel
             {
                 id: systemHostsModel
             }
 
-            recentLocalConnectionsModel: QnRecentLocalConnectionsModel
+            authenticationDataModel: AuthenticationDataModel
             {
-                id: recentLocalConnectionsModel
+                id: authenticationDataModel
             }
 
             width: parent.availableWidth
@@ -76,7 +77,7 @@ Page
 
             onClicked:
             {
-                removeSavedConnection(systemName)
+                removeSavedConnection(localSystemId)
                 Workflow.popCurrentScreen()
             }
         }

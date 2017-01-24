@@ -22,6 +22,7 @@
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
+#include <helpers/system_helpers.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -372,16 +373,13 @@ void QnConnectionManagerPrivate::doConnect()
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
-            QnLocalConnectionData connectionData;
-            if (!helpers::storeLocalSystemConnection(
-                connectionInfo.systemName, localId, url, connectionData))
-            {
-                return;
-            }
-
-            helpers::updateWeightData(localId);
+            using namespace nx::client::core::helpers;
+            storeConnection(localId, connectionInfo.systemName, url);
+            storeCredentials(localId, QnCredentials(url));
+            updateWeightData(localId);
             qnClientCoreSettings->save();
 
+            nx::client::core::SingleConnectionData connectionData{connectionInfo.systemName, url};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 

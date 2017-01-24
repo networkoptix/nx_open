@@ -152,24 +152,29 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& systemName)
+void QnContext::removeSavedConnection(const QString& localSystemId)
 {
-    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
+    const auto localId = QnUuid::fromStringSafe(localSystemId);
 
-    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
-    {
-        return connection.systemName == systemName;
-    };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
+    NX_ASSERT(!localId.isNull());
+    if (localId.isNull())
+        return;
 
-    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    recentConnections.remove(localId);
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+
+    auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
+    authenticationData.remove(localId);
+    qnClientCoreSettings->setSystemAuthenticationData(authenticationData);
+
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnClientCoreSettings->save();
 }
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedConnection(QnLocalConnectionData());
+    qnSettings->setLastUsedConnection(nx::client::core::SingleConnectionData());
 }
 
 QString QnContext::getLastUsedSystemName() const
@@ -179,7 +184,7 @@ QString QnContext::getLastUsedSystemName() const
 
 QUrl QnContext::getLastUsedUrl() const
 {
-    return qnSettings->lastUsedConnection().urlWithPassword();
+    return qnSettings->lastUsedConnection().url;
 }
 
 QUrl QnContext::getInitialUrl() const

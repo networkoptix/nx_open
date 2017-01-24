@@ -93,23 +93,20 @@ void QnSystemsFinder::onBaseSystemDiscovered(const QnSystemDescriptionPtr& syste
 
 void QnSystemsFinder::updateRecentConnections(const QnUuid& localSystemId, const QString& name)
 {
-    // Updates name
     auto connections = qnClientCoreSettings->recentLocalConnections();
-    bool changed = false;
-    for (auto& recent: connections)
-    {
-        if ((recent.localId != localSystemId) || (recent.systemName == name))
-            continue;
 
-        changed = true;
-        recent.systemName = name;
-    }
+    auto it = connections.find(localSystemId);
 
-    if (changed)
-    {
-        qnClientCoreSettings->setRecentLocalConnections(connections);
-        qnClientCoreSettings->save();
-    }
+    if (it == connections.end())
+        return;
+
+    if (it->systemName == name)
+        return;
+
+    it->systemName = name;
+
+    qnClientCoreSettings->setRecentLocalConnections(connections);
+    qnClientCoreSettings->save();
 }
 
 void QnSystemsFinder::onSystemLost(const QString& systemId,

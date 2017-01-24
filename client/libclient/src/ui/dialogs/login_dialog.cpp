@@ -51,7 +51,7 @@
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-
+#include <helpers/system_helpers.h>
 
 namespace {
 
@@ -98,14 +98,10 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
      * At first we check if we have stored connection to same system
      * with specified user and it stores password.
      */
-    const auto recent = qnClientCoreSettings->recentLocalConnections();
-    const auto itConnection = std::find_if(recent.begin(), recent.end(),
-        [localId, userName = url.userName()](const QnLocalConnectionData& data)
-        {
-            return ((data.localId == localId) && (userName == data.url.userName()));
-        });
 
-    if ((itConnection != recent.end()) && (itConnection->isStoredPassword()))
+    using namespace nx::client::core::helpers;
+
+    if (getCredentials(localId, url.userName()).isValid())
         return true;
 
     /**

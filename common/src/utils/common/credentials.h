@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -21,6 +22,11 @@ public:
     QnCredentials(const QAuthenticator& auth):
         user(auth.user()),
         password(auth.password())
+    {}
+
+    explicit QnCredentials(const QUrl& url):
+        user(url.userName()),
+        password(url.password())
     {}
 
     QAuthenticator toAuthenticator() const;

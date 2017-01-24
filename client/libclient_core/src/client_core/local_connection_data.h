@@ -7,55 +7,40 @@
 
 #include <utils/crypt/encoded_string.h>
 
-class QSettings;
+namespace nx {
+namespace client {
+namespace core {
 
-struct QnLocalConnectionData
+struct LocalConnectionData
 {
-    QnLocalConnectionData();
-
-    QnLocalConnectionData(
-        const QString& systemName,
-        const QnUuid& localId,
-        const QUrl& url);
-
-    QUrl urlWithPassword() const;
-
-    bool isStoredPassword() const;
-
     QString systemName;
-    QnUuid localId;
-    QUrl url;
-    QnEncodedString password;
+    QList<QUrl> urls;
 };
+#define LocalConnectionData_Fields (systemName)(urls)
 
-#define QnLocalConnectionData_Fields (systemName)(localId)(url)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnLocalConnectionData, (datastream)(metatype)(eq)(json))
+struct SingleConnectionData
+{
+    QString systemName;
+    QUrl url;
+};
+#define SingleConnectionData_Fields (systemName)(url)
 
-typedef QList<QnLocalConnectionData> QnLocalConnectionDataList;
-Q_DECLARE_METATYPE(QnLocalConnectionDataList)
-
-struct QnWeightData
+struct WeightData
 {
     QnUuid localId;
     qreal weight;
     qint64 lastConnectedUtcMs;
-    bool realConnection;    //< Shows if it was real connection or just record for new system
+    bool realConnection; //< Shows if it was real connection or just record for new system
 };
+#define WeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
 
-#define QnWeightData_Fields (localId)(weight)(lastConnectedUtcMs)(realConnection)
-QN_FUSION_DECLARE_FUNCTIONS(QnWeightData, (datastream)(metatype)(eq)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (LocalConnectionData)(SingleConnectionData)(WeightData), (eq)(json))
 
-typedef QList<QnWeightData> QnWeightDataList;
-Q_DECLARE_METATYPE(QnWeightDataList)
+} // namespace core
+} // namespace client
+} // namespace nx
 
-namespace helpers {
-
-bool storeLocalSystemConnection(
-    const QString& systemName,
-    const QnUuid& localSystemId,
-    const QUrl& url,
-    QnLocalConnectionData& result);
-
-void forgetLocalConnectionPassword(const QnUuid& localId, const QString& userName);
-
-}
+Q_DECLARE_METATYPE(nx::client::core::LocalConnectionData)
+Q_DECLARE_METATYPE(nx::client::core::SingleConnectionData)
+Q_DECLARE_METATYPE(nx::client::core::WeightData)
