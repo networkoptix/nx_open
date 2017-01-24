@@ -1,3 +1,4 @@
+#include <functional>
 #include <thread>
 #include <algorithm>
 #include <gtest/gtest.h>
@@ -325,4 +326,227 @@ TEST_F(WriterTest, IntervalTest)
     writer.write();
     thenWrittenFiles(12);
     thenAllFilesContainsPatternData(PatternData::WithAdditionalProp);
+}
+
+
+const QnUuid kModuleGuid = QnUuid::fromStringSafe(lit("{95a380a7-f7d7-4a4a-906f-b9c101a33ef1}"));
+const QnUuid kArchiveCamTypeGuid = QnUuid::fromStringSafe(lit("{1d250fa0-ce88-4358-9bc9-4f39d0ce3b12}"));
+
+QString kCameraId("cameraId");
+QString kFilePath("/some/" + kCameraId);
+
+const std::array<const char*, 5> kInvalidFileDataList = {
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName""plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"=
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+};
+
+enum class CameraPresence
+{
+    InTheResourcePool,
+    NotInTheResourcePool
+};
+
+enum class ModuleGuid
+{
+    Found,
+    NotFound
+};
+
+enum class ArchiveCamTypeId
+{
+    Found,
+    NotFound
+};
+
+enum class GetFileData
+{
+    Successfull,
+    Failed
+};
+
+enum class ResultIs
+{
+    Empty,
+    NotEmpty
+};
+
+class ReaderTestHandler: public nx::caminfo::ReaderHandler
+{
+public:
+    QnUuid moduleGuid() const override
+    {
+        return moduleGuidFlag == ModuleGuid::Found ? kModuleGuid : QnUuid();
+    }
+
+    QnUuid archiveCamTypeId() const override
+    {
+        return archiveCamTypeIdFlag == ArchiveCamTypeId::Found ? kArchiveCamTypeGuid : QnUuid();
+    }
+
+    bool isCameraInResPool(const QnUuid&) const override
+    {
+        return camInRpFlag == CameraPresence::InTheResourcePool;
+    }
+
+    void handleError(const QString& message) const override
+    {
+        errMsg = message;
+    }
+
+    CameraPresence camInRpFlag;
+    ModuleGuid moduleGuidFlag;
+    ArchiveCamTypeId archiveCamTypeIdFlag;
+
+    mutable QString errMsg;
+};
+
+class ReaderTest: public ::testing::Test
+{
+protected:
+    ReaderTest() :
+        reader(&readerHandler),
+        fileInfo(QnAbstractStorageResource::FileInfo(kFilePath, 1))
+    {}
+
+    void when(CameraPresence presenceFlag,
+              ModuleGuid moduleGuidFlag,
+              ArchiveCamTypeId archiveCamTypeIdFlag,
+              GetFileData getFileDataFlag)
+    {
+        readerHandler.camInRpFlag = presenceFlag;
+        readerHandler.moduleGuidFlag = moduleGuidFlag;
+        readerHandler.archiveCamTypeIdFlag = archiveCamTypeIdFlag;
+
+        if (getFileDataFlag == GetFileData::Successfull)
+            getDataFunc = [](const QString&) { return QByteArray(kInfoFileWithAdditionalPropPattern); };
+        else
+            getDataFunc = [](const QString&) { return QByteArray(); };
+    }
+
+    void then(ResultIs resultIsFlag)
+    {
+        if (resultIsFlag == ResultIs::Empty)
+        {
+            ASSERT_EQ(camDataList.size(), 0);
+            ASSERT_FALSE(readerHandler.errMsg.isEmpty());
+        }
+        else
+        {
+            ASSERT_EQ(camDataList.size(), 1);
+        }
+        readerHandler.errMsg.clear();
+    }
+
+    ReaderTestHandler readerHandler;
+    nx::caminfo::Reader reader;
+    std::function<QByteArray(const QString&)> getDataFunc;
+    QnAbstractStorageResource::FileInfo fileInfo;
+    nx::caminfo::ArchiveCameraDataList camDataList;
+};
+
+TEST_F(ReaderTest, HandlerError_moduleGuid)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::NotFound,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_cameraIsInResPool)
+{
+    when(CameraPresence::InTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_typeIdNotFound)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::NotFound,
+         GetFileData::Successfull);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_getFileDataError)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Failed);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, ErrorsInData)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    for (const char* fileData: kInvalidFileDataList)
+    {
+        reader.loadCameraInfo(
+            fileInfo,
+            camDataList,
+            [fileData](const QString&)
+            {
+                return QByteArray(fileData);
+            });
+        then(ResultIs::Empty);
+    }
 }

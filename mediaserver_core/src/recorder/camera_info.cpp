@@ -1,13 +1,23 @@
 #include <utils/common/util.h>
+#include <utils/common/id.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
+#include <plugins/resource/archive_camera/archive_camera.h>
 #include <recorder/device_file_catalog.h>
 #include <recorder/storage_manager.h>
 #include "camera_info.h"
 
 namespace nx {
 namespace caminfo {
+
+const char* const kArchiveCameraUrlKey = "cameraUrl";
+const char* const kArchiveCameraNameKey = "cameraName";
+const char* const kArchiveCameraModelKey = "cameraModel";
+const char* const kArchiveCameraGroupIdKey = "groupId";
+const char* const kArchiveCameraGroupNameKey = "groupName";
+
 
 QByteArray Composer::make(ComposerHandler* composerHandler)
 {
@@ -104,11 +114,11 @@ void Writer::setWriteInterval(std::chrono::milliseconds interval)
 }
 
 
-ServerHandler::ServerHandler(QnStorageManager* storageManager):
+ServerWriterHandler::ServerWriterHandler(QnStorageManager* storageManager):
     m_storageManager(storageManager)
 {}
 
-QStringList ServerHandler::storagesUrls() const
+QStringList ServerWriterHandler::storagesUrls() const
 {
     QStringList result;
     for (const auto& storage: m_storageManager->getUsedWritableStorages())
@@ -116,17 +126,17 @@ QStringList ServerHandler::storagesUrls() const
     return result;
 }
 
-QStringList ServerHandler::camerasIds(QnServer::ChunksCatalog catalog) const
+QStringList ServerWriterHandler::camerasIds(QnServer::ChunksCatalog catalog) const
 {
     return m_storageManager->getAllCameraIdsUnderLock(catalog);
 }
 
-bool ServerHandler::needStop() const
+bool ServerWriterHandler::needStop() const
 {
     return QnResource::isStopping();
 }
 
-bool ServerHandler::replaceFile(const QString& path, const QByteArray& data)
+bool ServerWriterHandler::replaceFile(const QString& path, const QByteArray& data)
 {
     auto storage = m_storageManager->getStorageByUrlInternal(path);
     NX_ASSERT(storage);
@@ -152,42 +162,42 @@ bool ServerHandler::replaceFile(const QString& path, const QByteArray& data)
     return true;
 }
 
-QString ServerHandler::name() const
+QString ServerWriterHandler::name() const
 {
     if (!hasCamera())
         return QString();
     return m_camera->getUserDefinedName();
 }
 
-QString ServerHandler::model() const
+QString ServerWriterHandler::model() const
 {
     if (!hasCamera())
         return QString();
     return m_camera->getModel();
 }
 
-QString ServerHandler::groupId() const
+QString ServerWriterHandler::groupId() const
 {
     if (!hasCamera())
         return QString();
     return m_camera->getGroupId();
 }
 
-QString ServerHandler::groupName() const
+QString ServerWriterHandler::groupName() const
 {
     if (!hasCamera())
         return QString();
     return m_camera->getGroupName();
 }
 
-QString ServerHandler::url() const
+QString ServerWriterHandler::url() const
 {
     if (!hasCamera())
         return QString();
     return m_camera->getUrl();
 }
 
-QList<QPair<QString, QString>> ServerHandler::properties() const
+QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 {
     QList<QPair<QString, QString>> result;
     if (!hasCamera())
@@ -199,15 +209,192 @@ QList<QPair<QString, QString>> ServerHandler::properties() const
     return result;
 }
 
-ComposerHandler* ServerHandler::composerHandler(const QString& cameraId)
+ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 {
     m_camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
     return this;
 }
-bool ServerHandler::hasCamera() const
+bool ServerWriterHandler::hasCamera() const
 {
     return static_cast<bool>(m_camera);
 }
+
+
+Reader::Reader(ReaderHandler* readerHandler):
+    m_handler(readerHandler)
+{}
+
+void Reader::loadCameraInfo(
+    const QnAbstractStorageResource::FileInfo &fileInfo,
+    ArchiveCameraDataList &archiveCameraList,
+    std::function<QByteArray(const QString& filePath)> getFileDataFunc)
+{
+    m_archiveCamList = &archiveCameraList;
+    m_fileInfo = &fileInfo;
+    m_getDataFunc = getFileDataFunc;
+
+    if (!initArchiveCamData()
+        || cameraAlreadyExists()
+        || !readFileData()
+        || !parseData())
+    {
+        m_handler->handleError(m_lastError);
+        return;
+    }
+
+    m_archiveCamList->push_back(m_archiveCamData);
+}
+
+bool Reader::initArchiveCamData()
+{
+    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+
+    coreData.physicalId = m_fileInfo->fileName();
+    if (coreData.physicalId.isEmpty())
+        coreData.id = QnUuid();
+    else
+        coreData.id = guidFromArbitraryData(m_archiveCamData.coreData.physicalId.toUtf8());
+
+    coreData.parentId = m_handler->moduleGuid();
+    if (coreData.parentId.isNull())
+    {
+        m_lastError = lit("Unable to get parent id for the archive camera %1")
+                            .arg(m_archiveCamData.coreData.physicalId);
+        return false;
+    }
+
+    coreData.typeId = m_handler->archiveCamTypeId();
+    if (coreData.typeId.isNull())
+    {
+        m_lastError = lit("Unable to get type id for the archive camera %1")
+                            .arg(m_archiveCamData.coreData.physicalId);
+        return false;
+    }
+
+    return true;
+}
+
+bool Reader::cameraAlreadyExists() const
+{
+    if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
+    {
+        m_lastError = lit("Camera %1 is already in resource pool")
+                            .arg(m_archiveCamData.coreData.physicalId);
+        return true;
+    }
+
+    if(std::find_if(
+                m_archiveCamList->cbegin(),
+                m_archiveCamList->cend(),
+                [this](const ArchiveCameraData& cam)
+                {
+                    return cam.coreData.id == m_archiveCamData.coreData.id;
+                }) != m_archiveCamList->cend())
+    {
+        m_lastError = lit("Camera %1 is already in the archive camera list")
+                            .arg(m_archiveCamData.coreData.physicalId);
+        return true;
+    }
+
+    return false;
+}
+
+QString Reader::infoFilePath() const
+{
+    return closeDirPath(m_fileInfo->absoluteFilePath()) + lit("info.txt");
+}
+
+bool Reader::readFileData()
+{
+    m_fileData = m_getDataFunc(infoFilePath());
+
+    if (m_fileData.isNull())
+    {
+        m_lastError = lit("File data is NULL for camera %1")
+                            .arg(m_archiveCamData.coreData.physicalId);
+        return false;
+    }
+
+    return true;
+}
+
+bool Reader::parseData()
+{
+    QTextStream fileDataStream(&m_fileData);
+    while (!fileDataStream.atEnd())
+    {
+        ParseResult result = parseLine(fileDataStream.readLine());
+        switch (result.code())
+        {
+        case ParseResult::ParseCode::NoData: break;
+        case ParseResult::ParseCode::RegexpFailed:
+            m_lastError = lit("Camera info file %1 parse failed")
+                                .arg(infoFilePath());
+            return false;
+        case ParseResult::ParseCode::Ok:
+            addProperty(result);
+            break;
+        }
+    }
+
+    return true;
+}
+
+Reader::ParseResult Reader::parseLine(const QString& line) const
+{
+    if (line.isEmpty())
+        return ParseResult::ParseCode::NoData;
+
+    thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
+
+    int reIndex = keyValueRegExp.indexIn(line);
+    if (reIndex == -1 || keyValueRegExp.captureCount() != 2)
+        return ParseResult::ParseCode::RegexpFailed;
+
+    auto captureList = keyValueRegExp.capturedTexts();
+    return ParseResult(ParseResult::ParseCode::Ok, captureList[1], captureList[2]);
+}
+
+void Reader::addProperty(const ParseResult& result)
+{
+    ec2::ApiCameraData& coreData = m_archiveCamData.coreData;
+
+    if (result.key().contains(kArchiveCameraNameKey))
+        coreData.name = result.value();
+    else if (result.key().contains(kArchiveCameraModelKey))
+        coreData.model = result.value();
+    else if (result.key().contains(kArchiveCameraGroupIdKey))
+        coreData.groupId= result.value();
+    else if (result.key().contains(kArchiveCameraGroupNameKey))
+        coreData.groupName = result.value();
+    else if (result.key().contains(kArchiveCameraUrlKey))
+        coreData.url = result.value();
+    else
+        m_archiveCamData.properties.emplace_back(result.key(), result.value());
+}
+
+QnUuid ServerReaderHandler::moduleGuid() const
+{
+    return qnCommon->moduleGUID();
+}
+
+QnUuid ServerReaderHandler::archiveCamTypeId() const
+{
+    if (m_archiveCamTypeId.isNull())
+        m_archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
+    return m_archiveCamTypeId;
+}
+
+bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
+{
+    return static_cast<bool>(qnResPool->getResourceById(cameraId));
+}
+
+void ServerReaderHandler::handleError(const QString& message) const
+{
+    NX_LOG(message, cl_logERROR);
+}
+
 
 } //namespace caminfo
 } //namespace nx
