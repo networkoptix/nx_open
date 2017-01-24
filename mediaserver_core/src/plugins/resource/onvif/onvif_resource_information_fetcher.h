@@ -14,6 +14,7 @@ struct EndpointAdditionalInfo
 {
     QString name;
     QString manufacturer;
+    QString location;
     QString mac;
     QString uniqId;
     QString discoveryIp;
@@ -23,10 +24,17 @@ struct EndpointAdditionalInfo
 
     EndpointAdditionalInfo() {}
 
-    EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, 
-            const QString& newUniqId, const QString& newDiscoveryIp):
+    EndpointAdditionalInfo(
+        const QString& newName,
+        const QString& newManufacturer,
+        const QString& newLocation,
+        const QString& newMac, 
+        const QString& newUniqId,
+        const QString& newDiscoveryIp):
+
         name(newName),
         manufacturer(newManufacturer),
+        location(newLocation),
         mac(newMac),
         uniqId(newUniqId),
         discoveryIp(newDiscoveryIp)
@@ -37,6 +45,7 @@ struct EndpointAdditionalInfo
     EndpointAdditionalInfo(const EndpointAdditionalInfo& src) :
         name(src.name),
         manufacturer(src.manufacturer),
+        location(src.location),
         mac(src.mac),
         uniqId(src.uniqId),
         discoveryIp(src.discoveryIp)

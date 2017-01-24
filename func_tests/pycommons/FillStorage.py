@@ -32,11 +32,11 @@ def detectAVIDuration(aviFile):
 #   data/hi_quality/92-61-00-00-00-01/2017/01/19/08/1484813007543_5531.mkv
 def ftime2path(ftime):
     sec = ftime / 1000
-    gm = time.gmtime(sec)
-    year = str(gm.tm_year)
-    month = "%02d" % gm.tm_mon
-    day = "%02d" % gm.tm_mday
-    hour = "%02d" % gm.tm_hour
+    lt = time.localtime(sec)
+    year = str(lt.tm_year)
+    month = "%02d" % lt.tm_mon
+    day = "%02d" % lt.tm_mday
+    hour = "%02d" % lt.tm_hour
     return os.path.join(year, month, day, hour)
 
 def copyFile(srcFile, dstFile):

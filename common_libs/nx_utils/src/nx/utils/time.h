@@ -9,12 +9,35 @@ namespace utils {
  * @return By default, std::chrono::system_clock::now () is returned.
  */
 NX_UTILS_API std::chrono::system_clock::time_point utcTime();
+
 /** Should be used instead of \a ::time(). */
 NX_UTILS_API std::chrono::seconds timeSinceEpoch();
+
 /**
  * @return By default, std::chrono::steady_clock::now () is returned.
  */
 NX_UTILS_API std::chrono::steady_clock::time_point monotonicTime();
+
+/**
+ * On Linux, get filename of a file which is used to set system time zone.
+ * @param timeZoneId IANA id of a time zone.
+ * @return On Linux - time zone file name, or a null string if time zone id is not valid; on
+ *     other platforms - an empty string.
+ */
+NX_UTILS_API QString getTimeZoneFile(const QString& timeZoneId);
+
+/**
+ * On Linux, set system time zone. On other platforms, do nothing, return true.
+ * @param timeZoneId IANA id of a time zone.
+ * @return False on error, invalid timeZoneId or unsupported platform, true on success.
+ */
+NX_UTILS_API bool setTimeZone(const QString& timeZoneId);
+
+/**
+ * On Linux, set system date and time. On other plaforms, do nothing, return true.
+ * @return false on error or unsupported platform, true on success.
+ */
+NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);
 
 namespace test {
 
@@ -24,7 +47,7 @@ enum class ClockType
     steady
 };
 
-/** 
+/**
  * Provides a way to shift result of utcTime() by some value.
  * Test-only!
  */
@@ -87,7 +110,7 @@ private:
     ClockType m_clockType;
     std::chrono::milliseconds m_currentAbsoluteShift;
 
-    /** 
+    /**
      * Test-only function!
      * After this call \a utcTime() will add \a diff to return value.
      */

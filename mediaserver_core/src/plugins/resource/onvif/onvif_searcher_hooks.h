@@ -7,6 +7,8 @@ namespace plugins {
 namespace onvif {
 namespace searcher_hooks {
 
+void commonHooks(EndpointAdditionalInfo* outInfo);
+
 void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo);
 
 } // namespace searcher_hooks
