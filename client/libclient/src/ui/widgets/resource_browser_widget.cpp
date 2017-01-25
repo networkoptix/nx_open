@@ -897,7 +897,6 @@ void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
     {
         QPainter painter(this);
         QRect rectToFill(rect());
-        rectToFill.adjust(1, 1, -1, -1);
         // rectToFill.setBottom(ui->horizontalLine->mapTo(this, QPoint(0, 0)).y()); //TODO #vkutin this line might be needed later. Remove it if not.
         painter.fillRect(rectToFill, palette().alternateBase());
     }
