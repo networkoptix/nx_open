@@ -24,7 +24,6 @@ public:
     virtual QString groupName() const = 0;
     virtual QString url() const = 0;
     virtual QList<QPair<QString, QString>> properties() const = 0;
-    virtual bool hasCamera() const = 0;
 };
 
 class Composer
@@ -49,7 +48,7 @@ public:
     virtual QStringList storagesUrls() const = 0;
     virtual QStringList camerasIds(QnServer::ChunksCatalog) const = 0;
     virtual bool needStop() const = 0;
-    virtual bool replaceFile(const QString& path, const QByteArray& data) = 0;
+    virtual bool handleFileData(const QString& path, const QByteArray& data) = 0;
     virtual ComposerHandler* composerHandler(const QString& cameraId) = 0;
 };
 
@@ -88,7 +87,7 @@ public: // WriterHandler
     virtual QStringList storagesUrls() const override;
     virtual QStringList camerasIds(QnServer::ChunksCatalog) const override;
     virtual bool needStop() const override;
-    virtual bool replaceFile(const QString& path, const QByteArray& data) override;
+    virtual bool handleFileData(const QString& path, const QByteArray& data) override;
     virtual ComposerHandler* composerHandler(const QString& cameraId) override;
 
 public: // ComposerHandler
@@ -98,7 +97,6 @@ public: // ComposerHandler
     virtual QString groupName() const override;
     virtual QString url() const override;
     virtual QList<QPair<QString, QString>> properties() const override;
-    virtual bool hasCamera() const override;
 
 private:
     QnStorageManager* m_storageManager;

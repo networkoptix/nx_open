@@ -125,7 +125,10 @@ public:
 
     void decreasePendingIOCount()
     {
-        NX_ASSERT(m_pendingIoCount !=0);
+        if (m_pendingIoCount == 0)
+            return;
+
+        NX_ASSERT(m_pendingIoCount > 0);
         --m_pendingIoCount;
         if (m_pendingIoCount == 0) {
             // Check if we can invoke the IO operations, if the IO
@@ -209,6 +212,10 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
+
+        if (handler == nullptr)
+            return;
+        NX_ASSERT(handler != nullptr);
 
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)

@@ -9,13 +9,7 @@
 class ComposerTestHandler : public nx::caminfo::ComposerHandler
 {
 public:
-    enum CameraPresense
-    {
-        CameraByIdFound,
-        CameraByIdNOTFound
-    };
-
-    ComposerTestHandler(CameraPresense hasCamera = CameraByIdFound): m_hasCamera(hasCamera)
+    ComposerTestHandler()
     {
         m_properties.append(QPair<QString, QString>("plainTestPropName", "plainTestPropValue"));
         m_properties.append(QPair<QString, QString>("specSymbolsTestPropName", "spec\r\n\r\nSymbolPro\npValue"));
@@ -51,20 +45,15 @@ public:
         return m_properties;
     }
 
-    virtual bool hasCamera() const override
-    {
-        return m_hasCamera == CameraByIdFound;
-    }
-
     void addProperty()
     {
         m_properties.append(QPair<QString, QString>("additionalPropName", "additionalPr\r\n\ropValue"));
     }
 
 private:
-    CameraPresense m_hasCamera;
     QList<QPair<QString, QString>> m_properties;
 };
+
 
 class WriterTestHandler : public nx::caminfo::WriterHandler
 {
@@ -86,7 +75,7 @@ public:
         return m_needStop;
     }
 
-    virtual bool replaceFile(const QString& path, const QByteArray& data) override
+    virtual bool handleFileData(const QString& path, const QByteArray& data) override
     {
         if (m_filesWritten.contains(path))
             return false;
@@ -124,6 +113,11 @@ public:
         m_needStop = value;
     }
 
+    void setHasCamera(bool value)
+    {
+        m_hasCamera = value;
+    }
+
     void resetWrittenData()
     {
         m_filesWritten.clear();
@@ -140,6 +134,7 @@ private:
     QStringList m_storagesUrls;
     QStringList m_camerasIds;
     bool m_needStop;
+    bool m_hasCamera;
 };
 
 const char *const kInfoFilePattern= R"#("cameraName"="testName"
@@ -163,7 +158,7 @@ const char *const kInfoFileWithAdditionalPropPattern= R"#("cameraName"="testName
 
 TEST(ComposerTest, CameraFound)
 {
-    ComposerTestHandler composerHandler(ComposerTestHandler::CameraByIdFound);
+    ComposerTestHandler composerHandler;
     nx::caminfo::Composer composer;
 
     auto result = composer.make(&composerHandler);
@@ -172,10 +167,9 @@ TEST(ComposerTest, CameraFound)
 
 TEST(ComposerTest, CameraNOTFound)
 {
-    ComposerTestHandler composerHandler(ComposerTestHandler::CameraByIdNOTFound);
     nx::caminfo::Composer composer;
 
-    ASSERT_TRUE(composer.make(&composerHandler).isEmpty());
+    ASSERT_TRUE(composer.make(nullptr).isEmpty());
 }
 
 class DerivedTestWriter : public nx::caminfo::Writer
@@ -486,6 +480,24 @@ protected:
         readerHandler.errMsg.clear();
     }
 
+    void thenDataIsCorrect()
+    {
+        const nx::caminfo::ArchiveCameraData& camData = camDataList[0];
+        const ec2::ApiCameraData& coreData = camData.coreData;
+
+        ASSERT_EQ(coreData.groupId, "testGroupId");
+        ASSERT_EQ(coreData.groupName, "testGroupName");
+        ASSERT_EQ(coreData.id, guidFromArbitraryData(lit("cameraId")));
+        ASSERT_EQ(coreData.mac, QnLatin1Array());
+        ASSERT_EQ(coreData.model, "testModel");
+        ASSERT_EQ(coreData.name, "testName");
+        ASSERT_EQ(coreData.parentId, kModuleGuid);
+        ASSERT_EQ(coreData.physicalId, fileInfo.fileName());
+        ASSERT_EQ(coreData.typeId, kArchiveCamTypeGuid);
+        ASSERT_EQ(coreData.url, "testUrl");
+    }
+
+
     ReaderTestHandler readerHandler;
     nx::caminfo::Reader reader;
     std::function<QByteArray(const QString&)> getDataFunc;
@@ -550,4 +562,15 @@ TEST_F(ReaderTest, ErrorsInData)
             });
         then(ResultIs::Empty);
     }
+}
+
+TEST_F(ReaderTest, CorrectData)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::NotEmpty);
+    thenDataIsCorrect();
 }
