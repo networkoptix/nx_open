@@ -1,9 +1,4 @@
-/**********************************************************
-* 21 nov 2012
-* a.kolesnikov
-***********************************************************/
-
-#include "aioservice.h"
+#include "aio_service.h"
 
 #include <atomic>
 #include <iostream>
@@ -11,7 +6,6 @@
 #include <thread>
 
 #include <QtCore/QThread>
-#include <qglobal.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
@@ -19,20 +13,13 @@
 
 #include "pollable.h"
 
-
-using namespace std;
-
 namespace nx {
 namespace network {
 namespace aio {
 
-typedef AIOThread SystemAIOThread;
-
-static std::atomic<AIOService*> AIOService_instance( nullptr );
-
-AIOService::AIOService( unsigned int threadCount )
+AIOService::AIOService(unsigned int threadCount)
 {
-    if( !threadCount )
+    if (!threadCount)
         threadCount = QThread::idealThreadCount();
 
     initializeAioThreadPool(&m_systemSocketAIO, threadCount);
@@ -44,12 +31,10 @@ AIOService::~AIOService()
     m_systemSocketAIO.aioThreadPool.clear();
 }
 
-//!Returns true, if object has been successfully initialized
 bool AIOService::isInitialized() const
 {
     return !m_systemSocketAIO.aioThreadPool.empty();
 }
-
 
 void AIOService::watchSocket(
     Pollable* const sock,
@@ -184,15 +169,6 @@ void AIOService::bindSocketToAioThread(Pollable* sock, AbstractAioThread* aioThr
 
     //socket can be bound to another aio thread, if it is not used at the moment
     sock->impl()->aioThread.exchange(static_cast<aio::AIOThread*>(desiredThread));
-
-    //aio::AIOThread* expected = nullptr;
-    //if (!sock->impl()->aioThread.compare_exchange_strong(expected, desiredThread))
-    //{
-    //    NX_ASSERT(
-    //        expected == desiredThread,  //already bound to desired thread?
-    //        Q_FUNC_INFO,
-    //        "Socket is already bound to some AIO thread");
-    //}
 }
 
 void AIOService::watchSocketNonSafe(
@@ -297,7 +273,6 @@ void AIOService::watchSocketNonSafe(
     lock->relock();
 }
 
-//!Same as \a AIOService::removeFromWatch, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
 void AIOService::removeFromWatchNonSafe(
     QnMutexLockerBase* const lock,
     Pollable* const sock,
@@ -410,6 +385,6 @@ void AIOService::postNonSafe(
     lock->relock();
 }
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

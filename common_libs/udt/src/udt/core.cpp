@@ -683,6 +683,7 @@ void CUDT::connect(const sockaddr* serv_addr)
    response.pack(0, NULL, resdata, m_iPayloadSize);
 
    CUDTException e(0, 0);
+   int internalConnectResult = -47;
 
    while (!m_bClosing)
    {
@@ -700,7 +701,8 @@ void CUDT::connect(const sockaddr* serv_addr)
       response.setLength(m_iPayloadSize);
       if (m_pRcvQueue->recvfrom(m_SocketID, response) > 0)
       {
-         if (connect(response) <= 0)
+         internalConnectResult = connect(response);
+         if (internalConnectResult <= 0)
             break;
 
          // new request/response should be sent out immediately on receving a response
@@ -726,6 +728,8 @@ void CUDT::connect(const sockaddr* serv_addr)
          e = CUDTException(1, 2, 0);
       else if ((!m_bRendezvous) && (m_iISN != m_ConnRes.m_iISN))      // secuity check
          e = CUDTException(1, 4, 0);
+      else if (internalConnectResult == -1) // Otherwise, success will be reported to the caller
+         e = CUDTException(1);
    }
 
    if (e.getErrorCode() != 0)

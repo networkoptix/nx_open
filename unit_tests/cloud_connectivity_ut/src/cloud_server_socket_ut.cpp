@@ -27,7 +27,7 @@ class FakeTcpTunnelConnection
 {
 public:
     FakeTcpTunnelConnection(
-        aio::AbstractAioThread* thread,
+        aio::AbstractAioThread* aioThread,
         network::test::AddressBinder::Manager addressManager,
         size_t clientsLimit)
     :
@@ -35,16 +35,7 @@ public:
         m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
-        m_server->bindToAioThread(thread);
-        NX_CRITICAL(m_server->setNonBlockingMode(true));
-        NX_CRITICAL(m_server->setReuseAddrFlag(true));
-        NX_CRITICAL(m_server->bind(SocketAddress::anyPrivateAddress));
-        NX_CRITICAL(m_server->listen());
-
-        auto address = m_server->getLocalAddress();
-        NX_LOGX(lm("listening %1 for %2 sockets")
-            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
-        m_addressManager.add(std::move(address));
+        init(aioThread);
     }
 
     ~FakeTcpTunnelConnection()
@@ -81,6 +72,24 @@ private:
     size_t m_clientsLimit;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     network::test::AddressBinder::Manager m_addressManager;
+
+    void init(aio::AbstractAioThread* aioThread)
+    {
+        m_server->bindToAioThread(aioThread);
+        ASSERT_TRUE(m_server->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->setReuseAddrFlag(true))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->listen())
+            << SystemError::getLastOSErrorText().toStdString();
+
+        auto address = m_server->getLocalAddress();
+        NX_LOGX(lm("listening %1 for %2 sockets")
+            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+        m_addressManager.add(std::move(address));
+    }
 };
 
 /**

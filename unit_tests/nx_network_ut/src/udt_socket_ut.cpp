@@ -6,7 +6,6 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket.h>
 #include <nx/network/udt/udt_socket.h>
-#include <nx/network/udt/udt_pollset.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/utils/std/future.h>

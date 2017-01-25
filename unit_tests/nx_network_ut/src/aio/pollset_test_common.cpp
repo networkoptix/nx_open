@@ -25,6 +25,14 @@ std::unique_ptr<Pollable> CommonPollSetTest::createSocketOfRandomType()
         return createRegularSocket();
 }
 
+std::vector<std::unique_ptr<Pollable>> CommonPollSetTest::createSocketOfAllSupportedTypes()
+{
+    std::vector<std::unique_ptr<Pollable>> sockets;
+    sockets.push_back(createRegularSocket());
+    sockets.push_back(std::make_unique<UdtStreamSocket>(AF_INET));
+    return sockets;
+}
+
 void CommonPollSetTest::initializeSocketOfRandomType()
 {
     m_sockets.push_back(createSocketOfRandomType());
@@ -37,7 +45,7 @@ void CommonPollSetTest::initializeUdtSocket()
 
 void CommonPollSetTest::subscribeSocketsToEvents(int events)
 {
-    for (const auto& socket : m_sockets)
+    for (const auto& socket: m_sockets)
     {
         if (events & aio::etRead)
             m_pollset->add(socket.get(), aio::etRead);
@@ -91,6 +99,12 @@ void CommonPollSetTest::givenRegularSocketAvailableForReadWrite()
     simulateSocketEvents(aio::etRead | aio::etWrite);
 }
 
+void CommonPollSetTest::givenSocketsOfAllSupportedTypes()
+{
+    m_sockets = createSocketOfAllSupportedTypes();
+    subscribeSocketsToEvents(aio::etRead | aio::etWrite);
+}
+
 void CommonPollSetTest::initializeBunchOfSocketsOfRandomType()
 {
     constexpr int socketCount = 100;
@@ -105,22 +119,21 @@ void CommonPollSetTest::runRemoveSocketWithMultipleEventsTest()
     simulateSocketEvents(aio::etRead | aio::etWrite);
     int numberOfEventsReported = 0;
     handleSocketEvents(
-        [this, &numberOfEventsReported](Pollable* const socket, aio::EventType eventType)
-    {
-        static_cast<void*>(&eventType);
-        ++numberOfEventsReported;
+        [this, &numberOfEventsReported](Pollable* const socket, aio::EventType /*eventType*/)
+        {
+            ++numberOfEventsReported;
 
-        const int seed = nx::utils::random::number<int>(0, 2);
-        const auto eventsToRemove =
-            seed == 0 ? (aio::etRead | aio::etWrite) :
-            seed == 1 ? (aio::etRead) :
-            seed == 2 ? (aio::etWrite) : 0;
+            const int seed = nx::utils::random::number<int>(0, 2);
+            const auto eventsToRemove =
+                seed == 0 ? (aio::etRead | aio::etWrite) :
+                seed == 1 ? (aio::etRead) :
+                seed == 2 ? (aio::etWrite) : 0;
 
-        unsubscribeSocketFromEvents(socket, eventsToRemove);
-        unsubscribeSocketFromEvents(
-            m_sockets[nx::utils::random::number<size_t>(0, m_sockets.size() - 1)].get(),
-            eventsToRemove);
-    });
+            unsubscribeSocketFromEvents(socket, eventsToRemove);
+            unsubscribeSocketFromEvents(
+                m_sockets[nx::utils::random::number<size_t>(0, m_sockets.size() - 1)].get(),
+                eventsToRemove);
+        });
 }
 
 void CommonPollSetTest::whenRemovedSocketFromPollSetOnFirstEvent()
@@ -144,6 +157,11 @@ void CommonPollSetTest::whenReceivedSocketEvents()
         });
 }
 
+void CommonPollSetTest::whenChangedEverySocketState()
+{
+    simulateSocketEvents(aio::etRead | aio::etWrite);
+}
+
 void CommonPollSetTest::thenPollsetDidNotReportEventsForRemovedSockets()
 {
     // If we did not crash to this point, then everything is ok.
@@ -151,9 +169,9 @@ void CommonPollSetTest::thenPollsetDidNotReportEventsForRemovedSockets()
 
 void CommonPollSetTest::thenReadWriteEventsHaveBeenReported()
 {
-    for (const auto& socketAndEventMask : m_socketToActiveEventMask)
+    for (const auto& socketAndEventMask: m_socketToActiveEventMask)
     {
-        for (auto eventTypeToCheck : { aio::etRead, aio::etWrite })
+        for (auto eventTypeToCheck: { aio::etRead, aio::etWrite })
         {
             if ((socketAndEventMask.second & eventTypeToCheck) == 0)
                 continue;
@@ -161,6 +179,18 @@ void CommonPollSetTest::thenReadWriteEventsHaveBeenReported()
                 m_eventsReported.find(std::make_pair(socketAndEventMask.first, eventTypeToCheck)) !=
                 m_eventsReported.end());
         }
+    }
+}
+
+void CommonPollSetTest::thenPollsetReportsSocketsAsSignalledMultipleTimes()
+{
+    constexpr int numberOfChecks = 2;
+
+    for (int i = 0; i < numberOfChecks; ++i)
+    {
+        whenReceivedSocketEvents();
+        thenReadWriteEventsHaveBeenReported();
+        m_eventsReported.clear();
     }
 }
 
@@ -195,10 +225,36 @@ void CommonPollSetTest::removeSocketThatHasUnprocessedEvents()
     thenPollsetDidNotReportEventsForRemovedSockets();
 }
 
+void CommonPollSetTest::pollIsActuallyLevelTriggered()
+{
+    givenSocketsOfAllSupportedTypes();
+    whenChangedEverySocketState();
+    thenPollsetReportsSocketsAsSignalledMultipleTimes();
+}
+
 // End of tests
 //---------------------------------------------------------------------------------------------
 
-void CommonPollSetTest::assertIfEventIsNotExpected(Pollable* const socket, aio::EventType eventType)
+void CommonPollSetTest::simulateSocketEvents(int eventMask)
+{
+    for (auto it = m_sockets.begin(); it != m_sockets.end();)
+    {
+        if (simulateSocketEvent(it->get(), eventMask))
+        {
+            ++it;
+        }
+        else
+        {
+            unsubscribeSocketFromEvents(it->get(), aio::etRead | aio::etWrite);
+            it = m_sockets.erase(it);
+        }
+    }
+
+    ASSERT_FALSE(m_sockets.empty());
+}
+
+void CommonPollSetTest::assertIfEventIsNotExpected(
+    Pollable* const socket, aio::EventType eventType)
 {
     auto socketIter = std::find_if(
         m_sockets.begin(),

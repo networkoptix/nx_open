@@ -27,6 +27,9 @@ class NX_NETWORK_API BasicPollable:
 {
 public:
     BasicPollable(aio::AbstractAioThread* aioThread = nullptr);
+    BasicPollable(
+        aio::AIOService* aioService,
+        aio::AbstractAioThread* aioThread);
     virtual ~BasicPollable() override;
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
@@ -54,7 +57,7 @@ protected:
 
 private:
     mutable Pollable m_pollable;
-    AIOService& m_aioService;
+    AIOService* m_aioService;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
 };
 
