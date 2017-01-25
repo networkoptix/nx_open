@@ -14,8 +14,8 @@ Control
     signal clicked()
 
     padding: 9
-    leftPadding: 8
-    rightPadding: 8
+    leftPadding: 16
+    rightPadding: 16
 
     implicitWidth: label.implicitWidth + indicator.implicitWidth + spacing
         + leftPadding + rightPadding
