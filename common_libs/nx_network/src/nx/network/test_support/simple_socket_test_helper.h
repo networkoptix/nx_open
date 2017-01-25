@@ -73,6 +73,15 @@ public:
     {
         bool hasSucceeded;
         SocketAddress address;
+
+        ServerStartResult(
+            bool hasSucceeded,
+            SocketAddress address)
+            :
+            hasSucceeded(hasSucceeded),
+            address(std::move(address))
+        {
+        }
     };
 
     SyncSocketServer(ServerSocketType server):
@@ -115,7 +124,7 @@ private:
     void run()
     {
         auto startedPromiseGuard = makeScopedGuard(
-            [this]() { m_startedPromise.set_value({false, SocketAddress()}); });
+            [this]() { m_startedPromise.set_value(ServerStartResult(false, SocketAddress())); });
 
         ASSERT_TRUE(m_server->setReuseAddrFlag(true)) << lastError();
         ASSERT_TRUE(m_server->bind(m_endpointToBindTo)) << lastError();
@@ -130,7 +139,7 @@ private:
 
         NX_LOGX(lm("Started on %1").arg(serverAddress.toString()), cl_logINFO);
         startedPromiseGuard.disarm();
-        m_startedPromise.set_value({true, std::move(serverAddress)});
+        m_startedPromise.set_value(ServerStartResult(true, std::move(serverAddress)));
 
         const auto startTime = std::chrono::steady_clock::now();
         const auto maxTimeout = kTestTimeout * testClientCount();
