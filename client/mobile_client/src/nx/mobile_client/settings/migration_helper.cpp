@@ -60,9 +60,6 @@ public:
                     if (!migratedSessionIds.contains(localId))
                         return false;
 
-                    if (moduleInformation.systemName != data.systemName)
-                        return false;
-
                     for (const auto& url: data.urls)
                     {
                         if (address == SocketAddress(url))
