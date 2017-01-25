@@ -35,6 +35,35 @@ public:
         init();
     }
 
+protected:
+    void allocateAccountTemporaryCredentials()
+    {
+        m_account = addActivatedAccount2();
+
+        api::TemporaryCredentialsParams params;
+        params.timeouts.expirationPeriod = std::chrono::hours(1);
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            createTemporaryCredentials(
+                m_account.email,
+                m_account.password,
+                params,
+                &m_temporaryCredentials));
+    }
+
+    void assertIfTemporaryCredentialsAreNotLowCase()
+    {
+        for (auto c: m_temporaryCredentials.login)
+            ASSERT_EQ(std::tolower(c), c);
+
+        for (auto c: m_temporaryCredentials.password)
+            ASSERT_EQ(std::tolower(c), c);
+    }
+
+private:
+    AccountWithPassword m_account;
+    api::TemporaryCredentials m_temporaryCredentials;
+
     void init()
     {
         ASSERT_TRUE(startAndWaitUntilStarted());
@@ -238,6 +267,12 @@ TEST_F(AccountTemporaryCredentials, temporary_credentials_removed_on_password_ch
             api::ResultCode::notAuthorized,
             getAccount(temporaryCredentials.login, temporaryCredentials.password, &accountData));
     }
+}
+
+TEST_F(AccountTemporaryCredentials, temporary_credentials_are_low_case)
+{
+    allocateAccountTemporaryCredentials();
+    assertIfTemporaryCredentialsAreNotLowCase();
 }
 
 } // namespace cdb
