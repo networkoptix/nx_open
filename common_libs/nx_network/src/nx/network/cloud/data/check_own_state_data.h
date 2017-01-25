@@ -9,7 +9,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class CheckOwnStateRequest:
+class NX_NETWORK_API CheckOwnStateRequest:
     public StunRequestData
 {
 public:
@@ -20,7 +20,7 @@ public:
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class CheckOwnStateResponse:
+class NX_NETWORK_API CheckOwnStateResponse:
     public StunResponseData
 {
 public:
