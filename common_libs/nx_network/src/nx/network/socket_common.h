@@ -114,7 +114,6 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* utf8Str);
-    SocketAddress(const QUrl& url);
 
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
