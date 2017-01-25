@@ -152,8 +152,8 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
             break;
         case Qn::ForbiddenConnectionResult:
             QnMessageBox::warning(parentWidget,
-                tr("Operation is not permitted now"),
-                tr("It could happen due to media server is restarting now. Please try again later.")
+                kFailedToConnectText,
+                tr("Server may be restarting now. Please try again later.")
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::NetworkErrorConnectionResult:
