@@ -550,7 +550,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
     if (messageText.isEmpty())
         return;
-    qDebug() << messageText;
 
     item = new QnNotificationWidget(m_list);
 
@@ -631,6 +630,20 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
             item->addActionButton(
                 qnSkin->icon("events/cloud_promo.png"),
                 QnActions::PreferencesCloudTabAction);
+            connect(item, &QnNotificationWidget::linkActivated, this,
+                [this](const QString& link)
+                {
+                    if (link.contains(lit("://")))
+                        QDesktopServices::openUrl(link);
+                    else
+                        menu()->trigger(QnActions::PreferencesCloudTabAction);
+                }, Qt::QueuedConnection);
+            connect(item, &QnNotificationWidget::closeTriggered, this,
+                [this]
+                {
+                    menu()->trigger(QnActions::HideCloudPromoAction);
+                });
+
             break;
         }
         default:

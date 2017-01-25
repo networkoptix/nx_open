@@ -992,6 +992,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Account Settings..."));
 
+    factory(QnActions::HideCloudPromoAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
         text(tr("Create Account..."));
