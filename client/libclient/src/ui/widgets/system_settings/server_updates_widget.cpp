@@ -784,7 +784,6 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
 
 void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
 {
-    // TODO: #ynikitenkov check order of controls
     const auto failedServers =
         qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
