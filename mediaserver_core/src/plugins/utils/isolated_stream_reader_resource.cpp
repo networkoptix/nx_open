@@ -1,18 +1,18 @@
 #ifdef ENABLE_ONVIF
 
-#include "optera_stream_reader_resource.h"
+#include "isolated_stream_reader_resource.h"
 
 namespace nx {
 namespace plugins {
-namespace pelco {
+namespace utils {
 
-bool OpteraStreamReaderResource::hasProperty(const QString &key) const
+bool IsolatedStreamReaderResource::hasProperty(const QString &key) const
 {
     QnMutexLocker lock(&m_propertyMutex);
     return m_properties.find(key) != m_properties.end();
 }
 
-QString OpteraStreamReaderResource::getProperty(const QString &key) const
+QString IsolatedStreamReaderResource::getProperty(const QString &key) const
 {
     QnMutexLocker lock(&m_propertyMutex);
     auto propertyValue = m_properties.find(key);
@@ -28,7 +28,7 @@ QString OpteraStreamReaderResource::getProperty(const QString &key) const
 
 }
 
-bool OpteraStreamReaderResource::setProperty(
+bool IsolatedStreamReaderResource::setProperty(
     const QString &key,
     const QString &value,
     PropertyOptions /*options*/)
@@ -38,7 +38,23 @@ bool OpteraStreamReaderResource::setProperty(
     return true;
 }
 
-} // namespace pelco
+void IsolatedStreamReaderResource::saveParams()
+{
+    // Do nothing.
+}
+
+void IsolatedStreamReaderResource::saveParamsAsync()
+{
+    // Do nothing.
+}
+
+int IsolatedStreamReaderResource::saveAsync()
+{
+    // Do nothing.
+    return 0;
+}
+
+} // namespace utils
 } // namespace plugins
 } // namespace nx
 

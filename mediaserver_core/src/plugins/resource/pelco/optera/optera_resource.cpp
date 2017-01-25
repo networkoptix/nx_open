@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include "optera_data_provider.h"
+#include <plugins/utils/multisensor_data_provider.h>
 #include <plugins/resource/onvif/onvif_resource_information_fetcher.h>
 #include <utils/network/http/httpclient.h>
 #include <common/common_module.h>
@@ -137,7 +137,7 @@ QnAbstractStreamDataProvider* QnOpteraResource::createLiveDataProvider()
     if (!isInitialized())
         return nullptr;
 
-    return new QnOpteraDataProvider(toSharedPointer());
+    return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer());
 }
 
 

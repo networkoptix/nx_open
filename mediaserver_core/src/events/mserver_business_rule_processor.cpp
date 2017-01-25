@@ -64,6 +64,7 @@
 #include <common/common_module.h>
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <api/helpers/thumbnail_request_data.h>
+#include <utils/common/util.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -103,7 +104,6 @@ namespace {
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
 
-    static const QByteArray kExecHttpActionContentType("text/plain");
 };
 
 struct QnEmailAttachmentData {
@@ -405,9 +405,13 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
             }
         };
 
+        QByteArray contentType = action->getParams().contentType.toUtf8();
+        if (contentType.isEmpty())
+            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+
         return nx_http::uploadDataAsync(url,
             action->getParams().text.toUtf8(),
-            kExecHttpActionContentType,
+            contentType,
             nx_http::HttpHeaders(),
             callback);
     }
