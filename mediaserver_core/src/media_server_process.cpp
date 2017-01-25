@@ -2026,7 +2026,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 {
     for (;;)
     {
-        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
+        if (!cloudConnectionManager.resetCloudData())
         {
             qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2356,6 +2356,14 @@ void MediaServerProcess::run()
     std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
         clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
 
+    if (m_cmdLineArguments.cleanupDb)
+    {
+        const bool kCleanupDbObjects = true;
+        const bool kCleanupTransactionLog = true;
+        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
+        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
+    }
+
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
@@ -2636,14 +2644,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
-    if (m_cmdLineArguments.cleanupDb)
-    {
-        const bool kCleanupDbObjects = true;
-        const bool kCleanupTransactionLog = true;
-        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
-        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
-    }
-
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();
 
@@ -2741,6 +2741,13 @@ void MediaServerProcess::run()
         &QnResourceDiscoveryManager::localInterfacesChanged,
         this,
         &MediaServerProcess::updateAddressesList);
+
+    connect(
+        m_mediaServer.data(),
+        &QnMediaServerResource::primaryAddressChanged,
+        this,
+        &MediaServerProcess::updateAddressesList);
+
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 

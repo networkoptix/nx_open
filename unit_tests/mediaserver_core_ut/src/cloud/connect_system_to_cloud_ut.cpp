@@ -109,6 +109,9 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+// FtConnectSystemToCloudOnlyCloudOwner
+
 class FtConnectSystemToCloudOnlyCloudOwner:
     public FtConnectSystemToCloud
 {
@@ -130,6 +133,9 @@ TEST_F(FtConnectSystemToCloudOnlyCloudOwner, removing_cloud_system_id_resets_sys
     thenSystemStateShouldBecomeNew();
 }
 
+//-------------------------------------------------------------------------------------------------
+// FtConnectSystemToCloudWithLocalOwner
+
 class FtConnectSystemToCloudWithLocalOwner:
     public FtConnectSystemToCloud
 {
@@ -149,4 +155,52 @@ TEST_F(FtConnectSystemToCloudWithLocalOwner, removing_cloud_system_id_cleans_up_
 
     thenCloudUsersShouldBeRemoved();
     thenCloudAttributesShouldBeRemoved();
+}
+
+//-------------------------------------------------------------------------------------------------
+// FtDisconnectSystemFromCloud
+
+class FtDisconnectSystemFromCloud:
+    public FtConnectSystemToCloud
+{
+protected:
+    void givenServerWithLocalAdminConnectedToTheCloud()
+    {
+        configureSystemAsLocal();
+        connectSystemToCloud();
+    }
+
+    void givenServerConnectedToTheCloudWithCloudOwnerOnly()
+    {
+        connectSystemToCloud();
+    }
+
+    void whenInvokedDetachFromCloudRestMethod()
+    {
+        auto mediaServerClient = prepareMediaServerClient();
+        DetachFromCloudData params;
+        QnJsonRestResult resultCode = mediaServerClient.detachFromCloud(std::move(params));
+        ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
+    }
+};
+
+TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_present)
+{
+    givenServerWithLocalAdminConnectedToTheCloud();
+
+    whenInvokedDetachFromCloudRestMethod();
+
+    thenCloudUsersShouldBeRemoved();
+    thenCloudAttributesShouldBeRemoved();
+}
+
+TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_cloud_owner_only)
+{
+    givenServerConnectedToTheCloudWithCloudOwnerOnly();
+
+    whenInvokedDetachFromCloudRestMethod();
+
+    thenCloudUsersShouldBeRemoved();
+    thenCloudAttributesShouldBeRemoved();
+    thenSystemStateShouldBecomeNew();
 }

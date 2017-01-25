@@ -37,7 +37,7 @@ public:
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
-    {
+    {   
         QnJsonRestResult restResult;
         if (!m_serverIdForModuleInformation)
         {
@@ -291,7 +291,15 @@ void MediaServerEmulator::onConnectionRequested(
         }
     }
 
-    NX_ASSERT(m_mediatorUdpClient);
+    if (!m_mediatorUdpClient)
+    {
+        m_mediatorUdpClient =
+            std::make_unique<nx::hpm::api::MediatorServerUdpConnection>(
+                *m_mediatorConnector->mediatorAddress(),
+                m_mediatorConnector.get());
+        m_mediatorUdpClient->bindToAioThread(getAioThread());
+    }
+
     m_mediatorUdpClient->connectionAck(
         std::move(connectionAckData),
         std::bind(&MediaServerEmulator::onConnectionAckResponseReceived, this, _1));
@@ -339,6 +347,10 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
 
     m_udtStreamSocket = std::move(udtStreamSocket);
     m_udtStreamServerSocket = std::move(udtStreamServerSocket);
+
+    NX_LOGX(lm("Starting rendezvous connect from %1 to %2")
+        .str(m_udtStreamSocket->getLocalAddress())
+        .str(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
 
     using namespace std::placeholders;
     m_udtStreamSocket->connectAsync(

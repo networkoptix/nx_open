@@ -2,7 +2,7 @@
 # Artem V. Nikitin
 # Client emulator
 
-import urllib2, FuncTest, json, base64, httplib
+import urllib2, FuncTest, json, base64, httplib, time
 from Logger import LOGLEVEL
 from Config import config
 from ComparisonMixin import ComparisonMixin
@@ -67,7 +67,9 @@ class Client:
         else:
             FuncTest.tlog(LOGLEVEL.DEBUG + 9, "Client#%d GET request '%s'" % (self.index, url))
         try:
-            request = urllib2.Request(url, data=data, headers=headers)
+            hdrs = headers.copy()
+            hdrs.setdefault('Connection', 'keep-alive')
+            request = urllib2.Request(url, data=data, headers=hdrs)
             response = Client.ServerResponseData(
               url, self._processRequest(request))
             FuncTest.tlog(LOGLEVEL.DEBUG + 9, "Client#%d HTTP response:\n'%s'" % (self.index, response.data))
@@ -136,7 +138,6 @@ class DigestAuthClient(BasicAuthClient):
                 if i == self.RETRY_COUNT - 1:
                     raise
                 FuncTest.tlog(LOGLEVEL.ERROR, "Client#%d got unexpected HTTP status BadStatusLine %s" % (self.index, str(x)))
-
 
 
 class ClientMixin(ComparisonMixin):

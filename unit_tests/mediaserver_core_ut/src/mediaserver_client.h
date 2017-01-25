@@ -4,6 +4,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <api/model/cloud_credentials_data.h>
+#include <api/model/detach_from_cloud_data.h>
 #include <api/model/setup_local_system_data.h>
 #include <api/model/system_settings_reply.h>
 #include <network/module_information.h>
@@ -40,6 +41,11 @@ public:
         std::function<void(QnJsonRestResult)> completionHandler);
     QnJsonRestResult setupLocalSystem(const SetupLocalSystemData& request);
 
+    void detachFromCloud(
+        const DetachFromCloudData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult detachFromCloud(const DetachFromCloudData& request);
+
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
 
@@ -75,6 +81,11 @@ private:
     ResultCode syncCallWrapper(
         void(MediaServerClient::*asyncFunc)(std::function<void(ResultCode, Output)>),
         Output* output);
+
+    template<typename ResultCode, typename Input>
+    ResultCode syncCallWrapper(
+        void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode)>),
+        const Input& input);
 
     template<typename Input>
     void performApiRequest(

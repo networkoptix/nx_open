@@ -94,20 +94,11 @@ int QnDetachFromCloudRestHandler::execute(
         NX_LOGX(lm("Received error response from %1: %2").arg(QnAppInfo::cloudName())
             .arg(api::toString(cdbResultCode)), cl_logWARNING);
 
-        // We've decided ignore cloud error in detach operation. So, it allows to do detach in offline mode
-#if 0
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            lit("Could not connect to %1: %2").arg(QnAppInfo::cloudName())
-                .arg(QString::fromStdString(api::toString(cdbResultCode))));
-        result.setReply(DetachFromCloudReply(
-            DetachFromCloudReply::ResultCode::errorFromCloudServer,
-            static_cast<int>(cdbResultCode)));
-        return nx_http::StatusCode::ok;
-#endif
+        // Ignoring cloud error in detach operation. 
+        // So, it is allowed to perform detach while offline.
     }
 
-    if (!m_cloudConnectionManager->cleanUpCloudDataInLocalDb())
+    if (!m_cloudConnectionManager->detachSystemFromCloud())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         result.setError(

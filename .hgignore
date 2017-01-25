@@ -35,6 +35,7 @@ vms*.pro
 x86/*
 x64/*
 target/*
+target-bpi/*
 packages.config
 .vs
 

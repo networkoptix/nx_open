@@ -1,5 +1,7 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Fragment Id='FragmentServerPackage'>
         <PackageGroup Id="ServerPackageGroup">
             <MsiPackage
@@ -14,7 +16,7 @@
         </PackageGroup>
     </Fragment>
 
-    <Fragment Id='FragmentConditions'>
+    <Fragment Id='FragmentServerConditions'>
         <?include BuildVars.wxi ?>
 
         <util:RegistrySearch
