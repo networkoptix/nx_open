@@ -61,6 +61,8 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
         m_loader, [this](){ m_loader->discardCachedData(); } );
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated,
         this, &QnCameraChunkProvider::update);
+
+    update();
 }
 
 qint64 QnCameraChunkProvider::bottomBound() const
