@@ -297,7 +297,7 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 }
 
 void QnNotificationWidget::addActionButton(
-    const QIcon& icon, const QString& /*tooltip*/, QnActions::IDType actionId,
+    const QIcon& icon, QnActions::IDType actionId,
     const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
