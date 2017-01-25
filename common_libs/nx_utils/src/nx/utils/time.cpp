@@ -1,7 +1,7 @@
 #include "time.h"
 
 #include <nx/utils/log/log.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #if defined(Q_OS_LINUX)
     #include <sys/time.h>

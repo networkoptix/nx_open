@@ -11,7 +11,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/literal.h>

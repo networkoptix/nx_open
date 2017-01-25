@@ -43,7 +43,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <utils/common/qtimespan.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #include <utils/math/color_transformations.h>
 
