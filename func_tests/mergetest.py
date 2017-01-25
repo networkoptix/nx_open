@@ -16,6 +16,7 @@ from functest_util import generateKey
 TEST_SYSTEM_NAME_1="MergeTestSystem1"
 TEST_SYSTEM_NAME_2="MergeTestSystem2"
 CLOUD_SERVER='cloud-test.hdw.mx'
+FAKE_CLOUD_SERVER='cloud-fake.hdw.mx'
 CLOUD_USER_NAME='anikitin@networkoptix.com'
 CLOUD_USER_PWD='qweasd123'
 DEFAULT_CUSTOMIZATION='default'
@@ -49,7 +50,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
               'testMergeTakeLocalSettings',
               'testMergeTakeRemoteSettings',
               'testRestartOneServer',
-              # 'testMergeCloudWithLocal',
+              'testMergeCloudWithLocal',
               # 'testMergeCloudSystems',
               # 'testCloudMergeAfterDisconnect'
           ]),
@@ -220,6 +221,20 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         srvInfo.user = CLOUD_USER_NAME
         srvInfo.password = CLOUD_USER_PWD
 
+    def __checkServerConnectedToCloud(self, srv):
+        srvInfo = self.servers[srv]
+        client = Client(srvInfo.user, srvInfo.password)
+        response = client.httpRequest(self.serverAddr1, "api/getNonce")
+        self.checkResponseError(response, "api/getNonce")
+        nonce = response.data["reply"]["nonce"]
+        realm = response.data["reply"]["realm"]
+        response =client.httpRequest(
+            self.serverAddr1,
+            'api/moduleInformationAuthenticated',
+            getKey=generateKey('GET', client.user, client.password, nonce, realm))
+        self.checkResponseError(response, "api/moduleInformationAuthenticated")
+        self.assertTrue(bool(response.data['reply']['cloudSystemId']))
+ 
     # wait cloud credentials
     def __waitCredentials(self, srv):
         tlog(LOGLEVEL.INFO, "Cloud credentials (wait cycle) start...")
@@ -337,7 +352,8 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         # Setup cloud and wait new cloud credentials
         self.__setupCloud(self.serverAddr1, self.sysName1)
         self.__waitCredentials(self.serverAddr1)
-        
+        self.__checkServerConnectedToCloud(self.serverAddr1)
+
         # Merge systems (takeRemoteSettings = False) -> Error
         self.__mergeSystems(False,
             apiErrorCode = 3,
@@ -348,6 +364,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         self.__waitCredentials(self.serverAddr2)
         self.__waitMergeDone()
 
+    
     def testMergeCloudSystems(self):
         "Merge two cloud systems"
         self.__prepareInitialState([self.serverAddr1, self.serverAddr2])
@@ -379,8 +396,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
             data=json.dumps({'id': adminGuid,
                              'isEnabled': True}))
         self.checkResponseError(response, "ec2/saveUser")
-        
-        
+       
         
     def testCloudMergeAfterDisconnect(self):
         "Merge after disconnect from cloud"
@@ -400,7 +416,6 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
         self.__checkSettings(
           response.data,
           srvInfo1.settings.get("systemSettings"))
-
 
         # Disconnect Server2 from cloud
         newSrv2Pwd = 'new_password'
@@ -422,5 +437,3 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
           not self.__changeBoolSettings(self.serverAddr1, 'auditTrailEnabled')
         data1, data2 = self.__waitMergeDone()
         self.__checkSettings(data2, {'auditTrailEnabled': newAuditTrailEnabled})
-
-    
