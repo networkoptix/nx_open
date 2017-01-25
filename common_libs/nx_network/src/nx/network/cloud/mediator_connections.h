@@ -7,6 +7,7 @@
 #include "abstract_cloud_system_credentials_provider.h"
 #include "base_mediator_client.h"
 #include "data/bind_data.h"
+#include "data/check_own_state_data.h"
 #include "data/client_bind_data.h"
 #include "data/connect_data.h"
 #include "data/connection_ack_data.h"
@@ -14,8 +15,8 @@
 #include "data/connection_result_data.h"
 #include "data/listen_data.h"
 #include "data/ping_data.h"
-#include "data/resolve_peer_data.h"
 #include "data/resolve_domain_data.h"
+#include "data/resolve_peer_data.h"
 
 namespace nx {
 namespace hpm {
@@ -162,6 +163,19 @@ public:
             std::move(completionHandler));
     }
 
+    /**
+     * Reads own state from mediator perspective.
+     */
+    void checkOwnState(
+        utils::MoveOnlyFunc<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::CheckOwnStateResponse)> completionHandler)
+    {
+        this->doAuthRequest(
+            CheckOwnStateRequest(),
+            std::move(completionHandler));
+    }
+
     String selfPeerId() const
     {
         if (m_connector)
@@ -218,6 +232,9 @@ public:
     {
     }
 
+    /**
+     * @param handler will be called each time connect request is received.
+     */
     void setOnConnectionRequestedHandler(
         std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
     {
@@ -228,6 +245,54 @@ public:
                 ConnectionRequestedEvent indicationData;
                 indicationData.parse(msg);
                 handler(std::move(indicationData));
+            });
+    }
+
+    /**
+     * Verifies if current peer is in listening state. The connection will be closed in case
+     *     if verification fails.
+     * @param repeatPeriod timeout to check again.
+     */
+    void monitorListeningState(std::chrono::milliseconds repeatPeriod)
+    {
+        checkOwnState(
+            [this, repeatPeriod](ResultCode code, CheckOwnStateResponse state)
+            {
+                onCheckOwnStateResponse(repeatPeriod, code, std::move(state));
+            });
+    }
+
+private:
+    void onCheckOwnStateResponse(
+        std::chrono::milliseconds repeatPeriod,
+        ResultCode code,
+        CheckOwnStateResponse state)
+    {
+        if (code != ResultCode::ok)
+        {
+            NX_LOGX(lm("Check own state has failed: %1").str(code), cl_logDEBUG1);
+            return client()->closeConnection(SystemError::invalidData);
+        }
+
+        if (!state.isListening)
+        {
+            NX_LOGX(lm("This peer is not listening"), cl_logWARNING);
+            return client()->closeConnection(SystemError::notConnected);
+        }
+
+        NX_LOGX(lm("Listening state is verified, repeat in %1")
+            .arg(repeatPeriod), cl_logDEBUG2);
+
+        // NOTE: Using shared client's timer is not the best design because start(...)
+        //     from one user might reset another's callback. Hovewer it is fine for now as
+        //     only single user monitors listening state.
+        // TODO: Modify client so it supports multiple timers.
+        client()->start(
+            repeatPeriod,
+            [this, guard = m_asyncGuard.sharedGuard(), repeatPeriod]()
+            {
+                if (auto lock = guard->lock())
+                    return monitorListeningState(repeatPeriod);
             });
     }
 };
