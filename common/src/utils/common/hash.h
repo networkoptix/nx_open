@@ -7,6 +7,7 @@
 #include <QtCore/QHash>
 #include <nx/utils/uuid.h>
 #include <QtGui/QColor>
+#include <QtNetwork/QAuthenticator>
 
 inline uint qHash(const QPoint &value, uint seed = 0) {
     using ::qHash;
@@ -26,6 +27,12 @@ inline uint qHash(const QColor &color, uint seed = 0) {
 
 inline uint qHash(const std::type_index &index, uint seed = 0) {
     return qHash(index.hash_code(), seed);
+}
+
+inline uint qHash(const QAuthenticator& auth, uint seed = 0)
+{
+    using ::qHash;
+    return qHash(auth.user() + auth.password(), seed);
 }
 
 #endif // QN_HASH_H

@@ -931,12 +931,15 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged()
     {
         case Qn::MotionSettingsTab:
         {
-            if (m_motionWidget)
-                break;
+            bool hasMotionWidget = m_motionWidget != NULL;
 
-            m_motionWidget = new QnCameraMotionMaskWidget(this);
+            if (!hasMotionWidget)
+                m_motionWidget = new QnCameraMotionMaskWidget(this);
 
             updateMotionWidgetFromResource();
+
+            if (hasMotionWidget)
+                break;
 
             using ::setReadOnly;
             setReadOnly(m_motionWidget, m_readOnly);
