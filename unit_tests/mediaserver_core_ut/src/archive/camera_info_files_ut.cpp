@@ -486,6 +486,24 @@ protected:
         readerHandler.errMsg.clear();
     }
 
+    void thenDataIsCorrect()
+    {
+        const nx::caminfo::ArchiveCameraData& camData = camDataList[0];
+        const ec2::ApiCameraData& coreData = camData.coreData;
+
+        ASSERT_EQ(coreData.groupId, "testGroupId");
+        ASSERT_EQ(coreData.groupName, "testGroupName");
+        ASSERT_EQ(coreData.id, guidFromArbitraryData(lit("cameraId")));
+        ASSERT_EQ(coreData.mac, QnLatin1Array());
+        ASSERT_EQ(coreData.model, "testModel");
+        ASSERT_EQ(coreData.name, "testName");
+        ASSERT_EQ(coreData.parentId, kModuleGuid);
+        ASSERT_EQ(coreData.physicalId, fileInfo.fileName());
+        ASSERT_EQ(coreData.typeId, kArchiveCamTypeGuid);
+        ASSERT_EQ(coreData.url, "testUrl");
+    }
+
+
     ReaderTestHandler readerHandler;
     nx::caminfo::Reader reader;
     std::function<QByteArray(const QString&)> getDataFunc;
@@ -550,4 +568,15 @@ TEST_F(ReaderTest, ErrorsInData)
             });
         then(ResultIs::Empty);
     }
+}
+
+TEST_F(ReaderTest, CorrectData)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
+    then(ResultIs::NotEmpty);
+    thenDataIsCorrect();
 }
