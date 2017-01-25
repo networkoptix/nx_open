@@ -30,17 +30,20 @@
                                   </div>
                                   <div class="media-body text-left">
                                         <h2><b>Download VMS_NAME</b></h2>
-                                        <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel || $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
+                                        <span class="installer-name">{{$root.L.downloads.groups[platform.name].shortLabel ||
+                                            $root.L.downloads.groups[platform.name].label}} {{platform.installers[0].formatName}}</span>
                                   </div>
                             </a>
-                            <p class="small" ng-if="platform.description" ng-bind-html="platform.description"></p>
+                            <p class="small" ng-if="$root.L.downloads.groups[platform.name].supported"
+                               ng-bind-html="$root.L.downloads.groups[platform.name].supported"></p>
                         </div>
                     </div>
 
                     <div ng-if="platform.installers.length>1">
                         <h5><b>Other packages:</b></h5>
                         <div class="row">
-                            <div class="col-sm-4 col-md-6 col-lg-4" ng-repeat="link in platform.installers" ng-if="$index > 0 && $index < (platform.installers.length / 2)">
+                            <div class="col-sm-4 col-md-6 col-lg-4" ng-repeat="link in platform.installers"
+                                 ng-if="$index > 0 && $index < (platform.installers.length / 2)">
                                 <p>
                                     <a ng-href="{{link.url}}">
                                         {{link.formatName}}
