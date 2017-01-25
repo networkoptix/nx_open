@@ -558,7 +558,8 @@ void socketErrorHandling(
     auto server = serverMaker();
 
     SystemError::setLastErrorCode(SystemError::noError);
-    ASSERT_TRUE(client->bind(SocketAddress::anyAddress));
+    ASSERT_TRUE(client->bind(SocketAddress::anyAddress))
+        << SystemError::getLastOSErrorText().toStdString();
     ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::noError);
 
     SystemError::setLastErrorCode(SystemError::noError);
