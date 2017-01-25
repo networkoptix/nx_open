@@ -3,6 +3,7 @@ import QtQuick.Layouts 1.1
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 Pane
@@ -23,15 +24,18 @@ Pane
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
     implicitWidth: 200
 
-    QnSystemHostsModel
+    SystemHostsModel
     {
         id: hostsModel
         systemId: control.systemId
     }
-    QnRecentLocalConnectionsModel
+    AuthenticationDataModel
     {
-        id: connectionsModel
+        id: authenticationDataModel
         systemId: control.localId
+
+        readonly property bool hasData: !!defaultCredentials.user
+        readonly property bool hasStoredPassword: !!defaultCredentials.password
     }
 
     background: Rectangle
@@ -62,7 +66,7 @@ Pane
         id: informationBlock
         enabled: compatible && online
         address: Nx.url(hostsModel.firstHost).address()
-        user: connectionsModel.firstUser
+        user: authenticationDataModel.defaultCredentials.user
     }
 
     IconButton
@@ -74,7 +78,7 @@ Pane
         z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: connectionsModel.hasConnections && !cloudSystem
+        visible: authenticationDataModel.hasData
         onClicked:
         {
             Workflow.openSavedSession(
@@ -83,7 +87,7 @@ Pane
                 systemName,
                 informationBlock.address,
                 informationBlock.user,
-                connectionsModel.getData("password", 0))
+                authenticationDataModel.defaultCredentials.password)
         }
     }
 
@@ -108,17 +112,18 @@ Pane
         }
         else
         {
-            if (connectionsModel.hasConnections)
+            if (authenticationDataModel.hasStoredPassword)
             {
                 connectionManager.connectToServer(
                     hostsModel.firstHost,
-                    connectionsModel.firstUser,
-                    connectionsModel.getData("password", 0))
+                    authenticationDataModel.defaultCredentials.user,
+                    authenticationDataModel.defaultCredentials.password)
                 Workflow.openResourcesScreen(systemName)
             }
             else
             {
-                Workflow.openDiscoveredSession(systemId, localId, systemName, informationBlock.address)
+                Workflow.openDiscoveredSession(
+                    systemId, localId, systemName, informationBlock.address)
             }
         }
     }

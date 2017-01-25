@@ -8,9 +8,6 @@
 #include <ui/qml/quick_item_mouse_tracker.h>
 #include <ui/qml/text_input.h>
 #include <ui/models/systems_model.h>
-#include <ui/models/recent_local_connections_model.h>
-#include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
 #include <models/camera_list_model.h>
 #include <models/calendar_model.h>
 #include <models/layouts_model.h>
@@ -48,9 +45,6 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
-    qmlRegisterType<QnOrderedSystemsModel>("com.networkoptix.qml", 1, 0, "QnSystemsModel");
-    qmlRegisterType<QnRecentLocalConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentLocalConnectionsModel");
-    qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");

@@ -468,9 +468,8 @@ QString QnSystemsModelPrivate::getCompatibleVersion(
         switch (result)
         {
             case Qn::IncompatibleProtocolConnectionResult:
-                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
             case Qn::IncompatibleCloudHostConnectionResult:
-                return serverInfo.version.toString();
+                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
             default:
                 break;
         }

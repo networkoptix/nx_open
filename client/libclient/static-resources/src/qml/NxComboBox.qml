@@ -119,9 +119,7 @@ ComboBox
     focus: true;
 
     height: 28;
-
     opacity: (enabled ? 1.0 : 0.3);
-
 
     onActiveFocusChanged:
     {
@@ -316,7 +314,7 @@ ComboBox
                     standardColor: Style.dropDown.textColor;
                     hoveredColor: Style.dropDown.hoveredTextColor;
 
-                    text: model[thisComponent.textRole];
+                    text: index >= 0 ? model[thisComponent.textRole] : "";
 
                     onClicked:
                     {
@@ -343,25 +341,3 @@ ComboBox
         readOnlyTextItem.text = thisComponent.currentText;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

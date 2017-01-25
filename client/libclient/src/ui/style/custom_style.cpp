@@ -38,6 +38,11 @@ void setAccentStyle(QAbstractButton *button, bool accent)
     button->setProperty(style::Properties::kAccentStyleProperty, accent);
 }
 
+void setWarningButtonStyle(QAbstractButton* button, bool value)
+{
+    button->setProperty(style::Properties::kWarningStyleProperty, value);
+}
+
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape)
 {
     tabBar->setProperty(style::Properties::kTabShape, QVariant::fromValue(tabShape));
