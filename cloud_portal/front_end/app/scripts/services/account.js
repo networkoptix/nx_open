@@ -14,22 +14,19 @@ angular.module('cloudApp')
 
         var service = {
             get:function(){
-                var defer = $q.defer();
-                cloudApi.account().then(function(account){
-                    defer.resolve(account.data);
-                },function(no_account){
-                    defer.reject(null);
+                return cloudApi.account().then(function(account){
+                    return account.data;
                 });
-                return defer.promise;
             },
             authKey:function(){
-                var defer = $q.defer();
-                cloudApi.authKey().then(function(result){
-                    defer.resolve(result.data.auth_key);
-                },function(no_account){
-                    defer.reject(null);
+                return cloudApi.authKey().then(function(result){
+                    return result.data.auth_key;
                 });
-                return defer.promise;
+            },
+            checkVisitedKey:function(key){
+                return cloudApi.visitedKey(key).then(function(result){
+                    return result.data.visited;
+                });
             },
             requireLogin:function(){
                 var res = this.get();
@@ -64,14 +61,19 @@ angular.module('cloudApp')
                 this.setEmail(email);
                 var self = this;
                 return cloudApi.login(email, password, remember).then(function(result){
+                    if(cloudApi.checkResponseHasError(result)){
+                        return $q.reject(result);
+                    }
+
                     if(result.data.email) { // (result.data.resultCode === L.errorCodes.ok)
                         self.setEmail(result.data.email);
                         $rootScope.session.loginState = result.data.email; //Forcing changing loginState to reload interface
                     }
+                    return result;
                 });
             },
             logout:function(doNotRedirect){
-                cloudApi.logout().then(function(){
+                cloudApi.logout().finally(function(){
                     $rootScope.session.$reset(); // Clear session
                     if(!doNotRedirect) {
                         $location.path(Config.redirectUnauthorised);
@@ -84,14 +86,25 @@ angular.module('cloudApp')
             logoutAuthorised:function(){
                 var self = this;
                 this.get().then(function(){
-                    dialogs.confirm(L.dialogs.logoutConfirmText,
-                        L.dialogs.logoutConfirmTitle,
-                        L.dialogs.logoutConfirmButton, "danger").then(function(){
-                        self.logout(true);
-                    },function(){
+                    // logoutAuthorisedLogoutButton
+                    dialogs.confirm(L.dialogs.logoutAuthorisedText,
+                        L.dialogs.logoutAuthorisedTitle,
+                        L.dialogs.logoutAuthorisedContinueButton,
+                        null,
+                        L.dialogs.logoutAuthorisedLogoutButton
+                        ).then(function(){
                         self.redirectAuthorised();
+                    },function(){
+                        self.logout(true);
                     });
                 });
+            },
+            checkUnauthorized:function(data){
+                if(data && data.data && data.data.resultCode == 'notAuthorized'){
+                    this.logout();
+                    return false;
+                }
+                return true;
             }
         }
 

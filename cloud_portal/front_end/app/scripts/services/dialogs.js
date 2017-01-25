@@ -2,9 +2,9 @@
 
 
 angular.module('cloudApp').run(['$http','$templateCache', function($http,$templateCache) {
-        $http.get('static/views/dialogs/login.html', {cache: $templateCache});
-        $http.get('static/views/dialogs/share.html', {cache: $templateCache});
-        $http.get('static/views/components/dialog.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'dialogs/login.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'dialogs/share.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'components/dialog.html', {cache: $templateCache});
     }])
     .factory('dialogs', ['$http', '$uibModal', '$q', '$location', 'ngToast', function ($http, $uibModal, $q, $location, ngToast) {
 
@@ -21,7 +21,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
             modalInstance = $uibModal.open({
                 size: settings.size || 'sm',
                 controller: 'DialogCtrl',
-                templateUrl: 'static/views/components/dialog.html',
+                templateUrl: Config.viewsDir + 'components/dialog.html',
                 animation: !isInline(),
                 keyboard:settings.cancellable,
                 backdrop:settings.cancellable?true:'static',
@@ -35,6 +35,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                             cancellable: settings.cancellable,
                             params: settings.params,
                             actionLabel: settings.actionLabel || L.dialogs.okButton,
+                            cancelLabel: settings.cancelLabel || L.dialogs.cancelButton,
                             closable: settings.closable || settings.cancellable,
                             buttonClass: settings.buttonType? 'btn-'+ settings.buttonType : 'btn-primary'
                         };
@@ -56,14 +57,14 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
 
             function escapeRegExp(str) {
-                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             }
             function clearPath(){
-                return $location.$$path.replace(new RegExp("/" + escapeRegExp(url) + '$'),'');
+                return $location.$$path.replace(new RegExp('/' + escapeRegExp(url) + '$'),'');
             }
 
             if(url) {
-                $location.path(clearPath() + "/" + url, false);
+                $location.path(clearPath() + '/' + url, false);
 
                 modalInstance.result.finally(function () {
                     $location.path(clearPath(), false);
@@ -96,7 +97,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     cancellable:true,
                     closable:true}).result;
             },
-            confirm:function(message, title, actionLabel, actionType){
+            confirm:function(message, title, actionLabel, actionType, cancelLabel){
                 //title, template, url, content, hasFooter, cancellable, params, closable, actionLabel, buttonType, size
                 return openDialog({
                     title: title,
@@ -105,13 +106,14 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                     cancellable:false,
                     closable: false,
                     actionLabel:actionLabel,
+                    cancelLabel:cancelLabel,
                     buttonType:actionType
                 }).result;
             },
             login:function(keepPage){
                 return openDialog({
                     title: L.dialogs.loginTitle,
-                    template: 'static/views/dialogs/login.html',
+                    template: Config.viewsDir + 'dialogs/login.html',
                     url: 'login',
                     hasFooter: false,
                     cancellable: !keepPage,
@@ -128,7 +130,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 }
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/share.html',
+                    template: Config.viewsDir + 'dialogs/share.html',
                     url: url,
                     hasFooter: false,
                     cancellable:true,
@@ -145,7 +147,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/disconnect.html',
+                    template: Config.viewsDir + 'dialogs/disconnect.html',
                     hasFooter: false,
                     cancellable:true,
                     params: {
@@ -158,7 +160,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
 
                 return openDialog({
                     title:title,
-                    template: 'static/views/dialogs/rename.html',
+                    template: Config.viewsDir + 'dialogs/rename.html',
                     hasFooter: false,
                     cancellable:true,
                     params: {
@@ -172,7 +174,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 return this.confirm(L.downloads.noClientDetectedMessage,
                     L.downloads.noClientDetectedTitle, L.downloads.action)
                     .then(function(){
-                        $location.path("/download");
+                        $location.path('/download');
                     });
                 // return this.notify(L.errorCodes.cantOpenClient, 'danger', true);
             },
@@ -206,7 +208,7 @@ angular.module('cloudApp').run(['$http','$templateCache', function($http,$templa
                 return $scope.settings || $scope.$parent && this.getSettings($scope.$parent) || null;
             }
         };
-    }]).controller("DialogCtrl",['$scope', '$uibModalInstance','settings', function($scope, $uibModalInstance,settings){
+    }]).controller('DialogCtrl',['$scope', '$uibModalInstance','settings', function($scope, $uibModalInstance,settings){
         $scope.settings = settings;
 
         $scope.close = function(){

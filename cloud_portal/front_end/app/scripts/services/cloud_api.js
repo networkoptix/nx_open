@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('cloudApi', ['$http', '$q', '$localStorage', function ($http, $q, $localStorage) {
+    .factory('cloudApi', ['$http', '$q', '$localStorage', '$log', function ($http, $q, $localStorage, $log) {
 
         var apiBase = Config.apiBase;
 
@@ -22,8 +22,7 @@ angular.module('cloudApp')
                 var haveValueInCache = typeof(cachedResults[url]) !== 'undefined';
                 var cacheMiss = !haveValueInCache || // clear cache miss
                     forceReload || // ignore cache
-                    !cacheForever && (now - cacheReceived[url]) > Config.cacheTimeout; // outdated cache
-
+                    !cacheForever && ((now - cacheReceived[url]) > Config.cacheTimeout); // outdated cache
 
                 if(clearCache){
                     delete(cachedResults[url]);
@@ -57,13 +56,8 @@ angular.module('cloudApp')
         }
 
         var getSystems = cacheGet(apiBase + '/systems');
-        var modules = cacheGet(apiBase + '/modules');
-        modules().then(function(result){
-            Config.gatewayUrl = window.location.protocol + "//" + result.data.vms_gateway_host +':' + result.data.vms_gateway_port;
-        });
 
         return {
-            modules:modules,
             checkResponseHasError:function(data){
                 if(data && data.data && data.data.resultCode && data.data.resultCode != L.errorCodes.ok){
                     return data;
@@ -95,7 +89,7 @@ angular.module('cloudApp')
             },
 
             notification_send:function(userEmail,type,message){
-                return $http.post(apiBase.replace("/api","/notifications") + '/send',{
+                return $http.post(apiBase.replace('/api','/notifications') + '/send',{
                     user_email:userEmail,
                     type:type,
                     message:message
@@ -146,7 +140,7 @@ angular.module('cloudApp')
                     return $http.get(apiBase + '/systems/' + systemId);
                 }
 
-                return getSystems('fromCache').then(function(systemsCache){
+                return getSystems().then(function(systemsCache){
                     //Search our system in cache
                     var system = _.find(systemsCache.data,function(system){
                         return system.id == systemId;
@@ -160,14 +154,29 @@ angular.module('cloudApp')
                 },requestSystem); // Total cache miss
             },
             renameSystem:function(systemId,systemName){
+                var self = this;
                 return $http.post(apiBase + '/systems/' + systemId + '/name',{
                     name:systemName
+                }).then(function(result){
+                    self.systems('clearCache');
+                    return result;
                 });
             },
             getSystemAuth:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/auth');
             },
-
+            getLanguages:cacheGet('/static/languages.json',true),
+            changeLanguage:function(language){
+                return $http.post(apiBase + '/utils/language/', {
+                    language: language
+                });
+            },
+            getDownloads:function(){
+                return $http.get(apiBase + '/utils/downloads').catch(function(){
+                    $log.error("TODO: remove this hack before the release");
+                    return cacheGet('/static/downloads.json', true);
+                });
+            },
             getCommonPasswords:cacheGet('/static/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
@@ -199,8 +208,12 @@ angular.module('cloudApp')
                 });
             },
             accessRoles: function(systemId){
-                console.error("This method must not be used");
+                console.error('This method must not be used');
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
+            },
+
+            visitedKey:function(key){
+                return $http.get(apiBase + '/utils/visitedKey/?key=' + encodeURIComponent(key));
             }
         }
 

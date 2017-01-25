@@ -9,7 +9,6 @@ angular.module('cloudApp')
             $scope.gettingSystems.run();
         });
 
-        $scope.Config = Config;
         $scope.showSearch = false;
 
         function sortSystems(systems){
@@ -33,7 +32,7 @@ angular.module('cloudApp')
                 });
             },Config.updateInterval);
 
-            $scope.$on("$destroy", function( event ) {
+            $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemsUpdate);
             } );
         }

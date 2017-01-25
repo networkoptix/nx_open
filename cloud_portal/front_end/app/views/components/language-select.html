@@ -1,0 +1,10 @@
+<span uib-dropdown on-toggle="toggled(open)" class="dropup">
+    <a href="" id="language-dropdown" uib-dropdown-toggle>
+        {{activeLanguage}}
+    </a>
+    <ul class="dropdown-menu dropup" uib-dropdown-menu aria-labelledby="language-dropdown">
+        <li ng-repeat="lang in languages" ng-class="{active:lang.language == $root.L.language}">
+            <a href="" ng-click="changeLanguage(lang.language)">{{lang.name}}</a>
+        </li>
+    </ul>
+</span>

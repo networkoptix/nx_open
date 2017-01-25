@@ -19,7 +19,7 @@ cloud_gateway:
 
 mail_from: 'DW Cloud <service@networkoptix.com>'
 
-mail_prefix: '[DW_PORTAL]'
+mail_prefix: '[DW Cloud]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -32,3 +32,8 @@ admins:
     -
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
+
+languages:
+    - en
+    - fr
+    - es

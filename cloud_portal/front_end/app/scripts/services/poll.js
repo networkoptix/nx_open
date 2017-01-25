@@ -46,7 +46,7 @@ angular.module('cloudApp')
 
             promise.abort = cancelPoll;
 
-            //$scope.$on("$destroy", function( event ) { stopTimeout = true; } );
+            //$scope.$on('$destroy', function( event ) { stopTimeout = true; } );
 
             runPoll();
             return promise;

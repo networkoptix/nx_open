@@ -13,7 +13,7 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
 
-    var cloudHost = 'cloud-test.hdw.mx';  // 'cloud-local' // For local vagrant
+    var cloudHost = 'cloud-dev.hdw.mx';  // 'cloud-local' // For local vagrant
     var cloudPort = 80;
 
     // Time how long tasks take. Can help when optimizing build times
@@ -89,10 +89,11 @@ module.exports = function (grunt) {
             },
             rules: [
                 {from: '^((?!\\.).)*$', to: '/index.html'},
+                {from: '^/static/lang_.*?/(.*)$', to: '/$1'},
                 {from: '^/static/(.*)$', to: '/$1'}
             ],
             proxies: [
-                // cloud-demo.hdw.mx
+                {context: '/gateway/',    host: cloudHost, port: cloudPort},
                 {context: '/api/',    host: cloudHost, port: cloudPort},
                 {context: '/notifications/',    host: cloudHost, port: cloudPort}/**/
             ],
@@ -319,7 +320,6 @@ module.exports = function (grunt) {
                         '<%= yeoman.dist %>/static/styles/{,*/}*.css',
 
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '!<%= yeoman.dist %>/scripts/{,*/}downloads.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
@@ -444,9 +444,9 @@ module.exports = function (grunt) {
                             '*.{ico,png,txt}',
                             '.htaccess',
                             '*.html',
+                            '*.json',
                             'apple-app-site-association',
                             'scripts/{,*/}*.json',
-                            'scripts/language.js',
                             'scripts/downloads.js',
                             'views/{,*/}*.html',
                             'customization/*',

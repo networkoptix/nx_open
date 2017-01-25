@@ -1,4 +1,4 @@
-customization: default
+customization: vmsdemoblue
 
 cloud_database:
     host: '$DB_HOST'
@@ -18,7 +18,7 @@ cloud_gateway:
 
 mail_from: 'service@networkoptix.com'
 
-mail_prefix: '[CLOUD_PORTAL]'
+mail_prefix: '[VMS Demo Cloud]'
 
 smtp:
     host: 'email-smtp.us-east-1.amazonaws.com'
@@ -31,3 +31,19 @@ admins:
     -
         - 'Admins'
         - 'cloud-portal-admins@networkoptix.com'
+
+languages:
+    - en
+    - ru
+    - fr
+    - de
+    - es
+    - ja
+    - ko
+    - th
+    - zh_CN
+    - zh_TW
+    - vi_VN
+    - hu
+    - he
+    - pt_PT 

@@ -3,7 +3,7 @@ from requests.auth import HTTPDigestAuth
 from hashlib import md5, sha256
 import base64
 from cloud import settings
-from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestException
+from api.helpers.exceptions import validate_response, ErrorCodes, APIRequestException, APINotAuthorisedException
 
 import logging
 
@@ -149,9 +149,19 @@ class Account(object):
         return password_ha1, password_ha1_sha256
 
     @staticmethod
-    @validate_response
     @lower_case_email
     def register(email, password, first_name, last_name, code=None):
+
+        @validate_response
+        def _update(login, password, params):
+            request = CLOUD_DB_URL + '/account/update'
+            return requests.post(request, json=params, auth=HTTPDigestAuth(login, password))
+
+        @validate_response
+        def _register(params):
+            request = CLOUD_DB_URL + '/account/register'
+            return requests.post(request, json=params)
+
         customization = settings.CLOUD_CONNECT['customization']
         password_ha1, password_ha1_sha256 = Account.encode_password(email, password)
 
@@ -164,15 +174,17 @@ class Account(object):
         }
 
         if not code:
-            request = CLOUD_DB_URL + '/account/register'
-            return requests.post(request, json=params)
+            return _register(params)
         else:
             temp_password, code_email = Account.extract_temp_credentials(code)
             if email != code_email:
                 raise APIRequestException('Activation code doesn\'t match email:' + code, ErrorCodes.wrong_code)
 
-            request = CLOUD_DB_URL + '/account/update'
-            return requests.post(request, json=params, auth=HTTPDigestAuth(code_email, temp_password))
+            try:
+                data = _update(code_email, temp_password, params)
+            except APINotAuthorisedException:
+                raise APIRequestException('Activation code was already used', ErrorCodes.wrong_code)
+            return data
 
     @staticmethod
     def restore_password(code, new_password):

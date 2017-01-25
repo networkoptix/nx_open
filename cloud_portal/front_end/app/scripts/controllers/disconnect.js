@@ -3,9 +3,6 @@
 angular.module('cloudApp')
     .controller('DisconnectCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account',
     function ($scope, cloudApi, process, dialogs, $q, account) {
-
-        $scope.Config = Config;
-        $scope.L = L;
         $scope.buttonText = L.sharing.shareConfirmButton;
         $scope.model = {
             password:''
@@ -22,6 +19,7 @@ angular.module('cloudApp')
         $scope.disconnecting = process.init(function(){
             return cloudApi.disconnect(systemId, $scope.model.password);
         },{
+            ignoreUnauthorized: true,
             errorCodes:{
                 notAuthorized: L.errorCodes.passwordMismatch
             },

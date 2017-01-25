@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('urlProtocol', ['$base64', '$location', 'account', '$q',
-    function ($base64, $location, account, $q) {
+    .factory('urlProtocol', ['$base64', '$location', 'account', '$q', '$timeout',
+    function ($base64, $location, account, $q, $timeout) {
 
         function parseSource() {
             var search = $location.search();
@@ -29,7 +29,7 @@ angular.module('cloudApp')
                 };
 
                 if(linkSettings.systemId){
-                    settings.command = 'systems';
+                    settings.command = 'client';
                 }
 
                 $.extend(settings,linkSettings);
@@ -58,7 +58,6 @@ angular.module('cloudApp')
                     url += linkSettings.action;
                 }
                 url += '?' + $.param(getParams);
-                console.log("generated link", url);
                 return url;
 
             },
@@ -67,31 +66,43 @@ angular.module('cloudApp')
                 var self = this;
                 account.authKey().then(function(authKey){
                     linkSettings.auth = authKey;
-                    defer.resolve(self.generateLink(linkSettings));
+                    defer.resolve({
+                        link: self.generateLink(linkSettings),
+                        authKey: authKey
+                    })
                 },function(no_account){
-                    defer.resolve(self.generateLink(linkSettings));
+                    defer.resolve({
+                        link: self.generateLink(linkSettings),
+                        authKey: null
+                    });
                     // defer.reject(null);
                 });
                 return defer.promise;
             },
             open:function(systemId){
-                var result = $q.defer();
-                this.getLink({
+                return this.getLink({
                     systemId: systemId
-                }).then(function(link){
-                    link = link.replace(/&/g,'&&'); // This is hack,
+                }).then(function(data){
+                    var link = data.link;
+                    var authKey = data.authKey;
+                    link = link.replace(/&/g,'&&'); // This is a hack,
                     // Google Chrome for mac has a bug - he looses one ampersand which brakes the link parameters
                     // Here we duplicate ampersands to keep one of them
                     // Dear successor, if you read this - plese, check if the bug was fixed in chrome and remove this
                     // ugly thing!
                     // see CLOUD-716 for more information
-                    window.protocolCheck(link, function () {
-                        result.reject(L.errorCodes.noClientDetected);
-                    },function(){
-                        result.resolve();
-                    });
+
+                    window.protocolCheck(link);
+
+                    return $timeout(function(){
+                        return account.checkVisitedKey(authKey).then(function(visited){
+                            if(!visited){
+                                return $q.reject(visited);
+                            }
+                            return visited;
+                        });
+                    }, Config.openClientTimeout);
                 });
-                return result.promise;
             },
             getSource: parseSource,
             source: parseSource()

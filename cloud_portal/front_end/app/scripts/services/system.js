@@ -13,7 +13,7 @@ angular.module('cloudApp')
             this.isAvailable = true;
             this.isOnline = false;
             this.isMine = false;
-            this.groups = [];
+            this.userRoles = [];
             this.info = {name:''};
             this.permissions = {};
             this.accessRole = '';
@@ -72,6 +72,10 @@ angular.module('cloudApp')
                 var error = false
                 if (error = cloudApi.checkResponseHasError(result)){
                     return $q.reject(error);
+                }
+
+                if(!result.data.length){
+                    return $q.reject({data:{resultCode: 'forbidden'}});
                 }
 
                 if(self.info){
@@ -147,14 +151,14 @@ angular.module('cloudApp')
 
         system.prototype.updateAccessRoles = function(){
             if(!this.accessRoles){
-                var groupsList = _.map(this.groups, function(group){
+                var userRolesList = _.map(this.userRoles, function(userRole){
                     return {
-                        name: group.name,
-                        groupId: group.id,
-                        group: group
+                        name: userRole.name,
+                        userRoleId: userRole.id,
+                        userRole: userRole
                     };
                 });
-                this.accessRoles = _.union(this.predefinedRoles, groupsList);
+                this.accessRoles = _.union(this.predefinedRoles, userRolesList);
                 this.accessRoles.push(Config.accessRoles.customPermission);
             }
             return this.accessRoles;
@@ -170,8 +174,8 @@ angular.module('cloudApp')
                 if(role.isOwner){ // Owner flag has top priority and overrides everything
                     return role.isOwner == user.isAdmin;
                 }
-                if(!self.isEmptyGuid(role.groupId)){
-                    return role.groupId == user.groupId;
+                if(!self.isEmptyGuid(role.userRoleId)){
+                    return role.userRoleId == user.userRoleId;
                 }
 
                 // Admins has second priority
@@ -186,14 +190,14 @@ angular.module('cloudApp')
 
         system.prototype.getUsersDataFromTheSystem = function(){
             var self = this;
-            function processUsers(users, groups, predefinedRoles){
+            function processUsers(users, userRoles, predefinedRoles){
                 self.predefinedRoles = predefinedRoles;
                 _.each(self.predefinedRoles, function(role){
                     role.permissions = normalizePermissionString(role.permissions);
                     role.isAdmin = self.isAdmin(role);
                 });
 
-                self.groups = _.sortBy(groups,function(group){return group.name;});
+                self.userRoles = _.sortBy(userRoles,function(userRole){return userRole.name;});
                 self.updateAccessRoles();
 
                 users = _.filter(users, function(user){ return user.isCloud; });
@@ -215,15 +219,15 @@ angular.module('cloudApp')
 
             return self.mediaserver.getAggregatedUsersData().then(function(result){
                 if(!result.data.reply){
-                    $log.error("Aggregated request to server has failed", result);
+                    $log.error('Aggregated request to server has failed', result);
                     return $q.reject();
                 }
                 var usersList = result.data.reply['ec2/getUsers'];
-                var userGroups = result.data.reply['ec2/getUserGroups'];
+                var userRoles = result.data.reply['ec2/getUserRoles'];
                 var predefinedRoles = result.data.reply['ec2/getPredefinedRoles'];
                 self.isAvailable = true;
                 self.updateSystemState();
-                return processUsers(usersList, userGroups, predefinedRoles)
+                return processUsers(usersList, userRoles, predefinedRoles)
             });
         }
 
@@ -293,7 +297,7 @@ angular.module('cloudApp')
                 }
             }
 
-            user.groupId = role.groupId || '';
+            user.userRoleId = role.userRoleId || '';
             user.permissions = role.permissions || '';
 
             // TODO: remove later

@@ -14,25 +14,40 @@ def unique_list(iter_list):
     return [e for i, e in enumerate(iter_list) if iter_list.index(e) == i]
 
 
-def process_js_file(file_name):
-    with open(file_name, 'r') as file_descriptor:
-        data = file_descriptor.read()
-        strings = re.findall("(?<=').+?(?<!\\\\)(?=')", data)
-        strings += re.findall("(?<=\").+?(?<!\\\\)(?=\")", data)
-        strings = [x for x in strings if x not in ignore_strings]
+def process_js_file(root_dir, file_name):
+    strings = []
 
-        if not strings:
-            return None
+    def iterate(d):
+        if not d:
+            return
+        if isinstance(d, dict):
+            for k, v in d.iteritems():
+                iterate(v)
+        elif isinstance(d, (list, tuple)):
+            for v in d:
+                iterate(v)
+        else:
+            strings.append(str(d))
 
-        return {
-            'filename': file_name,
-            'inline': [],
-            'attributes': strings
-        }
+    with open(os.path.join(root_dir, file_name), 'r') as file_descriptor:
+        data = json.load(file_descriptor)
+
+    iterate(data)
+
+    strings = [x for x in strings if x not in ignore_strings]
+
+    if not strings:
+        return None
+
+    return {
+        'filename': file_name,
+        'inline': [],
+        'attributes': strings
+    }
 
 
-def process_json_file(file_name):
-    with open(file_name, 'r') as file_descriptor:
+def process_js_file_old(root_dir, file_name):
+    with open(os.path.join(root_dir, file_name)) as file_descriptor:
         data = file_descriptor.read()
 
         json.load(data)
@@ -50,9 +65,14 @@ def process_json_file(file_name):
         }
 
 
-def process_html_file(file_name):
-    with open(file_name, 'r') as file_descriptor:
+def process_html_file(root_dir, file_name):
+    with open(os.path.join(root_dir, file_name), 'r') as file_descriptor:
         data = file_descriptor.read()
+
+        # 1. Replace <script> and <head> tags
+        data = re.sub('\<script\s*\>.+?\</script\>', '', data, flags=re.DOTALL)
+        data = re.sub('\<head\s*\>.+?\</head\>', '', data, flags=re.DOTALL)
+
         inline = process_inline_text(data)
         attributes = process_attributes(data)
         if not inline and not attributes:
@@ -65,8 +85,8 @@ def process_html_file(file_name):
 
 
 def process_inline_text(data):
-    data = re.sub(r'<.+?>', '<>', data)
-    data = re.sub(r'\{\{.+?\}\}', '', data)
+    data = re.sub(r'<.+?>', '<>', data, flags=re.DOTALL)
+    data = re.sub(r'\{\{.+?\}\}', '', data, flags=re.DOTALL)
     data = re.sub(r'>\s*<', '', data)
     data = re.sub(r'><', '', data)
     strings = re.split('<>', data)
@@ -74,38 +94,39 @@ def process_inline_text(data):
 
 
 ignore_attributes = ('id', 'name', 'class', 'style',
-                     'src',
+                     'src', 'srcset', 'rel', 'charset',
                      'type', 'role', 'for', 'target',
                      'width', 'rows', 'cols', 'maxlength',
-                     'autocomplete',
-                     'process', 'form',
-                     'ng\-.*?', 'aria\-.*?',
+                     'autocomplete', 'system',
+                     'process', 'form', 'process-loading', 'action-type',
+                     'ng\-.*?', 'aria\-.*?', 'data\-.*?',
                      'bgcolor', 'content', 'xmlns', 'topmargin', 'leftmargin', 'marginheight', 'marginwidth',
                      'border', 'cellspacing', 'cellpadding', 'border', 'cellspacing' 'cellpadding', 'http\-equiv')
 
-ignore_single_attributes = ('required', 'autofocus', 'validate-field', 'novalidate', 'uib\-.*?')
+ignore_single_attributes = ('required', 'readonly', 'disabled', 'autofocus', 'validate\-field',
+                            'validate\-email', 'novalidate', 'uib\-.*?')
 
-ignore_regex = (r'href="#.+?"',)
+ignore_regex = (r'href="#.+?"', r'href="/.+?"', r'href=".+?\.css"', r'&nbsp;')
 ignore_strings = ('use strict',)
 
 
 def process_attributes(data):
-    data = re.sub(r'<\?.+?\?>', '', data)   # Remove <?xml ... ?> - just in case
-    data = re.sub(r'<!\-.+?\->', '', data)    # Remove all html-comments
-    data = re.sub(r'>.*?<', '><', data)     # Remove everything except tags (clear spaces and texts)
+    data = re.sub(r'<\?.+?\?>', '', data, flags=re.DOTALL)   # Remove <?xml ... ?> - just in case
+    data = re.sub(r'<!\-.+?\->', '', data, flags=re.DOTALL)    # Remove all html-comments
+    data = re.sub(r'>.*?<', '><', data, flags=re.DOTALL)     # Remove everything except tags (clear spaces and texts)
 
     # Important: attributes in single quotes are not supported here
     for attr in ignore_attributes:  # Here we remove all attributes which do not contain language strings.
-        data = re.sub('\s+' + attr + '=".+?"', '', data)    # remove ignore_attribute="some value" with double-quotes
-        data = re.sub('\s+' + attr + '=[^\s>]+', '', data)  # remove ignore_attribute=some_value (after minhtml)
+        data = re.sub('\s+' + attr + '=".+?"', '', data, flags=re.DOTALL)    # remove ignore_attribute="some value" with double-quotes
+        data = re.sub('\s+' + attr + '=[^\s>]+', '', data, flags=re.DOTALL)  # remove ignore_attribute=some_value (after minhtml)
 
     for attr in ignore_single_attributes:   # ignore attributes which can be used without values
-        data = re.sub('\s+' + attr + '=".+?"', '', data)        # remove attribute if it has value in quotes anyway
+        data = re.sub('\s+' + attr + '=".+?"', '', data, flags=re.DOTALL)        # remove attribute if it has value in quotes anyway
         data = re.sub('\s+' + attr + '=[^\s>]+', '', data)      # remove attribute if it has value without quotes anyway
         data = re.sub('\s+' + attr + '(?=[\s/>])', '', data)     # remove attribute without value
 
     for regex in ignore_regex:
-        data = re.sub(regex, '', data)
+        data = re.sub(regex, '', data, flags=re.DOTALL)
 
     data = re.sub(r'<\S+?\s*/?>', '', data)     # remove tags without attributes
     data = re.sub(r'<\S+', '', data)            # remove tags
@@ -142,23 +163,22 @@ def generate_ts(data):
     return parsed.toprettyxml(indent="  ", encoding='UTF-8')
 
 
-def extract_strings(file_root_dir, file_filter, dir_exclude=None, mode='html', recursive=True):
+def extract_strings(root_dir, file_dir, file_filter, dir_exclude=None, mode='html', recursive=True):
     all_strings = []
-    for root, dirs, files in os.walk(file_root_dir):
+    for root, dirs, files in os.walk(os.path.join(root_dir, file_dir)):
         if dir_exclude and root.endswith(dir_exclude):
             continue
 
         if not recursive:
-            print ("drop", dirs)
             while len(dirs) > 0:
                 dirs.pop()
 
         for filename in files:
             if filename.endswith(file_filter):
                 if mode == 'js':
-                    result = process_js_file(os.path.join(root, filename))
+                    result = process_js_file(root_dir, os.path.relpath(os.path.join(root, filename), root_dir))
                 else:
-                    result = process_html_file(os.path.join(root, filename))
+                    result = process_html_file(root_dir, os.path.relpath(os.path.join(root, filename), root_dir))
                 if result:
                     all_strings.append(result)
     return all_strings
@@ -170,13 +190,11 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('static/scripts', 'language.js', mode='js')
-js_strings1 = extract_strings('static/', 'apple-app-site-association', mode='js')
-html_strings = extract_strings('static/views', '.html')  # , dir_exclude='static'
-html_strings1 = extract_strings('static/', '503.html')  # , dir_exclude='static'
-# html_strings1 = extract_strings('localization/static/', '.html', recursive=False)  # , dir_exclude='static'
+js_strings = extract_strings('static', '', 'language.json', mode='js')
+html_strings = extract_strings('static', 'views', '.html')  # , dir_exclude='static'
+html_strings1 = extract_strings('static', '', '503.html')  # , dir_exclude='static'
 
-format_ts(js_strings + js_strings1 + html_strings + html_strings1, "cloud_portal.ts")
+format_ts(js_strings + html_strings + html_strings1, "cloud_portal.ts")
 
-template_strings = extract_strings('templates', '.mustache')
-format_ts(template_strings, "templates.ts")
+template_strings = extract_strings('templates', '', '.mustache')
+format_ts(template_strings, "cloud_templates.ts")

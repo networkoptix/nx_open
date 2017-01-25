@@ -114,6 +114,13 @@ DATABASES = {
 }
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'portal_cache',
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -153,6 +160,11 @@ LOGGING = {
     },
     'loggers': {
         'default': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
+        },
+        'api.views.utils': {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
@@ -232,6 +244,7 @@ EMAIL_USE_TLS = conf['smtp']['tls']
 
 
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
+LINKS_LIVE_TIMEOUT = 300  # Five minutes
 
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
@@ -245,3 +258,33 @@ if os.path.isfile(common_list_file):
         PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)
 else:
     print >> sys.stderr, "Warning: Can't read from {}".format(common_list_file)
+
+
+NOTIFICATIONS_CONFIG = {
+    'activate_account': {
+        'engine': 'email',
+        'subject': 'Confirm your account'
+    },
+    'restore_password': {
+        'engine': 'email',
+        'subject': 'Restore your password'
+    },
+    'system_invite': {
+        'engine': 'email',
+        'subject': 'Video system was shared with you'
+    },
+    'system_shared': {
+        'engine': 'email',
+        'subject': 'Video system was shared with you'
+    },
+}
+
+NOTIFICATIONS_AUTO_SUBSCRIBE = False
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_LOCATION = os.path.join(BASE_DIR, "static")
+
+
+LANGUAGES = conf['languages']
+DEFAULT_LANGUAGE = conf['languages'][0]
+UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'

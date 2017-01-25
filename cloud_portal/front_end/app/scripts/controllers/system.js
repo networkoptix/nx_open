@@ -6,8 +6,6 @@ angular.module('cloudApp')
     function ($scope, cloudApi, $routeParams, $location, urlProtocol, dialogs, process,
     account, $q, system, $poll, page, $timeout) {
 
-        $scope.Config = Config;
-        $scope.L = L;
         var systemId = $routeParams.systemId;
 
 
@@ -39,7 +37,7 @@ angular.module('cloudApp')
                 return $scope.system.update();
             },Config.updateInterval);
 
-            $scope.$on("$destroy", function( event ) {
+            $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemUpdate);
             } );
         }

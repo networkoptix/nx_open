@@ -39,6 +39,15 @@
       <translation>L6FE34GJWM.com.networkoptix.NxMobile</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>https://itunes.apple.com/eg/app/hd-witness/id648369716</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=com.networkoptix.hdwitness</translation>
+    </message>
+
+    <message>
       <source>COMPANY_NAME</source>
       <translation>Network Optix</translation>
     </message>

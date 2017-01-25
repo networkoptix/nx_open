@@ -2,7 +2,7 @@
 
 
 angular.module('cloudApp')
-    .factory('process', ['$q', 'dialogs', 'cloudApi', function ($q, dialogs, cloudApi) {
+    .factory('process', ['$q', 'dialogs', 'cloudApi', 'account', function ($q, dialogs, cloudApi, account) {
 
         function formatError(error,errorCodes){
             if(!error || !error.resultCode){
@@ -71,11 +71,17 @@ angular.module('cloudApp')
                         );
 
                         function handleError(data){
-
                             self.processing = false;
                             self.finished = true;
                             self.error = true;
                             self.errorData = data;
+
+                            if(!settings.ignoreUnauthorized && data.data.resultCode == 'notAuthorized'){
+                                account.logout();
+                                deferred.reject(data);
+                                return;
+                            }
+
                             var formatted = formatError(data.data || data, errorCodes);
                             if(formatted !== false){
                                 self.errorMessage = formatted;
@@ -89,7 +95,7 @@ angular.module('cloudApp')
                             self.finished = true;
 
                             var error = false;
-                            if(error =  cloudApi.checkResponseHasError(data)){
+                            if(error = cloudApi.checkResponseHasError(data)){
                                 handleError(error);
                             } else {
                                 self.success = true;

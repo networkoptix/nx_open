@@ -6,12 +6,12 @@ angular.module('cloudApp')
 
         account.requireLogin();
 
-        $scope.user_email = "ebalashov@networkoptix.com";
-        $scope.type = "activate_account";
-        $scope.message = JSON.stringify({code:"test_code"}, null, "\t");
+        $scope.user_email = 'ebalashov@networkoptix.com';
+        $scope.type = 'activate_account';
+        $scope.message = JSON.stringify({code:'test_code'}, null, '\t');
 
         $scope.formatJSON = function(data){
-            return  JSON.stringify(data, null, "\t");
+            return  JSON.stringify(data, null, '\t');
         };
 
         $scope.debugProcess = {
@@ -40,7 +40,7 @@ angular.module('cloudApp')
             var states = ['warning','info','success','danger'];
             var type = states[Math.floor(Math.random() * states.length)];
             var hold = Math.random() > 0.9;
-            dialogs.notify((notifyCounter++) + ":" + type + ": " + hold, type, hold);
+            dialogs.notify((notifyCounter++) + ':' + type + ': ' + hold, type, hold);
         };
         $scope.testNotification = function(){
             $scope.result = null;
@@ -48,8 +48,8 @@ angular.module('cloudApp')
             try {
                 message = JSON.parse(message);
             }catch(a){
-                $scope.result = "message is not a valud JSON object";
-                console.warn ("message is not json", message);
+                $scope.result = 'message is not a valud JSON object';
+                console.warn ('message is not json', message);
             }
             cloudApi.notification_send($scope.user_email,$scope.type,message).
                 then(function(a){
@@ -110,11 +110,12 @@ angular.module('cloudApp')
                 $scope.actionParametersError = true
             }
 
-            urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(link){
+            urlProtocol.getLink(clearEmptyStrings($scope.linkSettings)).then(function(data){
+                var link = data.link;
                 window.protocolCheck(link, function () {
-                    alert("protocol not recognized");
+                    alert('protocol not recognized');
                 },function () {
-                    alert("ok - procotol is working");
+                    alert('ok - procotol is working');
                 });
             });
         }
@@ -123,8 +124,8 @@ angular.module('cloudApp')
             account.authKey().then(function(authKey){
                 $scope.linkSettings.auth = authKey;
             },function(no_account){
-                console.error("couldn't retrieve temporary auth_key from cloud_portal",no_account);
-                $scope.linkSettings.auth = "couldn't retrieve temporary auth_key from cloud_portal";
+                console.error('couldn\'t retrieve temporary auth_key from cloud_portal',no_account);
+                $scope.linkSettings.auth = 'couldn\'t retrieve temporary auth_key from cloud_portal';
             });
         }
     }]);

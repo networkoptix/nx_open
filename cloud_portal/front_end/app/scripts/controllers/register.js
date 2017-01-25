@@ -3,7 +3,7 @@
 angular.module('cloudApp')
     .run(['$http','$templateCache', function($http,$templateCache) {
         // Preload content into cache
-        $http.get('static/views/static/register-intro.html', {cache: $templateCache});
+        $http.get(Config.viewsDir + 'static/register-intro.html', {cache: $templateCache});
     }])
     .controller('RegisterCtrl', [
         '$scope', 'cloudApi', 'process', '$location', '$localStorage', '$timeout',
@@ -19,7 +19,7 @@ angular.module('cloudApp')
         }else if($scope.activated){
             account.redirectAuthorised();
         }
-        $scope.Config = Config;
+
         $scope.session = $localStorage;
         $scope.context = $sessionStorage;
 

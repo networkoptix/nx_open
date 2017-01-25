@@ -1,0 +1,143 @@
+{
+  "version": "3.0.0.13832",
+  "releaseNotes": "http://www.networkoptix.com/all-nx-witness-release-notes/",
+  "releaseUrl": "https://beta.networkoptix.com/beta-builds/default/13832/",
+  "product": "nxwitness",
+  "cloudGroup": "test",
+  "beta": true,
+  "installers": [
+    {
+      "platform": "rpi",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "arm/nxwitness-server-3.0.0.13832-rpi-beta-test.tar.gz"
+    },
+    {
+      "platform": "bpi",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "arm/nxwitness-server-3.0.0.13832-bpi-beta-test.tar.gz"
+    },
+    {
+      "platform": "bananapi",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "arm/nxwitness-server-3.0.0.13832-bananapi-beta-test.tar.gz"
+    },
+    {
+      "platform": "mac",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "macos/nxwitness-client-3.0.0.13832-mac-beta-test.dmg"
+    },
+    {
+      "platform": "android",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "android/nxwitness-client-3.0.0.13832-android-beta-test.apk"
+    },
+    {
+      "platform": "linux64",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "linux/nxwitness-server-3.0.0.13832-linux64-beta-test.deb"
+    },
+    {
+      "platform": "linux86",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "linux/nxwitness-client-3.0.0.13832-linux86-beta-test.deb"
+    },
+    {
+      "platform": "linux64",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "linux/nxwitness-client-3.0.0.13832-linux64-beta-test.deb"
+    },
+    {
+      "platform": "linux86",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "linux/nxwitness-server-3.0.0.13832-linux86-beta-test.deb"
+    },
+    {
+      "platform": "ios",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "ios/nxwitness-client-3.0.0.13832-ios-beta-test.ipa"
+    },
+    {
+      "platform": "win86",
+      "appType": "bundle",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-bundle-3.0.0.13832-win86-beta-test.exe"
+    },
+    {
+      "platform": "win64",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-client-3.0.0.13832-win64-beta-test.exe"
+    },
+    {
+      "platform": "win64",
+      "appType": "bundle",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-bundle-3.0.0.13832-win64-beta-test.exe"
+    },
+    {
+      "platform": "win86",
+      "appType": "client",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-client-3.0.0.13832-win86-beta-test.exe"
+    },
+    {
+      "platform": "win64",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-server-3.0.0.13832-win64-beta-test.exe"
+    },
+    {
+      "platform": "win86",
+      "appType": "paxton",
+      "beta": true,
+      "cloudGroup": "test.msi",
+      "path": "windows/nxwitness-paxton-3.0.0.13832-win86-beta-test.msi"
+    },
+    {
+      "platform": "win86",
+      "appType": "servertool",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-servertool-3.0.0.13832-win86-beta-test.exe"
+    },
+    {
+      "platform": "win64",
+      "appType": "servertool",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-servertool-3.0.0.13832-win64-beta-test.exe"
+    },
+    {
+      "platform": "win86",
+      "appType": "server",
+      "beta": true,
+      "cloudGroup": "test",
+      "path": "windows/nxwitness-server-3.0.0.13832-win86-beta-test.exe"
+    }
+  ]
+}
