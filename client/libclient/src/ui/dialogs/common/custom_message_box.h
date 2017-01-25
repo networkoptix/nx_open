@@ -7,6 +7,7 @@ class QWidget;
 
 class QnCustomMessageBox : public QObject
 {
+    Q_OBJECT
 public:
     static void showFailedToGetPosition(
         QWidget* parent,

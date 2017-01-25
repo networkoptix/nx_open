@@ -58,12 +58,6 @@ bool QnLayoutsHandlerMessages::showCompositeDialog(
 
     const auto result = messageBox.exec();
 
-    /**
-     * TODO: #ynikitenkov  Very strange logic. Do we have to store
-     * answer of dialog to use instead of asking?
-     *
-     * Moreover. Develop helpers to check and set flags
-     */
     if (messageBox.isChecked())
     {
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
@@ -114,7 +108,6 @@ bool QnLayoutsHandlerMessages::sharedLayoutEdit(QWidget* parent)
 bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
     const QnResourceList& resources, const QnResourceAccessSubject& subject)
 {
-    // TODO: #ynikitenkov check resources placement
     const QString text = (subject.user()
         ? tr("User will lose access to %n resources:", "", resources.size())
         : tr("All users with this role will lose access to %n resources:", "", resources.size()));
@@ -125,7 +118,6 @@ bool QnLayoutsHandlerMessages::stopSharingLayouts(QWidget* parent,
 
 bool QnLayoutsHandlerMessages::deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts)
 {
-    // TODO: #ynikitenkov check resources placement, custom button
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Delete %n shared layouts?", "", layouts.size()));
@@ -151,7 +143,6 @@ bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,
 bool QnLayoutsHandlerMessages::changeVideoWallLayout(QWidget* parent,
     const QnResourceList& inaccessible)
 {
-    // TODO: #ynikitenkov change description when spec is ready
     const auto extras = tr("You are going to delete some resources to which you have "
         "access from Video Wall only. You won't see them in your resource list after it and won't "
         "be able to add them to Video Wall again.");

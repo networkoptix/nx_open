@@ -246,7 +246,6 @@ private:
 
         Q_Q(QnUserRoleSettingsWidget);
 
-        // TODO: #ynikitenkov Develop QnDeleteRoleDialog
         const auto text =
             tr("What to do with %1 users with this role?", "", usersModel->rowCount());
         replacementMessageBox = new QnMessageBox(QnMessageBoxIcon::Question, text,

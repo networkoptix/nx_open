@@ -7,6 +7,7 @@ class QWidget;
 
 class QnStandardMessageBox : public QObject
 {
+    Q_OBJECT
 public:
     static bool overwriteFileQuestion(
         QWidget* parent,
