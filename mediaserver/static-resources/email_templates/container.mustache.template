@@ -21,13 +21,13 @@
             <div class="system-info">
                 <table border="0" cellspacing="0" cellpadding="0" >
                     <tbody>
-                    <tr>
+                    <tr title="System name">
                         <td><img class="icon" src="cid:systemIcon"></td>
                         <td><div class="name">{{systemName}}</div>
                             {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
                     </tr>
                     {{#cloudOwnerEmail}}
-                    <tr class="cloud-info">
+                    <tr class="cloud-info" title="System owner">
                         <td><img class="icon" src="cid:ownerIcon"></td>
                         <td>{{#cloudOwner}}<div class="name">{{cloudOwner}}</div>{{/cloudOwner}}
                             {{#cloudOwnerEmail}}<div class="hint"><a rel="nofollow" class="nolink">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
