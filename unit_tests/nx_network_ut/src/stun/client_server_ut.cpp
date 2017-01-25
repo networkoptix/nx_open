@@ -29,7 +29,7 @@ public:
 
     virtual ~TestServer() override
     {
-        pleaseStop();
+        pleaseStopSync();
         for (auto& connection: connections)
         {
             connection->pleaseStopSync();
@@ -49,7 +49,8 @@ protected:
     };
 };
 
-class StunClientServerTest: public ::testing::Test
+class StunClientServerTest:
+    public ::testing::Test
 {
 protected:
     static AbstractAsyncClient::Settings defaultSettings()
@@ -71,7 +72,7 @@ protected:
         if (client)
             client->pleaseStopSync();
         if (server)
-            server->pleaseStop();
+            server->pleaseStopSync();
     }
 
     SystemError::ErrorCode sendTestRequestSync()
@@ -125,7 +126,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     startServer(address);
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError); // ok
-    EXPECT_EQ(server->connections.size(), 1);
+    EXPECT_EQ(1, server->connectionCount());
 
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError); // no server
@@ -139,7 +140,7 @@ TEST_F(StunClientServerTest, Connectivity)
     // there might be a small delay before server creates connection from
     // accepted socket
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(server->connections.size(), 1);
+    EXPECT_EQ(1, server->connectionCount());
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
@@ -201,7 +202,7 @@ TEST_F(StunClientServerTest, Indications)
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(server->connections.size(), 1);
+    EXPECT_EQ(1, server->connectionCount());
 
     EXPECT_EQ(sendIndicationSync(0xAB), SystemError::noError);
     EXPECT_EQ(sendIndicationSync(0xCD), SystemError::noError);
@@ -212,9 +213,10 @@ TEST_F(StunClientServerTest, Indications)
     EXPECT_TRUE(recvWaiter.isEmpty()); // 3rd indication is not subscribed
 }
 
-struct TestUser
-    : public AsyncClientUser
+class TestUser:
+    public AsyncClientUser
 {
+public:
     TestUser(std::shared_ptr<AbstractAsyncClient> client):
         AsyncClientUser(std::move(client))
     {
@@ -246,58 +248,6 @@ TEST_F(StunClientServerTest, AsyncClientUser)
             EXPECT_EQ(user->responses.pop().first, SystemError::noError);
         user->pleaseStopSync();
     }
-}
-
-class StunClient:
-    public StunClientServerTest
-{
-public:
-    ~StunClient()
-    {
-        m_stunClient.pleaseStopSync();
-    }
-
-protected:
-    void givenClientConnectedToServer()
-    {
-        const auto address = startServer();
-        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
-        m_stunClient.setOnConnectionClosedHandler(
-            [this](SystemError::ErrorCode closeReason)
-            {
-                m_connectionClosedPromise.set_value(closeReason);
-            });
-        m_stunClient.connect(
-            address,
-            false,
-            [&connectedPromise](SystemError::ErrorCode sysErrorCode)
-            {
-                connectedPromise.set_value(sysErrorCode);
-            });
-        ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
-    }
-
-    void whenServerTerminatedAbruptly()
-    {
-        server->pleaseStop();
-        server.reset();
-    }
-
-    void verifyClientProcessedConnectionCloseProperly()
-    {
-        ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
-    }
-
-private:
-    nx::stun::AsyncClient m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
-};
-
-TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side)
-{
-    givenClientConnectedToServer();
-    whenServerTerminatedAbruptly();
-    verifyClientProcessedConnectionCloseProperly();
 }
 
 } // namespace test

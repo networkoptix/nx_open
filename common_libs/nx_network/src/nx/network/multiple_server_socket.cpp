@@ -10,7 +10,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+    if (nx::network::SocketGlobals::debugConfig().multipleServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -345,7 +345,7 @@ bool MultipleServerSocket::addSocket(
             {
                 ServerSocketHandle& source = m_serverSockets.back();
                 source.isAccepting = true;
-                DEBUG_LOG(lm("Accept on source(%1) when added").arg(&source));
+                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(

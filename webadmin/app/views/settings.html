@@ -132,7 +132,7 @@
                                     </tr>
                                     <tr>
                                         <td><select class="form-control"
-                                                    ng-options="zone.id as zone.id +': ' + zone.comment for zone in timeZones"
+                                                    ng-options="zone.id as zone.name for zone in timeZones"
                                                     id="timeZone"
                                                     name="timeZone"
                                                     ng-model="dateTimeSettings.timeZone"

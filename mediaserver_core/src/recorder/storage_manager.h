@@ -28,6 +28,7 @@
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <recorder/camera_info.h>
 
 #include <atomic>
 #include <future>
@@ -49,13 +50,7 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
     friend class TestHelper;
-    struct ArchiveCameraData
-    {
-        ec2::ApiCameraData coreData;
-        ec2::ApiResourceParamWithRefDataList properties;
-    };
-
-    typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
+    friend class nx::caminfo::ServerWriterHandler;
 
 public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
@@ -190,7 +185,7 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
+    void createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnSecurityCamResourceList &cameras,
                                     qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,
@@ -214,9 +209,7 @@ private:
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                      ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
-
-    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ArchiveCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
+                                      nx::caminfo::ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
 
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
@@ -306,11 +299,14 @@ private:
     std::random_device m_rd;
     std::mt19937 m_gen;
     bool m_isRenameDisabled;
-	mutable QnMutex m_occupiedSpaceInfoMutex;
-	StorageSpaceInfoMap m_occupiedSpaceInfo;
+    mutable QnMutex m_occupiedSpaceInfoMutex;
+    StorageSpaceInfoMap m_occupiedSpaceInfo;
 
-    QMap<QString, QByteArray> m_storageUrlToCameraInfo;
-    QElapsedTimer m_cameraInfoWriteTimer;
+    nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
+    nx::caminfo::Writer m_camInfoWriter;
+
+    nx::caminfo::ServerReaderHandler m_camInfoReadHandler;
+    nx::caminfo::Reader m_camInfoReader;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

@@ -43,7 +43,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
 #include <utils/common/qtimespan.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #include <utils/math/color_transformations.h>
 
@@ -124,19 +124,7 @@ namespace
 
             /* Set proper color for links: */
             if (index.column() == QnStorageListModel::RemoveActionColumn && !opt.text.isEmpty())
-            {
-                if (auto style = QnNxStyle::instance())
-                {
-                    QnPaletteColor color = style->findColor(QPalette().color(QPalette::Link));
-                    if (!hovered)
-                        color = color.darker(2);
-                    opt.palette.setColor(QPalette::Text, color);
-                }
-                else
-                {
-                    opt.palette.setColor(QPalette::Text, QPalette().color(QPalette::Link));
-                }
-            }
+                opt.palette.setColor(QPalette::Text, style::linkColor(opt.palette, hovered));
 
             /* Set warning color for inaccessible storages: */
             if (index.column() == QnStorageListModel::StoragePoolColumn && !storage.isOnline)
@@ -801,16 +789,16 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (hasChanges())
         return error(tr("Apply changes to start backup."));
 
-    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-        return true;
-
-    if (!selectedCamerasCount)
+    if (selectedCamerasCount == 0)
     {
         const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Select at least one device to start backup."),
-            tr("Select at least one camera to start backup."));
+            tr("Select at least one device in the Backup Settings to start backup."),
+            tr("Select at least one camera in the Backup Settings to start backup."));
         return error(text);
     }
+
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return true;
 
     const auto rebuildStatusState = [this](QnServerStoragesPool type)
     {

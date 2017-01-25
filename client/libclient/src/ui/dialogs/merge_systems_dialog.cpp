@@ -138,7 +138,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
         const auto moduleInformation = server->getModuleInformation();
 
         QString systemName = helpers::isNewSystem(moduleInformation)
-            ? tr("New System")
+            ? tr("New Server")
             : moduleInformation.systemName;
 
         if (!systemName.isEmpty())
@@ -299,7 +299,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     ui->loginEdit->setEnabled(!isNewSystem);
     ui->passwordEdit->setEnabled(!isNewSystem);
     const QString systemName = isNewSystem
-        ? tr("New System")
+        ? tr("New Server")
         : moduleInformation.systemName;
 
     ui->remoteSystemLabel->setText(systemName);

@@ -29,6 +29,7 @@
 #include <network/multicodec_rtp_reader.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/http/httpclient.h>
+#include <nx/network/test_support/buffer_socket.h>
 
 #include "file_socket.h"
 

@@ -85,9 +85,6 @@ signals:
     /** New video frame is decoded and ready for rendering. */
     void gotVideoFrame();
 
-    /** End of archive reached. */
-    void onEOF();
-
     /** Jump to new position. */
     void jumpOccurred(int sequence);
 private slots:

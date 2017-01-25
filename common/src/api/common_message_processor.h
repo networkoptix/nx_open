@@ -33,15 +33,15 @@ public:
      * @param resource resource to update
      * @param peerId peer what modified resource.
      */
-    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId);
+    virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source);
 
-    virtual void updateResource(const ec2::ApiUserData& user, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiVideowallData& videowall, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiWebPageData& webpage, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiCameraData& camera, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId);
-    virtual void updateResource(const ec2::ApiStorageData& storage, const QnUuid& peerId);
+    virtual void updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
+    virtual void updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
 
     QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
 

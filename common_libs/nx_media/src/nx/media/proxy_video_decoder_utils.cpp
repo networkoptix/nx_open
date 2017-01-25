@@ -9,7 +9,11 @@
 namespace nx {
 namespace media {
 
-ProxyVideoDecoderFlagConfig conf("ProxyVideoDecoder");
+namespace proxy_video_decoder {
+
+FlagConfig conf("ProxyVideoDecoder");
+
+} // namespace proxy_video_decoder
 
 void debugDrawCheckerboardArgb(
     uint8_t* argbBuffer, int lineSizeBytes, int frameWidth, int frameHeight)
@@ -26,7 +30,7 @@ void debugDrawCheckerboardArgb(
     if (!(frameWidth >= kBoardSize && frameHeight >= kBoardSize)) //< Frame is too small.
         return;
 
-    uint32_t* pLine = ((uint32_t*) argbBuffer) + line0 * lineLen;
+    uint32_t* pLine = ((uint32_t*)argbBuffer) + line0 * lineLen;
     for (int line = 0; line < kBoardSize; ++line)
     {
         for (int x = 0; x < kBoardSize; ++x)
@@ -49,8 +53,8 @@ std::unique_ptr<ProxyDecoder::CompressedFrame> createUniqueCompressedFrame(
         NX_CRITICAL(compressedVideoData->data());
         NX_CRITICAL(compressedVideoData->dataSize() > 0);
         compressedFrame.reset(new ProxyDecoder::CompressedFrame);
-        compressedFrame->data = (const uint8_t*) compressedVideoData->data();
-        compressedFrame->dataSize = (int) compressedVideoData->dataSize();
+        compressedFrame->data = (const uint8_t*)compressedVideoData->data();
+        compressedFrame->dataSize = (int)compressedVideoData->dataSize();
         compressedFrame->ptsUs = compressedVideoData->timestamp;
         compressedFrame->isKeyFrame =
             (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey) != 0;

@@ -41,8 +41,6 @@ protected:
 
     void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
-
-private:
     void disconnectFromClient();
 
     std::atomic<bool> m_isEnabled;

@@ -133,7 +133,7 @@ public:
         m_editIcon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Active);
 
         /* Draw link text: */
-        QnScopedPainterPenRollback penRollback(painter, newOption.palette.color(QPalette::Normal, QPalette::Link));
+        QnScopedPainterPenRollback penRollback(painter, style::linkColor(newOption.palette, true));
         painter->drawText(textRect, kTextFlags | Qt::AlignRight, linkText);
     }
 

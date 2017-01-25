@@ -6,7 +6,7 @@
 #include "../abstract_socket.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
-#include "../aio/pollset.h"
+#include "../aio/event_type.h"
 
 
 namespace nx {

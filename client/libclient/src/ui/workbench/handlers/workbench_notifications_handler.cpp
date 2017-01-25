@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
+#include <client/client_show_once_settings.h>
 
 #include <business/business_strings_helper.h>
 
@@ -26,6 +27,13 @@
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
+namespace {
+
+static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
+
+
+}
+
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -36,6 +44,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
 
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
+    static_cast<void>(sessionDelegate); //< Debug?
 
     //TODO: #GDM #future
     /*
@@ -79,6 +88,12 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         [this]
         {
             setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, false);
+        });
+
+    connect(action(QnActions::HideCloudPromoAction), &QAction::triggered, this,
+        [this]
+        {
+            qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
         });
 
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH),
@@ -187,7 +202,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
 }
 
-bool QnWorkbenchNotificationsHandler::tryClose(bool force)
+bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
 {
     clear();
     return true;
@@ -325,9 +340,17 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::CloudPromo:
-            setSystemHealthEventVisible(message, context()->user());
+        {
+            const bool canShow =
+                // show only to admins and owners
+                accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+                // only if system is not connected to the cloud
+                && qnGlobalSettings->cloudSystemId().isNull()
+                // and if user did not close notification manually at least once
+                && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+            setSystemHealthEventVisible(message, canShow);
             return;
-
+        }
         default:
             break;
 

@@ -7,6 +7,7 @@ from ServerEnvironment import ServerEnvironment
 from ProcMgr import Process
 from Config import config
 from pycommons.Logger import LOGLEVEL, log
+from pycommons.Rec import Rec
 from MockClient import ClientMixin
 
 WAIT_CAMERA_TIMEOUT=30
@@ -71,7 +72,7 @@ class TestCameraMixin(ClientMixin):
                 if d["name"] == TEST_CAMERA_NAME:
                     if not self.cameraGuid:
                         self.cameraGuid = d["id"]
-                        self.cameraData = d
+                        self.cameraData = Rec(d)
                     return True
         return False
 

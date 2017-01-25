@@ -449,7 +449,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     if (!forcedCredentials.user.isEmpty())
     {
         setLogin(forcedCredentials.user);
-        setPassword(forcedCredentials.password);
+        setPassword(forcedCredentials.password.value());
         return true;
     }
 
@@ -478,7 +478,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
             return false;
 
         setLogin(auth.user);
-        setPassword(auth.password);
+        setPassword(auth.password.value());
 
         NetIfacesReq request;
         NetIfacesResp response;
@@ -492,7 +492,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     {
         auto first = possibleCredentials.cbegin();
         setLogin(first->user);
-        setPassword(first->password);
+        setPassword(first->password.value());
     }
     else
     {

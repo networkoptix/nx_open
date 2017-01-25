@@ -1,3 +1,6 @@
+#include <nx/utils/log/log.h>
+
+#include "config.h"
 #include "ffmpeg_video_decoder.h"
 
 extern "C" {
@@ -5,7 +8,6 @@ extern "C" {
 #include <libavutil/pixdesc.h>
 #include <libswscale/swscale.h>
 };
-
 
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/thread/mutex.h>
@@ -19,10 +21,10 @@ namespace media {
 
 namespace {
 
-    QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+{
+    switch (pixFormat)
     {
-        switch (pixFormat)
-        {
         case AV_PIX_FMT_YUV420P:
         case AV_PIX_FMT_YUVJ420P:
             return QVideoFrame::Format_YUV420P;
@@ -32,8 +34,8 @@ namespace {
             return QVideoFrame::Format_NV12;
         default:
             return QVideoFrame::Format_Invalid;
-        }
     }
+}
 
 } // namespace
 
@@ -90,11 +92,10 @@ class AvFrameMemoryBuffer: public QAbstractVideoBuffer
 {
     Q_DECLARE_PRIVATE(AvFrameMemoryBuffer)
 public:
-    AvFrameMemoryBuffer(AVFrame* frame)
-    :
-    QAbstractVideoBuffer(
-        *(new AvFrameMemoryBufferPrivate(frame)),
-        NoHandle)
+    AvFrameMemoryBuffer(AVFrame* frame):
+        QAbstractVideoBuffer(
+            *(new AvFrameMemoryBufferPrivate(frame)),
+            NoHandle)
     {
     }
 
@@ -107,7 +108,7 @@ public:
     {
         Q_D(AvFrameMemoryBuffer);
         *bytesPerLine = d->frame->linesize[0];
-        AVPixelFormat pixFmt = (AVPixelFormat) d->frame->format;
+        AVPixelFormat pixFmt = (AVPixelFormat)d->frame->format;
         *numBytes = avpicture_get_size(pixFmt, d->frame->linesize[0], d->frame->height);
         return d->frame->data[0];
     }
@@ -123,11 +124,11 @@ public:
 class FfmpegVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(FfmpegVideoDecoder)
-    FfmpegVideoDecoder* q_ptr;
+        FfmpegVideoDecoder* q_ptr;
 
 public:
     FfmpegVideoDecoderPrivate()
-    :
+        :
         codecContext(nullptr),
         frame(av_frame_alloc()),
         lastPts(AV_NOPTS_VALUE),
@@ -166,7 +167,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        qWarning() << "Can't open decoder for codec" << frame->compressionType;
+        NX_LOG(lit("Can't open decoder for codec %1").arg(frame->compressionType), cl_logDEBUG1);
         closeCodecContext();
         return;
     }
@@ -188,7 +189,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
     if (!scaleContext)
     {
         scaleContext = sws_getContext(
-            srcFrame->width, srcFrame->height, (AVPixelFormat) srcFrame->format,
+            srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
             srcFrame->width, srcFrame->height, dstAvFormat,
             SWS_BICUBIC, NULL, NULL, NULL);
     }
@@ -200,7 +201,7 @@ AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
     numBytes += FF_INPUT_BUFFER_PADDING_SIZE; //< extra alloc space due to ffmpeg doc
     dstFrame->buf[0] = av_buffer_alloc(numBytes);
     avpicture_fill(
-        (AVPicture*) dstFrame,
+        (AVPicture*)dstFrame,
         dstFrame->buf[0]->data,
         dstAvFormat,
         srcFrame->linesize[0],
@@ -246,8 +247,25 @@ bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolu
     if (maxRes.isEmpty())
         return true;
 
-    return resolution.width() <= maxRes.width() &&
-            resolution.height() <= maxRes.height();
+    if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
+        return true;
+
+    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
+        .arg(maxRes.width()).arg(maxRes.height())
+        .arg(resolution.width()).arg(resolution.height()),
+        cl_logWARNING);
+
+    if (conf.unlimitFfmpegMaxResolution)
+    {
+        NX_LOG(lit(
+            "[ffmpeg_video_decoder] Config unlimitFfmpegMaxResolution is true => ignore limit"),
+            cl_logWARNING);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
@@ -273,7 +291,7 @@ int FfmpegVideoDecoder::decode(
     av_init_packet(&avpkt);
     if (compressedVideoData)
     {
-        avpkt.data = (unsigned char*) compressedVideoData->data();
+        avpkt.data = (unsigned char*)compressedVideoData->data();
         avpkt.size = static_cast<int>(compressedVideoData->dataSize());
         avpkt.dts = avpkt.pts = compressedVideoData->timestamp;
         if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
@@ -312,10 +330,10 @@ int FfmpegVideoDecoder::decode(
     {
         // Workaround for MJPEG decoder bug: it always sets coded_picture_number to 0, and
         // need monotonic frame number to associate decoder's input and output frames.
-        frameNum = qMax(0, d->codecContext->frame_number -1);
+        frameNum = qMax(0, d->codecContext->frame_number - 1);
     }
 
-    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat) d->frame->format);
+    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
 
     // Frame moved to the buffer. buffer keeps reference to a frame.
     QAbstractVideoBuffer* buffer;
@@ -329,7 +347,7 @@ int FfmpegVideoDecoder::decode(
         AVFrame* newFrame = d->convertPixelFormat(d->frame);
         if (!newFrame)
             return -1; //< can't convert pixel format
-        qtPixelFormat = toQtPixelFormat((AVPixelFormat) newFrame->format);
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat)newFrame->format);
         buffer = new AvFrameMemoryBuffer(newFrame);
     }
 

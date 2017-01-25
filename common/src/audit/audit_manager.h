@@ -2,6 +2,7 @@
 #define __AUDIT_MANAGER_H__
 
 #include <atomic>
+#include <deque>
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -54,6 +55,7 @@ private slots:
     void at_timer();
 private:
     int registerNewConnection(const QnAuthSession &data, bool explicitCall);
+    bool hasSimilarRecentlyRecord(const QnAuditRecord& data) const;
 
     struct AuditConnection
     {
@@ -102,6 +104,7 @@ private:
     QTimer m_timer;
     std::atomic<bool> m_enabled;
     QElapsedTimer m_sessionCleanupTimer;
+    std::deque<QnAuditRecord> m_recentlyAddedRecords;
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     void cleanupExpiredSessions();

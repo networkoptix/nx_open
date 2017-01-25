@@ -11,7 +11,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/literal.h>
@@ -870,7 +870,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         UnauthorizedConnectionResult,               /*< Invalid login/password. */
         LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
         CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
-        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization. */
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/

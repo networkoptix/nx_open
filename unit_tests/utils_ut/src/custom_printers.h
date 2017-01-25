@@ -12,6 +12,7 @@
 #include <QByteArray>
 #include <QString>
 
+#include <nx/utils/log/to_string.h>
 
 //!Used by google test to print QByteArray as text
 void PrintTo(const QByteArray& val, ::std::ostream* os);
@@ -20,10 +21,12 @@ void PrintTo(const QString& val, ::std::ostream* os);
 namespace std {
 namespace chrono {
 
-void PrintTo(const milliseconds& val, ::std::ostream* os);
-void PrintTo(const seconds& val, ::std::ostream* os);
-void PrintTo(const microseconds& val, ::std::ostream* os);
-void PrintTo(const nanoseconds& val, ::std::ostream* os);
+template<typename Rep, typename Period>
+void PrintTo(const duration<Rep, Period>& val, ::std::ostream* os)
+{
+    *os << toString(val).toStdString();
+}
+
 void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os);
 
 } // namespace chrono

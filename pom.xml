@@ -195,7 +195,7 @@
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
         <cloud.group>dev</cloud.group>
-        <cloud.host>cloud-test.hdw.mx</cloud.host>
+        <cloudHostAutoDetect>false</cloudHostAutoDetect>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -265,6 +265,7 @@
         <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
         <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
     </properties>
 
@@ -743,6 +744,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
+                <qt.version>5.6.2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -1213,7 +1215,8 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudHostAutoDetect</name>
+                    <value>true</value>
                 </property>
             </activation>
             <build>
@@ -1249,12 +1252,12 @@
                 <property>
                     <name>artifactsValidator</name>
                 </property>
-            </activation>            
+            </activation>
             <modules>
                 <module>artifacts_validator</module>
             </modules>
         </profile>
-        
+
         <!-- Artifact naming profiles -->
 
         <profile>

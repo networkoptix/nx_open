@@ -18,9 +18,11 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 
+#include <nx/utils/raii_guard.h>
+
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 
-#include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
@@ -198,19 +200,19 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
         return false;
 
     // try to drop videowall items first
-    if (context->menu()->triggerIfPossible(
+    if (delayedTriggerIfPossible(
         QnActions::StartVideoWallControlAction,
         QnActionParameters(m_videoWallItems))) {
 
     }
     else
     if(!m_intoNewLayout) {
-        context->menu()->trigger(
+        delayedTriggerIfPossible(
             QnActions::DropResourcesAction,
             QnActionParameters(m_resources).withArgument(Qn::ItemPositionRole, context->workbench()->mapper()->mapToGridF(event->scenePos()))
         );
     } else {
-        context->menu()->trigger(
+        delayedTriggerIfPossible(
             QnActions::DropResourcesIntoNewLayoutAction,
             QnActionParameters(m_resources)
         );
@@ -226,4 +228,26 @@ DestructionGuardItem *DropInstrument::guard() const {
 
 SceneEventFilterItem *DropInstrument::filterItem() const {
     return m_filterItem.data();
+}
+
+bool DropInstrument::delayedTriggerIfPossible(QnActions::IDType id, const QnActionParameters& parameters)
+{
+    if (!m_context || !m_context->menu()->canTrigger(id, parameters))
+        return false;
+
+    const auto triggerIfPossible =
+        [context = m_context, id, parameters]()
+        {
+            if (!context)
+                return;
+
+            QnRaiiGuard cursorGuard(
+                []() { QApplication::setOverrideCursor(Qt::WaitCursor); },
+                []() { QApplication::restoreOverrideCursor(); });
+
+            context->menu()->triggerIfPossible(id, parameters);
+        };
+
+    executeDelayed(triggerIfPossible);
+    return true;
 }

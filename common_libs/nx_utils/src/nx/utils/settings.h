@@ -43,9 +43,13 @@ public:
     const QString getModuleName() const { return m_moduleName; }
 
 private:
+    void initializeSystemSettings();
+
+    const QString m_organizationName;
     const QString m_applicationName;
     const QString m_moduleName;
+    const QSettings::Scope m_scope;
 
-    QSettings m_systemSettings;
+    std::unique_ptr<QSettings> m_systemSettings;
     nx::utils::ArgumentParser m_args;
 };

@@ -21,18 +21,18 @@
   </Page>
 
   <Page Name="Install">
-    <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">Accept and Install</Button>
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
+    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
     <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">By clicking "Accept and Install" you are agreeing to our</Text>
-    <Hypertext Name="EulaHyperlink" X="180" Y="-40" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes" Center="yes">#(loc.InstallLicenseLinkText)</Hypertext>
+    <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
     <Button Name="OptionsButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
+    <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">Accept and Install</Button>
   </Page>
   <Page Name="Options">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo_small.png"/>
+    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo-64x64.png"/>
     <Text X="24" Y="104" Width="-12" Height="32" FontId="6">Options</Text>
     <Text X="24" Y="141" Width="-12" Height="17" FontId="9">Select applications to be installed:</Text>
     <Button Name="InstallClientAndServer" X="24" Y="166" Width="210" Height="17" TabStop="yes" FontId="3" HideWhenDisabled="no" HexStyle="0x000009">Client and Server</Button>
@@ -47,7 +47,7 @@
   </Page>
   <Page Name="FilesInUse">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo_small.png"/>
+    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo-64x64.png"/>
     <Text X="12" Y="104" Width="-164" Height="34" FontId="9" DisablePrefix="yes">#(loc.FilesInUseLabel)</Text>
     <Text Name="FilesInUseText"  X="12" Y="166" Width="-164" Height="-86" FontId="9" DisablePrefix="yes" HexStyle="0x0000C000"></Text>
 
@@ -59,7 +59,7 @@
   </Page>
   <Page Name="Progress">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
+    <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
     <Text X="12" Y="184" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Progressbar Name="OverallCalculatedProgressbar" X="150" Y="256" Width="250" Height="18" />
     <Text X="12" Y="282" Width="-12" Height="40" FontId="8" DisablePrefix="yes" Center="yes">#(loc.ProgressLabel)</Text>
@@ -67,7 +67,7 @@
   </Page>
   <Page Name="Modify">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
+    <Image X="223" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">Uninstall ${display.product.name}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
 
@@ -76,7 +76,7 @@
   </Page>
   <Page Name="Success">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo_big.png"/>
+    <Image X="229" Y="56" Width="102" Height="102" ImageFile="logo-102x102.png"/>
 
     <Text Name="SuccessInstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessInstallHeader)</Text>
     <Text Name="SuccessUninstallHeader" Center="yes" X="12" Y="174" Width="-12" Height="40" FontId="6" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.SuccessUninstallHeader)</Text> 
@@ -88,11 +88,11 @@
   </Page>
   <Page Name="Failure">
     <Image X="-1" Y="1" Width="349" Height="252" ImageFile="installer_bg.png"/>
-    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo_small.png"/>
+    <Image X="24" Y="24" Width="64" Height="64" ImageFile="logo-64x64.png"/>
     <Text X="24" Y="104" Width="-12" Height="32" FontId="6">#(loc.FailureHeader)</Text>
-    <Hypertext Name="FailureLogFileLink" X="24" Y="140" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
-    <Hypertext Name="FailureMessageText" X="24" Y="190" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes" />
-    <Text Name="FailureRestartText" X="24" Y="220" Width="-164" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Text>
+    <Hypertext Name="FailureLogFileLink" X="24" Y="145" Width="-164" Height="51" FontId="7" TabStop="yes" HideWhenDisabled="yes">#(loc.FailureHyperlinkLogText)</Hypertext>
+    <Hypertext Name="FailureMessageText" X="24" Y="195" Width="-164" Height="71" FontId="7" TabStop="yes" HideWhenDisabled="yes" />
+    <Text Name="FailureRestartText" X="24" Y="245" Width="-164" Height="34" FontId="7" HideWhenDisabled="yes" DisablePrefix="yes">#(loc.FailureRestartText)</Text>
     <Button Name="FailureRestartButton" X="-92" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.FailureRestartButton)</Button>
     <Button Name="FailureCloseButton" X="-12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0">#(loc.FailureCloseButton)</Button>
   </Page>

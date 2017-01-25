@@ -64,7 +64,6 @@
 
 #include <events/mserver_business_rule_processor.h>
 
-#include <media_server/media_server_module.h>
 #include <media_server/media_server_app_info.h>
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -508,37 +507,6 @@ static int freeGB(QString drive)
 }
 #endif
 
-nx::mserver_aux::UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
-    m_mediaFolderName(mediaFolderName)
-{}
-
-QString nx::mserver_aux::UnmountedStoragesFilter::getStorageUrlWithoutMediaFolder(const QString& url)
-{
-    if (!url.endsWith(m_mediaFolderName))
-        return url;
-
-    int indexBeforeMediaFolderName = url.indexOf(m_mediaFolderName) - 1;
-    NX_ASSERT(indexBeforeMediaFolderName > 0);
-    if (indexBeforeMediaFolderName <= 0)
-        return url;
-
-    return url.mid(0, indexBeforeMediaFolderName);
-}
-
-QnStorageResourceList nx::mserver_aux::UnmountedStoragesFilter::getUnmountedStorages(
-        const QnStorageResourceList& allStorages,
-        const QStringList& paths)
-{
-    QnStorageResourceList result;
-    for (const auto& storage: allStorages)
-    {
-        if (!paths.contains(getStorageUrlWithoutMediaFolder(storage->getUrl())))
-            result.append(storage);
-    }
-
-    return result;
-}
-
 static QStringList listRecordFolders()
 {
     QStringList folderPaths;
@@ -596,6 +564,11 @@ static QStringList listRecordFolders()
     }
 #endif
 
+    if (MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() != 0)
+    {
+        for (auto& path: folderPaths)
+            path = closeDirPath(path) + serverGuid().toString();
+    }
     return folderPaths;
 }
 
@@ -766,7 +739,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                    .arg(Q_FUNC_INFO)
                    .arg(storage.url)
                    .arg(storage.spaceLimit), cl_logDEBUG2);
-            messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
@@ -799,7 +772,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         modifiedStorages.append(updateStorages(m_mediaServer));
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
-            messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
         qnNormalStorageMan->initDone();
         qnBackupStorageMan->initDone();
@@ -1114,7 +1087,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
-    commandLineParser.parse(argc, argv, stderr);
+    commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
         QTextStream stream(stdout);
@@ -1379,7 +1352,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             }
             qnServerAdditionalAddressesDictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
             qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
-            messageProcessor->updateResource(mediaServer, qnCommon->moduleGUID());
+            messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
         }
         do {
             if (needToStop())
@@ -1449,7 +1422,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         QnManualCameraInfoMap manualCameras;
         for (const auto &camera : cameras)
         {
-            messageProcessor->updateResource(camera, qnCommon->moduleGUID());
+            messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
             if (camera.manuallyAdded)
             {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
@@ -1485,7 +1458,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &user: users)
-            messageProcessor->updateResource(user, qnCommon->moduleGUID());
+            messageProcessor->updateResource(user, ec2::NotificationSource::Local);
     }
 
     {
@@ -1500,7 +1473,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for (const ec2::ApiVideowallData& videowall: videowalls)
-            messageProcessor->updateResource(videowall, qnCommon->moduleGUID());
+            messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
     }
 
     {
@@ -1515,7 +1488,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &layout: layouts)
-            messageProcessor->updateResource(layout, qnCommon->moduleGUID());
+            messageProcessor->updateResource(layout, ec2::NotificationSource::Local);
     }
 
     {
@@ -1530,7 +1503,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for (const auto &webpage : webpages)
-            messageProcessor->updateResource(webpage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(webpage, ec2::NotificationSource::Local);
     }
 
     {
@@ -1643,7 +1616,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     if (mappedAddress.port)
     {
         NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS)
+                .arg(address), cl_logALWAYS);
 
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
@@ -1658,7 +1631,7 @@ void MediaServerProcess::at_portMappingChanged(QString address)
         if (oldIp != m_forwardedAddresses.end())
         {
             NX_LOGX(lit("External address %1:%2 has been unmapped")
-                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS)
+                   .arg(oldIp->first.toString()).arg(oldIp->second), cl_logALWAYS);
 
             m_forwardedAddresses.erase(oldIp);
             updateAddressesList();
@@ -2053,7 +2026,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 {
     for (;;)
     {
-        if (!cloudConnectionManager.cleanUpCloudDataInLocalDb())
+        if (!cloudConnectionManager.resetCloudData())
         {
             qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2128,7 +2101,10 @@ void MediaServerProcess::run()
 
     SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
 
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+    std::unique_ptr<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+
+    if (!m_obsoleteGuid.isNull())
+        qnCommon->setObsoleteServerGuid(m_obsoleteGuid);
 
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
@@ -2379,6 +2355,14 @@ void MediaServerProcess::run()
         QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
     std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>
         clearEc2ConnectionGuard(this, clearEc2ConnectionGuardFunc);
+
+    if (m_cmdLineArguments.cleanupDb)
+    {
+        const bool kCleanupDbObjects = true;
+        const bool kCleanupTransactionLog = true;
+        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
+        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
+    }
 
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
@@ -2660,14 +2644,6 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
-    if (m_cmdLineArguments.cleanupDb)
-    {
-        const bool kCleanupDbObjects = true;
-        const bool kCleanupTransactionLog = true;
-        auto miscManager = ec2Connection->getMiscManager(Qn::kSystemAccess);
-        miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
-    }
-
     auto upnpPortMapper = initializeUpnpPortMapper();
     updateAddressesList();
 
@@ -2765,6 +2741,13 @@ void MediaServerProcess::run()
         &QnResourceDiscoveryManager::localInterfacesChanged,
         this,
         &MediaServerProcess::updateAddressesList);
+
+    connect(
+        m_mediaServer.data(),
+        &QnMediaServerResource::primaryAddressChanged,
+        this,
+        &MediaServerProcess::updateAddressesList);
+
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
@@ -2997,7 +2980,8 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-        if (application->isRunning())
+        if (application->isRunning() && 
+            MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
             NX_LOG("Server already started", cl_logERROR);
             qApp->quit();
@@ -3131,7 +3115,7 @@ private:
 
         QnUuid obsoleteGuid = QnUuid(MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString());
         if (!obsoleteGuid.isNull()) {
-            qnCommon->setObsoleteServerGuid(obsoleteGuid);
+            m_main->setObsoleteGuid(obsoleteGuid);
         }
     }
 

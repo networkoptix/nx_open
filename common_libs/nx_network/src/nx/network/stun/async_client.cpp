@@ -75,9 +75,8 @@ void AsyncClient::sendRequest(
             return;
 
         default:
-            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
-            NX_LOGX( lit( "m_state has invalid value: %1" )
-                    .arg( static_cast< int >( m_state ) ), cl_logERROR );
+            NX_ASSERT( false, lit( "m_state has invalid value: %1" )
+                .arg( static_cast< int >( m_state ) ) );
             return;
     };
 }
@@ -101,7 +100,7 @@ SocketAddress AsyncClient::remoteAddress() const
 
 void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
 {
-    closeConnection(errorCode, nullptr);
+    post([this, errorCode](){ closeConnection(errorCode, nullptr); });
 }
 
 template<typename Container>
@@ -140,25 +139,16 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
     dispatch(
         [this, options = std::move(options)]()
         {
-            if (m_baseConnection)
-            {
-                if (const auto socket = dynamic_cast<AbstractStreamSocket*>(
-                    m_baseConnection->socket().get()))
-                {
-                    NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
-                    const auto isKeepAliveSet = socket->setKeepAlive(std::move(options));
-                    NX_ASSERT(isKeepAliveSet, SystemError::getLastOSErrorText());
-                }
-                else
-                {
-                    NX_LOGX(lm("Trying to set keep alive for non-stream socket"), cl_logWARNING);
-                }
-            }
-            else
+            if (!m_baseConnection)
             {
                 NX_LOGX(lm("Unable to set keep alive, connection is probably closed."),
                     cl_logDEBUG1);
+                return;
             }
+
+            NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
+            const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
+            NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
 }
 
@@ -248,9 +238,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             return;
 
         default:
-            NX_ASSERT( false, Q_FUNC_INFO, "m_state is invalid" );
-            NX_LOGX( lit( "m_state has invalid value: %1" )
-                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
+            NX_ASSERT(false, lit("m_state has invalid value: %1").arg(static_cast<int>(m_state)));
             return;
     }
 }
@@ -258,6 +246,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 void AsyncClient::closeConnectionImpl(
     QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
+    NX_LOGX(lm("Connection is closed: %1").arg(SystemError::toString(code)), cl_logINFO);
     auto connectingSocket = std::move(m_connectingSocket);
     auto requestQueue = std::move(m_requestQueue);
     auto requestsInProgress = std::move(m_requestsInProgress);
@@ -315,6 +304,8 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* lock)
             [ this ]( SystemError::ErrorCode code ) mutable
             {
                 QnMutexLocker lock( &m_mutex );
+                // TODO #mu following code looks redundant since handler will be triggered 
+                //   on connection closure (which is imminent).
                 if( code != SystemError::noError )
                     dispatchRequestsInQueue( &lock );
             } );
@@ -342,7 +333,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     m_timer->reset();
     NX_ASSERT(!m_baseConnection);
-    NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logDEBUG1);
+    NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logINFO);
 
     m_baseConnection = std::make_unique<BaseConnectionType>(this, std::move(m_connectingSocket));
     m_baseConnection->bindToAioThread(getAioThread());
@@ -372,8 +363,7 @@ void AsyncClient::processMessage(Message message)
     switch( message.header.messageClass )
     {
         case MessageClass::request:
-            NX_ASSERT( false, Q_FUNC_INFO, "client does not support requests" );
-            NX_LOGX( lit( "Client does not support requests" ), cl_logERROR );
+            NX_ASSERT( false, "Client does not support requests" );
             return;
 
         case MessageClass::errorResponse:
@@ -383,8 +373,8 @@ void AsyncClient::processMessage(Message message)
             const auto it = m_requestsInProgress.find( message.header.transactionId );
             if( it == m_requestsInProgress.end() )
             {
-                NX_LOGX(lm("Response to canceled request %1")
-                    .arg(message.header.transactionId.toHex()), cl_logDEBUG2);
+                NX_LOGX( lm("Response to canceled request %1" )
+                    .arg( message.header.transactionId.toHex() ), cl_logDEBUG2 );
                 return;
             }
 
@@ -408,17 +398,14 @@ void AsyncClient::processMessage(Message message)
             else
             {
                 NX_LOGX( lit( "Unexpected/unsupported indication: %2" )
-                         .arg( message.header.method ),
-                         cl_logWARNING );
+                    .arg( message.header.method ), cl_logWARNING );
             }
             return;
         }
 
         default:
-            NX_ASSERT( false, Q_FUNC_INFO, "messageClass is invalid" );
-            NX_LOGX( lit( "messageClass has invalid value: %1" )
-                     .arg( static_cast< int >( message.header.messageClass ) ),
-                     cl_logERROR );
+            NX_ASSERT( false, lit( "messageClass has invalid value: %1" )
+                .arg( static_cast< int >( message.header.messageClass ) ));
             return;
     }
 }

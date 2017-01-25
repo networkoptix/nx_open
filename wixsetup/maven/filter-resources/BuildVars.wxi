@@ -4,6 +4,7 @@
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
     <?define serverUpgradeCode = "${customization.upgradeCode}"?>
+    <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
     <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
     <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
     <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>

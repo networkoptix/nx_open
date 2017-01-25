@@ -51,3 +51,12 @@ QString QnUrlHelper::path() const
 {
     return m_url.path();
 }
+
+QUrl QnUrlHelper::cleanUrl() const
+{
+    QUrl url;
+    url.setScheme(m_url.scheme());
+    url.setHost(m_url.host());
+    url.setPort(m_url.port());
+    return url;
+}

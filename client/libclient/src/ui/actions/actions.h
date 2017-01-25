@@ -1100,6 +1100,9 @@ enum IDType
      */
     OpenCloudManagementUrl,
 
+    /** Hide cloud promo */
+    HideCloudPromoAction,
+
     ActionCount,
 
     NoAction = -1

@@ -1,12 +1,9 @@
-/**********************************************************
-* Jul 26, 2016
-* akolesnikov
-***********************************************************/
-
 #include "cross_nat_connector_test.h"
 
 #include <nx/network/cloud/tunnel/cross_nat_connector.h>
+#include <nx/utils/log/to_string.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace nx {
 namespace network {
@@ -159,12 +156,16 @@ void TunnelConnector::doSimpleConnectTest(
             result.connection = std::move(connection);
             connectedPromise.set_value(std::move(result));
         });
+
     auto connectedFuture = connectedPromise.get_future();
-    const auto actualConnectTimeout =
+    auto actualConnectTimeout =
         connectTimeout == std::chrono::milliseconds::zero()
-        ? kDefaultTestTimeout
-        : (connectTimeout * 2);
-    ASSERT_EQ(std::future_status::ready, connectedFuture.wait_for(actualConnectTimeout));
+            ? kDefaultTestTimeout : (connectTimeout * 2);
+
+    actualConnectTimeout *= utils::TestOptions::timeoutMultiplier();
+    ASSERT_EQ(std::future_status::ready, connectedFuture.wait_for(actualConnectTimeout))
+        << ::toString(actualConnectTimeout).toStdString();
+
     *connectResult = connectedFuture.get();
     connectResult->executionTime =
         std::chrono::duration_cast<std::chrono::milliseconds>(

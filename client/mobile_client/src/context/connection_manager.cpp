@@ -22,6 +22,9 @@
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
+#include <helpers/url_helper.h>
+#include <helpers/system_helpers.h>
+#include <settings/last_connection.h>
 #include <nx/utils/log/log.h>
 
 namespace {
@@ -344,6 +347,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+            QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
             QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
@@ -371,16 +375,16 @@ void QnConnectionManagerPrivate::doConnect()
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
-            QnLocalConnectionData connectionData;
-            if (!helpers::storeLocalSystemConnection(
-                connectionInfo.systemName, localId, url, connectionData))
-            {
-                return;
-            }
-
-            helpers::updateWeightData(localId);
+            using namespace nx::client::core::helpers;
+            storeConnection(localId, connectionInfo.systemName, url);
+            storeCredentials(localId, QnCredentials(url));
+            updateWeightData(localId);
             qnClientCoreSettings->save();
 
+            LastConnectionData connectionData{
+                connectionInfo.systemName,
+                QnUrlHelper(url).cleanUrl(),
+                QnCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 
@@ -399,9 +403,10 @@ void QnConnectionManagerPrivate::doDisconnect()
 
     disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
 
-    QnMobileClientMessageProcessor::instance()->init(NULL);
+    QnMobileClientMessageProcessor::instance()->init(nullptr);
     QnAppServerConnectionFactory::setUrl(QUrl());
-    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setEc2Connection(nullptr);
+    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
     QnSessionManager::instance()->stop();
 
     connectionVersion = QnSoftwareVersion();

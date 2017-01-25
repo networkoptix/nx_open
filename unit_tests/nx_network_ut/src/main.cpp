@@ -1,15 +1,15 @@
 #include <nx/network/ssl_socket.h>
-#include <nx/network/socket_global.h>
 
 #define USE_GMOCK
-#include <nx/utils/test_support/run_test.h>
+#include <nx/network/test_support/run_test.h>
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    return nx::utils::runTest(
+    return nx::network::test::runTest(
         argc, argv,
         [](const nx::utils::ArgumentParser&)
         {
             nx::network::SslEngine::useRandomCertificate("nx_network_ut");
+            return nx::utils::test::DeinitFunctions();
         });
 }

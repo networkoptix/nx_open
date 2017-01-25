@@ -19,7 +19,8 @@ GenericProduct
         "product.display.title": customization.productDisplayName + " Mobile Client",
         "liteMode": vms.box == "bpi",
         "android.oldPackageName": customization.androidOldPackageName,
-        "ios.old_app_appstore_id" : customization.iosOldAppstoreId
+        "ios.old_app_appstore_id" : customization.iosOldAppstoreId,
+        "mobile.nx1_customized_name": customization.liteDeviceName
     })
 
     Group

@@ -32,6 +32,8 @@ public:
     virtual boost::optional<nx::hpm::api::SystemCredentials>
         getSystemCredentials() const override;
 
+    void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
+
     bool boundToCloud() const;
     /** Returns \a nullptr if not connected to the cloud */
     std::unique_ptr<nx::cdb::api::Connection> getCloudConnection(
@@ -42,9 +44,10 @@ public:
 
     void processCloudErrorCode(nx::cdb::api::ResultCode resultCode);
 
-    bool cleanUpCloudDataInLocalDb();
-
     void setProxyVia(const SocketAddress& proxyEndpoint);
+
+    bool detachSystemFromCloud();
+    bool resetCloudData();
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);
@@ -60,7 +63,7 @@ private:
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
-    bool detachSystemFromCloud();
+    bool makeSystemLocal();
     bool boundToCloud(QnMutexLockerBase* const lk) const;
     void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);

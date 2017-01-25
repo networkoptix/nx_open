@@ -9,7 +9,7 @@ namespace nx {
 namespace stun {
 
 class NX_NETWORK_API AbstractAsyncClient:
-    public network::aio::BasicPollable
+    public network::aio::Timer
 {
 public:
     struct Settings

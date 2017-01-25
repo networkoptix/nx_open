@@ -258,11 +258,10 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     auto connectionResult = QnConnectionValidator::validateConnection(*response);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
-        NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 or cloud host %4 on local address %5")
+        NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4")
             .arg(response->type)
             .arg(remoteEndpoint.toString())
             .arg(response->customization)
-            .arg(response->cloudHost)
             .arg(udpSocket->getLocalAddress().toString()),
             cl_logDEBUG2);
         return false;

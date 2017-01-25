@@ -236,13 +236,18 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
     QnJsonRestResult* result)
 {
     return saveLocalSystemIdToCloud(data, result) &&
-        initializeCloudRelatedManagers(result);
+        initializeCloudRelatedManagers(data, result);
 }
 
 bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
+    const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;
+
+    m_cloudManagerGroup->connectionManager.setCloudCredentials(
+        data.cloudSystemID,
+        data.cloudAuthKey);
 
     api::ResultCode resultCode = 
         m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();

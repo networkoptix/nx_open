@@ -495,7 +495,7 @@ public:
         for (auto& clientContext: m_clients)
             clientContext.client->pleaseStopSync();
 
-        m_testServer.pleaseStop();
+        m_testServer.pleaseStopSync();
     }
 
 protected:

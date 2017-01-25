@@ -23,6 +23,7 @@ const QString kLocalParam(lit("local"));
 const QString kFormatParam(lit("format"));
 const QString kDeprecatedPhysicalIdParam(lit("physicalId"));
 const QString kDeprecatedMacParam(lit("mac"));
+const QString kDeprecatedIdParam(lit("id"));
 const QString kCameraIdParam(lit("cameraId"));
 const QString kLimitParam(lit("limit"));
 const QString kFlatParam(lit("flat"));
@@ -75,7 +76,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
     QnLexical::deserialize(params.value(kFormatParam), &request.format);
 
     nx::camera_id_helper::findAllCamerasByFlexibleIds(&request.resList, params,
-        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
+        {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
     return request;
 }
@@ -96,8 +97,22 @@ QnRequestParamList QnChunksRequestData::toParams() const
         result.insert(kLocalParam, QString());
     result.insert(kFormatParam, QnLexical::serialized(format));
 
-    for (const auto& camera: resList)
-        result.insert(kCameraIdParam, QnLexical::serialized(camera->getId().toString()));
+    // TODO: #mshevchenko #3.1 The request format changed in 3.0, so Mobile Client cannot
+    // read chunks from 2.6 server. This is a temporary in-place fix which should be refactored
+    // when API versioning is implemented.
+    switch (requestVersion)
+    {
+        case RequestVersion::v2_6:
+            for (const auto& resource: resList)
+                result.insert(kDeprecatedPhysicalIdParam, resource->getPhysicalId());
+            break;
+
+        case RequestVersion::v3_0:
+        default:
+            for (const auto& resource: resList)
+                result.insert(kCameraIdParam, resource->getId().toString());
+            break;
+    }
 
     return result;
 }

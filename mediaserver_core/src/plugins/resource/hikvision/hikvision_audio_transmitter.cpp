@@ -34,6 +34,11 @@ HikvisionAudioTransmitter::HikvisionAudioTransmitter(QnSecurityCamResource* reso
 {
 }
 
+HikvisionAudioTransmitter::~HikvisionAudioTransmitter()
+{
+    stop();
+}
+
 bool HikvisionAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 {
     // Unused function

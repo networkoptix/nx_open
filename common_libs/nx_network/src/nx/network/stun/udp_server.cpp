@@ -51,6 +51,11 @@ bool UdpServer::listen()
     return true;
 }
 
+void UdpServer::stopReceivingMessagesSync()
+{
+    m_messagePipeline.stopReceivingMessagesSync();
+}
+
 SocketAddress UdpServer::address() const
 {
     return m_messagePipeline.address();

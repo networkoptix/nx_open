@@ -2,9 +2,8 @@
 # Artem V. Nikitin
 # Data generators
 
-import json, random, string
+import json, random, string, uuid
 from hashlib import md5
-from Utils import generateGuid
 from Rec import Rec
 
 class _unique(object):
@@ -16,6 +15,9 @@ class _unique(object):
     LayoutSeedNumber = 0
     UserRoleSeedNumber = 0
 
+def generateGuid(quoted=True):
+    guid = str(uuid.uuid4())
+    return quoted and "{%s}" % guid or guid
 
 class BasicGenerator(object):
     chars = string.ascii_uppercase + string.digits
@@ -105,7 +107,7 @@ class BasicGenerator(object):
 
 def generateServerData(**kw):
     gen = BasicGenerator()
-    srvAddr = gen.generateIpV4Endpoint()
+    srvAddr = kw.get('networkAddresses', gen.generateIpV4Endpoint())
     default_server_data = {
         'apiUrl': srvAddr, 'url' : "rtsp://%s" % srvAddr,
         'authKey': gen.generateRandomId(), 'flags' : "SF_HasPublicIP",
@@ -132,14 +134,15 @@ def generateStorageData(**kw):
 
 def generateCameraData(**kw):
     gen = BasicGenerator()
-    mac = gen.generateMac()
-    name = gen.generateCameraName()
+    mac = kw.get('physicalId', gen.generateMac())
+    name = kw.get('name', gen.generateCameraName())
     default_camera_data = {
         "audioEnabled": gen.generateBoolVal(),
         "controlEnabled": gen.generateBoolVal(),
         "dewarpingParams": "",  "groupId": "",
-        "groupName": "", "id": generateGuid(),
-        "mac": gen.generateUUIdFromMd5(mac),
+        "groupName": "",
+        "id": gen.generateUUIdFromMd5(mac),
+        "mac": mac,
         "manuallyAdded": False,  "maxArchiveDays": 0,
         "minArchiveDays": 0, "model": name,
         "motionMask": "", "motionType": "MT_Default",
@@ -214,3 +217,116 @@ def generateUserData(**kw):
         "typeId": "{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}",
         "url": "" }
     return Rec(init=default_user_data, **kw)
+
+
+class GeneratorMixin:
+
+    # Create user with resource
+    def createUser(self, **kw):
+        userData = generateUserData(**kw)
+                
+        self.sendAndCheckRequest(
+           self.server.address, "ec2/saveUser",
+           headers={'Content-Type': 'application/json'},
+           data=json.dumps(userData.get()))
+
+        userResourceData = generateResourceData(
+            resourceId = userData.id)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/setResourceParams",
+            data=json.dumps([userResourceData.get()]))
+
+        self.checkPresent("ec2/getUsers",
+                            'User', id=userData.id)
+
+        self.checkPresent("ec2/getResourceParams",
+                           'UserResource', resourceId=userData.id)
+        return userData
+
+    # Create camera with attributes & resource
+    def createCamera(self, **kw):
+        cameraData = generateCameraData(**kw)
+        
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/saveCamera",
+            data=json.dumps(cameraData.get()))
+        
+        cameraUserAttrData = generateCameraUserAttributesData(
+            cameraId = cameraData.id)
+        
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/saveCameraUserAttributes",
+            data=json.dumps(cameraUserAttrData.get()))
+       
+        cameraResourceData = generateResourceData(
+            resourceId = cameraData.id)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/setResourceParams",
+            data=json.dumps([cameraResourceData.get()]))
+
+        self.checkPresent("ec2/getCameras", 'Camera', id=cameraData.id)
+        self.checkPresent("ec2/getCameraUserAttributesList", 'CameraAttributes',
+                            cameraId=cameraData.id)
+        self.checkPresent("ec2/getResourceParams",
+                            'CameraResource', resourceId=cameraData.id)
+        
+        return cameraData
+
+    # Create storage
+    def createStorage(self, **kw):
+        storageData = generateStorageData(**kw)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/saveStorage",
+            data=json.dumps(storageData.get()))
+
+        self.checkPresent("ec2/getStorages", 'Storage', id=storageData.id)
+
+        return storageData
+
+    # Create server with attributes & resource
+    def createServer(self, **kw):
+        serverData = generateServerData(**kw)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/saveMediaServer",
+            data=json.dumps(serverData.get()))
+
+        serverUserAttrData = generateServerUserAttributesData(
+            serverId = serverData.id)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/saveMediaServerUserAttributes",
+            data=json.dumps(serverUserAttrData.get()))
+
+        serverResourceData = generateResourceData(
+            resourceId = serverData.id)
+
+        self.sendAndCheckRequest(
+            self.server.address, "ec2/setResourceParams",
+            data=json.dumps([serverResourceData.get()]))
+
+        self.checkPresent("ec2/getMediaServers", 'Server', id=serverData.id)
+        self.checkPresent("ec2/getMediaServerUserAttributesList",
+                          'ServerAttributes', serverId=serverData.id)
+        self.checkPresent("ec2/getResourceParams",
+                          'ServerResource', resourceId=serverData.id)
+        return serverData
+
+    # Check entity (server, camera, user, etc) present
+    def checkPresent(self, __method, __name, **kw):
+        response = self.sendAndCheckRequest(
+            self.server.address, __method)
+        
+        self.assertHasItem(kw, response.data, __name)
+
+    # Check entity (server, camera, user, etc) absent
+    def checkAbsent(self, __method, __name, **kw):
+        response = self.sendAndCheckRequest(
+            self.server.address, __method)
+        
+        self.assertHasNotItem(kw, response.data, __name)
+
+

@@ -4,6 +4,8 @@
 #include <finders/systems_finder.h>
 #include <client_core/client_core_settings.h>
 
+using nx::client::core::WeightData;
+
 QnForgottenSystemsManager::QnForgottenSystemsManager():
     base_type(),
     m_systems()
@@ -55,7 +57,7 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 
             auto localWeights = qnClientCoreSettings->localSystemWeightsData();
             const auto itWeight = std::find_if(localWeights.begin(), localWeights.end(),
-                [localId](const QnWeightData& data) { return (localId == data.localId); });
+                [localId](const WeightData& data) { return (localId == data.localId); });
 
             if (itWeight == localWeights.end())
                 return;

@@ -349,6 +349,8 @@ void PlayerPrivate::at_jumpOccurred(int sequence)
 
 void PlayerPrivate::at_gotVideoFrame()
 {
+    Q_Q(Player);
+
     if (state == Player::State::Stopped)
         return;
 
@@ -359,9 +361,16 @@ void PlayerPrivate::at_gotVideoFrame()
     if (!videoFrameToRender)
         return;
 
+    FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+    if (metadata.dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        videoFrameToRender.reset();
+        q->setPosition(kLivePosition); //< EOF reached
+        return;
+    }
+
     if (state == Player::State::Paused)
     {
-        FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
         if (!metadata.noDelay && !isCoarseFrame(videoFrameToRender))
             return; //< Display regular frames only if the player is playing.
     }
@@ -681,12 +690,6 @@ bool PlayerPrivate::initDataProvider()
         this, &PlayerPrivate::at_hurryUp);
     connect(dataConsumer.get(), &PlayerDataConsumer::jumpOccurred,
         this, &PlayerPrivate::at_jumpOccurred);
-    connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this,
-        [this]()
-        {
-            Q_Q(Player);
-            q->setPosition(kLivePosition);
-        });
 
     if (!liveMode)
     {

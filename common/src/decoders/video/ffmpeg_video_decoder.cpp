@@ -275,7 +275,7 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
 
     if (m_passedContext)
         QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
-    
+
     determineOptimalThreadType(data);
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;

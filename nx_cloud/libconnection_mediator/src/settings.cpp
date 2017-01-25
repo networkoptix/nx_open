@@ -14,6 +14,7 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/utils/url_builder.h>
 
 #include <utils/common/app_info.h>
 
@@ -31,6 +32,9 @@ const QLatin1String kDefaultDataDir("");
 //CloudDB settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
+
+const QLatin1String kCdbUrl("cloud_db/url");
+const QLatin1String kDefaultCdbUrl("");
 
 const QLatin1String kCdbEndpoint("cloud_db/endpoint");
 const QLatin1String kDefaultCdbEndpoint("");
@@ -51,12 +55,18 @@ const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
+const QLatin1String kStunInactivityTimeout("stun/inactivityTimeout");
+const std::chrono::hours kDefaultStunInactivityTimeout(10);
+
 //HTTP
 const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
 const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
 const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
 const QLatin1String kDefaultHttpKeepAliveOptions("");
+
+const QLatin1String kHttpInactivityTimeout("stun/inactivityTimeout");
+const std::chrono::hours kDefaultHttpInactivityTimeout(1);
 
 const QString kModuleName = lit("connection_mediator");
 
@@ -173,10 +183,10 @@ const Statistics& Settings::statistics() const
     return m_statistics;
 }
 
-void Settings::load(int argc, char **argv)
+void Settings::load(int argc, const char **argv)
 {
     m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, (const char**)argv);
+    m_settings.parseArgs(argc, argv);
 
     loadConfiguration();
 }
@@ -213,7 +223,28 @@ void Settings::loadConfiguration()
     m_logging.load(m_settings);
 
     m_cloudDB.runWithCloud = m_settings.value(kRunWithCloud, kDefaultRunWithCloud).toBool();
-    m_cloudDB.endpoint = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
+    const auto cdbUrlStr = m_settings.value(kCdbUrl, kDefaultCdbUrl).toString();
+    if (!cdbUrlStr.isEmpty())
+    {
+        m_cloudDB.url = QUrl(cdbUrlStr);
+    }
+    else
+    {
+        // Reading endpoint for backward compatibility.
+        const auto endpointString = m_settings.value(kCdbEndpoint, kDefaultCdbEndpoint).toString();
+        if (!endpointString.isEmpty())
+        {
+            // Supporting both url and host:port here.
+            m_cloudDB.url = QUrl(endpointString);
+            if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
+            {
+                const SocketAddress endpoint(endpointString);
+                *m_cloudDB.url = nx::utils::UrlBuilder()
+                    .setScheme("http").setHost(endpoint.address.toString())
+                    .setPort(endpoint.port).toUrl();
+            }
+        }
+    }
     m_cloudDB.user = m_settings.value(kCdbUser, kDefaultCdbUser).toString();
     m_cloudDB.password = m_settings.value(kCdbPassword, kDefaultCdbPassword).toString();
     m_cloudDB.updateInterval = duration_cast<seconds>(
@@ -228,12 +259,18 @@ void Settings::loadConfiguration()
     m_stun.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
 
+    m_stun.inactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kStunInactivityTimeout).toString(), kDefaultStunInactivityTimeout);
+
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
 
     m_http.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
+
+    m_http.inactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kHttpInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
 
     m_dbConnectionOptions.loadFromSettings(&m_settings);
 

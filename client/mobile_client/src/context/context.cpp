@@ -18,6 +18,7 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <settings/last_connection.h>
 #include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
@@ -152,24 +153,29 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& systemName)
+void QnContext::removeSavedConnection(const QString& localSystemId)
 {
-    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
+    const auto localId = QnUuid::fromStringSafe(localSystemId);
 
-    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
-    {
-        return connection.systemName == systemName;
-    };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
+    NX_ASSERT(!localId.isNull());
+    if (localId.isNull())
+        return;
 
-    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
+    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+    recentConnections.remove(localId);
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+
+    auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
+    authenticationData.remove(localId);
+    qnClientCoreSettings->setSystemAuthenticationData(authenticationData);
+
+    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnClientCoreSettings->save();
 }
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedConnection(QnLocalConnectionData());
+    qnSettings->setLastUsedConnection(LastConnectionData());
 }
 
 QString QnContext::getLastUsedSystemName() const
@@ -179,7 +185,7 @@ QString QnContext::getLastUsedSystemName() const
 
 QUrl QnContext::getLastUsedUrl() const
 {
-    return qnSettings->lastUsedConnection().urlWithPassword();
+    return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
 QUrl QnContext::getInitialUrl() const

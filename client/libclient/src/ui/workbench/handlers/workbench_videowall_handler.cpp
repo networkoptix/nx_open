@@ -492,7 +492,10 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
             updateItemsLayout(items, layout->getId());
         };
 
-    if (layout->hasFlags(Qn::local) || snapshotManager()->isModified(layout))
+    const bool needToSave = !layout->isFile()
+        && (layout->hasFlags(Qn::local) || snapshotManager()->isModified(layout));
+
+    if (needToSave)
     {
         auto callback =
             [this, items, reset](bool success, const QnLayoutResourcePtr &layout)
@@ -1291,11 +1294,12 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             if (filtered.contains(resource))
                 return;
 
-            if (!resource->hasFlags(Qn::desktop_camera) &&
-                !QnResourceAccessFilter::isShareableMedia(resource))
-            {
+            bool allowed = QnResourceAccessFilter::isShareableMedia(resource)
+                || resource->hasFlags(Qn::desktop_camera)
+                || resource->hasFlags(Qn::local_media);
+
+            if (!allowed)
                 return;
-            }
 
             filtered << resource;
             qreal ar = defaultAr;
@@ -1828,10 +1832,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
                 continue;
 
             if (QnLayoutResourcePtr layout = qnResPool->getResourceById<QnLayoutResource>(index.item().layout))
-            {
-                if (!layout->isFile())
-                    targetResources << layout;
-            }
+                targetResources << layout;
         }
 
         /* Dragging single videowall item causing swap (if Shift is not pressed). */
@@ -1840,18 +1841,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     }
     else
     {
-        for (const QnResourcePtr& resource : parameters.resources())
-        {
-            if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-            {
-                if (!layout->isFile())
-                    targetResources << layout;
-            }
-            else
-            {
-                targetResources << resource;
-            }
-        }
+        targetResources = parameters.resources();
     }
 
     if (targetResources.isEmpty())
@@ -1897,8 +1887,11 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     if (targetResources.size() == 1)
     {
         auto layout = targetResources.first().dynamicCast<QnLayoutResource>();
-        if (layout && layout->getParentId() == videoWallId)
-            targetLayout = layout;
+        if (layout)
+        {
+            if (layout->getParentId() == videoWallId || layout->hasFlags(Qn::exported_layout))
+                targetLayout = layout;
+        }
     }
 
     if (!targetLayout)

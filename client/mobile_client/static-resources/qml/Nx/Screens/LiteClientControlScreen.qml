@@ -28,7 +28,7 @@ Page
         {
             id: enabledSwitch
 
-            onCheckedChanged:
+            onClicked:
             {
                 if (checked)
                     liteClientController.startLiteClient()

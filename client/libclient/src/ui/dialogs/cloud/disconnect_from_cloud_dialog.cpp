@@ -62,6 +62,7 @@ private:
     void createAuthorizeWidget();
     void createResetPasswordWidget();
 
+    QString disconnectQuestionMessage() const;
     QString allUsersDisabledMessage() const;
     QString enterPasswordMessage() const;
     QString disconnectWarnMessage() const;
@@ -224,17 +225,14 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
-    q->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
     q->setFixedWidth(kDialogWidth);
 
-    /* We replace standard button instead of simply adding our one to keep OS theme values: */
-    QScopedPointer<QAbstractButton> baseOkButton(q->button(QDialogButtonBox::Ok));
+    q->removeButton(q->button(QDialogButtonBox::Ok));
+
     okButton = new QnBusyIndicatorButton(q);
-    okButton->setText(baseOkButton->text()); // Title from OS theme
-    okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
-    setAccentStyle(okButton);
-    q->removeButton(baseOkButton.data());
+    okButton->setText(tr("Disconnect"));
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
+    setWarningButtonStyle(okButton);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
@@ -247,11 +245,10 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         case Scenario::LocalOwner:
         {
             q->setIcon(QnMessageBoxIcon::Question);
-            q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+            q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
-                + enterPasswordMessage(),
-                false);
+                + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
             q->setDefaultButton(okButton);
@@ -260,7 +257,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         case Scenario::CloudOwner:
         {
             q->setIcon(QnMessageBoxIcon::Question);
-            q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+            q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
                 + disconnectWarnMessage()
@@ -301,9 +298,16 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
     return authorizePasswordField->validate();
 }
 
+QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
+{
+    return tr("Disconnect the System from %1?",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+}
+
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All %1 users and features will be disabled.").arg(QnAppInfo::cloudName());
+    return tr("All cloud features will be disabled, cloud users will be deleted from the System.")
+        .arg(QnAppInfo::cloudName());
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
@@ -374,7 +378,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
         tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.",
-            "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+            "%1 is name of cloud (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
@@ -405,7 +409,7 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
     Q_Q(QnDisconnectFromCloudDialog);
 
     q->setIcon(QnMessageBoxIcon::Question);
-    q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+    q->setText(disconnectQuestionMessage());
     q->setInformativeText(allUsersDisabledMessage()
         + L'\n'
         + disconnectWarnMessage());
