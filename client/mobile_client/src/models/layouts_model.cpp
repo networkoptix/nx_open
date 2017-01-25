@@ -111,6 +111,8 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     auto updateCamerasCount = [this, camerasWatcher]()
     {
         m_allCamerasCount = camerasWatcher->availableCameras().size();
+        const auto idx = index(0);
+        emit dataChanged(idx, idx, QVector<int>{ItemsCountRole});
     };
     connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraAdded,
             this, updateCamerasCount);
