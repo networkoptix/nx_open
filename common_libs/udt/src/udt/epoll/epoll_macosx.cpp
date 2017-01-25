@@ -7,6 +7,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+static const int USER_EVENT_IDENT = 11;
+
 EpollMacosx::EpollMacosx():
     m_kqueueFd(-1)
 {
@@ -90,8 +92,8 @@ int EpollMacosx::poll(
     if (isTimeoutSpecified)
     {
         const auto fullSeconds = duration_cast<seconds>(timeout);
-        timeout.tv_sec = fullSeconds.count();
-        timeout.tv_nsec = duration_cast<nanoseconds>(timeout - fullSeconds).count();
+        systemTimeout.tv_sec = fullSeconds.count();
+        systemTimeout.tv_nsec = duration_cast<nanoseconds>(timeout - fullSeconds).count();
     }
 
     const int nfds = kevent(
