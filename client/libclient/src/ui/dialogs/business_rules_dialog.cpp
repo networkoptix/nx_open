@@ -411,10 +411,10 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
         switch (change)
         {
             case RulesLoaded:
-                QnMessageBox::_critical(this, tr("Failed to retrieve rules"));
+                QnMessageBox::critical(this, tr("Failed to retrieve rules"));
                 break;
             case RuleSaved:
-                QnMessageBox::_critical(this, tr("Failed to save rule"));
+                QnMessageBox::critical(this, tr("Failed to save rule"));
                 break;
         }
         return;
@@ -434,7 +434,7 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
 
     if(errorCode != ec2::ErrorCode::ok)
     {
-        QnMessageBox::_critical(this, ec2::toString(errorCode));
+        QnMessageBox::critical(this, ec2::toString(errorCode));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
@@ -492,7 +492,7 @@ bool QnBusinessRulesDialog::saveAll()
     if (!invalid_modified.isEmpty())
     {
         const QDialogButtonBox::StandardButton btn =
-            QnMessageBox::_warning(this,
+            QnMessageBox::warning(this,
                 tr("Some rules are not valid. Disable them?"), QString(),
                 QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
                 QDialogButtonBox::Yes);
@@ -590,7 +590,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     if (!hasChanges)
         return true;
 
-    const auto result = QnMessageBox::_question(this,
+    const auto result = QnMessageBox::question(this,
         tr("Apply changes before exit?"), QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
         QDialogButtonBox::Apply);

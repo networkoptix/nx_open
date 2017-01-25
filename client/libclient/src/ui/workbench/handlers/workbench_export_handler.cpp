@@ -148,7 +148,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename)
 {
     if (m_filesIsUse.contains(filename))
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("File already used for recording"),
             QFileInfo(filename).completeBaseName()
                 + L'\n' + tr("Please choose another name or wait until recording is finished."));
@@ -658,7 +658,7 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
     }
     else if (!tool->errorMessage().isEmpty())
     {
-        QnMessageBox::_critical(mainWindow(),
+        QnMessageBox::critical(mainWindow(),
             tr("Failed to export Multi-Video"), tool->errorMessage());
     }
 }
@@ -685,7 +685,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
     const auto showWarning =
         [this]()
         {
-            QnMessageBox::_warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Local files not allowed for Multi-Video export"),
                 tr("Please remove all local files from the layout and try again.")
             );
@@ -887,7 +887,7 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 
     if (durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
             tr("For exporting as Rapid Review, video length should be at least 10 seconds."));
         return;
@@ -910,7 +910,7 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
 
 void QnWorkbenchExportHandler::showExportCompleteMessage()
 {
-    QnMessageBox::_success(mainWindow(), tr("Export completed"));
+    QnMessageBox::success(mainWindow(), tr("Export completed"));
 }
 
 void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QString &fileName)
@@ -932,7 +932,7 @@ void QnWorkbenchExportHandler::at_camera_exportFinished(bool success, const QStr
     }
     else if (tool->status() != StreamRecorderError::noError)
     {
-        QnMessageBox::_critical(mainWindow(),
+        QnMessageBox::critical(mainWindow(),
             tr("Failed to export video"),
             QnStreamRecorder::errorString(tool->status()));
     }

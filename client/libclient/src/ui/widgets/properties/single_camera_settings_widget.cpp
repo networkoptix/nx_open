@@ -657,7 +657,7 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
     {
         const auto extras = tr("FPS in the schedule was lowered from %1 to %2,"
             " which is the maximum for this camera.").arg(maxFps).arg(maxValidFps);
-        QnMessageBox::_warning(this, text, extras);
+        QnMessageBox::warning(this, text, extras);
         hasChanges = true;
     }
 
@@ -668,7 +668,7 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded()
             + L'\n' + tr("FPS in the schedule was lowered from %1 to %2.")
                 .arg(maxDualStreamFps).arg(maxDualStreamingValidFps);
 
-        QnMessageBox::_warning(this, text, extras);
+        QnMessageBox::warning(this, text, extras);
         hasChanges = true;
     }
 

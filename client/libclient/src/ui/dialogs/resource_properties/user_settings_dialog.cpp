@@ -314,7 +314,7 @@ QDialogButtonBox::StandardButton QnUserSettingsDialog::showConfirmationDialog()
     if (!canApplyChanges())
         return QDialogButtonBox::Cancel;
 
-    const auto result = QnMessageBox::_question(this,
+    const auto result = QnMessageBox::question(this,
         tr("Apply changes before switching to another user?"), QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
         QDialogButtonBox::Apply);

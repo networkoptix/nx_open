@@ -99,7 +99,7 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked()
     if (!context()->instance<QnAppServerNotificationCache>()->storeSound(
         fileName, cropSoundSecs * 1000, title))
     {
-        QnMessageBox::_warning(this, tr("Failed to add file"));
+        QnMessageBox::warning(this, tr("Failed to add file"));
     }
 }
 
@@ -123,7 +123,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked()
         return;
 
     if (!context()->instance<QnAppServerNotificationCache>()->updateTitle(filename, newTitle))
-        QnMessageBox::_warning(this, tr("Failed to set new title"));
+        QnMessageBox::warning(this, tr("Failed to set new title"));
 
 }
 

@@ -231,7 +231,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         {
             Q_Q(QnLoginToCloudDialog);
 
-            QnMessageBox::_critical(q, tr("Failed to login to %1").arg(QnAppInfo::cloudName()));
+            QnMessageBox::critical(q, tr("Failed to login to %1").arg(QnAppInfo::cloudName()));
             break;
         }
     }

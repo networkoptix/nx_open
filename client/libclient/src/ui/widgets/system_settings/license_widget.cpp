@@ -104,7 +104,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     connect(ui->copyHwidButton, &QPushButton::clicked, this, [this]
     {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QnMessageBox::_success(this, tr("Hardware id copied to clipboard"));
+        QnMessageBox::success(this, tr("Hardware id copied to clipboard"));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked, this, [this]
@@ -227,7 +227,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        QnMessageBox::_critical(this, tr("Failed to open file"), fileName);
+        QnMessageBox::critical(this, tr("Failed to open file"), fileName);
         return;
     }
 

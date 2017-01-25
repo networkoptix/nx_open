@@ -772,7 +772,7 @@ bool QnPtzManageDialog::askToSaveChanges(bool cancelIsAllowed /* = true*/)
     if (cancelIsAllowed)
         allowedButtons |= QDialogButtonBox::Cancel;
 
-    const auto button = QnMessageBox::_question(this,
+    const auto button = QnMessageBox::question(this,
         tr("Apply changes before exit?"), QString(),
         allowedButtons, QDialogButtonBox::Apply);
 

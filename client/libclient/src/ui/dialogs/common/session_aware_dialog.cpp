@@ -72,7 +72,7 @@ QDialogButtonBox::StandardButton QnSessionAwareTabbedDialog::showConfirmationDia
     static const auto kDelimiter = L'\n';
     const auto extraMessage = tr("Unsaved changes:") + kDelimiter + details.join(kDelimiter);
 
-    return QnMessageBox::_question(this, tr("Save changes before exit?"), extraMessage,
+    return QnMessageBox::question(this, tr("Save changes before exit?"), extraMessage,
         QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
         QDialogButtonBox::Yes);
 }

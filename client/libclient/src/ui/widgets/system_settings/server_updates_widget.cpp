@@ -449,7 +449,7 @@ void QnServerUpdatesWidget::discardChanges()
     }
     else
     {
-        QnMessageBox::_warning(this,
+        QnMessageBox::warning(this,
             tr("Update can't be canceled at this stage"),
             tr("Please wait until it's finished."));
     }
@@ -837,14 +837,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                 {
                     if (result.clientInstallerRequired)
                     {
-                        QnMessageBox::_success(this,
+                        QnMessageBox::success(this,
                             tr("Server update completed"),
                             tr("Please update %1 Client manually using an installation package.")
                                 .arg(QnAppInfo::productNameLong()));
                     }
                     else
                     {
-                        QnMessageBox::_success(this,
+                        QnMessageBox::success(this,
                             tr("Update completed"),
                             tr("%1 Client will be restarted to the updated version.")
                                 .arg(QnAppInfo::productNameLong()));
@@ -852,7 +852,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                 }
                 else
                 {
-                    QnMessageBox::_success(this, tr("Update completed"));
+                    QnMessageBox::success(this, tr("Update completed"));
                 }
 
                 bool unholdConnection = !clientUpdated || result.clientInstallerRequired || result.protocolChanged;
@@ -880,11 +880,11 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
             }
 
             case QnUpdateResult::Cancelled:
-                QnMessageBox::_information(this, tr("Update canceled"));
+                QnMessageBox::information(this, tr("Update canceled"));
                 break;
 
             case QnUpdateResult::AlreadyUpdated:
-                QnMessageBox::_information(this, tr("All Servers already updated"));
+                QnMessageBox::information(this, tr("All Servers already updated"));
                 break;
 
             case QnUpdateResult::LockFailed:
@@ -898,7 +898,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
             case QnUpdateResult::ClientInstallationFailed:
             case QnUpdateResult::InstallationFailed:
             case QnUpdateResult::RestInstallationFailed:
-                QnMessageBox::_critical(this, tr("Update failed"), result.errorMessage());
+                QnMessageBox::critical(this, tr("Update failed"), result.errorMessage());
                 break;
         }
     }

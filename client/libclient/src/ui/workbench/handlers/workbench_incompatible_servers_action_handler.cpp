@@ -47,7 +47,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QnMessageBox::_information(mainWindow(),
+        QnMessageBox::information(mainWindow(),
             tr("Systems will be merged shortly"),
             tr("Servers from the other System will appear in the resource tree."));
         return;
@@ -76,7 +76,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
         const auto message = utils::MergeSystemsStatus::getErrorMessage(
              kStatus, moduleInformation).prepend(lit("\n"));
-        QnMessageBox::_critical(mainWindow(), tr("Failed to merge Systems"), message);
+        QnMessageBox::critical(mainWindow(), tr("Failed to merge Systems"), message);
         return;
     }
 
@@ -149,17 +149,17 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::_success(mainWindow(), tr("Server connected to the System"));
+            QnMessageBox::success(mainWindow(), tr("Server connected to the System"));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
-            QnMessageBox::_critical(mainWindow(),
+            QnMessageBox::critical(mainWindow(),
                 tr("Failed to update Server"),
                 m_connectTool->updateResult().errorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::MergeFailed:
-            QnMessageBox::_critical(mainWindow(),
+            QnMessageBox::critical(mainWindow(),
                 tr("Failed to merge Systems"),
                 m_connectTool->mergeErrorMessage());
             break;
@@ -187,7 +187,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     const auto message = utils::MergeSystemsStatus::getErrorMessage(
         utils::MergeSystemsStatus::starterLicense, server->getModuleInformation());
 
-    const auto result = QnMessageBox::_warning(mainWindow(),
+    const auto result = QnMessageBox::warning(mainWindow(),
         tr("Total amount of licenses will decrease"), message,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
@@ -228,7 +228,7 @@ QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 
         if (password.isEmpty())
         {
-            QnMessageBox::_warning(mainWindow(), tr("Password cannot be empty!"));
+            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty!"));
             continue;
         }
 

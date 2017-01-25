@@ -1056,7 +1056,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 {
     if (!m_licensesHelper->isValid(Qn::LC_VideoWall))
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Video Wall license required"),
             tr("To enable this feature, please activate a Video Wall license."));
         return false;
@@ -1090,12 +1090,12 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 
 void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
 {
-    QnMessageBox::_critical(mainWindow(), tr("Failed to apply changes"));
+    QnMessageBox::critical(mainWindow(), tr("Failed to apply changes"));
 }
 
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
-    QnMessageBox::_warning(mainWindow(),
+    QnMessageBox::warning(mainWindow(),
         tr("Screen controlled by another user"),
         tr("Control session can't be started."));
 }
@@ -1406,7 +1406,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
     QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
     if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0)
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Video Wall license required"),
             tr("To enable Video Wall, please activate a Video Wall license."));
         return;
@@ -1989,7 +1989,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     if (matrix.layoutByItem.isEmpty())
     {
-        QnMessageBox::_warning(mainWindow(), tr("Can't save empty matrix"));
+        QnMessageBox::warning(mainWindow(), tr("Can't save empty matrix"));
         return;
     }
 
@@ -2988,7 +2988,7 @@ bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const
     //TODO: #GDM add "Licenses" button
     if (!m_licensesHelper->isValid())
     {
-        QnMessageBox::_warning(mainWindow(), tr("More Video Wall licenses required"), detail);
+        QnMessageBox::warning(mainWindow(), tr("More Video Wall licenses required"), detail);
         return false;
     }
     return true;

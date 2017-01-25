@@ -30,7 +30,7 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
      * close to the event loop. */
     if(displayWarnings && !contextIsValid)
     {
-        QnMessageBox::_warning(nullptr,
+        QnMessageBox::warning(nullptr,
             tr("Video card drivers are outdated or not installed"),
             tr("%1 Client may not work properly.").arg(QnAppInfo::productNameLong()));
     }

@@ -1104,7 +1104,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
             cameras)
         : tr("Delete %n items?", "", resources.size()));
 
-    const auto extras = (!onlineAutoDiscoveredCameras.isEmpty()
+    const auto extras = (onlineAutoDiscoveredCameras.isEmpty()
         ? QString()
         : QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
@@ -1282,7 +1282,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
 
     if (period.durationMs < steps[1])
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
             tr("Can't perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
@@ -1474,7 +1474,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered() {
         if (dialog->state() == QnCameraAdditionDialog::Searching
             || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            const auto result = QnMessageBox::_question(mainWindow(),
+            const auto result = QnMessageBox::question(mainWindow(),
                 tr("Cancel device adding?"), QString(),
                 QDialogButtonBox::Yes | QDialogButtonBox::No,
                 QDialogButtonBox::No);
@@ -1571,7 +1571,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             continue;
 
         if (checkedFlags == Qn::user)
-            QnMessageBox::_warning(mainWindow(), tr("There is another user with the same name"));
+            QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
         else
             QnMessageBox::showAnotherVideoWallExist(mainWindow());
 
@@ -1822,7 +1822,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
         {
             const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
-            QnMessageBox::_warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Image too big"),
                 tr("Maximum size is %1 MB.").arg(maxFileSize));
             return;
@@ -1830,7 +1830,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status != QnAppServerFileCache::OperationResult::ok)
         {
-            QnMessageBox::_critical(mainWindow(), tr("Failed to upload image"));
+            QnMessageBox::critical(mainWindow(), tr("Failed to upload image"));
             return;
         }
 
@@ -2134,7 +2134,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QnMessageBox::_information(mainWindow(),
+    QnMessageBox::information(mainWindow(),
         tr("The System sends anonymous usage statistics"),
         tr("It will be used by software development team to improve your user experience.")
             + L'\n' + tr("To disable it, go to the System Administration dialog."));
@@ -2249,7 +2249,7 @@ void QnWorkbenchActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
-        QnMessageBox::_critical(mainWindow(), tr("Failed to open server web page"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to open server web page"));
 
         return;
     }

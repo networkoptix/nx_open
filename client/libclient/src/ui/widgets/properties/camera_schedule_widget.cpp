@@ -1115,7 +1115,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
 
     if (m_cameras.size() > 1)
     {
-        QnMessageBox::_warning(this,
+        QnMessageBox::warning(this,
             tr("Motion detection disabled or not supported"),
             tr("To ensure it is supported and to enable it, go to the \"Motion\" tab in Camera Settings."));
     }
@@ -1130,15 +1130,15 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target)
 
         if (hasMotion && !hasDualStreaming)
         {
-            QnMessageBox::_warning(this, tr("Dual-Streaming not supported for this camera"));
+            QnMessageBox::warning(this, tr("Dual-Streaming not supported for this camera"));
         }
         else if (!hasMotion && !hasDualStreaming)
         {
-            QnMessageBox::_warning(this, tr("Dual-Streaming and motion detection not supported for this camera"));
+            QnMessageBox::warning(this, tr("Dual-Streaming and motion detection not supported for this camera"));
         }
         else /* Has dual streaming but not motion */
         {
-            QnMessageBox::_warning(this,
+            QnMessageBox::warning(this,
                 tr("Motion detection disabled"),
                 tr("To enable or adjust it, go to the \"Motion\" tab in Camera Settings."));
         }

@@ -202,7 +202,7 @@ void QnStorageUrlDialog::accept()
 
     if (result.status() == 0 && initStatus == Qn::StorageInit_WrongAuth)
     {
-        QnMessageBox::_warning(this, tr("Invalid credentials for external storage"));
+        QnMessageBox::warning(this, tr("Invalid credentials for external storage"));
         return;
     }
 
@@ -211,7 +211,7 @@ void QnStorageUrlDialog::accept()
             && m_storage.isWritable
             && m_storage.isExternal))
     {
-        QnMessageBox::_warning(this, tr("Invalid storage path"));
+        QnMessageBox::warning(this, tr("Invalid storage path"));
         return;
     }
 

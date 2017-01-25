@@ -100,14 +100,14 @@ void QnDatabaseManagementWidget::backupDb()
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
-        QnMessageBox::_critical(this, tr("Failed to back up database"));
+        QnMessageBox::critical(this, tr("Failed to back up database"));
         return;
     }
 
     file.write(databaseData);
     file.close();
 
-    QnMessageBox::_success(this, tr("Database backed up to file"), fileName);
+    QnMessageBox::success(this, tr("Database backed up to file"), fileName);
 }
 
 void QnDatabaseManagementWidget::restoreDb()
@@ -131,11 +131,11 @@ void QnDatabaseManagementWidget::restoreDb()
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
-        QnMessageBox::_critical(this, tr("Failed to open file"), fileName);
+        QnMessageBox::critical(this, tr("Failed to open file"), fileName);
         return;
     }
 
-    const auto button = QnMessageBox::_question(this,
+    const auto button = QnMessageBox::question(this,
         tr("Restore database?"),
         tr("The System configuration will be restored from backup,"
            " Server application will be restarted."),
@@ -169,7 +169,7 @@ void QnDatabaseManagementWidget::restoreDb()
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     if (!conn)
     {
-        QnMessageBox::_critical(this, tr("You need to connect to a server prior to backup start."));
+        QnMessageBox::critical(this, tr("You need to connect to a server prior to backup start."));
         return;
     }
 
@@ -180,7 +180,7 @@ void QnDatabaseManagementWidget::restoreDb()
 
     if (errorCode == ec2::ErrorCode::ok)
     {
-        QnMessageBox::_success(this,
+        QnMessageBox::success(this,
             tr("Database successfully restored"),
             tr("Server application will restart shortly."));
     }
@@ -191,7 +191,7 @@ void QnDatabaseManagementWidget::restoreDb()
             .arg(ec2::toString(errorCode)),
             cl_logERROR);
 
-        QnMessageBox::_critical(this, tr("Failed to restore database"));
+        QnMessageBox::critical(this, tr("Failed to restore database"));
     }
 }
 

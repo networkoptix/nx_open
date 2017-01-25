@@ -63,7 +63,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
         QnWebPageResourcePtr webPage(new QnWebPageResource(url));
         if (qnResPool->getResourceById(webPage->getId()))
         {
-            QnMessageBox::_warning(mainWindow(), tr("This Web Page already exists"));
+            QnMessageBox::warning(mainWindow(), tr("This Web Page already exists"));
             continue;
         }
 

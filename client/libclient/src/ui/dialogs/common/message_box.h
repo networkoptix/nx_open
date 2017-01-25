@@ -35,7 +35,6 @@ enum class QnMessageBoxCustomButton
     Overwrite,                  //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
     Delete,                     //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
     Reset,                      //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
-
     Skip,                       //< QDialogButtonBox::RejectRole / QnButtonAccent::NoAccent
 };
 
@@ -53,13 +52,6 @@ public:
     };
 
 public: // TODO: #ynikitenkov Move to distinct class
-    static QDialogButtonBox::StandardButton showCustomDialog(
-        QWidget* parent,
-        QnMessageBoxIcon icon,
-        QnMessageBoxCustomButton yesCustomButon,
-        const QString& text,
-        const QString& extras);
-
     static bool overwriteFileQuestion(
         QWidget* parent,
         const QString& fileName);
@@ -82,8 +74,8 @@ public: // TODO: #ynikitenkov Move to distinct class
 
 public:
     QnMessageBox(
-        QWidget* parent = nullptr,
-        Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        QWidget* parent = nullptr
+        , Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     QnMessageBox(
         QnMessageBoxIcon icon,
@@ -91,38 +83,37 @@ public:
         const QString& extras,
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton,
-        QWidget* parent = nullptr,
-        Qt::WindowFlags flags = Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        QWidget* parent = nullptr);
 
-    static QDialogButtonBox::StandardButton _information(
+    static QDialogButtonBox::StandardButton information(
         QWidget* parent,
         const QString& text,
         const QString& extras = QString(),
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
-    static QDialogButtonBox::StandardButton _warning(
+    static QDialogButtonBox::StandardButton warning(
         QWidget* parent,
         const QString& text,
         const QString& extras = QString(),
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
-    static QDialogButtonBox::StandardButton _question(
+    static QDialogButtonBox::StandardButton question(
         QWidget* parent,
         const QString& text,
         const QString& extras = QString(),
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
-    static QDialogButtonBox::StandardButton _critical(
+    static QDialogButtonBox::StandardButton critical(
         QWidget* parent,
         const QString& text,
         const QString& extras = QString(),
         QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok,
         QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton);
 
-    static QDialogButtonBox::StandardButton _success(
+    static QDialogButtonBox::StandardButton success(
         QWidget* parent,
         const QString& text,
         const QString& extras = QString(),

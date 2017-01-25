@@ -531,9 +531,9 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
 
     if (!license || (errorCode != ec2::ErrorCode::ok))
-        QnMessageBox::_critical(this, networkErrorText(), networkErrorExtras());
+        QnMessageBox::critical(this, networkErrorText(), networkErrorExtras());
     else if (license)
-        QnMessageBox::_success(this, tr("License activated"));
+        QnMessageBox::success(this, tr("License activated"));
 
     if (!licenses.isEmpty())
     {

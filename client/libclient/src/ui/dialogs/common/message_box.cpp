@@ -169,8 +169,8 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
 }
 
 QnMessageBox::QnMessageBox(
-    QWidget* parent,
-    Qt::WindowFlags flags)
+    QWidget* parent
+    , Qt::WindowFlags flags)
     :
     base_type(parent, flags),
     ui(new Ui::MessageBox),
@@ -186,10 +186,9 @@ QnMessageBox::QnMessageBox(
     const QString& extras,
     QDialogButtonBox::StandardButtons buttons,
     QDialogButtonBox::StandardButton defaultButton,
-    QWidget* parent,
-    Qt::WindowFlags flags)
+    QWidget* parent)
     :
-    base_type(parent, flags),
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
@@ -230,7 +229,7 @@ QDialogButtonBox::StandardButton QnMessageBox::execute(
     return static_cast<QDialogButtonBox::StandardButton>(msgBox.exec());
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::_information(
+QDialogButtonBox::StandardButton QnMessageBox::information(
     QWidget* parent,
     const QString& text,
     const QString& extras,
@@ -240,7 +239,7 @@ QDialogButtonBox::StandardButton QnMessageBox::_information(
     return execute(parent, QnMessageBoxIcon::Information, text, extras, buttons, defaultButton);
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::_warning(
+QDialogButtonBox::StandardButton QnMessageBox::warning(
     QWidget* parent,
     const QString& text,
     const QString& extras,
@@ -250,7 +249,7 @@ QDialogButtonBox::StandardButton QnMessageBox::_warning(
     return execute(parent, QnMessageBoxIcon::Warning, text, extras, buttons, defaultButton);
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::_question(
+QDialogButtonBox::StandardButton QnMessageBox::question(
     QWidget* parent,
     const QString& text,
     const QString& extras,
@@ -260,7 +259,7 @@ QDialogButtonBox::StandardButton QnMessageBox::_question(
     return execute(parent, QnMessageBoxIcon::Question, text, extras, buttons, defaultButton);
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::_critical(
+QDialogButtonBox::StandardButton QnMessageBox::critical(
     QWidget* parent,
     const QString& text,
     const QString& extras,
@@ -270,7 +269,7 @@ QDialogButtonBox::StandardButton QnMessageBox::_critical(
     return execute(parent, QnMessageBoxIcon::Critical, text, extras, buttons, defaultButton);
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::_success(
+QDialogButtonBox::StandardButton QnMessageBox::success(
     QWidget* parent,
     const QString& text,
     const QString& extras,
@@ -798,7 +797,7 @@ void QnMessageBox::showFailedToOverwriteMessage(
     QWidget* parent,
     const QString& fileName)
 {
-    QnMessageBox::_critical(parent, tr("Failed to overwrite file"), fileName);
+    QnMessageBox::critical(parent, tr("Failed to overwrite file"), fileName);
 }
 
 void QnMessageBox::showFailedToGetPosition(
@@ -808,7 +807,7 @@ void QnMessageBox::showFailedToGetPosition(
     const auto extras =
         tr("Can't get the current position from camera \"%1\"").arg(cameraName)
         + L'\n' + tr("Please wait for the camera to go online.");
-    QnMessageBox::_critical(parent, tr("Failed to get current position"), extras);
+    QnMessageBox::critical(parent, tr("Failed to get current position"), extras);
 
 }
 
@@ -819,19 +818,19 @@ void QnMessageBox::showFailedToSetPosition(
     const auto extras =
         tr("Can't set the current position for camera \"%1\"").arg(cameraName)
         + L'\n' + tr("Please wait for the camera to go online.");
-    QnMessageBox::_critical(parent, tr("Failed to set current position"), extras);
+    QnMessageBox::critical(parent, tr("Failed to set current position"), extras);
 
 }
 
 void QnMessageBox::showFailedRestartClient(QWidget* parent)
 {
-    QnMessageBox::_critical(parent,
+    QnMessageBox::critical(parent,
         tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
         tr("Please close the application and start it again using the shortcut in the start menu."));
 }
 
 void QnMessageBox::showAnotherVideoWallExist(QWidget* parent)
 {
-    QnMessageBox::_warning(parent, tr("There is another Video Wall with the same name"));
+    QnMessageBox::warning(parent, tr("There is another Video Wall with the same name"));
 }
 

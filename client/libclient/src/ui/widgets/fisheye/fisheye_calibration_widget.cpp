@@ -152,12 +152,12 @@ void QnFisheyeCalibrationWidget::at_image_animationFinished()
     switch (m_lastError)
     {
         case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-            QnMessageBox::_critical(this,
+            QnMessageBox::critical(this,
                 tr("Auto calibration failed"), tr("Image is not round."));
             break;
 
         case QnFisheyeCalibrator::ErrorTooLowLight:
-            QnMessageBox::_critical(this,
+            QnMessageBox::critical(this,
                 tr("Auto calibration failed"), tr("Image might be too dim."));
             break;
 

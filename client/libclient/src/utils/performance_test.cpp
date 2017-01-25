@@ -67,6 +67,6 @@ void QnPerformanceTest::detectLightMode() {
         extras += L'\n' + QCoreApplication::translate("QnPerformanceTest",
             "For full - featured mode, please use another computer");
 
-        QnMessageBox::_warning(nullptr, text, extras);
+        QnMessageBox::warning(nullptr, text, extras);
     }
 }

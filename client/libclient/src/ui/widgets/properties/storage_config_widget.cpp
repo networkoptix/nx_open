@@ -712,7 +712,7 @@ void QnStorageConfigWidget::startRebuid(bool isMain)
         + L'\n' +tr("You can cancel this operation at any moment without data loss.")
         + L'\n' +tr("Continue anyway?");
 
-    const auto warnResult = QnMessageBox::_warning(this,
+    const auto warnResult = QnMessageBox::warning(this,
         tr("Hard disk load will increase significantly"), extras,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
@@ -1115,7 +1115,7 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished(const QnMediaServerR
             ? tr("Archive reindexing completed")
             : tr("Backup reindexing completed"));
 
-        QnMessageBox::_success(this, text);
+        QnMessageBox::success(this, text);
     }
 
     storagePool.rebuildCancelled = false;
@@ -1135,7 +1135,7 @@ void QnStorageConfigWidget::at_serverBackupFinished(const QnMediaServerResourceP
         return;
     }
 
-    QnMessageBox::_success(this, tr("Backup completed"));
+    QnMessageBox::success(this, tr("Backup completed"));
 }
 
 void QnStorageConfigWidget::invokeBackupSettings()

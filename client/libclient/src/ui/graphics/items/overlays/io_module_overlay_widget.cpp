@@ -326,7 +326,7 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
                 ? tr("Failed to turn off I/O port %1")
                 : tr("Failed to turn on I/O port %1");
 
-            QnMessageBox::_warning(nullptr, message.arg(portName));
+            QnMessageBox::warning(nullptr, message.arg(portName));
         }
     }
 }

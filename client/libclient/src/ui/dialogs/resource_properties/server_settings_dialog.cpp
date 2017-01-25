@@ -136,7 +136,7 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
 {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    const auto result = QnMessageBox::_question(this,
+    const auto result = QnMessageBox::question(this,
         tr("Apply changes before switching to another server?"),
         QString(),
         QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,

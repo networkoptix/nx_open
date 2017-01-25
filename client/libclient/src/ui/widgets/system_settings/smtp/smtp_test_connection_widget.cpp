@@ -85,7 +85,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
     if (!result.isValid())
     {
-        QnMessageBox::_warning(this, tr("Invalid parameters"), tr("Can't perform the test."));
+        QnMessageBox::warning(this, tr("Invalid parameters"), tr("Can't perform the test."));
         return false;
     }
 
@@ -102,7 +102,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
     if (!serverConnection)
     {
-        QnMessageBox::_warning(this,
+        QnMessageBox::warning(this,
             tr("No Servers connected to internet"), tr("Can't perform the test."));
         return false;
     }

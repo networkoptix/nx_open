@@ -134,16 +134,16 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
     switch (result)
     {
         case Qn::UnauthorizedConnectionResult:
-            QnMessageBox::_warning(parentWidget, tr("Incorrect username or password"));
+            QnMessageBox::warning(parentWidget, tr("Incorrect username or password"));
             break;
         case Qn::LdapTemporaryUnauthorizedConnectionResult:
-            QnMessageBox::_critical(parentWidget,
+            QnMessageBox::critical(parentWidget,
                 kFailedToConnectText,
                 ldapServerTimeoutMessage() + L'\n'
                     + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
-            QnMessageBox::_critical(parentWidget,
+            QnMessageBox::critical(parentWidget,
                 kFailedToConnectText,
                 tr("Connection to %1 is not established.",
                     "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
@@ -151,31 +151,31 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::ForbiddenConnectionResult:
-            QnMessageBox::_warning(parentWidget,
+            QnMessageBox::warning(parentWidget,
                 tr("Operation is not permitted now"),
                 tr("It could happen due to media server is restarting now. Please try again later.")
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::NetworkErrorConnectionResult:
-            QnMessageBox::_critical(parentWidget,
+            QnMessageBox::critical(parentWidget,
                 kFailedToConnectText,
                 tr("Please check access credentials and try again.")
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::IncompatibleCloudHostConnectionResult:
-            QnMessageBox::_warning(parentWidget,
+            QnMessageBox::warning(parentWidget,
                 tr("Incompatible Server"));
             break;
         case Qn::IncompatibleVersionConnectionResult:
-            QnMessageBox::_critical(parentWidget,
+            QnMessageBox::critical(parentWidget,
                 getDiffVersionsText(),
                 getDiffVersionsExtra(qnCommon->engineVersion().toString(), serverVersion) + L'\n'
                     + tr("Compatibility mode for versions lower than %1 is not supported.")
                         .arg(QnConnectionValidator::minSupportedVersion().toString()));
             break;
         case Qn::IncompatibleProtocolConnectionResult:
-            QnMessageBox::_warning(parentWidget,
+            QnMessageBox::warning(parentWidget,
                 QString(),
                 getDiffVersionsFullText(qnCommon->engineVersion().toString(), serverVersion)
                     + L'\n' + tr("Restart %1 Client in compatibility mode "
@@ -228,7 +228,7 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
 
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidget* parentWidget)
 {
-    QnMessageBox::_critical(parentWidget,
+    QnMessageBox::critical(parentWidget,
         tr("Failed to restart %1 Client in compatibility mode")
             .arg(QnAppInfo::productNameLong()),
         tr("Please close %1 Client and start it again using the shortcut in the start menu.")

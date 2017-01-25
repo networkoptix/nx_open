@@ -272,7 +272,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
     linkedSuccessfully = true;
     q->accept();
 
-    QnMessageBox::_success(q->parentWidget(),
+    QnMessageBox::success(q->parentWidget(),
         tr("The System connected to %1").arg(QnAppInfo::cloudName()));
 }
 
@@ -280,7 +280,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnConnectToCloudDialog);
 
-    QnMessageBox::_critical(q,
+    QnMessageBox::critical(q,
         tr("Failed to connect the System to %1").arg(QnAppInfo::cloudName()),
         message);
 

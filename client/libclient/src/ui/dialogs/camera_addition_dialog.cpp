@@ -337,7 +337,7 @@ bool QnCameraAdditionDialog::ensureServerOnline()
     if (serverOnline())
         return true;
 
-    QnMessageBox::_critical(this, tr("Server offline"),
+    QnMessageBox::critical(this, tr("Server offline"),
         tr("Device adding is possible for online servers only."));
     return false;
 }
@@ -554,7 +554,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
 
     if (camerasToAdd.empty())
     {
-        QnMessageBox::_information(this,
+        QnMessageBox::information(this,
             tr("No devices selected."), tr("Please select at least one device"));
         return;
     }
@@ -577,7 +577,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         if(result.status() == 0)
         {
             removeAddedCameras();
-            QnMessageBox::_success(this,
+            QnMessageBox::success(this,
                 tr("%n devices added.", "", camerasToAdd.size()),
                 tr("It might take them a few moments to appear."));
         }
@@ -588,7 +588,7 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
                 setState(CamerasOffline);
                 return;
             }
-            QnMessageBox::_critical(this, tr("Failed to add %n devices", "", camerasToAdd.size()));
+            QnMessageBox::critical(this, tr("Failed to add %n devices", "", camerasToAdd.size()));
         }
     }
     setState(CamerasFound);
@@ -679,7 +679,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QnMessageBox::_critical(this, tr("Device search failed"));
+        QnMessageBox::critical(this, tr("Device search failed"));
         return;
     }
 
@@ -716,12 +716,12 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         {
             setState(CamerasFound);
             if (newCameras == 0)
-                QnMessageBox::_information(this, tr("Selected devices already added"));
+                QnMessageBox::information(this, tr("Selected devices already added"));
         }
         else
         {
             setState(Initial);
-            QnMessageBox::_warning(this, tr("No devices found"));
+            QnMessageBox::warning(this, tr("No devices found"));
         }
         m_processUuid = QnUuid();
     }

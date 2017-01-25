@@ -320,7 +320,7 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QnMessageBox::_success(mainWindow(),
+    QnMessageBox::success(mainWindow(),
         lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
@@ -507,7 +507,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     {
         hideProgress();
 
-        QnMessageBox::_critical(mainWindow(), tr("Failed to save screenshot"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to save screenshot"));
         return;
     }
 
@@ -600,7 +600,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
     if (!imageProvider)
     {
-        QnMessageBox::_critical(mainWindow(), tr("Failed to take screenshot"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to take screenshot"));
         return;
     }
 

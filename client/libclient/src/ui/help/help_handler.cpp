@@ -90,7 +90,7 @@ QUrl QnHelpHandler::urlForTopic(int topic) const {
     if (!m_onlineHelpRoot.isEmpty())
         return QUrl(m_onlineHelpRoot + lit("/") + topicPath);
 
-    QnMessageBox::_critical(nullptr, tr("Help page not found"));
+    QnMessageBox::critical(nullptr, tr("Help page not found"));
 
     return QUrl();
 }

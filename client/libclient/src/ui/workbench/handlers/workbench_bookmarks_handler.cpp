@@ -147,7 +147,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online)
         {
-            QnMessageBox::_warning(mainWindow(),
+            QnMessageBox::warning(mainWindow(),
                 tr("Server offline"),
                 tr("Bookmarks can only be added to an online server."));
             return;
@@ -189,7 +189,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
     {
-        QnMessageBox::_warning(mainWindow(),
+        QnMessageBox::warning(mainWindow(),
             tr("Server offline"),
             tr("Bookmarks can only be edited on an online Server."));
         return;

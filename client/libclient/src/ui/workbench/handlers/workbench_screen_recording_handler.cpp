@@ -324,5 +324,5 @@ void QnWorkbenchScreenRecordingHandler::onError(const QString& reason)
 {
     stopRecording();
 
-    QnMessageBox::_critical(mainWindow(), tr("Failed to start recording"), reason);
+    QnMessageBox::critical(mainWindow(), tr("Failed to start recording"), reason);
 }

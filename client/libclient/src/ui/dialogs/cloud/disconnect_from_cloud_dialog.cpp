@@ -214,7 +214,7 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnDisconnectFromCloudDialog);
 
-    QnMessageBox::_critical(q,
+    QnMessageBox::critical(q,
         tr("Failed to disconnect the System from %1").arg(QnAppInfo::cloudName()),
         message);
 

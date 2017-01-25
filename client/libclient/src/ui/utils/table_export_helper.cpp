@@ -49,7 +49,7 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
             const auto extras = QFileInfo(fileName).completeBaseName() + L'\n'
                 + tr("Close all programs which may use this file and try again");
 
-            QnMessageBox::_warning(parent, tr("File used by another process"), extras);
+            QnMessageBox::warning(parent, tr("File used by another process"), extras);
             continue;
         }
 
