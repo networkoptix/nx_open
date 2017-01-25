@@ -18,6 +18,8 @@ public:
     bool isEmpty() const;
 
     bool operator==(const QnEncodedString& value) const;
+    bool operator!=(const QnEncodedString& value) const;
+
 private:
     QString m_value;
 };

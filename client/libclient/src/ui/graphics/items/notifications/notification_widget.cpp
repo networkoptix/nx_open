@@ -183,16 +183,12 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
     m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
     m_closeButton->setVisible(false);
-    connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
+    connect(m_closeButton, &QnImageButtonWidget::clicked, this, &QnNotificationWidget::closeTriggered);
 
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    m_textLabel->setOpenExternalLinks(true);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
-    connect(m_textLabel, &QnProxyLabel::linkHovered, this, [this](const QString& link)
-        {
-            qDebug() << "link " << link << "was hovered";
-        });
+    connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, [this](const QString& link)
         {
             qDebug() << "link " << link << "was activated";

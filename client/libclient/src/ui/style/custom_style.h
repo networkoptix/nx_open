@@ -12,6 +12,7 @@ void setWarningStyle(QPalette *palette);
 QString setWarningStyleHtml(const QString &source);
 
 void setAccentStyle(QAbstractButton* button, bool accent = true);
+void setWarningButtonStyle(QAbstractButton* button, bool value = true);
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape);
 
