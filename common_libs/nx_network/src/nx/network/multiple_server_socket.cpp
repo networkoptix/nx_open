@@ -345,7 +345,7 @@ bool MultipleServerSocket::addSocket(
             {
                 ServerSocketHandle& source = m_serverSockets.back();
                 source.isAccepting = true;
-                DEBUG_LOG(lm("Accept on source(%1) when added").arg(&source));
+                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(

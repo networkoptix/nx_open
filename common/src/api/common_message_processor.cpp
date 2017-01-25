@@ -84,7 +84,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     // Use direct connect for persistent transactions
 
-#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&, const QnUuid&)>(&QnCommonMessageProcessor::updateResource)
+#define on_resourceUpdated(Type) static_cast<void (QnCommonMessageProcessor::*)(const Type&, ec2::NotificationSource)>(&QnCommonMessageProcessor::updateResource)
 
     connect(connection, &ec2::AbstractECConnection::remotePeerFound,                this, &QnCommonMessageProcessor::on_remotePeerFound);
     connect(connection, &ec2::AbstractECConnection::remotePeerLost,                 this, &QnCommonMessageProcessor::on_remotePeerLost);
@@ -433,7 +433,7 @@ void QnCommonMessageProcessor::updateResources(
 {
     for (const auto& resource: resList)
     {
-        updateResource(resource, qnCommon->remoteGUID());
+        updateResource(resource, ec2::NotificationSource::Remote);
         remoteResources.remove(resource.id);
     }
 }
@@ -644,17 +644,17 @@ QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() c
     return m_rules;
 }
 
-void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, const QnUuid& )
+void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)
 {
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
 {
     QnUserResourcePtr qnUser(fromApiToResource(user));
-    updateResource(qnUser, peerId);
+    updateResource(qnUser, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
 {
     QnLayoutResourcePtr qnLayout(new QnLayoutResource());
     if (!layout.url.isEmpty())
@@ -668,24 +668,24 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
     {
         fromApiToResource(layout, qnLayout);
     }
-    updateResource(qnLayout, peerId);
+    updateResource(qnLayout, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
 {
     QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
     fromApiToResource(videowall, qnVideowall);
-    updateResource(qnVideowall, peerId);
+    updateResource(qnVideowall, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
 {
     QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
     fromApiToResource(webpage, qnWebpage);
-    updateResource(qnWebpage, peerId);
+    updateResource(qnWebpage, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, ec2::NotificationSource source)
 {
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
@@ -699,18 +699,18 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 
-        updateResource(qnCamera, peerId);
+        updateResource(qnCamera, source);
     }
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source)
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
     fromApiToResource(server, qnServer);
-    updateResource(qnServer, peerId);
+    updateResource(qnServer, source);
 }
 
-void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, const QnUuid& peerId)
+void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source)
 {
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
     NX_ASSERT(!resTypeId.isNull(), Q_FUNC_INFO, "Invalid resource type pool state");
@@ -724,6 +724,6 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     if (qnStorage)
     {
         fromApiToResource(storage, qnStorage);
-        updateResource(qnStorage, peerId);
+        updateResource(qnStorage, source);
     }
 }

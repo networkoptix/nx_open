@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <network/module_finder.h>
 #include <network/direct_module_finder.h>
 #include <network/direct_module_finder_helper.h>
@@ -62,7 +64,7 @@ public:
 
                     for (const auto& url: data.urls)
                     {
-                        if (address == SocketAddress(url))
+                        if (address == nx::network::url::getEndpoint(url))
                             return true;
                     }
 

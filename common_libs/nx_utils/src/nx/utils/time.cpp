@@ -1,5 +1,8 @@
 #include "time.h"
 
+#include <QtCore/QDateTime>
+#include <QtCore/QTimeZone>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/unused.h>
 
@@ -17,26 +20,15 @@ namespace utils {
 
 namespace {
 
-static std::chrono::milliseconds utcTimeShift(0);
-static std::chrono::milliseconds monotonicTimeShift(0);
+static milliseconds utcTimeShift(0);
+static milliseconds monotonicTimeShift(0);
 
-} // namespace
-
-std::chrono::system_clock::time_point utcTime()
-{
-    return system_clock::now() + utcTimeShift;
-}
-
-std::chrono::seconds timeSinceEpoch()
-{
-    return duration_cast<seconds>(utcTime().time_since_epoch());
-}
-
-std::chrono::steady_clock::time_point monotonicTime()
-{
-    return steady_clock::now() + monotonicTimeShift;
-}
-
+/**
+ * On Linux, get filename of a file which is used to set system time zone.
+ * @param timeZoneId IANA id of a time zone.
+ * @return On Linux - time zone file name, or a null string if time zone id is not valid; on
+ *     other platforms - an empty string.
+ */
 QString getTimeZoneFile(const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
@@ -50,13 +42,32 @@ QString getTimeZoneFile(const QString& timeZoneId)
     #endif
 }
 
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+
+system_clock::time_point utcTime()
+{
+    return system_clock::now() + utcTimeShift;
+}
+
+seconds timeSinceEpoch()
+{
+    return duration_cast<seconds>(utcTime().time_since_epoch());
+}
+
+steady_clock::time_point monotonicTime()
+{
+    return steady_clock::now() + monotonicTimeShift;
+}
+
 bool setTimeZone(const QString& timeZoneId)
 {
     #if defined(Q_OS_LINUX)
         const QString& timeZoneFile = getTimeZoneFile(timeZoneId);
         if (timeZoneFile.isNull())
         {
-            NX_LOG(lit("setTimeZone(): Invalid time zone id %1").arg(timeZoneId), cl_logERROR);
+            NX_LOG(lit("setTimeZone(): Unsupported time zone id %1").arg(timeZoneId), cl_logERROR);
             return false;
         }
 
@@ -89,6 +100,42 @@ bool setTimeZone(const QString& timeZoneId)
         QN_UNUSED(timeZoneId);
         return false;
     #endif
+}
+
+QStringList getSupportedTimeZoneIds()
+{
+    QStringList result;
+
+    for (const QByteArray& timeZoneId: QTimeZone::availableTimeZoneIds())
+    {
+        if (getTimeZoneFile(timeZoneId).isNull())
+            continue;
+
+        result.append(QString::fromLatin1(timeZoneId));
+    }
+
+    return result;
+}
+
+QString getCurrentTimeZoneId()
+{
+    const QString id = QDateTime::currentDateTime().timeZone().id();
+
+    // For certain values, return the equivalent known to be in the list of supported ids.
+    if (id == "Etc/UTC" ||
+        id == "Etc/GMT" ||
+        id == "Etc/GMT0" ||
+        id == "Etc/GMT-0" ||
+        id == "Etc/GMT+0" ||
+        id == "Etc/Greenwich" ||
+        id == "Etc/UCT" ||
+        id == "Etc/Universal" ||
+        id == "Etc/Zulu")
+    {
+        return "UTC";
+    }
+
+    return id;
 }
 
 bool setDateTime(qint64 millisecondsSinceEpoch)
@@ -136,5 +183,6 @@ void ScopedTimeShift::shiftCurrentTime(ClockType clockType, milliseconds diff)
 }
 
 } // namespace test
+
 } // namespace utils
 } // namespace nx

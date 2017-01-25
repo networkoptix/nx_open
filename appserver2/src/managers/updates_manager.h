@@ -13,9 +13,9 @@ namespace ec2 {
     public:
         QnUpdatesNotificationManager();
 
-        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction);
-        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction);
-        void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
+        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction, NotificationSource source);
 
     private:
         void at_transactionProcessed(const QnAbstractTransaction &transaction);

@@ -15,13 +15,16 @@ enum class CloudConnectVersion
     /** Used when cloudConnectionVersion attribute is missing in message */
     initial = 1,
     /** #CLOUD-398 */
-    tryingEveryAddressOfPeer
+    tryingEveryAddressOfPeer,
+    /** #CLOUD-824 */
+    serverChecksOwnState,
+
 };
 
 constexpr const CloudConnectVersion kDefaultCloudConnectVersion =
     CloudConnectVersion::initial;
 constexpr const CloudConnectVersion kCurrentCloudConnectVersion = 
-    CloudConnectVersion::tryingEveryAddressOfPeer;
+    CloudConnectVersion::serverChecksOwnState;
 
 }   //namespace api
 }   //namespace hpm
