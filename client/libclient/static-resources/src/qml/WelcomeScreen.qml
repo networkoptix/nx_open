@@ -1,6 +1,6 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 import com.networkoptix.qml 1.0;
 
 import "."
@@ -196,7 +196,7 @@ Rectangle
 
                     sourceComponent: Component
                     {
-                        QnFilteringSystemsModel
+                        FilteringSystemsModel
                         {
                             filterCaseSensitivity: Qt.CaseInsensitive;
                             filterRole: 257;    // Search text role

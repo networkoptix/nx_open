@@ -95,10 +95,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-        QnCredentials defaultCreds;
-        defaultCreds.user = kDefaultIsdUsername;
-        defaultCreds.password = kDefaultIsdPassword;
-        possibleCreds << defaultCreds;
+        possibleCreds << QnCredentials(kDefaultIsdUsername, kDefaultIsdPassword);
 
         for (const auto& creds: possibleCreds)
         {

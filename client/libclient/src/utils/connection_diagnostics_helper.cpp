@@ -32,9 +32,9 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::LdapTemporaryUnauthorizedConnectionResult:
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
         case Qn::IncompatibleInternalConnectionResult:
-        case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::ForbiddenConnectionResult:
             return Qn::Login_Help;
+        case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
         case Qn::IncompatibleProtocolConnectionResult:
             return Qn::VersionMismatch_Help;
@@ -78,7 +78,6 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::IncompatibleInternalConnectionResult:
-    case Qn::IncompatibleCloudHostConnectionResult:
         return tr("You are trying to connect to incompatible Server.");
     case Qn::IncompatibleVersionConnectionResult:
     {
@@ -87,6 +86,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + tr("Compatibility mode for versions lower than %1 is not supported.")
             .arg(QnConnectionValidator::minSupportedVersion().toString());
     }
+    case Qn::IncompatibleCloudHostConnectionResult:
     case Qn::IncompatibleProtocolConnectionResult:
         return tr("Server has a different version:") + L'\n'
             + versionDetails

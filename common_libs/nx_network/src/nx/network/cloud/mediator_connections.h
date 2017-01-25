@@ -258,32 +258,41 @@ public:
         checkOwnState(
             [this, repeatPeriod](ResultCode code, CheckOwnStateResponse state)
             {
-                if (code != ResultCode::ok)
-                {
-                    NX_LOGX(lm("Check own state has failed: %1").str(code), cl_logDEBUG1);
-                    return client()->closeConnection(SystemError::invalidData);
-                }
+                onCheckOwnStateResponse(repeatPeriod, code, std::move(state));
+            });
+    }
 
-                if (!state.isListening)
-                {
-                    NX_LOGX(lm("This peer is not listening"), cl_logWARNING);
-                    return client()->closeConnection(SystemError::notConnected);
-                }
+private:
+    void onCheckOwnStateResponse(
+        std::chrono::milliseconds repeatPeriod,
+        ResultCode code,
+        CheckOwnStateResponse state)
+    {
+        if (code != ResultCode::ok)
+        {
+            NX_LOGX(lm("Check own state has failed: %1").str(code), cl_logDEBUG1);
+            return client()->closeConnection(SystemError::invalidData);
+        }
 
-                NX_LOGX(lm("Listening state is verified, repeat in %1")
-                    .arg(repeatPeriod), cl_logDEBUG2);
+        if (!state.isListening)
+        {
+            NX_LOGX(lm("This peer is not listening"), cl_logWARNING);
+            return client()->closeConnection(SystemError::notConnected);
+        }
 
-                // NOTE: Using shared client's timer is not the best design because start(...)
-                //     from one user might reset another's callback. Hovewer it is fine for now as
-                //     only single user monitors listening state.
-                // TODO: Modify client so it supports multiple timers.
-                client()->start(
-                    repeatPeriod,
-                    [this, guard = m_asyncGuard.sharedGuard(), repeatPeriod]()
-                    {
-                        if (auto lock = guard->lock())
-                            return monitorListeningState(repeatPeriod);
-                    });
+        NX_LOGX(lm("Listening state is verified, repeat in %1")
+            .arg(repeatPeriod), cl_logDEBUG2);
+
+        // NOTE: Using shared client's timer is not the best design because start(...)
+        //     from one user might reset another's callback. Hovewer it is fine for now as
+        //     only single user monitors listening state.
+        // TODO: Modify client so it supports multiple timers.
+        client()->start(
+            repeatPeriod,
+            [this, guard = m_asyncGuard.sharedGuard(), repeatPeriod]()
+            {
+                if (auto lock = guard->lock())
+                    return monitorListeningState(repeatPeriod);
             });
     }
 };

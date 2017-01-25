@@ -7,28 +7,15 @@
 
 namespace {
 
-static const int kUrlRole = Qt::UserRole + 1;
+const auto kRoles = QHash<int, QByteArray>{
+    {QnSystemHostsModel::UrlRole, "url"}};
 
-typedef QHash<int, QByteArray> RolesHash;
-static const RolesHash kRoles =
-{
-    {Qt::DisplayRole, "display"},
-    {kUrlRole, "url"}
-};
-
-}
+} // namespace
 
 QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
-    base_type(parent),
-    m_disconnectHelper(),
-    m_systemId(),
-    m_hosts()
+    base_type(parent)
 {
     connect(this, &QnSystemHostsModel::systemIdChanged, this, &QnSystemHostsModel::reloadHosts);
-
-    connect(this, &QnSystemHostsModel::modelReset, this, &QnSystemHostsModel::countChanged);
-    connect(this, &QnSystemHostsModel::rowsInserted, this, &QnSystemHostsModel::countChanged);
-    connect(this, &QnSystemHostsModel::rowsRemoved, this, &QnSystemHostsModel::countChanged);
 }
 
 QnSystemHostsModel::~QnSystemHostsModel()
@@ -53,25 +40,9 @@ QUrl QnSystemHostsModel::firstHost() const
     return (m_hosts.isEmpty() ? QUrl() : m_hosts.front().second);
 }
 
-bool QnSystemHostsModel::isEmpty() const
-{
-    return m_hosts.empty();
-}
-
-int QnSystemHostsModel::count() const
-{
-    return m_hosts.size();
-}
-
 int QnSystemHostsModel::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_hosts.size());
-}
-
-QVariant QnSystemHostsModel::getData(const QString& dataRole, int row)
-{
-    const auto role = kRoles.key(dataRole.toLatin1(), Qt::DisplayRole);
-    return data(index(row), role);
 }
 
 QVariant QnSystemHostsModel::data(const QModelIndex &index, int role) const
@@ -93,7 +64,7 @@ QVariant QnSystemHostsModel::data(const QModelIndex &index, int role) const
 
             return hostData.second.host();
         }
-        case kUrlRole:
+        case UrlRole:
             return hostData.second.toString();
         default:
             break;
@@ -110,7 +81,6 @@ void QnSystemHostsModel::reloadHosts()
         endResetModel();
 
         emit firstHostChanged();
-        emit isEmptyChanged();
     }
 
     m_disconnectHelper.reset(new QnDisconnectHelper());
@@ -189,10 +159,7 @@ void QnSystemHostsModel::addServer(const QnSystemDescriptionPtr &systemDescripti
     endInsertRows();
 
     if (onlineStatusChanged)
-    {
         emit firstHostChanged();
-        emit isEmptyChanged();
-    }
 }
 
 void QnSystemHostsModel::updateServerHost(const QnSystemDescriptionPtr &systemDescription
@@ -251,11 +218,7 @@ void QnSystemHostsModel::removeServerInternal(const ServerIdHostList::iterator &
     endRemoveRows();
 
     if (row == 0)
-    {
         emit firstHostChanged();
-        if (m_hosts.isEmpty())
-            emit isEmptyChanged();
-    }
 }
 
 QnSystemHostsModel::ServerIdHostList::iterator
@@ -268,7 +231,7 @@ QnSystemHostsModel::getDataIt(const QnUuid &serverId)
     });
 }
 
-RolesHash QnSystemHostsModel::roleNames() const
+QHash<int, QByteArray> QnSystemHostsModel::roleNames() const
 {
-    return kRoles;
+    return base_type::roleNames().unite(kRoles);
 }
