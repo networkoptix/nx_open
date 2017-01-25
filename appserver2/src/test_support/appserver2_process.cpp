@@ -135,7 +135,7 @@ protected:
 
     virtual void updateResource(
         const QnResourcePtr& resource,
-        const QnUuid& /*authorPeerId*/) override
+        ec2::NotificationSource /*source*/) override
     {
         m_resourcePool->addResource(resource);
     }

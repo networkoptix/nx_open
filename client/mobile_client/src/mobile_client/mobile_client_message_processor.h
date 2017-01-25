@@ -14,7 +14,7 @@ public:
 
     bool isConnected() const;
 
-    virtual void updateResource(const QnResourcePtr &resource, const QnUuid& peerId) override;
+    virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
 
 protected:
     virtual QnResourceFactory* getResourceFactory() const override;

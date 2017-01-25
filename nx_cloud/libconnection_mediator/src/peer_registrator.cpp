@@ -41,6 +41,18 @@ PeerRegistrator::PeerRegistrator(
                     std::move(message));
             } ) &&
 
+
+        dispatcher->registerRequestProcessor(
+            stun::extension::methods::checkOwnState,
+            [this](const ConnectionStrongRef& connection, stun::Message message)
+            {
+                processRequestWithOutput(
+                    &PeerRegistrator::checkOwnState,
+                    this,
+                    std::move(connection),
+                    std::move(message));
+            } ) &&
+
         dispatcher->registerRequestProcessor(
             stun::extension::methods::resolveDomain,
             [this](const ConnectionStrongRef& connection, stun::Message message)
@@ -189,10 +201,38 @@ void PeerRegistrator::listen(
 
     api::ListenResponse response;
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    response.cloudConnectVersion = hpm::api::kCurrentCloudConnectVersion;
     completionHandler(api::ResultCode::ok, std::move(response));
 
     for (auto& indication: clientBindIndications)
         connection->sendMessage(std::move(indication));
+}
+
+void PeerRegistrator::checkOwnState(
+    const ConnectionStrongRef& connection,
+    api::CheckOwnStateRequest /*requestData*/,
+    stun::Message requestMessage,
+    std::function<void(api::ResultCode, api::CheckOwnStateResponse)> completionHandler)
+{
+    MediaserverData mediaserverData;
+    nx::String errorMessage;
+    const api::ResultCode resultCode =
+        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
+    if (resultCode != api::ResultCode::ok)
+    {
+        sendErrorResponse(
+            connection,
+            requestMessage.header,
+            resultCode,
+            api::resultCodeToStunErrorCode(resultCode),
+            errorMessage);
+        return;
+    }
+
+    api::CheckOwnStateResponse response;
+    auto peer = m_listeningPeerPool->findAndLockPeerDataByHostName(mediaserverData.hostName());
+    response.isListening = peer && peer->value().isListening;
+    completionHandler(api::ResultCode::ok, std::move(response));
 }
 
 void PeerRegistrator::resolveDomain(

@@ -36,9 +36,9 @@ QnServerMessageProcessor::QnServerMessageProcessor()
 {
 }
 
-void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
+void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
 {
-    QnCommonMessageProcessor::updateResource(resource, peerId);
+    QnCommonMessageProcessor::updateResource(resource, source);
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById<QnMediaServerResource>(serverGuid());
 
     if (resource.dynamicCast<QnVirtualCameraResource>())
@@ -58,7 +58,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, con
             ec2::fromResourceToApi(ownMediaServer, ownData);
             ec2::fromResourceToApi(resource.staticCast<QnMediaServerResource>(), newData);
 
-            if (ownData != newData && peerId != qnCommon->moduleGUID())
+            if (ownData != newData && source == ec2::NotificationSource::Remote)
             {
                 // if remote peer send update for our server then ignore it and resend our own data
                 QnAppServerConnectionFactory::getConnection2()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);

@@ -269,7 +269,7 @@ class ECConnectionNotificationManager;
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated( QnBusinessEventRulePtr businessRule, const QnUuid& peerId);
+        void addedOrUpdated( QnBusinessEventRulePtr businessRule, NotificationSource source);
         void removed( QnUuid id );
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
