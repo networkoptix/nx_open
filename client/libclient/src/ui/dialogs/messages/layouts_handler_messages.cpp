@@ -20,12 +20,11 @@ QDialogButtonBox::StandardButton QnLayoutsHandlerMessages::askOverrideLayout(QWi
     messageBox.setText(tr("Overwrite existing layout?"));
     messageBox.setInformativeText(tr("There is another layout with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite);
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox._addCustomButton(QnMessageBoxCustomButton::Overwrite);
 
-    //TODO: #texts check me before review. ON REVIEW: ask me WTF
-    // check default button, accent button
-    return static_cast<QDialogButtonBox::StandardButton>(messageBox.exec());
+    return (messageBox.exec() == QDialogButtonBox::Cancel
+        ? QDialogButtonBox::Cancel
+        : QDialogButtonBox::Yes);
 }
 
 bool QnLayoutsHandlerMessages::showCompositeDialog(
@@ -135,10 +134,9 @@ bool QnLayoutsHandlerMessages::deleteSharedLayouts(QWidget* parent, const QnReso
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
+    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
 
-    return (messageBox.exec() == QDialogButtonBox::Yes);
+    return (messageBox.exec() != QDialogButtonBox::Cancel);
 }
 
 bool QnLayoutsHandlerMessages::deleteLocalLayouts(QWidget* parent,

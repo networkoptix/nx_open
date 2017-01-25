@@ -23,45 +23,20 @@ enum class QnMessageBoxIcon
     Success
 };
 
+enum class QnButtonAccent
+{
+    NoAccent,
+    Standard,
+    Warning
+};
+
 enum class QnMessageBoxCustomButton
 {
-    Overwrite,                  //< Uses QDialogButtonBox::YesRole
-    Delete,                     //< Uses QDialogButtonBox::YesRole
+    Overwrite,                  //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
+    Delete,                     //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
+    Reset,                      //< QDialogButtonBox::AcceptRole / QnButtonAccent::Warning
 
-    Reset,                      //< Uses QDialogButtonBox::YesRole
-
-    Update,                     //< Uses QDialogButtonBox::YesRole
-
-    Export,                     //< Uses QDialogButtonBox::YesRole
-
-    Download,                   //< Uses QDialogButtonBox::YesRole
-
-    Move,                       //< Uses QDialogButtonBox::YesRole
-    Skip,                       //< Uses QDialogButtonBox::NoRole
-
-    Close,                      //< Uses QDialogButtonBox::YesRole
-    Keep,                       //< Uses QDialogButtonBox::NoRole
-
-    Stop,                       //< Uses QDialogButtonBox::YesRole
-
-    TryAgain,                   //< Uses QDialogButtonBox::YesRole
-
-    CopyToClipboard,            //< Uses QDialogButtonBox::HelpRole
-
-    Restart,                    //< Uses QDialogButtonBox::YesRole
-
-    RestartNow,                 //< Uses QDialogButtonBox::YesRole
-    RestartLater,               //< Uses QDialogButtonBox::NoRole
-
-    SetRecordingToAlways,       //< Uses QDialogButtonBox::YesRole
-    EnableSecondaryStream,      //< Uses QDialogButtonBox::NoRole
-
-    AddStorage,                 //< Uses QDialogButtonBox::YesRole
-
-    ForceUpdate,                //< Uses QDialogButtonBox::YesRole
-
-    CancelUpdate,               //< Uses QDialogButtonBox::YesRole
-    ContinueInBackground,       //< Uses QDialogButtonBox::NoRole
+    Skip,                       //< QDialogButtonBox::RejectRole / QnButtonAccent::NoAccent
 };
 
 class QnMessageBox: public QnDialog
@@ -157,11 +132,18 @@ public:
 public:
     virtual ~QnMessageBox();
 
-    QAbstractButton* addCustomButton(QnMessageBoxCustomButton button);
+    QPushButton* _addCustomButton(QnMessageBoxCustomButton button);
+    QPushButton* _addCustomButton(
+        QnMessageBoxCustomButton button,
+        QDialogButtonBox::ButtonRole role,
+        QnButtonAccent accent);
 
-    void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
-    QPushButton *addButton(const QString &text, QDialogButtonBox::ButtonRole role);
-    QPushButton *addButton(QDialogButtonBox::StandardButton button);
+    void _addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
+    QPushButton* addButton(
+        const QString &text,
+        QDialogButtonBox::ButtonRole role,
+        QnButtonAccent accent);
+    QPushButton* _addButton(QDialogButtonBox::StandardButton button);
     void removeButton(QAbstractButton *button);
 
     QList<QAbstractButton *> buttons() const;

@@ -556,10 +556,10 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                         tr("These tours will become invalid."),
                         QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-                    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+                    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
                     dialog.setCheckBoxText(tr("Don't show this message again"));
 
-                    const auto result = dialog.exec();
+                    const auto cancelled = (dialog.exec() == QDialogButtonBox::Cancel);
                     if (dialog.isChecked())
                     {
                         messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
@@ -567,7 +567,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                         qnSettings->save();
                     }
 
-                    if (result == QDialogButtonBox::Cancel)
+                    if (cancelled)
                         break;
                 }
             }

@@ -625,17 +625,11 @@ void QnLoginDialog::at_saveButton_clicked()
             tr("There is an another connection with the same name."),
             QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
-        switch (dialog.exec())
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::Yes:
-                connections.removeOne(name);
-                break;
-            default:
-                break;
-        }
+        dialog._addCustomButton(QnMessageBoxCustomButton::Overwrite);
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        connections.removeOne(name);
     }
 
     const QUrl url = currentUrl();
@@ -684,11 +678,11 @@ void QnLoginDialog::at_deleteButton_clicked()
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Delete connection?"), connection.name,
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
-    if (dialog.exec() != QDialogButtonBox::Yes)
+    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     connections.removeOne(connection.name);

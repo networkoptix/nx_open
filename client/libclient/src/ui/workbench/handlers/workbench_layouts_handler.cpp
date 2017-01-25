@@ -406,8 +406,7 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
         messageBox.setIcon(QnMessageBoxIcon::Warning);
         messageBox.setText(tr("Remove %n items from layout?", "", items.size()));
         messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-        messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
         messageBox.addCustomWidget(
             new QnResourceListView(QnActionParameterTypes::resources(items), true));
         messageBox.setCheckBoxText(tr("Don't show this message again"));
@@ -419,7 +418,8 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
             qnSettings->setShowOnceMessages(messagesFilter);
             qnSettings->save();
         }
-        if (result != QDialogButtonBox::Yes)
+
+        if (result == QDialogButtonBox::Cancel)
             return;
     }
 

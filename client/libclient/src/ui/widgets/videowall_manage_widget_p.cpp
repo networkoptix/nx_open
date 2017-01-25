@@ -736,9 +736,10 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         {
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Delete \"%1\"?").arg(item->name), QString(),
-                QDialogButtonBox::Cancel, QDialogButtonBox::Yes, q_ptr);
+                QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+                q_ptr);
 
-            dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+            dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
             if (dialog.exec() == QDialogButtonBox::Cancel)
                 return;
         }

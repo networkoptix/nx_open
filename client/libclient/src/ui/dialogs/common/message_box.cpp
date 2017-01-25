@@ -280,59 +280,7 @@ QDialogButtonBox::StandardButton QnMessageBox::_success(
     return execute(parent, QnMessageBoxIcon::Success, text, extras, buttons, defaultButton);
 }
 
-///
-
-QAbstractButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
-{
-    switch (button)
-    {
-    case QnMessageBoxCustomButton::Overwrite:
-        return addButton(tr("Overwrite"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Delete:
-        return addButton(tr("Delete"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::RestartNow:
-        return addButton(tr("Restart Now"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::RestartLater:
-        return addButton(tr("Restart Later"), QDialogButtonBox::NoRole);
-    case QnMessageBoxCustomButton::AddStorage:
-        return addButton(tr("Add Storage"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::SetRecordingToAlways:
-        return addButton(tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::EnableSecondaryStream:
-        return addButton(tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
-    case QnMessageBoxCustomButton::Reset:
-        return addButton(tr("Reset"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::ForceUpdate:
-        return addButton(tr("Force Update"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Update:
-        return addButton(tr("Update..."), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Move:
-        return addButton(tr("Move"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Skip:
-        return addButton(tr("Skip"), QDialogButtonBox::NoRole);
-    case QnMessageBoxCustomButton::Export:
-        return addButton(tr("Export"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Close:
-        return addButton(tr("Close"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Keep:
-        return addButton(tr("Keep"), QDialogButtonBox::NoRole);
-    case QnMessageBoxCustomButton::Download:
-        return addButton(tr("Download"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::Stop:
-        return addButton(tr("Stop"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::TryAgain:
-        return addButton(tr("Try Again"), QDialogButtonBox::YesRole);
-    case QnMessageBoxCustomButton::CopyToClipboard:
-        return addButton(tr("Copy to Clipboard"), QDialogButtonBox::HelpRole);
-    case QnMessageBoxCustomButton::Restart:
-        return addButton(tr("Restart"), QDialogButtonBox::YesRole);
-    default:
-        NX_ASSERT(false, "Unknown custom button");
-        return nullptr;
-    }
-}
-
-void QnMessageBox::addButton(
+void QnMessageBox::_addButton(
         QAbstractButton *button,
         QDialogButtonBox::ButtonRole role)
 {
@@ -348,25 +296,65 @@ void QnMessageBox::addButton(
     d->stylizeButtons();
 }
 
-QPushButton *QnMessageBox::addButton(
-        const QString &text,
-        QDialogButtonBox::ButtonRole role)
+QPushButton* QnMessageBox::_addCustomButton(QnMessageBoxCustomButton button)
+{
+    switch (button)
+    {
+        case QnMessageBoxCustomButton::Overwrite:
+            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Delete:
+            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Reset:
+            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Skip:
+            return _addCustomButton(button, QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+        default:
+            return nullptr;
+    }
+}
+
+QPushButton* QnMessageBox::_addCustomButton(
+    QnMessageBoxCustomButton button,
+    QDialogButtonBox::ButtonRole role,
+    QnButtonAccent accent)
+{
+    QPushButton* result = nullptr;
+    switch (button)
+    {
+        case QnMessageBoxCustomButton::Overwrite:
+            return addButton(tr("Overwrite"), role, accent);
+        case QnMessageBoxCustomButton::Delete:
+            return addButton(tr("Delete"), role, accent);
+        case QnMessageBoxCustomButton::Reset:
+            return addButton(tr("Reset"), role, accent);
+        case QnMessageBoxCustomButton::Skip:
+            return addButton(tr("Skip"), role, accent);
+        default:
+            return nullptr;
+    }
+}
+
+QPushButton* QnMessageBox::addButton(
+    const QString &text,
+    QDialogButtonBox::ButtonRole role,
+    QnButtonAccent accent)
 {
     Q_D(QnMessageBox);
 
-    QPushButton *addedButton = ui->buttonBox->addButton(text, role);
-    d->customButtons.append(addedButton);
+    QPushButton* result = ui->buttonBox->addButton(text, role);
+    d->customButtons.append(result);
 
     if (!d->escapeButton)
         d->detectEscapeButton();
-    if (!d->defaultButton)
-        d->detectDefaultButton();
+    if (accent != QnButtonAccent::NoAccent)
+        d->defaultButton = result;
+
     d->stylizeButtons();
 
-    return addedButton;
+    return result;
 }
 
-QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
+QPushButton *QnMessageBox::_addButton(QDialogButtonBox::StandardButton button)
 {
     Q_D(QnMessageBox);
 
@@ -375,6 +363,7 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
 
     if (!d->escapeButton)
         d->detectEscapeButton();
+
     if (!d->defaultButton)
         d->detectDefaultButton();
     d->stylizeButtons();
@@ -793,29 +782,16 @@ void QnMessageBox::afterLayout()
     }
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::showCustomDialog(
-    QWidget* parent,
-    QnMessageBoxIcon icon,
-    QnMessageBoxCustomButton yesCustomButon,
-    const QString& text,
-    const QString& extras)
-{
-    QnMessageBox dialog(QnMessageBoxIcon::Warning, text, extras,
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parent);
-    dialog.addCustomButton(yesCustomButon);
-    return static_cast<QDialogButtonBox::StandardButton>(dialog.exec());
-
-}
-
 bool QnMessageBox::overwriteFileQuestion(
     QWidget* parent,
     const QString& fileName)
 {
-    const auto result = showCustomDialog(parent,
-        QnMessageBoxIcon::Question, QnMessageBoxCustomButton::Overwrite,
-        tr("Overwrite existing file?"), fileName);
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Overwrite existing file?"), fileName,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
 
-    return (result == QDialogButtonBox::Yes);
+    dialog._addCustomButton(QnMessageBoxCustomButton::Overwrite);
+    return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
 void QnMessageBox::showFailedToOverwriteMessage(

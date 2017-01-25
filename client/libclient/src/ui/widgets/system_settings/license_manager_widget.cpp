@@ -310,7 +310,8 @@ void QnLicenseManagerWidget::showMessage(
 
     if (button == CopyToClipboardButton::Show)
     {
-        const auto button = messageBox->addCustomButton(QnMessageBoxCustomButton::CopyToClipboard);
+        const auto button = messageBox->addButton(
+            tr("Copy To Clipboard"), QDialogButtonBox::HelpRole, QnButtonAccent::NoAccent);
         connect(button, &QPushButton::clicked, this,
             [this, extras] { qApp->clipboard()->setText(extras); });
     }

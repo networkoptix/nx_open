@@ -60,8 +60,6 @@ private:
     /** Check if exe file will be greater than 4 Gb. */
     bool exeFileIsTooBig(const QnMediaResourcePtr& mediaResource, const QnTimePeriod& period) const;
 
-    bool confirmExportTooBigExeFile() const;
-
     private slots:
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
@@ -71,6 +69,13 @@ private:
     void at_camera_exportFinished(bool success, const QString &fileName);
 
     void showExportCompleteMessage();
+
+    bool confirmExport(
+        QnMessageBoxIcon icon,
+        const QString& text,
+        const QString& extras) const;
+
+    bool confirmExportTooBigExeFile() const;
 
 private:
     QSet<QString> m_filesIsUse;

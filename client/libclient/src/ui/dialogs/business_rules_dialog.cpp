@@ -393,10 +393,10 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Reset all rules to default?"),
         tr("This action can't be undone."),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Cancel,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    dialog._addCustomButton(QnMessageBoxCustomButton::Reset);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

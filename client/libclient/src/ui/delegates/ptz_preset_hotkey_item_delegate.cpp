@@ -109,10 +109,9 @@ void QnPtzPresetHotkeyItemDelegate::setModelData(
         ? tr("Hotkey used by preset \"%1\"").arg(existing.presetModel.preset.name)
         : tr("Hotkey used by tour \"%1\"").arg(existing.tourModel.tour.name));
 
-    QnMessageBox messageBox(QnMessageBoxIcon::Warning, tr("Change hotkey"),
-        message, QDialogButtonBox::Cancel);
-    messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole);
-
+    QnMessageBox messageBox(QnMessageBoxIcon::Warning, message,
+        QString(), QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 

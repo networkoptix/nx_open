@@ -815,17 +815,17 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
             text, QString(),
-            QDialogButtonBox::Cancel| QDialogButtonBox::Yes, QDialogButtonBox::Yes,
+            QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
 
-        messageBox.addCustomButton(QnMessageBoxCustomButton::Move);
-        messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        messageBox._addCustomButton(QnMessageBoxCustomButton::Skip);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
-        if (result == QDialogButtonBox::Yes)
+        if (result != QDialogButtonBox::Cancel)
             modifiedResources << errorResources;
     }
 
@@ -1117,10 +1117,10 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
             cameras) + L' ' + tr("They may be auto-discovered again after removing."));
 
     QnMessageBox messageBox(QnMessageBoxIcon::Warning,
-        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::No,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.setCheckBoxText(tr("Don't show this message again"));
     messageBox.addCustomWidget(new QnResourceListView(resources));
 
@@ -1133,7 +1133,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         qnSettings->save();
     }
 
-    return result == QDialogButtonBox::Yes;
+    return result != QDialogButtonBox::Cancel;
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
@@ -2068,18 +2068,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setText(tr("Components of the System have different versions:"));
     messageBox->setInformativeText(extras);
 
-    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
-    const auto updateButton = messageBox->addCustomButton(QnMessageBoxCustomButton::Update);
-    messageBox->setDefaultButton(QDialogButtonBox::Yes);
+    messageBox->_addCustomButton(QnMessageBoxCustomButton::Skip);
+    const auto updateButton = messageBox->addButton(
+        tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 
-    connect(updateButton, &QPushButton::clicked, this,
-        [this, dialog = messageBox.data()]
-        {
-            dialog->accept();
-            menu()->trigger(QnActions::SystemUpdateAction);
-        });
-
-    messageBox->exec();
+    const bool confirmed = ((messageBox->exec() != QDialogButtonBox::Cancel)
+        && (messageBox->clickedButton() == updateButton));
 
     if (messageBox->isChecked())
     {
@@ -2087,6 +2081,9 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         messagesFilter |= Qn::ShowOnceMessage::VersionMismatchDialog;
         qnSettings->setShowOnceMessages(messagesFilter);
     }
+
+    if (confirmed)
+        menu()->trigger(QnActions::SystemUpdateAction);
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()

@@ -13,7 +13,7 @@ public:
 
     /**
     * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
-    * @return                      Selected button (Yes or Cancel)
+    * @return                      Yes button if confirmed, overwise Cancel
     */
     static QDialogButtonBox::StandardButton askOverrideLayout(QWidget* parent);
 

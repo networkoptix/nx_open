@@ -176,8 +176,8 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
             break;
         case Qn::IncompatibleProtocolConnectionResult:
             QnMessageBox::_warning(parentWidget,
-                getDiffVersionsText(),
-                getDiffVersionsExtra(qnCommon->engineVersion().toString(), serverVersion)
+                QString(),
+                getDiffVersionsFullText(qnCommon->engineVersion().toString(), serverVersion)
                     + L'\n' + tr("Restart %1 Client in compatibility mode "
                         "will be required.").arg(QnAppInfo::productNameLong()));
             break;
@@ -295,10 +295,10 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,
-                QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parentWidget);
+                QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
-            dialog.addCustomButton(QnMessageBoxCustomButton::Download);
-            if (dialog.exec() == QDialogButtonBox::Yes)
+            dialog.addButton(tr("Download"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+            if (dialog.exec() != QDialogButtonBox::Cancel)
             {
                 QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
                     new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));
@@ -321,12 +321,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
         QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Restart %1 Client in compatibility mode?").arg(QnAppInfo::productNameLong()),
-            extras, QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
-            parentWidget);
-        dialog.addCustomButton(QnMessageBoxCustomButton::Restart);
+            extras, QDialogButtonBox::Cancel, QDialogButtonBox::No, parentWidget);
 
-        int button = dialog.exec();
-        if (button != QDialogButtonBox::Ok)
+        dialog.addButton(tr("Restart"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+
+        if (dialog.exec() == QDialogButtonBox::Cancel)
             return Qn::IncompatibleVersionConnectionResult;
 
         switch (applauncher::restartClient(connectionInfo.version, connectionInfo.ecUrl.toEncoded()))
@@ -344,12 +343,13 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 QnMessageBox dialog(QnMessageBoxIcon::Critical,
                     tr("Failed to download and launch version %1").arg(version),
                     QString(),
-                    QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+                    QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
                     parentWidget);
 
-                dialog.addCustomButton(QnMessageBoxCustomButton::TryAgain);
+                dialog.addButton(
+                    tr("Try Again"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 
-                if (dialog.exec() == QDialogButtonBox::Yes)
+                if (dialog.exec() != QDialogButtonBox::Cancel)
                 {
                     //starting installation
                     QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(new CompatibilityVersionInstallationDialog(connectionInfo.version, parentWidget));

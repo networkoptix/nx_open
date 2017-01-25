@@ -149,9 +149,10 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
-        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Update);
+
+    messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
     messageBox.setCheckBoxText(tr("Don't notify again about this update"));
 
     const auto result = messageBox.exec();
@@ -162,6 +163,6 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         qnSettings->save();
     }
 
-    if (result == QDialogButtonBox::Yes)
+    if (result != QDialogButtonBox::Cancel)
         action(QnActions::SystemUpdateAction)->trigger();
 }

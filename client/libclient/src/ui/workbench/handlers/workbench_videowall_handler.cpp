@@ -633,17 +633,18 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Close %1 Client before starting Video Wall?").arg(QnAppInfo::productNameLong()),
         QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Close);
-    dialog.addCustomButton(QnMessageBoxCustomButton::Keep);
-    const auto result = dialog.exec();
+    const auto closeButton =
+        dialog.addButton(tr("Close"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    dialog.addButton(tr("Keep"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
 
+    const auto result = dialog.exec();
     if (result == QDialogButtonBox::Cancel)
         return;
 
-    if (result == QDialogButtonBox::Yes)
+    if (dialog.clickedButton() == closeButton)
         closeInstanceDelayed();
 
     QnUuid pcUuid = qnSettings->pcUuid();
@@ -1526,13 +1527,13 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n items?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
-    if (result != QDialogButtonBox::Yes)
+    if (result == QDialogButtonBox::Cancel)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
@@ -1569,10 +1570,10 @@ void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Stop Video Wall?"),
         tr("To start it again, you should have physical access to its computer."),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Stop);
+    dialog.addButton(tr("Stop"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
@@ -2064,7 +2065,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)

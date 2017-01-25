@@ -100,23 +100,21 @@ void QnLocalSettingsDialog::accept()
     if (isRestartRequired())
     {
         QnMessageBox dialog(this);
-        dialog.setText(tr("Some changes will take effect only after  Client restart")
+        dialog.setText(tr("Some changes will take effect only after %1 Client restart")
             .arg(QnAppInfo::productNameLong()));
-        dialog.setStandardButtons(QDialogButtonBox::Cancel);
-        dialog.addCustomButton(QnMessageBoxCustomButton::RestartNow);
-        dialog.addCustomButton(QnMessageBoxCustomButton::RestartLater);
-        dialog.setDefaultButton(QDialogButtonBox::Yes);
 
-        switch (dialog.exec())
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::Yes:
-                restartQueued = true;
-                break;
-            default:
-                break;
-        }
+        dialog.setStandardButtons(QDialogButtonBox::Cancel);
+        const auto restartNowButton = dialog.addButton(
+            tr("Restart Now"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+
+        dialog.addButton(
+            tr("Restart Later"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        if (dialog.clickedButton() == restartNowButton)
+            restartQueued = true;
     }
 
     base_type::accept();

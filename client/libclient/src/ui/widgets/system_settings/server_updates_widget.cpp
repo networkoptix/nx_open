@@ -433,14 +433,19 @@ void QnServerUpdatesWidget::discardChanges()
     {
         QnMessageBox dialog(QnMessageBoxIcon::Information,
             tr("System update in process"), QString(),
-            QDialogButtonBox::NoButton | QDialogButtonBox::Yes, QDialogButtonBox::Yes,
+            QDialogButtonBox::NoButton, QDialogButtonBox::NoButton,
             this);
 
-        dialog.addCustomButton(QnMessageBoxCustomButton::CancelUpdate);
-        dialog.addCustomButton(QnMessageBoxCustomButton::ContinueInBackground);
+        const auto cancelUpdateButton = dialog.addButton(
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        dialog.addButton(
+            tr("Continue in Background"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
 
-        if (dialog.exec() == QDialogButtonBox::Yes)
+        if ((dialog.exec() != QDialogButtonBox::Cancel) &&
+            (dialog.clickedButton() == cancelUpdateButton))
+        {
             cancelUpdate();
+        }
     }
     else
     {
@@ -784,15 +789,14 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Not enough free space at %n Servers:", "", failedServers.size()),
         tr("Attempt to update may fail or cause Server malfunction."),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
     dialog.addCustomWidget(new QnResourceListView(failedServers, true));
-    dialog.addCustomButton(QnMessageBoxCustomButton::ForceUpdate);
+    dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();
     lowFreeSpaceWarning.ignore = true;
-
     if (result == QDialogButtonBox::Cancel)
         m_updateTool->cancelUpdate();
 }

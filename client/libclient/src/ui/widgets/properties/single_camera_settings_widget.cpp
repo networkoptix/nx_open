@@ -771,20 +771,23 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
         tr("Secondary stream disabled for this camera"),
         tr("\"Motion + Low - Res\" recording option can't be set."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
-    dialog.addCustomButton(QnMessageBoxCustomButton::SetRecordingToAlways);
-    dialog.addCustomButton(QnMessageBoxCustomButton::EnableSecondaryStream);
 
-    switch (dialog.exec())
+    const auto recordAlways = dialog.addButton(
+        tr("Set Recording to \"Always\""), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+    dialog.addButton(
+        tr("Enable Secondary Stream"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return  false;
+
+    if (dialog.clickedButton() == recordAlways)
     {
-        case QDialogButtonBox::Yes:
-            ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
-            return true;
-        case QDialogButtonBox::No:
-            ui->expertSettingsWidget->setSecondStreamEnabled();
-            return true;
-        default:
-            return false;
+        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        return true;
     }
+
+    ui->expertSettingsWidget->setSecondStreamEnabled();
+    return true;
 }
 
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled)
@@ -905,10 +908,10 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Reset motion regions to default?"),
         tr("This action can't be undone."),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    dialog._addCustomButton(QnMessageBoxCustomButton::Reset);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

@@ -273,13 +273,12 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     // TODO: #Elric implement more precise estimation
     if (durationMs / exportSpeed > maxRecordingDurationMsec && timelapseFrameStepMs == 0)
     {
-        const auto result = QnMessageBox::showCustomDialog(
-            mainWindow(), QnMessageBoxIcon::Warning, QnMessageBoxCustomButton::Export,
+        const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
             tr("You are about to export a long video"),
             tr("It may require over a gigabyte of HDD space and take several minutes to complete.")
                 + L'\n' + tr("Export anyway?"));
 
-        if (result != QDialogButtonBox::Yes)
+        if (!confirmed)
             return;
     }
 
@@ -419,14 +418,13 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
                 {
-                    const auto result = QnMessageBox::showCustomDialog(
-                        mainWindow(), QnMessageBoxIcon::Warning, QnMessageBoxCustomButton::Export,
+                    const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
                         tr("AVI format not recommended"),
                         tr("For exporting a non-continuous recording with audio track,"
                             " MKV or some other format is recommended.")
                             + L'\n' + tr("Export to AVI anyway?"));
 
-                    if (result != QDialogButtonBox::Yes)
+                    if (!confirmed)
                         continue;
                 }
             }
@@ -459,14 +457,13 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                         resultResolution.height() > imageParameters.defaultResolutionLimit.height())
                     {
                         transcodeWarnShown = true;
-                        int result = QnMessageBox::showCustomDialog(
-                            mainWindow(), QnMessageBoxIcon::Warning, QnMessageBoxCustomButton::Export,
+                        const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
                             tr("Selected format not recommended"),
                             tr("To avoid video downscaling,"
                                 " NOV or EXE formats are recommended for this camera.")
                                 + L'\n' + tr("Export anyway?"));
 
-                        if (result != QDialogButtonBox::Yes)
+                        if (!confirmed)
                             return;
                         else
                             break; // do not show warning for other tracks
@@ -477,12 +474,11 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             if (!transcodeWarnShown)
             {
                 transcodeWarnShown = true;
-                const auto result = QnMessageBox::showCustomDialog(
-                    mainWindow(), QnMessageBoxIcon::Question, QnMessageBoxCustomButton::Export,
+                const auto confirmed = confirmExport(QnMessageBoxIcon::Question,
                     tr("Export with transcoding?"),
                     tr("It will increase CPU usage and may take significant time."));
 
-                if (result != QDialogButtonBox::Yes)
+                if (!confirmed)
                     return;
             }
         }
@@ -586,13 +582,10 @@ bool QnWorkbenchExportHandler::exeFileIsTooBig(
 
 bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
 {
-    const auto result = QnMessageBox::showCustomDialog(
-        mainWindow(), QnMessageBoxIcon::Warning, QnMessageBoxCustomButton::Update,
+    return confirmExport(QnMessageBoxIcon::Warning,
         tr("EXE format not recommended"),
         tr("EXE files over 4 GB can't be opened by double click due to a Windows limitation.")
             + L'\n' + tr("Export to EXE anyway?"));
-
-    return result == QDialogButtonBox::Yes;
 }
 
 void QnWorkbenchExportHandler::exportTimeSelection(const QnActionParameters& parameters, qint64 timelapseFrameStepMs)
@@ -831,6 +824,19 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     return true;
 }
 
+bool QnWorkbenchExportHandler::confirmExport(
+    QnMessageBoxIcon icon,
+    const QString& text,
+    const QString& extras) const
+{
+    QnMessageBox dialog(icon, text, extras,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        mainWindow());
+
+    dialog.addButton(tr("Export"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    return (dialog.exec() != QDialogButtonBox::Cancel);
+}
+
 void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
@@ -845,12 +851,12 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
 
     if (exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30)
     {
-        const auto result = QnMessageBox::showCustomDialog(
-            mainWindow(), QnMessageBoxIcon::Warning, QnMessageBoxCustomButton::Export,
+        const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
             tr("You are about to export a lot of video"),
             tr("It may require over a gigabyte of HDD space and take several minutes to complete.")
                 + L'\n' + tr("Export anyway?"));
-        if (result == QDialogButtonBox::Cancel)
+
+        if (!confirmed)
             return;
     }
 
