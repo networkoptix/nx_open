@@ -6,7 +6,7 @@ namespace url {
 
 SocketAddress getEndpoint(const QUrl& url)
 {
-    return SocketAddress(url.host(), url.port());
+    return SocketAddress(url.host(), static_cast<quint16>(url.port(0)));
 }
 
 QString normalizePath(const QString& path)
