@@ -272,7 +272,6 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
     QWidget* parentWidget)
 {
     using namespace Qn;
-    int helpTopicId = helpTopic(Qn::IncompatibleProtocolConnectionResult);
 
     QList<QnSoftwareVersion> versions;
     if (!getInstalledVersions(&versions))
