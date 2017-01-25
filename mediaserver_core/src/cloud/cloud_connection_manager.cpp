@@ -71,11 +71,12 @@ void CloudConnectionManager::setCloudCredentials(
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (cloudSystemId == m_cloudSystemId &&
-        cloudAuthKey == m_cloudAuthKey)
-    {
+    NX_LOGX(lm("New credentials: %1:%2. Known credentials: %3:%4")
+        .arg(cloudSystemId).arg(cloudAuthKey.size()).arg(m_cloudSystemId).arg(m_cloudAuthKey.size()),
+        cl_logDEBUG2);
+
+    if (!hasCloudBindingStatusChanged(cloudSystemId, cloudAuthKey))
         return;
-    }
 
     m_cloudSystemId = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
@@ -105,10 +106,8 @@ void CloudConnectionManager::setCloudCredentials(
         nx::network::SocketGlobals::mediatorConnector()
             .setSystemCredentials(boost::none);
         MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
-    }
-
-    if (!boundToCloud)
         makeSystemLocal();
+    }
 
     emit cloudBindingStatusChanged(boundToCloud);
     if (boundToCloud)
@@ -217,6 +216,31 @@ bool CloudConnectionManager::resetCloudData()
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
+}
+
+bool CloudConnectionManager::hasCloudBindingStatusChanged(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey) const
+{
+    const bool currentCloudBindingStatus = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
+    const bool newCloudBindingStatus = !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty();
+
+    if (currentCloudBindingStatus != newCloudBindingStatus)
+        return true;
+
+    if (currentCloudBindingStatus)
+    {
+        if (cloudSystemId != m_cloudSystemId ||
+            cloudAuthKey != m_cloudAuthKey)
+        {
+            NX_LOGX(lm("Overwriting existing cloud credentials. Old cloudSystemId %1, new cloudSystemId %2")
+                .arg(m_cloudSystemId).arg(cloudSystemId), cl_logDEBUG1);
+            return true;
+        }
+    }
+
+    NX_LOGX(lm("Cloud binding status stayed unchanged"), cl_logDEBUG2);
+    return false;
 }
 
 bool CloudConnectionManager::makeSystemLocal()
