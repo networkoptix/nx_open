@@ -47,7 +47,10 @@ const QString kActiMacAddressParamName = lit("mac address");
 const QString kActiPlatformParamName = lit("platform");
 const QString kActiEncoderCapabilitiesParamName = lit("encoder_cap");
 
-} // namespace 
+const QString kTwoAudioParamName = lit("factory default type");
+const QString kTwoWayAudioDeviceType = lit("Two Ways Audio (0x71)");
+
+} // namespace
 
 QnActiResource::QnActiResource() :
     m_desiredTransport(RtpTransport::_auto),

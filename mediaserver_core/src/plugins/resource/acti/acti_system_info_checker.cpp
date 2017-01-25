@@ -38,7 +38,7 @@ QnActiSystemInfoChecker::~QnActiSystemInfoChecker()
             httpClientCopy = m_httpClient;
     }
 
-    httpClientCopy->terminate();
+    httpClientCopy->pleaseStopSync();
 }
 
 boost::optional<QnActiResource::ActiSystemInfo> QnActiSystemInfoChecker::getSystemInfo()
@@ -143,7 +143,7 @@ void QnActiSystemInfoChecker::tryToGetSystemInfoWithGivenAuthUnsafe(const QAuthe
 }
 
 bool QnActiSystemInfoChecker::isLastCheckInCycleUnsafe()
-{    
+{
     return m_currentCycleAuthOptions.isEmpty();
 }
 
