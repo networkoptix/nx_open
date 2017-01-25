@@ -11,6 +11,9 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LastConnectionData, (json), LastConnectionData_
 
 QUrl LastConnectionData::urlWithCredentials() const
 {
+    if (!url.isValid())
+        return QUrl();
+
     auto result = url;
     result.setUserName(credentials.user);
     result.setPassword(credentials.password.value());
