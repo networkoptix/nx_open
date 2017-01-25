@@ -681,7 +681,7 @@ public:
 
     bool bindAndListen()
     {
-        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) |
+        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) ||
             !m_serverSocket.listen())
         {
             return false;
@@ -758,7 +758,8 @@ X-Nx-Result-Code: ok
     )http");
 
     TestTcpServer testTcpServer(std::move(dataToSend));
-    ASSERT_TRUE(testTcpServer.bindAndListen());
+    ASSERT_TRUE(testTcpServer.bindAndListen())
+        << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
 
     QUrl url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));
