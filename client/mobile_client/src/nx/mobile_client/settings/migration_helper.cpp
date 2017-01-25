@@ -3,6 +3,8 @@
 #include <boost/range/algorithm/find_if.hpp>
 #include <boost/range/algorithm/remove_if.hpp>
 
+#include <nx/network/url/url_parse_helper.h>
+
 #include <network/module_finder.h>
 #include <network/direct_module_finder_helper.h>
 #include <network/system_helpers.h>
@@ -37,7 +39,7 @@ public:
             auto migratedIt = boost::find_if(recentConnections,
                 [this, &moduleInformation, &address](const QnLocalConnectionData& connectionData)
                 {
-                    return address == SocketAddress(connectionData.url)
+                    return address == nx::network::url::getEndpoint(connectionData.url)
                         && moduleInformation.systemName == connectionData.systemName
                         && migratedSessionIds.contains(connectionData.localId);
                 });
@@ -58,7 +60,7 @@ public:
                  [this, &moduleInformation, &address, migratedIt]
                     (const QnLocalConnectionData& connectionData)
                  {
-                     return address == SocketAddress(connectionData.url)
+                     return address == nx::network::url::getEndpoint(connectionData.url)
                          && moduleInformation.systemName == connectionData.systemName
                          && migratedIt->url.userName() == connectionData.url.userName()
                          && !migratedSessionIds.contains(connectionData.localId);
