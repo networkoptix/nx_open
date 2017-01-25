@@ -125,8 +125,13 @@ public:
     QPushButton *button(QDialogButtonBox::StandardButton which) const;
 
     QAbstractButton *defaultButton() const;
-    void setDefaultButton(QAbstractButton *button);
-    void setDefaultButton(QDialogButtonBox::StandardButton button);
+    void setDefaultButton(
+        QAbstractButton *button,
+        QnButtonAccent accent = QnButtonAccent::Standard);
+
+    void setDefaultButton(
+        QDialogButtonBox::StandardButton button,
+        QnButtonAccent accent = QnButtonAccent::Standard);
 
     QAbstractButton *escapeButton() const;
     void setEscapeButton(QAbstractButton *button);

@@ -23,6 +23,7 @@ public:
     QAbstractButton *clickedButton;
     QList<QAbstractButton *> customButtons;
     QAbstractButton *defaultButton;
+    QnButtonAccent buttonAccent;
     QAbstractButton *escapeButton;
     QList<QLabel*> informativeLabels;
     QList<QWidget*> customWidgets;
@@ -44,6 +45,7 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     q_ptr(parent),
     clickedButton(nullptr),
     defaultButton(nullptr),
+    buttonAccent(QnButtonAccent::Standard),
     escapeButton(nullptr),
     icon(QnMessageBoxIcon::NoIcon)
 {
@@ -151,8 +153,13 @@ void QnMessageBoxPrivate::stylizeButtons()
 {
     Q_Q(QnMessageBox);
 
-    for (QAbstractButton *button: q->buttons())
-        setAccentStyle(button, button == defaultButton);
+    for (QAbstractButton *button : q->buttons())
+    {
+        if (buttonAccent == QnButtonAccent::Warning)
+            setWarningButtonStyle(button, button == defaultButton);
+        else
+            setAccentStyle(button, button == defaultButton);
+    }
 }
 
 int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
@@ -346,7 +353,10 @@ QPushButton* QnMessageBox::addButton(
     if (!d->escapeButton)
         d->detectEscapeButton();
     if (accent != QnButtonAccent::NoAccent)
+    {
+        d->buttonAccent = accent;
         d->defaultButton = result;
+    }
 
     d->stylizeButtons();
 
@@ -430,7 +440,9 @@ QAbstractButton *QnMessageBox::defaultButton() const
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QAbstractButton* button)
+void QnMessageBox::setDefaultButton(
+    QAbstractButton* button
+    , QnButtonAccent accent)
 {
     NX_ASSERT(ui->buttonBox->buttons().contains(button));
     if (!ui->buttonBox->buttons().contains(button))
@@ -445,16 +457,19 @@ void QnMessageBox::setDefaultButton(QAbstractButton* button)
 
     button->setFocus();
 
+    d->buttonAccent = accent;
     d->defaultButton = button;
     d->stylizeButtons();
 }
 
-void QnMessageBox::setDefaultButton(QDialogButtonBox::StandardButton button)
+void QnMessageBox::setDefaultButton(
+    QDialogButtonBox::StandardButton button,
+    QnButtonAccent accent)
 {
     QPushButton *buttonWidget = ui->buttonBox->button(button);
 
     if (buttonWidget)
-        setDefaultButton(buttonWidget);
+        setDefaultButton(buttonWidget, accent);
 }
 
 QAbstractButton *QnMessageBox::escapeButton() const
