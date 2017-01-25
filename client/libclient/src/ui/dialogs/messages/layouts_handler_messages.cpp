@@ -20,7 +20,7 @@ QDialogButtonBox::StandardButton QnLayoutsHandlerMessages::askOverrideLayout(QWi
     messageBox.setText(tr("Overwrite existing layout?"));
     messageBox.setInformativeText(tr("There is another layout with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox._addCustomButton(QnMessageBoxCustomButton::Overwrite);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite);
 
     return (messageBox.exec() == QDialogButtonBox::Cancel
         ? QDialogButtonBox::Cancel
@@ -134,7 +134,7 @@ bool QnLayoutsHandlerMessages::deleteSharedLayouts(QWidget* parent, const QnReso
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
 
     return (messageBox.exec() != QDialogButtonBox::Cancel);
 }

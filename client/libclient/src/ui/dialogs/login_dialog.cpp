@@ -625,7 +625,7 @@ void QnLoginDialog::at_saveButton_clicked()
             tr("There is an another connection with the same name."),
             QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-        dialog._addCustomButton(QnMessageBoxCustomButton::Overwrite);
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;
 
@@ -681,7 +681,7 @@ void QnLoginDialog::at_deleteButton_clicked()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

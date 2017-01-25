@@ -26,6 +26,7 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/dialogs/common/custom_message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -431,7 +432,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::showFailedToGetPosition(this, m_resource->getName());
+        QnCustomMessageBox::showFailedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -450,7 +451,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::showFailedToSetPosition(this, m_resource->getName());
+        QnCustomMessageBox::showFailedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -491,7 +492,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::showFailedToSetPosition(this, m_resource->getName());
+        QnCustomMessageBox::showFailedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -556,7 +557,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                         tr("These tours will become invalid."),
                         QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-                    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+                    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
                     dialog.setCheckBoxText(tr("Don't show this message again"));
 
                     const auto cancelled = (dialog.exec() == QDialogButtonBox::Cancel);

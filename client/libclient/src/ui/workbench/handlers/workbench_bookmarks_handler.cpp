@@ -219,7 +219,7 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
         tr("Delete bookmark?"), bookmark.name.trimmed(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
 
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
@@ -239,7 +239,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
         tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::Cancel,
         mainWindow());
-    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
 
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;

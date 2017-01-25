@@ -544,7 +544,7 @@ bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.setCheckBoxText(tr("Don't show this message again"));
     messageBox.addCustomWidget(new QnResourceListView(users));
 

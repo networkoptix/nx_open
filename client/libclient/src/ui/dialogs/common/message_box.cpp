@@ -279,7 +279,7 @@ QDialogButtonBox::StandardButton QnMessageBox::success(
     return execute(parent, QnMessageBoxIcon::Success, text, extras, buttons, defaultButton);
 }
 
-void QnMessageBox::_addButton(
+void QnMessageBox::addButton(
         QAbstractButton *button,
         QDialogButtonBox::ButtonRole role)
 {
@@ -295,24 +295,24 @@ void QnMessageBox::_addButton(
     d->stylizeButtons();
 }
 
-QPushButton* QnMessageBox::_addCustomButton(QnMessageBoxCustomButton button)
+QPushButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
 {
     switch (button)
     {
         case QnMessageBoxCustomButton::Overwrite:
-            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
         case QnMessageBoxCustomButton::Delete:
-            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
         case QnMessageBoxCustomButton::Reset:
-            return _addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
         case QnMessageBoxCustomButton::Skip:
-            return _addCustomButton(button, QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+            return addCustomButton(button, QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
         default:
             return nullptr;
     }
 }
 
-QPushButton* QnMessageBox::_addCustomButton(
+QPushButton* QnMessageBox::addCustomButton(
     QnMessageBoxCustomButton button,
     QDialogButtonBox::ButtonRole role,
     QnButtonAccent accent)
@@ -353,7 +353,7 @@ QPushButton* QnMessageBox::addButton(
     return result;
 }
 
-QPushButton *QnMessageBox::_addButton(QDialogButtonBox::StandardButton button)
+QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
 {
     Q_D(QnMessageBox);
 
@@ -780,57 +780,3 @@ void QnMessageBox::afterLayout()
         setFixedHeight(sizeHint().height());
     }
 }
-
-bool QnMessageBox::overwriteFileQuestion(
-    QWidget* parent,
-    const QString& fileName)
-{
-    QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Overwrite existing file?"), fileName,
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
-
-    dialog._addCustomButton(QnMessageBoxCustomButton::Overwrite);
-    return (dialog.exec() != QDialogButtonBox::Cancel);
-}
-
-void QnMessageBox::showFailedToOverwriteMessage(
-    QWidget* parent,
-    const QString& fileName)
-{
-    QnMessageBox::critical(parent, tr("Failed to overwrite file"), fileName);
-}
-
-void QnMessageBox::showFailedToGetPosition(
-    QWidget* parent,
-    const QString& cameraName)
-{
-    const auto extras =
-        tr("Can't get the current position from camera \"%1\"").arg(cameraName)
-        + L'\n' + tr("Please wait for the camera to go online.");
-    QnMessageBox::critical(parent, tr("Failed to get current position"), extras);
-
-}
-
-void QnMessageBox::showFailedToSetPosition(
-    QWidget* parent,
-    const QString& cameraName)
-{
-    const auto extras =
-        tr("Can't set the current position for camera \"%1\"").arg(cameraName)
-        + L'\n' + tr("Please wait for the camera to go online.");
-    QnMessageBox::critical(parent, tr("Failed to set current position"), extras);
-
-}
-
-void QnMessageBox::showFailedRestartClient(QWidget* parent)
-{
-    QnMessageBox::critical(parent,
-        tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
-        tr("Please close the application and start it again using the shortcut in the start menu."));
-}
-
-void QnMessageBox::showAnotherVideoWallExist(QWidget* parent)
-{
-    QnMessageBox::warning(parent, tr("There is another Video Wall with the same name"));
-}
-

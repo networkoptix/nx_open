@@ -24,6 +24,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
+#include <ui/dialogs/common/custom_message_box.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -154,7 +155,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::showFailedToGetPosition(mainWindow(),
+        QnCustomMessageBox::showFailedToGetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
@@ -360,7 +361,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::showFailedToSetPosition(mainWindow(),
+        QnCustomMessageBox::showFailedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases

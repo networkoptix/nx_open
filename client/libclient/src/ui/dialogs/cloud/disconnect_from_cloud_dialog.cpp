@@ -234,12 +234,12 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
     setAccentStyle(okButton);
     q->removeButton(baseOkButton.data());
-    q->_addButton(okButton, QDialogButtonBox::AcceptRole);
+    q->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
     setAccentStyle(nextButton);
-    q->_addButton(nextButton, QDialogButtonBox::ActionRole);
+    q->addButton(nextButton, QDialogButtonBox::ActionRole);
     nextButton->setVisible(false);
 
     switch (scenario)

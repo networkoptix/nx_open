@@ -30,6 +30,7 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/dialogs/common/standard_message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -424,7 +425,8 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)
-                && !QnMessageBox::overwriteFileQuestion(mainWindow(), QFileInfo(fileName).fileName()))
+                && !QnStandardMessageBox::overwriteFileQuestion(
+                    mainWindow(), QFileInfo(fileName).fileName()))
             {
                 continue;
             }
@@ -437,7 +439,8 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
 
         if (QFile::exists(fileName) && !QFile::remove(fileName))
         {
-            QnMessageBox::showFailedToOverwriteMessage(mainWindow(), QFileInfo(fileName).fileName());
+            QnStandardMessageBox::failedToOverwriteMessage(
+                mainWindow(), QFileInfo(fileName).fileName());
             continue;
         }
 

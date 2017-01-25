@@ -141,7 +141,7 @@ void QnNotificationSoundManagerDialog::at_deleteButton_clicked()
 
     QnMessageBox dialog(QnMessageBoxIcon::Question, tr("Delete sound?"), title,
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
-    dialog._addCustomButton(QnMessageBoxCustomButton::Delete);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

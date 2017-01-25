@@ -51,27 +51,6 @@ public:
         Content
     };
 
-public: // TODO: #ynikitenkov Move to distinct class
-    static bool overwriteFileQuestion(
-        QWidget* parent,
-        const QString& fileName);
-
-    static void showFailedToOverwriteMessage(
-        QWidget* parent,
-        const QString& fileName);
-
-    static void showFailedToGetPosition(
-        QWidget* parent,
-        const QString& cameraName);
-
-    static void showFailedToSetPosition(
-        QWidget* parent,
-        const QString& cameraName);
-
-    static void showFailedRestartClient(QWidget* parent);
-
-    static void showAnotherVideoWallExist(QWidget* parent);
-
 public:
     QnMessageBox(
         QWidget* parent = nullptr
@@ -123,18 +102,18 @@ public:
 public:
     virtual ~QnMessageBox();
 
-    QPushButton* _addCustomButton(QnMessageBoxCustomButton button);
-    QPushButton* _addCustomButton(
+    QPushButton* addCustomButton(QnMessageBoxCustomButton button);
+    QPushButton* addCustomButton(
         QnMessageBoxCustomButton button,
         QDialogButtonBox::ButtonRole role,
         QnButtonAccent accent);
 
-    void _addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
+    void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton* addButton(
         const QString &text,
         QDialogButtonBox::ButtonRole role,
         QnButtonAccent accent);
-    QPushButton* _addButton(QDialogButtonBox::StandardButton button);
+    QPushButton* addButton(QDialogButtonBox::StandardButton button);
     void removeButton(QAbstractButton *button);
 
     QList<QAbstractButton *> buttons() const;

@@ -22,6 +22,7 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
+#include <ui/dialogs/common/custom_message_box.h>
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 #include <ui/style/skin.h>
@@ -861,7 +862,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     if (!restartClient(result.targetVersion))
                     {
                         unholdConnection = true;
-                        QnMessageBox::showFailedRestartClient(this);
+                        QnCustomMessageBox::showFailedRestartClient(this);
                     }
                     else
                     {

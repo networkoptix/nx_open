@@ -59,6 +59,8 @@
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
 #include <ui/dialogs/messages/layouts_handler_messages.h>  //TODO: #GDM #VW refactor
+#include <ui/dialogs/common/standard_message_box.h>
+#include <ui/dialogs/common/custom_message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1436,7 +1438,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            QnMessageBox::showAnotherVideoWallExist(mainWindow());
+            QnCustomMessageBox::showAnotherVideoWallExist(mainWindow());
             continue;
         }
 
@@ -1529,7 +1531,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
@@ -2065,7 +2067,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox._addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
