@@ -17,7 +17,7 @@ Item
 
         Text
         {
-            text: qsTr("%1 is offline").arg(applicationInfo.nx1CustomizedName())
+            text: qsTr("%1 is offline").arg(applicationInfo.liteDeviceName())
             anchors.horizontalCenter: parent.horizontalCenter
             color: ColorTheme.base13
             font.pixelSize: 24

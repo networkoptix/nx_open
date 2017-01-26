@@ -16,5 +16,5 @@ struct QnMobileClientAppInfo
 
     static QString oldAndroidAppId();
 
-    static QString nx1CustomizedName();
+    static QString liteDeviceName();
 };
