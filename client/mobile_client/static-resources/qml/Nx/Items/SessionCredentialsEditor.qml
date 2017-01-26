@@ -25,7 +25,7 @@ Pane
     property bool displayAddressError: false
     property bool displayUserCredentialsError: false
     property alias addressErrorText: addressErrorPanel.text
-    property alias userCredentialsErrorText: credentialsWarningField.text
+    property alias credentialsErrorText: credentialsErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -136,7 +136,7 @@ Pane
         }
         FieldWarning
         {
-            id: credentialsWarningField
+            id: credentialsErrorPanel;
             width: parent.width
             opened: displayUserCredentialsError
         }

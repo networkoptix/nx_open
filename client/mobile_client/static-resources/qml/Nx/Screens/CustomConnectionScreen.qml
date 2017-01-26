@@ -106,15 +106,15 @@ Page
 
         if (credentialsEditor.address.trim().length == 0)
         {
-            credentialsEditor.displayAddressError = true
             credentialsEditor.addressErrorText = qsTr("Enter server address")
+            credentialsEditor.displayAddressError = true
             return false
         }
         else if ((credentialsEditor.login.trim().length == 0)
             || (credentialsEditor.password.trim().length == 0))
         {
+            credentialsEditor.credentialsErrorText = qsTr("All fields must be filled")
             credentialsEditor.displayUserCredentialsError = true
-            credentialsEditor.userCredentialsErrorText = qsTr("All fields must be filled")
             return false
         }
         return true
@@ -122,7 +122,7 @@ Page
 
     function connect()
     {
-        if(!checkConnectionFields())
+        if (!checkConnectionFields())
             return
 
         connectButton.forceActiveFocus()
@@ -134,9 +134,9 @@ Page
     {
         if (status == QnConnectionManager.UnauthorizedConnectionResult)
         {
-            credentialsEditor.displayUserCredentialsError = true
-            credentialsEditor.userCredentialsErrorText =
+            credentialsEditor.credentialsErrorText =
                 LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            credentialsEditor.displayUserCredentialsError = true
         }
         else
         {
