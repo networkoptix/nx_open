@@ -119,7 +119,8 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -147,6 +148,7 @@
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/connection_diagnostics_helper.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -770,33 +772,18 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (status != 0)
     {
-        const auto title = QnDeviceDependentStrings::getNameFromSet(
+        const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Cannot move devices"),
-                tr("Cannot move cameras"),
-                tr("Cannot move I/O modules")
-            ),
-            modifiedResources
-        );
+                tr("Failed to move %n devices", "", modifiedResources.size()),
+                tr("Failed to move %n cameras", "", modifiedResources.size()),
+                tr("Failed to move %n I/O Modules", "", modifiedResources.size())),
+            modifiedResources);
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
-            ),
-            modifiedResources
-        ).arg(server->getName());
-
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            title,
-            QDialogButtonBox::Ok,
+        const auto extras = tr("Server \"%1\" is not responding.").arg(server->getName());
+        QnMessageBox messageBox(QnMessageBoxIcon::Critical,
+            text, extras, QDialogButtonBox::Ok, QDialogButtonBox::Ok,
             mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Ok);
-        messageBox.setInformativeText(question);
+
         messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
         messageBox.exec();
         return;
@@ -818,38 +805,29 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
     if (!errorResources.empty())
     {
-        const auto title = QnDeviceDependentStrings::getNameFromSet(
+        const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Cannot move devices"),
-                tr("Cannot move cameras"),
-                tr("Cannot move I/O modules")
-            ),
-            errorResources
-        );
+                tr("Server \"%1\" can't access %n devices. Move them anyway?",
+                    "", errorResources.size()),
+                tr("Server \"%1\" can't access %n cameras. Move them anyway?",
+                    "", errorResources.size()),
+                tr("Server \"%1\" can't access %n I/O modules. Move them anyway?",
+                    "", errorResources.size())),
+            errorResources).arg(server->getName());
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
-                tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
-            ),
-            errorResources
-        ).arg(server->getName());
-
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::MainWindow_Tree_DragCameras_Help,
-            tr("Error"),
-            title,
-            QDialogButtonBox::Yes | QDialogButtonBox::No,
+        QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+            text, QString(),
+            QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.setInformativeText(question);
+
+        messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
-        auto result = messageBox.exec();
+
+        const auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
-        if (result == QDialogButtonBox::Yes)
+        if (result != QDialogButtonBox::Cancel)
             modifiedResources << errorResources;
     }
 
@@ -1113,51 +1091,39 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
     /* Check that we are deleting online auto-found cameras */
-    auto onlineAutoDiscoveredCameras = cameras.filtered(
+    const auto onlineAutoDiscoveredCameras = cameras.filtered(
         [](const QnVirtualCameraResourcePtr& camera)
-    {
-        return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
-    });
+        {
+            return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
+        });
 
-    const auto question = (cameras.size() == resources.size())
+    const auto text = (cameras.size() == resources.size()
         ? QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Do you really want to delete the following %n devices?", "", cameras.size()),
-                tr("Do you really want to delete the following %n cameras?", "", cameras.size()),
-                tr("Do you really want to delete the following %n I/O modules?", "", cameras.size())
-            ), cameras)
-        : tr("Do you really want to delete the following %n items?", "", resources.size());
+                tr("Delete %n devices?", "", cameras.size()),
+                tr("Delete %n cameras?", "", cameras.size()),
+                tr("Delete %n I/O Modules?", "", cameras.size())),
+            cameras)
+        : tr("Delete %n items?", "", resources.size()));
 
-    QString information;
-    if (!onlineAutoDiscoveredCameras.isEmpty())
-    {
-        information = QnDeviceDependentStrings::getNameFromSet(
+    const auto extras = (onlineAutoDiscoveredCameras.isEmpty()
+        ? QString()
+        : QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("%n devices are auto-discovered. They may be auto-discovered again after removing.",
+                tr("%n of them are auto-discovered.",
                     "", onlineAutoDiscoveredCameras.size()),
-                tr("%n cameras are auto-discovered. They may be auto-discovered again after removing.",
+                tr("%n cameras are auto-discovered.",
                     "", onlineAutoDiscoveredCameras.size()),
-                tr("%n I/O modules are auto-discovered. They may be auto-discovered again after removing.",
-                    "", onlineAutoDiscoveredCameras.size())
-                ),
-            cameras
-            );
-    }
+                tr("%n I/O modules are auto-discovered.",
+                    "", onlineAutoDiscoveredCameras.size())),
+            cameras) + L' ' + tr("They may be auto-discovered again after removing."));
 
-    int helpId = Qn::Empty_Help;
-    if (boost::algorithm::any_of(resources, [](const QnResourcePtr& res) { return res->hasFlags(Qn::live_cam); }))
-        helpId = Qn::DeletingCamera_Help;
-
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        helpId,
-        tr("Delete Resources..."),
-        question,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::No,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(information);
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.setCheckBoxText(tr("Don't show this message again"));
     messageBox.addCustomWidget(new QnResourceListView(resources));
 
     auto result = messageBox.exec();
@@ -1169,7 +1135,7 @@ bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& reso
         qnSettings->save();
     }
 
-    return result == QDialogButtonBox::Ok;
+    return result != QDialogButtonBox::Cancel;
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
@@ -1318,10 +1284,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
 
     if (period.durationMs < steps[1])
     {
-        QnMessageBox::warning(
-            mainWindow(),
-            tr("Unable to perform preview search."),
-            tr("Selected time period is too short to perform preview search. Please select a longer period."));
+        QnMessageBox::warning(mainWindow(),
+            tr("Too short period selected"),
+            tr("Can't perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
     }
 
@@ -1511,15 +1476,12 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered()
         if (dialog->state() == QnCameraAdditionDialog::Searching
             || dialog->state() == QnCameraAdditionDialog::Adding) {
 
-            int result = QnMessageBox::warning(
-                mainWindow(),
-                tr("Process in progress..."),
-                tr("Device addition is already in progress. "
-                    "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
-                QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-                QDialogButtonBox::Cancel
-                );
-            if (result != QDialogButtonBox::Ok)
+            const auto result = QnMessageBox::question(mainWindow(),
+                tr("Cancel device adding?"), QString(),
+                QDialogButtonBox::Yes | QDialogButtonBox::No,
+                QDialogButtonBox::No);
+
+            if (result != QDialogButtonBox::Yes)
                 return;
         }
         dialog->setServer(server);
@@ -1576,18 +1538,17 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered()
 {
     auto resources = menu()->currentParameters(sender()).resources().toSet().toList();
 
-    const auto question = tr("Are you sure you want to permanently delete these %n files?",
-        "", resources.size());
-
+    /**
+     * #ynikitenkov According to specs this functionality is disabled
+     * Change texts and dialog when it is enabled
+     */
     QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::MainWindow_Tree_DragCameras_Help,
-        tr("Delete Files"),
+        QnMessageBoxIcon::Warning,
         tr("Confirm files deleting"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
+        tr("Are you sure you want to permanently delete these %n files?", "", resources.size()),
+        QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::Yes,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Yes);
-    messageBox.setInformativeText(question);
+
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
@@ -1611,25 +1572,16 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
             continue;
 
-        QString title = checkedFlags == Qn::user
-            ? tr("User already exists.")
-            : tr("Video Wall already exists");
+        if (checkedFlags == Qn::user)
+            QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
+        else
+            QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(mainWindow());
 
-        QString message = checkedFlags == Qn::user
-            ? tr("User with the same name already exists")
-            : tr("Video Wall with the same name already exists.");
-
-        QnMessageBox::warning(
-            mainWindow(),
-            title,
-            message
-            );
         return false;
     }
 
     return true;
 }
-
 
 void QnWorkbenchActionHandler::at_renameAction_triggered()
 {
@@ -1871,19 +1823,16 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Error"),
-                tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024 * 1024)));
+            const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
+            QnMessageBox::warning(mainWindow(),
+                tr("Image too big"),
+                tr("Maximum size is %1 MB.").arg(maxFileSize));
             return;
         }
 
         if (status != QnAppServerFileCache::OperationResult::ok)
         {
-            QnMessageBox::warning(
-                mainWindow(),
-                tr("Error"),
-                tr("Error while uploading picture."));
+            QnMessageBox::critical(mainWindow(), tr("Failed to upload image"));
             return;
         }
 
@@ -2063,6 +2012,9 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     if (qnRuntime->ignoreVersionMismatch())
         return;
 
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::VersionMismatchDialog))
+        return;
+
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
     if (!watcher->hasMismatches())
         return;
@@ -2075,9 +2027,6 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         latestMsVersion = latestVersion;
 
     QStringList messageParts;
-    messageParts << tr("Some components of the system are not updated");
-    messageParts << QString();
-
     for (const QnAppInfoMismatchData &data : watcher->mismatchData())
     {
         QString componentName;
@@ -2099,13 +2048,12 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         if (componentName.isEmpty())
             continue;
 
-        QString version = L'v' + data.version.toString();
-
         bool updateRequested = (data.component == Qn::ServerComponent) &&
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
-        if (updateRequested)
-            version = setWarningStyleHtml(version);
+        const QString version = (updateRequested
+            ? setWarningStyleHtml(data.version.toString())
+            : data.version.toString());
 
         /* Consistency with 'About' dialog. */
         QString component = lit("%1: %2").arg(componentName, version);
@@ -2113,27 +2061,31 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     }
 
     messageParts << QString();
-    messageParts << tr("Please update all components to the latest version %1.").arg(latestMsVersion.toString());
+    messageParts << tr("Please update all components to the version %1").arg(latestMsVersion.toString());
 
-    QString message = messageParts.join(lit("<br/>"));
-
+    const QString extras = messageParts.join(lit("<br/>"));
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindow()));
-    messageBox->setIcon(QnMessageBox::Warning);
-    messageBox->setWindowTitle(tr("Version Mismatch"));
-    messageBox->setText(message);
-    messageBox->setTextFormat(Qt::RichText);
-    messageBox->setStandardButtons(QDialogButtonBox::Cancel);
-    setHelpTopic(messageBox.data(), Qn::Upgrade_Help);
+    messageBox->setIcon(QnMessageBoxIcon::Warning);
+    messageBox->setText(tr("Components of the System have different versions:"));
+    messageBox->setInformativeText(extras);
 
-    QPushButton *updateButton = messageBox->addButton(tr("Update..."), QDialogButtonBox::HelpRole);
-    connect(updateButton, &QPushButton::clicked, this, [this, dialog = messageBox.data()]
+    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
+    const auto updateButton = messageBox->addButton(
+        tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+
+    const bool confirmed = ((messageBox->exec() != QDialogButtonBox::Cancel)
+        && (messageBox->clickedButton() == updateButton));
+
+    if (messageBox->isChecked())
     {
-        dialog->accept();
-    menu()->trigger(QnActions::SystemUpdateAction);
-    });
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::VersionMismatchDialog;
+        qnSettings->setShowOnceMessages(messagesFilter);
+    }
 
-    messageBox->exec();
+    if (confirmed)
+        menu()->trigger(QnActions::SystemUpdateAction);
 }
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
@@ -2141,10 +2093,24 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    QnMessageBox::warning(mainWindow(),
+    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::BetaVersion))
+        return;
+
+    QnMessageBox dialog(QnMessageBoxIcon::Information,
         tr("Beta version %1").arg(QnAppInfo::applicationVersion()),
-        tr("This is a beta version of %1.")
-        .arg(qApp->applicationDisplayName()));
+        tr("Some functionality may be unavailable or not working properly."),
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
+
+    dialog.setCheckBoxText(tr("Don't show this message again"));
+    dialog.exec();
+
+    if (dialog.isChecked())
+    {
+        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
+        messagesFilter |= Qn::ShowOnceMessage::BetaVersion;
+        qnSettings->setShowOnceMessages(messagesFilter);
+        qnSettings->save();
+    }
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
@@ -2170,13 +2136,10 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (!atLeastOneServerHasInternetAccess)
         return;
 
-    QnMessageBox::information(
-        mainWindow(),
-        tr("Anonymous Usage Statistics"),
-        tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.")
-            + L'\n'
-            + tr("If you would like to disable this feature you can do so in the System Administration dialog.")
-        );
+    QnMessageBox::information(mainWindow(),
+        tr("The System sends anonymous usage statistics"),
+        tr("It will be used by software development team to improve your user experience.")
+            + L'\n' + tr("To disable it, go to the System Administration dialog."));
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
@@ -2213,12 +2176,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
 
     if (!tryToRestartClient())
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Launcher process not found."),
-            tr("Cannot restart the client.") + L'\n'
-            + tr("Please close the application and start it again using the shortcut in the start menu.")
-            );
+        QnConnectionDiagnosticsHelper::failedRestartClientMessage(mainWindow());
         return;
     }
     menu()->trigger(QnActions::DelayedForcedExitAction);
@@ -2293,9 +2251,7 @@ void QnWorkbenchActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     NonceReply auth;
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
-        QnMessageBox::warning(mainWindow(),
-            tr("Cannot open server web page"),
-            tr("Could not execute initial server query"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to open server web page"));
 
         return;
     }

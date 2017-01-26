@@ -215,18 +215,10 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnDisconnectFromCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Can not disconnect the System from %1",
-                                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()),
-                            QDialogButtonBox::Ok,
-                            q);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
+    QnMessageBox::critical(q,
+        tr("Failed to disconnect the System from %1", "%1 is name of cloud (like 'Nx Cloud')")
+            .arg(QnAppInfo::cloudName()),
+        message);
 
     lockUi(false);
 }
@@ -253,7 +245,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     {
         case Scenario::LocalOwner:
         {
-            q->setIcon(QnMessageBox::Question);
+            q->setIcon(QnMessageBoxIcon::Question);
             q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
@@ -265,7 +257,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         }
         case Scenario::CloudOwner:
         {
-            q->setIcon(QnMessageBox::Question);
+            q->setIcon(QnMessageBoxIcon::Question);
             q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
@@ -292,7 +284,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         }
         default:
             NX_ASSERT(false, "Invalid scenario");
-            q->setIcon(QnMessageBox::Warning);
+            q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(tr("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
             q->setDefaultButton(okButton);
@@ -315,8 +307,7 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All cloud features will be disabled, cloud users will be deleted from the System.")
-        .arg(QnAppInfo::cloudName());
+    return tr("All cloud features will be disabled, cloud users will be deleted from the System.");
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
@@ -417,7 +408,7 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
     Q_Q(QnDisconnectFromCloudDialog);
 
-    q->setIcon(QnMessageBox::Question);
+    q->setIcon(QnMessageBoxIcon::Question);
     q->setText(disconnectQuestionMessage());
     q->setInformativeText(allUsersDisabledMessage()
         + L'\n'

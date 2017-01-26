@@ -539,20 +539,16 @@ bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
     if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
         return true;
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Users..."),
-        tr("Confirm Delete Users"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+    QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+        tr("Delete %n users?", "", users.size()), QString(),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("Do you really want to delete the following %n users?",
-        "", users.size()));
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
+
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.setCheckBoxText(tr("Don't show this message again"));
     messageBox.addCustomWidget(new QnResourceListView(users));
 
-    auto result = messageBox.exec();
+    const auto confirmed = (messageBox.exec() != QDialogButtonBox::Cancel);
     if (messageBox.isChecked())
     {
         Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
@@ -560,5 +556,5 @@ bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
         qnSettings->setShowOnceMessages(messagesFilter);
     }
 
-    return result == QDialogButtonBox::Ok;
+    return confirmed;
 }
