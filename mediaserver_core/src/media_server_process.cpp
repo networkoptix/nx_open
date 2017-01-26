@@ -2114,7 +2114,22 @@ void MediaServerProcess::run()
 
     QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
-    misc::migrateFilesFromWindowsOldDir(QDir::toNativeSeparators(getDataDirectory()));
+    nx::misc::ServerDataMigrateHandler migrateHandler;
+    switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
+    {
+        case nx::misc::MigrateDataResult::WinDirNotFound:
+            NX_LOG(lit("Moving data from the old windows dir. Windows dir not found."), cl_logWARNING);
+            break;
+        case nx::misc::MigrateDataResult::NoNeedToMigrate:
+            NX_LOG(lit("Moving data from the old windows dir. Nothing to move"), cl_logDEBUG2);
+            break;
+        case nx::misc::MigrateDataResult::MoveDataFailed:
+            NX_LOG(lit("Moving data from the old windows dir. Old data found but move failed."), cl_logWARNING);
+            break;
+        case nx::misc::MigrateDataResult::Ok:
+            NX_LOG(lit("Moving data from the old windows dir. Old data found and successfully moved."), cl_logINFO);
+            break;
+    }
 #endif
     ffmpegInit();
 
