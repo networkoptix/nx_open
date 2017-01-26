@@ -36,7 +36,8 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     const auto widgetRect = widget->geometry();
-    const auto rect = QRectF(widgetRect.topLeft(), widgetRect.size() * qApp->devicePixelRatio());
+    const qreal ratio = painter->device()->devicePixelRatio();
+    const auto rect = QRectF(widgetRect.topLeft() * ratio, widgetRect.size() * ratio);
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(rect);
 
