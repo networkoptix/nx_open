@@ -189,10 +189,6 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
-    connect(m_textLabel, &QnProxyLabel::linkActivated, this, [this](const QString& link)
-        {
-            qDebug() << "link " << link << "was activated";
-        });
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
     m_layout->addItem(m_textLabel);
@@ -297,7 +293,7 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 }
 
 void QnNotificationWidget::addActionButton(
-    const QIcon& icon, const QString& /*tooltip*/, QnActions::IDType actionId,
+    const QIcon& icon, QnActions::IDType actionId,
     const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);

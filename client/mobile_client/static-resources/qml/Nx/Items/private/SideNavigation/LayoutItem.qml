@@ -82,7 +82,7 @@ SideNavigationItem
                 color: active ? ColorTheme.windowText : ColorTheme.contrast10
 
                 text: type == QnLayoutsModel.LiteClient
-                    ? applicationInfo.nx1CustomizedName()
+                    ? applicationInfo.liteDeviceName()
                     : sideNavigationItem.text
             }
 

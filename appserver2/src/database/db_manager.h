@@ -14,7 +14,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 #include <nx/utils/singleton.h>
 #include "nx/utils/type_utils.h"
 #include "core/resource_access/user_access_data.h"

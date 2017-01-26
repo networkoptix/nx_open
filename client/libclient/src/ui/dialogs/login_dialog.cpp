@@ -616,26 +616,16 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::question(
-            this,
+        QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
             tr("There is an another connection with the same name."),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
+            QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
 
-        switch (button)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::No:
-                name = connections.generateUniqueName(name);
-                break;
-            case QDialogButtonBox::Yes:
-                connections.removeOne(name);
-                break;
-            default:
-                break;
-        }
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        connections.removeOne(name);
     }
 
     const QUrl url = currentUrl();
@@ -682,16 +672,13 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::question(
-        this,
-        tr("Delete connection?"),
-//         tr("Are you sure you want to delete this connection: %1?")
-//         + L'\n' + connection.name,
-        connection.name,
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete connection?"), connection.name,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
 
-    if (result != QDialogButtonBox::Yes)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     connections.removeOne(connection.name);

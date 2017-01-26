@@ -69,17 +69,17 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
-    const QString kIssuesLink = makeHref(tr("known issues"), QnAppInfo::defaultCloudPortalUrl());
-    const QString kPromoText = tr("%1 is in Beta yet. See %2", 
-        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
-        .arg(QnAppInfo::cloudName()).arg(kIssuesLink);
-
-    ui->promoBar->setText(kPromoText);
-
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
+
+    const QString kIssuesLink = makeHref(tr("known issues"), urlHelper.faqUrl());
+    const QString kPromoText = tr("%1 is in Beta yet. See %2",
+        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
+        .arg(QnAppInfo::cloudName()).arg(kIssuesLink);
+
+    ui->promoBar->setText(kPromoText);
 
     ui->learnMoreLabel->setText(
         makeHref(tr("Learn more about %1", "%1 is name of cloud (like 'Nx Cloud')").arg(

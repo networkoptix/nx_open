@@ -1,6 +1,7 @@
 #pragma once
 
 namespace nx {
+namespace utils {
 namespace unused {
 namespace detail {
 
@@ -29,6 +30,7 @@ inline void mark_unused(const T0&, const T1&, const T2&, const T3&, const T4&, c
 
 } // namespace detail
 } // namespace unused
+} // namespace utils
 } // namespace nx
 
 // TODO: Rename to NX_UNUSED().
@@ -37,4 +39,4 @@ inline void mark_unused(const T0&, const T1&, const T2&, const T3&, const T4&, c
  * <code>Q_UNUSED(X)</code> or <code>(void) x</code>, does not require arguments
  * to have a complete type. Multiple arguments are supported.
  */
-#define QN_UNUSED(...) ::nx::unused::detail::mark_unused(__VA_ARGS__)
+#define QN_UNUSED(...) ::nx::utils::unused::detail::mark_unused(__VA_ARGS__)

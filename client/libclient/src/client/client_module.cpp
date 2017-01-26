@@ -27,6 +27,7 @@
 #include <client/forgotten_systems_manager.h>
 #include <client/startup_tile_manager.h>
 #include <client/client_settings_watcher.h>
+#include <client/client_show_once_settings.h>
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -265,7 +266,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Depends on QnClientSettings. */
     auto clientInstanceManager = common->store(new QnClientInstanceManager());
 
-    /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
+    /* Depends on nothing. */
+    common->store(new QnClientShowOnceSettings());
+
+    /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
     common->store(new QnClientSettingsWatcher());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
