@@ -100,10 +100,9 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
-//!Listens local tcp address, accepts incoming connections and forwards them to the specified handler
-/*!
-    \uses \a aio::AIOService
-*/
+/**
+ * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
+ */
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
