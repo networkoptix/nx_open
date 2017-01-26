@@ -17,7 +17,7 @@ Pane
     background: null
 
     property alias hostsModel: hostSelectionDialog.model
-    property alias authenticationDataModel: userSelectionDialog.model;
+    property alias authenticationDataModel: userSelectionDialog.model
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
@@ -25,6 +25,7 @@ Pane
     property bool displayAddressError: false
     property bool displayUserCredentialsError: false
     property alias addressErrorText: addressErrorPanel.text
+    property alias userCredentialsErrorText: credentialsWarningField.text
 
     signal accepted()
     signal changed()
@@ -135,7 +136,7 @@ Pane
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            id: credentialsWarningField
             width: parent.width
             opened: displayUserCredentialsError
         }
