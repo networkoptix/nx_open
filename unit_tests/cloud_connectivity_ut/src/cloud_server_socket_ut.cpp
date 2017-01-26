@@ -588,7 +588,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     otherCredentials.key = system.authKey;
     otherCredentials.serverId = server->serverId();
 
-    for (int i = 0; i < 200; ++i)
+    for (int i = 0; i < 17; ++i)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
