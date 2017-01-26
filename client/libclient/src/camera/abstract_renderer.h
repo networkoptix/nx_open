@@ -99,6 +99,7 @@ public:
     void inUse()
     {
         QnMutexLocker lock(&m_usingMutex);
+        NX_ASSERT(!m_needStop);
         m_useCount++;
     }
 
