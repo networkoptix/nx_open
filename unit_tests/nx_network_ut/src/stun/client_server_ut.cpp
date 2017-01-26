@@ -58,7 +58,7 @@ protected:
         AbstractAsyncClient::Settings settings;
         settings.sendTimeout = std::chrono::seconds(1);
         settings.recvTimeout = std::chrono::seconds(1);
-        settings.reconnectPolicy.setInitialDelay(std::chrono::seconds(3));
+        settings.reconnectPolicy.initialDelay = std::chrono::seconds(3);
         return settings;
     }
 
