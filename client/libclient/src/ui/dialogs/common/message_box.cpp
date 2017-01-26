@@ -155,10 +155,16 @@ void QnMessageBoxPrivate::stylizeButtons()
 
     for (QAbstractButton *button : q->buttons())
     {
+        if (button != defaultButton)
+        {
+            resetButtonStyle(button);
+            continue;
+        }
+
         if (buttonAccent == QnButtonAccent::Warning)
-            setWarningButtonStyle(button, button == defaultButton);
+            setWarningButtonStyle(button);
         else
-            setAccentStyle(button, button == defaultButton);
+            setAccentStyle(button);
     }
 }
 
@@ -182,9 +188,9 @@ QnMessageBox::QnMessageBox(
     base_type(parent, flags),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
-
 {
     initialize();
+    setStandardButtons(QDialogButtonBox::NoButton);
 }
 
 QnMessageBox::QnMessageBox(
@@ -455,7 +461,8 @@ void QnMessageBox::setDefaultButton(
     if (QPushButton* pushButton = qobject_cast<QPushButton*>(button))
         pushButton->setDefault(true);
 
-    button->setFocus();
+    if (button)
+        button->setFocus();
 
     d->buttonAccent = accent;
     d->defaultButton = button;
@@ -563,6 +570,24 @@ Qt::TextFormat QnMessageBox::textFormat() const
 void QnMessageBox::setTextFormat(Qt::TextFormat format)
 {
     ui->mainLabel->setTextFormat(format);
+}
+
+bool QnMessageBox::informativeOpenLinks() const
+{
+    Q_D(const QnMessageBox);
+    if (d->informativeLabels.isEmpty())
+        return false;
+
+    return d->informativeLabels.first()->openExternalLinks();
+}
+
+void QnMessageBox::setInformativeOpenLinks(bool value)
+{
+    Q_D(const QnMessageBox);
+
+    QStringList lines;
+    for (auto label : d->informativeLabels)
+        label->setOpenExternalLinks(value);
 }
 
 QString QnMessageBox::informativeText() const

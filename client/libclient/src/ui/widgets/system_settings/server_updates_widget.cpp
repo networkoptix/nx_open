@@ -353,7 +353,10 @@ void QnServerUpdatesWidget::updateButtonAccent()
     if (m_mode == Mode::LatestVersion && !ui->dayWarningBanner->isHidden())
         accented = false;
 
-    setAccentStyle(ui->updateButton, accented);
+    if (accented)
+        setAccentStyle(ui->updateButton);
+    else
+        resetButtonStyle(ui->updateButton);
 }
 
 void QnServerUpdatesWidget::updateDownloadButton()
