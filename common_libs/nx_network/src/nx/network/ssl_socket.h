@@ -97,14 +97,12 @@ public:
     virtual bool getNonBlockingMode(bool* val) const override;
     virtual bool shutdown() override;
 
-    enum IOMode { ASYNC, SYNC };
-
 protected:
     Q_DECLARE_PRIVATE(SslSocket);
     SslSocketPrivate *d_ptr;
 
     SslSocket(
-        SslSocketPrivate* priv, AbstractStreamSocket* wrappedSocket,
+        SslSocketPrivate* priv,AbstractStreamSocket* wrappedSocket,
         bool isServerSide, bool encriptionEnforced);
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
@@ -131,7 +129,6 @@ private:
     bool doHandshake();
     int asyncRecvInternal(void* buffer , unsigned int bufferLen);
     int asyncSendInternal(const void* buffer , unsigned int bufferLen);
-    IOMode ioMode() const;
     void init();
 
     static int bioRead(BIO* bio, char* out, int outl);
@@ -153,8 +150,6 @@ class NX_NETWORK_API MixedSslSocket: public SslSocket
 {
 public:
     MixedSslSocket(AbstractStreamSocket* wrappedSocket);
-    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
-    virtual int send(const void* buffer, unsigned int bufferLen) override;
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,

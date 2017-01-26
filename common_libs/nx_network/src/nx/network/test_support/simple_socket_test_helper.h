@@ -476,10 +476,10 @@ void socketSimpleAsync(
 
 static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
+    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
-    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
     std::promise<void> promise;
     receiver->readAsyncAtLeast(
@@ -508,7 +508,7 @@ static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket
         });
 
     Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
-    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size())) << lastError();
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << lastError();
     EXPECT_EQ(buffer, kTestMessage);
     promise.get_future().wait();
 }
@@ -518,7 +518,7 @@ static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* rec
     ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
     Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
-    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size())) << lastError();
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << lastError();
 }
 
 static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
@@ -535,7 +535,6 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
 
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
-    EXPECT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
 
     std::promise<void> readPromise;
     receiver->readAsyncAtLeast(
