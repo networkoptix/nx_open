@@ -366,8 +366,9 @@ TEST_F(SocketUdt, acceptingFirstConnection)
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* /*socket*/)
+                AbstractStreamSocket* socket)
             {
+                delete socket;
                 socketAcceptedPromise.set_value(errorCode);
             });
 
