@@ -1,13 +1,6 @@
 #!/bin/bash
 
-COMPANY_NAME=${deb.customization.company.name}
-BETA=
-
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-
-DISTRIB=${installer.name}-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}$BETA.deb
+DISTRIB=${artifact.name.server}.deb
 
 update () {
     export DEBIAN_FRONTEND=noninteractive

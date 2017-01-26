@@ -8,16 +8,14 @@ class QnResourcePool;
 
 namespace ec2
 {
-    struct ApiBusinessRuleData: ApiData {
-        ApiBusinessRuleData(): 
-            eventType(QnBusiness::UndefinedEvent), eventState(QnBusiness::UndefinedState), actionType(QnBusiness::UndefinedAction), 
+    struct ApiBusinessRuleData: ApiIdData {
+        ApiBusinessRuleData():
+            eventType(QnBusiness::UndefinedEvent), eventState(QnBusiness::UndefinedState), actionType(QnBusiness::UndefinedAction),
             aggregationPeriod(0), disabled(false), system(false) {}
-
-        QnUuid id;
 
         QnBusiness::EventType eventType;
         std::vector<QnUuid>  eventResourceIds;
-        QnLatin1Array eventCondition; 
+        QnLatin1Array eventCondition;
         QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
@@ -31,7 +29,7 @@ namespace ec2
 
         bool system; // system rule cannot be deleted
     };
-#define ApiBusinessRuleData_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState)(actionType)(actionResourceIds)(actionParams) \
+#define ApiBusinessRuleData_Fields ApiIdData_Fields (eventType)(eventResourceIds)(eventCondition)(eventState)(actionType)(actionResourceIds)(actionParams) \
     (aggregationPeriod)(disabled)(comment)(schedule)(system)
 
 
@@ -50,8 +48,8 @@ namespace ec2
     };
 #define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds)(params)(runtimeParams)(ruleId)(aggregationCount)
 
-    
-    struct ApiResetBusinessRuleData: public ApiData
+
+    struct ApiResetBusinessRuleData: ApiData
     {
         ApiBusinessRuleDataList defaultRules;
     };

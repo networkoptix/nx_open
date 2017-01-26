@@ -14,10 +14,12 @@ namespace nx_ms_conf
 #ifdef __arm__
     static const qint64 DEFAULT_MIN_STORAGE_SPACE = 100*1024*1024; // 100MB
 #else
-    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 5*1024*1024*1024ll; // 5gb
+    static const qint64 DEFAULT_MIN_STORAGE_SPACE = 10*1024*1024*1024ll; // 10gb
 #endif
 
-    static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
+    static const QLatin1String DISABLE_STORAGE_DB_OPTIMIZATION("disableStorageDbOptimization");
+
+	static const QLatin1String MAX_RECORD_QUEUE_SIZE_BYTES( "maxRecordQueueSizeBytes" );
     static const int DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES = 1024*1024*20;
 
     static const QLatin1String MAX_RECORD_QUEUE_SIZE_ELEMENTS( "maxRecordQueueSizeElements" );
@@ -43,6 +45,16 @@ namespace nx_ms_conf
     static const QLatin1String HLS_PLAYLIST_PRE_FILL_CHUNKS("hlsPlaylistPreFillChunks");
     static const unsigned int DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS = 2;
 
+    /** Chunk can be fully cached in memory only it size is not greater then this value.
+        Otherwise, only last \a DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE bytes can be stored in memory
+    */
+    static const QLatin1String HLS_MAX_CHUNK_BUFFER_SIZE("hlsMaxChunkBufferSize");
+#ifdef __arm__
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 2*1024*1024;
+#else
+    static const unsigned int DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE = 10*1024*1024;
+#endif
+
     //!Write block size. This block is always aligned to file system sector size
     static const QLatin1String IO_BLOCK_SIZE( "ioBlockSize" );
     static const int DEFAULT_IO_BLOCK_SIZE = 4*1024*1024;
@@ -55,6 +67,12 @@ namespace nx_ms_conf
     */
     static const QLatin1String FFMPEG_BUFFER_SIZE( "ffmpegBufferSize" );
     static const int DEFAULT_FFMPEG_BUFFER_SIZE = 4*1024*1024;
+
+    static const QLatin1String MAX_FFMPEG_BUFFER_SIZE( "maxFfmpegBufferSize" );
+    static const int DEFAULT_MAX_FFMPEG_BUFFER_SIZE = 4*1024*1024;
+
+    static const QLatin1String MEDIA_FILE_DURATION_SECONDS( "mediaFileDuration" );
+    static const int DEFAULT_MEDIA_FILE_DURATION_SECONDS = 60;
 
     //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
     static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
@@ -88,6 +106,10 @@ namespace nx_ms_conf
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
+
+    static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
+
+    static const QLatin1String ENABLE_MULTIPLE_INSTANCES("enableMultipleInstances");
 }
 
 /*!
@@ -98,10 +120,12 @@ class MSSettings
 public:
     static QString defaultROSettingsFilePath();
     static void initializeROSettingsFromConfFile( const QString& fileName );
+    static void initializeROSettings();
     static QSettings* roSettings();
 
     static QString defaultRunTimeSettingsFilePath();
     static void initializeRunTimeSettingsFromConfFile( const QString& fileName );
+    static void initializeRunTimeSettings();
     static QSettings* runTimeSettings();
 };
 

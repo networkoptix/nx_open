@@ -11,16 +11,6 @@ set -e
 #     echo
 # }
 
-# function get_var()
-# {
-#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-#         h=networkoptix
-#     fi
-#     echo "$h"
-# }
-
-
 
 CUSTOMIZATION=${deb.customization.company.name}
 PRODUCT_NAME=${product.name.short}
@@ -30,14 +20,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${artifact.name.server}.tar.gz
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 BUILD_DIR="`mktemp -d`"
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -61,32 +45,32 @@ do
 done
 
 LIBS_TO_COPY=\
-( libavcodec.so.54.23.100 \
-libavdevice.so.54.0.100 \
-libavfilter.so.2.77.100 \
-libavformat.so.54.6.100 \
-libavutil.so.51.54.100 \
-libudt.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libpostproc.so.52.0.100 \
-libquazip.so.1.0.0 \
-libsasl2.so.3.0.0 \
-liblber-2.4.so.2.10.5 \
-libldap-2.4.so.2.10.5 \
-libldap_r-2.4.so.2.10.5 \
+( libavcodec.so \
+libavdevice.so \
+libavfilter.so \
+libavformat.so \
+libavutil.so \
+libudt.so \
+libcommon.so \
+libcloud_db_client.so \
+libnx_fusion.so \
+libnx_network.so \
+libnx_streaming.so \
+libnx_utils.so \
+libnx_email.so \
+libappserver2.so \
+libmediaserver_core.so \
+libquazip.so \
+libsasl2.so \
+liblber-2.4.so.2 \
+libldap-2.4.so.2 \
+libldap_r-2.4.so.2 \
 libsigar.so \
-libswresample.so.0.15.100 \
-libswscale.so.2.1.100 )
+libswresample.so \
+libswscale.so )
 
-if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
-  LIBS_TO_COPY+=( libvpx.so.1.2.0 )
+if [ -e "$LIBS_DIR/libvpx.so" ]; then
+  LIBS_TO_COPY+=( libvpx.so )
 fi
 if [ -e "$LIBS_DIR/libcreateprocess.so" ]; then
   LIBS_TO_COPY+=( libcreateprocess.so )
@@ -100,28 +84,20 @@ echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  echo "Adding lib" $var
+  cp $LIBS_DIR/${var}* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
-     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
 
-#generating links
-pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
-LIBS="`find ./ -name '*.so.*.*.*'`"
-for var in $LIBS
-do
-    LINK_TARGET="`echo $var | sed 's/\(.*so.[0-9]\+\)\(.*\)/\1/'`"
-    ln -s $var $LINK_TARGET
-done
-popd
-
 #copying qt libs
-QTLIBS=`readelf -d $BUILD_OUTPUT_DIR/bin/${build.configuration}/mediaserver | grep libQt5 | sed -e 's/.*\(libQt5.*\.so\).*/\1/'`
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
 for var in $QTLIBS
 do
-    cp -P ${qt.dir}/lib/$var* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 done
 
 #copying bin
@@ -136,7 +112,7 @@ cp $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/libisd_native_plugin.so 
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp ./usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
@@ -173,7 +149,7 @@ if [ ! -f $PACKAGE_NAME ]; then
   echo "Distribution is not created! Exiting"
   exit 1
 fi
-zip ./$UPDATE_NAME.zip ./*
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip

@@ -43,6 +43,13 @@
 #ifndef QNAUDIOFORMAT_H
 #define QNAUDIOFORMAT_H
 
+#ifdef Q_OS_WIN
+#   include <QtMultimedia/QAudioFormat>
+#   define QnAudioFormat QAudioFormat
+#else
+
+#define CUSTOM_AUDIO_FORMAT_CLASS
+
 #include <QtCore/qobject.h>
 #include <QtCore/qglobal.h>
 #include <QtCore/qshareddata.h>
@@ -105,9 +112,12 @@ private:
     QSharedDataPointer<QnAudioFormatPrivate> d;
 };
 
+QDebug operator<<(QDebug, QnAudioFormat::SampleType type);
+QDebug operator<<(QDebug, const QnAudioFormat&);
 
 QT_END_NAMESPACE
 
 QT_END_HEADER
 
+#endif // !Q_OS_WIN
 #endif  // QNAUDIOFORMAT_H

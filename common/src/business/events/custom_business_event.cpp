@@ -1,12 +1,12 @@
 #include "custom_business_event.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "network/authutil.h"
 #include <business/actions/abstract_business_action.h>
 
-QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, 
-                                             qint64 timeStamp, const 
-                                             QString& resourceName, 
-                                             const QString& caption, 
+QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
+                                             qint64 timeStamp, const
+                                             QString& resourceName,
+                                             const QString& caption,
                                              const QString& description,
                                              QnEventMetaData metadata):
     base_type(QnBusiness::UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
@@ -15,16 +15,16 @@ QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
     m_description(description),
     m_metadata(std::move(metadata))
 {
-    
+
 }
 
 bool QnCustomBusinessEvent::isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const {
     return state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
 }
 
-bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const 
+bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const
 {
-    auto unquote = [](const QStringList& dataList) 
+    auto unquote = [](const QStringList& dataList)
     {
         QStringList result;
         for (const auto& data: dataList)
@@ -36,11 +36,11 @@ bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &pa
     QStringList captionKeywords      = unquote(smartSplit(params.caption, L' ', QString::SkipEmptyParts));
     QStringList descriptionKeywords  = unquote(smartSplit(params.description, L' ', QString::SkipEmptyParts));
 
-    auto mathKeywords = [](const QStringList& keywords, const QString& pattern) 
+    auto mathKeywords = [](const QStringList& keywords, const QString& pattern)
     {
         if (keywords.isEmpty())
             return true;
-        for (const QString& keyword: keywords) 
+        for (const QString& keyword: keywords)
         {
             if (pattern.contains(keyword))
                 return true;
@@ -53,7 +53,7 @@ bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &pa
            mathKeywords(descriptionKeywords, m_description);
 }
 
-QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const 
+QnBusinessEventParameters QnCustomBusinessEvent::getRuntimeParams() const
 {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
     params.resourceName = m_resourceName;

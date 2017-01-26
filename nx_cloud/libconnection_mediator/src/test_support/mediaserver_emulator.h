@@ -1,30 +1,24 @@
-/**********************************************************
-* Dec 22, 2015
-* akolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef MEDIASERVER_EMULATOR_H
-#define MEDIASERVER_EMULATOR_H
-
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
+#include <nx/network/cloud/mediator_address_publisher.h>
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/stoppable.h>
 
 #include "../cloud_data_provider.h"
 
-
 namespace nx {
 namespace hpm {
 
-class MediaServerEmulator
-:
-    private QnStoppableAsync,
+class MediaServerEmulator:
+    public network::aio::BasicPollable,
     public StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
@@ -35,6 +29,7 @@ public:
         establishUdtConnection,
         ignoreSyn,
         sendBadSynAck,
+        doNotAnswerTunnelChoiceNotification,
         proceedWithConnection,
     };
 
@@ -47,16 +42,19 @@ public:
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
 
+    virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
+
     /** Attaches to a local port and */
-    bool start();
-    nx::hpm::api::ResultCode registerOnMediator();
+    bool start(bool listenForConnectRequests = true);
     nx::String serverId() const;
+    void setServerId(nx::String serverId);
     /** returns serverId.systemId */
     nx::String fullName() const;
     /** Server endpoint */
     SocketAddress endpoint() const;
 
-    nx::hpm::api::ResultCode listen() const;
+    nx::hpm::api::ResultCode bind();
+    std::pair<nx::hpm::api::ResultCode, nx::hpm::api::ListenResponse> listen() const;
 
     /** Address of connection to mediator */
     SocketAddress mediatorConnectionLocalAddress() const;
@@ -69,11 +67,18 @@ public:
     void setConnectionAckResponseHandler(
         std::function<ActionToTake(api::ResultCode)> handler);
 
+    void setCloudSystemIdForModuleInformation(
+        boost::optional<nx::String> cloudSystemId);
+    void setServerIdForModuleInformation(
+        boost::optional<nx::String> serverId);
+
+    nx::hpm::api::ResultCode updateTcpAddresses(std::list<SocketAddress> addresses);
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection();
+
 private:
-    nx::network::aio::Timer m_timer;
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     nx_http::MessageDispatcher m_httpMessageDispatcher;
-    nx_http::HttpStreamSocketServer m_httpServer;
+    std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
@@ -86,6 +91,10 @@ private:
     std::unique_ptr<nx::network::UdtStreamServerSocket> m_udtStreamServerSocket;
     std::unique_ptr<stun::MessagePipeline> m_stunPipeline;
     ActionToTake m_action;
+    const int m_cloudConnectionMethodMask;
+    std::unique_ptr<network::cloud::MediatorAddressPublisher> m_mediatorAddressPublisher;
+    boost::optional<nx::String> m_cloudSystemIdForModuleInformation;
+    boost::optional<nx::String> m_serverIdForModuleInformation;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);
@@ -99,13 +108,11 @@ private:
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
         stun::MessagePipeline* connection) override;
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void stopWhileInAioThread() override;
 
     MediaServerEmulator(const MediaServerEmulator&);
     MediaServerEmulator& operator=(const MediaServerEmulator&);
 };
 
-}   //hpm
-}   //nx
-
-#endif  //MEDIASERVER_EMULATOR_H
+} // namespace hpm
+} // namespace nx

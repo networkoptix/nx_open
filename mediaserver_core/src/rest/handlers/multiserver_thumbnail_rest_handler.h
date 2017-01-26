@@ -9,8 +9,11 @@
 class QnMultiserverThumbnailRestHandler: public QnFusionRestHandler
 {
 public:
-    QnMultiserverThumbnailRestHandler(const QString& path);
+    QnMultiserverThumbnailRestHandler(const QString& path = QString());
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor) override;
+
+    // todo: remove ownerPort from params
+    int getScreenshot(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort);
 
 private:
     /** Calculate server where the request should be executed. */

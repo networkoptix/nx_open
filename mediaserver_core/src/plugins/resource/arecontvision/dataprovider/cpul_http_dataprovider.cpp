@@ -5,6 +5,7 @@
 
 #include "../resource/av_resource.h"
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 
 #include "cpul_http_dataprovider.h"
 
@@ -169,7 +170,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     }
 
     //video/H.264I
-    videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    videoData->compressionType = h264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG;
     videoData->width = resolutionFULL ? width : width>>1;
     videoData->height = resolutionFULL ? height : height>>1;
 

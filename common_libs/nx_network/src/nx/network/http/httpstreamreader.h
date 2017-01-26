@@ -6,16 +6,15 @@
 #ifndef HTTPSTREAMREADER_H
 #define HTTPSTREAMREADER_H
 
-#include <mutex>
-
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/utils/thread/mutex.h>
+#include <utils/media/abstract_byte_stream_filter.h>
+
 #include "httptypes.h"
 #include "linesplitter.h"
-
-#include "utils/media/abstract_byte_stream_filter.h"
 
 
 namespace nx_http
@@ -32,7 +31,6 @@ namespace nx_http
     class NX_NETWORK_API HttpStreamReader
     {
     public:
-        // TODO: #Elric #enum
         enum ReadState
         {
             waitingMessageStart,
@@ -64,7 +62,10 @@ namespace nx_http
             \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
         */
         const Message& message() const;
+        /** moves message out of parser */
+        Message takeMessage();
         ReadState state() const;
+        quint64 messageBodyBytesRead() const;
         size_t messageBodyBufferSize() const;
         //!Returns internal message body buffer and clears internal buffer
         BufferType fetchMessageBody();
@@ -74,6 +75,8 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
+        //!Force HttpStreamReader think that end of message body has been met
+        void forceEndOfMsgBody();
         /*!
             By default \a true.
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
@@ -122,7 +125,7 @@ namespace nx_http
         bool m_breakAfterReadingHeaders;
 
         LineSplitter m_lineSplitter;
-        mutable std::mutex m_mutex;
+        mutable QnMutex m_mutex;
 
         bool parseLine( const ConstBufferRefType& data );
         //!Reads message body parameters from message headers and initializes required data

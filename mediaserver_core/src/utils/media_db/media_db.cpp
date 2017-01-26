@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "media_db.h"
 #include <nx/utils/log/log.h>
+#include <cerrno>
 
 namespace nx
 {
@@ -33,6 +34,8 @@ public:
         *m_stream << camOp.part1;
         if (m_stream->status() == QDataStream::WriteFailed)
         {
+            qWarning() << "Media DB Camera operation write error: QDataStream::WriteFailed. errno: " 
+                       << strerror(errno);
             *m_error = Error::WriteError;
             return;
         }
@@ -40,7 +43,13 @@ public:
         int bytesWritten = m_stream->writeRawData(camOp.cameraUniqueId.data(),
                                                   bytesToWrite);
         if (bytesToWrite != bytesWritten)
+        {
+            qWarning() << "Media DB Camera operation write error: QDataStream::WriteRawData wrong bytes written count. errno: " 
+                       << strerror(errno)
+                       << ". Bytes to write = " << bytesToWrite
+                       << "; Bytes written = " << bytesWritten;
             *m_error = Error::WriteError;
+        }
     }
 
     template<typename StructToWrite>
@@ -48,6 +57,13 @@ public:
     { 
         QnMutexLocker lk(m_mutex);
         *m_stream << s; 
+        if (m_stream->status() == QDataStream::WriteFailed)
+        {
+            qWarning() << "Media DB Media File operation write error: QDataStream::WriteFailed. errno: " 
+                       << strerror(errno);
+            *m_error = Error::WriteError;
+            return;
+        }
     }
 
 private:
@@ -84,7 +100,7 @@ void DbHelper::run()
         {
             auto record = m_writeQueue.front();
 
-            Error error;
+            Error error = Error::NoError;
             RecordVisitor vis(&m_stream, &error, &m_mutex);
             lk.unlock();
             boost::apply_visitor(vis, record);

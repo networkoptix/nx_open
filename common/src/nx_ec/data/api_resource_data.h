@@ -1,55 +1,57 @@
-#ifndef __RESOURCE_TRANSACTION_DATA_H__
-#define __RESOURCE_TRANSACTION_DATA_H__
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
 
+namespace ec2 {
 
-namespace ec2
+struct ApiResourceParamData: ApiData
 {
-    struct ApiResourceParamData: ApiData
-    {
-        ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value): value(value), name(name) {}
+    ApiResourceParamData() {}
+    ApiResourceParamData(const QString& name, const QString& value): value(value), name(name) {}
 
-        QString value;
-        QString name;
-    };
+    QString value;
+    QString name;
+};
 #define ApiResourceParamData_Fields (value)(name)
 
+struct ApiResourceParamWithRefData: ApiResourceParamData
+{
+    ApiResourceParamWithRefData() {}
 
-    struct ApiResourceParamWithRefData: ApiResourceParamData
+    ApiResourceParamWithRefData(
+        const QnUuid& resourceId, const QString& name, const QString& value)
+        :
+        ApiResourceParamData(name, value), resourceId(resourceId)
     {
-        ApiResourceParamWithRefData() {}
-        ApiResourceParamWithRefData(const QnUuid& resourceId, const QString& name, const QString& value): ApiResourceParamData(name, value), resourceId(resourceId) {}
-        QnUuid resourceId;
-    };
+    }
+
+    QnUuid resourceId;
+};
 #define ApiResourceParamWithRefData_Fields ApiResourceParamData_Fields (resourceId)
 
+struct ApiResourceData: ApiIdData
+{
+    ApiResourceData() {}
 
-    struct ApiResourceData: ApiData {
-        ApiResourceData() {}
+    QnUuid parentId;
+    QString name;
+    QString url;
+    QnUuid typeId;
 
-        QnUuid          id;
-        QnUuid          parentId;
-        QString       name;
-        QString       url;
-        QnUuid          typeId;
-    };
-#define ApiResourceData_Fields (id)(parentId)(name)(url)(typeId)
+    bool operator==(const ApiResourceData&) const;
+};
+#define ApiResourceData_Fields ApiIdData_Fields (parentId)(name)(url)(typeId)
 
-    struct ApiResourceStatusData: ApiData
-    {
-        ApiResourceStatusData(): status(Qn::Offline) {}
+struct ApiResourceStatusData: ApiIdData
+{
+    ApiResourceStatusData(): status(Qn::Offline) {}
 
-        QnUuid id;
-        Qn::ResourceStatus status;
-    };
-#define ApiResourceStatusData_Fields (id)(status)
+    Qn::ResourceStatus status;
+};
+#define ApiResourceStatusData_Fields ApiIdData_Fields (status)
 
 } // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ApiResourceParamData)
 Q_DECLARE_METATYPE(ec2::ApiResourceParamWithRefData)
-
-#endif // __RESOURCE_TRANSACTION_DATA_H__

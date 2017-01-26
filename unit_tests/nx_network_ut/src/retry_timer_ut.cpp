@@ -38,6 +38,8 @@ TEST(RetryTimer, tryCount)
         }
         if (retryCount != RetryPolicy::kInfiniteRetries)
             ASSERT_FALSE(retryTimer.scheduleNextTry([]{}));
+
+        retryTimer.pleaseStopSync();
     }
 }
 
@@ -82,6 +84,8 @@ TEST(RetryTimer, delayCalculation)
                 ASSERT_EQ(expectedDelay, delay);
                 prevDelay = delay;
             }
+
+            retryTimer.pleaseStopSync();
         }
     }
 }

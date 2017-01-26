@@ -63,7 +63,7 @@ public:
     template<class Func>
     bool atomicUpdate(
         const KeyType& key,
-        const Func& updateFunc)
+        Func updateFunc)
     {
         QnMutexLocker lk(&m_mutex);
 

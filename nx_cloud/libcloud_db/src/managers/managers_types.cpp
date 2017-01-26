@@ -5,30 +5,13 @@
 
 #include "managers_types.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 
 namespace nx {
 namespace cdb {
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(EntityType,
-    (EntityType::none, "none")
-    (EntityType::module, "module")
-    (EntityType::account, "account")
-    (EntityType::system, "system")
-    (EntityType::subscription, "subscription")
-    (EntityType::product, "product")
-    )
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(DataActionType,
-    (DataActionType::fetch, "fetch")
-    (DataActionType::insert, "insert")
-    (DataActionType::update, "update")
-    (DataActionType::_delete, "delete")
-    )
-
-
-api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
+api::ResultCode dbResultToApiResult( nx::db::DBResult dbResult )
 {
     switch( dbResult )
     {
@@ -38,12 +21,40 @@ api::ResultCode fromDbResultCode( nx::db::DBResult dbResult )
         case nx::db::DBResult::notFound:
             return api::ResultCode::notFound;
 
+        case nx::db::DBResult::cancelled:
+            return api::ResultCode::retryLater;
+
         case nx::db::DBResult::ioError:
+        case nx::db::DBResult::statementError:
+        case nx::db::DBResult::connectionError:
             return api::ResultCode::dbError;
+
+        case nx::db::DBResult::retryLater:
+            return api::ResultCode::retryLater;
+
+        case nx::db::DBResult::uniqueConstraintViolation:
+            return api::ResultCode::alreadyExists;
     }
 
     return api::ResultCode::dbError;
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, EntityType,
+    (nx::cdb::EntityType::none, "none")
+    (nx::cdb::EntityType::module, "module")
+    (nx::cdb::EntityType::account, "account")
+    (nx::cdb::EntityType::system, "system")
+    (nx::cdb::EntityType::subscription, "subscription")
+    (nx::cdb::EntityType::product, "product")
+    (nx::cdb::EntityType::maintenance, "maintenance")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb, DataActionType,
+    (nx::cdb::DataActionType::fetch, "fetch")
+    (nx::cdb::DataActionType::insert, "insert")
+    (nx::cdb::DataActionType::update, "update")
+    (nx::cdb::DataActionType::_delete, "delete")
+)

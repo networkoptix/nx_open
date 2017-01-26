@@ -82,8 +82,8 @@ public slots:
         locker.unlock();
         if(val == 0)
         {
-            m_counterReachedZeroCondition.wakeAll();
             emit reachedZero();
+            m_counterReachedZeroCondition.wakeAll();
         }
     }
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <utils/serialization/lexical.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 TEST( QnLexical, Bool )
 {

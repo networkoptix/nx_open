@@ -1,8 +1,6 @@
 #ifndef uniclient_filetypesupport_h
 #define uniclient_filetypesupport_h
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QString>
 
 class QN_EXPORT FileTypeSupport
@@ -16,7 +14,5 @@ public:
     static bool isImageFileExt(const QString &filename);
     static bool isLayoutFileExt(const QString &filename);
 };
-
-#endif // ENABLE_ARCHIVE
 
 #endif // uniclient_filetypesupport_h

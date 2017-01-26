@@ -50,8 +50,8 @@ public: // inherited interface overrides
 
     virtual int     getCapabilities() const override;    
     virtual qint64  getFreeSpace() override;
-    virtual qint64  getTotalSpace() override;
-    virtual bool    initOrUpdate() const override;
+    virtual qint64  getTotalSpace()const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
     virtual bool    removeFile(const QString& url) override;
     virtual bool    removeDir(const QString& url) override;
     virtual bool    renameFile(const QString& oldName, const QString& newName) override;

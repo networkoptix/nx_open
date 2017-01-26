@@ -7,13 +7,12 @@
 
 #ifdef _WIN32
     #include <windows.h>
-    
-    #include <common/systemexcept_win32.h>
 #else
     #include <sys/types.h>
     #include <signal.h>
 #endif
 
+#include <nx/utils/crash_dump/systemexcept.h>
 
 static nx::cdb::CloudDBProcessPublic* serviceInstance = NULL;
 

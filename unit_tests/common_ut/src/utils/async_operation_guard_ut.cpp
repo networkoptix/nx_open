@@ -1,10 +1,9 @@
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <thread>
 
 #include <nx/utils/async_operation_guard.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 namespace nx {
 namespace utils {
@@ -42,7 +41,7 @@ public:
 
 private:
     std::thread m_thread;
-    TestSyncQueue<std::function<void()>> m_tasks;
+    utils::TestSyncQueue<std::function<void()>> m_tasks;
 };
 
 class AsyncOperationGuardTest
@@ -69,7 +68,7 @@ public:
 
 private:
     AsyncRunner* m_runner;
-    TestSyncQueue<bool> m_completeQueue;
+    utils::TestSyncQueue<bool> m_completeQueue;
     AsyncOperationGuard m_operationGuard;
 };
 

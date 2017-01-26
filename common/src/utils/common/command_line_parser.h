@@ -89,14 +89,9 @@ private:
 };
 
 
-class QN_EXPORT QnCommandLineParser {
-    Q_DECLARE_TR_FUNCTIONS(QnCommandLineParser);
+class QN_EXPORT QnCommandLineParser
+{
 public:
-    enum ParameterPreservationMode {
-        RemoveParsedParameters,
-        PreserveParsedParameters
-    };
-
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
@@ -104,7 +99,14 @@ public:
     void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
 
     template<class T>
-    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    {
+        addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
+    }
+
+    template<class T>
+    void addParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue())
+    {
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }
 
@@ -115,8 +117,8 @@ public:
 
     void clear();
 
-    bool parse(int &argc, char **argv, FILE *errorFile, ParameterPreservationMode preservationMode = RemoveParsedParameters);
-    bool parse(int &argc, char **argv, QTextStream *errorStream, ParameterPreservationMode preservationMode = RemoveParsedParameters);
+    bool parse(int &argc, const char **argv, FILE *errorFile);
+    bool parse(int &argc, const char **argv, QTextStream *errorStream);
 
 private:
     void addName(int index, const QString &name);
@@ -126,24 +128,5 @@ private:
     QList<QVariant> m_values;
     QHash<QString, int> m_indexByName;
 };
-
-
-//!Stand-alone & simple function for parsing arguments
-/*!
-    Supports both "-a value" and "--arg=value" syntax. "-" and "--" are ommitted
-*/
-void parseCmdArgs(
-    int argc,
-    char **argv,
-    std::multimap<QString, QString>* const args);
-
-bool readArg(
-    const std::multimap<QString, QString>& args,
-    const QString& name,
-    QString* const value);
-bool readArg(
-    const std::multimap<QString, QString>& args,
-    const QString& name,
-    int* const value);
 
 #endif // QN_COMMAND_LINE_PARSER_H

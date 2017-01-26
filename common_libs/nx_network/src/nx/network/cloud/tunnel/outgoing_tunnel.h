@@ -8,52 +8,72 @@
 #include <utils/common/stoppable.h>
 
 #include "abstract_tunnel_connector.h"
+#include "cross_nat_connector.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "nx/network/aio/timer.h"
 #include "nx/network/system_socket.h"
 #include "tunnel.h"
-
 
 namespace nx {
 namespace network {
 namespace cloud {
 
 /**
-    \note \a OutgoingTunnel instance can be safely freed only after 
-        \a OutgoingTunnel::pleaseStop completion. It is allowed 
-        to free object in \a closed handler itself.
-        It is needed to guarantee that all clients receive response.
-    \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
-*/
-class NX_NETWORK_API OutgoingTunnel
-:
-    public Tunnel
+ * @note OutgoingTunnel instance can be safely freed only after 
+ *       OutgoingTunnel::pleaseStop completion. It is allowed 
+ *       to free object in "on closed" handler itself.
+ *       It is needed to guarantee that all clients receive response.
+ * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call
+ */
+class NX_NETWORK_API OutgoingTunnel:
+    public aio::BasicPollable
 {
+    typedef aio::BasicPollable BaseType;
+
 public:
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
+
+    enum class State
+    {
+        init,
+        connecting,
+        connected,
+        closed
+    };
+
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 
     OutgoingTunnel(AddressEntry targetPeerAddress);
     virtual ~OutgoingTunnel();
 
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     /**
-       \note Calling party MUST not use object after \a OutgoingTunnel::pleaseStop call
+     * @note Calling party MUST not use object after OutgoingTunnel::pleaseStop call.
      */
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void stopWhileInAioThread() override;
 
-    /** Establish new connection.
-    * @param timeout Zero means no timeout
-    * @param socketAttributes attribute values to apply to a newly-created socket
-    * \note This method is re-enterable. So, it can be called in
-    *        different threads simultaneously */
+    void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler);
+
+    /**
+     * Establish new connection.
+     * @param timeout Zero means no timeout
+     * @param socketAttributes attribute values to apply to a newly-created socket
+     * @note This method is re-enterable. So, it can be called in
+     *       different threads simultaneously
+     */
     void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
-    /** same as above, but no timeout */
+    /** Same as above, but no timeout. */
     void establishNewConnection(
         SocketAttributes socketAttributes,
         NewConnectionHandler handler);
+
+    static QString stateToString(State state);
 
 private:
     struct ConnectionRequestData
@@ -69,13 +89,15 @@ private:
     std::multimap<
         std::chrono::steady_clock::time_point,
         ConnectionRequestData> m_connectHandlers;
-    std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
-    aio::Timer m_timer;
+    std::unique_ptr<AbstractCrossNatConnector> m_connector;
+    std::unique_ptr<aio::Timer> m_timer;
     bool m_terminated;
     boost::optional<std::chrono::steady_clock::time_point> m_timerTargetClock;
-    int m_counter;
-    std::shared_ptr<AbstractOutgoingTunnelConnection> m_connection;
+    std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     SystemError::ErrorCode m_lastErrorCode;
+    QnMutex m_mutex;
+    State m_state;
+    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
 
     void updateTimerIfNeeded();
     void updateTimerIfNeededNonSafe(
@@ -90,17 +112,9 @@ private:
     void onTunnelClosed(SystemError::ErrorCode errorCode);
     void startAsyncTunnelConnect(QnMutexLockerBase* const locker);
     void onConnectorFinished(
-        CloudConnectType connectorType,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
-
-    void connectorsTerminated(
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
-    void connectorsTerminatedNonSafe(
-        QnMutexLockerBase* const /*lock*/,
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
-    void connectionTerminated(
-        nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler);
+    void setTunnelConnection(std::unique_ptr<AbstractOutgoingTunnelConnection> connection);
 };
 
 } // namespace cloud

@@ -1,18 +1,12 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "udp_message_response_sender.h"
 
 #include "udp_server.h"
-
 
 namespace nx {
 namespace stun {
 
 UDPMessageResponseSender::UDPMessageResponseSender(
-    UDPServer* udpServer,
+    UdpServer* udpServer,
     SocketAddress sourceAddress)
 :
     m_udpServer(udpServer),
@@ -44,7 +38,8 @@ SocketAddress UDPMessageResponseSender::getSourceAddress() const
     return m_sourceAddress;
 }
 
-void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()> /*handler*/)
+void UDPMessageResponseSender::addOnConnectionCloseHandler(
+    nx::utils::MoveOnlyFunc<void()> /*handler*/)
 {
     //TODO #ak
     NX_ASSERT(false);
@@ -55,5 +50,10 @@ AbstractCommunicatingSocket* UDPMessageResponseSender::socket()
     return m_udpServer->socket().get();
 }
 
-}   //stun
-}   //nx
+void UDPMessageResponseSender::close()
+{
+    // Doing nothing, since it is UDP.
+}
+
+} // namespace stun
+} // namespace nx

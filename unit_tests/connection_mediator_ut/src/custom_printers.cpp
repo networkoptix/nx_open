@@ -12,7 +12,7 @@
 #include <QString>
 
 #include <cdb/system_data.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 
 void PrintTo(const QByteArray& val, ::std::ostream* os) {

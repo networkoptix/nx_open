@@ -1,30 +1,95 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SettingsCtrl', function ($scope, $modal, $log, mediaserver,$location,$timeout, dialogs) {
+    .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
+                                          cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
 
-        mediaserver.getUser().then(function(user){
-            if(!user.isAdmin){
-                $location.path('/info'); //no admin rights - redirect
+        function updateActive(){
+            $scope.active={
+                device: $location.path() === '/settings/device',
+                system: $location.path() === '/settings/system',
+                server: $location.path() === '/settings/server'
+            };
+        }
+        updateActive();
+
+        var killSubscription = $rootScope.$on('$routeChangeStart', updateActive);
+        $scope.$on( '$destroy', function( ) {
+            killSubscription();
+        });
+
+        function pingModule(){
+            return mediaserver.getModuleInformation(true).then(function(r){
+                if(!data.flags.brokenSystem){
+                     window.location.reload();
+                }
+                return true;
+            });
+        }
+
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
+
+
+        mediaserver.getModuleInformation().then(function (r) {
+            var data = r.data.reply;
+
+            if(data.flags.newSystem){
                 return;
             }
 
-            $scope.canMerge = user.isOwner;
+            $scope.settings = data;
+            // $scope.noNetwork =
+
+            $scope.oldSystemName = data.systemName;
+            $scope.oldPort = data.port;
+
+            if(data.flags.brokenSystem){
+                $poll(pingModule,1000);
+                return;
+            }
+            
+            if(data.flags.canSetupNetwork){
+                mediaserver.networkSettings().then(function(r){
+                    $scope.networkSettings = r.data.reply;
+                });
+            }
+            checkUserRights();
         });
 
-        mediaserver.getModuleInformation().then(function (r) {
-            $scope.settings = {
-                systemName: r.data.reply.systemName,
-                port: r.data.reply.port,
-                id: r.data.reply.id,
-                ecDbReadOnly:r.data.reply.ecDbReadOnly
-            };
+        function checkUserRights() {
+            return mediaserver.getUser().then(function (user) {
+                if (!user.isAdmin) {
+                    $location.path('/info'); //no admin rights - redirect
+                    return false;
+                }
 
-            $scope.oldSystemName = r.data.reply.systemName;
-            $scope.oldPort = r.data.reply.port;
-        });
+                $scope.$watch("active.device",function(){
+                    if( $scope.active.device){
+                        $location.path('/settings/device',false);
+                    }
+                });
+                $scope.$watch("active.system",function(){
+                    if( $scope.active.system){
+                        $location.path('/settings/system',false);
+                    }
+                });
+                $scope.$watch("active.server",function(){
+                    if( $scope.active.server){
+                        $location.path('/settings/server',false);
+                    }
+                });
 
+                $scope.canConnectToCloud = $scope.canMerge = user.isOwner;
+
+                getCloudInfo();
+                requestScripts();
+
+                $scope.user = user;
+            });
+        }
         $scope.Config = Config;
         $scope.password = '';
         $scope.oldPassword = '';
@@ -43,18 +108,26 @@ angular.module('webadminApp')
         };
 
 
-        $scope.openDisconnectDialog = function () {
+        $scope.openRestoreDefaultsDialog = function () {
             //1. confirm detach
-            var confirmation = $scope.singleServer?
-                'This server will be disconnected from old server and turned into a new one':
-                'Reset system: clear system name, administrator account and cloud settings';
-            dialogs.confirmWithPassword(null,
-                confirmation,
-                'Create New System').then(function(oldPassword){
-                mediaserver.detachFromSystem(oldPassword).then(function(){
-                    //2. throw him to master
-                    $location.path('/setup');
-                    window.location.reload();
+            dialogs.confirmWithPassword(null, L.settings.confirmRestoreDefault, L.settings.confirmRestoreDefaultTitle).then(function(oldPassword){
+
+                mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    mediaserver.restoreFactoryDefaults().then(function (data) {
+                        if (data.data.error !== '0' && data.data.error !== 0) {
+                            // Some Error has happened
+                            dialogs.alert(data.data.errorString);
+                            return;
+                        }
+
+                        restartServer();
+                    }, function (error) {
+                        dialogs.alert(L.settings.unexpectedError);
+                        $log.log('can\'t detach');
+                        $log.error(error);
+                    });
+                },function(){
+                    dialogs.alert(L.settings.wrongPassword);
                 });
             });
         };
@@ -71,13 +144,11 @@ angular.module('webadminApp')
             });
         }
 
-
-
         function errorHandler(){
-            dialogs.alert ('Connection error');
+            dialogs.alert (L.settings.connnetionError);
             return false;
         }
-        function resultHandler (r){
+        function resultHandler (r, message){
             var data = r.data;
 
             if(data.error!=='0') {
@@ -86,126 +157,106 @@ angular.module('webadminApp')
                     case 'UNAUTHORIZED':
                     case 'password':
                     case 'PASSWORD':
-                        errorToShow = 'Wrong password.';
+                        errorToShow = L.settings.wrongPassword;
                 }
-                dialogs.alert('Error: ' + errorToShow);
-            }else if (data.reply.restartNeeded) {
-                dialogs.confirm('All changes saved. New settings will be applied after restart. \n Do you want to restart server now?').then(function() {
+                dialogs.alert( L.settings.error + errorToShow);
+            }else if (data.reply && data.reply.restartNeeded) {
+                dialogs.confirm(L.settings.restartNeeded).then(function() {
                     restartServer(true);
                 });
             } else {
-                dialogs.alert('Settings saved');
-                if( $scope.settings.port !==  window.location.port ) {
-                    window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
-                }else{
-                    window.location.reload();
+                dialogs.alert(message || L.settings.settingsSaved);
+                if(!message) {
+                    if ($scope.settings.port !== window.location.port) {
+                        window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
+                    } else {
+                        window.location.reload();
+                    }
                 }
             }
         }
 
         $scope.save = function () {
-            if($scope.settingsForm.$valid) {
-                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
-            }else{
-                dialogs.alert('form is not valid');
-            }
+            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
         };
 
 // execute/scryptname&mode
         $scope.restart = function () {
-            dialogs.confirm('Do you want to restart server now?').then(function(){
+            dialogs.confirm(L.settings.confirmRestart).then(function(){
                 restartServer(false);
             });
         };
         $scope.canHardwareRestart = false;
         $scope.canRestoreSettings = false;
         $scope.canRestoreSettingsNotNetwork = false;
+        function requestScripts() {
+            return mediaserver.getScripts().then(function (data) {
+                if (data.data && data.data.reply) {
 
-        mediaserver.getScripts().then(function(data){
-            if(data.data && data.data.reply) {
-                $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
-                $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
-                $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
-            }
-        });
+                    // Has any scripts
+                    $scope.controlDevice = data.data.reply && data.data.reply.length>0;
 
-        $scope.hardwareRestart = function(){
-            dialogs.confirm('Do you want to restart server\'s operation system?').then(function(){
-                mediaserver.execute('reboot').then(resultHandler, errorHandler);
+                    $scope.canHardwareRestart = data.data.reply.indexOf('reboot') >= 0;
+                    $scope.canRestoreSettings = data.data.reply.indexOf('restore') >= 0;
+                    $scope.canRestoreSettingsNotNetwork = data.data.reply.indexOf('restore_keep_ip') >= 0;
+                }
+            });
+        }
+
+
+        function runResultHandler(result){
+            resultHandler(result, L.settings.nx1ControlHint);
+        }
+
+        $scope.renameSystem = function(){
+            mediaserver.changeSystemName($scope.settings.systemName).then(resultHandler, errorHandler);
+        };
+
+        $scope.hardwareRestart = function(settingsSaved){
+            dialogs.confirm(settingsSaved?L.settings.restartNeeded:L.settings.confirmHardwareRestart).then(function(){
+                mediaserver.execute('reboot').then(restartServer, errorHandler);
             });
         };
 
         $scope.restoreSettings = function(){
-            dialogs.confirm('Do you want to restart all server\'s settings? Archive will be saved, but network settings will be reset.').then(function(){
+            dialogs.confirm(L.settings.confirmRestoreSettings).then(function(){
                 mediaserver.execute('restore').then(resultHandler, errorHandler);
             });
         };
 
         $scope.restoreSettingsNotNetwork = function(){
-            dialogs.confirm('Do you want to restart all server\'s settings? Archive and network settings will be saved.').then(function(){
+            dialogs.confirm(L.settings.confirmRestoreSettingsNotNetwork).then(function(){
                 mediaserver.execute('restore_keep_ip').then(resultHandler, errorHandler);
             });
         };
 
-        function checkServersIp(server,i){
-            var ips = server.networkAddresses.split(';');
 
-            var port = '';
-            if(!ips[i].includes(':')){
-                port = server.apiUrl.substring(server.apiUrl.lastIndexOf(':'));
-            }
+        function getCloudInfo() {
+            return mediaserver.systemCloudInfo().then(function (data) {
+                $scope.cloudSystemID = data.cloudSystemID;
+                $scope.cloudAccountName = data.cloudAccountName;
+            }, function () {
+                $scope.cloudSystemID = null;
+                $scope.cloudAccountName = null;
 
-            var url = window.location.protocol + '//' + ips[i] + port;
+                mediaserver.checkInternet().then(function (hasInternetOnServer) {
+                    $scope.hasInternetOnServer = hasInternetOnServer;
+                });
 
-            mediaserver.getModuleInformation(url).then(function(){
-                server.apiUrl = url;
-            },function(error){
-                if(i < ips.length-1) {
-                    checkServersIp(server, i + 1);
-                }
-                else {
-                    server.status = 'Unavailable';
-
-                    $scope.mediaServers = _.sortBy($scope.mediaServers,function(server){
-                        return (server.status==='Online'?'0':'1') + server.Name + server.id;
-                        // Сортировка: online->name->id
-                    });
-
-                }
-                return false;
+                cloudAPI.checkConnection().then(function () {
+                    $scope.hasInternetOnClient = true;
+                }, function (error) {
+                    $scope.hasInternetOnClient = false;
+                    if (error.data && error.data.resultCode) {
+                        $scope.settings.internetError = formatError(error.data.resultCode);
+                    } else {
+                        $scope.settings.internetError = L.settings.couldntCheckInternet;
+                    }
+                });
             });
         }
-        $scope.singleServer = true;
 
-        mediaserver.getMediaServers().then(function(data){
-
-            $scope.singleServer = data.data.length==1;
-            $scope.disconnectCaption = $scope.singleServer? 'Disconnect Server And Create New System': 'Reset System';
-
-            $scope.mediaServers = _.sortBy(data.data,function(server){
-                // Set active state for server
-                server.active = $scope.settings.id.replace('{','').replace('}','') === server.id.replace('{','').replace('}','');
-                return (server.status==='Online'?'0':'1') + server.Name + server.id;
-                // Sorting: online->name->id
-            });
-            $timeout(function() {
-                _.each($scope.mediaServers, function (server) {
-                    var i = 0;//1. Опрашиваем айпишники подряд
-                    checkServersIp(server, i);
-                });
-            },1000);
-        });
-
-        mediaserver.systemCloudInfo().then(function(data){
-            $scope.cloudSystemID = data.cloudSystemID;
-            $scope.cloudAccountName = data.cloudAccountName;
-        },function(){
-            $scope.cloudSystemID = null;
-            $scope.cloudAccountName = null;
-        });
-
-
-        function openCloudDialog(connect){
+        function openCloudDialog(){
             $modal.open({
                 templateUrl: 'views/dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
@@ -214,7 +265,7 @@ angular.module('webadminApp')
                 keyboard:false,
                 resolve:{
                     connect:function(){
-                        return connect;
+                        return true;
                     },
                     systemName:function(){
                         return $scope.settings.systemName;
@@ -226,19 +277,143 @@ angular.module('webadminApp')
                         return $scope.cloudSystemID;
                     }
                 }
-            }).result.finally(function(){
-                window.location.reload();
-            });
+            }).result.then(function(){
+                dialogs.alert(L.settings.connectedSuccess).finally(function(){
+                    window.location.reload();
+                });
+            },errorHandler);
         }
+
+        $scope.changePassword = function(){
+            dialogs.confirmWithPassword(
+                L.settings.confirmChangePasswordTitle,
+                L.settings.confirmChangePassword,
+                L.settings.confirmChangePasswordAction,
+                'danger').then(function (oldPassword) {
+                    //1. Check password
+                    return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                        // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                        mediaserver.changeAdminPassword($scope.settings.rootPassword).then(resultHandler, errorHandler);
+                    },function(){
+                        dialogs.alert(L.settings.wrongPassword);
+                    });
+                });
+        };
         $scope.disconnectFromCloud = function() { // Disconnect from Cloud
-            //Open Disconnect Dialog
-            openCloudDialog(false);
+
+            function doDisconnect(localLogin,localPassword){
+                // 2. Send request to the system only
+                return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
+                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
+                        window.location.reload();
+                    });
+                }, function(error){
+                    console.error(error);
+                    dialogs.alert(L.settings.unexpectedError);
+                });
+
+                /*
+
+                 // Old code: request to cloud and to the system
+
+                 cloudAPI.disconnect(cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
+                 function () {
+                 //2. Save settings to local server
+                 mediaserver.clearCloudSystemCredentials().then(successHandler, errorHandler);
+                 }, cloudErrorHandler);
+                 */
+            }
+            dialogs.confirmWithPassword(
+                L.settings.confirmDisconnectFromCloudTitle.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloud.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                L.settings.confirmDisconnectFromCloudAction.replace("{{CLOUD_NAME}}",Config.cloud.productName),
+                'danger').then(function (oldPassword) {
+                //1. Check password
+                return mediaserver.checkCurrentPassword(oldPassword).then(function() {
+                    // 1. Check for another enabled owner. If there is one - request login and password for him - open dialog
+                    mediaserver.getUsers().then(function(result){
+                        var localAdmin = _.find(result.data,function(user){
+                            return user.isAdmin && user.isEnabled && !user.isCloud;
+                        });
+                        if(!localAdmin){
+                            // Request for login and password
+                            dialogs.createUser(L.settings.createLocalOwner, L.settings.createLocalOwnerTitle).then(function(data){
+                                doDisconnect(data.login,data.password);
+                            })
+                        }else{
+                            doDisconnect();
+                        }
+                    });
+                },function(){
+                    dialogs.alert(L.settings.wrongPassword);
+                });
+            });
         };
 
         $scope.connectToCloud = function() { // Connect to Cloud
-            //Open Connect Dialog
-            openCloudDialog(true);
+            openCloudDialog(); //Open Connect Dialog
+        };
+        $scope.saveNetworkSettings = function(){
+            mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
 
+        mediaserver.getTimeZones().then(function(reply){
 
+            var zones = reply.data.reply;
+            zones = _.sortBy(zones,function(zone){
+
+                var offsetString = '(UTC)';
+                if(zone.offsetFromUtc != 0){
+                    offsetString = zone.offsetFromUtc > 0?'(UTC +':'(UTC -';
+
+                    var absOffset = Math.abs(zone.offsetFromUtc);
+                    var zoneHours = Math.floor(absOffset/3600);
+                    var zoneMinutes = Math.floor( (absOffset % 3600) / 60);
+
+                    if(zoneHours<10){
+                        zoneHours = '0' + zoneHours;
+                    }
+                    if(zoneMinutes<10){
+                        zoneMinutes = '0' + zoneMinutes;
+                    }
+                    offsetString += zoneHours  + ":" + zoneMinutes +")";
+                }
+
+                zone.name = offsetString +' ' + zone.id;
+                return zone.offsetFromUtc;
+            });
+            /*$scope.alltimeZones = _.indexBy(zones,function(zone){
+                return zone.id;
+            });
+            zones = _.uniq(zones, false, function(zone){
+                return zone.comment;
+            });*/
+            $scope.timeZones = zones;
+
+            return mediaserver.timeSettings().then(function(reply){
+                var time = reply.data.reply;
+                $scope.dateTimeSettings = {
+                    timeZone: time.timezoneId,
+                    dateTime: new Date(time.utcTime * 1),
+                    openDate: true
+                };
+                /*
+                var currentZone = $scope.alltimeZones[time.timezoneId];
+                if($scope.timeZones.indexOf(currentZone)<=0){
+                    $scope.timeZones.push(currentZone);
+                }
+                */
+            });
+        });
+
+        $scope.openDatePicker = function($event) {
+            $event.preventDefault();
+            $event.stopPropagation();
+            $scope.dateTimeSettings.openDate = true;
+        };
+
+        $scope.saveDateTime = function(){
+            mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
+                then(resultHandler,errorHandler);
+        };
     });

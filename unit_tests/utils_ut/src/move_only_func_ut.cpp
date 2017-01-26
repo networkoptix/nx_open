@@ -1,12 +1,10 @@
-
 #include <gtest/gtest.h>
 
 #include <future>
-
 #include <boost/optional.hpp>
 
 #include <nx/utils/move_only_func.h>
-
+#include <nx/utils/random.h>
 
 TEST(MoveOnlyFunc, common)
 {
@@ -14,11 +12,10 @@ TEST(MoveOnlyFunc, common)
     {
         nx::utils::MoveOnlyFunc< void() > handler;
         boost::optional< std::promise< bool > > promise;
-        int y = rand();
+        int y = nx::utils::random::number();
         {
             promise = std::promise< bool >();
             handler = [&, y]() { promise->set_value(true); };
-            int x = 0;
         }
 
         handler();

@@ -16,6 +16,7 @@
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
+#include <core/resource_access/user_access_data.h>
 
 
 namespace nx_hls
@@ -40,8 +41,16 @@ namespace nx_hls
         QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
 
+        /** Processes request, generates and sends response asynchronously. */
+        void processRequest(const nx_http::Request& request);
+        void prepareResponse(
+            const nx_http::Request& request,
+            nx_http::Response* const response);
+
+        static void setMinPlayListSizeToStartStreaming(size_t value);
     protected:
         virtual void run() override;
+        const char* mimeTypeByExtension(const QString& extension) const;
 
     private:
         enum State
@@ -56,17 +65,15 @@ namespace nx_hls
         nx::Buffer m_writeBuffer;
         StreamingChunkPtr m_currentChunk;
         //!For reading data from \a m_currentChunk
-        std::unique_ptr<AbstractInputByteStream> m_chunkInputStream;
+        std::unique_ptr<StreamingChunkInputStream> m_chunkInputStream;
         QnMutex m_mutex;
         QnWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
         bool m_useChunkedTransfer;
         QString m_currentFileName;
         size_t m_bytesSent;
-        const size_t m_minPlaylistSizeToStartStreaming;
+        static size_t m_minPlaylistSizeToStartStreaming;
 
-        //!Processes \a request, generates and sends (asynchronously) response
-        void processRequest( const nx_http::Request& request );
         //!
         /*!
             In case of success, adds Content-Type, Content-Length headers to \a response
@@ -79,7 +86,9 @@ namespace nx_hls
         bool prepareDataToSend();
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
+            const QString& requestFileExtension,
             const QnSecurityCamResourcePtr& camResource,
+            const Qn::UserAccessData& accessRights,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
@@ -90,14 +99,14 @@ namespace nx_hls
             const QnSecurityCamResourcePtr& camResource,
             const QnVideoCameraPtr& videoCamera,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            QByteArray* serializedPlaylist );
         //!Generates playlist with chunks inside
         nx_http::StatusCode::Value getChunkedPlaylist(
             HLSSession* const session,
             const nx_http::Request& request,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
-            nx_http::Response* const response );
+            QByteArray* serializedPlaylist );
         nx_http::StatusCode::Value getResourceChunk(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
@@ -106,6 +115,7 @@ namespace nx_hls
             nx_http::Response* const response );
 
         nx_http::StatusCode::Value createSession(
+            const Qn::UserAccessData& accessRight,
             const QString& requestedPlaylistPath,
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,
@@ -119,9 +129,6 @@ namespace nx_hls
             const QnVideoCameraPtr& videoCamera,
             MediaQuality streamQuality );
         void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
-
-    private slots:
-        void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );
     };
 }
 

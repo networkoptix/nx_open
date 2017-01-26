@@ -1,51 +1,50 @@
-#ifndef NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
-#define NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H
+#pragma once
 
+#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/timer_manager.h>
-
-#include "mediator_connections.h"
-#include "nx/network/aio/timer.h"
-
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-class NX_NETWORK_API MediatorAddressPublisher
-    : public QnStoppableAsync
+class NX_NETWORK_API MediatorAddressPublisher:
+    public aio::BasicPollable
 {
+    using BaseType = aio::BasicPollable;
+
 public:
+    static const std::chrono::milliseconds kDefaultRetryInterval;
+
     MediatorAddressPublisher(
-            std::shared_ptr< hpm::api::MediatorServerTcpConnection > mediatorConnection );
+        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection);
+    virtual ~MediatorAddressPublisher() override;
 
-    static const std::chrono::milliseconds DEFAULT_UPDATE_INTERVAL;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-    /** Should be called before initial @fn updateAuthorization */
-    void setUpdateInterval(std::chrono::milliseconds updateInterval );
-    void updateAddresses( std::list< SocketAddress > addresses );
-
+    void setRetryInterval(std::chrono::milliseconds interval);
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
-private:
-    void setupUpdateTimer( QnMutexLockerBase* lk );
-    void pingReportedAddresses( QnMutexLockerBase* lk );
-    void publishPingedAddresses( QnMutexLockerBase* lk );
+    void updateAddresses(
+        std::list<SocketAddress> addresses,
+        utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler = nullptr);
 
 private:
-    QnMutex m_mutex;
-    std::chrono::milliseconds m_updateInterval;
-    enum class State { kInit, kProgress, kTerminated } m_state;
+    void publishAddressesIfNeeded();
 
-    std::list< SocketAddress > m_reportedAddresses;
-    std::list< SocketAddress > m_pingedAddresses;
-    std::list< SocketAddress > m_publishedAddresses;
+private:
+    std::chrono::milliseconds m_retryInterval;
+    bool m_isRequestInProgress;
+    std::list<SocketAddress> m_serverAddresses;
+    std::list<SocketAddress> m_publishedAddresses;
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    std::list<utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)>> m_updateHandlers;
 
-    nx::network::aio::Timer m_timer;
-    std::shared_ptr< hpm::api::MediatorServerTcpConnection > m_mediatorConnection;
+    virtual void stopWhileInAioThread() override;
+
+    void reportResultToTheCaller(hpm::api::ResultCode resultCode);
 };
 
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif // NX_CC_MEDIATOR_ADDRESS_PUBLISHER_H

@@ -6,7 +6,6 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
-#include <common/common_globals.h>
 
 namespace {
     const QString defaultSearchPath(lit(":/translations"));
@@ -141,7 +140,9 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
             continue;
 
         QString mask = m_prefixes[0] + lit("*.qm");
-        for(const QString &fileName: dir.entryList(QStringList(mask))) {
+        for(const QString &fileName: dir.entryList(QStringList(mask)))
+        {
+            qDebug() << "found translation" << fileName;
             QnTranslation translation = loadTranslationInternal(dir.absolutePath(), fileName);
             if(!translation.isEmpty())
                 result.push_back(translation);

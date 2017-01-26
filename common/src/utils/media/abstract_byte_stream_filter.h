@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <nx/network/http/qnbytearrayref.h>
+#include <nx/utils/qnbytearrayref.h>
 
 //!Interface for class doing something with byte stream
 /*!

@@ -14,15 +14,13 @@
 
 namespace nx_api
 {
-    namespace ParserState
+    enum class ParserState
     {
-        typedef int Type;
-
-        static const int init = 1;
-        static const int inProgress = 2;
-        static const int done = 3;
-        static const int failed = 4;
-    };
+        init = 1,
+        inProgress,
+        done,
+        failed,
+    };  //namespace ParserState
 
     namespace SerializerState
     {
@@ -55,7 +53,7 @@ namespace nx_api
             \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
             \note Reads whole message even if parse error occured
         */
-        ParserState::Type parse( const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/ );
+        ParserState parse( const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/ );
 
         //!Resets parse state and prepares for parsing different data
         void reset();

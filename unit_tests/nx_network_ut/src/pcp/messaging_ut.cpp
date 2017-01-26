@@ -5,10 +5,10 @@
 using namespace pcp;
 
 static const auto ipHex = QByteArray(16, 'a') + QByteArray(16, 'b');
-static const auto ipBin = dsh::reversed(QByteArray::fromHex(ipHex));
+static const auto ipBin = QByteArray::fromHex(ipHex);
 
 static const auto nonceBin = makeRandomNonce();
-static const auto nonceHex = dsh::reversed(nonceBin).toHex();
+static const auto nonceHex = nonceBin.toHex();
 
 TEST(PcpMessaging, RequestHeader)
 {
@@ -18,10 +18,10 @@ TEST(PcpMessaging, RequestHeader)
     EXPECT_EQ(QByteArray("0201000078563412") + ipHex, a.toHex());
 
     const auto h2 = dsh::fromBytes<RequestHeader>(a);
-    EXPECT_EQ(VERSION,       h2.version);
-    EXPECT_EQ(Opcode::MAP,   h2.opcode);
-    EXPECT_EQ((size_t)0x12345678,    h2.lifeTime);
-    EXPECT_EQ(ipBin,         h2.clientIp);
+    EXPECT_EQ(VERSION, h2.version);
+    EXPECT_EQ(Opcode::MAP, h2.opcode);
+    EXPECT_EQ((size_t)0x12345678, h2.lifeTime);
+    EXPECT_EQ(ipBin, h2.clientIp);
 }
 
 TEST(PcpMessaging, ResponseHeadeer)

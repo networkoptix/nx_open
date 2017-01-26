@@ -18,18 +18,18 @@
 #include <memory>
 #include <mutex>
 
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <QtCore/QUuid>
 
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_properties.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/common/synctime.h>
 #include <network/multicodec_rtp_reader.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/network/http/httpclient.h>
+#include <nx/network/test_support/buffer_socket.h>
 
 #include "file_socket.h"
 

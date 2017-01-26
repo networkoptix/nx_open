@@ -7,7 +7,8 @@
 #define NX_MS_SYSTEM_SETTINGS_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
-
+#include <core/resource_access/user_access_data.h>
+#include <api/model/audit/auth_session.h>
 
 /*!
     If no parameters are specified then just returns list of settings.
@@ -24,7 +25,18 @@ public:
         const QString& path,
         const QnRequestParams& params,
         QnJsonRestResult& result,
-        const QnRestConnectionProcessor*) override;
+        const QnRestConnectionProcessor* owner) override;
+
+    bool updateSettings(
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
+        const Qn::UserAccessData& accessRights,
+        const QnAuthSession& authSession);
+private:
+    void systemNameChanged(
+        const QnAuthSession& authSession,
+        const QString& oldValue,
+        const QString& newValue);
 };
 
 #endif  //NX_MS_SYSTEM_SETTINGS_HANDLER_H

@@ -1,9 +1,8 @@
 #ifndef AV_CODEC_MEDIA_CONTEXT
 #define AV_CODEC_MEDIA_CONTEXT
 
-#ifndef DISABLE_FFMPEG
-
 #include "media_context.h"
+#include <nx/streaming/media_context_serializable_data.h>
 
 /**
  * Implementation of QnMediaContext which wraps (and owns) AVCodecContext. Does
@@ -19,7 +18,7 @@ public:
     /**
      * Allocate internal AVCodecContext with ffmpeg's defaults for the codec.
      */
-    QnAvCodecMediaContext(CodecID codecId);
+    QnAvCodecMediaContext(AVCodecID codecId);
 
     /**
      * Copy the specified AVCodecContext into the internal one.
@@ -30,7 +29,7 @@ public:
      * @return Pointer to the internal AVCodecContext which can be altered.
      */
     AVCodecContext* getAvCodecContext() const { return m_context; }
-   
+
     /**
      * Replace existing extradata with the copy of the provided one.
      * @param extradata Can be null, in which case extradata_size is ignored.
@@ -40,7 +39,7 @@ public:
 
     //--------------------------------------------------------------------------
 
-    virtual CodecID getCodecId() const override;
+    virtual AVCodecID getCodecId() const override;
     virtual AVMediaType getCodecType() const override;
     virtual const char* getRcEq() const override;
     virtual const quint8* getExtradata() const override;
@@ -60,6 +59,7 @@ public:
     virtual int getBitRate() const override;
     virtual quint64 getChannelLayout() const override;
     virtual int getBlockAlign() const override;
+    virtual int getFrameSize() const override;
 
 private:
     QnAvCodecMediaContext(const QnAvCodecMediaContext&) /*= delete*/;
@@ -67,7 +67,5 @@ private:
 
     AVCodecContext* m_context;
 };
-
-#endif // DISABLE_FFMPEG
 
 #endif // AV_CODEC_MEDIA_CONTEXT

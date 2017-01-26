@@ -4,42 +4,22 @@
 
 #include <common/common_module.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
+
+#include <api/model/setup_local_system_data.h>
+#include <api/resource_property_adaptor.h>
+#include <core/resource_management/resource_pool.h>
 #include <media_server/serverutil.h>
 
-#include <utils/common/model_functions.h>
+#include "rest/server/rest_connection_processor.h"
+#include "rest/helpers/permissions_helper.h"
+#include "system_settings_handler.h"
 
-namespace
-{
-    static const QString kDefaultAdminPassword(QLatin1String("admin"));
-    static const QString kSystemNameParamName(QLatin1String("systemName"));
-}
-
-struct SetupLocalSystemData: public PasswordData
-{
-    SetupLocalSystemData() : PasswordData() {}
-
-    SetupLocalSystemData(const QnRequestParams& params):
-        PasswordData(params),
-        systemName(params.value(kSystemNameParamName))
-    {
-    }
-
-    QString systemName;
-};
-
-#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SetupLocalSystemData),
-    (json),
-    _Fields,
-    (optional, true));
-
-int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupLocalSystemData(params)), result);
+    return execute(std::move(SetupLocalSystemData(params)), owner, result);
 }
 
 int QnSetupLocalSystemRestHandler::executePost(
@@ -47,17 +27,22 @@ int QnSetupLocalSystemRestHandler::executePost(
     const QnRequestParams&,
     const QByteArray &body,
     QnJsonRestResult &result,
-    const QnRestConnectionProcessor*)
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
     SetupLocalSystemData data = QJson::deserialized<SetupLocalSystemData>(body);
-    return execute(std::move(data), result);
+    return execute(std::move(data), owner, result);
 }
 
-int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRestResult &result)
+int QnSetupLocalSystemRestHandler::execute(
+    SetupLocalSystemData data,
+    const QnRestConnectionProcessor* owner,
+    QnJsonRestResult &result)
 {
-    if (data.oldPassword.isEmpty())
-        data.oldPassword = kDefaultAdminPassword;
+    if (QnPermissionsHelper::isSafeMode())
+        return QnPermissionsHelper::safeModeError(result);
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+        return QnPermissionsHelper::notOwnerError(result);
 
     if (!qnGlobalSettings->isNewSystem())
     {
@@ -77,32 +62,45 @@ int QnSetupLocalSystemRestHandler::execute(SetupLocalSystemData data, QnJsonRest
         return nx_http::StatusCode::ok;
     }
 
-    qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setNewSystem(false);
-    if (!qnGlobalSettings->synchronizeNowSync())
-    {
-        result.setError(
-            QnJsonRestResult::CantProcessRequest,
-            lit("Internal server error."));
-        return nx_http::StatusCode::ok;
-    }
-    qnCommon->updateModuleInformation();
-
     if (data.systemName.isEmpty())
     {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'systemName' must be provided."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeAdminPassword(data)) {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't change password."));
+    const auto systemNameBak = qnGlobalSettings->systemName();
+
+    qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setSystemName(data.systemName);
+    qnGlobalSettings->setLocalSystemId(QnUuid::createUuid());
+
+    if (!qnGlobalSettings->synchronizeNowSync())
+    {
+        //changing system name back
+        qnGlobalSettings->setSystemName(systemNameBak);
+        qnGlobalSettings->setLocalSystemId(QnUuid()); //< revert
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!changeSystemName(data.systemName, 0, 0))
+    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
     {
-        result.setError(QnRestResult::CantProcessRequest, lit("Internal server error. Can't change system name."));
-        return nx_http::StatusCode::internalServerError;
+        //changing system name back
+        qnGlobalSettings->setSystemName(systemNameBak);
+        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
+        return nx_http::StatusCode::ok;
+    }
+
+    QnSystemSettingsHandler settingsHandler;
+    if (!settingsHandler.updateSettings(
+        data.systemSettings,
+        result,
+        Qn::kSystemAccess,
+        owner->authSession()))
+    {
+        qWarning() << "failed to write system settings";
     }
 
     return nx_http::StatusCode::ok;

@@ -17,7 +17,7 @@
 
 
 static const size_t RESERVED_TRANSCODED_PACKET_SIZE = 4096;
-static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 1000;
+static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 500;
 //static const size_t USEC_IN_MSEC = 1000;
 
 using namespace std;
@@ -101,17 +101,6 @@ size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
     return m_transcodeContext.size();
 }
 
-//void StreamingChunkTranscoderThread::cancel( int transcodingID )
-//{
-//    QnMutexLocker lk( &m_mutex );
-//
-//    map<int, std::unique_ptr<TranscodeContext>>::iterator it = m_transcodeContext.find( transcodingID );
-//    if( it == m_transcodeContext.end() )
-//        return;
-//    disconnect( it->second->dataSource.data(), 0, this, 0 );
-//    removeTranscodingNonSafe( it, true, &lk );
-//}
-
 void StreamingChunkTranscoderThread::pleaseStop()
 {
     QnMutexLocker lk( &m_mutex );
@@ -150,7 +139,7 @@ void StreamingChunkTranscoderThread::run()
         if( transcodeIter == m_transcodeContext.end() || !transcodeIter->second->dataAvailable )
         {
             //nothing to do
-            m_cond.wait( lk.mutex(), EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS ); //TODO #ak this timeout is not correct, have to find min timeout to 
+            m_cond.wait( lk.mutex(), EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS ); //TODO #ak this timeout is not correct, have to find min timeout to
             continue;
         }
 
@@ -160,22 +149,33 @@ void StreamingChunkTranscoderThread::run()
         QnAbstractDataPacketPtr srcPacket;
         if( !transcodeIter->second->dataSourceCtx->mediaDataProvider->tryRead( &srcPacket ) )
         {
+            //no data at source
             transcodeIter->second->prevReadTryTimestamp = currentMonotonicTimestamp;
             transcodeIter->second->dataAvailable = false;
             continue;
         }
 
-        if( !srcPacket )
+        QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
+
+        if( !srcMediaData || 
+            std::dynamic_pointer_cast<QnEmptyMediaData>(srcMediaData) ) //< QnEmptyMediaData signals end-of-stream
         {
             NX_LOG( lit("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).
                 arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            removeTranscodingNonSafe( transcodeIter, false, &lk );
+            finishTranscoding(&lk, transcodeIter, false);
             continue;
         }
 
-        QnAbstractMediaDataPtr srcMediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(srcPacket);
-        NX_ASSERT( srcMediaData );
+        if( !transcodeIter->second->chunk->wantMoreData() )
+        {
+            // Output stream does not want more data. Will try later...
+            // TODO #ak should use some event here and get rid of fixed delay before trying
+            transcodeIter->second->dataSourceCtx->mediaDataProvider->put(std::move(srcPacket));
+            transcodeIter->second->prevReadTryTimestamp = currentMonotonicTimestamp;
+            transcodeIter->second->dataAvailable = false;
+            continue;
+        }
 
         if (srcMediaData->dataType == QnAbstractMediaData::VIDEO &&
             srcMediaData->channelNumber != transcodeIter->second->transcodeParams.channel())
@@ -184,12 +184,12 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
-        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
-
-        //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done), 
-        //that required for minimizing hls live delay 
-        if (srcMediaData->timestamp >= transcodeIter->second->transcodeParams.endTimestamp())
-            //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC >= transcodeIter->second->transcodeParams.duration() )
+        //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done),
+        //that required for minimizing hls live delay
+        if ((quint64) srcMediaData->timestamp
+            >= transcodeIter->second->transcodeParams.endTimestamp())
+            //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC
+                //>= transcodeIter->second->transcodeParams.duration())
         {
             //returning media packet to the media stream because this packet belongs to the next chunk
             transcodeIter->second->dataSourceCtx->mediaDataProvider->put(std::move(srcPacket));
@@ -200,23 +200,12 @@ void StreamingChunkTranscoderThread::run()
 #ifdef SAVE_OUTPUT_TO_FILE
             transcodeIter->second->outputFile.close();
 #endif
-            //neccessary source data has been processed, depleting transcoder buffer
-            for (;; )
-            {
-                resultStream.clear();
-                int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket(
-                    QnAbstractMediaDataPtr(new QnEmptyMediaData()),
-                    &resultStream);
-                if (res || resultStream.size() == 0)
-                    break;
-                transcodeIter->second->chunk->appendData(
-                    QByteArray::fromRawData(resultStream.constData(), resultStream.size()));
-            }
 
-            //removing transcoding
-            removeTranscodingNonSafe(transcodeIter, true, &lk);
+            finishTranscoding(&lk, transcodeIter, true);
             continue;
         }
+
+        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
 
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
@@ -296,4 +285,28 @@ void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
         tc->dataSourceCtx );
     tc.reset();
     lk->relock();
+}
+
+void StreamingChunkTranscoderThread::finishTranscoding(
+    QnMutexLockerBase* const lk,
+    const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
+    bool transcodingFinishedSuccessfully)
+{
+    QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
+
+    //neccessary source data has been processed, depleting transcoder buffer
+    for (;;)
+    {
+        resultStream.clear();
+        int res = transcodingIter->second->dataSourceCtx->transcoder->transcodePacket(
+            QnAbstractMediaDataPtr(new QnEmptyMediaData()),
+            &resultStream);
+        if (res || (resultStream.size() == 0))
+            break;
+        transcodingIter->second->chunk->appendData(
+            QByteArray::fromRawData(resultStream.constData(), resultStream.size()));
+    }
+
+    //removing transcoding
+    removeTranscodingNonSafe(transcodingIter, transcodingFinishedSuccessfully, lk);
 }

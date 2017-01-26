@@ -1,0 +1,7 @@
+KERNEL=="mali", MODE="0660", GROUP="video"
+KERNEL=="ump", MODE="0660", GROUP="video"
+KERNEL=="disp", MODE="0660", GROUP="video"
+KERNEL=="g2d", MODE="0660", GROUP="video"
+KERNEL=="fb*", MODE="0660", GROUP="video"
+KERNEL=="cedar_dev", MODE="0660", GROUP="video"
+

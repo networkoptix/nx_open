@@ -145,7 +145,6 @@ add_definitions(-DUSE_NX_HTTP
                 -DENABLE_PULSE_CAMERA
                 -DENABLE_COLDSTORE
                 -DENABLE_MDNS
-                -DENABLE_ARCHIVE
                 -DENABLE_THIRD_PARTY
                 -DENABLE_SOFTWARE_MOTION_DETECTION
                 -DENABLE_DESKTOP_CAMERA

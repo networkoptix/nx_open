@@ -288,7 +288,12 @@ namespace ite
         void addPid(uint16_t pid)
         {
             m_queues[pid] = TsQueue();
-            m_times[pid] = PtsTime();
+            if (m_times.find(pid) == m_times.cend())
+                m_times.emplace(
+                    std::piecewise_construct,
+                    std::forward_as_tuple(pid),
+                    std::forward_as_tuple()
+                );
         }
 
         TsBuffer tsFromPool() { return TsBuffer(m_poolTs); }
@@ -395,10 +400,15 @@ namespace ite
     class RCCommand;
 
     ///
+
+    const int MAX_TS_ERRORS = 50;
+
     class DevReader : public ObjectCounter<DevReader>
     {
+        friend class DevReadThread;
     public:
         DevReader(It930x * dev = nullptr);
+        ~DevReader() { stop(); }
 
         bool subscribe(uint16_t pid);
         void unsubscribe(uint16_t pid);
@@ -407,8 +417,17 @@ namespace ite
         void stop();
         void wait();
 
-        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
-        bool hasThread() const { return m_threadObject; }
+        void setThreadObj(DevReadThread * ptr)
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            m_threadObject = ptr;
+        }
+
+        bool hasThread() const
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            return m_threadObject;
+        }
 
         bool sync()
         {
@@ -424,6 +443,8 @@ namespace ite
         ContentPacketPtr getPacket(uint16_t pid, const std::chrono::milliseconds& timeout);
         void interrupt() const { m_cond.notify_all(); } // NOTIFY
 
+        void clearBuf() {m_buf.clear();}
+
     private:
         typedef std::deque<ContentPacketPtr> PacketsQueue;
 
@@ -436,7 +457,7 @@ namespace ite
 
         DevReadThread * m_threadObject;
         std::thread m_readThread;
-        bool m_hasThread;
+        std::atomic_bool m_hasThread;
 
         void dumpPacket(uint16_t pid);
     };

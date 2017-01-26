@@ -9,6 +9,14 @@
 
 module.exports = function (grunt) {
 
+    var proxy = grunt.file.readJSON('proxy.json');
+    var proxy_server_port = proxy.proxy_server_port;
+    var proxy_server_host = proxy.proxy_server_host;
+
+    //var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
+    //var proxy_server_host = '10.1.5.147';  //Parallels - Burbank
+    //var proxy_server_port = 7001;
+
     var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
@@ -16,6 +24,7 @@ module.exports = function (grunt) {
 
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
+
 
     grunt.loadNpmTasks('grunt-protractor-webdriver');
     grunt.loadNpmTasks('grunt-protractor-runner');
@@ -94,148 +103,20 @@ module.exports = function (grunt) {
                         'Authorization': 'Basic YWRtaW46MTIz'
                     }
                  },
-                 {
-                     context: '/',
-                     host: 'mono',
-                     port: 41000,
-                 }
                  */
 
                 //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
-                //'Authorization': 'Basic dXNlcjoxMjM='//user:123
+                //'Authorization': 'Basic dXNlcjoxMjM=' //user:123
 
                 //Total proxy
                 //{context: '/',        host: '192.168.56.101',port: 7002},
 
-                //Cube
-                /*{context: '/api/',    host: '192.168.0.25', port: 7001},
-                {context: '/ec2/',      host: '192.168.0.25', port: 7001},
-                {context: '/hls/',      host: '192.168.0.25', port: 7001},
-                {context: '/media/',    host: '192.168.0.25', port: 7001},
-                {context: '/proxy/',    host: '192.168.0.25', port: 7001}/**/
-
-                //demo.networkoptix.com
-                /*{context: '/api/',    host: 'demo.networkoptix.com', port: 7001},
-                {context: '/ec2/',      host: 'demo.networkoptix.com', port: 7001},
-                {context: '/hls/',      host: 'demo.networkoptix.com',port: 7001},
-                {context: '/media/',    host: 'demo.networkoptix.com', port: 7001},
-                {context: '/proxy/',    host: 'demo.networkoptix.com',port: 7001}/**/
-
-                //Evgeniy
-/*                {context: '/api/',    host: '192.168.56.101', port: 9000},
-                {context: '/ec2/',      host: '192.168.56.101', port: 9000},
-                {context: '/hls/',      host: '192.168.56.101',port: 9000},
-                {context: '/media/',    host: '192.168.56.101', port: 9000},
-                {context: '/proxy/',    host: '192.168.56.101',port: 9000}/**/
-
-                /*{context: '/api/',      host: '10.0.2.203', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.203', port: 7001},
-                {context: '/hls/',      host: '10.0.2.203', port: 7001},
-                {context: '/media/',    host: '10.0.2.203', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.203', port: 7001}/**/
-
-                // Sasha V
-                /*{context: '/api/',      host: '10.0.3.43', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.43', port: 7001},
-                {context: '/hls/',      host: '10.0.3.43', port: 7001},
-                {context: '/media/',    host: '10.0.3.43', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.43', port: 7001}/**/
-
-                // Gdm
-                /*{context: '/api/',      host: '10.0.2.240', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.240', port: 7001},
-                {context: '/hls/',      host: '10.0.2.240', port: 7001},
-                {context: '/media/',    host: '10.0.2.240', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.240', port: 7001}/**/
-
-
-                // Burbank - test
-                /*{context: '/api/',      host: '10.1.5.126', port: 7001},
-                {context: '/ec2/',      host: '10.1.5.126', port: 7001},
-                {context: '/hls/',      host: '10.1.5.126', port: 7001},
-                {context: '/media/',    host: '10.1.5.126', port: 7001},
-                {context: '/proxy/',    host: '10.1.5.126', port: 7001}/**/
-
-
-                // kds
-                /* {context: '/api/',      host: '10.0.2.137', port: 7000},
-                 {context: '/ec2/',      host: '10.0.2.137', port: 7000},
-                 {context: '/hls/',      host: '10.0.2.137', port: 7000},
-                 {context: '/media/',    host: '10.0.2.137', port: 7000},
-                 {context: '/proxy/',    host: '10.0.2.137', port: 7000}/**/
-
-                //Vitaly Kutin
-                /*{context: '/api/',      host: '10.0.3.197', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.197', port: 7001},
-                {context: '/hls/',      host: '10.0.3.197', port: 7001},
-                {context: '/media/',    host: '10.0.3.197', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.197', port: 7001}/**/
-
-                // Olya - external
-                /*{context: '/api/',      host: '95.31.136.2', port: 7011},
-                {context: '/ec2/',      host: '95.31.136.2', port: 7011},
-                {context: '/hls/',      host: '95.31.136.2', port: 7011},
-                {context: '/media/',    host: '95.31.136.2', port: 7011},
-                {context: '/proxy/',    host: '95.31.136.2', port: 7011}/**/
-
-                // Regress
-                /*{context: '/api/',      host: '10.0.2.169', port: 7011},
-                {context: '/ec2/',      host: '10.0.2.169', port: 7011},
-                {context: '/hls/',      host: '10.0.2.169', port: 7011},
-                {context: '/media/',    host: '10.0.2.169', port: 7011},
-                {context: '/proxy/',    host: '10.0.2.169', port: 7011}/**/
-
-                // Nx1 Cloud 3.0
-                /*{context: '/api/',      host: '10.0.3.65', port: 7001},
-                {context: '/ec2/',      host: '10.0.3.65', port: 7001},
-                {context: '/hls/',      host: '10.0.3.65', port: 7001},
-                {context: '/media/',    host: '10.0.3.65', port: 7001},
-                {context: '/proxy/',    host: '10.0.3.65', port: 7001}/**/
-
-                // Sasha
-                /*{context: '/api/',      host: '10.0.2.119', port: 7042},
-                {context: '/ec2/',      host: '10.0.2.119', port: 7042},
-                {context: '/hls/',      host: '10.0.2.119', port: 7042},
-                {context: '/media/',    host: '10.0.2.119', port: 7042},
-                {context: '/proxy/',    host: '10.0.2.119', port: 7042}/**/
-
-                // Andrey
-                /*{context: '/api/',      host: '10.0.2.95', port: 7001},
-                {context: '/ec2/',      host: '10.0.2.95', port: 7001},
-                {context: '/hls/',      host: '10.0.2.95', port: 7001},
-                {context: '/media/',    host: '10.0.2.95', port: 7001},
-                {context: '/proxy/',    host: '10.0.2.95', port: 7001}/**/
-
-                //Roman Vasilenko  port: 7003,7004,7005,2006
-                /*{context: '/api/',      host: '10.0.2.232', port: 7002},
-                {context: '/ec2/',      host: '10.0.2.232', port: 7002},
-                {context: '/hls/',      host: '10.0.2.232', port: 7002},
-                {context: '/media/',    host: '10.0.2.232', port: 7002},
-                {context: '/proxy/',    host: '10.0.2.232', port: 7002}/**/
-
-
-                //Surface
-                /*{context: '/api/',      host: '10.0.3.203', port: 7001},
-                 {context: '/ec2/',      host: '10.0.3.203', port: 7001},
-                 {context: '/hls/',      host: '10.0.3.203', port: 7001},
-                 {context: '/media/',    host: '10.0.3.203', port: 7001},
-                 {context: '/proxy/',    host: '10.0.3.203', port: 7001}/**/
-
-
-                //Dell - Burbank
-                /*{context: '/api/',      host: '10.1.5.130', port: 7001},
-                 {context: '/ec2/',      host: '10.1.5.130', port: 7001},
-                 {context: '/hls/',      host: '10.1.5.130', port: 7001},
-                 {context: '/media/',    host: '10.1.5.130', port: 7001},
-                 {context: '/proxy/',    host: '10.1.5.130', port: 7001}/**/
-
-
-                //Parallels - Burbank
-                {context: '/api/',      host: '10.1.5.104', port: 7001},
-                {context: '/ec2/',      host: '10.1.5.104', port: 7001},
-                {context: '/hls/',      host: '10.1.5.104', port: 7001},
-                {context: '/media/',    host: '10.1.5.104', port: 7001},
-                {context: '/proxy/',    host: '10.1.5.104', port: 7001}/**/
+                {context: '/web/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/api/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/ec2/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/hls/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/media/',    host: proxy_server_host, port: proxy_server_port},
+                {context: '/proxy/',    host: proxy_server_host, port: proxy_server_port}
 
             ],
             livereload: {
@@ -439,6 +320,7 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
+                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
                         '<%= yeoman.dist %>/styles/{,*/}*.css'//,
                         //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
                         //'<%= yeoman.dist %>/fonts/*'
@@ -553,7 +435,9 @@ module.exports = function (grunt) {
                             '*.html',
                             '*.xml',
                             '*.xsl',
+                            '*.json',
                             'views/{,*/}*.html',
+                            'scripts/language.js',
                             'customization/*',
                             //'bower_components/**/*',
                             //'bower_components/videogular-themes-default/videogular.css',
@@ -619,11 +503,26 @@ module.exports = function (grunt) {
             merge: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
             },
+            merge_release: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+            },
             version: {
                 command: 'hg parent > static/version.txt'
             },
             print_version:{
                 command: 'hg parent'
+            },
+            generate_translation:{
+                command: 'cd translation; python generate_ts.py; python localize.py'
+            },
+            localize:{
+                command: 'cd translation; python localize.py'
+            },
+            run_ffmpeg:{
+                command: './ffmpeg.sh'
+            },
+            close_ffmpeg:{
+                command: 'tmux send-keys -t ffmpeg_buffer q'
             }
         },
 
@@ -649,6 +548,7 @@ module.exports = function (grunt) {
                 singleRun: true
             }
         },
+
         protractor: {
             options: {
                 configFile: 'protractor-conf.js', // Default config file
@@ -660,17 +560,69 @@ module.exports = function (grunt) {
             },
             all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
                 options: {
-                    //configFile: 'e2e.conf.js', // Target-specific config file
-                    args: {} // Target-specific arguments
+                    //args: {specs: ['test/e2e/*/*spec.js']} // Target-specific arguments
                 }
             },
-            server:{
-
+            advanced: {
+                options: {
+                    args: {specs: ['test/e2e/advanced/*spec.js']} // Target-specific arguments
+                }
+            },
+            developers: {
+                options: {
+                    args: {specs: ['test/e2e/developers/*spec.js']} // Target-specific arguments
+                }
+            },
+            help: {
+                options: {
+                    args: {specs: ['test/e2e/help/*spec.js']} // Target-specific arguments
+                }
+            },
+            info: {
+                options: {
+                    args: {specs: ['test/e2e/info/*spec.js']} // Target-specific arguments
+                }
+            },
+            merge: {
+                options: {
+                    args: {specs: ['test/e2e/merge/*spec.js']} // Target-specific arguments
+                }
+            },
+            restart: {
+                options: {
+                    args: {specs: ['test/e2e/restart/*spec.js']} // Target-specific arguments
+                }
+            },
+            settings: {
+                options: {
+                    args: {specs: ['test/e2e/settings/spec.js']} // Target-specific arguments
+                }
+            },
+            settingsAll: {
+                options: {
+                    args: {specs: ['test/e2e/settings/*spec.js']} // Target-specific arguments
+                }
+            },
+            settingsCloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/cloud_spec.js']} // Target-specific arguments
+                }
+            },
+            settingsUncloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/uncloud_spec.js']} // Target-specific arguments
+                }
+            },
+            setup: {
+                options: {
+                    args: {specs: ['test/e2e/setup/*spec.js']} // Target-specific arguments
+                }
             }
         },
         'protractor_webdriver': {
             options:{
-
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
+                keepAlive : true
             },
             default:{
 
@@ -715,9 +667,121 @@ module.exports = function (grunt) {
         'connect:test',
         'protractor_webdriver',
         'shell:print_version',
-        'protractor:all',
-        'newer:jshint'
-        //'karma'
+        // 'shell:run_ffmpeg',
+        'protractor:all'
+        // 'shell:close_ffmpeg',
+        // 'newer:jshint',
+        // 'karma'
+    ]);
+    grunt.registerTask('test-advanced', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:advanced'
+    ]);
+    grunt.registerTask('test-developers', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:developers'
+    ]);
+    grunt.registerTask('test-help', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:help'
+    ]);
+    grunt.registerTask('test-info', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:info'
+    ]);
+    grunt.registerTask('test-merge', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:merge'
+    ]);
+    grunt.registerTask('test-restart', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:restart'
+    ]);
+    grunt.registerTask('test-settings', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settings'
+    ]);
+    grunt.registerTask('test-settings-all', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsAll'
+    ]);
+    grunt.registerTask('test-settings-cloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsCloud'
+    ]);
+    grunt.registerTask('test-settings-uncloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsUncloud'
+    ]);
+    grunt.registerTask('test-setup', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:setup'
     ]);
     grunt.registerTask('code', [
         'newer:jshint'
@@ -738,7 +802,9 @@ module.exports = function (grunt) {
         'rev',
         'usemin',
         'htmlmin',
-        'shell:version'
+        'shell:version',
+        'shell:generate_translation',
+        'shell:localize'
     ]);
 
     grunt.registerTask('default', [
@@ -764,6 +830,13 @@ module.exports = function (grunt) {
         'shell:merge'
     ]);
 
+
+    grunt.registerTask('merge_release', [
+        'shell:merge_release'
+    ]);
+
+    
+
     grunt.registerTask('deploy', [
         'publish',
         'copy:zip',
@@ -782,6 +855,4 @@ module.exports = function (grunt) {
         'build',
         'scp:demo_fast'
     ]);
-
-
 };

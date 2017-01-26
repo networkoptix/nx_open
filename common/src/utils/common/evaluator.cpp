@@ -1,6 +1,6 @@
 #include "evaluator.h"
 
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 namespace Qee {
 // -------------------------------------------------------------------------- //

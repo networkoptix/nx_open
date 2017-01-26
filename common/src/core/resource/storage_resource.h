@@ -6,16 +6,17 @@
 
 class QnAbstractMediaStreamDataProvider;
 
-class QnStorageResource 
-	: public QnAbstractStorageResource
+class QnStorageResource: public QnAbstractStorageResource
 {
     Q_OBJECT
 
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
+    using base_type = QnAbstractStorageResource;
 public:
     static const qint64 kNasStorageLimit;
+    static const qint64 kThirdPartyStorageLimit;
 
     QnStorageResource();
     virtual ~QnStorageResource();
@@ -26,7 +27,7 @@ public:
 
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
-    qint64 getSpaceLimit() const;
+    virtual qint64 getSpaceLimit() const;
 
     void setStorageType(const QString& type);
     QString getStorageType() const;
@@ -39,9 +40,11 @@ public:
 
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
+    static QString urlWithoutCredentials(const QString& url);
 
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
     bool isExternal() const;
+    virtual bool isSystem() const { return false; }
 #ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return m_storageBitrateCoeff; }
@@ -60,18 +63,12 @@ public:
      */
     virtual float getAvarageWritingUsage() const;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     static QString toNativeDirPath(const QString &dirPath);
 
     void setBackup(bool value);
     bool isBackup() const;
-
-    void addWrited(qint64 value);
-    void resetWrited();
-    void setWritedCoeff(double value);
-    double getWritedCoeff() const;
-    double calcUsageCoeff() const;
 
     bool isWritable() const;
 signals:
@@ -92,9 +89,7 @@ private:
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
     mutable QnMutex m_bitrateMtx;
-    bool    m_isBackup;
-    double  m_writed;
-    double  m_writedCoeff;
+    bool m_isBackup;
 };
 
 Q_DECLARE_METATYPE(QnStorageResourcePtr);

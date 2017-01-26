@@ -12,6 +12,7 @@
 bool readExtraFields(QnNetworkAddressEntryList& entryList)
 {
 #ifdef Q_OS_WIN
+    // On Windows, this method can only be called for debug by manually modifying the code.
     QFile netSettings(lit("c:/etc/network/interfaces"));
 #else
     QFile netSettings(lit("/etc/network/interfaces"));
@@ -37,14 +38,14 @@ bool readExtraFields(QnNetworkAddressEntryList& entryList)
         if (worlds.size() < 2)
             continue;
 
-        if (data.startsWith("iface")) 
+        if (data.startsWith("iface"))
             lastIfName = worlds[1].trimmed();
 
-        for (auto& entry: entryList) 
+        for (auto& entry: entryList)
         {
-            if (entry.name == lastIfName) 
+            if (entry.name == lastIfName)
             {
-                if (data.startsWith("iface")) 
+                if (data.startsWith("iface"))
                     entry.dhcp = data.contains("dhcp");
                 else if (data.startsWith("netmask"))
                     entry.netMask = worlds[1].trimmed();
@@ -59,15 +60,15 @@ bool readExtraFields(QnNetworkAddressEntryList& entryList)
     return true;
 }
 
-int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnIfListRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
 
     QnNetworkAddressEntryList entryList;
 
-    const bool allInterfaces = (QnAppInfo::armBox() == "bpi");
-    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces)) 
+    const bool allInterfaces = (QnAppInfo::isBpi());
+    for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces(allInterfaces))
     {
         static const QChar kColon = ':';
         if (allInterfaces && iface.name.contains(kColon))

@@ -2,7 +2,7 @@
 
 #include "newdw_ptz_controller.h"
 #include "plugins/resource/digitalwatchdog/digital_watchdog_resource.h"
-#include "utils/math/fuzzy.h"
+#include "nx/utils/math/fuzzy.h"
 
 static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
@@ -80,8 +80,6 @@ bool QnNewDWPtzController::doQuery(const QString &request, QByteArray* body) con
         url.setQuery(request.mid(queryPos+1));
     }
     QString encodedPath = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
-
-    QAuthenticator auth = m_resource->getAuth();
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, m_resource->getAuth());
     CLHttpStatus status = client.doGET(encodedPath);
     if (status == CL_HTTP_SUCCESS && body)

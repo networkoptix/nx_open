@@ -9,12 +9,30 @@
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "utils/serialization/binary_stream.h"
-#include "utils/serialization/sql_functions.h"
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
-#include "utils/serialization/json.h"
+#include "utils/crypt/symmetrical.h"
+
 #include "core/resource/user_resource.h"
+#include <core/resource/camera_resource.h>
+
+#include <core/resource_management/user_roles_manager.h>
+
+#include <database/api/db_resource_api.h>
+#include <database/api/db_layout_api.h>
+#include <database/api/db_webpage_api.h>
+
+#include <database/migrations/business_rules_db_migration.h>
+#include <database/migrations/user_permissions_db_migration.h>
+#include <database/migrations/accessible_resources_db_migration.h>
+#include <database/migrations/legacy_transaction_migration.h>
+#include <database/migrations/add_transaction_type.h>
+#include <database/migrations/make_transaction_timestamp_128bit.h>
+#include <database/migrations/add_history_attributes_to_transaction.h>
+#include <database/migrations/reparent_videowall_layouts.h>
+#include <database/migrations/add_default_webpages_migration.h>
+
+#include <network/system_helpers.h>
 
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
@@ -41,7 +59,7 @@
 #include "business/business_event_rule.h"
 #include "settings.h"
 
-using std::nullptr_t;
+#include <nx/fusion/model_functions.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
@@ -50,8 +68,31 @@ static const QString RES_TYPE_STORAGE = "storage";
 namespace ec2
 {
 
+namespace aux {
+
+bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin)
+{
+    if (!restoreData.isEmpty())
+    {
+        admin->setHash(restoreData.hash);
+        admin->setDigest(restoreData.digest);
+        admin->setCryptSha512Hash(restoreData.cryptSha512Hash);
+        admin->setRealm(restoreData.realm);
+        admin->setEnabled(true);
+        return true;
+    }
+
+    return false;
+}
+}
+
+namespace detail
+{
+
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
+
+using std::nullptr_t;
 
 static bool removeDirRecursive(const QString & dirName)
 {
@@ -83,145 +124,21 @@ void assertSorted(std::vector<T> &data) {
 #endif // DEBUG
 }
 
-template <class T, class Field>
-void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
-#ifdef _DEBUG
-    if (data.empty())
-        return;
-
-    QByteArray prev = (data[0].*idField).toRfc4122();
-    for (size_t i = 1; i < data.size(); ++i) {
-        QByteArray next = (data[i].*idField).toRfc4122();
-        NX_ASSERT(next >= prev);
-        prev = next;
-    }
-#else
-    Q_UNUSED(data);
-    Q_UNUSED(idField);
-#endif // DEBUG
-}
-
 /**
- * Function merges sorted query into the sorted Data list. Data list contains placeholder
- * field for the data, that is contained in the query.
- * Data elements should have 'id' field and should be sorted by it.
- * Query should have 'id' and 'parentId' fields and should be sorted by 'id'.
+ * Updaters are used to update object fields which are stored as raw json strings.
+ * @return True if the object is updated.
  */
-template <class MainData>
-void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnUuid> MainData::*subList)
+bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
 {
-    assertSorted(data);
-
-    QSqlRecord rec = query.record();
-    int idIdx = rec.indexOf("id");
-    int parentIdIdx = rec.indexOf("parentId");
-    NX_ASSERT(idIdx >=0 && parentIdIdx >= 0);
-
-    bool eof = true;
-    QnUuid id, parentId;
-    QByteArray idRfc;
-
-    auto step = [&eof, &id, &idRfc, &parentId, &query, idIdx, parentIdIdx]{
-        eof = !query.next();
-        if (eof)
-            return;
-        idRfc = query.value(idIdx).toByteArray();
-        NX_ASSERT(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
-        id = QnUuid::fromRfc4122(idRfc);
-        parentId = QnUuid::fromRfc4122(query.value(parentIdIdx).toByteArray());
-    };
-
-    step();
-    size_t i = 0;
-    while (i < data.size() && !eof) {
-        if (id == data[i].id) {
-            (data[i].*subList).push_back(parentId);
-            step();
-        } else if (idRfc > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            step();
-        }
-    }
+    if (data.actionParams.size() <= 4) //< keep empty json
+        return false;
+    auto deserializedData = QJson::deserialized<QnBusinessActionParameters>(data.actionParams);
+    data.actionParams = QJson::serialized(deserializedData);
+    return true;
 }
 
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements should have 'id' field and should be sorted by it.
- * SubData elements should be sorted by parentIdField.
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
-void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
-{
-    assertSorted(data);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].id) {
-            (data[i].*subDataListField).push_back(subDataList[j]);
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > data[i].id.toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-template <class MainData, class SubData, class MainOrParentType, class IdType, class SubOrParentType, class Handler>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    IdType MainOrParentType::*idField,
-    IdType SubOrParentType::*parentIdField,
-    Handler mergeHandler )
-{
-    assertSorted(data, idField);
-    assertSorted(subDataList, parentIdField);
-
-    size_t i = 0;
-    size_t j = 0;
-
-    while (i < data.size() && j < subDataList.size()) {
-        if (subDataList[j].*parentIdField == data[i].*idField) {
-            mergeHandler( data[i], subDataList[j] );
-            ++j;
-        } else if ((subDataList[j].*parentIdField).toRfc4122() > (data[i].*idField).toRfc4122()) {
-            ++i;
-        } else {
-            ++j;
-        }
-    }
-}
-
-//!Same as above but does not require field "id" of type QnUuid
-/**
- * Function merges two sorted lists. First of them (data) contains placeholder
- * field for the data, that is contained in the second (subData).
- * Data elements MUST be sorted by \a idField.
- * SubData elements should be sorted by parentIdField.
- * Types MainOrParentType1 and MainOrParentType2 are separated to allow \a subDataListField and \a idField to be pointers to fields of related types
- */
-template <class MainData, class SubData, class MainSubData, class MainOrParentType1, class MainOrParentType2, class IdType, class SubOrParentType>
-void mergeObjectListData(
-    std::vector<MainData>& data,
-    std::vector<SubData>& subDataList,
-    std::vector<MainSubData> MainOrParentType1::*subDataListField,
-    IdType MainOrParentType2::*idField,
-    IdType SubOrParentType::*parentIdField )
-{
-    mergeObjectListData(
-        data,
-        subDataList,
-        idField,
-        parentIdField,
-        [subDataListField]( MainData& mergeTo, SubData& mergeWhat ){ (mergeTo.*subDataListField).push_back(mergeWhat); } );
-}
-
-// --------------------------------------- QnDbTransactionExt -----------------------------------------
+//-------------------------------------------------------------------------------------------------
+// QnDbTransactionExt
 
 bool QnDbManager::QnDbTransactionExt::beginTran()
 {
@@ -250,7 +167,8 @@ bool QnDbManager::QnDbTransactionExt::commit()
     return rez;
 }
 
-// --------------------------------------- QnDbManager -----------------------------------------
+//-------------------------------------------------------------------------------------------------
+// QnDbManager
 
 QnUuid QnDbManager::getType(const QString& typeName)
 {
@@ -273,19 +191,10 @@ QnDbManager::QnDbManager()
     m_initialized(false),
     m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
-    m_needResyncLog(false),
-    m_needResyncLicenses(false),
-    m_needResyncFiles(false),
-    m_needResyncCameraUserAttributes(false),
-    m_needResyncServerUserAttributes(false),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
-    m_needResyncLayout(false),
-    m_needResyncbRules(false),
-    m_needResyncUsers(false),
-    m_needResyncStorages(false),
-    m_needResyncClientInfoData(false),
-    m_dbReadOnly(false)
+    m_dbReadOnly(false),
+    m_resyncFlags()
 {
 }
 
@@ -344,350 +253,385 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 
 bool QnDbManager::init(const QUrl& dbUrl)
 {
-    const QString dbFilePath = dbUrl.toLocalFile();
-    const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
-
-    QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
-    addDatabase(dbFileName, "QnDbManager");
-
-    QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
-    bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
-    if (QFile::exists(backupDbFileName) || needCleanup)
     {
-        if (!removeDbFile(dbFileName))
-            return false;
-        if (QFile::exists(backupDbFileName))
+        const QString dbFilePath = dbUrl.toLocalFile();
+        const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
+
+        QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
+        addDatabase(dbFileName, "QnDbManager");
+
+        QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
+        bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
+        if (QFile::exists(backupDbFileName) || needCleanup)
         {
-            m_needResyncLog = true;
-            m_isBackupRestore = true;
-            if (!QFile::rename(backupDbFileName, dbFileName)) {
-                qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
+            if (!removeDbFile(dbFileName))
                 return false;
-            }
-        }
-    }
-
-    m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
-    QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
-    m_sdbStatic.setDatabaseName( closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
-
-    if( !m_sdb.open() )
-    {
-        qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
-        return false;
-    }
-
-
-    QSqlQuery identityTimeQuery(m_sdb);
-    identityTimeQuery.setForwardOnly(true);
-    identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
-    identityTimeQuery.addBindValue("gotDbDumpTime");
-    if (identityTimeQuery.exec() && identityTimeQuery.next())
-    {
-        qint64 dbRestoreTime = identityTimeQuery.value(0).toLongLong();
-        if (dbRestoreTime)
-        {
-            identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
-            identityTimeQuery.addBindValue("gotDbDumpTime");
-            if (!identityTimeQuery.exec())
+            if (QFile::exists(backupDbFileName))
             {
-                qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
+                m_resyncFlags |= ResyncLog;
+                m_resyncFlags |= ClearLog;
+                m_isBackupRestore = true;
+                if (!QFile::rename(backupDbFileName, dbFileName)) {
+                    qWarning() << "Can't rename database file from" << backupDbFileName << "to" << dbFileName << "Database restore operation canceled";
+                    return false;
+                }
+            }
+        }
+
+        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
+        QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
+        m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
+
+        if (!m_sdb.open())
+        {
+            qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
+            return false;
+        }
+
+
+        QSqlQuery identityTimeQuery(m_sdb);
+        identityTimeQuery.setForwardOnly(true);
+        identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
+        identityTimeQuery.addBindValue("gotDbDumpTime");
+        if (identityTimeQuery.exec() && identityTimeQuery.next())
+        {
+            qint64 dbRestoreTime = identityTimeQuery.value(0).toLongLong();
+            if (dbRestoreTime)
+            {
+                identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
+                identityTimeQuery.addBindValue("gotDbDumpTime");
+                if (!identityTimeQuery.exec())
+                {
+                    qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
+                    return false;
+                }
+
+                qint64 currentIdentityTime = qnCommon->systemIdentityTime();
+                qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
+            }
+        }
+
+        if (!m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic))
+        {
+            qWarning() << "can't initialize Server static sqlLite database " << m_sdbStatic.databaseName() << ". Error: " << m_sdbStatic.lastError().text();
+            return false;
+        }
+
+        //tuning DB
+        if (!tuneDBAfterOpen(&m_sdb))
+        {
+            m_sdb.close();
+            qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
+            if (!createCorruptedDbBackup(dbFileName)) {
+                qWarning() << "Can't create database backup before removing file";
+                return false;
+            }
+            if (!removeDbFile(dbFileName))
+                qWarning() << "Can't delete corrupted database file " << m_sdb.databaseName();
+            return false;
+        }
+
+        if (!createDatabase())
+        {
+            // create tables is DB is empty
+            qWarning() << "can't create tables for sqlLite database!";
+            return false;
+        }
+
+        QnDbManager::QnDbTransactionLocker locker(getTransaction());
+
+        if (!qnCommon->obsoleteServerGuid().isNull())
+        {
+            if (!migrateServerGUID("vms_resource", "guid"))
+                return false;
+            if (!migrateServerGUID("vms_resource", "parent_guid"))
+                return false;
+
+            if (!migrateServerGUID("vms_businessrule_action_resources", "resource_guid"))
+                return false;
+            if (!migrateServerGUID("vms_businessrule_event_resources", "resource_guid"))
+                return false;
+            if (!migrateServerGUID("vms_kvpair", "resource_guid"))
+                return false;
+            if (!migrateServerGUID("vms_resource_status", "guid"))
+                return false;
+            if (!migrateServerGUID("vms_server_user_attributes", "server_guid"))
+                return false;
+        }
+
+        QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
+        int addedStoredFilesCnt = 0;
+        addStoredFiles(storedFilesDir, &addedStoredFilesCnt);
+        if (addedStoredFilesCnt > 0)
+            m_resyncFlags |= ResyncFiles;
+
+        removeDirRecursive(storedFilesDir);
+
+        // updateDBVersion();
+        QSqlQuery insVersionQuery(m_sdb);
+        insVersionQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
+        insVersionQuery.addBindValue("VERSION");
+        insVersionQuery.addBindValue(QnAppInfo::applicationVersion());
+        if (!insVersionQuery.exec())
+        {
+            qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
+            return false;
+        }
+        insVersionQuery.addBindValue("BUILD");
+        insVersionQuery.addBindValue(QnAppInfo::applicationRevision());
+        if (!insVersionQuery.exec())
+        {
+            qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
+            return false;
+        }
+
+        m_storageTypeId = getType("Storage");
+        m_serverTypeId = getType(QnResourceTypePool::kServerTypeId);
+        m_cameraTypeId = getType("Camera");
+
+        QSqlQuery queryAdminUser(m_sdb);
+        queryAdminUser.setForwardOnly(true);
+        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); //TODO: #GDM check owner permission instead
+        execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
+        if (queryAdminUser.next())
+        {
+            m_adminUserID = QnUuid::fromRfc4122(queryAdminUser.value(0).toByteArray());
+            m_adminUserInternalID = queryAdminUser.value(1).toInt();
+        }
+        NX_CRITICAL(!m_adminUserID.isNull());
+
+
+        QSqlQuery queryServers(m_sdb);
+        queryServers.prepare("UPDATE vms_resource_status set status = ? WHERE guid in (select guid from vms_resource where xtype_guid = ?)"); // todo: only mserver without DB?
+        queryServers.bindValue(0, Qn::Offline);
+        queryServers.bindValue(1, m_serverTypeId.toRfc4122());
+        if (!queryServers.exec())
+        {
+            qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
+            NX_ASSERT(false);
+            return false;
+        }
+
+        // read license overflow time
+        QSqlQuery query(m_sdb);
+        query.setForwardOnly(true);
+        query.prepare("SELECT data from misc_data where key = ?");
+        query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+        qint64 licenseOverflowTime = 0;
+        if (query.exec() && query.next())
+        {
+            licenseOverflowTime = query.value(0).toByteArray().toLongLong();
+            m_licenseOverflowMarked = licenseOverflowTime > 0;
+        }
+
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
+        {
+            localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
+            QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        }
+
+        query.addBindValue(DB_INSTANCE_KEY);
+        if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
+        {
+            m_dbInstanceId = QnUuid::fromRfc4122(query.value(0).toByteArray());
+        }
+        else
+        {
+            m_dbInstanceId = QnUuid::createUuid();
+            QSqlQuery insQuery(m_sdb);
+            insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
+            insQuery.addBindValue(DB_INSTANCE_KEY);
+            insQuery.addBindValue(m_dbInstanceId.toRfc4122());
+            if (!insQuery.exec())
+            {
+                qWarning() << "can't initialize sqlLite database!";
+                return false;
+            }
+        }
+
+        if (QnTransactionLog::instance())
+            if (!QnTransactionLog::instance()->init())
+            {
+                qWarning() << "can't initialize transaction log!";
                 return false;
             }
 
-            qint64 currentIdentityTime = qnCommon->systemIdentityTime();
-            qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
-        }
-    }
-
-    if( !m_sdbStatic.open() )
-    {
-        qWarning() << "can't initialize Server static sqlLite database " << m_sdbStatic.databaseName() << ". Error: " << m_sdbStatic.lastError().text();
-        return false;
-    }
-
-    //tuning DB
-    if( !tuneDBAfterOpen() )
-    {
-        m_sdb.close();
-        qWarning() << "Corrupted database file " << m_sdb.databaseName() << "!";
-        if (!createCorruptedDbBackup(dbFileName)) {
-            qWarning() << "Can't create database backup before removing file";
-            return false;
-        }
-        if (!removeDbFile(dbFileName))
-            qWarning() << "Can't delete corrupted database file " << m_sdb.databaseName();
-        return false;
-    }
-
-    if( !createDatabase() )
-    {
-        // create tables is DB is empty
-        qWarning() << "can't create tables for sqlLite database!";
-        return false;
-    }
-
-    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
-
-    if( !qnCommon->obsoleteServerGuid().isNull() )
-    {
-        if (!migrateServerGUID("vms_resource", "guid"))
-            return false;
-        if (!migrateServerGUID("vms_resource", "parent_guid"))
+        if (!syncLicensesBetweenDB())
             return false;
 
-        if (!migrateServerGUID("vms_businessrule_action_resources", "resource_guid"))
+        if (m_resyncFlags.testFlag(ClearLog) && !transactionLog->clear())
             return false;
-        if (!migrateServerGUID("vms_businessrule_event_resources", "resource_guid"))
-            return false;
-        if (!migrateServerGUID("vms_kvpair", "resource_guid"))
-            return false;
-        if (!migrateServerGUID("vms_resource_status", "guid"))
-            return false;
-        if (!migrateServerGUID("vms_server_user_attributes", "server_guid"))
-            return false;
-    }
 
-    QString storedFilesDir = closeDirPath(dbFilePath) + QString(lit("vms_storedfiles/"));
-    int addedStoredFilesCnt = 0;
-    addStoredFiles(storedFilesDir, &addedStoredFilesCnt);
-    m_needResyncFiles = addedStoredFilesCnt > 0;
-    removeDirRecursive(storedFilesDir);
-
-    // updateDBVersion();
-    QSqlQuery insVersionQuery( m_sdb );
-    insVersionQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
-    insVersionQuery.addBindValue( "VERSION" );
-    insVersionQuery.addBindValue( QnAppInfo::applicationVersion() );
-    if( !insVersionQuery.exec() )
-    {
-        qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
-        return false;
-    }
-    insVersionQuery.addBindValue( "BUILD" );
-    insVersionQuery.addBindValue( QnAppInfo::applicationRevision() );
-    if( !insVersionQuery.exec() )
-    {
-        qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
-        return false;
-    }
-
-
-
-
-
-    m_storageTypeId = getType( "Storage" );
-    m_serverTypeId = getType( QnResourceTypePool::kServerTypeId );
-    m_cameraTypeId = getType( "Camera" );
-
-    QSqlQuery queryAdminUser( m_sdb );
-    queryAdminUser.setForwardOnly( true );
-    queryAdminUser.prepare( "SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'" ); //TODO: #GDM check owner permission instead
-    execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
-    if (queryAdminUser.next())
-    {
-        m_adminUserID = QnUuid::fromRfc4122( queryAdminUser.value( 0 ).toByteArray() );
-        m_adminUserInternalID = queryAdminUser.value( 1 ).toInt();
-    }
-    NX_CRITICAL(!m_adminUserID.isNull());
-
-
-    QSqlQuery queryServers(m_sdb);
-    queryServers.prepare("UPDATE vms_resource_status set status = ? WHERE guid in (select guid from vms_resource where xtype_guid = ?)"); // todo: only mserver without DB?
-    queryServers.bindValue(0, Qn::Offline);
-    queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-    if( !queryServers.exec() )
-    {
-        qWarning() << Q_FUNC_INFO << __LINE__ << queryServers.lastError();
-        NX_ASSERT( false );
-        return false;
-    }
-
-    // read license overflow time
-    QSqlQuery query( m_sdb );
-    query.setForwardOnly(true);
-    query.prepare( "SELECT data from misc_data where key = ?" );
-    query.addBindValue( LICENSE_EXPIRED_TIME_KEY );
-    qint64 licenseOverflowTime = 0;
-    if( query.exec() && query.next() )
-    {
-        licenseOverflowTime = query.value( 0 ).toByteArray().toLongLong();
-        m_licenseOverflowMarked = licenseOverflowTime > 0;
-    }
-
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if( localInfo.data.prematureLicenseExperationDate != licenseOverflowTime )
-    {
-        localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-        QnRuntimeInfoManager::instance()->updateLocalItem( localInfo );
-    }
-
-    query.addBindValue( DB_INSTANCE_KEY );
-    if(!m_needResyncLog && query.exec() && query.next())
-    {
-        m_dbInstanceId = QnUuid::fromRfc4122( query.value( 0 ).toByteArray() );
-    }
-    else
-    {
-        m_dbInstanceId = QnUuid::createUuid();
-        QSqlQuery insQuery( m_sdb );
-        insQuery.prepare( "INSERT OR REPLACE INTO misc_data (key, data) values (?,?)" );
-        insQuery.addBindValue( DB_INSTANCE_KEY );
-        insQuery.addBindValue( m_dbInstanceId.toRfc4122() );
-        if( !insQuery.exec() )
+        if (m_resyncFlags.testFlag(ResyncLog))
         {
-            qWarning() << "can't initialize sqlLite database!";
-            return false;
+            if (!resyncTransactionLog())
+                return false;
         }
-    }
-
-    if( QnTransactionLog::instance() )
-        if( !QnTransactionLog::instance()->init() )
+        else
         {
-            qWarning() << "can't initialize transaction log!";
-            return false;
+            if (m_resyncFlags.testFlag(ResyncLicences))
+            {
+                if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncFiles))
+            {
+                if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncCameraAttributes))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncServerAttributes))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncServers))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncLayouts))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncRules))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncUsers))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncStorages))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncClientInfo))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncVideoWalls))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+                    return false;
+            }
+            if (m_resyncFlags.testFlag(ResyncWebPages))
+            {
+                if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
+                    return false;
+            }
+
         }
 
-    if( m_needResyncLog ) {
-        if (!resyncTransactionLog())
-		    return false;
-    }
-    else
-    {
-        if (m_needResyncLicenses) {
-            if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
-                return false;
-        }
-        if (m_needResyncFiles) {
-            if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
-                return false;
-        }
-        if (m_needResyncCameraUserAttributes) {
-            if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
-                return false;
-        }
-        if (m_needResyncServerUserAttributes) {
-            if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
-                return false;
-        }
-        if (m_needResyncLayout) {
-            if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
-                return false;
-        }
-        if (m_needResyncbRules) {
-            if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
-                return false;
-        }
-        if (m_needResyncUsers) {
-            if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
-                return false;
-        }
-        if (m_needResyncStorages) {
-            if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
-                return false;
-        }
-        if(m_needResyncClientInfoData) {
-            if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
-                return false;
-        }
-
-    }
-
-    // Set admin user's password
-    QnUserResourcePtr userResource;
-    {
-        ApiUserDataList users;
-        ErrorCode errCode = doQueryNoLock(nullptr, users);
-        if (errCode != ErrorCode::ok)
-            return false;
-
-        if (users.empty())
-            return false;
-
-        auto iter = std::find_if(users.cbegin(), users.cend(), [this](const ec2::ApiUserData& user)
+        // Set admin user's password
+        QnUserResourcePtr userResource;
         {
-            return user.id == m_adminUserID;
-        });
+            ApiUserDataList users;
+            ErrorCode errCode = doQueryNoLock(QnUuid(), users);
+            if (errCode != ErrorCode::ok)
+                return false;
 
-        NX_ASSERT(iter != users.cend(), Q_FUNC_INFO, "Admin must exist");
-        if (iter == users.cend())
-            return false;
+            if (users.empty())
+                return false;
 
-        userResource.reset(new QnUserResource());
-        fromApiToResource(*iter, userResource);
-        NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
-    }
+            auto iter = std::find_if(users.cbegin(), users.cend(), [this](const ec2::ApiUserData& user)
+            {
+                return user.id == m_adminUserID;
+            });
 
-    QByteArray md5Password;
-    QByteArray digestPassword;
-    qnCommon->adminPasswordData(&md5Password, &digestPassword);
-    QString defaultAdminPassword = qnCommon->defaultAdminPassword();
-    if( (userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty() ) {
-        defaultAdminPassword = lit("admin");
-        if (m_dbJustCreated)
-            qnCommon->setUseLowPriorityAdminPasswordHach(true);
-    }
+            NX_ASSERT(iter != users.cend(), Q_FUNC_INFO, "Admin must exist");
+            if (iter == users.cend())
+                return false;
 
-
-    bool updateUserResource = false;
-    if( !defaultAdminPassword.isEmpty() )
-    {
-        if (!userResource->checkPassword(defaultAdminPassword) || userResource->getRealm() != QnAppInfo::realm()) {
-            userResource->setPassword( defaultAdminPassword );
-            userResource->generateHash();
-            updateUserResource = true;
+            userResource = fromApiToResource(*iter);
+            NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
-    }
-    if (!md5Password.isEmpty() || !digestPassword.isEmpty()) {
-        userResource->setHash(md5Password);
-        userResource->setDigest(digestPassword);
-        updateUserResource = true;
-    }
-    if (updateUserResource)
-    {
-        // admin user resource has been updated
-        QnTransaction<ApiUserData> userTransaction( ApiCommand::saveUser );
-        transactionLog->fillPersistentInfo(userTransaction);
-        if (qnCommon->useLowPriorityAdminPasswordHach())
-            userTransaction.persistentInfo.timestamp = 1; // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
-        fromResourceToApi( userResource, userTransaction.params );
-        executeTransactionNoLock( userTransaction, QnUbjson::serialized( userTransaction ) );
-    }
 
-    QSqlQuery queryCameras( m_sdb );
-    // Update cameras status
-    // select cameras from servers without DB and local cameras
-    // In case of database backup restore, mark all cameras as offline (we are going to push our data to all other servers)
-    queryCameras.setForwardOnly(true);
-    QString serverCondition;
-    if (!m_isBackupRestore)
-         serverCondition = lit("AND ((s.flags & 2) or sr.guid = ?)");
-    queryCameras.prepare(lit("SELECT r.guid FROM vms_resource r \
-                         JOIN vms_resource_status rs on rs.guid = r.guid \
-                         JOIN vms_camera c on c.resource_ptr_id = r.id \
-                         JOIN vms_resource sr on sr.guid = r.parent_guid \
-                         JOIN vms_server s on s.resource_ptr_id = sr.id \
-                         WHERE coalesce(rs.status,0) != ? %1").arg(serverCondition));
-    queryCameras.bindValue(0, Qn::Offline);
-    if (!m_isBackupRestore)
-        queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-    if (!queryCameras.exec()) {
-        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-        NX_ASSERT( 0 );
-        return false;
-    }
-    while( queryCameras.next() )
-    {
-        QnTransaction<ApiResourceStatusData> tran( ApiCommand::setResourceStatus );
-        transactionLog->fillPersistentInfo(tran);
-        tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
-        tran.params.status = Qn::Offline;
-        if (executeTransactionNoLock( tran, QnUbjson::serialized( tran ) ) != ErrorCode::ok)
+        QString defaultAdminPassword = qnCommon->defaultAdminPassword();
+        if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
+        {
+            defaultAdminPassword = helpers::kFactorySystemPassword;
+            if (m_dbJustCreated)
+                qnCommon->setUseLowPriorityAdminPasswordHack(true);
+        }
+
+
+        bool updateUserResource = false;
+
+        if (!defaultAdminPassword.isEmpty())
+        {
+            if (!userResource->checkLocalUserPassword(defaultAdminPassword) ||
+                userResource->getRealm() != QnAppInfo::realm() ||
+                !userResource->isEnabled())
+            {
+                userResource->setPassword(defaultAdminPassword);
+                userResource->generateHash();
+                userResource->setEnabled(true);
+                updateUserResource = true;
+            }
+        }
+
+        updateUserResource |= aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
+
+        if (updateUserResource)
+        {
+            // admin user resource has been updated
+            QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
+            transactionLog->fillPersistentInfo(userTransaction);
+            if (qnCommon->useLowPriorityAdminPasswordHack())
+                userTransaction.persistentInfo.timestamp = Timestamp::fromInteger(1); // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
+            fromResourceToApi(userResource, userTransaction.params);
+            executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
+        }
+
+        QSqlQuery queryCameras(m_sdb);
+        // Update cameras status
+        // select cameras from servers without DB and local cameras
+        // In case of database backup restore, mark all cameras as offline (we are going to push our data to all other servers)
+        queryCameras.setForwardOnly(true);
+        QString serverCondition;
+        if (!m_isBackupRestore)
+            serverCondition = lit("AND ((s.flags & 2) or sr.guid = ?)");
+        queryCameras.prepare(lit("SELECT r.guid FROM vms_resource r \
+                             JOIN vms_resource_status rs on rs.guid = r.guid \
+                             JOIN vms_camera c on c.resource_ptr_id = r.id \
+                             JOIN vms_resource sr on sr.guid = r.parent_guid \
+                             JOIN vms_server s on s.resource_ptr_id = sr.id \
+                             WHERE coalesce(rs.status,0) != ? %1").arg(serverCondition));
+        queryCameras.bindValue(0, Qn::Offline);
+        if (!m_isBackupRestore)
+            queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+        if (!queryCameras.exec()) {
+            qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
+            NX_ASSERT(0);
             return false;
-    }
+        }
+        while (queryCameras.next())
+        {
+            QnTransaction<ApiResourceStatusData> tran(ApiCommand::setResourceStatus);
+            transactionLog->fillPersistentInfo(tran);
+            tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
+            tran.params.status = Qn::Offline;
+            if (executeTransactionNoLock(tran, QnUbjson::serialized(tran)) != ErrorCode::ok)
+                return false;
+        }
 
-    if (!locker.commit())
-        return false;
+        if (!locker.commit())
+            return false;
+    } // end of DB update
+
+    if (!execSQLScript("vacuum;", m_sdb))
+        qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
     m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
     emit initialized();
@@ -696,52 +640,77 @@ bool QnDbManager::init(const QUrl& dbUrl)
     return true;
 }
 
-template <>
-bool QnDbManager::queryObjects<ApiMediaServerUserAttributesDataList>(ApiMediaServerUserAttributesDataList& objects)
+bool QnDbManager::syncLicensesBetweenDB()
 {
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
+    // move license table to static DB
+    ec2::ApiLicenseDataList licensesMainDbVect;
+    ec2::ApiLicenseDataList licensesStaticDbVect;
+    if (getLicenses(licensesMainDbVect, m_sdb) != ErrorCode::ok)
+        return false;
+    if (getLicenses(licensesStaticDbVect, m_sdbStatic) != ErrorCode::ok)
+        return false;
+
+    std::set<ApiLicenseData> licensesMainDbSet(licensesMainDbVect.begin(), licensesMainDbVect.end());
+    std::set<ApiLicenseData> licensesStaticDbSet(licensesStaticDbVect.begin(), licensesStaticDbVect.end());
+
+    ec2::ApiLicenseDataList addToMain;
+    std::set_difference(
+        licensesStaticDbSet.begin(),
+        licensesStaticDbSet.end(),
+        licensesMainDbSet.begin(),
+        licensesMainDbSet.end(),
+        std::inserter(addToMain, addToMain.begin()));
+
+    ec2::ApiLicenseDataList addToStatic;
+    std::set_difference(
+        licensesMainDbSet.begin(),
+        licensesMainDbSet.end(),
+        licensesStaticDbSet.begin(),
+        licensesStaticDbSet.end(),
+        std::inserter(addToStatic, addToStatic.begin()));
+
+
+    for (const auto& license : addToMain)
+    {
+        if (saveLicense(license, m_sdb) != ErrorCode::ok)
+            return false;
+        m_resyncFlags |= ResyncLicences; //< resync transaction log due to data changes
+    }
+
+    for (const auto& license : addToStatic)
+    {
+        if (saveLicense(license, m_sdbStatic) != ErrorCode::ok)
+            return false;
+    }
+
+    return true;
 }
 
-template <>
-bool QnDbManager::queryObjects<ApiClientInfoDataList>(ApiClientInfoDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
 
-template <>
-bool QnDbManager::queryObjects<ApiStorageDataList>(ApiStorageDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <>
-bool QnDbManager::queryObjects<ApiResourceParamWithRefDataList>(ApiResourceParamWithRefDataList& objects)
-{
-    ErrorCode errCode = doQueryNoLock(QnUuid(), objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <class ObjectListType>
-bool QnDbManager::queryObjects(ObjectListType& objects)
-{
-    ErrorCode errCode = doQueryNoLock(nullptr, objects);
-    return errCode == ErrorCode::ok;
-}
-
-template <class ObjectType, class ObjectListType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
+template <typename FilterDataType, class ObjectType, class ObjectListType>
+bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater)
 {
     ObjectListType objects;
-    if (!queryObjects<ObjectListType>(objects))
+    if (doQueryNoLock(FilterDataType(), objects) != ErrorCode::ok)
         return false;
 
     for(const ObjectType& object: objects)
     {
         QnTransaction<ObjectType> transaction(command, object);
+        auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
+
+        if (transactionDescriptor)
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object);
+        else
+            transaction.transactionType = ec2::TransactionType::Unknown;
+
         transactionLog->fillPersistentInfo(transaction);
+        if (updater && updater(transaction.params))
+        {
+            if (executeTransactionInternal(transaction) != ErrorCode::ok)
+                return false;
+        }
+
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
@@ -750,33 +719,48 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 
 bool QnDbManager::resyncTransactionLog()
 {
-    if (!fillTransactionLogInternal<ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
+    if (!fillTransactionLogInternal<QnUuid, ApiUserData, ApiUserDataList>(ApiCommand::saveUser))
         return false;
-    if (!fillTransactionLogInternal<ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
+    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerData, ApiMediaServerDataList>(ApiCommand::saveMediaServer))
         return false;
-    if (!fillTransactionLogInternal<ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveServerUserAttributes))
+    if (!fillTransactionLogInternal<QnUuid, ApiMediaServerUserAttributesData, ApiMediaServerUserAttributesDataList>(ApiCommand::saveMediaServerUserAttributes))
         return false;
-    if (!fillTransactionLogInternal<ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
+    if (!fillTransactionLogInternal<QnUuid, ApiCameraData, ApiCameraDataList>(ApiCommand::saveCamera))
         return false;
-    if (!fillTransactionLogInternal<ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
+    if (!fillTransactionLogInternal<QnUuid, ApiCameraAttributesData, ApiCameraAttributesDataList>(ApiCommand::saveCameraUserAttributes))
         return false;
-    if (!fillTransactionLogInternal<ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
+    if (!fillTransactionLogInternal<QnUuid, ApiLayoutData, ApiLayoutDataList>(ApiCommand::saveLayout))
         return false;
-    if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
+    if (!fillTransactionLogInternal<QnUuid, ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveEventRule, businessRuleObjectUpdater))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
-        return false;
-
-    if (!fillTransactionLogInternal<ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
+    if (!fillTransactionLogInternal<QnUuid, ApiResourceParamWithRefData, ApiResourceParamWithRefDataList>(ApiCommand::setResourceParam))
         return false;
 
-    if (!fillTransactionLogInternal<ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
+    if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
         return false;
 
-    if (!fillTransactionLogInternal<ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+    if (!fillTransactionLogInternal<nullptr_t, ApiLicenseData, ApiLicenseDataList>(ApiCommand::addLicense))
         return false;
 
-    if (!fillTransactionLogInternal<ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+    if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
+        return false;
+
+    if (!fillTransactionLogInternal<nullptr_t, ApiAccessRightsData, ApiAccessRightsDataList>(ApiCommand::setAccessRights))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiUserRoleData, ApiUserRoleDataList>(ApiCommand::saveUserRole))
+        return false;
+
+    if (!fillTransactionLogInternal<QnUuid, ApiWebPageData, ApiWebPageDataList>(ApiCommand::saveWebPage))
         return false;
 
     return true;
@@ -787,7 +771,8 @@ bool QnDbManager::isInitialized() const
     return m_initialized;
 }
 
-QMap<int, QnUuid> QnDbManager::getGuidList( const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix )
+QMap<int, QnUuid> QnDbManager::getGuidList(
+    const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix )
 {
     QMap<int, QnUuid>  result;
     QSqlQuery query(m_sdb);
@@ -1024,140 +1009,10 @@ bool QnDbManager::addStoredFiles(const QString& baseDirectoryName, int* count)
     return true;
 }
 
-
-namespace oldBusinessData // TODO: #Elric #EC2 sane naming
-{
-    enum BusinessEventType
-    {
-        NotDefinedEvent,
-        Camera_Motion,
-        Camera_Input,
-        Camera_Disconnect,
-        Storage_Failure,
-        Network_Issue,
-        Camera_Ip_Conflict,
-        MediaServer_Failure,
-        MediaServer_Conflict,
-        MediaServer_Started
-    };
-
-    enum BusinessActionType
-    {
-        UndefinedAction,
-        CameraOutput,
-        Bookmark,
-        CameraRecording,
-        PanicRecording,
-        SendMail,
-        Diagnostics,
-        ShowPopup,
-        CameraOutputInstant,
-        PlaySound,
-        SayText,
-        PlaySoundRepeated
-    };
-}
-
-int EventRemapData[][2] =
-{
-    { oldBusinessData::Camera_Motion,        QnBusiness::CameraMotionEvent     },
-    { oldBusinessData::Camera_Input,         QnBusiness::CameraInputEvent      },
-    { oldBusinessData::Camera_Disconnect,    QnBusiness::CameraDisconnectEvent },
-    { oldBusinessData::Storage_Failure,      QnBusiness::StorageFailureEvent   },
-    { oldBusinessData::Network_Issue,        QnBusiness::NetworkIssueEvent     },
-    { oldBusinessData::Camera_Ip_Conflict,   QnBusiness::CameraIpConflictEvent },
-    { oldBusinessData::MediaServer_Failure,  QnBusiness::ServerFailureEvent    },
-    { oldBusinessData::MediaServer_Conflict, QnBusiness::ServerConflictEvent   },
-    { oldBusinessData::MediaServer_Started,  QnBusiness::ServerStartEvent      },
-    { -1,                                    -1                                }
-};
-
-int ActionRemapData[][2] =
-{
-    { oldBusinessData::CameraOutput,        QnBusiness::CameraOutputAction     },
-    { oldBusinessData::Bookmark,            QnBusiness::BookmarkAction         },
-    { oldBusinessData::CameraRecording,     QnBusiness::CameraRecordingAction  },
-    { oldBusinessData::PanicRecording,      QnBusiness::PanicRecordingAction   },
-    { oldBusinessData::SendMail,            QnBusiness::SendMailAction         },
-    { oldBusinessData::Diagnostics,         QnBusiness::DiagnosticsAction      },
-    { oldBusinessData::ShowPopup,           QnBusiness::ShowPopupAction        },
-    { oldBusinessData::CameraOutputInstant, QnBusiness::CameraOutputOnceAction },
-    { oldBusinessData::PlaySound,           QnBusiness::PlaySoundOnceAction    },
-    { oldBusinessData::SayText,             QnBusiness::SayTextAction          },
-    { oldBusinessData::PlaySoundRepeated,   QnBusiness::PlaySoundAction        },
-    { -1,                                   -1                                 }
-};
-
-int remapValue(int oldVal, const int remapData[][2])
-{
-    for (int i = 0; remapData[i][0] >= 0; ++i)
-    {
-        if (remapData[i][0] == oldVal)
-            return remapData[i][1];
-    }
-    return oldVal;
-}
-
-bool QnDbManager::doRemap(int id, int newVal, const QString& fieldName)
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    QString sqlText = QString(lit("UPDATE vms_businessrule set %1 = ? where id = ?")).arg(fieldName);
-    query.prepare(sqlText);
-    query.addBindValue(newVal);
-    query.addBindValue(id);
-    return query.exec();
-}
-
-struct BeRemapData
-{
-    BeRemapData(): id(0), eventType(0), actionType(0) {}
-
-    int id;
-    int eventType;
-    int actionType;
-};
-
-bool QnDbManager::migrateBusinessEvents()
-{
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id,event_type, action_type from vms_businessrule");
-    if (!query.exec())
-        return false;
-
-    QVector<BeRemapData> oldData;
-    while (query.next())
-    {
-        BeRemapData data;
-        data.id = query.value("id").toInt();
-        data.eventType = query.value("event_type").toInt();
-        data.actionType = query.value("action_type").toInt();
-        oldData << data;
-    }
-
-    for(const BeRemapData& remapData: oldData)
-    {
-        if (!doRemap(remapData.id, remapValue(remapData.eventType, EventRemapData), "event_type"))
-            return false;
-        if (!doRemap(remapData.id, remapValue(remapData.actionType, ActionRemapData), "action_type"))
-            return false;
-    }
-
-    return true;
-}
-
 bool QnDbManager::beforeInstallUpdate(const QString& updateName)
 {
-    if (updateName == lit(":/updates/29_update_history_guid.sql")) {
-        ; //return updateCameraHistoryGuids(); // perform string->guid conversion before SQL update because of reducing field size to 16 bytes. Probably data would lost if moved it to afterInstallUpdate
-    }
-    else if (updateName == lit(":/updates/30_update_history_guid.sql")) {
+    if (updateName.endsWith(lit("/33_history_refactor_dummy.sql")))
         return removeOldCameraHistory();
-    }
-    else if (updateName == lit(":/updates/33_history_refactor_dummy.sql")) {
-        return removeOldCameraHistory();
-    }
 
     return true;
 }
@@ -1176,7 +1031,7 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     while (query.next()) {
         ApiResourceStatusData data;
         data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
-        QnUuid hash = transactionLog->transactionHash(data);
+        QnUuid hash = transactionHash(data);
         delQuery.bindValue(0, QnSql::serialized_field(hash));
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();
@@ -1212,27 +1067,6 @@ bool QnDbManager::removeEmptyLayoutsFromTransactionLog()
     return true;
 }
 
-bool QnDbManager::tuneDBAfterOpen()
-{
-    QSqlQuery enableWalQuery(m_sdb);
-    enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-    if( !enableWalQuery.exec() )
-    {
-        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
-        return false;
-    }
-
-    QSqlQuery enableFKQuery(m_sdb);
-    enableFKQuery.prepare("PRAGMA foreign_keys = ON");
-    if( !enableFKQuery.exec() )
-    {
-        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
-        return false;
-    }
-
-    return true;
-}
-
 bool QnDbManager::removeOldCameraHistory()
 {
     // migrate transaction log
@@ -1248,7 +1082,7 @@ bool QnDbManager::removeOldCameraHistory()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        migration::legacy::QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1283,7 +1117,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     updQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        migration::legacy::QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1299,7 +1133,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
             return false;
         }
-        if (data.name == lit("supportedMotion") && data.value.isEmpty())
+        if (data.name == lit("supportedMotion") && (data.value.isEmpty() || data.value.toInt() == 1))
         {
             updQuery.addBindValue(QnSql::serialized_field(tranGuid));
             if (!updQuery.exec()) {
@@ -1310,6 +1144,12 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
     }
 
     return true;
+}
+
+bool QnDbManager::cleanupDanglingDbObjects()
+{
+    const QString kCleanupScript(":/updates/68_cleanup_db.sql");
+    return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
 bool QnDbManager::fixBusinessRules()
@@ -1326,7 +1166,7 @@ bool QnDbManager::fixBusinessRules()
     delQuery.prepare(QString("DELETE FROM transaction_log WHERE tran_guid = ?"));
 
     while (query.next()) {
-        QnAbstractTransaction abstractTran;
+        migration::legacy::QnAbstractTransactionV1 abstractTran;
         QnUuid tranGuid = QnSql::deserialized_field<QnUuid>(query.value(0));
         QByteArray srcData = query.value(1).toByteArray();
         QnUbjsonReader<QByteArray> stream(&srcData);
@@ -1334,7 +1174,7 @@ bool QnDbManager::fixBusinessRules()
             qWarning() << Q_FUNC_INFO << "Can' deserialize transaction from transaction log";
             return false;
         }
-        if (abstractTran.command == ApiCommand::resetBusinessRules || abstractTran.command == ApiCommand::saveBusinessRule)
+        if (abstractTran.command == ApiCommand::resetEventRules || abstractTran.command == ApiCommand::saveEventRule)
         {
             delQuery.addBindValue(QnSql::serialized_field(tranGuid));
             if (!delQuery.exec()) {
@@ -1343,148 +1183,238 @@ bool QnDbManager::fixBusinessRules()
             }
         }
     }
-    m_needResyncbRules = true;
     return true;
 }
 
-bool QnDbManager::isTranAllowed(const QnAbstractTransaction& tran) const
+bool QnDbManager::encryptKvPairs()
 {
-    if( !m_dbReadOnly )
-        return true;
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString queryStr = "SELECT rowid, value, name FROM vms_kvpair";
 
-    switch( tran.command )
+    if(!query.prepare(queryStr))
     {
-        case ApiCommand::addLicense:
-        case ApiCommand::addLicenses:
-        case ApiCommand::removeLicense:
-            return true;
-
-        case ApiCommand::saveMediaServer:
-        case ApiCommand::saveStorage:
-        case ApiCommand::saveStorages:
-        case ApiCommand::saveServerUserAttributes:
-        case ApiCommand::saveServerUserAttributesList:
-        case ApiCommand::setResourceStatus:
-        case ApiCommand::setResourceParam:
-        case ApiCommand::setResourceParams:
-            //allowing minimum set of transactions required for local server to function properly
-            return tran.deliveryInfo.originatorType == QnTranDeliveryInformation::localServer;
-
-        default:
-            return false;
+        NX_LOG(lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
+        return false;
     }
+
+    if (!query.exec())
+    {
+        NX_LOG(lit("Could not execute query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
+        return false;
+    }
+
+    QSqlQuery insQuery(m_sdb);
+    QString insQueryString = "UPDATE vms_kvpair SET value = :value WHERE rowid = :rowid";
+
+    while (query.next())
+    {
+        int rowid     = query.value(0).toInt();
+        QString value = query.value(1).toString();
+        QString name  = query.value(2).toString();
+
+        bool allowed = ec2::access_helpers::kvSystemOnlyFilter(
+            ec2::access_helpers::Mode::read,
+            Qn::UserAccessData(),
+            name);
+
+        if (!allowed) // need encrypt
+        {
+            value = nx::utils::encodeHexStringFromStringAES128CBC(value);
+
+            insQuery.prepare(insQueryString);
+
+            insQuery.bindValue(":name",  name);
+            insQuery.bindValue(":value", value);
+            insQuery.bindValue(":rowid", rowid);
+
+            if (!insQuery.exec())
+            {
+                NX_LOG(lit("Could not execute query %1: %2").arg(insQueryString).arg(insQuery.lastError().text()), cl_logERROR);
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 bool QnDbManager::afterInstallUpdate(const QString& updateName)
 {
-    if (updateName == lit(":/updates/07_videowall.sql"))
+    if (updateName.endsWith(lit("/07_videowall.sql")))
     {
-        QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
-        if (!updateTableGuids("vms_resourcetype", "guid", guids))
-            return false;
+        //TODO: #GDM move to migration?
+        auto guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'", CM_MakeHash);
+        return updateTableGuids("vms_resourcetype", "guid", guids);
     }
-    else if (updateName == lit(":/updates/17_add_isd_cam.sql")) {
-        updateResourceTypeGuids();
-    }
-    else if (updateName == lit(":/updates/20_adding_camera_user_attributes.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncLog = true;
-    }
-    else if (updateName == lit(":/updates/21_business_action_parameters.sql")) {
-        updateBusinessActionParameters();
-    }
-    else if (updateName == lit(":/updates/21_new_dw_cam.sql")) {
-        updateResourceTypeGuids();
-    }
-    else if (updateName == lit(":/updates/24_insert_default_stored_files.sql")) {
-        addStoredFiles(lit(":/vms_storedfiles/"));
-    }
-    else if (updateName == lit(":/updates/27_remove_server_status.sql")) {
+
+    if (updateName.endsWith(lit("/17_add_isd_cam.sql")))
+        return updateResourceTypeGuids();
+
+    if (updateName.endsWith(lit("/20_adding_camera_user_attributes.sql")))
+        return resyncIfNeeded(ResyncLog);
+
+    if (updateName.endsWith(lit("/21_business_action_parameters.sql")))
+        return updateBusinessActionParameters();
+
+    if (updateName.endsWith(lit("/21_new_dw_cam.sql")))
+        return updateResourceTypeGuids();
+
+    if (updateName.endsWith(lit("/24_insert_default_stored_files.sql")))
+        return addStoredFiles(lit(":/vms_storedfiles/"));
+
+    if (updateName.endsWith(lit("/27_remove_server_status.sql")))
         return removeServerStatusFromTransactionLog();
-    }
-    else if (updateName == lit(":/updates/31_move_group_name_to_user_attrs.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncCameraUserAttributes = true;
-    }
-    else if (updateName == lit(":/updates/32_default_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getSystemRules())
-        {
-            ApiBusinessRuleData bRuleData;
-            fromResourceToApi(bRule, bRuleData);
-            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
-                return false;
-        }
-    }
-    else if (updateName == lit(":/updates/33_resync_layout.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncLayout = true;
-    }
-    else if (updateName == lit(":/updates/35_fix_onvif_mt.sql")) {
-        return removeWrongSupportedMotionTypeForONVIF();
-    }
-    else if (updateName == lit(":/updates/36_fix_brules.sql")) {
-        return fixBusinessRules();
-    }
-    else if (updateName == lit(":/updates/37_remove_empty_layouts.sql")) {
-        return removeEmptyLayoutsFromTransactionLog();
-    }
-    else if (updateName == lit(":/updates/41_resync_tran_log.sql"))
+
+    if (updateName.endsWith(lit("/31_move_group_name_to_user_attrs.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/32_default_business_rules.sql")))
     {
-        if (!m_dbJustCreated) {
-            m_needResyncUsers = true;
-            m_needResyncStorages = true;
-        }
-    }
-    else if (updateName == lit(":/updates/42_add_license_to_user_attr.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncCameraUserAttributes = true;
-    }
-    else if (updateName == lit(":/updates/43_add_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getRulesUpd43())
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getSystemRules())
         {
             ApiBusinessRuleData bRuleData;
             fromResourceToApi(bRule, bRuleData);
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/48_add_business_rules.sql")) {
-        for(const auto& bRule: QnBusinessEventRule::getRulesUpd48())
+
+    if (updateName.endsWith(lit("/33_resync_layout.sql")))
+        return resyncIfNeeded(ResyncLayouts);
+
+    if (updateName.endsWith(lit("/35_fix_onvif_mt.sql")))
+        return removeWrongSupportedMotionTypeForONVIF();
+
+    if (updateName.endsWith(lit("/36_fix_brules.sql")))
+        return fixBusinessRules() && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/37_remove_empty_layouts.sql")))
+        return removeEmptyLayoutsFromTransactionLog();
+
+    if (updateName.endsWith(lit("/41_resync_tran_log.sql")))
+        return resyncIfNeeded({ResyncUsers, ResyncStorages});
+
+    if (updateName.endsWith(lit("/42_add_license_to_user_attr.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
+    if (updateName.endsWith(lit("/43_add_business_rules.sql")))
+    {
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getRulesUpd43())
         {
             ApiBusinessRuleData bRuleData;
             fromResourceToApi(bRule, bRuleData);
             if (updateBusinessRule(bRuleData) != ErrorCode::ok)
                 return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncClientInfoData = true;
-    }
-    else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
-        if (!m_dbJustCreated)
-            m_needResyncbRules = true;
-    }
-    else if (updateName == lit(":/updates/49_fix_migration.sql")) {
-        if (!m_dbJustCreated)
+
+    if (updateName.endsWith(lit("/48_add_business_rules.sql")))
+    {
+        //TODO: #GDM move to migration
+        for (const auto& bRule : QnBusinessEventRule::getRulesUpd48())
         {
-            m_needResyncCameraUserAttributes = true;
-            m_needResyncServerUserAttributes = true;
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
         }
+        return resyncIfNeeded(ResyncRules);
     }
-    else if (updateName == lit(":/updates/49_add_webpage_table.sql"))
+
+    if (updateName.endsWith(lit("/43_resync_client_info_data.sql")))
+        return resyncIfNeeded(ResyncClientInfo);
+
+    if (updateName.endsWith(lit("/44_upd_brule_format.sql")))
+        return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/49_fix_migration.sql")))
+        return resyncIfNeeded({ResyncCameraAttributes, ResyncServerAttributes});
+
+    if (updateName.endsWith(lit("/49_add_webpage_table.sql")))
     {
         QMap<int, QnUuid> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'WebPage'", CM_MakeHash);
-        if (!updateTableGuids("vms_resourcetype", "guid", guids))
-            return false;
+        return updateTableGuids("vms_resourcetype", "guid", guids);
     }
-    else if (updateName == lit(":/updates/50_add_access_rights.sql"))
+
+    if (updateName.endsWith(lit("/50_add_access_rights.sql")))
+        return resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/50_fix_migration.sql")))
+        return resyncIfNeeded({ResyncRules, ResyncUsers});
+
+    if (updateName.endsWith(lit("/51_http_business_action.sql")))
+        return resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/54_migrate_permissions.sql")))
+        return ec2::db::migrateV25UserPermissions(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/55_migrate_accessible_resources.sql")))
+        return ec2::db::migrateAccessibleResources(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/56_remove_layout_editable.sql")))
+        return resyncIfNeeded(ResyncLayouts);
+
+    if (updateName.endsWith(lit("/58_migrate_camera_output_action.sql")))
+        return ec2::db::migrateBusinessRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/52_fix_onvif_mt.sql")))
+        return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
+
+    if (updateName.endsWith(lit("/65_transaction_log_add_fields.sql")))
+        return resyncIfNeeded(ResyncLog);
+
+    if (updateName.endsWith(lit("/68_add_transaction_type.sql")))
+        return migration::addTransactionType::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+
+    if (updateName.endsWith(lit("/68_cleanup_db.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
+
+    if (updateName.endsWith(lit("/70_make_transaction_timestamp_128bit.sql")))
+        return migration::timestamp128bit::migrate(&m_sdb); //TODO: #rvasilenko namespaces consistency break
+
+    if (updateName.endsWith(lit("/73_encrypt_kvpairs.sql")))
+        return encryptKvPairs();
+
+    if (updateName.endsWith(lit("/74_remove_server_deprecated_columns.sql")))
+        return resyncIfNeeded(ResyncServers);
+
+    if (updateName.endsWith(lit("/75_add_user_id_to_tran.sql")))
+        return migration::add_history::migrate(&m_sdb);
+
+    if (updateName.endsWith(lit("/76_rename_discovery_attribute.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
+
+    if (updateName.endsWith(lit("/77_fix_custom_permission_flag.sql")))
+        return ec2::db::fixCustomPermissionFlag(m_sdb) && resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/78_migrate_videowall_layouts.sql")))
+    {
+        return ec2::database::migrations::reparentVideoWallLayouts(m_sdb)
+            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
+    }
+
+    if (updateName.endsWith(lit("/81_changed_status_stransaction_hash.sql")))
+        return resyncIfNeeded({ClearLog, ResyncLog});
+
+    if (updateName.endsWith(lit("/82_optera_trash_cleanup.sql")))
     {
         if (!m_dbJustCreated)
-        {
-            m_needResyncUsers = true;
-        }
+            cleanupDanglingDbObjects();
+        return resyncIfNeeded({ClearLog, ResyncLog});
     }
+
+    if (updateName.endsWith(lit("/83_add_default_webpages.sql")))
+    {
+        return ec2::database::migrations::addDefaultWebpages(m_sdb)
+            && resyncIfNeeded(ResyncWebPages);
+    }
+
+    NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }
 
@@ -1496,7 +1426,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
-        NX_LOG(QString("Create new database"), cl_logINFO);
+        NX_LOG(lit("Create new database"), cl_logINFO);
 
         m_dbJustCreated = true;
 
@@ -1509,15 +1439,17 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
-		NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
+        NX_LOG(lit("Update database to v 2.3"), cl_logINFO);
 
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!migrateBusinessEvents())
+        if (!ec2::db::migrateBusinessRulesToV23(m_sdb))
             return false;
-        if (!m_dbJustCreated) {
-            m_needResyncLog = true;
+
+        if (!m_dbJustCreated)
+        {
+            m_resyncFlags |= ResyncLog;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
         }
@@ -1537,33 +1469,14 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/05_staticdb_add_license_table.sql"), m_sdbStatic))
             return false;
     }
-    else if (m_dbJustCreated)
-        m_needResyncLicenses = true;
-
-    // move license table to static DB
-    ec2::ApiLicenseDataList licenses;
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
-    if (!query.exec())
-    {
-        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
-        return false;
-    }
-    QnSql::fetch_many(query, &licenses);
-
-    for(const ApiLicenseData& data: licenses)
-    {
-        if (saveLicense(data) != ErrorCode::ok)
-            return false;
-        m_needResyncLicenses = true;
-    }
-    if (!execSQLQuery("DELETE FROM vms_license", m_sdb, Q_FUNC_INFO))
-        return false;
-
 
     if (!applyUpdates(":/updates"))
+    {
+        NX_LOG(lit("%1 Applying migration updates failed").arg(Q_FUNC_INFO), cl_logWARNING);
         return false;
+    }
+
+    NX_LOG(lit("%1 Applying migration updates succeded").arg(Q_FUNC_INFO), cl_logDEBUG2);
 
     if (!lockStatic.commit())
         return false;
@@ -1575,6 +1488,11 @@ bool QnDbManager::createDatabase()
 
 QnDbManager::~QnDbManager()
 {
+    if (m_sdbStatic.isOpen())
+    {
+        m_sdbStatic = QSqlDatabase();
+        QSqlDatabase::removeDatabase("QnDbManagerStatic");
+    }
 }
 
 ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
@@ -1625,7 +1543,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
     if( !query.prepare( queryStr ) )
     {
-        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Could not prepare query %1: %2").arg(queryStr).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1635,7 +1553,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
         query.bindValue(QLatin1String(":parentGuid"), resParentID.toRfc4122());
     if (!query.exec())
     {
-        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1644,30 +1562,9 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
     return ErrorCode::ok;
 }
 
-/*
-ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
+qint32 QnDbManager::getResourceInternalId( const QnUuid& guid )
 {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = ?");
-    insQuery.addBindValue(resourceId);
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-}
-*/
-
-qint32 QnDbManager::getResourceInternalId( const QnUuid& guid ) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT id from vms_resource where guid = ?");
-    query.bindValue(0, guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-    return query.value(0).toInt();
+    return database::api::getResourceInternalId(m_sdb, guid);
 }
 
 QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
@@ -1682,47 +1579,31 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    *internalId = getResourceInternalId(data.id);
-
-    //NX_ASSERT(data.status == Qn::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
-
-    QSqlQuery query(m_sdb);
-    if (*internalId) {
-        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalId");
-        query.bindValue(":internalId", *internalId);
-    }
-    else {
-        query.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url) VALUES(:id, :typeId, :parentId, :name, :url)");
-    }
-    QnSql::bind(data, &query);
-
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    if (!database::api::insertOrReplaceResource(m_sdb, data, internalId))
         return ErrorCode::dbError;
-    }
-    if (*internalId == 0)
-        *internalId = query.lastInsertId().toInt();
-
     return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 internalId)
 {
     {
-        const QString authQueryStr = data.hash.isEmpty()
-            ? "UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name"
-            : R"(
-                INSERT OR REPLACE
-                INTO auth_user
-                (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined, first_name, last_name)
-                VALUES
-                (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '', '', '')
-            )";
-
+        const QString authQueryStr =
+            R"(
+            INSERT OR REPLACE
+            INTO auth_user
+            (id, username, is_superuser, email,
+                password,
+                is_staff, is_active, last_login, date_joined, first_name, last_name)
+            VALUES
+            (:internalId, :name, :isAdmin, :email,
+            coalesce(:hash, coalesce((SELECT password FROM auth_user WHERE id = :internalId), '')),
+            1, 1, '', '', '', '')
+        )";
 
         QSqlQuery authQuery(m_sdb);
         if (!prepareSQLQuery(&authQuery, authQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
+
         QnSql::bind(data, &authQuery);
         authQuery.bindValue(":internalId", internalId);
         if (!execSQLQuery(&authQuery, Q_FUNC_INFO))
@@ -1733,15 +1614,21 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         const QString profileQueryStr = R"(
             INSERT OR REPLACE
             INTO vms_userprofile
-            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, group_guid, is_cloud)
+            (user_id, resource_ptr_id, digest, crypt_sha512_hash, realm, rights, is_ldap, is_enabled, user_role_guid, is_cloud, full_name)
             VALUES
-            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :groupId, :isCloud)
+            (:internalId, :internalId, :digest, :cryptSha512Hash, :realm, :permissions, :isLdap, :isEnabled, :userRoleId, :isCloud, :fullName)
         )";
 
         QSqlQuery profileQuery(m_sdb);
         if (!prepareSQLQuery(&profileQuery, profileQueryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
+
         QnSql::bind(data, &profileQuery);
+        if (data.isLdap && data.isCloud)
+        {
+            NX_LOG(lit("Warning at %1: user data has both LDAP and cloud flags set; cloud flag will be ignored. Internal id=%2").arg(Q_FUNC_INFO).arg(internalId), cl_logWARNING);
+            profileQuery.bindValue(":isCloud", false);
+        }
 
         if (data.digest.isEmpty() && !data.isLdap)
         {
@@ -1767,11 +1654,11 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceUserGroup(const ApiUserGroupData& data)
+ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
 {
     QSqlQuery query(m_sdb);
     const QString queryStr = R"(
-        INSERT OR REPLACE INTO vms_user_groups
+        INSERT OR REPLACE INTO vms_user_roles
         (id, name, permissions)
         VALUES
         (:id, :name, :permissions)
@@ -1805,6 +1692,18 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
     }
 }
 
+ErrorCode QnDbManager::removeCameraAttributes(const QnUuid& id)
+{
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_camera_user_attributes where camera_guid = ?");
+    delQuery.addBindValue(id.toRfc4122());
+    if (!delQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
 {
     //TODO #ak if record already exists have to find id first?
@@ -1824,13 +1723,13 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             dewarping_params,               \
             min_archive_days,               \
             max_archive_days,               \
-            prefered_server_id,             \
+            preferred_server_id,            \
             license_used,                   \
             failover_priority,              \
             backup_type                     \
             )                               \
          VALUES (                           \
-            :cameraID,                      \
+            :cameraId,                      \
             :cameraName,                    \
             :userDefinedGroupName,          \
             :audioEnabled,                  \
@@ -1842,7 +1741,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :dewarpingParams,               \
             :minArchiveDays,                \
             :maxArchiveDays,                \
-            :preferedServerId,              \
+            :preferredServerId,             \
             :licenseUsed,                   \
             :failoverPriority,              \
             :backupType                     \
@@ -1851,7 +1750,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     QnSql::bind(data, &insQuery);
     if( !insQuery.exec() )
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -1860,10 +1759,10 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
     QSqlQuery renameQuery(m_sdb);
     renameQuery.prepare("UPDATE vms_resource set name = ? WHERE guid = ?");
     renameQuery.addBindValue(data.cameraName);
-    renameQuery.addBindValue(QnSql::serialized_field(data.cameraID));
+    renameQuery.addBindValue(QnSql::serialized_field(data.cameraId));
     if( !renameQuery.exec() )
     {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(renameQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 #endif
@@ -1874,8 +1773,8 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server (api_url, auth_key, version, net_addr_list, system_info, flags, system_name, resource_ptr_id, panic_mode) \
-        VALUES (:apiUrl, :authKey, :version, :networkAddresses, :systemInfo, :flags, :systemName, :internalId, 0)\
+        INSERT OR REPLACE INTO vms_server (auth_key, version, net_addr_list, system_info, flags, resource_ptr_id) \
+        VALUES (:authKey, :version, :networkAddresses, :systemInfo, :flags, :internalId)\
     ");
     QnSql::bind(data, &insQuery);
 
@@ -1889,33 +1788,6 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
             insQuery.bindValue(":authKey", selQuery.value(0).toString());
     }
 
-    insQuery.bindValue(":internalId", internalId);
-    if (insQuery.exec()) {
-        return ErrorCode::ok;
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-        return ErrorCode::dbError;
-    }
-}
-
-
-ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId)
-{
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_layout \
-        (user_can_edit, cell_spacing_height, locked, \
-        cell_aspect_ratio, background_width, \
-        background_image_filename, background_height, \
-        cell_spacing_width, background_opacity, resource_ptr_id) \
-        \
-        VALUES (:editable, :verticalSpacing, :locked, \
-        :cellAspectRatio, :backgroundWidth, \
-        :backgroundImageFilename, :backgroundHeight, \
-        :horizontalSpacing, :backgroundOpacity, :internalId)\
-    ");
-    QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
@@ -1943,6 +1815,13 @@ ErrorCode QnDbManager::removeStorage(const QnUuid& guid)
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorageData>& tran)
 {
+    if (tran.params.parentId.isNull())
+    {
+        // TODO: Improve error reporting. Currently HTTP 500 with empty error text is returned.
+        NX_LOG(lit("saveStorage: parentId is null"), cl_logERROR);
+        return ErrorCode::unsupported;
+    }
+
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result != ErrorCode::ok)
@@ -2042,9 +1921,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
 {
     QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_infos VALUES ("
+    query.prepare("INSERT OR REPLACE INTO vms_client_info_list VALUES ("
         ":id, :parentId, :skin, :systemInfo, :cpuArchitecture, :cpuModelName,"
-        ":phisicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
+        ":physicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
         ":fullVersion, :systemRuntime)");
 
     QnSql::bind(tran.params, &query);
@@ -2216,7 +2095,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
             backup_bitrate                                       \
         )                                                        \
         VALUES(                                                  \
-            :serverID,                                           \
+            :serverId,                                           \
             :serverName,                                         \
             :maxCameras,                                         \
             :allowAutoRedundancy,                                \
@@ -2231,7 +2110,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaSe
 
     if( !insQuery.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(insQuery.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -2245,7 +2124,7 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
     query.bindValue(":guid", guid.toRfc4122());
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -2254,48 +2133,11 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
 
 ErrorCode QnDbManager::removeLayoutItems(qint32 id)
 {
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_layoutitem WHERE layout_id = :id");
-    delQuery.bindValue(":id", id);
-    if (!delQuery.exec()) {
-        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+    if (!database::api::removeLayoutItems(m_sdb, id))
         return ErrorCode::dbError;
-    }
-
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId)
-{
-    ErrorCode result = removeLayoutItems(internalLayoutId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_guid, \
-        zoom_right, top, layout_id, bottom, zoom_top, \
-        zoom_target_uuid, flags, contrast_params, rotation, \
-        dewarping_params, left, display_info \
-        ) VALUES \
-        (:zoomBottom, :right, :id, :zoomLeft, :resourceId, \
-        :zoomRight, :top, :layoutId, :bottom, :zoomTop, \
-        :zoomTargetId, :flags, :contrastParams, :rotation, \
-        :dewarpingParams, :left, :displayInfo \
-        )\
-    ");
-    for(const ApiLayoutItemData& item: data.items)
-    {
-        QnSql::bind(item, &insQuery);
-        insQuery.bindValue(":layoutId", internalLayoutId);
-
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-            return ErrorCode::dbError;
-        }
-    }
-    return ErrorCode::ok;
-}
 
 ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
 {
@@ -2328,10 +2170,6 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
 
     ErrorCode err = ErrorCode::ok;
 
-    //err = deleteAddParams(internalId);
-    //if (err != ErrorCode::ok)
-    //    return err;
-
     err = deleteUserProfileTable(internalId);
     if (err != ErrorCode::ok)
         return err;
@@ -2344,24 +2182,34 @@ ErrorCode QnDbManager::removeUser( const QnUuid& guid )
     if (err != ErrorCode::ok)
         return err;
 
+    /* Cleanup user shared resources. */
+    err = cleanAccessRights(guid);
+    if (err != ErrorCode::ok)
+        return err;
+
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeUserGroup(const QnUuid& guid)
+ErrorCode QnDbManager::removeUserRole(const QnUuid& userRoleId)
 {
-    /* Cleanup all users, belonging to this group. */
+    /* Cleanup all users having this role. */
     {
         QSqlQuery query(m_sdb);
-        const QString queryStr("UPDATE vms_userprofile SET group = NULL WHERE group = :groupId");
+        const QString queryStr("UPDATE vms_userprofile SET user_role_guid = NULL WHERE user_role_guid = ?");
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        query.bindValue(":groupId", guid.toRfc4122());
+        query.addBindValue(userRoleId.toRfc4122());
         if (!execSQLQuery(&query, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
 
-    return deleteTableRecord(guid, "vms_user_groups", "id");
+    /* Cleanup user role shared resources. */
+    auto err = cleanAccessRights(userRoleId);
+    if (err != ErrorCode::ok)
+        return err;
+
+    return deleteTableRecord(userRoleId, "vms_user_roles", "id");
 }
 
 ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule)
@@ -2403,18 +2251,9 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
 
 ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 {
-    qint32 internalId;
-
-    ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result !=ErrorCode::ok)
-        return result;
-
-    result = insertOrReplaceLayout(params, internalId);
-    if (result !=ErrorCode::ok)
-        return result;
-
-    result = updateLayoutItems(params, internalId);
-    return result;
+    if (!database::api::saveLayout(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
@@ -2499,9 +2338,23 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourc
     if (tran.command == ApiCommand::setResourceParam)
         return insertAddParam(tran.params);
     else if (tran.command == ApiCommand::removeResourceParam)
-        return deleteTableRecord(tran.params.resourceId, "vms_kvpair", "resource_guid");
+        return removeParam(tran.params);
     else
         return ErrorCode::notImplemented;
+}
+
+ErrorCode QnDbManager::removeParam(const ApiResourceParamWithRefData& data)
+{
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_kvpair WHERE resource_guid = :id AND name = :name");
+    query.bindValue(lit(":id"), data.resourceId.toRfc4122());
+    query.bindValue(lit(":name"), data.name);
+    if (!query.exec())
+    {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::addCameraHistory(const ApiServerFootageData& params)
@@ -2725,7 +2578,7 @@ ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId)
 
 ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
 {
-    const QByteArray userOrGroupId = data.userId.toRfc4122();
+    const QByteArray userOrRoleId = data.userId.toRfc4122();
 
     /* Get list of resources, user already has access to. */
     QSet<qint32> accessibleResources;
@@ -2734,7 +2587,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QString selectQueryString = R"(
             SELECT resource_ptr_id
             FROM vms_access_rights
-            WHERE guid = :userOrGroupId
+            WHERE guid = :userOrRoleId
         )";
 
         QSqlQuery selectQuery(m_sdb);
@@ -2742,7 +2595,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         if (!prepareSQLQuery(&selectQuery, selectQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
-        selectQuery.bindValue(":userOrGroupId", userOrGroupId);
+        selectQuery.bindValue(":userOrRoleId", userOrRoleId);
         if (!execSQLQuery(&selectQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
 
@@ -2755,7 +2608,7 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     {
         qint32 resource_ptr_id = getResourceInternalId(resourceId);
         if (resource_ptr_id <= 0)
-            return ErrorCode::dbError;
+            continue;   /* Just skip invalid id's. */
         newAccessibleResources << resource_ptr_id;
     }
 
@@ -2771,14 +2624,14 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
         QStringList values;
 
         for (const qint32& resource_ptr_id : resourcesToAdd)
-             values << QString("(:userOrGroupId, %1)").arg(resource_ptr_id);
+             values << QString("(:userOrRoleId, %1)").arg(resource_ptr_id);
          insertQueryString.append(values.join(L',')).append(L';');
 
         QSqlQuery insertQuery(m_sdb);
         insertQuery.setForwardOnly(true);
         if (!prepareSQLQuery(&insertQuery, insertQueryString, Q_FUNC_INFO))
             return ErrorCode::dbError;
-        insertQuery.bindValue(":userOrGroupId", userOrGroupId);
+        insertQuery.bindValue(":userOrRoleId", userOrRoleId);
 
         if (!execSQLQuery(&insertQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
@@ -2787,25 +2640,76 @@ ErrorCode QnDbManager::setAccessRights(const ApiAccessRightsData& data)
     QSet<qint32> resourcesToRemove = accessibleResources - newAccessibleResources;
     if (!resourcesToRemove.empty())
     {
-        QSqlQuery removeQuery(m_sdb);
-        removeQuery.prepare(R"(
-            DELETE FROM vms_access_rights
-            WHERE guid = :userOrGroupId
-            AND resource_ptr_id IN (:resources);
-        )");
-        removeQuery.bindValue(":userOrGroupId", userOrGroupId);
-
         QStringList values;
         for (const qint32& resource_ptr_id : resourcesToRemove)
             values << QString::number(resource_ptr_id);
+        QString resourcesToRemoveIds = values.join(L',');
 
-        removeQuery.bindValue(":resources", values.join(L','));
+        QSqlQuery removeQuery(m_sdb);
+        QString removeQueryStr
+        (R"(
+            DELETE FROM vms_access_rights
+            WHERE guid = :userOrRoleId
+            AND resource_ptr_id IN (%1);
+        )");
+        /* We cannot bind this value via QSql as it puts numbers to braces */
+        removeQueryStr = removeQueryStr.arg(resourcesToRemoveIds);
+
+        if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+            return ErrorCode::dbError;
+
+        removeQuery.bindValue(":userOrRoleId", userOrRoleId);
         if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
             return ErrorCode::dbError;
     }
+
+    /* This whole function should be optimized out in release */
+    auto validate = [this, data, newAccessibleResources]()
+    {
+        ApiAccessRightsDataList allAccessRights;
+        if (doQueryNoLock(nullptr, allAccessRights) != ErrorCode::ok)
+            return false;
+
+        for (auto updated: allAccessRights)
+        {
+            if (updated.userId != data.userId)
+                continue;
+            QSet<qint32> accessible;
+            for (const QnUuid& id : updated.resourceIds)
+            {
+                qint32 resource_ptr_id = getResourceInternalId(id);
+                if (resource_ptr_id <= 0)
+                    return false;
+                accessible << resource_ptr_id;
+            }
+            return accessible == newAccessibleResources;
+        }
+        return newAccessibleResources.isEmpty();
+    };
+    NX_ASSERT(validate());
+
     return ErrorCode::ok;
 }
 
+
+ec2::ErrorCode QnDbManager::cleanAccessRights(const QnUuid& userOrRoleId)
+{
+    QSqlQuery query(m_sdb);
+    QString queryStr
+    (R"(
+        DELETE FROM vms_access_rights
+        WHERE guid = :userOrRoleId;
+     )");
+
+    if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    query.bindValue(":userOrRoleId", userOrRoleId.toRfc4122());
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
@@ -2823,12 +2727,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserDat
     return insertOrReplaceUser(tran.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran)
 {
-    NX_ASSERT(tran.command == ApiCommand::saveUserGroup, Q_FUNC_INFO, "Unsupported transaction");
-    if (tran.command != ApiCommand::saveUserGroup)
+    NX_ASSERT(tran.command == ApiCommand::saveUserRole, Q_FUNC_INFO, "Unsupported transaction");
+    if (tran.command != ApiCommand::saveUserRole)
         return ec2::ErrorCode::serverError;
-    return insertOrReplaceUserGroup(tran.params);
+    return insertOrReplaceUserRole(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran)
@@ -2879,6 +2783,30 @@ ApiObjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
     }
 }
 
+namespace {
+QString getObjectInfoSelectString(const QString& objType, const QString& objTable)
+{
+    return lit("SELECT :%1, r.guid \
+                FROM %2 o JOIN vms_resource r  \
+                    on r.id = o.resource_ptr_id WHERE r.parent_guid = :guid")
+                .arg(objType)
+                .arg(objTable);
+}
+
+QString getMultiObjectsInfoSelectString(const QStringList& selectStrings)
+{
+    QString result;
+    for (int i = 0; i < selectStrings.size(); ++i)
+    {
+        result.append(selectStrings[i]);
+        if (i != selectStrings.size() - 1)
+            result.append(lit(" UNION "));
+    }
+
+    return result;
+}
+}
+
 ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
 {
     ApiObjectInfoList result;
@@ -2889,16 +2817,18 @@ ApiObjectInfoList QnDbManager::getNestedObjectsNoLock(const ApiObjectInfo& paren
     switch(parentObject.type)
     {
         case ApiObject_Server:
-            query.prepare("\
-                SELECT :cameraObjType, r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = :guid \
-                UNION \
-                SELECT :storageObjType, r.guid from vms_storage s JOIN vms_resource r on r.id = s.resource_ptr_id WHERE r.parent_guid = :guid \
-            ");
+            query.prepare(
+                getMultiObjectsInfoSelectString(
+                      QStringList() << getObjectInfoSelectString(lit("cameraObjType"), lit("vms_camera"))
+                                    << getObjectInfoSelectString(lit("storageObjType"), lit("vms_storage"))
+                                    << getObjectInfoSelectString(lit("layoutObjType"), lit("vms_layout"))));
             query.bindValue(":cameraObjType", (int)ApiObject_Camera);
             query.bindValue(":storageObjType", (int)ApiObject_Storage);
+            query.bindValue(":layoutObjType", (int)ApiObject_Layout);
             break;
+        case ApiObject_Videowall:
         case ApiObject_User:
-            query.prepare( "SELECT :objType, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = :guid AND r.id = vms_layout.resource_ptr_id" );
+            query.prepare(getObjectInfoSelectString(lit("objType"), lit("vms_layout")));
             query.bindValue(":objType", (int)ApiObject_Layout);
             break;
         default:
@@ -2951,24 +2881,19 @@ ApiObjectInfoList QnDbManager::getObjectsNoLock(const ApiObjectType& objectType)
     return result;
 }
 
-bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value )
+ErrorCode QnDbManager::saveMiscParam(const ApiMiscData &params)
 {
-    QnDbManager::QnDbTransactionLocker locker( getTransaction() );
-
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
-    insQuery.addBindValue( name );
-    insQuery.addBindValue( value );
+    insQuery.addBindValue( params.name );
+    insQuery.addBindValue( params.value );
     if( !insQuery.exec() )
-        return false;
-    locker.commit();
-    return true;
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
 
 bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT data from misc_data where key = ?");
@@ -2982,8 +2907,6 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 
 ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 {
-    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
-
     ApiResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     settings.reserve( params.size() );
@@ -3008,19 +2931,57 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
         return removeMediaServerUserAttributes(tran.params.id);
     case ApiCommand::removeLayout:
         return removeLayout(tran.params.id);
-    case ApiCommand::removeBusinessRule:
+    case ApiCommand::removeEventRule:
         return removeBusinessRule(tran.params.id);
     case ApiCommand::removeUser:
         return removeUser(tran.params.id);
-    case ApiCommand::removeUserGroup:
-        return removeUserGroup(tran.params.id);
+    case ApiCommand::removeUserRole:
+        return removeUserRole(tran.params.id);
     case ApiCommand::removeVideowall:
         return removeVideowall(tran.params.id);
     case ApiCommand::removeWebPage:
         return removeWebPage(tran.params.id);
+    case ApiCommand::removeCameraUserAttributes:
+        return removeCameraAttributes(tran.params.id);
+    case ApiCommand::removeAccessRights:
+        return removeResourceAccessRights(tran.params.id);
+    case ApiCommand::removeResourceStatus:
+        return removeResourceStatus(tran.params.id);
     default:
         return removeObject(ApiObjectInfo(getObjectTypeNoLock(tran.params.id), tran.params.id));
     }
+}
+
+ErrorCode QnDbManager::removeResourceAccessRights(const QnUuid& id)
+{
+    auto internalResourceId = getResourceInternalId(id);
+
+    QSqlQuery removeQuery(m_sdb);
+    QString removeQueryStr("DELETE FROM vms_access_rights WHERE resource_ptr_id = :resourceId;");
+
+    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    removeQuery.bindValue(":resourceId", internalResourceId);
+    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::removeResourceStatus(const QnUuid& id)
+{
+    QSqlQuery removeQuery(m_sdb);
+    QString removeQueryStr("DELETE FROM vms_resource_status WHERE guid = :resourceId");
+
+    if (!prepareSQLQuery(&removeQuery, removeQueryStr, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    removeQuery.bindValue(":resourceId", QnSql::serialized_field(id));
+    if (!execSQLQuery(&removeQuery, Q_FUNC_INFO))
+        return ErrorCode::dbError;
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
@@ -3089,11 +3050,29 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
 
 void QnDbManager::addResourceTypesFromXML(ApiResourceTypeDataList& data)
 {
-    for(const QFileInfo& fi: QDir(":/resources").entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
-    QDir dir2(QCoreApplication::applicationDirPath() + QString(lit("/resources")));
-    for(const QFileInfo& fi: dir2.entryInfoList(QDir::Files))
-        loadResourceTypeXML(fi.absoluteFilePath(), data);
+    const auto cameraTypesDir = lit("/resources/camera_types");
+    const auto nameFilters = QStringList{lit("*.xml")};
+
+    const auto qrcDir = QDir(lit(":") + cameraTypesDir);
+    for(const auto& fileInfo: qrcDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
+
+    const auto applicationDir = QDir(QCoreApplication::applicationDirPath() + cameraTypesDir);
+    for(const auto& fileInfo: applicationDir.entryInfoList(nameFilters, QDir::Files))
+        loadResourceTypeXML(fileInfo.absoluteFilePath(), data);
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const QByteArray &name, ApiMiscData& miscData)
+{
+    if (!readMiscParam(name, &miscData.value))
+        return ErrorCode::dbError;
+    miscData.name = name;
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data)
+{
+    return readSettings(data);
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
@@ -3127,7 +3106,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         JOIN vms_resourcetype t2 on t2.id = p.to_resourcetype_id \
         ORDER BY t1.guid, p.to_resourcetype_id desc\
     ");
-	if (!queryParents.exec()) {
+    if (!queryParents.exec()) {
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
         return ErrorCode::dbError;
     }
@@ -3156,67 +3135,36 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     return ErrorCode::ok;
 }
 
-// ----------- getLayouts --------------------
-
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layouts)
+/**
+ * /ec2/getLayouts
+ */
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layouts)
 {
-    QSqlQuery query(m_sdb);
-    QString filter; // todo: add data filtering by user here
-    query.setForwardOnly(true);
-    query.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        l.user_can_edit as editable, l.cell_spacing_height as verticalSpacing, l.locked, \
-        l.cell_aspect_ratio as cellAspectRatio, l.background_width as backgroundWidth, \
-        l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight, \
-        l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id \
-        FROM vms_layout l \
-        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid\
-    ").arg(filter));
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    if (!database::api::fetchLayouts(m_sdb, id, layouts))
         return ErrorCode::dbError;
-    }
-
-    QSqlQuery queryItems(m_sdb);
-    queryItems.setForwardOnly(true);
-    queryItems.prepare("\
-        SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId, \
-        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
-        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
-        li.dewarping_params as dewarpingParams, li.left, li.display_info as displayInfo \
-        FROM vms_layoutitem li \
-        JOIN vms_resource r on r.id = li.layout_id order by r.guid\
-    ");
-
-    if (!queryItems.exec()) {
-        qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
-        return ErrorCode::dbError;
-    }
-
-    QnSql::fetch_many(query, &layouts);
-    std::vector<ApiLayoutItemWithRefData> items;
-    QnSql::fetch_many(queryItems, &items);
-    mergeObjectListData(layouts, items, &ApiLayoutData::items, &ApiLayoutItemWithRefData::layoutId);
-
     return ErrorCode::ok;
 }
 
-// ----------- getCameras --------------------
-
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataList& cameraList)
+/**
+ * /ec2/getCameras
+ */
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList)
 {
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+
     QSqlQuery queryCameras(m_sdb);
     queryCameras.setForwardOnly(true);
-    queryCameras.prepare(QString("\
+    queryCameras.prepare(lit(" \
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
         c.vendor, c.manually_added as manuallyAdded, \
         c.group_name as groupName, c.group_id as groupId, c.mac, c.model, \
-		c.status_flags as statusFlags, c.physical_id as physicalId \
+        c.status_flags as statusFlags, c.physical_id as physicalId \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
-        JOIN vms_camera c on c.resource_ptr_id = r.id ORDER BY r.guid\
-    "));
-
+        JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid \
+    ").arg(filterStr));
 
     if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
@@ -3227,8 +3175,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataLi
     return ErrorCode::ok;
 }
 
-// ----------- getResourceStatus --------------------
-
+/**
+ * /ec2/getResourceStatus
+ */
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList)
 {
     QString filterStr;
@@ -3237,7 +3186,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataL
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT guid as id, status from vms_resource_status %1 ORDER BY guid").arg(filterStr));
+    query.prepare(lit("SELECT guid as id, status from vms_resource_status %1 ORDER BY guid")
+        .arg(filterStr));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -3249,25 +3199,22 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataL
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& storageList)
+ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList& storageList)
 {
-    QString filterStr;
-    if (!mServerId.isNull())
-        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
-
     QSqlQuery queryStorage(m_sdb);
     queryStorage.setForwardOnly(true);
-    queryStorage.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType, \
-        s.backup as isBackup \
-        FROM vms_resource r \
-        JOIN vms_storage s on s.resource_ptr_id = r.id \
-        %1 \
-        ORDER BY r.guid\
-    ").arg(filterStr));
+    queryStorage.prepare(lm(R"sql(
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name,
+            r.url, s.space_limit as spaceLimit, s.used_for_writing as usedForWriting,
+            s.storage_type as storageType, s.backup as isBackup
+        FROM vms_resource r
+        JOIN vms_storage s on s.resource_ptr_id = r.id
+        %1
+        ORDER BY r.guid
+    )sql").arg(filterStr));
 
-    if (!queryStorage.exec()) {
+    if (!queryStorage.exec())
+    {
         qWarning() << Q_FUNC_INFO << queryStorage.lastError().text();
         return ErrorCode::dbError;
     }
@@ -3275,11 +3222,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     QnSql::fetch_many(queryStorage, &storageList);
 
     QnQueryFilter filter;
-    filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_STORAGE );
+    filter.fields.insert(RES_TYPE_FIELD, RES_TYPE_STORAGE);
 
     ApiResourceParamWithRefDataList params;
-    const auto result = fetchResourceParams( filter, params );
-    if( result != ErrorCode::ok )
+    const auto result = fetchResourceParams(filter, params);
+    if (result != ErrorCode::ok)
         return result;
 
     mergeObjectListData<ApiStorageData>(
@@ -3287,13 +3234,39 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
         &ApiStorageData::addParams,
         &ApiResourceParamWithRefData::resourceId);
 
-    // Storages are generally bound to MediaServers,
-    // so it's required to be sorted by parent id
+    // Storages are generally bound to mediaservers, so it's required to be sorted by parent id.
     std::sort(storageList.begin(), storageList.end(),
-              [](const ApiStorageData& lhs, const ApiStorageData& rhs)
-              { return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122(); });
+        [](const ApiStorageData& lhs, const ApiStorageData& rhs)
+        {
+            return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122();
+        });
 
     return ErrorCode::ok;
+}
+
+/**
+ * /ec2/getStorages: get storages filtered by parentServerId.
+ */
+ErrorCode QnDbManager::doQueryNoLock(
+    const ParentId& parentId, ApiStorageDataList& storageList)
+{
+    QString filterStr;
+    if (!parentId.id.isNull())
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(parentId.id));
+
+    return getStorages(filterStr, storageList);
+}
+
+/**
+ * Used for API Merge by /ec2/saveStorages: get storage by id.
+ */
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList)
+{
+    QString filterStr;
+    if (!storageId.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(storageId));
+
+    return getStorages(filterStr, storageList);
 }
 
 ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
@@ -3320,7 +3293,7 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
     "));
 
     if (!queryScheduleTask.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryScheduleTask.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3328,15 +3301,19 @@ ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>&
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList)
+ErrorCode QnDbManager::doQueryNoLock(
+    const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList)
 {
     //fetching camera user attributes
     QSqlQuery queryCameras(m_sdb);
     queryCameras.setForwardOnly(true);
+    QString filterStr;
+    if (!cameraId.isNull())
+        filterStr = QString("WHERE camera_guid = %1").arg(guidToSqlString(cameraId));
 
     queryCameras.prepare(lit("\
         SELECT                                           \
-            camera_guid as cameraID,                     \
+            camera_guid as cameraId,                     \
             camera_name as cameraName,                   \
             group_name as userDefinedGroupName,          \
             audio_enabled as audioEnabled,               \
@@ -3346,19 +3323,22 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttrib
             motion_type as motionType,                   \
             secondary_quality as secondaryStreamQuality, \
             dewarping_params as dewarpingParams,         \
-            min_archive_days as minArchiveDays,          \
-            max_archive_days as maxArchiveDays,          \
-            prefered_server_id as preferedServerId,      \
+            coalesce(min_archive_days, %1) as minArchiveDays,             \
+            coalesce(max_archive_days, %2) as maxArchiveDays,             \
+            preferred_server_id as preferredServerId,    \
             license_used as licenseUsed,                 \
             failover_priority as failoverPriority,       \
             backup_type as backupType                    \
-         FROM vms_camera_user_attributes                 \
-         LEFT JOIN vms_resource r on r.guid = camera_guid     \
-         ORDER BY camera_guid                            \
-        "));
+         FROM vms_camera_user_attributes \
+         LEFT JOIN vms_resource r on r.guid = camera_guid \
+         %3 \
+         ORDER BY camera_guid \
+        ").arg(-ec2::kDefaultMinArchiveDays)
+          .arg(-ec2::kDefaultMaxArchiveDays)
+          .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
@@ -3374,16 +3354,20 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraAttrib
         cameraUserAttributesList,
         scheduleTaskList,
         &ApiCameraAttributesData::scheduleTasks,
-        &ApiCameraAttributesData::cameraID,
+        &ApiCameraAttributesData::cameraId,
         &ApiScheduleTaskWithRefData::sourceId );
 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataExList& cameraExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraExList)
 {
     QSqlQuery queryCameras( m_sdb );
     queryCameras.setForwardOnly(true);
+
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
 
     queryCameras.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, \
@@ -3400,9 +3384,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
             cu.motion_type as motionType,                      \
             cu.secondary_quality as secondaryStreamQuality,    \
             cu.dewarping_params as dewarpingParams,            \
-            cu.min_archive_days as minArchiveDays,             \
-            cu.max_archive_days as maxArchiveDays,             \
-            cu.prefered_server_id as preferedServerId,         \
+            coalesce(cu.min_archive_days, %1) as minArchiveDays,             \
+            coalesce(cu.max_archive_days, %2) as maxArchiveDays,             \
+            cu.preferred_server_id as preferredServerId,       \
             cu.license_used as licenseUsed,                    \
             cu.failover_priority as failoverPriority,          \
             cu.backup_type as backupType                       \
@@ -3410,11 +3394,14 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \
         LEFT JOIN vms_camera_user_attributes cu on cu.camera_guid = r.guid \
+        %3 \
         ORDER BY r.guid \
-    "));
+    ").arg(-ec2::kDefaultMinArchiveDays)
+      .arg(-ec2::kDefaultMaxArchiveDays)
+      .arg(filterStr));
 
     if (!queryCameras.exec()) {
-        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Db error in %1: %2").arg(Q_FUNC_INFO).arg(queryCameras.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(queryCameras, &cameraExList);
@@ -3444,23 +3431,26 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraDataEx
     return ErrorCode::ok;
 }
 
-
-// ----------- getServers --------------------
-
-
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList)
+/**
+ * /ec2/getServers
+ */
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
 
-    query.prepare(QString("\
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+
+    query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.api_url as apiUrl, s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
-        s.flags, s.system_name as systemName \
+        s.auth_key as authKey, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, \
+        s.flags \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
-        JOIN vms_server s on s.resource_ptr_id = r.id ORDER BY r.guid\
-    "));
+        JOIN vms_server s on s.resource_ptr_id = r.id %1 ORDER BY r.guid\
+    ").arg(filterStr));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -3472,12 +3462,12 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverExList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverExList)
 {
     {
         //fetching server data
         ApiMediaServerDataList serverList;
-        ErrorCode result = doQueryNoLock(nullptr, serverList);
+        ErrorCode result = doQueryNoLock(id, serverList);
         if( result != ErrorCode::ok )
             return result;
 
@@ -3490,7 +3480,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     {
         //fetching server attributes
         ApiMediaServerUserAttributesDataList serverAttrsList;
-        ErrorCode result = doQueryNoLock(QnUuid(), serverAttrsList );
+        ErrorCode result = doQueryNoLock(id, serverAttrsList);
         if( result != ErrorCode::ok )
             return result;
 
@@ -3499,7 +3489,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
             serverExList,
             serverAttrsList,
             &ApiMediaServerDataEx::id,
-            &ApiMediaServerUserAttributesData::serverID,
+            &ApiMediaServerUserAttributesData::serverId,
             []( ApiMediaServerDataEx& server, ApiMediaServerUserAttributesData& serverAttrs )
                 {
                     ((ApiMediaServerUserAttributesData&)server) = std::move(serverAttrs);
@@ -3527,7 +3517,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
 
     //reading status info
     ApiResourceStatusDataList statusList;
-    result = doQueryNoLock( QnUuid(), statusList );
+    result = doQueryNoLock( id, statusList );
     if( result != ErrorCode::ok )
         return result;
 
@@ -3551,7 +3541,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
 
     query.prepare( lit("\
         SELECT                                                      \
-            server_guid as serverID,                                \
+            server_guid as serverId,                                \
             server_name as serverName,                              \
             max_cameras as maxCameras,                              \
             redundancy as allowAutoRedundancy,                      \
@@ -3566,7 +3556,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
     ").arg(filterStr));
     if( !query.exec() )
     {
-        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("DB Error at %1: %2").arg(Q_FUNC_INFO).arg(query.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
     QnSql::fetch_many(query, &serverAttrsList);
@@ -3596,18 +3586,24 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
 }
 
 //getUsers
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserDataList& userList)
 {
-    const QString queryStr = R"(
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url,
-        u.is_superuser as isAdmin, u.email,
-        p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions,
-        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.group_guid as groupId, p.is_cloud as isCloud
-        FROM vms_resource r
-        JOIN auth_user u on u.id = r.id
-        JOIN vms_userprofile p on p.user_id = u.id
-        ORDER BY r.guid
-    )";
+    QString filterStr;
+    if( !id.isNull() )
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+
+    QString queryStr = lit(" \
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
+        u.is_superuser as isAdmin, u.email, \
+        p.digest as digest, p.crypt_sha512_hash as cryptSha512Hash, p.realm as realm, u.password as hash, p.rights as permissions, \
+        p.is_ldap as isLdap, p.is_enabled as isEnabled, p.user_role_guid as userRoleId, p.is_cloud as isCloud, \
+        coalesce((SELECT value from vms_kvpair WHERE resource_guid = r.guid and name = '%1'), p.full_name) as fullName \
+        FROM vms_resource r \
+        JOIN auth_user u on u.id = r.id \
+        JOIN vms_userprofile p on p.user_id = u.id \
+        %2 \
+        ORDER BY r.guid \
+    ").arg(Qn::USER_FULL_NAME).arg(filterStr);
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3621,16 +3617,22 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDat
     return ErrorCode::ok;
 }
 
-//getUserGroups
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& result)
+//getUserRoles
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& result)
 {
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE id = %1").arg(guidToSqlString(id));
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    const QString queryStr = R"(
+    const QString queryStr = QString(R"(
         SELECT id, name, permissions
-        FROM vms_user_groups
+        FROM vms_user_roles
+        %1
         ORDER BY id
-    )";
+    )").arg(filterStr);
+
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return ErrorCode::dbError;
 
@@ -3641,8 +3643,13 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGro
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& result)
+{
+    result = QnUserRolesManager::getPredefinedRoles();
+    return ErrorCode::ok;
+}
 
-ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
+ec2::ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -3683,11 +3690,14 @@ ec2::ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAc
 
 
 //getTransactionLog
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList)
+ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransactionDataList& tranList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("SELECT tran_guid, tran_data from transaction_log order by peer_guid, db_guid, sequence"));
+    QString whereClause;
+    if (filter.cloudOnly)
+        whereClause = lit("WHERE tran_type=%1").arg(TransactionType::Cloud);
+    query.prepare(lit("SELECT tran_guid, tran_data from transaction_log %1 order by peer_guid, db_guid, sequence").arg(whereClause));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3710,26 +3720,21 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiTransactionDataLi
     return ErrorCode::ok;
 }
 
-// getClientInfos
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data)
-{
-	return doQueryNoLock(QnUuid(), data);
-}
-
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
 {
-	QString filterStr;
+    QString filterStr;
     if (!clientId.isNull())
         filterStr = QString("WHERE guid = %1").arg(guidToSqlString(clientId));
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString(
+    query.prepare(lit(
         "SELECT guid as id, parent_guid as parentId, skin, systemInfo,"
-            "cpuArchitecture, cpuModelName, cpuModelName, phisicalMemory,"
+            "cpuArchitecture, cpuModelName, cpuModelName, physicalMemory,"
             "openGLVersion, openGLVendor, openGLRenderer,"
             "full_version as fullVersion, systemRuntime "
-        "FROM vms_client_infos %1 ORDER BY guid").arg(filterStr));
+        "FROM vms_client_info_list %1 ORDER BY guid"
+        ).arg(filterStr));
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -3741,15 +3746,17 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataLi
 }
 
 //getVideowallList
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList) {
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList) {
     QSqlQuery query(m_sdb);
-    QString filter; // todo: add data filtering by user here
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
     query.setForwardOnly(true);
-    query.prepare(QString("\
+    query.prepare(lit("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, l.autorun \
         FROM vms_videowall l \
-        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid\
-    ").arg(filter));
+        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid \
+    ").arg(filterStr));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3838,15 +3845,18 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
 }
 
 //getWebPageList
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList)
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("\
-                          SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url \
-                          FROM vms_webpage l \
-                          JOIN vms_resource r on r.id = l.resource_ptr_id ORDER BY r.guid\
-                          "));
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(id));
+    query.prepare(lit("\
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url \
+        FROM vms_webpage l \
+        JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid \
+        ").arg(filterStr));
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -3857,16 +3867,19 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataL
     return ErrorCode::ok;
 }
 
-//getBusinessRules
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& businessRuleList)
+//getEventRules
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& businessRuleList)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare(QString("\
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE guid = %1").arg(guidToSqlString(id));
+    query.prepare(lit(" \
         SELECT guid as id, event_type as eventType, event_condition as eventCondition, event_state as eventState, action_type as actionType, \
         action_params as actionParams, aggregation_period as aggregationPeriod, disabled, comments as comment, schedule, system \
-        FROM vms_businessrule order by guid\
-    "));
+        FROM vms_businessrule %1 ORDER BY guid \
+    ").arg(filterStr));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -3919,6 +3932,9 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 {
     QnWriteLocker lock(&m_mutex);
 
+    if (!execSQLScript("vacuum;", m_sdb))
+        qWarning() << "failed to vacuum database" << Q_FUNC_INFO;
+
     //have to close/open DB to dump journals to .db file
     m_sdb.close();
     m_sdbStatic.close();
@@ -3933,24 +3949,24 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
-    if( !m_sdbStatic.open() )
+    if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& dumpFileSize)
+ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -3964,66 +3980,121 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& du
     //TODO #ak add license db to backup
 
     QFileInfo dumpFileInfo( dumpFilePath.path );
-    dumpFileSize = dumpFileInfo.size();
+    databaseDumpToFileData.size = dumpFileInfo.size();
 
     if( !m_sdb.open() )
     {
-        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 DB (%1). Error %2").arg(m_sdb.databaseName()).arg(m_sdb.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
-    if( !m_sdbStatic.open() )
+    if( !m_sdbStatic.open() || !tuneDBAfterOpen(&m_sdbStatic) )
     {
-        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logWARNING );
+        NX_LOG( lit("Can't reopen ec2 license DB (%1). Error %2").arg(m_sdbStatic.databaseName()).arg(m_sdbStatic.lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
     //tuning DB
-    if( !tuneDBAfterOpen() )
+    if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
 
     return ErrorCode::ok;
 }
 
+// TODO: Change to a function. ATTENTION: Macro contains "return".
+#define DB_LOAD(ID, DATA) do \
+{ \
+    const ErrorCode errorCode = doQueryNoLock(ID, DATA); \
+    if (errorCode != ErrorCode::ok) \
+        return errorCode; \
+} while (0)
 
-// ApiFullInfo
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)
+ErrorCode QnDbManager::readApiFullInfoDataComplete(ApiFullInfoData* data)
 {
-    ErrorCode status;
+    QnWriteLocker lock(&m_mutex);
 
-#define db_load(target)      { ErrorCode status = doQueryNoLock(dummy, target);     if (status != ErrorCode::ok) return status; }
-#define db_load_uuid(target) { ErrorCode status = doQueryNoLock(QnUuid(), target);  if (status != ErrorCode::ok) return status; }
-
-    db_load(data.resourceTypes);
-
-    db_load(data.servers);
-    db_load_uuid(data.serversUserAttributesList);
-    db_load(data.cameras);
-    db_load(data.cameraUserAttributesList);
-    db_load(data.users);
-    db_load(data.userGroups);
-    db_load(data.layouts);
-    db_load(data.videowalls);
-    db_load(data.webPages);
-    db_load(data.rules);
-    db_load(data.cameraHistory);
-    db_load(data.licenses);
-    db_load(data.discoveryData);
-    db_load_uuid(data.allProperties);
-    db_load_uuid(data.storages);
-    db_load_uuid(data.resStatusList);
-    db_load(data.accessRights);
-
-#undef db_load_uuid
-#undef db_load
+    DB_LOAD(nullptr, data->resourceTypes);
+    DB_LOAD(QnUuid(), data->servers);
+    DB_LOAD(QnUuid(), data->serversUserAttributesList);
+    DB_LOAD(QnUuid(), data->cameras);
+    DB_LOAD(QnUuid(), data->cameraUserAttributesList);
+    DB_LOAD(QnUuid(), data->users);
+    DB_LOAD(QnUuid(), data->userRoles);
+    DB_LOAD(QnUuid(), data->layouts);
+    DB_LOAD(QnUuid(), data->videowalls);
+    DB_LOAD(QnUuid(), data->webPages);
+    DB_LOAD(QnUuid(), data->rules);
+    DB_LOAD(nullptr, data->cameraHistory);
+    DB_LOAD(nullptr, data->licenses);
+    DB_LOAD(QnUuid(), data->discoveryData);
+    DB_LOAD(QnUuid(), data->allProperties);
+    DB_LOAD(QnUuid(), data->storages);
+    DB_LOAD(QnUuid(), data->resStatusList);
+    DB_LOAD(nullptr, data->accessRights);
 
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+ErrorCode QnDbManager::readApiFullInfoDataForMobileClient(
+    ApiFullInfoData* data, const QnUuid& userId)
+{
+    QnWriteLocker lock(&m_mutex);
+
+    DB_LOAD(QnUuid(), data->servers);
+    DB_LOAD(QnUuid(), data->serversUserAttributesList);
+    DB_LOAD(QnUuid(), data->cameras);
+    DB_LOAD(QnUuid(), data->cameraUserAttributesList);
+
+    DB_LOAD(userId, data->users);
+    const ApiUserData* user = nullptr;
+    if (data->users.size() == 1)
+        user = &data->users[0];
+
+    if (user) // Do not load user roles if there is no current user.
+        DB_LOAD(user->userRoleId, data->userRoles);
+
+    DB_LOAD(QnUuid(), data->layouts);
+    if (user) // Remove layouts belonging to other users.
+    {
+        QSet<QnUuid> serverIds;
+        for (const auto& server: data->servers)
+            serverIds.insert(server.id);
+
+        data->layouts.erase(std::remove_if(data->layouts.begin(), data->layouts.end(),
+            [user, &serverIds](const ApiLayoutData& layout)
+            {
+                return !layout.parentId.isNull()
+                    && layout.parentId != user->id
+                    && !serverIds.contains(layout.parentId);
+            }),
+            data->layouts.end());
+    }
+
+    // Admin user is required for global properties.
+    if (userId != QnUserResource::kAdminGuid)
+        DB_LOAD(QnUserResource::kAdminGuid, data->users);
+
+    DB_LOAD(nullptr, data->cameraHistory);
+    DB_LOAD(QnUuid(), data->discoveryData);
+    DB_LOAD(QnUuid(), data->allProperties);
+    DB_LOAD(QnUuid(), data->resStatusList);
+    DB_LOAD(nullptr, data->accessRights);
+
+    return ErrorCode::ok;
+}
+
+#undef DB_LOAD
+
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList &data) {
     QSqlQuery query(m_sdb);
 
-    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    QString filterStr;
+    if (!id.isNull())
+        filterStr = QString("WHERE server_id = %1").arg(guidToSqlString(id));
+
+    QString q = QString(lit(
+        "SELECT server_id as id, url, ignore from vms_mserver_discovery %1 ORDER BY server_id")
+        .arg(filterStr));
     query.setForwardOnly(true);
     query.prepare(q);
 
@@ -4037,8 +4108,22 @@ ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataLis
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
-    QSqlQuery insQuery(m_sdbStatic);
+ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license)
+{
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
+    auto result = saveLicense(license, m_sdbStatic);
+    if (result == ErrorCode::ok)
+    {
+        result = saveLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
+    return result;
+}
+
+ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license, QSqlDatabase& database)
+{
+    QSqlQuery insQuery(database);
     insQuery.prepare("INSERT OR REPLACE INTO vms_license (license_key, license_block) VALUES(:licenseKey, :licenseBlock)");
     insQuery.bindValue(":licenseKey", license.key);
     insQuery.bindValue(":licenseBlock", license.licenseBlock);
@@ -4051,8 +4136,22 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
     }
 }
 
-ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
-    QSqlQuery delQuery(m_sdbStatic);
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license)
+{
+    QnDbTransactionLocker lockStatic(&m_tranStatic);
+    auto result = removeLicense(license, m_sdbStatic);
+    if (result == ErrorCode::ok)
+    {
+        result = removeLicense(license, m_sdb);
+        if (result == ErrorCode::ok)
+            lockStatic.commit();
+    }
+    return result;
+}
+
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license, QSqlDatabase& database)
+{
+    QSqlQuery delQuery(database);
     delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
     delQuery.addBindValue(license.key);
     if (delQuery.exec()) {
@@ -4062,6 +4161,11 @@ ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::dbError;
     }
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMiscData>& tran)
+{
+    return saveMiscParam(tran.params);
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
@@ -4090,7 +4194,12 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
 {
-    QSqlQuery query(m_sdbStatic);
+    return getLicenses(data, m_sdb);
+}
+
+ErrorCode QnDbManager::getLicenses(ec2::ApiLicenseDataList& data, QSqlDatabase& database)
+{
+    QSqlQuery query(database);
 
     QString q = QString(lit("SELECT license_key as key, license_block as licenseBlock from vms_license"));
     query.setForwardOnly(true);
@@ -4104,6 +4213,13 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
 
     QnSql::fetch_many(query, &data);
     return ErrorCode::ok;
+}
+
+bool QnDbManager::resyncIfNeeded(ResyncFlags flags)
+{
+    if (!m_dbJustCreated)
+        m_resyncFlags |= flags;
+    return true;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDirContents& data)
@@ -4402,16 +4518,10 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnUuid &layout_id) {
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {
-    qint32 internalId;
-
-    ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    result = insertOrReplaceWebPage(params, internalId);
-    return result;
+    if (!database::api::saveWebPage(m_sdb, params))
+        return ErrorCode::dbError;
+    return ErrorCode::ok;
 }
-
 
 ErrorCode QnDbManager::removeWebPage(const QnUuid& guid)
 {
@@ -4456,13 +4566,22 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
         return ErrorCode::failure;
     }
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != tran.params.time) {
-        localInfo.data.prematureLicenseExperationDate = tran.params.time;
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
-
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran)
+{
+    ErrorCode result = ErrorCode::ok;
+    if (tran.params.cleanupDbObjects)
+        result = cleanupDanglingDbObjects() ? ErrorCode::ok : ErrorCode::failure;
+
+    if (result != ErrorCode::ok)
+        return result;
+
+    if (tran.params.cleanupTransactionLog)
+        result = transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+
+    return result;
 }
 
 QnUuid QnDbManager::getID() const
@@ -4470,9 +4589,91 @@ QnUuid QnDbManager::getID() const
     return m_dbInstanceId;
 }
 
+bool QnDbManager::updateId()
+{
+    auto newDbInstanceId = QnUuid::createUuid();
+
+    QSqlQuery query(m_sdb);
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
+    insQuery.addBindValue(DB_INSTANCE_KEY);
+    insQuery.addBindValue(newDbInstanceId.toRfc4122());
+    if (!insQuery.exec())
+    {
+        qWarning() << "can't update db instance ID";
+        return false;
+    }
+
+    m_dbInstanceId = newDbInstanceId;
+    return true;
+}
+
 QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
     return &m_tran;
 }
+} // namespace detail
 
+QnDbManagerAccess::QnDbManagerAccess(const Qn::UserAccessData &userAccessData)
+    : m_userAccessData(userAccessData)
+{}
+
+ApiObjectType QnDbManagerAccess::getObjectType(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectType(objectId);
 }
+
+QnDbHelper::QnDbTransaction* QnDbManagerAccess::getTransaction()
+{
+    return detail::QnDbManager::instance()->getTransaction();
+}
+
+ApiObjectType QnDbManagerAccess::getObjectTypeNoLock(const QnUuid& objectId)
+{
+    return detail::QnDbManager::instance()->getObjectTypeNoLock(objectId);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
+{
+    return detail::QnDbManager::instance()->getNestedObjectsNoLock(parentObject);
+}
+
+ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
+{
+    return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+}
+
+void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
+{
+    detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
+}
+
+bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
+{
+    if (!detail::QnDbManager::instance()->isReadOnly())
+        return true;
+
+    switch (tran.command)
+    {
+        case ApiCommand::addLicense:
+        case ApiCommand::addLicenses:
+        case ApiCommand::removeLicense:
+            return true;
+
+        case ApiCommand::saveMediaServer:
+        case ApiCommand::saveStorage:
+        case ApiCommand::saveStorages:
+        case ApiCommand::saveMediaServerUserAttributes:
+        case ApiCommand::saveMediaServerUserAttributesList:
+        case ApiCommand::setResourceStatus:
+        case ApiCommand::setResourceParam:
+        case ApiCommand::setResourceParams:
+            // Allowing minimum set of transactions required for local server to function properly.
+            return m_userAccessData == Qn::kSystemAccess;
+
+        default:
+            return false;
+    }
+}
+
+} // namespace ec2

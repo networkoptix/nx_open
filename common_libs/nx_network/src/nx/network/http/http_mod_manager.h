@@ -18,11 +18,16 @@
 namespace nx_http
 {
     //!This class is to manage all modifications to HTTP request/response
-    class NX_NETWORK_API HttpModManager
-    :
+    class NX_NETWORK_API HttpModManager : public QObject,
         public Singleton<HttpModManager>
     {
+        Q_OBJECT
+
+       using base_type = QObject;
     public:
+        HttpModManager(QObject* parent = nullptr);
+        virtual ~HttpModManager();
+
         //!Performs some modifications on \a request
         void apply( Request* const request );
 

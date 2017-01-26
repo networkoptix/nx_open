@@ -12,20 +12,28 @@
 
 namespace 
 {
-    void splitToLines( const nx::Buffer& sourceText, std::vector<nx::Buffer>* const lines )
+    void splitToLines(
+        nx_http::LineSplitter* const lineSplitter,
+        const nx::Buffer& sourceText,
+        std::vector<nx::Buffer>* const lines)
     {
-        nx_http::LineSplitter lineSplitter;
-        for( int pos = 0; pos < sourceText.size(); )
+        for (int pos = 0; pos < sourceText.size(); )
         {
             QnByteArrayConstRef readLine;
             size_t bytesRead = 0;
-            if( lineSplitter.parseByLines(
-                    QnByteArrayConstRef( sourceText, pos ),
+            if (lineSplitter->parseByLines(
+                    QnByteArrayConstRef(sourceText, pos),
                     &readLine,
-                    &bytesRead ) )
-                lines->push_back( readLine );
+                    &bytesRead))
+                    lines->push_back(readLine);
             pos += bytesRead;
         }
+    }
+
+    void splitToLines(const nx::Buffer& sourceText, std::vector<nx::Buffer>* const lines)
+    {
+        nx_http::LineSplitter lineSplitter;
+        splitToLines(&lineSplitter, sourceText, lines);
     }
 }
 
@@ -121,4 +129,22 @@ TEST( LineSplitter, TrailingLFTest )
         "xxxxxxxx"
         "xxxxxxxx",
         msgBody );
+}
+
+TEST( LineSplitter, common )
+{
+    static const nx::Buffer testData =
+        "line1\r\n"
+        "line2\r\n"
+        "line3"
+        ;
+
+    nx_http::LineSplitter lineSplitter;
+    std::vector<nx::Buffer> lines;
+    splitToLines(&lineSplitter, testData, &lines);
+    QnByteArrayConstRef lineBuffer;
+    size_t bytesRead = 0;
+    ASSERT_TRUE(lineSplitter.parseByLines(QByteArray("\r\n"), &lineBuffer, &bytesRead));
+    ASSERT_EQ(2, bytesRead);
+    ASSERT_EQ("line3", lineBuffer);
 }

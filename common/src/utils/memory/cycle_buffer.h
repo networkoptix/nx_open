@@ -50,6 +50,8 @@ public:
     //!Return buffer size
     size_type size() const { return m_size; }
 
+    bool resize(size_type size);
+
     //!Clear data
     void clear() { m_size = m_offset = 0; }
 
@@ -62,6 +64,7 @@ private:
     size_type m_maxSize;
     size_type m_size;
     size_type m_offset;
+    int m_align;
 };
 
 #endif // _QN_CYCLE_BUFFER_H_

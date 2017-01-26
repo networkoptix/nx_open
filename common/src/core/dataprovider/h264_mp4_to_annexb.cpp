@@ -20,7 +20,7 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 {
     static const quint8 START_CODE[] = { 0, 0, 0, 1 };
     QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data->get());
-    if( !srcVideoPacket || srcVideoPacket->compressionType != CODEC_ID_H264 )
+    if( !srcVideoPacket || srcVideoPacket->compressionType != AV_CODEC_ID_H264 )
         return *data;
     if( srcVideoPacket->data()[3] == 1 )
         return *data;   //already in annexb format. TODO #ak: format validation is too weak

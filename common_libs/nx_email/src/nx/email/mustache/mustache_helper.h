@@ -7,7 +7,7 @@
 
 bool renderTemplateFromFile(
     const QString& filename,
-    const QVariantHash& contextMap,
+    const QVariantMap& contextMap,
     QString* const renderedMail );
 
 

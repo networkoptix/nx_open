@@ -6,269 +6,52 @@
 #include "database/db_manager.h"
 #include "utils/common/synctime.h"
 
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
+#include "transaction_descriptor.h"
 
+namespace ec2 {
 
-namespace ec2
+namespace ApiCommand
 {
+    QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
-    namespace ApiCommand
-    {
-        struct ApiCommandName
-        {
-            Value command;
-            const char* name;
-        };
-
-#define REGISTER_COMMAND(x) {x, #x}
-
-        static ApiCommandName COMMAND_NAMES[] =
-        {
-            REGISTER_COMMAND(tranSyncRequest),
-            REGISTER_COMMAND(tranSyncResponse),
-            REGISTER_COMMAND(tranSyncDone),
-            REGISTER_COMMAND(lockRequest),
-            REGISTER_COMMAND(lockResponse),
-            REGISTER_COMMAND(unlockRequest),
-            REGISTER_COMMAND(peerAliveInfo),
-
-            REGISTER_COMMAND(testConnection),
-            REGISTER_COMMAND(connect),
-            REGISTER_COMMAND(openReverseConnection),
-
-            REGISTER_COMMAND(getResourceTypes),
-            REGISTER_COMMAND(setResourceStatus),
-            REGISTER_COMMAND(setResourceParams),
-            REGISTER_COMMAND(setResourceParam),
-            REGISTER_COMMAND(removeResourceParam),
-            REGISTER_COMMAND(removeResourceParams),
-            REGISTER_COMMAND(getResourceParams),
-            REGISTER_COMMAND(getStatusList),
-            REGISTER_COMMAND(removeResources),
-            REGISTER_COMMAND(removeResource),
-            REGISTER_COMMAND(getFullInfo),
-
-            REGISTER_COMMAND(saveCamera),
-            REGISTER_COMMAND(saveCameras),
-            REGISTER_COMMAND(removeCamera),
-            REGISTER_COMMAND(getCameras),
-            REGISTER_COMMAND(getCameraHistoryItems),
-            REGISTER_COMMAND(addCameraHistoryItem),
-            REGISTER_COMMAND(saveCameraUserAttributes),
-            REGISTER_COMMAND(saveCameraUserAttributesList),
-            REGISTER_COMMAND(getCameraUserAttributes),
-            REGISTER_COMMAND(getCamerasEx),
-
-            REGISTER_COMMAND(removeCameraHistoryItem),
-
-            REGISTER_COMMAND(getMediaServers),
-            REGISTER_COMMAND(saveMediaServer),
-            REGISTER_COMMAND(removeMediaServer),
-            REGISTER_COMMAND(saveServerUserAttributes),
-            REGISTER_COMMAND(saveServerUserAttributesList),
-            REGISTER_COMMAND(getServerUserAttributes),
-            REGISTER_COMMAND(saveStorage),
-            REGISTER_COMMAND(saveStorages),
-            REGISTER_COMMAND(getStorages),
-            REGISTER_COMMAND(removeStorage),
-            REGISTER_COMMAND(removeStorages),
-            REGISTER_COMMAND(getMediaServersEx),
-
-            REGISTER_COMMAND(getUsers),
-            REGISTER_COMMAND(saveUser),
-            REGISTER_COMMAND(removeUser),
-            REGISTER_COMMAND(getUserGroups),
-            REGISTER_COMMAND(saveUserGroup),
-            REGISTER_COMMAND(removeUserGroup),
-            REGISTER_COMMAND(getAccessRights),
-            REGISTER_COMMAND(setAccessRights),
-
-            REGISTER_COMMAND(saveBusinessRule),
-            REGISTER_COMMAND(removeBusinessRule),
-            REGISTER_COMMAND(broadcastBusinessAction),
-            REGISTER_COMMAND(execBusinessAction),
-            REGISTER_COMMAND(getBusinessRules),
-            REGISTER_COMMAND(resetBusinessRules),
-
-            REGISTER_COMMAND(saveLayout),
-            REGISTER_COMMAND(saveLayouts),
-            REGISTER_COMMAND(getLayouts),
-            REGISTER_COMMAND(removeLayout),
-
-            REGISTER_COMMAND(saveVideowall),
-            REGISTER_COMMAND(getVideowalls),
-            REGISTER_COMMAND(removeVideowall),
-            REGISTER_COMMAND(videowallControl),
-
-            REGISTER_COMMAND(saveWebPage),
-            REGISTER_COMMAND(getWebPages),
-            REGISTER_COMMAND(removeWebPage),
-
-            REGISTER_COMMAND(listDirectory),
-            REGISTER_COMMAND(getStoredFile),
-            REGISTER_COMMAND(addStoredFile),
-            REGISTER_COMMAND(updateStoredFile),
-            REGISTER_COMMAND(removeStoredFile),
-            REGISTER_COMMAND(getStoredFiles),
-
-            REGISTER_COMMAND(addLicenses),
-            REGISTER_COMMAND(addLicense),
-            REGISTER_COMMAND(getLicenses),
-            REGISTER_COMMAND(removeLicense),
-
-            REGISTER_COMMAND(testEmailSettings),
-            REGISTER_COMMAND(sendEmail),
-
-            REGISTER_COMMAND(uploadUpdate),
-            REGISTER_COMMAND(uploadUpdateResponce),
-            REGISTER_COMMAND(installUpdate),
-
-            REGISTER_COMMAND(discoveredServerChanged),
-            REGISTER_COMMAND(discoveredServersList),
-
-            REGISTER_COMMAND(discoverPeer),
-            REGISTER_COMMAND(addDiscoveryInformation),
-            REGISTER_COMMAND(removeDiscoveryInformation),
-            REGISTER_COMMAND(getDiscoveryData),
-
-            REGISTER_COMMAND(forcePrimaryTimeServer),
-            REGISTER_COMMAND(broadcastPeerSystemTime),
-            REGISTER_COMMAND(getCurrentTime),
-            REGISTER_COMMAND(changeSystemName),
-            REGISTER_COMMAND(getKnownPeersSystemTime),
-
-            REGISTER_COMMAND(runtimeInfoChanged),
-            REGISTER_COMMAND(dumpDatabase),
-            REGISTER_COMMAND(restoreDatabase),
-            REGISTER_COMMAND(updatePersistentSequence),
-            REGISTER_COMMAND(dumpDatabaseToFile),
-
-            REGISTER_COMMAND(markLicenseOverflow),
-            REGISTER_COMMAND(getSettings),
-
-            REGISTER_COMMAND(getClientInfos),
-            REGISTER_COMMAND(saveClientInfo),
-
-            REGISTER_COMMAND(getStatisticsReport),
-            REGISTER_COMMAND(triggerStatisticsReport),
-
-            REGISTER_COMMAND(getTransactionLog),
-        };
-
-        QString toString(Value val)
-        {
-            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
-            {
-                if (COMMAND_NAMES[i].command == val)
-                    return QString::fromUtf8(COMMAND_NAMES[i].name);
-            }
-            return "unknown " + QString::number((int)val);
-        }
-
-        Value fromString(const QString& val)
-        {
-            QByteArray data = val.toUtf8();
-            for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
-            {
-                if (COMMAND_NAMES[i].name == data)
-                    return COMMAND_NAMES[i].command;
-            }
-            return NotDefined;
-        }
-
-        bool isSystem( Value val )
-        {
-            return  val == lockRequest   ||
-                    val == lockResponse  ||
-                    val == unlockRequest ||
-                    val == tranSyncRequest ||
-                    val == tranSyncResponse ||
-                    val == runtimeInfoChanged ||
-                    val == peerAliveInfo ||
-                    val == broadcastPeerSystemTime ||
-                    val == tranSyncDone ||
-                    val == uploadUpdate ||
-                    val == uploadUpdateResponce ||
-                    val == installUpdate ||
-                    val == openReverseConnection;
-
-        }
-
-        bool isPersistent( Value val )
-        {
-            return
-                val == removeResource  ||
-                val == removeResources  ||
-                val == setResourceStatus ||
-                val == setResourceParams ||
-                val == setResourceParam ||
-                val == removeResourceParam ||
-                val == removeResourceParams ||
-                val == saveCamera ||
-                val == saveCameraUserAttributes ||
-                val == saveCameraUserAttributesList ||
-                val == saveCameras ||
-                val == removeCamera ||
-                val == addCameraHistoryItem ||
-                val == removeCameraHistoryItem ||
-                val == saveMediaServer ||
-                val == saveServerUserAttributes ||
-                val == saveServerUserAttributesList ||
-                val == saveStorage ||
-                val == saveStorages ||
-                val == removeStorage ||
-                val == removeStorages ||
-                val == removeMediaServer ||
-                val == saveUser ||
-                val == removeUser ||
-                val == saveUserGroup ||
-                val == removeUserGroup ||
-                val == setAccessRights ||
-                val == saveLayout ||
-                val == saveLayouts ||
-                val == removeLayout ||
-                val == saveVideowall ||
-                val == removeVideowall ||
-                val == saveWebPage ||
-                val == removeWebPage ||
-                val == saveBusinessRule ||
-                val == removeBusinessRule ||
-                val == resetBusinessRules ||
-                val == addStoredFile ||
-                val == updateStoredFile ||
-                val == removeStoredFile ||
-                val == addDiscoveryInformation ||
-                val == removeDiscoveryInformation ||
-                val == getDiscoveryData ||
-                val == addLicense ||
-                val == addLicenses ||
-                val == removeLicense ||
-                val == restoreDatabase ||
-                val == markLicenseOverflow ||
-                val == saveClientInfo;
-        }
-
+    Value fromString(const QString& val)
+	{
+        auto descriptor = getTransactionDescriptorByName(val);
+        return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
     }
 
-    int generateRequestID()
-    {
-        static std::atomic<int> requestID( 0 );
-        return ++requestID;
-    }
+    bool isSystem(Value val) { return getTransactionDescriptorByValue(val)->isSystem; }
 
-    QString QnAbstractTransaction::toString() const
-    {
-        return lit("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
-            .arg(ApiCommand::toString(command))
-            .arg(persistentInfo.timestamp)
-            .arg(peerID.toString())
-            .arg(persistentInfo.dbID.toString())
-            .arg(persistentInfo.sequence);
-    }
+    bool isPersistent(Value val) { return getTransactionDescriptorByValue(val)->isPersistent; }
+}
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_PERSISTENT_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,                    (json)(ubjson)(xml)(csv_record),   ApiTransactionDataFields)
+int generateRequestID()
+{
+    static std::atomic<int> requestId(0);
+    return ++requestId;
+}
+
+QString QnAbstractTransaction::toString() const
+{
+    return lm("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+        .arg(ApiCommand::toString(command))
+        .str(persistentInfo.timestamp)
+        .arg(peerID.toString())
+        .arg(persistentInfo.dbID.toString())
+        .arg(persistentInfo.sequence);
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnAbstractTransaction::PersistentInfo,
+    (json)(ubjson)(xml)(csv_record),
+    QnAbstractTransaction_PERSISTENT_Fields,
+    (optional, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (HistoryAttributes)(QnAbstractTransaction)(ApiTransactionData),
+    (json)(ubjson)(xml)(csv_record),
+    _Fields,
+    (optional, true))
 
 } // namespace ec2
-

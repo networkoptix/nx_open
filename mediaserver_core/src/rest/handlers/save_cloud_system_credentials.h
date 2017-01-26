@@ -1,21 +1,18 @@
-/**********************************************************
-* Sep 21, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SAVE_CLOUD_SYSTEM_CREDENTIALS_H
-#define SAVE_CLOUD_SYSTEM_CREDENTIALS_H
+#pragma once
 
 #include "rest/server/json_rest_handler.h"
 
 struct CloudCredentialsData;
-class QnSaveCloudSystemCredentialsHandler
-:
+struct CloudManagerGroup;
+
+class QnSaveCloudSystemCredentialsHandler:
     public QnJsonRestHandler
 {
     Q_OBJECT
 
 public:
+    QnSaveCloudSystemCredentialsHandler(CloudManagerGroup* cloudManagerGroup);
+
     virtual int executePost(
         const QString& path,
         const QnRequestParams& params,
@@ -23,7 +20,30 @@ public:
         QnJsonRestResult& result,
         const QnRestConnectionProcessor*);
 
-    int execute(const CloudCredentialsData& data, QnJsonRestResult& result);
-};
+    int execute(
+        const CloudCredentialsData& data,
+        QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
 
-#endif  //SAVE_CLOUD_SYSTEM_CREDENTIALS_H
+private:
+    CloudManagerGroup* m_cloudManagerGroup;
+
+    bool authorize(
+        const QnRestConnectionProcessor* owner,
+        QnJsonRestResult* result,
+        nx_http::StatusCode::Value* const authorizationStatusCode);
+    bool validateInputData(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool checkInternetConnection(QnJsonRestResult* result);
+
+    bool saveCloudData(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool saveCloudCredentials(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool insertCloudOwner(const CloudCredentialsData& data, QnJsonRestResult* result);
+
+    bool fetchNecessaryDataFromCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool saveLocalSystemIdToCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool initializeCloudRelatedManagers(
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
+
+    bool rollback();
+};

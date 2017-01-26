@@ -94,7 +94,7 @@ namespace ec2
         unsupported,
         unauthorized,
         //!Can't check authorization because of LDAP server is offline
-        temporary_unauthorized,
+        ldap_temporary_unauthorized,
         //!Requested operation is currently forbidden (e.g., read-only mode is enabled)
         forbidden,
         //!Response parse error
@@ -106,10 +106,19 @@ namespace ec2
         //!Method is not implemented yet
         notImplemented,
         //!Connection to peer is impossible due to incompatible protocol
-        incompatiblePeer
+        incompatiblePeer,
+        //!Can't check authorization because of cloud is offline
+        cloud_temporary_unauthorized
+
     };
 
     QString toString(ErrorCode errorCode);
+
+    enum class NotificationSource
+    {
+        Local,
+        Remote
+    };
 
     namespace impl
     {
@@ -171,7 +180,7 @@ namespace ec2
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiCameraAttributesDataList&);
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
-            void onGetUserGroupsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiUserGroupDataList&);
+            void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
@@ -179,6 +188,7 @@ namespace ec2
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
             void onDumpDatabaseDone             (int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpData&);
+            void onDumpDatabaseToFileDone		(int reqID, const ec2::ErrorCode, const ec2::ApiDatabaseDumpToFileData&);
             void onGetDiscoveryDataDone         (int reqID, const ec2::ErrorCode, const ec2::ApiDiscoveryDataList&);
             void onTestConnectionDone           (int reqID, const ec2::ErrorCode, const QnConnectionInfo&);
             void onConnectDone                  (int reqID, const ec2::ErrorCode, const AbstractECConnectionPtr &);
@@ -241,7 +251,7 @@ namespace ec2
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
-        DEFINE_TWO_ARG_HANDLER(GetUserGroups,              ec2::ErrorCode, ec2::ApiUserGroupDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUserRoles,               ec2::ErrorCode, ec2::ApiUserRoleDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractAccessRightsManager
@@ -280,7 +290,6 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(CurrentTime, ec2::ErrorCode, qint64)
         DEFINE_TWO_ARG_HANDLER(DumpDatabase, ec2::ErrorCode, ec2::ApiDatabaseDumpData)
-
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractECConnectionFactory

@@ -2,20 +2,25 @@ $icon-font-path: "../fonts/";
 
 @import '../bower_components/sass-bootstrap/lib/_variables.scss';
 
+
+@mixin icon{
+  display: inline-block;
+  background-size: 352px 224px;
+  background-image: url('../images/icons/web_wizard_sprite.png');
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/web_wizard_sprite@2x.png');
+  }
+}
+
 @mixin kill-glyphicon{
-  background-size: 176px 152px;
-  background-image: url('../images/icons/wizard_sprite.png');
+  @include icon;
   &:before{
     content:none;
-  }
-
-  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    background-image: url('../images/icons/wizard_sprite@2x.png');
   }
 }
 
 
-.master-success .preloader{
+.master-icon .preloader{
   background-image: url('../images/icons/preloader.gif');
 
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
@@ -24,6 +29,11 @@ $icon-font-path: "../fonts/";
 }
 
 
+$radio-panels-hover-border: transparent;
+$radio-panels-hover-bg: $gray-lighter;
+
+$radio-panels-selected-bg: $gray-lighter;
+$radio-panels-selected-border: $gray-light;
 
 @import 'master';
 
@@ -247,13 +257,6 @@ code{
 
 /* Iframe with logs on info page */
 .log-frame{
-  border: none;
-  width: 100%;
-  height:300px;
-  border-radius:5px;
-}
-
-.log-frame-big{
   border:1px solid silver;
   width: 100%;
   height:600px;
@@ -481,4 +484,121 @@ span.danger{
 
 .modal-dialog.modal-sm{
   width:450px;
+}
+
+
+
+.form-group.CameraMotionEvent,
+.form-group.CameraInputEvent,
+.form-group.CameraDisconnectEvent,
+.form-group.StorageFailureEvent,
+.form-group.NetworkIssueEvent,
+.form-group.CameraIpConflictEvent,
+.form-group.ServerFailureEvent,
+.form-group.ServerConflictEvent,
+.form-group.ServerStartEvent,
+.form-group.LicenseIssueEvent,
+.form-group.BackupFinishedEvent,
+.form-group.UserDefinedEvent{
+  display:none;
+}
+
+.AnyEvent,
+.CameraMotionEvent .CameraMotionEvent,
+.CameraInputEvent .CameraInputEvent,
+.CameraDisconnectEvent .CameraDisconnectEvent,
+.StorageFailureEvent .StorageFailureEvent,
+.NetworkIssueEvent .NetworkIssueEvent,
+.CameraIpConflictEvent .CameraIpConflictEvent,
+.ServerFailureEvent .ServerFailureEvent,
+.ServerConflictEvent .ServerConflictEvent,
+.ServerStartEvent .ServerStartEvent,
+.LicenseIssueEvent .LicenseIssueEvent,
+.BackupFinishedEvent .BackupFinishedEvent,
+.UserDefinedEvent .UserDefinedEvent{
+  display:block;
+}
+
+.system-info{
+  background-color: $gray-lighter;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .panel-title{
+    font-size: 20px;
+  }
+
+  td{
+    vertical-align: top;
+    &:first-child{
+      white-space:nowrap;
+      padding-right:5px;
+    }
+  }
+
+  .table-spacer td{
+    &,td {
+      max-height: 8px;
+      line-height: 8px;
+    }
+  }
+}
+
+.container{
+  margin: 0;
+}
+
+h3 {
+  margin-top: 30px;
+}
+
+.table-fixed{
+  table-layout: fixed;
+  width:100%;
+  td:first-child{
+    width: 85px;
+  }
+  td{
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.panel-inline{
+  display:inline-block;
+  text-align: left;
+  margin: 30px 10px;
+
+  img {
+    vertical-align: bottom;
+    margin: 0 5px;
+  }
+
+  h3{
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  table>tbody>tr>td{
+    vertical-align: bottom;
+    height: 42px;
+  }
+
+}
+
+.grey-text{
+  color: #698796;
+}
+
+
+/* Kill visual effects for nx1 */
+.lite-client-mode{
+  * {
+    outline: none !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-timing-function: linear !important;
+    opacity: 1 !important;
+  }
 }

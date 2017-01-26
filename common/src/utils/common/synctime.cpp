@@ -107,9 +107,9 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
+    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     QnMutexLocker lock( &m_mutex );
 
-    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     if (
         (
             m_lastReceivedTime == 0 
@@ -122,7 +122,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         if( appServerConnection ) 
         {
-            appServerConnection->getTimeManager()->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
+            appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;
         }
     }
@@ -142,5 +142,5 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         return time;
     }
     else
-        return QDateTime::currentMSecsSinceEpoch();
+        return localTime;
 }

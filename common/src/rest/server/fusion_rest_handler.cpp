@@ -1,40 +1,39 @@
 #include "fusion_rest_handler.h"
 
-namespace QnFusionRestHandlerDetail
+namespace QnFusionRestHandlerDetail {
+
+Qn::SerializationFormat formatFromParams(const QnRequestParamList& params)
 {
-    Qn::SerializationFormat formatFromParams(const QnRequestParamList& params)
-    {
-        Qn::SerializationFormat format = Qn::JsonFormat;
-        QnLexical::deserialize(params.value(lit("format")), &format);
-        return format;
-    }
+    Qn::SerializationFormat format = Qn::JsonFormat;
+    QnLexical::deserialize(params.value(lit("format")), &format);
+    return format;
 }
 
-int QnFusionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& resultContentType, const QnRestConnectionProcessor *processor)
+} // namespace QnFusionRestHandlerDetail
+
+int QnFusionRestHandler::executePost(
+    const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/, QByteArray& /*result*/,
+    QByteArray& /*resultContentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(body);
-    Q_UNUSED(srcBodyContentType);
-    Q_UNUSED(result);
-    Q_UNUSED(resultContentType);
-    Q_UNUSED(processor);
     return nx_http::StatusCode::notImplemented;
 }
 
-int QnFusionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnFusionRestHandler::executeGet(
+    const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /*result*/,
+    QByteArray& /*contentType*/, const QnRestConnectionProcessor* /*processor*/)
 {
-    Q_UNUSED(path);
-    Q_UNUSED(params);
-    Q_UNUSED(result);
-    Q_UNUSED(contentType);
     return nx_http::StatusCode::notImplemented;
 }
 
-int QnFusionRestHandler::genericError( int errCode, const QString &error, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format, bool extraFormatting )
+int QnFusionRestHandler::makeError(
+    int httpStatusCode, const QString &errorMessage, QByteArray* outBody,
+    QByteArray* outContentType, Qn::SerializationFormat format, bool extraFormatting,
+    QnRestResult::Error error)
 {
     QnRestResult restResult;
-    restResult.setError(QnRestResult::CantProcessRequest, error);
-    QnFusionRestHandlerDetail::serialize(restResult, result, contentType, format, extraFormatting);
-    return errCode;
+    restResult.setError(error, errorMessage);
+    QnFusionRestHandlerDetail::serialize(
+        restResult, *outBody, *outContentType, format, extraFormatting);
+    return httpStatusCode;
 }

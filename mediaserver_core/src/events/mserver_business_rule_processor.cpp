@@ -1,5 +1,7 @@
 #include "mserver_business_rule_processor.h"
 
+#include <map>
+
 #include <QtCore/QList>
 
 #include "api/app_server_connection.h"
@@ -7,11 +9,20 @@
 #include "business/actions/panic_business_action.h"
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/user_roles_manager.h>
+
+#include <core/resource_access/resource_access_subjects_cache.h>
+
 #include <core/resource/resource.h>
+#include <core/resource/resource_display_info.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/camera_history.h>
+
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <database/server_db.h>
 
@@ -22,10 +33,8 @@
 
 #include <media_server/serverutil.h>
 
-#include <utils/math/math.h>
 #include <nx/utils/log/log.h>
 #include "camera/get_image_helper.h"
-#include "core/resource_management/resource_properties.h"
 
 #include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
@@ -37,25 +46,49 @@
 #include <nx/email/mustache/mustache_helper.h>
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
-#include "core/resource/resource_name.h"
 #include "business/events/mserver_conflict_business_event.h"
-#include "core/resource/camera_history.h"
-#include <utils/common/synctime.h>
+
+#include <common/common_module.h>
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
 #include "utils/common/delayed.h"
 #include <business/business_event_connector.h>
 
+#if !defined(EDGE_SERVER)
+#include <providers/speech_synthesis_data_provider.h>
+#endif
+
+#include <providers/stored_file_data_provider.h>
+#include <streaming/audio_streamer_pool.h>
+#include <nx/network/http/asynchttpclient.h>
+
+#include <nx/streaming/abstract_archive_stream_reader.h>
+
+#include <utils/common/app_info.h>
+#include <utils/common/systemerror.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+#include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <common/common_module.h>
+#include <rest/handlers/multiserver_thumbnail_rest_handler.h>
+#include <api/helpers/thumbnail_request_data.h>
+#include <utils/common/util.h>
+
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
-    const QString tpProductLogo(lit("productLogo.png"));
+    const QString tpProductLogo(lit("logo"));
+    const QString tpSystemIcon(lit("systemIcon"));
+    const QString tpOwnerIcon(lit("ownerIcon"));
+    const QString tpCloudOwner(lit("cloudOwner"));
+    const QString tpCloudOwnerEmail(lit("cloudOwnerEmail"));
     const QString tpCompanyName(lit("companyName"));
     const QString tpCompanyUrl(lit("companyUrl"));
     const QString tpSupportLink(lit("supportLink"));
     const QString tpSupportLinkText(lit("supportLinkText"));
     const QString tpSystemName(lit("systemName"));
+    const QString tpSystemSignature(lit("systemSignature"));
     const QString tpImageMimeType(lit("image/png"));
     const QString tpScreenshotFilename(lit("screenshot"));
     const QString tpScreenshot(lit("screenshot.jpeg"));
@@ -64,10 +97,19 @@ namespace {
     static const QString tpProductName(lit("productName"));
     static const QString tpEvent(lit("event"));
     static const QString tpSource(lit("source"));
+    static const QString tpSourceIP(lit("sourceIp"));
+
+    static const QString tpCameraName(lit("name"));
+    static const QString tpCameraIP(lit("cameraIP"));
+
     static const QString tpUrlInt(lit("urlint"));
     static const QString tpUrlExt(lit("urlext"));
+    static const QString tpCount(lit("count"));
     static const QString tpTimestamp(lit("timestamp"));
+    static const QString tpTimestampDate(lit("timestampDate"));
+    static const QString tpTimestampTime(lit("timestampTime"));
     static const QString tpReason(lit("reason"));
+    static const QString tpReasonContext(lit("reasonContext"));
     static const QString tpAggregated(lit("aggregated"));
     static const QString tpInputPort(lit("inputPort"));
     static const QString tpHasCameras(lit("hasCameras"));
@@ -84,6 +126,7 @@ namespace {
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
+
 };
 
 struct QnEmailAttachmentData {
@@ -192,6 +235,20 @@ void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resou
     qnServerDb->removeLogForRes(resource->getId());
 }
 
+void QnMServerBusinessRuleProcessor::prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action)
+{
+    switch(action->actionType())
+    {
+    case QnBusiness::SendMailAction:
+        // Add user's email addresses to action emailAddress field and filter invalid addresses
+        if (auto emailAction = action.dynamicCast<QnSendMailBusinessAction>())
+            updateRecipientsList(emailAction);
+        break;
+    default:
+        break;
+    }
+}
+
 bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
     bool result = QnBusinessRuleProcessor::executeActionInternal(action);
@@ -205,7 +262,6 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = executeBookmarkAction(action);
             break;
         case QnBusiness::CameraOutputAction:
-        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
             break;
         case QnBusiness::CameraRecordingAction:
@@ -217,6 +273,16 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::ExecutePtzPresetAction:
             result = executePtzAction(action);
             break;
+        case QnBusiness::ExecHttpRequestAction:
+            result = executeHttpRequestAction(action);
+            break;
+
+        case QnBusiness::SayTextAction:
+            result = executeSayTextAction(action);
+            break;
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+            result = executePlaySoundAction(action);
         default:
             break;
         }
@@ -226,6 +292,85 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         qnServerDb->saveActionToDB(action);
 
     return result;
+}
+
+bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
+{
+    const auto params = action->getParams();
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+
+    if (!resource)
+        return false;
+
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
+
+    if (!transmitter)
+        return false;
+
+
+    if (action->actionType() == QnBusiness::PlaySoundOnceAction)
+    {
+        auto url = lit("dbfile://notifications/") + params.url;
+
+        QnAviResourcePtr resource(new QnAviResource(url));
+        resource->setStatus(Qn::Online);
+        QnAbstractStreamDataProviderPtr provider(
+            resource->createDataProvider(Qn::ConnectionRole::CR_Default));
+
+        provider.dynamicCast<QnAbstractArchiveStreamReader>()->setCycleMode(false);
+
+        transmitter->subscribe(provider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+
+        provider->startIfNotRunning();
+    }
+    else
+    {
+
+        QnAbstractStreamDataProviderPtr provider;
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
+            provider->startIfNotRunning();
+        }
+        else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
+            transmitter->unsubscribe(provider.data());
+            if (provider->processorsCount() == 0)
+                QnAudioStreamerPool::instance()->destroyActionDataProvider(action);
+        }
+    }
+
+    return true;
+
+}
+
+bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusinessActionPtr& action)
+{
+#if !defined(EDGE_SERVER)
+    const auto params = action->getParams();
+    const auto text = params.sayText;
+    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    if (!resource)
+        return false;
+
+    QnAudioTransmitterPtr transmitter;
+    if (resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        transmitter = resource->getAudioTransmitter();
+
+    if (!transmitter)
+        return false;
+
+    QnAbstractStreamDataProviderPtr speechProvider(new QnSpeechSynthesisDataProvider(text));
+    transmitter->subscribe(speechProvider, QnAbstractAudioTransmitter::kSingleNotificationPriority);
+    speechProvider->startIfNotRunning();
+    return true;
+#else
+    return true;
+#endif
 }
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
@@ -243,6 +388,57 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     mediaServer->setPanicMode(val);
     propertyDictionary->saveParams(mediaServer->getId());
     return true;
+}
+
+bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBusinessActionPtr& action)
+{
+    QUrl url(action->getParams().url);
+
+    if (action->getParams().text.isEmpty())
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType messageBody)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                    << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                    << "osErrorCode:" << osErrorCode
+                    << "HTTP result:" << statusCode
+                    << "message:" << messageBody;
+            }
+        };
+
+        nx_http::downloadFileAsync(
+            url,
+            callback );
+        return true;
+    }
+    else
+    {
+        auto callback = [action](SystemError::ErrorCode osErrorCode, int statusCode)
+        {
+            if( osErrorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok )
+            {
+                qWarning() << "Failed to execute HTTP action for url "
+                           << QUrl(action->getParams().url).toString(QUrl::RemoveUserInfo)
+                           << "osErrorCode:" << osErrorCode
+                           << "HTTP result:" << statusCode;
+            }
+        };
+
+        QByteArray contentType = action->getParams().contentType.toUtf8();
+        if (contentType.isEmpty())
+            contentType = autoDetectHttpContentType(action->getParams().text.toUtf8());
+
+        nx_http::uploadDataAsync(url,
+            action->getParams().text.toUtf8(),
+            contentType,
+            nx_http::HttpHeaders(),
+            callback);
+        return true;
+    }
 }
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
@@ -315,8 +511,8 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getUniqueId();
-    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
+    bookmark.cameraId = camera->getId();
+    bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
@@ -344,17 +540,6 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
-    //if( relayOutputId.isEmpty() )
-    //{
-    //    NX_LOG( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
-    //    return false;
-    //}
-
-    //bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
-
-    //int autoResetTimeout = instant
-    //        ? ( action->getRelayAutoResetTimeout() ? action->getRelayAutoResetTimeout() : 30*1000)
-    //        : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = action->getToggleState() != QnBusiness::InactiveState;
 
@@ -366,16 +551,34 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 
 QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
-    const QnResourcePtr& cameraRes = qnResPool->getResourceById(id);
-    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
-    return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
+    QnVirtualCameraResourcePtr cameraRes = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    const QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!cameraRes || !server)
+        return QByteArray();
+
+    QnThumbnailRequestData request;
+    request.camera = cameraRes;
+    request.msecSinceEpoch = timestampUsec / 1000;
+    request.size = dstSize;
+    request.imageFormat = QnThumbnailRequestData::JpgFormat;
+    request.roundMethod = QnThumbnailRequestData::PreciseMethod;
+
+    QnMultiserverThumbnailRestHandler handler;
+    QByteArray frame;
+    QByteArray contentType;
+    if (handler.getScreenshot(request, frame, contentType, server->getPort()) != nx_http::StatusCode::ok)
+        return QByteArray();
+    return frame;
+
+    //QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
+    //return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }
 
 bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
 {
     NX_ASSERT( action );
 
-    QStringList recipients = getRecipients(action);
+    QStringList recipients = action->getParams().emailAddress.split(kNewEmailDelimiter);
 
     if( recipients.isEmpty() )
     {
@@ -397,26 +600,49 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
     QnEmailAttachmentList attachments;
-    QVariantHash contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments, true);
-    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
-
+    QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
+    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
+    QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
 
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
+    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+//    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
     contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
+    contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    if (!cloudOwnerAccount.isEmpty())
+    {
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
+        contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
+
+        const auto allUsers = qnResPool->getResources<QnUserResource>();
+        for (const auto& user: allUsers)
+        {
+            if (user->isCloud() && user->getEmail() == cloudOwnerAccount)
+            {
+                contextMap[tpCloudOwner] = user->fullName();
+                break;
+            }
+        }
+    }
+
+    QnEmailAddress supportEmail(emailSettings.supportEmail);
+
+//    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
-    contextMap[tpSupportLink] = QnEmailAddress::isValid(emailSettings.supportEmail)
-        ? lit("mailto:%1").arg(emailSettings.supportEmail)
+    contextMap[tpSupportLink] = supportEmail.isValid()
+        ? lit("mailto:%1").arg(supportEmail.value())
         : emailSettings.supportEmail;
     contextMap[tpSupportLinkText] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = emailSettings.signature;
+    contextMap[tpSystemName] = qnGlobalSettings->systemName();
+    contextMap[tpSystemSignature] = emailSettings.signature;
 
     contextMap[tpCaption] = action->getRuntimeParams().caption;
     contextMap[tpDescription] = action->getRuntimeParams().description;
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams());
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(action->getRuntimeParams(), Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
@@ -424,14 +650,14 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     ec2::ApiEmailData data(
         recipients,
         aggregatedResCount > 1
-        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
-        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+        ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams())
+        : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl),
         messageBody,
         emailSettings.timeout,
         attachments
         );
 
-    if (!m_emailManager->sendEmail(data))
+    if (!m_emailManager->sendEmail(emailSettings, data))
     {
         QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
         broadcastBusinessAction(action);
@@ -443,10 +669,6 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
 {
     //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
 
-    // Add user's email addresses to action emailAddress field and filter invalid addresses
-    updateRecipientsList(action);
-	QStringList recipients = getRecipients(action);
-
     //aggregating by recipients and eventtype
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
@@ -454,7 +676,9 @@ bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr&
         return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
     }
 
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
+    SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
+        action->getParams().emailAddress); // all recipients are already computed and packed here
+
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
@@ -494,34 +718,39 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
                                                                  const QnBusinessAggregationInfo &aggregationInfo,
-                                                                 QnEmailAttachmentList& attachments,
-                                                                 bool useIp)
+                                                                 QnEmailAttachmentList& attachments)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    QVariantHash contextMap;
+    QVariantMap contextMap;
 
     contextMap[tpProductName] = QnAppInfo::productNameLong();
-    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
-    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
-    if (eventType == QnBusiness::CameraMotionEvent)
+    const int deviceCount = aggregationInfo.toList().size();
+    contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType, qMax(1, deviceCount));
+    contextMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, Qn::ResourceInfoLevel::RI_NameOnly);
+    contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
+
+    if (eventType == QnBusiness::CameraMotionEvent ||
+        eventType == QnBusiness::CameraInputEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
+        if (camRes->hasVideo(nullptr))
+        {
+            QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
+            if (!screenshotData.isNull())
+            {
+                contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
+                contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
 
-        contextMap[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, false);
-        contextMap[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(params.eventResourceId, params.eventTimestampUsec, true);
-
-        QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
-        if (!screenshotData.isNull()) {
-            QBuffer screenshotStream(&screenshotData);
-            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-            contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+                QBuffer screenshotStream(&screenshotData);
+                attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
+                contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
+            }
         }
-
     }
     else if (eventType == QnBusiness::UserDefinedEvent)
     {
@@ -536,7 +765,9 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                 {
                     QVariantMap camera;
 
-                    camera[QLatin1String("name")] = getFullResourceName(camRes, useIp);
+                    QnResourceDisplayInfo camInfo(camRes);
+                    camera[tpCameraName] = camInfo.name();
+                    camera[tpCameraIP] = camInfo.host();
 
                     qnCameraHistoryPool->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
@@ -560,22 +791,23 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
         }
     }
 
-    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, useIp);
-
+    contextMap[tpAggregated] = aggregatedEventDetailsMap(action, aggregationInfo, Qn::ResourceInfoLevel::RI_NameOnly);
+    // TODO: CHECK!
     return contextMap;
 }
 
-QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-                                                                const QnBusinessAggregationInfo& aggregationInfo,
-                                                                bool useIp)
+QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
+    const QnAbstractBusinessActionPtr& action,
+    const QnBusinessAggregationInfo& aggregationInfo,
+    Qn::ResourceInfoLevel detailLevel)
 {
     QVariantList result;
     if (aggregationInfo.isEmpty()) {
-        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), useIp);
+        result << eventDetailsMap(action, QnInfoDetail(action->getRuntimeParams(), action->getAggregationCount()), detailLevel);
     }
 
     for (const QnInfoDetail& detail: aggregationInfo.toList()) {
-        result << eventDetailsMap(action, detail, useIp);
+        result << eventDetailsMap(action, detail, detailLevel);
     }
     return result;
 }
@@ -583,19 +815,19 @@ QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnA
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QList<QnInfoDetail>& aggregationDetailList,
-    bool useIp )
+    Qn::ResourceInfoLevel detailLevel)
 {
     QVariantList result;
     for (const QnInfoDetail& detail: aggregationDetailList)
-        result << eventDetailsMap(action, detail, useIp);
+        result << eventDetailsMap(action, detail, detailLevel);
     return result;
 }
 
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
+QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnAbstractBusinessActionPtr& action,
     const QnInfoDetail& aggregationData,
-    bool useIp,
+    Qn::ResourceInfoLevel detailLevel,
     bool addSubAggregationData )
 {
     using namespace QnBusiness;
@@ -603,21 +835,25 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     const QnBusinessEventParameters& params = aggregationData.runtimeParams();
     const int aggregationCount = aggregationData.count();
 
-    QVariantHash detailsMap;
+    QVariantMap detailsMap;
 
     if( addSubAggregationData )
     {
         const QnBusinessAggregationInfo& subAggregationData = aggregationData.subAggregationData();
         detailsMap[tpAggregated] = !subAggregationData.isEmpty()
-            ? aggregatedEventDetailsMap(action, subAggregationData, useIp)
-            : (QVariantList() << eventDetailsMap(action, aggregationData, useIp, false));
+            ? aggregatedEventDetailsMap(action, subAggregationData, detailLevel)
+            : (QVariantList() << eventDetailsMap(action, aggregationData, detailLevel, false));
     }
 
+    detailsMap[tpCount] = QString::number(aggregationCount);
     detailsMap[tpTimestamp] = QnBusinessStringsHelper::eventTimestampShort(params, aggregationCount);
+    detailsMap[tpTimestampDate] = QnBusinessStringsHelper::eventTimestampDate(params);
+    detailsMap[tpTimestampTime] = QnBusinessStringsHelper::eventTimestampTime(params);
 
     switch (params.eventType) {
     case CameraDisconnectEvent: {
-        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
+        detailsMap[tpSource] =  QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+        detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
         break;
     }
 
@@ -628,7 +864,8 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
 
     case NetworkIssueEvent:
         {
-            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, useIp);
+            detailsMap[tpSource] = QnBusinessStringsHelper::getResoureNameFromParams(params, detailLevel);
+            detailsMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(params);
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
             break;
         }
@@ -638,6 +875,22 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     case BackupFinishedEvent:
         {
             detailsMap[tpReason] = QnBusinessStringsHelper::eventReason(params);
+
+            // Fill event-specific reason context here
+            QVariantMap reasonContext;
+
+            if (params.reasonCode == LicenseRemoved)
+            {
+                QVariantList disabledCameras;
+
+                for (const QString &id: params.description.split(L';'))
+                    if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                        disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
+
+                reasonContext[lit("disabledCameras")] = disabledCameras;
+            }
+            detailsMap[tpReasonContext] = reasonContext;
+
             break;
         }
     case CameraIpConflictEvent: {
@@ -645,7 +898,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         QVariantList conflicts;
         int n = 0;
         foreach (const QString& mac, params.description.split(QnConflictBusinessEvent::Delimiter)) {
-            QVariantHash conflict;
+            QVariantMap conflict;
             conflict[lit("number")] = ++n;
             conflict[lit("mac")] = mac;
             conflicts << conflict;
@@ -664,7 +917,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr) {
             const QString &server = itr.key();
             foreach (const QString &camera, conflicts.camerasByServer[server]) {
-                QVariantHash conflict;
+                QVariantMap conflict;
                 conflict[lit("number")] = ++n;
                 conflict[lit("ip")] = server;
                 conflict[lit("mac")] = camera;
@@ -680,26 +933,52 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
     return detailsMap;
 }
 
-QStringList QnMServerBusinessRuleProcessor::getRecipients(const QnSendMailBusinessActionPtr& action) const
+/*
+* This method is called once per action, calculates all recipients and packs them into
+* emailAddress action parameter with new delimiter.
+*/
+void QnMServerBusinessRuleProcessor::updateRecipientsList(
+    const QnSendMailBusinessActionPtr& action) const
 {
-    QString email = action->getParams().emailAddress;
-    if (email.isEmpty())
-        return QStringList();
-    return email.split(email.contains(kOldEmailDelimiter) ? kOldEmailDelimiter : kNewEmailDelimiter);
-}
+    QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
+        QString::SkipEmptyParts);
 
-void QnMServerBusinessRuleProcessor::updateRecipientsList(const QnSendMailBusinessActionPtr& action) const
-{
-    QStringList unfiltered = getRecipients(action);
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) 
-        unfiltered << user->getEmail();
+    const auto ids = action->getResources();
+    const auto userRoles = qnUserRolesManager->userRoles(ids);
+    const auto users = qnResPool->getResources<QnUserResource>(ids);
 
-    auto recipientsFilter = [](const QString& email)
-    {
-        QString trimmed = email.trimmed();
-        return !trimmed.isEmpty() && QnEmailAddress::isValid(trimmed);
-    };
     QStringList recipients;
-    std::copy_if(unfiltered.cbegin(), unfiltered.cend(), std::back_inserter(recipients), recipientsFilter);
+    auto addRecipient = [&recipients](const QString& email)
+        {
+            const QString simplified = email.trimmed().toLower();
+            if (simplified.isEmpty()) //fast check
+                return;
+
+            if (nx::email::isValidAddress(simplified))
+                recipients.append(simplified);
+        };
+
+
+    for (const auto& email: additional)
+        addRecipient(email);
+
+    for (const auto& user: users)
+    {
+        if (user->isEnabled())
+            addRecipient(user->getEmail());
+    }
+
+    for (const auto& userRole: userRoles)
+    {
+        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        {
+            const auto& user = subject.user();
+            NX_ASSERT(user);
+            if (user && user->isEnabled())
+                addRecipient(user->getEmail());
+        }
+    }
+
+    recipients.removeDuplicates();
     action->getParams().emailAddress = recipients.join(kNewEmailDelimiter);
 }

@@ -2,7 +2,6 @@
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=$COMPANY_NAME-cloud-db
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
@@ -11,12 +10,8 @@ BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${artifact.name.cdb}
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -70,9 +65,3 @@ install -m 755 debian/postinst $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
-cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
-cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
-tar czf ./$FINALNAME-debug-symbols.tar.gz ./*.debug
-(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
-mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
-

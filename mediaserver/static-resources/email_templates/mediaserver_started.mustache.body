@@ -1,0 +1,10 @@
+<h1>Server {{#source}}<b>{{source}}</b> {{/source}}started</h1>
+
+
+<div class="date">
+    <p>
+     {{#aggregated}}
+        <b>{{{timestamp}}}</b>
+     {{/aggregated}}
+    </p>
+</div>

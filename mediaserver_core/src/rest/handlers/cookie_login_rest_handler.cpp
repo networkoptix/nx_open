@@ -21,7 +21,12 @@ struct QnCookieData
 QN_FUSION_DECLARE_FUNCTIONS(QnCookieData, (json))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCookieData), (json), _Fields)
 
-int QnCookieLoginRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnCookieLoginRestHandler::executePost(
+    const QString &/*path*/,
+    const QnRequestParams &/*params*/,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     bool success = false;
     QnCookieData cookieData = QJson::deserialized<QnCookieData>(body, QnCookieData(), &success);
@@ -31,14 +36,24 @@ int QnCookieLoginRestHandler::executePost(const QString &path, const QnRequestPa
         return nx_http::StatusCode::ok;
     }
 
-    QnUuid authUserId;
+    Qn::UserAccessData accessRights;
     Qn::AuthResult authResult = QnAuthHelper::instance()->authenticateByUrl(
         cookieData.auth,
-        QByteArray("GET"), 
-        *owner->response(), 
-        &authUserId);
-    const_cast<QnRestConnectionProcessor*>(owner)->setAuthUserId(authUserId);
-    if (authResult != Qn::Auth_OK)
+        QByteArray("GET"),
+        *owner->response(),
+        &accessRights);
+    const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
+    if (authResult == Qn::Auth_CloudConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult == Qn::Auth_LDAPConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, "LDAP server is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult != Qn::Auth_OK)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
         return nx_http::StatusCode::ok;

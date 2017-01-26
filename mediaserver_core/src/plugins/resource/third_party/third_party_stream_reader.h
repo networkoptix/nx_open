@@ -8,11 +8,11 @@
 
 #ifdef ENABLE_THIRD_PARTY
 
-#include "core/dataprovider/abstract_media_stream_provider.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
-#include "core/resource/resource_media_layout.h"
-#include "third_party_resource.h"
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include <core/dataprovider/spush_media_stream_provider.h>
+#include <core/resource/resource_media_layout.h>
 
+#include "third_party_resource.h"
 
 //!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader
@@ -29,7 +29,7 @@ public:
 
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 
-    static CodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
+    static AVCodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader, int* errorCode = nullptr );
 
     virtual void updateSoftwareMotion() override;
@@ -58,6 +58,7 @@ private:
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
+    mutable QnMutex m_streamReaderMutex;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
@@ -68,7 +69,6 @@ private:
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 
-    QnAbstractMediaDataPtr readLiveStreamReader();
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
 

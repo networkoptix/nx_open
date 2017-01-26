@@ -5,29 +5,32 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/string.h>
 
-#include <utils/serialization/lexical.h>
-#include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <api/helpers/camera_id_helper.h>
 
 namespace {
-    const QString startTimeKey(lit("startTime"));
-    const QString endTimeKey(lit("endTime"));
-    const QString detailKey(lit("detail"));
-    const QString keepSmallChunksKey(lit("keepSmallChunks"));
-    const QString periodsTypeKey(lit("periodsType"));
-    const QString filterKey(lit("filter"));
-    const QString localKey(lit("local"));
-    const QString formatKey(lit("format"));
-    const QString physicalIdKey(lit("physicalId"));
-    const QString macKey(lit("mac"));
-    const QString idKey(lit("id"));
-    const QString limitKey(lit("limit"));
-    const QString flatKey(lit("flat"));
-}
 
+const QString kStartTimeParam(lit("startTime"));
+const QString kEndTimeParam(lit("endTime"));
+const QString kDetailParam(lit("detail"));
+const QString kKeepSmallChunksParam(lit("keepSmallChunks"));
+const QString kPeriodsTypeParam(lit("periodsType"));
+const QString kFilterParam(lit("filter"));
+const QString kLocalParam(lit("local"));
+const QString kFormatParam(lit("format"));
+const QString kDeprecatedPhysicalIdParam(lit("physicalId"));
+const QString kDeprecatedMacParam(lit("mac"));
+const QString kDeprecatedIdParam(lit("id"));
+const QString kCameraIdParam(lit("cameraId"));
+const QString kLimitParam(lit("limit"));
+const QString kFlatParam(lit("flat"));
 
-QnChunksRequestData::QnChunksRequestData() :
+} // namespace
+
+QnChunksRequestData::QnChunksRequestData():
     periodsType(Qn::RecordingContent),
     startTimeMs(0),
     endTimeMs(DATETIME_NOW),
@@ -38,54 +41,42 @@ QnChunksRequestData::QnChunksRequestData() :
     limit(INT_MAX),
     flat(false)
 {
-
 }
-
 
 QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& params)
 {
-    static const qint64 USEC_PER_MS = 1000;
+    static const qint64 kUsPerMs = 1000;
 
     QnChunksRequestData request;
 
-    if (params.contains(startTimeKey))
-        request.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
+    if (params.contains(kStartTimeParam))
+        request.startTimeMs = nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs;
 
-    if (params.contains(endTimeKey))
-        request.endTimeMs = parseDateTime(params.value(endTimeKey)) / USEC_PER_MS;
+    if (params.contains(kEndTimeParam))
+        request.endTimeMs = nx::utils::parseDateTime(params.value(kEndTimeParam)) / kUsPerMs;
 
-    if (params.contains(detailKey))
-        request.detailLevel = params.value(detailKey).toLongLong();
-    if (params.contains(keepSmallChunksKey))
+    if (params.contains(kDetailParam))
+        request.detailLevel = params.value(kDetailParam).toLongLong();
+    if (params.contains(kKeepSmallChunksParam))
         request.keepSmallChunks = true;
 
-    if (params.contains(periodsTypeKey))
-        request.periodsType = static_cast<Qn::TimePeriodContent>(params.value(periodsTypeKey).toInt());
-
-    if (params.contains(limitKey))
-        request.limit = qMax(0LL, params.value(limitKey).toLongLong());
-
-    request.flat = params.contains(flatKey);
-
-    request.filter = params.value(filterKey);
-    request.isLocal = params.contains(localKey);
-    QnLexical::deserialize(params.value(formatKey), &request.format);
-
-    for (const auto& id: params.allValues(physicalIdKey)) {
-        QnVirtualCameraResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(id).dynamicCast<QnVirtualCameraResource>();
-        if (camRes)
-            request.resList << camRes;
+    if (params.contains(kPeriodsTypeParam))
+    {
+        request.periodsType = static_cast<Qn::TimePeriodContent>(
+            params.value(kPeriodsTypeParam).toInt());
     }
-    for (const auto& id: params.allValues(macKey)) {
-        QnVirtualCameraResourcePtr camRes = qnResPool->getResourceByMacAddress(id).dynamicCast<QnVirtualCameraResource>();
-        if (camRes)
-            request.resList << camRes;
-    }
-    for (const auto& id: params.allValues(idKey)) {
-        QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById(QnUuid::fromStringSafe(id)).dynamicCast<QnVirtualCameraResource>();
-        if (camRes)
-            request.resList << camRes;
-    }
+
+    if (params.contains(kLimitParam))
+        request.limit = qMax(0LL, params.value(kLimitParam).toLongLong());
+
+    request.flat = params.contains(kFlatParam);
+
+    request.filter = params.value(kFilterParam);
+    request.isLocal = params.contains(kLocalParam);
+    QnLexical::deserialize(params.value(kFormatParam), &request.format);
+
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(&request.resList, params,
+        {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
     return request;
 }
@@ -94,20 +85,34 @@ QnRequestParamList QnChunksRequestData::toParams() const
 {
     QnRequestParamList result;
 
-    result.insert(startTimeKey,     QString::number(startTimeMs));
-    result.insert(endTimeKey,       QString::number(endTimeMs));
-    result.insert(detailKey,        QString::number(detailLevel));
+    result.insert(kStartTimeParam, QString::number(startTimeMs));
+    result.insert(kEndTimeParam, QString::number(endTimeMs));
+    result.insert(kDetailParam, QString::number(detailLevel));
     if (keepSmallChunks)
-        result.insert(keepSmallChunksKey, QString());
-    result.insert(periodsTypeKey,   QString::number(periodsType));
-    result.insert(filterKey,        filter);
-    result.insert(limitKey,         QString::number(limit));
+        result.insert(kKeepSmallChunksParam, QString());
+    result.insert(kPeriodsTypeParam, QString::number(periodsType));
+    result.insert(kFilterParam, filter);
+    result.insert(kLimitParam, QString::number(limit));
     if (isLocal)
-        result.insert(localKey, QString());
-    result.insert(formatKey, QnLexical::serialized(format));
+        result.insert(kLocalParam, QString());
+    result.insert(kFormatParam, QnLexical::serialized(format));
 
-    for (const auto &camera: resList)
-        result.insert(physicalIdKey, camera->getPhysicalId());
+    // TODO: #mshevchenko #3.1 The request format changed in 3.0, so Mobile Client cannot
+    // read chunks from 2.6 server. This is a temporary in-place fix which should be refactored
+    // when API versioning is implemented.
+    switch (requestVersion)
+    {
+        case RequestVersion::v2_6:
+            for (const auto& resource: resList)
+                result.insert(kDeprecatedPhysicalIdParam, resource->getPhysicalId());
+            break;
+
+        case RequestVersion::v3_0:
+        default:
+            for (const auto& resource: resList)
+                result.insert(kCameraIdParam, resource->getId().toString());
+            break;
+    }
 
     return result;
 }
@@ -115,7 +120,7 @@ QnRequestParamList QnChunksRequestData::toParams() const
 QUrlQuery QnChunksRequestData::toUrlQuery() const
 {
     QUrlQuery urlQuery;
-    for(const auto& param: toParams())
+    for (const auto& param: toParams())
         urlQuery.addQueryItem(param.first, param.second);
     return urlQuery;
 }

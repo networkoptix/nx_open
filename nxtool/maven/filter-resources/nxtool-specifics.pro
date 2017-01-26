@@ -29,3 +29,7 @@ export(INSTALLS)
 RC_FILE = ${project.build.directory}/nxtool.rc
 
 SOURCES += ${project.build.directory}/nxtool_app_info_impl.cpp
+
+CONFIG -= precompile_header
+PRECOMPILED_HEADER =
+PRECOMPILED_SOURCE =

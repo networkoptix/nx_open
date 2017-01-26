@@ -19,13 +19,12 @@ public:
         Calls \a QnResourceDiscoveryManager::createResource first. If resource was not created and resource type is present in system, returns data-only resource
     */
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams &params) override;
-    virtual void doResourceDiscoverIteration() override;
+
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
 protected:
-    virtual bool processDiscoveredResources(QnResourceList& resources) override;
-
+    virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType) override;
 private:
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
@@ -35,16 +34,16 @@ private:
     void pingResources(const QnResourcePtr& res);
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
 private:
-    bool m_foundSmth; // minor just to minimize lof output
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_resourceDiscoveryCounter;
     //map<uniq id, > TODO #ak old values from this dictionary are not cleared
     QMap<QString, int> m_disconnectSended;
     QTime netStateTime;
     CLNetState netState;
-    
-    QMap<QnUuid, QnSecurityCamResourcePtr> m_tmpForeignResources;
+
+    QMap<QString, QnSecurityCamResourcePtr> m_tmpForeignResources;
     int m_foreignResourcesRetryCount;
+    QnMutex m_discoveryMutex;
 };
 
 #endif //QN_MSERVER_RESOURCE_DISCOVERY_MANAGER_H

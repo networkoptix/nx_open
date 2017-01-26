@@ -10,27 +10,10 @@
 #include <boost/optional.hpp>
 
 #include <utils/media/pts_to_clock_mapper.h>
-
+#include <nx/utils/random.h>
 
 typedef uint64_t pts_type;
 typedef PtsToClockMapper::ts_type ts_type;
-
-TEST( PtsToClockMapper, test )
-{
-    uint32_t bits = 1;
-    uint32_t x = (1 << bits) - 1;
-
-    uint32_t bits1 = 30;
-    uint32_t bits30mask = (1 << bits1) - 1;
-
-    uint32_t pts1 = bits30mask - 100;
-    //uint32_t pts2 = 100;
-    uint32_t pts2 = bits30mask - 300;
-
-    uint32_t diff = (pts2 - pts1) & bits30mask;
-
-    uint32_t absDiff = std::min<uint32_t>( (pts2 - pts1) & bits30mask, (pts1 - pts2) & bits30mask );
-}
 
 TEST( PtsToClockMapper, general )
 {
@@ -45,8 +28,6 @@ TEST( PtsToClockMapper, general )
 
         for( int j = 0; j < 100; ++j )
         {
-            srand( ::time(NULL) );
-
             MapperType::TimeSynchronizationData timeSync;
 
             MapperType ptsToClockMapper(
@@ -67,10 +48,10 @@ TEST( PtsToClockMapper, general )
             pts_type prevEffectivePts = 0;
             pts_type ptsDelta = 0;
 
-            ptsToClockMapper.updateTimeMapping( MIN_PTS, rand() );
+            ptsToClockMapper.updateTimeMapping( MIN_PTS, nx::utils::random::number() );
 
             //for( pts_type pts = MIN_PTS; pts < MAX_PTS; pts += STEP_VALUE )
-            for( int i = 0; i < STEPS; ++i )
+            for( pts_type i = 0; i < STEPS; ++i )
             {
                 auto effectivePts = pts;
 
@@ -78,13 +59,13 @@ TEST( PtsToClockMapper, general )
                 bool discontinuity = false;
                 if( i > 0 )
                 {
-                    if( rand() % 7 == 0 )
+                    if( nx::utils::random::number(0, 6) == 0 )
                     {
                         //emulating non-monotonic pts 
                         effectivePts -= STEP_VALUE + STEP_VALUE/2;
                         nonMonotonic = true;
                     }
-                    else if( rand() % 15 == 0 )
+                    else if( nx::utils::random::number(0, 14) == 0 )
                     {
                         //emulation pts discontinuity
                         ptsDelta -= pts - prevEffectivePts; //rolling back to prevEffectivePts
@@ -114,7 +95,7 @@ TEST( PtsToClockMapper, general )
                 ASSERT_EQ( tsDiff, ptsDiff * PTS_FREQUENCY );
 
 #if 1
-                if( rand() % 50 == 0 )
+                if( nx::utils::random::number(0, 50) == 0 )
                     ptsToClockMapper.updateTimeMapping( effectivePts & PTS_MASK, timestamp );
 #endif
 

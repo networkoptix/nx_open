@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
@@ -9,20 +9,20 @@ namespace nx {
 namespace network {
 namespace test {
 
-NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslFreeTcpSockets,
-    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, true); },
-    &std::make_unique<TCPSocket>);
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), true); },
+    [](){ return std::make_unique<TCPSocket>(AF_INET); });
 
-NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslEnabledTcpSockets,
-    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, true); },
-    [](){ return std::make_unique<SslSocket>(new TCPSocket, false); });
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), true); },
+    [](){ return std::make_unique<SslSocket>(new TCPSocket(AF_INET), false); });
 
-NX_NETWORK_BOTH_SOCKETS_TEST_CASE(
+NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, SslEnforcedTcpSockets,
-    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket, false); },
-    [](){ return std::make_unique<SslSocket>(new TCPSocket, false); });
+    [](){ return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), false); },
+    [](){ return std::make_unique<SslSocket>(new TCPSocket(AF_INET), false); });
 
 } // namespace test
 } // namespace network

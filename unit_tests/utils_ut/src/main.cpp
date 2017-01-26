@@ -1,15 +1,6 @@
-/**********************************************************
-* Dec 29, 2015
-* akolesnikov
-***********************************************************/
+#include <nx/utils/test_support/run_test.h>
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    ::testing::InitGoogleMock(&argc, argv);
-    const int result = RUN_ALL_TESTS();
-    return result;
+    return nx::utils::test::runTest(argc, argv);
 }

@@ -8,188 +8,194 @@ int QnAppInfo::ec2ProtoVersion()
     return ${nxec.ec2ProtoVersion};
 }
 
-QString QnAppInfo::organizationName() {
+QString QnAppInfo::organizationName()
+{
     return QStringLiteral("${company.name}");
 }
 
-QString QnAppInfo::linuxOrganizationName() {
+QString QnAppInfo::linuxOrganizationName()
+{
     return QStringLiteral("${deb.customization.company.name}");
 }
 
-QString QnAppInfo::realm() {
+QString QnAppInfo::realm()
+{
     return QStringLiteral("VMS");
 }
 
-QString QnAppInfo::applicationVersion() {
+QString QnAppInfo::applicationVersion()
+{
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
 
-QString QnAppInfo::applicationRevision() {
+QString QnAppInfo::applicationRevision()
+{
     return QStringLiteral("${changeSet}");
 }
 
-QString QnAppInfo::applicationPlatform() {
-    return QStringLiteral("${platform}");
-}
-
-QString QnAppInfo::applicationArch() {
-    return QStringLiteral("${arch}");
-}
-
-QString QnAppInfo::applicationPlatformModification() {
+QString QnAppInfo::applicationPlatformModification()
+ {
     return QStringLiteral("${modification}");
 }
 
-QString QnAppInfo::applicationCompiler() {
-    return QStringLiteral("${additional.compiler}");
+QString QnAppInfo::applicationCompiler()
+{
+    #if defined(__clang__)
+        return QStringLiteral("clang");
+    #elif defined(__GNUC__)
+        return QStringLiteral("gcc");
+    #elif defined(_MSC_VER)
+        return QStringLiteral("msvc");
+    #else
+        return QStringLiteral();
+    #endif
 }
 
-QString QnAppInfo::applicationUriProtocol() {
-    return QStringLiteral("${uri.protocol}");
-}
-
-QString QnAppInfo::engineVersion() {
+QString QnAppInfo::engineVersion()
+ {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
 
-QString QnAppInfo::ffmpegVersion() {
+QString QnAppInfo::ffmpegVersion()
+ {
     return QStringLiteral("${ffmpeg.version}");
 }
 
-QString QnAppInfo::sigarVersion() {
+QString QnAppInfo::sigarVersion()
+{
     return QStringLiteral("${sigar.version}");
 }
 
-QString QnAppInfo::boostVersion() {
+QString QnAppInfo::boostVersion()
+{
     return QStringLiteral("${boost.version}");
 }
 
-QString QnAppInfo::armBox() {
-    //#ak for now box has sense value on ARM devices only. 
-        //On other platforms it is used by build system for internal purposes
-#ifdef __arm__
-    return QStringLiteral("${box}");
-#else
-    return QString();
-#endif
-}
-
-bool QnAppInfo::beta() {
+bool QnAppInfo::beta()
+{
     return ${beta};
 }
 
-QString QnAppInfo::productName() {
+QString QnAppInfo::productName()
+{
 #ifdef _WIN32
     return QStringLiteral("${product.name}");
 #else
-    return QStringLiteral("${namespace.additional}");
+    return QStringLiteral("${product.appName}");
 #endif
 }
 
-QString QnAppInfo::productNameShort() {
+QString QnAppInfo::productNameShort()
+{
     return QStringLiteral("${product.name.short}");
 }
 
-QString QnAppInfo::productNameLong() {
+QString QnAppInfo::productNameLong()
+{
     return QStringLiteral("${display.product.name}");
 }
 
-QString QnAppInfo::customizationName() {
+QString QnAppInfo::customizationName()
+{
     return QStringLiteral("${customization}");
 }
 
-QString QnAppInfo::defaultLanguage() {
+QString QnAppInfo::defaultLanguage()
+{
     return QStringLiteral("${translation1}");
 }
 
-QString QnAppInfo::clientExecutableName() {
-#ifdef _WIN32
-    return QStringLiteral("${product.name}.exe"); // TODO: #Boris probably there exists a variable for this?
-#else
-    return QStringLiteral("client-bin");
-#endif
+QString QnAppInfo::clientExecutableName()
+{
+    return QStringLiteral("${client.binary.name}");
 }
 
-QString QnAppInfo::applauncherExecutableName() {
-#ifdef _WIN32
-    return QStringLiteral("${product.name} Launcher.exe");
-#else
-    return QStringLiteral("applauncher-bin");
-#endif
+QString QnAppInfo::applauncherExecutableName()
+{
+    return QStringLiteral("${applauncher.binary.name}");
 }
 
-QString QnAppInfo::mediaFolderName() {
+QString QnAppInfo::mediaFolderName()
+{
     return QStringLiteral("${client.mediafolder.name}");
 }
 
-QString QnAppInfo::licensingEmailAddress() {
+QString QnAppInfo::licensingEmailAddress()
+{
     return QStringLiteral("${company.license.address}");
 }
 
-QString QnAppInfo::companyUrl() {
+QString QnAppInfo::companyUrl()
+{
     return QStringLiteral("${company.url}");
 }
 
-QString QnAppInfo::supportEmailAddress() {
+QString QnAppInfo::supportEmailAddress()
+{
     return QStringLiteral("${company.support.address}");
 }
 
-QString QnAppInfo::supportLink() {
+QString QnAppInfo::supportLink()
+{
     return QStringLiteral("${company.support.link}");
 }
 
-QString QnAppInfo::showcaseUrl() {
+QString QnAppInfo::showcaseUrl()
+{
     return QStringLiteral("${showcase.url}/${customization}");
 }
 
-QString QnAppInfo::settingsUrl() {
+QString QnAppInfo::settingsUrl()
+{
     return QStringLiteral("${settings.url}/${customization}.json");
 }
 
-QString QnAppInfo::mirrorListUrl() {
-    return QStringLiteral("${mirrorListUrl}");
-}
-
-QString QnAppInfo::helpUrl() {
+QString QnAppInfo::helpUrl()
+{
     return QStringLiteral("${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url");
 }
 
-QString QnAppInfo::updateGeneratorUrl() {
+QString QnAppInfo::updateGeneratorUrl()
+{
     return QStringLiteral("${update.generator.url}");
 }
 
-QString QnAppInfo::cloudPortalUrl() {
-    return QStringLiteral("${cloud.portalUrl}");
+//Filling string constant with zeros to be able to change this constant in already-built binary
+static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloudHost}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
+
+QString QnAppInfo::defaultCloudHost()
+{
+    return QString::fromUtf8(kCloudHostName);
 }
 
-QString QnAppInfo::cloudName() {
-    return QStringLiteral("${cloud.name}");
+QString QnAppInfo::defaultCloudPortalUrl()
+{
+    return QString::fromLatin1("https://%1").arg(defaultCloudHost());
 }
 
-int QnAppInfo::freeLicenseCount() {
+QString QnAppInfo::defaultCloudModulesXmlUrl()
+{
+    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
+}
+
+QString QnAppInfo::cloudName()
+{
+    return QStringLiteral("${cloudName}");
+}
+
+int QnAppInfo::freeLicenseCount()
+{
     return ${freeLicenseCount};
 }
 
-QString QnAppInfo::freeLicenseKey() {
+QString QnAppInfo::freeLicenseKey()
+{
     return QStringLiteral("${freeLicenseKey}");
 }
 
-bool QnAppInfo::freeLicenseIsTrial() {
+bool QnAppInfo::freeLicenseIsTrial()
+{
     return ${freeLicenseIsTrial};
 }
 
-QString QnAppInfo::iosPlayButtonTint() {
-    return QStringLiteral("${ios.playButton.tint}");
-}
-
-QString QnAppInfo::oldAndroidClientLink() {
-    return QStringLiteral("https://play.google.com/store/apps/details?id=${namespace.major}.${namespace.minor}.${namespace.additional}");
-}
-
-QString QnAppInfo::oldIosClientLink() {
-    return QStringLiteral("https://itunes.apple.com/app/${ios.old_app_appstore_id}");
-}
-
-QString QnAppInfo::oldAndroidAppId() {
-    return QStringLiteral("${old.android.packagename}");
-}

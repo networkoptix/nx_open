@@ -23,16 +23,15 @@ class QTimer;
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
 public:
-    QnModuleFinder(bool clientMode, bool compatibilityMode);
+    QnModuleFinder(bool clientMode);
 
     virtual ~QnModuleFinder();
-
-    bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
     ec2::ApiDiscoveredServerDataList discoveredServers() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
+    QnModuleInformation moduleInformation(const QnMediaServerResourcePtr& server) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
 
     /** Get the best address to access the server with the given id.
@@ -120,3 +119,5 @@ private:
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;
 };
+
+#define qnModuleFinder QnModuleFinder::instance()

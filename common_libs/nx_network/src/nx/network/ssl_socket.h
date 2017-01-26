@@ -31,6 +31,25 @@ typedef AbstractSocketImplementationDelegate<
         std::function<AbstractStreamServerSocket*()>
     > SslSocketServerImplementationDelegate;
 
+class NX_NETWORK_API SslEngine
+{
+    static const size_t kBufferSize;
+    static const int kRsaLength;
+    static const std::chrono::seconds kCertExpiration;
+
+public:
+    static String makeCertificateAndKey(
+        const String& name, const String& country, const String& company);
+
+    static bool useCertificateAndPkey(const String& certData);
+
+    static void useOrCreateCertificate(
+        const QString& filePath,
+        const String& name, const String& country, const String& company);
+
+    static void useRandomCertificate(const String& module);
+};
+
 class NX_NETWORK_API SslSocket
 :
     public SslSocketImplementationDelegate
@@ -43,9 +62,6 @@ public:
         bool isServerSide, bool encriptionEnforced = false);
     virtual ~SslSocket();
 
-    static void initSSLEngine(const QByteArray& certData);
-    static void releaseSSLEngine();
-
     virtual bool reopen() override;
     virtual bool setNoDelay(bool value) override;
     virtual bool getNoDelay(bool* value) const override;
@@ -55,6 +71,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 
@@ -69,15 +86,20 @@ public:
         unsigned short foreignPort,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
     virtual bool enableClientEncryption() override;
+    virtual bool isEncryptionEnabled() const override;
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
-protected:
+    virtual bool setNonBlockingMode(bool val) override;
+    virtual bool getNonBlockingMode(bool* val) const override;
+    virtual bool shutdown() override;
+
     enum IOMode { ASYNC, SYNC };
 
+protected:
     Q_DECLARE_PRIVATE(SslSocket);
     SslSocketPrivate *d_ptr;
 

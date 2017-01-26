@@ -4,13 +4,13 @@
 
 #include <core/resource/camera_advanced_param.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 
 namespace {
-    const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
+    const QRegExp DW_RES_SETTINGS_FILTER(QLatin1String("[{},']"));
     const int kHttpReadTimeout = 1000 * 10;
 
     const int kPravisHttpPort = 10080;
@@ -41,8 +41,17 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::fetchParamsFromHttpResponse
         QString str = QString::fromLatin1(lines[i]);
         str.replace(DW_RES_SETTINGS_FILTER, QString());
         QStringList pairStrs = str.split(L':');
-        if (pairStrs.size() == 2) {
-            result << QnCameraAdvancedParamValue(pairStrs[0].trimmed(), pairStrs[1].trimmed());
+        if (pairStrs.size() == 2)
+        {
+            auto paramId = pairStrs[0].trimmed();
+            auto paramValue = pairStrs[1].trimmed();
+
+            auto param = m_params.getParameterById(paramId);
+
+            if (param.isValid())
+                paramValue = fromInnerValue(param, paramValue);
+
+            result << QnCameraAdvancedParamValue(paramId, paramValue);
         }
     }
     return result;
@@ -104,13 +113,38 @@ QString QnWin4NetCameraProxy::toInnerValue(const QnCameraAdvancedParameter &para
     return innerValue;
 }
 
-bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) 
+QString QnWin4NetCameraProxy::fromInnerValue(const QnCameraAdvancedParameter& parameter, const QString& value) const
+{
+    bool ok = true;
+    std::size_t idx = value.toUInt(&ok);
+
+    if (!ok)
+        return QString();
+
+    if (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration)
+    {
+        auto range = parameter.getRange();
+
+        if (range.size() <= idx)
+            return QString();
+
+        return range[idx];
+    }
+    else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool)
+    {
+        return value == lit("0") ? lit("false") : lit("true");
+    }
+
+    return value;
+}
+
+bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value)
 {
     QString innerValue = toInnerValue(parameter, value);
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 
-    if (parameter.tag == lit("POST")) {     
+    if (parameter.tag == lit("POST")) {
         QString paramQuery;
         QString query;
 
@@ -136,7 +170,7 @@ bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QString &request) const {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     CLHttpStatus status = httpClient.doGET(request);
-    if (status == CL_HTTP_SUCCESS) 
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         httpClient.readAll(body);
@@ -149,7 +183,7 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QS
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::getParamsList() const {
     QnCameraAdvancedParamValueList result;
     result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=color")));
-    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));  
+    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));
     return result;
 }
 
@@ -204,7 +238,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
 {
     QnCameraAdvancedParamValueList result;
     int workers = 0;
-    
+
     QnMutex waitMutex;
     QnWaitCondition waitCond;
 
@@ -225,7 +259,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             {
                 QnMutexLocker lock(&waitMutex);
                 QnCameraAdvancedParamValue param;
-                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty()) 
+                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty())
                     param.value = fromInnerValue(cameraAdvParam, parseParamFromHttpResponse(cameraAdvParam, msgBody));
                 else
                     qWarning() << "error reading param" << cameraAdvParam.id << "for camera" << m_host;

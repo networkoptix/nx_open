@@ -12,22 +12,23 @@
 #include "nx/streaming/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "../resource/av_panoramic.h"
+#include <nx/streaming/config.h>
 
 // ======================================================
 
 extern int create_sps_pps(
-                   int frameWidth,
-                   int frameHeight,
-                   int deblock_filter,
-                   unsigned char* data, int max_datalen);
+    int frameWidth,
+    int frameHeight,
+    int deblock_filter,
+    unsigned char* data, int max_datalen);
 
 extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 
 // =========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
-QnPlAVClinetPullStreamReader(res)
+AVPanoramicClientPullSSTFTPStreamreader::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
+    QnPlAVClinetPullStreamReader(res)
 {
 
     m_timeout = 500;
@@ -98,7 +99,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
         for (int y = 0; y < zones; ++y)
         {
             int index = y*zones + x;
-            QString m = md.at(index) ;
+            QString m = md.at(index);
 
 
             if (m == QLatin1String("00") || m == QLatin1String("0"))
@@ -112,7 +113,7 @@ QnMetaDataV1Ptr AVPanoramicClientPullSSTFTPStreamreader::getCameraMetadata()
     }
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
     motion->channelNumber = m_motionData;
     filterMotionByMask(motion);
     return motion;
@@ -148,7 +149,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     int quality = 15;
 
     {
-        QnMutexLocker mutex( &m_mutex );
+        QnMutexLocker mutex(&m_mutex);
 
         h264 = isH264();;
 
@@ -181,9 +182,17 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     //unsigned int forecast_size = (width*height)/2; // 0.5 meg per megapixel as maximum
 
     QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
-    if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress()) {
+    if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress())
+    {
         delete m_tftp_client;
-        m_tftp_client = new CLSimpleTFTPClient(netRes->getHostAddress(),  m_timeout, 3);
+        m_tftp_client = new CLSimpleTFTPClient(netRes->getHostAddress(), m_timeout, 3);
+
+        QUrl streamUrl;
+        streamUrl.setScheme(lit("tftp"));
+        streamUrl.setHost(netRes->getHostAddress());
+        streamUrl.setPort(CLSimpleTFTPClient::kDefaultTFTPPort);
+
+        netRes->updateSourceUrl(streamUrl.toString() + lit("/") + request, getRole());
     }
 
     m_videoFrameBuff.clear();
@@ -200,9 +209,9 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         // 3) we do not nees to put SPS and PPS in before each, but we can.
 
         unsigned char h264header[50];
-        expectable_header_size = create_sps_pps(resolutionFULL ? width : width/2, resolutionFULL ? height: height/2, 0, h264header, sizeof(h264header));
-        img.startWriting(expectable_header_size + 5 ); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
-        img.finishWriting(expectable_header_size + 5 );
+        expectable_header_size = create_sps_pps(resolutionFULL ? width : width / 2, resolutionFULL ? height : height / 2, 0, h264header, sizeof(h264header));
+        img.startWriting(expectable_header_size + 5); // 5: from cam in tftp mode we receive data starts from second byte of slice header; so we need to put start code and first byte
+        img.finishWriting(expectable_header_size + 5);
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -210,8 +219,8 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     else
     {
         // in jpeg image header size has constant len
-        img.startWriting(AVJpeg::Header::GetHeaderSize()-2);
-        img.finishWriting(AVJpeg::Header::GetHeaderSize()-2); //  for some reason first 2 bytes from cam is trash
+        img.startWriting(AVJpeg::Header::GetHeaderSize() - 2);
+        img.finishWriting(AVJpeg::Header::GetHeaderSize() - 2); //  for some reason first 2 bytes from cam is trash
 
         // please note that we did not write a single byte to img, we just move position...
         // we will write header based on last packet information
@@ -249,13 +258,13 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     int channelNum = 0;
 
-    if(m_panoramic)
+    if (m_panoramic)
     {
         const unsigned char* arr = last_packet + 0x0C;
         arr[0] & 4 ? resolutionFULL = true : false;
         size = ExtractSize(&arr[2]);
 
-        if (size.width>5000 || size.width<0 || size.height>5000 || size.height<0) // bug of arecontvision firmware
+        if (size.width > 5000 || size.width < 0 || size.height>5000 || size.height < 0) // bug of arecontvision firmware
         {
             return QnAbstractMediaDataPtr(0);
         }
@@ -279,25 +288,25 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
     }
 
     bool iFrame = true;
-    
+
     if (h264)
     {
 
-        if (last_packet[iframe_index-1]==0)
+        if (last_packet[iframe_index - 1] == 0)
             iFrame = false;
 
         // ==========================================
         //put unit delimetr at the end of the frame
 
         char  c = 0;
-        img.write(&c,1); //0
-        img.write(&c,1); //0
+        img.write(&c, 1); //0
+        img.write(&c, 1); //0
         c = 1;
-        img.write(&c,1); //1
+        img.write(&c, 1); //1
         c = 0x09;
-        img.write(&c,1); //0x09
+        img.write(&c, 1); //0x09
         c = (iFrame) ? 0x10 : 0x30;
-        img.write(&c,1); // 0x10
+        img.write(&c, 1); // 0x10
 
         // ==========================================
         char* dst = img.data();
@@ -306,10 +315,10 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
             unsigned char h264header[50];
             int header_size = create_sps_pps(size.width, size.height, 0, h264header, sizeof(h264header));
 
-            if (header_size!=expectable_header_size) // this should be very rarely
+            if (header_size != expectable_header_size) // this should be very rarely
             {
                 int diff = header_size - expectable_header_size;
-                if (diff>0)
+                if (diff > 0)
                     img.startWriting(diff);
 
                 NX_LOG("Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data", cl_logINFO);
@@ -320,7 +329,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
             dst = img.data();
             memcpy(dst, h264header, header_size);
-            dst+= header_size;
+            dst += header_size;
         }
         /*
         else
@@ -336,7 +345,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
         img.startWriting(8);
         dst = img.data() + img.size();
-        dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] =  dst[6] = dst[7] = 0;
+        dst[0] = dst[1] = dst[2] = dst[3] = dst[4] = dst[5] = dst[6] = dst[7] = 0;
 
     }
     else
@@ -346,19 +355,19 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
-    QnWritableCompressedVideoDataPtr videoData( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameBuff.size()));
     videoData->m_data.write(m_videoFrameBuff);
-    
+
 
     if (iFrame)
         videoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
-    videoData->compressionType = h264 ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    videoData->compressionType = h264 ? AV_CODEC_ID_H264 : AV_CODEC_ID_MJPEG;
     videoData->width = size.width;
     videoData->height = size.height;
     videoData->channelNumber = channelNum;
 
-    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
 
@@ -366,9 +375,9 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
 bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 {
-    QnMutexLocker mtx( &m_mutex );
+    QnMutexLocker mtx(&m_mutex);
     for (int i = 0; i < 4; ++i)
-        if (m_gotKeyFrame[i]<2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
+        if (m_gotKeyFrame[i] < 2)  // due to bug of AV panoramic H.264 cam. cam do not send frame with diff resolution of resolution changed. first I frame comes with old resolution
             return true;
 
     return false;

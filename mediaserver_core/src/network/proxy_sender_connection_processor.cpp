@@ -18,7 +18,10 @@
 #include <nx/network/http/auth_tools.h>
 
 #include "universal_tcp_listener.h"
+#include <core/resource/media_server_resource.h>
+#include <http/custom_headers.h>
 
+#include <utils/common/app_info.h>
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
 static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
@@ -101,7 +104,10 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    const auto admin = qnResPool->getAdministrator();
+    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverUuid);
+    if (!server)
+        return QByteArray();
+
     const auto time = qnSyncTime->currentUSecsSinceEpoch();
 
     nx_http::header::WWWAuthenticate authHeader;
@@ -111,21 +117,27 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
 
     nx_http::header::DigestAuthorization digestHeader;
     if (!nx_http::calcDigestResponse(
-                H_METHOD, admin->getName().toUtf8(), boost::none, admin->getDigest(),
-                url.path().toUtf8(), authHeader, &digestHeader))
+        H_METHOD,
+        server->getId().toByteArray(),
+        server->getAuthKey().toUtf8(),
+        boost::none,
+        url.path().toUtf8(),
+        authHeader,
+        &digestHeader))
+    {
         return QByteArray();
+    }
 
     return QString(QLatin1String(
        "%1 %2 HTTP/1.1\r\n" \
        "Host: %3:%4\r\n" \
-       "Authorization: %5\r\n" \
-       "NX-User-Name: %6\r\n" \
-       "X-Server-Uuid: %7\r\n" \
+       "Authorization: %5\r\n"\
+       "%6: %7\r\n" \
        "\r\n"))
             .arg(QString::fromUtf8(H_METHOD)).arg(QString::fromUtf8(H_PATH))
             .arg(url.host()).arg(url.port(nx_http::DEFAULT_HTTP_PORT))
             .arg(QString::fromUtf8(digestHeader.serialized()))
-            .arg(admin->getName()).arg(serverUuid.toString())
+            .arg(QLatin1String(Qn::SERVER_GUID_HEADER_NAME)).arg(serverUuid.toString())
             .toUtf8();
 }
 
@@ -194,6 +206,9 @@ void QnProxySenderConnection::run()
     if (!m_needStop && gotRequest)
     {
         parseRequest();
-        processRequest();
+        auto handler = d->owner->findHandler(d->protocol, d->request);
+        bool noAuth;
+        if (handler && authenticate(&d->accessRights, &noAuth))
+            processRequest(noAuth);
     }
 }

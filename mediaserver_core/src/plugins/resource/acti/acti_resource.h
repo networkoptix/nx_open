@@ -13,8 +13,8 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/multipartcontentparser.h>
 #include <utils/xml/camera_advanced_param_reader.h>
+#include <network/multicodec_rtp_reader.h>
 
 
 
@@ -28,6 +28,9 @@ class QnActiResource
     Q_OBJECT
 
 public:
+
+    typedef QMap<QString, QString> ActiSystemInfo;
+
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
     static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
@@ -42,7 +45,7 @@ public:
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
-    
+
     virtual QString getDriverName() const override;
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
@@ -52,13 +55,13 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
-    bool isInitialized() const;
-
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
     virtual bool hasDualStreaming() const override;
     virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
+
+    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 
     /*!
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
@@ -67,6 +70,10 @@ public:
     QSize getResolution(Qn::ConnectionRole role) const;
     int roundFps(int srcFps, Qn::ConnectionRole role) const;
     int roundBitrate(int srcBitrateKbps) const;
+    QString formatBitrateString(int bitrateKbps) const;
+
+    QSet<QString> getAvailableEncoders() const;
+    RtpTransport::Value getDesiredTransport() const;
 
     bool isAudioSupported() const;
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
@@ -94,8 +101,9 @@ public:
         bool keepAllData,
         QByteArray* const msgBody,
         QString* const localAddress = nullptr );
+
     static QByteArray unquoteStr(const QByteArray& value);
-    static QMap<QByteArray, QByteArray> parseSystemInfo(const QByteArray& report);
+    static ActiSystemInfo parseSystemInfo(const QByteArray& report);
 
     //!Called by http server on receiving message from camera
     void cameraMessageReceived( const QString& path, const QnRequestParamList& message );
@@ -119,9 +127,11 @@ protected:
 private:
     QSize extractResolution(const QByteArray& resolutionStr) const;
     QList<QSize> parseResolutionStr(const QByteArray& resolutions);
-    QList<int> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
-    void initializePtz();
-    void initializeIO( const QMap<QByteArray, QByteArray>& systemInfo );
+    QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
+    QString bitrateToDefaultString(int bitrateKbps) const; 
+
+    void initialize2WayAudio( const ActiSystemInfo& systemInfo );
+    void initializeIO( const ActiSystemInfo& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
     void fetchAndSetAdvancedParameters();
     QString getAdvancedParametersTemplate() const;
@@ -155,6 +165,8 @@ private:
 
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
+
+    boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
 
 private:
@@ -196,7 +208,10 @@ private:
 
     QSize m_resolution[MAX_STREAMS]; // index 0 for primary, index 1 for secondary
     QList<int> m_availFps[MAX_STREAMS];
-    QList<int> m_availBitrate;
+    QMap<int, QString> m_availableBitrates;
+    QSet<QString> m_availableEncoders;
+    RtpTransport::Value m_desiredTransport;
+
     int m_rtspPort;
     bool m_hasAudio;
     QByteArray m_platform;
@@ -210,6 +225,8 @@ private:
     boost::optional<bool> m_audioInputOn;
     QnCameraAdvancedParams m_advancedParameters;
     QnCameraAdvancedParams m_advancedParametersCache;
+
+    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 #endif // #ifdef ENABLE_ACTI

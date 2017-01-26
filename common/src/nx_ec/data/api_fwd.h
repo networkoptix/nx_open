@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 class QString;
-class QnUuid;
 
 namespace ec2 {
     struct ApiData;
@@ -55,7 +55,8 @@ namespace ec2 {
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
     struct ApiUserData;
-    struct ApiUserGroupData;
+    struct ApiUserRoleData;
+    struct ApiPredefinedRoleData;
     struct ApiAccessRightsData;
     struct ApiVideowallControlMessageData;
     struct ApiVideowallData;
@@ -74,12 +75,14 @@ namespace ec2 {
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
     struct ApiConnectionData;
-    struct ApiSystemNameData;
+    struct ApiSystemIdData;
     struct ApiTransactionData;
+    struct ApiTranLogFilter;
     struct ApiWebPageData;
     struct ApiDiscoveredServerData;
 
     struct ApiTimeData;
+    struct ApiMiscData;
     struct ApiPeerSystemTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
@@ -87,7 +90,9 @@ namespace ec2 {
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
+    struct ApiDatabaseDumpToFileData;
     struct ApiLicenseOverflowData;
+    struct ApiCleanupDatabaseData;
 
     typedef std::vector<ApiTransactionData> ApiTransactionDataList;
     typedef std::vector<ApiStoredFileData> ApiStoredFileDataList;
@@ -108,7 +113,8 @@ namespace ec2 {
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
-    typedef std::vector<ApiUserGroupData> ApiUserGroupDataList;
+    typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
+    typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
     typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
@@ -122,6 +128,17 @@ namespace ec2 {
     typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
     typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
+    typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
+
+    /**
+     * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
+     */
+    struct ParentId
+    {
+        QnUuid id;
+        ParentId() = default;
+        ParentId(const QnUuid& id): id(id) {}
+    };
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -169,7 +186,8 @@ namespace ec2 {
     (ApiStorageData)\
     (ApiStoredFileData)\
     (ApiUserData)\
-    (ApiUserGroupData)\
+    (ApiUserRoleData)\
+    (ApiPredefinedRoleData)\
     (ApiAccessRightsData)\
     (ApiVideowallControlMessageData)\
     (ApiVideowallData)\
@@ -188,12 +206,15 @@ namespace ec2 {
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
     (ApiConnectionData)\
-    (ApiSystemNameData)\
+    (ApiSystemIdData)\
     (ApiTimeData)\
+    (ApiMiscData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
+    (ApiDatabaseDumpToFileData)\
     (ApiLicenseOverflowData)\
+    (ApiCleanupDatabaseData)\
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 

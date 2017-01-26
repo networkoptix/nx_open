@@ -1,6 +1,6 @@
 project(nxtool)
 set(PROJECT_SHORTNAME "nxtool")
-set(PROJECT_LONGNAME "${nxtool.company.name} Server Tool")
+set(PROJECT_LONGNAME "${short.company.name} Server Tool")
 if(WIN32)
     set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 endif()

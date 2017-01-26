@@ -26,10 +26,11 @@ extern "C"
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
-#include "utils/color_space/image_correction.h"
-#include "core/resource/resource_consumer.h"
-#include "transcoding/filters/filter_helper.h"
+#include <utils/color_space/image_correction.h>
+#include <core/resource/resource_consumer.h>
+#include <transcoding/filters/filter_helper.h>
 
+#include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
 
 class QnAbstractMediaStreamDataProvider;
@@ -39,64 +40,9 @@ class QnFfmpegVideoTranscoder;
 class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
 {
     Q_OBJECT
-    Q_ENUMS(StreamRecorderError)
-    Q_ENUMS(Role)
 
 public:
-    // TODO: #Elric #enum
-    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
-
-    enum StreamRecorderError {
-        NoError = 0,
-        ContainerNotFoundError,
-        FileCreateError,
-        VideoStreamAllocationError,
-        AudioStreamAllocationError,
-        InvalidAudioCodecError,
-        IncompatibleCodecError,
-        FileWriteError,
-
-        LastError
-    };
-
-    struct ErrorStruct
-    {
-        int                   lastError;
-        QnStorageResourcePtr  storage;
-
-        ErrorStruct(
-            int                         lastError,
-            const QnStorageResourcePtr  &storage
-        )
-            : lastError(lastError),
-              storage(storage)
-        {}
-
-        ErrorStruct()
-            : lastError(0),
-              storage(QnStorageResourcePtr())
-        {}
-    };
-
-    struct RecordingContext
-    {
-        QString                 fileName;
-        AVFormatContext         *formatCtx;
-        QnStorageResourcePtr    storage;
-        qint64                  totalWriteTimeNs;
-
-        RecordingContext(
-            const QString               &fname,
-            const QnStorageResourcePtr  &st
-        ) :
-            fileName(fname),
-            formatCtx(nullptr),
-            storage(st),
-            totalWriteTimeNs(0)
-        {}
-    };
-
-    static QString errorString(int errCode);
+    static QString errorString(StreamRecorderError errCode);
 
     QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
@@ -148,7 +94,7 @@ public:
     */
     QByteArray getSignature() const;
 
-    void setRole(Role role);
+    void setRole(StreamRecorderRole role);
 
     void setContainer(const QString& container);
     void setNeedReopen();
@@ -157,7 +103,7 @@ public:
     /*
     * Transcode to specified audio codec is source codec is different
     */
-    void setAudioCodec(CodecID codec);
+    void setAudioCodec(AVCodecID codec);
 
 
     /*
@@ -170,7 +116,7 @@ public:
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
+    void recordingFinished(const StreamRecorderErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -194,6 +140,13 @@ protected:
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
+    virtual void initIoContext(
+        const QnStorageResourcePtr& storage,
+        const QString& url,
+        AVIOContext** context);
+    virtual qint64 getPacketTimeUsec(const QnConstAbstractMediaDataPtr& md);
+    virtual bool isUtcOffsetAllowed() const { return true; }
+
 private:
     void updateSignatureAttr(size_t i);
     qint64 findNextIFrame(qint64 baseTime);
@@ -206,16 +159,15 @@ protected:
     bool m_fixedFileName;
     qint64 m_endDateTime;
     qint64 m_startDateTime;
-    bool m_stopOnWriteError;
     int m_currentTimeZone;
-    std::vector<RecordingContext> m_recordingContextVector;
+    std::vector<StreamRecorderContext> m_recordingContextVector;
 
 private:
     bool m_waitEOF;
 
     bool m_forceDefaultCtx;
     bool m_packetWrited;
-    ErrorStruct m_lastError;
+    StreamRecorderErrorStruct m_lastError;
     qint64 m_currentChunkLen;
 
     qint64 m_startOffset;
@@ -240,8 +192,8 @@ private:
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
     QnFfmpegVideoTranscoder* m_videoTranscoder;
-    CodecID m_dstAudioCodec;
-    CodecID m_dstVideoCodec;
+    AVCodecID m_dstAudioCodec;
+    AVCodecID m_dstVideoCodec;
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;
@@ -249,14 +201,12 @@ private:
 
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
-    Role m_role;
+    StreamRecorderRole m_role;
     QnImageFilterHelper m_extraTranscodeParams;
 
     std::random_device m_rd;
     std::mt19937 m_gen;
 };
-
-Q_DECLARE_METATYPE(QnStreamRecorder::ErrorStruct)
 
 #endif // ENABLE_DATA_PROVIDERS
 

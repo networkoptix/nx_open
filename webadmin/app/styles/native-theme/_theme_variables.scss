@@ -7,6 +7,11 @@ $font-family-base:        "Roboto", "Helvetica Neue", Helvetica, Arial, sans-ser
 
 $brand-primary:         $blue10;
 $brand-info:            $blue8;
+$brand-success:         $green_main;
+$brand-warning:         $yellow_main;
+$brand-danger:          $red_main;
+
+$state-danger-text:          $red_main;
 
 $gray-darker:            $light4;
 $gray-dark:              $light8;
@@ -20,6 +25,7 @@ $text-color:              $light;
 
 $link-color:              $blue12;
 $link-hover-color:        $link;
+$label-color:             $shadow;
 
 
 /* Panels */
@@ -62,6 +68,9 @@ $input-bg:      $shadow;
 $input-border:  $shadow_d1;
 $input-bg-disabled: transparentize($shadow,0.8);
 
+/* Dropdown */
+$dropdown-bg: $mid;
+
 /* Common parameters */
 $font-size-base:          13px;
 
@@ -96,3 +105,10 @@ $font-size-h4:            ceil($font-size-base * 1.15); // ~16px
 $font-size-h5:            $font-size-base;
 $font-size-h6:            ceil($font-size-base * 0.85); // ~12px
 */
+
+
+$radio-panels-hover-border: transparent;
+$radio-panels-hover-bg: $dark8;
+
+$radio-panels-selected-bg: $dark;
+$radio-panels-selected-border: $dark9;

@@ -5,94 +5,206 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <network/tcp_listener.h>
-#include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
 
-QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path): QnFusionRestHandler()
+#include <rest/helpers/permissions_helper.h>
+#include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
+#include <core/resource_access/resource_access_manager.h>
+
+namespace {
+
+/**
+ * Check if operation modifies the database.
+ */
+bool isModifyingOperation(QnBookmarkOperation op)
+{
+    switch (op)
+    {
+        case QnBookmarkOperation::Add:
+        case QnBookmarkOperation::Update:
+        case QnBookmarkOperation::Delete:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+static int checkPermissions(
+    QnBookmarkOperation op,
+    const QnRequestParamList& params,
+    QByteArray* outBody,
+    QByteArray* outContentType,
+    const QnRestConnectionProcessor* processor)
+{
+    Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
+    if (isModifyingOperation(op))
+    {
+        if (QnPermissionsHelper::isSafeMode())
+        {
+            const QnMultiserverRequestData request(params);
+            return QnPermissionsHelper::safeModeError(
+                *outBody, *outContentType, request.format, request.extraFormatting);
+        }
+        requiredPermission = Qn::GlobalManageBookmarksPermission;
+    }
+    if (!qnResourceAccessManager->hasGlobalPermission(
+        processor->accessRights(), requiredPermission))
+    {
+        const QnMultiserverRequestData request(params);
+        return QnPermissionsHelper::permissionsError(
+            *outBody, *outContentType, request.format, request.extraFormatting);
+    }
+
+    return nx_http::StatusCode::ok;
+}
+
+static int processAddOrUpdate(
+    QnBookmarkOperation op,
+    int ownerPort,
+    const QnRequestParamList& params,
+    QByteArray* outBody,
+    QByteArray* outContentType)
+{
+    auto request =
+        QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
+    if (!request.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+            lit("Missing parameter(s)"),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::MissingParameter);
+    }
+
+    QnUpdateBookmarkRequestContext context(request, ownerPort);
+    bool ok = (op == QnBookmarkOperation::Add)
+        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
+        : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
+    if (!ok)
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+            lit("Can't %1 bookmark").arg(
+                (op == QnBookmarkOperation::Add) ? lit("add") : lit("update")),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::CantProcessRequest);
+    }
+    QnRestResult execResult;
+    QnFusionRestHandlerDetail::serialize(
+        execResult, *outBody, *outContentType, request.format, request.extraFormatting);
+    return nx_http::StatusCode::ok;
+}
+
+static int performDelete(
+    int ownerPort,
+    const QnRequestParamList& params,
+    QByteArray* outBody,
+    QByteArray* outContentType)
+{
+    auto request =
+        QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
+    if (!request.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+            lit("Missing parameter(s)"),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::MissingParameter);
+    }
+
+    QnDeleteBookmarkRequestContext context(request, ownerPort);
+    if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context))
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::internalServerError,
+            lit("Can't delete bookmark"),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::CantProcessRequest);
+    }
+    return nx_http::StatusCode::ok;
+}
+
+static int performGetTags(
+    int ownerPort,
+    const QnRequestParamList& params,
+    QByteArray* outBody,
+    QByteArray* outContentType)
+{
+    auto request =
+        QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(params);
+    if (!request.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+            lit("Missing parameter(s)"),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::MissingParameter);
+    }
+
+    QnGetBookmarkTagsRequestContext context(request, ownerPort);
+    QnCameraBookmarkTagList outputData =
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
+    QnFusionRestHandlerDetail::serialize(
+        outputData, *outBody, *outContentType, request.format, request.extraFormatting);
+    return nx_http::StatusCode::ok;
+}
+
+static int performGet(
+    int ownerPort,
+    const QnRequestParamList& params,
+    QByteArray* outBody,
+    QByteArray* outContentType)
+{
+    QnGetBookmarksRequestData request =
+        QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(params);
+    if (!request.isValid())
+    {
+        return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
+            lit("Missing parameter(s)"),
+            outBody, outContentType, request.format, request.extraFormatting,
+            QnRestResult::MissingParameter);
+    }
+
+    QnGetBookmarksRequestContext context(request, ownerPort);
+    QnCameraBookmarkList outputData =
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
+    QnFusionRestHandlerDetail::serialize(
+        outputData, *outBody, *outContentType, request.format, request.extraFormatting);
+    return nx_http::StatusCode::ok;
+}
+
+} // namespace
+
+QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path):
+    QnFusionRestHandler()
 {
     QnMultiserverBookmarksRestHandlerPrivate::urlPath = path;
 }
 
-int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
-                                                  const QnRequestParamList& params,
-                                                  QByteArray& result,
-                                                  QByteArray& contentType,
-                                                  const QnRestConnectionProcessor *processor)
+int QnMultiserverBookmarksRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* processor)
 {
     QString action = extractAction(path);
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
+    const int status = checkPermissions(op, params, &result, &contentType, processor);
+    if (status != nx_http::StatusCode::ok)
+        return status;
+
     const auto ownerPort = processor->owner()->getPort();
-    switch (op) {
-    case QnBookmarkOperation::Add:
-    case QnBookmarkOperation::Update:
-        {
-            QnRestResult execResult;
-            auto request = QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
-            if (!request.isValid()) {
-                execResult.error = QnRestResult::MissingParameter;
-                execResult.errorString = lit("missing parameter(s)");
-                QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
-                return nx_http::StatusCode::badRequest;
-            }
 
-            QnUpdateBookmarkRequestContext context(request, ownerPort);
-            bool ok = op == QnBookmarkOperation::Add
-                ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
-                : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
-            if (!ok) {
-                execResult.error = QnRestResult::CantProcessRequest;
-                execResult.errorString = lit("Can't %1 bookmark").arg(op == QnBookmarkOperation::Add ? lit("add") : lit("update"));
-            }
-            QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
-            return ok
-                ? nx_http::StatusCode::ok
-                : nx_http::StatusCode::internalServerError;
-        }
+    switch (op)
+    {
+        case QnBookmarkOperation::Add:
+        case QnBookmarkOperation::Update:
+            return processAddOrUpdate(op, ownerPort, params, &result, &contentType);
 
-    case QnBookmarkOperation::Delete:
-        {
-            QnRestResult execResult;
-            auto request = QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
-            if (!request.isValid()) {
-                execResult.error = QnRestResult::MissingParameter;
-                execResult.errorString = lit("missing parameter(s)");
-                QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
-                return nx_http::StatusCode::badRequest;
-            }
+        case QnBookmarkOperation::Delete:
+            return performDelete(ownerPort, params, &result, &contentType);
 
-            QnDeleteBookmarkRequestContext context(request, ownerPort);
-            bool ok = QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context);
-            if (!ok) {
-                execResult.error = QnRestResult::CantProcessRequest;
-                execResult.errorString = lit("Can't delete bookmark");
-            }
-            return ok
-                ? nx_http::StatusCode::ok
-                : nx_http::StatusCode::internalServerError;
-        }
-    case QnBookmarkOperation::GetTags:
-        {
-            auto request = QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(params);
-            if (!request.isValid())
-                return nx_http::StatusCode::badRequest;
+        case QnBookmarkOperation::GetTags:
+            return performGetTags(ownerPort, params, &result, &contentType);
 
-            QnGetBookmarkTagsRequestContext context(request, ownerPort);
-            QnCameraBookmarkTagList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
-            QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format, request.extraFormatting);
-            return nx_http::StatusCode::ok;
-        }
-    default:
-        {
-            QnGetBookmarksRequestData request = QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(params);
-            if (!request.isValid())
-                return nx_http::StatusCode::badRequest;
-
-            QnGetBookmarksRequestContext context(request, ownerPort);
-            QnCameraBookmarkList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
-            QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format, request.extraFormatting);
-            return nx_http::StatusCode::ok;
-        }
+        default:
+            return performGet(ownerPort, params, &result, &contentType);
     }
-
-
 }

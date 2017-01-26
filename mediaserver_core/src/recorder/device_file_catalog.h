@@ -10,6 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <deque>
+#include <unordered_map>
 #include <set>
 #include <QtCore/QFileInfo>
 
@@ -133,6 +134,7 @@ public:
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
     qint64 lastChunkStartTime() const;
+    qint64 lastChunkStartTime(int storageIndex) const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
     Chunk deleteFirstRecord(); 
@@ -171,12 +173,6 @@ public:
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
     QString cameraUniqueId() const;
 
-    void setLastSyncTime(int64_t);
-    int64_t getLastSyncTime() const;
-
-    // This should be called without m_mutex locked
-    int64_t getLastSyncTimeFromDBNoLock() const;
-
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
@@ -214,9 +210,10 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
+    std::unordered_map<int, qint64> calcSpaceByStorage() const;
 
     // only for unit tests, don't use in production.
-    std::deque<Chunk> &getChunks() { return m_chunks; }
+    std::deque<Chunk> &getChunksUnsafe() { return m_chunks; }
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);

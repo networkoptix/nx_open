@@ -28,32 +28,40 @@ namespace
 
 QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler( const QString& path )
 {
-    urlPath = path;
+    // todo: remove this variable
+    if (!path.isEmpty())
+        urlPath = path;
 }
 
 int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor )
 {
     Q_UNUSED(path);
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
 
+    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
+    const auto ownerPort = processor->owner()->getPort();
+    return getScreenshot(request, result, contentType, ownerPort);
+}
+
+int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort)
+{
     if (request.camera && !request.camera->hasVideo(nullptr))
     {
-        return genericError(
+        return makeError(
             nx_http::StatusCode::badRequest
             , lit("Camera has no video")
-            , result
-            , contentType
+            , &result
+            , &contentType
             , request.format
             , request.extraFormatting);
     }
 
     if (!request.isValid())
     {
-        return genericError(
+        return makeError(
             nx_http::StatusCode::badRequest
             , lit("Invalid request") //TODO: #GDM think about more detailed error
-            , result
-            , contentType
+            , &result
+            , &contentType
             , request.format
             , request.extraFormatting);
     }
@@ -62,7 +70,6 @@ int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const Qn
     if (!server || server->getId() == qnCommon->moduleGUID() || server->getStatus() != Qn::Online)
         return getThumbnailLocal(request, result, contentType);
 
-    const auto ownerPort = processor->owner()->getPort();
     return getThumbnailRemote(server, request, result, contentType, ownerPort);
 }
 
@@ -90,11 +97,11 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
     CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(request.camera, timeUSec, request.size, request.roundMethod, request.rotation);
     if (!outFrame)
     {
-        return genericError(
-              nx_http::StatusCode::noContent
+        return makeError(
+            nx_http::StatusCode::noContent
             , lit("No image found for the given request")
-            , result
-            , contentType
+            , &result
+            , &contentType
             , request.format
             , request.extraFormatting);
     }
@@ -121,11 +128,11 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
 
     if (result.isEmpty())
     {
-        return genericError(
-              nx_http::StatusCode::badRequest
+        return makeError(
+            nx_http::StatusCode::badRequest
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
-            , result
-            , contentType
+            , &result
+            , &contentType
             , request.format
             , request.extraFormatting);
     }
@@ -167,11 +174,11 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote( const QnMediaServerRe
     QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();
     if (result.isEmpty())
     {
-        return genericError(
+        return makeError(
             nx_http::StatusCode::badRequest
             , lit("Unsupported image format '%1'").arg(QString::fromUtf8(imageFormat))
-            , result
-            , contentType
+            , &result
+            , &contentType
             , request.format
             , request.extraFormatting);
     }

@@ -3,35 +3,38 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <list>
+
 #include <QHash>
 #include <QtCore/QString>
 #include <QtCore/QSet>
 #include <QtCore/QPair>
+#include <nx/utils/singleton.h>
 
 //first - login, second - password
-typedef QSet<QPair<const char*, const char*> > PasswordList;
+typedef std::list<std::pair<const char*, const char*> > PasswordList;
 
 struct SOAP_ENV__Fault;
 
-class PasswordHelper
+class PasswordHelper:
+    public QObject,
+    public Singleton<PasswordHelper>
 {
+    Q_OBJECT
+
     //QHash<Manufacturer, Passwords>
     typedef QHash<QString, PasswordList> ManufacturerPasswords;
 
     ManufacturerPasswords manufacturerPasswords;
 
-    PasswordHelper(const PasswordHelper&) {}
+public:
     PasswordHelper();
     ~PasswordHelper() {};
-
-public:
-
-    static PasswordHelper& instance();
 
     static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
     static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
 
-    const PasswordList& getPasswordsByManufacturer(const QString& mdnsPacketData) const;
+    const PasswordList getPasswordsByManufacturer(const QString& mdnsPacketData) const;
 
 private:
 

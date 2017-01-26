@@ -7,6 +7,7 @@
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
+#include <core/resource_access/user_access_data.h>
 
 class QnRestProcessorPool
 :
@@ -18,7 +19,7 @@ public:
     /*!
         Takes ownership of \a handler
     */
-    void registerHandler( const QString& path, QnRestRequestHandler* handler, RestPermissions permissions = RestPermissions::anyUser);
+    void registerHandler( const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions = Qn::NoGlobalPermissions);
     QnRestRequestHandlerPtr findHandler( QString path ) const;
     const Handlers& handlers() const;
 
@@ -34,9 +35,10 @@ class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
 public:
     QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
+    void setAuthNotRequired(bool noAuth);
 
-    QnUuid authUserId() const;
-    void setAuthUserId(const QnUuid& authUserId);
+    Qn::UserAccessData accessRights() const;
+    void setAccessRights(const Qn::UserAccessData& accessRights);
 
     //!Rest handler can use following methods to access http request/response directly
     const nx_http::Request& request() const;
@@ -46,6 +48,7 @@ protected:
     virtual void run() override;
 
 private:
+    bool m_noAuth;
     Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 

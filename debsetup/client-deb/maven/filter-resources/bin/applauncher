@@ -1,8 +1,20 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-export LD_LIBRARY_PATH=$DIR/../lib
 export vblank_mode=0
+export QT_QPA_PLATFORM=xcb
 
-$DIR/applauncher-bin $@
+USER_APPLAUNCHER_DIR="$HOME/.local/share/${company.name}/applauncher/${customization}"
+
+if [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ]
+then
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/bin"
+else
+    APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
+    then
+        echo "Error: applauncher-bin is not found."
+        exit 1
+    fi
+fi
+
+"$APPLAUNCHER_DIR/applauncher-bin" $@

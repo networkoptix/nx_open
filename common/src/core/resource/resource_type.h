@@ -66,13 +66,18 @@ class QN_EXPORT QnResourceTypePool
 public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
-    static const QString kDesktopCameraTypeName;
     static const QString kLayoutTypeId;
     static const QString kServerTypeId;
     static const QString kVideoWallTypeId;
     static const QString kWebPageTypeId;
     static const QString kStorageTypeId;
     static const QString kUserTypeId;
+
+    static const QnUuid kUserTypeUuid;
+    static const QnUuid kServerTypeUuid;
+    static const QnUuid kStorageTypeUuid;
+    static const QnUuid kLayoutTypeUuid;
+    static const QnUuid kDesktopCameraTypeUuid;
 
     static QnResourceTypePool *instance();
 
@@ -85,7 +90,7 @@ public:
     QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
 
     /* exact match name for fixed resourceTypes (Layout, Server, etc) */
-    QnUuid getFixedResourceTypeId(const QString& name) const;
+    static QnUuid getFixedResourceTypeId(const QString& name);
 
     /* match name using like operation */
     QnUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
@@ -94,7 +99,6 @@ public:
 
     bool isEmpty() const;
 
-    QnResourceTypePtr desktopCameraResourceType() const;
 private:
     mutable QnMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;

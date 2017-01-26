@@ -7,17 +7,14 @@ angular.module('webadminApp', [
     //'ngTouch',
     'ui.bootstrap',
     'tc.chartjs',
-    'ui.select',
-    'ngStorage'
-]).config(function($sceDelegateProvider) {
-    $sceDelegateProvider.resourceUrlWhitelist([
-        'self',
-        Config.cloud.portalWhiteList]);
-}).config(function ($routeProvider) {
+    'ngStorage',
+    'typeahead-focus',
+    'ui.timepicker'
+]).config(function ($routeProvider) {
 
     var universalResolves = {
         currentUser: ['mediaserver',function(mediaserver){
-            return mediaserver.getCurrentUser();
+            return mediaserver.resolveNewSystemAndUser();
         }]
     };
 
@@ -34,9 +31,20 @@ angular.module('webadminApp', [
     });
 
     customRouteProvider
-        .when('/settings', {
+        .when('/settings/system', {
             templateUrl: 'views/settings.html',
             controller: 'SettingsCtrl'
+        })
+        .when('/settings/server', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
+        .when('/settings/device', {
+            templateUrl: 'views/settings.html',
+            controller: 'SettingsCtrl'
+        })
+        .when('/settings', {
+            redirectTo: '/settings/server'
         })
         .when('/join', {
             templateUrl: 'views/join.html',
@@ -69,15 +77,17 @@ angular.module('webadminApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
-        .when('/webclient', {
-            templateUrl: 'views/webclient.html',
-            controller: 'WebclientCtrl',
+        .when('/client', {
+            templateUrl: 'views/client.html',
+            controller: 'ClientCtrl',
             reloadOnSearch: false
-        }).when('/view/', {
+        })
+        .when('/view', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
-        }).when('/view/:cameraId', {
+        })
+        .when('/view/:cameraId', {
             templateUrl: 'views/view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
@@ -90,19 +100,20 @@ angular.module('webadminApp', [
             templateUrl: 'views/sdkeula.html',
             controller: 'SdkeulaCtrl'
         })
-        .when('/log', {
-            templateUrl: 'views/log.html',
-            controller: 'LogCtrl'
-        })
         .when('/setup', {
             templateUrl: 'views/dialogs/setup.html',
             controller: 'SetupCtrl'
         })
+        .when('/', {
+            template: '',
+            controller: 'MainCtrl'
+        })
         .otherwise({
-            redirectTo: '/view'
+            redirectTo: '/'
         });
-}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
     var original = $location.path;
+    $rootScope.storage = $localStorage;
     $location.path = function (path, reload) {
         if (reload === false) {
             var lastRoute = $route.current;

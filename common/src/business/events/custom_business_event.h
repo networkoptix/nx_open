@@ -3,7 +3,7 @@
 
 #include <business/events/prolonged_business_event.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnCustomBusinessEvent: public QnAbstractBusinessEvent 
 {

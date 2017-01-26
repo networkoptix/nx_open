@@ -1,228 +1,302 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef BASE_SERVER_CONNECTION_H
-#define BASE_SERVER_CONNECTION_H
+#pragma once
 
 #include <forward_list>
 #include <functional>
 #include <memory>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/pollable.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <utils/common/stoppable.h>
 
 #include "stream_socket_server.h"
 
+namespace nx_api {
 
-namespace nx_api
+static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
+
+/**
+ * Contains common logic for server-side connection created by StreamSocketServer.
+ * CustomConnectionType MUST implement following methods:
+ * @code {*.cpp}
+ *     //Received data from remote host. Empty buffer signals end-of-file.
+ *     void bytesReceived( const nx::Buffer& buf );
+ *     //Submitted data has been sent, m_writeBuffer has some free space.
+ *     void readyToSendData();
+ * @endcode
+ *
+ * CustomConnectionManagerType MUST implement following types:
+ * @code {*.cpp}
+ *     //Type of connections, handled by server. BaseServerConnection<CustomConnectionType, CustomConnectionManagerType>
+ *     //MUST be convertible to ConnectionType with static_cast
+ *     typedef ... ConnectionType;
+ * @endcode
+ * and method(s):
+ * @code {*.cpp}
+ *     //This connection is passed here just after socket has been terminated.
+ *     closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionType* )
+ * @endcode
+ *
+ * @note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to.
+ *     In other case, it is caller's responsibility to syunchronize access to the connection object.
+ * @note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
+ * @note This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
+ * @note It is allowed to free instance within event handler
+ */
+template<
+    class CustomConnectionType
+> class BaseServerConnection:
+    public nx::network::aio::BasicPollable
 {
-    static const size_t READ_BUFFER_CAPACITY = 16*1024;
+    typedef nx::network::aio::BasicPollable BaseType;
 
-    //!Contains common logic for server-side connection created by \a StreamSocketServer
-    /*!
-        \a CustomConnectionType MUST implement following methods:
-        \code {*.cpp}
-            //!Received data from remote host
-            void bytesReceived( const nx::Buffer& buf );
-            //!Submitted data has been sent, \a m_writeBuffer has some free space
-            void readyToSendData();
-        \endcode
+public:
+    typedef BaseServerConnection<CustomConnectionType> SelfType;
 
-        \a CustomConnectionManagerType MUST implement following types:
-        \code {*.cpp}
-            //!Type of connections, handled by server. BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> MUST be convertible to ConnectionType with static_cast
-            typedef ... ConnectionType;
-        \endcode
-        and method(s):
-        \code {*.cpp}
-            //!This connection is passed here just after socket has been terminated
-            closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionType* )
-        \endcode
-
-        \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
-            In other case, it is caller's responsibility to syunchronize access to the connection object.
-        \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
-        \note This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
-        \note It is allowed to free instance within event handler
-    */
-    template<
-        class CustomConnectionType
-    > class BaseServerConnection
-    :
-        public QnStoppableAsync
-    {
-    public:
-        typedef BaseServerConnection<CustomConnectionType> SelfType;
-
-        /*!
-            \param connectionManager When connection is finished, \a connectionManager->closeConnection(closeReason, this) is called
-        */
-        BaseServerConnection(
-            StreamConnectionHolder<CustomConnectionType>* connectionManager,
-            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+    /**
+     * @param connectionManager When connection is finished,
+     * connectionManager->closeConnection(closeReason, this) is called.
+     */
+    BaseServerConnection(
+        StreamConnectionHolder<CustomConnectionType>* connectionManager,
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
-            m_connectionManager(connectionManager),
-            m_streamSocket(std::move(streamSocket)),
-            m_bytesToSend(0)
-        {
-            m_readBuffer.reserve( READ_BUFFER_CAPACITY );
-        }
+        m_connectionManager(connectionManager),
+        m_streamSocket(std::move(streamSocket)),
+        m_bytesToSend(0),
+        m_isSendingData(false)
+    {
+        bindToAioThread(m_streamSocket->getAioThread());
 
-        ~BaseServerConnection()
-        {
-            stopWhileInAioThread();
-        }
+        m_readBuffer.reserve(READ_BUFFER_CAPACITY);
+    }
 
-        virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
-        {
-            m_streamSocket->pleaseStop(
-                [this, handler = std::move(handler)]
-                {
-                    stopWhileInAioThread();
-                    handler();
-                });
-        }
+    ~BaseServerConnection()
+    {
+        stopWhileInAioThread();
+    }
 
-        //!Start receiving data from connection
-        /*!
-            \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
-        */
-        void startReadingConnection()
-        {
-            using namespace std::placeholders;
-            m_streamSocket->readSomeAsync(
-                &m_readBuffer,
-                std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
-        }
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
+    {
+        BaseType::bindToAioThread(aioThread);
 
-        /*!
-            \return \a true, if started async send operation
-        */
-        void sendBufAsync( const nx::Buffer& buf )
-        {
-            using namespace std::placeholders;
-            m_streamSocket->sendAsync(
-                buf,
-                std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
-            m_bytesToSend = buf.size();
-        }
+        m_streamSocket->bindToAioThread(aioThread);
+    }
 
-        void closeConnection(SystemError::ErrorCode closeReasonCode)
-        {
-            m_connectionManager->closeConnection(
-                closeReasonCode,
-                static_cast<CustomConnectionType*>(this) );
-        }
+    /**
+     * Start receiving data from connection
+     * @return false, if could not start asynchronous operation
+     * (this can happen due to lack of resources on host machine).
+     */
+    void startReadingConnection(
+        boost::optional<std::chrono::milliseconds> inactivityTimeout = boost::none)
+    {
+        using namespace std::placeholders;
 
-        //!Register handler to be executed when connection just about to be destroyed
-        /*!
-            \note It is unspecified which thread \a handler will be invoked in (usually, it is aio thread corresponding to the socket)
-        */
-        void registerCloseHandler( std::function<void()>&& handler )
-        {
-            m_connectionCloseHandlers.push_front( std::move(handler) );
-        }
-
-        const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
-        {
-            return m_streamSocket;
-        }
-
-        /** Moves socket to the caller.
-            \a BaseServerConnection instance MUST be deleted just after this call
-        */
-        std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
-        {
-            return std::move(m_streamSocket);
-        }
-
-    protected:
-        SocketAddress getForeignAddress() const
-        {
-            return m_streamSocket->getForeignAddress();
-        }
-
-        StreamConnectionHolder<CustomConnectionType>* connectionManager()
-        {
-            return m_connectionManager;
-        }
-
-    private:
-        StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
-        std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
-        nx::Buffer m_readBuffer;
-        size_t m_bytesToSend;
-        std::forward_list<std::function<void()>> m_connectionCloseHandlers;
-        nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
-
-        void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
-        {
-            using namespace std::placeholders;
-
-            if( errorCode != SystemError::noError )
-                return handleSocketError( errorCode );
-            if( bytesRead == 0 )    //connection closed by remote peer
-                return m_connectionManager->closeConnection(
-                    SystemError::connectionReset,
-                    static_cast<CustomConnectionType*>(this) );
-
-            NX_ASSERT( (size_t)m_readBuffer.size() == bytesRead );
-
+        m_streamSocket->dispatch(
+            [this, inactivityTimeout]()
             {
-                nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-                static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer );
-                if (watcher.objectDestroyed())
-                    return; //connection has been removed by handler
-            }
+                setInactivityTimeout(inactivityTimeout);
+                if (!m_streamSocket->setNonBlockingMode(true))
+                    return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
 
-            m_readBuffer.resize( 0 );
-            m_streamSocket->readSomeAsync(
-                &m_readBuffer,
-                std::bind(&SelfType::onBytesRead, this, _1, _2));
-        }
+                m_streamSocket->readSomeAsync(
+                    &m_readBuffer,
+                    std::bind(&SelfType::onBytesRead, this, _1, _2));
+            });
+    }
 
-        void onBytesSent( SystemError::ErrorCode errorCode, size_t count )
-        {
-            if( errorCode != SystemError::noError )
-                return handleSocketError( errorCode );
+    /**
+     * @return true, if started async send operation.
+     */
+    void sendBufAsync(const nx::Buffer& buf)
+    {
+        using namespace std::placeholders;
 
-            static_cast<void>(count);
-            NX_ASSERT(count == m_bytesToSend);
-
-            static_cast<CustomConnectionType*>(this)->readyToSendData();
-        }
-
-        void handleSocketError( SystemError::ErrorCode errorCode )
-        {
-            switch( errorCode )
+        m_streamSocket->dispatch(
+            [this, &buf]()
             {
-                case SystemError::noError:
-                    NX_ASSERT( false );
-                    break;
+                m_isSendingData = true;
+                if (m_inactivityTimeout)
+                    removeInactivityTimer();
 
-                case SystemError::connectionReset:
-                case SystemError::notConnected:
-                    return m_connectionManager->closeConnection(
-                        errorCode,
-						static_cast<CustomConnectionType*>(this) );
+                m_streamSocket->sendAsync(
+                    buf,
+                    std::bind(&SelfType::onBytesSent, this, _1, _2));
+                m_bytesToSend = buf.size();
 
-                default:
-                    return m_connectionManager->closeConnection(
-                        errorCode,
-						static_cast<CustomConnectionType*>(this) );
-            }
-        }
+            });
+    }
 
-        void stopWhileInAioThread()
+    void closeConnection(SystemError::ErrorCode closeReasonCode)
+    {
+        m_connectionManager->closeConnection(
+            closeReasonCode,
+            static_cast<CustomConnectionType*>(this));
+    }
+
+    /**
+     * Register handler to be executed when connection just about to be destroyed.
+     * @note It is unspecified which thread handler will be invoked in
+     * (usually, it is aio thread corresponding to the socket).
+     */
+    void registerCloseHandler(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        m_connectionClosedHandlers.push_front(std::move(handler));
+    }
+
+    bool isSsl() const
+    {
+        if (auto s = dynamic_cast<AbstractEncryptedStreamSocket*>(m_streamSocket.get()))
+            return s->isEncryptionEnabled();
+
+        return false;
+    }
+
+    const std::unique_ptr<AbstractStreamSocket>& socket() const
+    {
+        return m_streamSocket;
+    }
+
+    /**
+     * Moves socket to the caller.
+     * BaseServerConnection instance MUST be deleted just after this call.
+     */
+    std::unique_ptr<AbstractStreamSocket> takeSocket()
+    {
+        auto socket = std::move(m_streamSocket);
+        socket->cancelIOSync(nx::network::aio::etNone);
+        m_streamSocket = nullptr;
+        return socket;
+    }
+
+    /**
+     * @note Can be called inly from connection's AIO thread.
+     */
+    void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
+    {
+        NX_CRITICAL(m_streamSocket->pollable()->isInSelfAioThread());
+        m_inactivityTimeout = value;
+
+        if (value)
+            resetInactivityTimer();
+        else
+            removeInactivityTimer();
+    }
+
+protected:
+    SocketAddress getForeignAddress() const
+    {
+        return m_streamSocket->getForeignAddress();
+    }
+
+    StreamConnectionHolder<CustomConnectionType>* connectionManager()
+    {
+        return m_connectionManager;
+    }
+
+private:
+    StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
+    std::unique_ptr<AbstractStreamSocket> m_streamSocket;
+    nx::Buffer m_readBuffer;
+    size_t m_bytesToSend;
+    std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;
+    nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
+
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    bool m_isSendingData;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_streamSocket.reset();
+        triggerConnectionClosedEvent();
+    }
+
+    void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
+    {
+        using namespace std::placeholders;
+
+        resetInactivityTimer();
+        if (errorCode != SystemError::noError)
+            return handleSocketError(errorCode);
+
+        NX_ASSERT((size_t)m_readBuffer.size() == bytesRead);
+
         {
-            for (auto& connectionCloseHandler : m_connectionCloseHandlers)
-                connectionCloseHandler();
-            m_connectionCloseHandlers.clear();
+            nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+            static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
+            if (watcher.objectDestroyed())
+                return; //< Connection has been removed by handler.
         }
-    };
-}
 
-#endif  //BASE_SERVER_CONNECTION_H
+        if (bytesRead == 0)    //< Connection closed by remote peer.
+            return handleSocketError(SystemError::connectionReset);
+
+        m_readBuffer.resize(0);
+        m_streamSocket->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&SelfType::onBytesRead, this, _1, _2));
+    }
+
+    void onBytesSent(SystemError::ErrorCode errorCode, size_t count)
+    {
+        m_isSendingData = false;
+        resetInactivityTimer();
+
+        if (errorCode != SystemError::noError)
+            return handleSocketError(errorCode);
+
+        static_cast<void>(count);
+        NX_ASSERT(count == m_bytesToSend);
+
+        static_cast<CustomConnectionType*>(this)->readyToSendData();
+    }
+
+    void handleSocketError(SystemError::ErrorCode errorCode)
+    {
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        switch (errorCode)
+        {
+            case SystemError::noError:
+                NX_ASSERT(false);
+                break;
+
+            default:
+                m_connectionManager->closeConnection(
+                    errorCode,
+                    static_cast<CustomConnectionType*>(this));
+                break;
+        }
+
+        if (!watcher.objectDestroyed())
+            triggerConnectionClosedEvent();
+    }
+
+    void triggerConnectionClosedEvent()
+    {
+        decltype(m_connectionClosedHandlers) connectionClosedHandlers;
+        connectionClosedHandlers.swap(m_connectionClosedHandlers);
+        for (auto& connectionCloseHandler: connectionClosedHandlers)
+            connectionCloseHandler();
+    }
+
+    void resetInactivityTimer()
+    {
+        if (!m_inactivityTimeout || m_isSendingData)
+            return;
+
+        m_streamSocket->registerTimer(
+            *m_inactivityTimeout,
+            [this]() { handleSocketError(SystemError::timedOut); });
+    }
+
+    void removeInactivityTimer()
+    {
+        m_streamSocket->cancelIOSync(nx::network::aio::etTimedOut);
+    }
+};
+
+} // namespace nx_api

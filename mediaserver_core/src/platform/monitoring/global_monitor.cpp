@@ -4,8 +4,16 @@
 #ifdef __linux__
 #include <malloc.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/resource.h>
 #endif
 
+#include <iostream>
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
@@ -16,6 +24,8 @@
 #include <utils/common/delete_later.h>
 #include <nx/utils/log/log.h>
 
+// Uncomment to enable malloc statistics debug output
+//#define MALLOC_STATISTICS
 
 // -------------------------------------------------------------------------- //
 // QnStubMonitor
@@ -147,7 +157,7 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     d->restartTimersLocked();
 }
 
-static const int STATISTICS_LOGGING_PERIOD_MS = 100 * 60 * 1000;
+static const int STATISTICS_LOGGING_PERIOD_MS = 30 * 60 * 1000;
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);
@@ -178,10 +188,77 @@ qreal QnGlobalMonitor::totalRamUsage() {
     {
         NX_LOG(lit("MONITORING. Memory usage %1%").arg(d->totalRamUsage * 100, 0, 'f', 2), cl_logWARNING);
         d->prevMemUsageLoggingClock = d->upTimeTimer.elapsed();
+
+#ifdef __linux__
+        std::cerr << std::endl << "-----------------------------> malloc_stats info start " << std::endl;
+        malloc_stats();
+        std::cerr << "-----------------------------> malloc_stats info end" << std::endl << std::endl;
+#endif
     }
 
     return d->totalRamUsage;
 }
+
+#if defined (Q_OS_LINUX)
+void logOpenedHandleCount()
+{
+	int fdCount = 0;
+	char buf[64];
+	struct dirent *dp;
+
+	snprintf(buf, 64, "/proc/%i/fd/", getpid());
+
+	DIR *dir = opendir(buf);
+	while ((dp = readdir(dir)) != NULL)
+		fdCount++;
+	closedir(dir);
+	NX_LOG(lit("    Opened: %1").arg(fdCount), cl_logWARNING);
+}
+#elif defined (Q_OS_WIN)
+void logOpenedHandleCount()
+{
+	DWORD typeChar = 0;
+	DWORD typeDisk = 0;
+	DWORD typePipe = 0;
+	DWORD typeRemote = 0;
+	DWORD typeUnknown = 0;
+	DWORD handlesCount = 0;
+
+	GetProcessHandleCount(GetCurrentProcess(), &handlesCount);
+	handlesCount *= 4;
+	for (DWORD handle = 0x4; handle < handlesCount; handle += 4)
+	{
+		switch (GetFileType((HANDLE)handle))
+		{
+			case FILE_TYPE_CHAR:
+				typeChar++;
+				break;
+			case FILE_TYPE_DISK:
+				typeDisk++;
+				break;
+			case FILE_TYPE_PIPE:
+				typePipe++;
+				break;
+			case FILE_TYPE_REMOTE:
+				typeRemote++;
+				break;
+			case FILE_TYPE_UNKNOWN:
+				if (GetLastError() == NO_ERROR) typeUnknown++;
+				break;
+		}
+	}
+
+	NX_LOG(lit("    Disk files: %1").arg(typeDisk), cl_logWARNING);
+	NX_LOG(lit("    Sockets, pipes: %1").arg(typePipe), cl_logWARNING);
+	NX_LOG(lit("    Character devices: %1").arg(typeChar), cl_logWARNING);
+	NX_LOG(lit("    Unknown: %1").arg(typeUnknown), cl_logWARNING);
+}
+#else
+void logOpenedHandleCount()
+{
+	NX_LOG(lit("    Not implemented for this platform"), cl_logWARNING);
+}
+#endif
 
 QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     Q_D(QnGlobalMonitor);
@@ -196,17 +273,19 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
         NX_LOG(lit("MONITORING. HDD usage:"), cl_logWARNING);
         for( const HddLoad& hddLoad : d->totalHddLoad )
             NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
+        NX_LOG(lit("MONITORING. File handles:"), cl_logWARNING);
+		logOpenedHandleCount();
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
 
-#ifdef __linux__
-        const size_t memStatBufSize = 64*1024;
-        std::vector<char> memStatBuf;
-        memStatBuf.resize(memStatBufSize);
-        FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
-        malloc_info(0, memStatStr);
-        fclose(memStatStr);
-        NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
-#endif
+        #if defined(__linux__) && defined(MALLOC_STATISTICS)
+            const size_t memStatBufSize = 64*1024;
+            std::vector<char> memStatBuf;
+            memStatBuf.resize(memStatBufSize);
+            FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
+            malloc_info(0, memStatStr);
+            fclose(memStatStr);
+            NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+        #endif
     }
 
     return d->totalHddLoad;

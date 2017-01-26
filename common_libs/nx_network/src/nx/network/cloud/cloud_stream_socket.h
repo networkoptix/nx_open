@@ -1,20 +1,17 @@
-/**********************************************************
-* Jan 27, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
+
+#include <queue>
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/future.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
+#include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_global.h"
 #include "nx/network/socket_attributes_cache.h"
-
 
 namespace nx {
 namespace network {
@@ -26,13 +23,17 @@ namespace cloud {
     If connection to peer requires using udp hole punching than this socket uses UDT.
     \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
 */
-class NX_NETWORK_API CloudStreamSocket
-:
+class NX_NETWORK_API CloudStreamSocket:
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
+    using BaseType = AbstractStreamSocketAttributesCache<AbstractStreamSocket>;
+
 public:
-    CloudStreamSocket();
+    explicit CloudStreamSocket(int ipVersion = AF_INET);
     virtual ~CloudStreamSocket();
+
+    virtual aio::AbstractAioThread* getAioThread() const override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::*
     virtual bool bind(const SocketAddress& localAddress) override;
@@ -78,38 +79,45 @@ public:
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
-    virtual aio::AbstractAioThread* getAioThread() override;
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
+
+    bool isInSelfAioThread() const;
 
 private:
-    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>* SocketResultPrimisePtr;
+    typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*
+        SocketResultPrimisePtr;
 
-    int recvImpl(nx::Buffer* const buf);
+    void connectToEntriesAsync(
+        std::deque<AddressEntry> dnsEntries, int port,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
 
-    void onAddressResolved(
-        std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
-        int remotePort,
-        SystemError::ErrorCode osErrorCode,
-        std::vector<AddressEntry> dnsEntries);
-    bool startAsyncConnect(
-        //const SocketAddress& originalAddress,
-        std::vector<AddressEntry> dnsEntries,
-        int port);
+    void connectToEntryAsync(
+        const AddressEntry& dnsEntry, int port,
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler);
+
+    SystemError::ErrorCode applyRealNonBlockingMode(AbstractStreamSocket* streamSocket);
+    void onDirectConnectDone(SystemError::ErrorCode errorCode);
     void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
+    void cancelIoWhileInAioThread(aio::EventType eventType);
+    void stopWhileInAioThread();
+
     nx::utils::AtomicUniquePtr<AbstractStreamSocket> m_socketDelegate;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
-    /** Used to tie this to aio thread.
-    //TODO #ak replace with aio thread timer */
-    std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
-    std::atomic<SocketResultPrimisePtr> m_recvPromisePtr;
-    std::atomic<SocketResultPrimisePtr> m_sendPromisePtr;
+    // TODO: #ak replace with aio::BasicPollable inheritance.
+    aio::BasicPollable m_aioThreadBinder;
+    aio::Timer m_timer;
+    aio::BasicPollable m_readIoBinder;
+    aio::BasicPollable m_writeIoBinder;
+    std::atomic<SocketResultPrimisePtr> m_connectPromisePtr;
 
     QnMutex m_mutex;
     bool m_terminated;
+    const int m_ipVersion;
 };
 
 } // namespace cloud

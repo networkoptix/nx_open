@@ -4,13 +4,14 @@
 #include "api/global_settings.h"
 #include <nx/utils/log/assert.h>
 
-static QnAuditManager* m_globalInstance = 0;
-
 namespace
 {
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
     static const qint64 SESSION_KEEP_PERIOD_SECS      = 3600ll * 24;
     static const qint64 SESSION_CLEANUP_INTERVAL_MS = 1000;
+
+    static const int kRecentlyRecordsCacheSize = 100;
+    static const int kRecentlyRecordsTimeGapSec = 5;
 }
 
 QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
@@ -42,25 +43,16 @@ QnAuditRecord QnAuditManager::ChangedSettingInfo::toAuditRecord() const
     return QnAuditManager::prepareRecord(session, eventType);
 }
 
-QnAuditManager* QnAuditManager::instance()
-{
-    return m_globalInstance;
-}
-
 QnAuditManager::QnAuditManager()
 {
     m_sessionCleanupTimer.restart();
-    m_enabled = qnGlobalSettings->isInitialized() ?
-        qnGlobalSettings->isAuditTrailEnabled()
-        : false;
+    m_enabled = qnGlobalSettings->isAuditTrailEnabled();
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::auditTrailEnableChanged, this,
         [this]() {
             setEnabled(QnGlobalSettings::instance()->isAuditTrailEnabled());
         }
     );
 
-    NX_ASSERT( m_globalInstance == nullptr );
-    m_globalInstance = this;
     connect(&m_timer, &QTimer::timeout, this, &QnAuditManager::at_timer);
     m_timer.start(1000 * 5);
 }
@@ -108,7 +100,7 @@ int QnAuditManager::registerNewConnection(const QnAuthSession& authInfo, bool ex
         updateAuditRecord(connection.internalId, connection.record); // make database record opened again
     }
 
-    int endTime = explicitCall ? INT_MAX : qnSyncTime->currentMSecsSinceEpoch() / 1000; // do not auto delete if explicit login (logout is expected);
+    int endTime = explicitCall ? INT_MAX : qnSyncTime->currentMSecsSinceEpoch() / 1000; // do not auto delete if explicit log in (log out is expected);
     connection.record.rangeEndSec = qMax(endTime, connection.record.rangeEndSec);
     return connection.internalId;
 }
@@ -296,9 +288,25 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
         }
     } while (recordProcessed);
     for (const auto& record: recordsToAdd) {
-        registerNewConnection(record.authSession, record.eventType == Qn::AR_Login); // add new session if not exists
+        registerNewConnection(record.authSession, record.eventType == Qn::AR_Login); //< add new session if not exists
         addAuditRecordInternal(record);
     }
+}
+
+bool QnAuditManager::hasSimilarRecentlyRecord(const QnAuditRecord& data) const
+{
+    for (const auto& record: m_recentlyAddedRecords)
+    {
+        if (record.eventType == data.eventType &&
+            record.resources == data.resources &&
+            record.params == data.params &&
+            record.authSession == data.authSession)
+        {
+            if (qAbs(record.createdTimeSec - data.createdTimeSec) < kRecentlyRecordsTimeGapSec)
+                return true;
+        }
+    }
+    return false;
 }
 
 int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
@@ -312,6 +320,13 @@ int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
         m_sessionCleanupTimer.restart();
         cleanupExpiredSessions();
     }
+
+    if (hasSimilarRecentlyRecord(record))
+        return -1; //< ignore if same record has been added recently
+
+    m_recentlyAddedRecords.push_back(record);
+    if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
+        m_recentlyAddedRecords.pop_front();
 
     if (record.eventType == Qn::AR_UnauthorizedLogin)
         return addAuditRecordInternal(record);

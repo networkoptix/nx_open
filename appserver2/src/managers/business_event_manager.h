@@ -9,56 +9,51 @@
 
 namespace ec2
 {
-    class QnBusinessEventNotificationManager
-    :
-        public AbstractBusinessEventManager
+    class QnBusinessEventNotificationManager : public AbstractBusinessEventNotificationManager
     {
     public:
         QnBusinessEventNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran, NotificationSource /*source*/)
         {
-            NX_ASSERT( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
+            NX_ASSERT( tran.command == ApiCommand::broadcastAction || tran.command == ApiCommand::execAction);
             QnAbstractBusinessActionPtr businessAction;
             fromApiToResource(tran.params, businessAction);
             businessAction->setReceivedFromRemoteHost(true);
-            if (tran.command == ApiCommand::broadcastBusinessAction)
+            if (tran.command == ApiCommand::broadcastAction)
                 emit gotBroadcastAction( businessAction );
             else
                 emit execBusinessAction( businessAction );
         }
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
         {
-            NX_ASSERT( tran.command == ApiCommand::removeBusinessRule );
+            NX_ASSERT( tran.command == ApiCommand::removeEventRule );
             emit removed( QnUuid(tran.params.id) );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran, NotificationSource source)
         {
-            NX_ASSERT( tran.command == ApiCommand::saveBusinessRule);
+            NX_ASSERT( tran.command == ApiCommand::saveEventRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
             fromApiToResource(tran.params, businessRule);
-            emit addedOrUpdated( businessRule );
+            emit addedOrUpdated( businessRule, source);
         }
 
-        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
+        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran, NotificationSource /*source*/)
         {
-            NX_ASSERT( tran.command == ApiCommand::resetBusinessRules);
+            NX_ASSERT( tran.command == ApiCommand::resetEventRules);
             emit businessRuleReset(tran.params.defaultRules);
         }
     };
 
-
-
+    typedef std::shared_ptr<QnBusinessEventNotificationManager> QnBusinessEventNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnBusinessEventManager
-    :
-        public QnBusinessEventNotificationManager
+    class QnBusinessEventManager : public AbstractBusinessEventManager
     {
     public:
-        QnBusinessEventManager( QueryProcessorType* const queryProcessor );
+        QnBusinessEventManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
@@ -71,9 +66,8 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
 
-        QnTransaction<ApiBusinessRuleData> prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnUuid& id );
         QnTransaction<ApiBusinessActionData> prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource );
     };
 }

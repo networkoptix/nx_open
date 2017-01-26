@@ -1,10 +1,8 @@
 #ifndef QN_AVI_RESOURCE_H
 #define QN_AVI_RESOURCE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <nx/streaming/abstract_archive_resource.h>
-
+#include <nx/streaming/config.h>
 #include "nx/streaming/media_data_packet.h"
 
 class QnArchiveStreamReader;
@@ -42,7 +40,5 @@ private:
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
 };
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_RESOURCE_H

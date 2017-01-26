@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef DISABLE_FFMPEG
-
 #include <QtCore/QObject>
 
 #include <nx/streaming/audio_data_packet.h>
@@ -22,7 +20,7 @@ public:
     FfmpegAudioDecoder();
     virtual ~FfmpegAudioDecoder();
 
-    static bool isCompatible(const CodecID codec);
+    static bool isCompatible(const AVCodecID codec);
     virtual bool decode(const QnConstCompressedAudioDataPtr& frame, AudioFramePtr* const outFrame) override;
 
 private:
@@ -32,5 +30,3 @@ private:
 
 } // namespace media
 } // namespace nx
-
-#endif // #DISABLE_FFMPEG

@@ -16,11 +16,12 @@
 #include <transcoding/filters/rotate_image_filter.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/config.h>
 #include <core/resource/camera_resource.h>
-#include <utils/serialization/json.h>
+#include <nx/fusion/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
-QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
+QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
     m_quality(Qn::QualityNormal)
@@ -82,7 +83,7 @@ QSize QnCodecTranscoder::roundSize(const QSize& size)
 
 // --------------------------- QnVideoTranscoder -----------------
 
-QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
+QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
     QnCodecTranscoder(codecId)
 {
 
@@ -108,7 +109,11 @@ CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecod
         return decodedFrame;
     CLVideoDecoderOutputPtr result = decodedFrame;
     for(QnAbstractImageFilterPtr filter: m_filters)
+    {
         result = filter->updateImage(result);
+        if (!result)
+            break;
+    }
     return result;
 }
 
@@ -126,7 +131,7 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
     if (!res)
         return result;
     const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
-    for(const auto& stream: supportedMediaStreams.streams) 
+    for(const auto& stream: supportedMediaStreams.streams)
     {
         QStringList resolutionInfo = stream.resolution.split(L'x');
         if (resolutionInfo.size() == 2) {
@@ -173,8 +178,8 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 
 QnTranscoder::QnTranscoder():
-    m_videoCodec(CODEC_ID_NONE),
-    m_audioCodec(CODEC_ID_NONE),
+    m_videoCodec(AV_CODEC_ID_NONE),
+    m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
     m_audioStreamCopy(false),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
@@ -186,7 +191,7 @@ QnTranscoder::QnTranscoder():
     m_packetizedMode(false),
     m_useRealTimeOptimization(false)
 {
-    QThread::currentThread()->setPriority(QThread::LowPriority); 
+    QThread::currentThread()->setPriority(QThread::LowPriority);
 }
 
 QnTranscoder::~QnTranscoder()
@@ -195,7 +200,7 @@ QnTranscoder::~QnTranscoder()
 }
 
 int QnTranscoder::suggestMediaStreamParams(
-    CodecID codec,
+    AVCodecID codec,
     QSize resolution,
     Qn::StreamQuality quality,
     QnCodecParams::Value* const params )
@@ -232,7 +237,7 @@ int QnTranscoder::suggestMediaStreamParams(
 
     int result = hiEnd * resolutionFactor;
 
-    if( codec == CODEC_ID_MJPEG )
+    if( codec == AV_CODEC_ID_MJPEG )
     {
         //setting qmin and qmax, since mjpeg encoder uses only these
         if( params && !params->contains(QnCodecParams::qmin) && !params->contains(QnCodecParams::qmax) )
@@ -268,7 +273,7 @@ int QnTranscoder::suggestMediaStreamParams(
 }
 
 int QnTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     TranscodeMethod method,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -299,8 +304,8 @@ int QnTranscoder::setVideoCodec(
             m_extraTranscodeParams.setCodec(codec);
             ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
 
-            if (codec != CODEC_ID_H263P) {
-                // H263P has bug for multi thread encoding in current ffmpeg version
+            if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
+                // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
                 bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
                 if (isAtom || resolution.height() >= 1080)
                     ffmpegTranscoder->setMTMode(true);
@@ -323,14 +328,14 @@ int QnTranscoder::setVideoCodec(
     return OperationResult::Success;
 }
 
-void QnTranscoder::setUseRealTimeOptimization(bool value) 
-{ 
-    m_useRealTimeOptimization = value; 
+void QnTranscoder::setUseRealTimeOptimization(bool value)
+{
+    m_useRealTimeOptimization = value;
     if (m_vTranscoder)
         m_vTranscoder->setUseRealTimeOptimization(value);
 }
 
-QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
 {
     m_audioCodec = codec;
     switch (method)
@@ -353,8 +358,8 @@ QnTranscoder::OperationResult QnTranscoder::setAudioCodec(CodecID codec, Transco
             m_lastErrMessage = tr("Unknown transcode method");
             break;
     }
-    return m_lastErrMessage.isEmpty() 
-        ? OperationResult::Success 
+    return m_lastErrMessage.isEmpty()
+        ? OperationResult::Success
         : OperationResult::Error;
 }
 
@@ -374,7 +379,7 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
     m_eofCounter = 0;
 
-    if ((quint64)m_firstTime == AV_NOPTS_VALUE)
+    if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
@@ -387,17 +392,17 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         else
             m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
-                                          && m_delayedAudioQueue.size() < kMaxDelayedQueueSize)
+        if (m_videoCodec != AV_CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+            && m_delayedAudioQueue.size() < (int)kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
         }
-        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
-                                          && m_delayedVideoQueue.size() < kMaxDelayedQueueSize)
+        if (m_audioCodec != AV_CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+            && m_delayedVideoQueue.size() < (int)kMaxDelayedQueueSize)
         {
             return 0; // not ready to init
         }
-        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
+        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(),
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
@@ -428,10 +433,10 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         if (errCode != 0)
             return errCode;
     }
-    
+
     if( result )
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
-    
+
     return OperationResult::Success;
 }
 

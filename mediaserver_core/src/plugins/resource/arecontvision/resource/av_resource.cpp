@@ -156,8 +156,9 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         url.setHost( urlStr );
     }
     url.setPath( lit("/get?mac") );
-    url.setUserName( getAuth().user() );
-    url.setPassword( getAuth().password() );
+    QAuthenticator auth = getAuth();
+    url.setUserName( auth.user() );
+    url.setPassword( auth.password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
     httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
@@ -196,7 +197,7 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
-    
+
     QString maxSensorWidth;
     QString maxSensorHeight;
     {
@@ -305,8 +306,11 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     const auto activateWithAutoResetDoneHandler =
         [autoResetTimeoutMS, url](
@@ -409,7 +413,7 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
     }
 
     //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec 
+    motion->m_duration = 1000 * 1000 * 1000; // 1000 sec
     return motion;
 }
 
@@ -542,7 +546,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QString &id, QString &valu
 
     if (status != CL_HTTP_SUCCESS)
         return false;
-        
+
 
     QByteArray response;
     connection.readAll(response);
@@ -589,7 +593,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
         {
             QString new_name = name.mid(2);
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
-            if (!rt.isNull())
+            if (rt.isNull())
             {
                 NX_LOG( lit("Unsupported AV resource found: %1").arg(name), cl_logERROR);
                 return 0;
@@ -638,9 +642,9 @@ QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
 void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 {
     if (channel != 0)
-        return; // motion info used always once even for multisensor cameras 
+        return; // motion info used always once even for multisensor cameras
 
-    static int sensToLevelThreshold[10] = 
+    static int sensToLevelThreshold[10] =
     {
         31, // 0 - aka mask really filtered by server always
         31, // 1
@@ -655,9 +659,9 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
     };
 
     QnMotionRegion region = getMotionRegion(0);
-    for (int sens = QnMotionRegion::MIN_SENSITIVITY+1; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens)
+    for (int sens = 1; sens < QnMotionRegion::kSensitivityLevelCount; ++sens)
     {
-        
+
         if (!region.getRegionBySens(sens).isEmpty())
         {
             setParamPhysicalAsync(lit("mdlevelthreshold"), QString::number(sensToLevelThreshold[sens]));
@@ -673,12 +677,15 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
     url.setPath(lit("/get?auxin"));
-    url.setUserName(getAuth().user());
-    url.setPassword(getAuth().password());
+
+    QAuthenticator auth = getAuth();
+
+    url.setUserName(auth.user());
+    url.setPassword(auth.password());
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
-            this, 
+            this,
             [this, completionHandler](nx_http::AsyncHttpClientPtr client) {
                 if (completionHandler)
                     completionHandler(
@@ -733,11 +740,15 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 }
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
-{
-    return isH264() &&
-           QnGlobalSettings::instance()->arecontRtspEnabled() &&
-           qnCommon->dataPool()->data(toSharedPointer(this)).
-               value<bool>(lit("isRTSPSupported"), true);
+{   
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
+    auto cameraSupportsH264 = isH264();
+    auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
+    auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);
+
+    return arecontRtspIsAllowed 
+        && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
 }
 
 bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)
@@ -745,6 +756,7 @@ bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& nam
     m_mutex.lock();
     m_mutex.unlock();
     QUrl devUrl(getUrl());
+
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get") + QString::number(channel) + QLatin1String("?") + name;
 

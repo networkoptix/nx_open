@@ -5,7 +5,9 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QProcess>
+#include <QtCore/QMap>
 #include <QtCore/QSet>
+#include <nx/streaming/data_packet_queue.h>
 #include <nx/utils/thread/wait_condition.h>
 
 #include "core/resource/resource_fwd.h"

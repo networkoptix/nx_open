@@ -12,18 +12,16 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common_ut</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Common Library Unit Tests</name>
+    <name>VMS Common Libraryrary Unit Tests</name>
 
     <properties>
-        <guid>${common_ut.guid}</guid>
-        <product.title>HD Witness Common Library Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <path>${env.PATH}</path>
         <!--Specify the project to test-->
         <master.project.directory>common</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_network -lnx_streaming -ludt -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -49,6 +47,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

@@ -5,7 +5,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
@@ -24,6 +24,10 @@ QN_DECLARE_METAOBJECT_HEADER(QnEmail, ConnectionType, )
 struct QnEmailSmtpServerPreset;
 struct QnEmailSettings;
 class  QnEmailAddress;
+
+enum class SmtpReplyCode;
+enum class SmtpError;
+struct SmtpOperationResult;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::ConnectionType), (metatype)(lexical))
 

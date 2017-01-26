@@ -1,7 +1,7 @@
 #ifndef UPNP_ASYNC_CLIENT_H
 #define UPNP_ASYNC_CLIENT_H
 
-#include "utils/common/model_functions_fwd.h"
+#include "nx/fusion/model_functions_fwd.h"
 #include <nx/network/http/asynchttpclient.h>
 
 #include <set>
@@ -108,8 +108,8 @@ private:
     std::set< nx_http::AsyncHttpClientPtr > m_httpClients;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS( AsyncClient::Protocol, ( lexical ) );
-
 } // namespace nx_upnp
+
+QN_FUSION_DECLARE_FUNCTIONS( nx_upnp::AsyncClient::Protocol, ( lexical ) );
 
 #endif // UPNP_ASYNC_CLIENT_H

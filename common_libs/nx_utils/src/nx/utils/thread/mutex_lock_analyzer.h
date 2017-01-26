@@ -89,7 +89,7 @@ bool are_elements_same_in_sorted_ranges(
 
 class QnMutex;
 
-class MutexLockKey
+class NX_UTILS_API MutexLockKey
 {
 public:
     QByteArray sourceFile;
@@ -114,7 +114,7 @@ public:
     QString toString() const;
 };
 
-class LockGraphEdgeData
+class NX_UTILS_API LockGraphEdgeData
 {
 public:
     class TwoMutexLockData
@@ -154,7 +154,7 @@ public:
     bool connectedTo( const LockGraphEdgeData& rhs ) const;
 };
 
-class MutexLockAnalyzer
+class NX_UTILS_API MutexLockAnalyzer
 {
 public:
     void mutexCreated( QnMutex* const mutex );
@@ -162,6 +162,8 @@ public:
 
     void afterMutexLocked( const MutexLockKey& mutexLockPosition );
     void beforeMutexUnlocked( const MutexLockKey& mutexLockPosition );
+
+    void expectNoLocks();
 
     //!Should be called just after a new thread has been started
     void threadStarted( std::uintptr_t sysThreadID );
@@ -173,8 +175,13 @@ public:
 private:
     struct ThreadContext
     {
+        uintptr_t threadId;
         std::deque<MutexLockKey> currentLockPath;
+
+        ThreadContext(uintptr_t id): threadId(id) {}
     };
+
+    ThreadContext& currentThreadContext();
 
     typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
 

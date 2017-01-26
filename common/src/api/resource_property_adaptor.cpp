@@ -15,7 +15,8 @@ QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
     m_key(key),
     m_defaultValue(defaultValue),
     m_handler(handler),
-    m_pendingSave(0)
+    m_pendingSave(0),
+    m_value(defaultValue)
 {
     connect(this, &QnAbstractResourcePropertyAdaptor::saveRequestQueued, this, &QnAbstractResourcePropertyAdaptor::processSaveRequests, Qt::QueuedConnection);
 }
@@ -178,6 +179,16 @@ void QnAbstractResourcePropertyAdaptor::saveToResource()
     processSaveRequests();
 }
 
+bool QnAbstractResourcePropertyAdaptor::takeFromSettings(QSettings* settings)
+{
+    const auto value = settings->value(m_key);
+    if (value.isNull())
+        return false;
+
+    setValueInternal(value);
+    settings->remove(m_key);
+    return true;
+}
 
 void QnAbstractResourcePropertyAdaptor::processSaveRequests()
 {

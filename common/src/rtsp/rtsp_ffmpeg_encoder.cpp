@@ -21,7 +21,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     // Do nothing.
 }    
 
-void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, CodecID dstCodec)
+void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
     m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
     m_videoTranscoder->setResolution(dstVideSize);
@@ -34,9 +34,9 @@ void QnRtspFfmpegEncoder::init()
     m_eofReached = false;
 }
 
-QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
+QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(AVCodecID compressionType)
 {
-    QMap<CodecID, QnConstMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
+    QMap<AVCodecID, QnConstMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
     QnConstMediaContextPtr result;
     if (itr != m_generatedContexts.end())
     {
@@ -96,6 +96,9 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
+    if (!m_media)
+        return false;
+
     sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
 
     if (!m_codecCtxData.isEmpty())

@@ -56,17 +56,9 @@ public:
     //! \returns true, if object has been successfully initialized (socket is created and binded to local address)
     bool isValid() const;
 
-    /**
-     * \returns                         Whether this module finder is working in compatibility mode.
-     *                                  In this mode all EC are supported regardless of customization.
-     */
-    bool isCompatibilityMode() const;
-
-    //! \param compatibilityMode         New compatibility mode state.
-    void setCompatibilityMode(bool compatibilityMode);
-
     void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
 
+    // TODO: #mux Fix the comment.
     //! Returns \fn run (DEBUG ONLY!)
     static bool isDisabled;
 
@@ -99,7 +91,6 @@ private:
     quint64 m_prevPingClock;
     unsigned int m_checkInterfacesTimeoutMs;
     quint64 m_lastInterfacesCheckMs;
-    bool m_compatibilityMode;
     QHostAddress m_multicastGroupAddress;
     quint16 m_multicastGroupPort;
     QCache<QByteArray, RevealResponse> m_cachedResponse;

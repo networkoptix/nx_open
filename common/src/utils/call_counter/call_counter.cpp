@@ -19,13 +19,18 @@ QnCallCounter::~QnCallCounter()
         m_thread.join();
 }
 
-void QnCallCounter::incrementCallCount(QString functionName)
+void QnCallCounter::incrementCallCount(const QString& functionName)
 {
     std::lock_guard<std::mutex> lk(m_mutex);
     if (m_callInfo.find(functionName) == m_callInfo.cend())
         m_callInfo.emplace(std::move(functionName), CallInfo());
     else
         ++m_callInfo[std::move(functionName)].totalCalls;
+}
+
+void QnCallCounter::incrementCallCount(const char* functionName)
+{
+    incrementCallCount(QLatin1String(functionName));
 }
 
 void QnCallCounter::startReporter()
@@ -42,11 +47,11 @@ void QnCallCounter::startReporter()
             while (true)
             {
                 std::unique_lock<std::mutex> lk(m_mutex);
-                m_cond.wait_for(lk, m_reportPeriod, 
-                                [this] 
-                                { 
+                m_cond.wait_for(lk, m_reportPeriod,
+                                [this]
+                                {
                                     if (m_needStop)
-                                        return true; 
+                                        return true;
 
                                     auto timeSinceLastReport =
                                             std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -55,7 +60,7 @@ void QnCallCounter::startReporter()
 
                                     if (timeSinceLastReport < m_reportPeriod)
                                         return false;
-                                    
+
                                     return true;
                                 });
                 if (m_needStop)
@@ -71,19 +76,19 @@ void QnCallCounter::startReporter()
 
                 for (auto it = m_callInfo.begin(); it != m_callInfo.end(); ++it)
                 {
-                    auto callsAtLastPeriod = it->second.totalCalls - 
+                    auto callsAtLastPeriod = it->second.totalCalls -
                                              it->second.lastTotalCalls;
 
                     auto callsPerPeriod = (double)it->second.totalCalls / totalPeriods;
 
-                    NX_LOG(lit("(CALL REPORT) Functon: %1. Total calls: %2. Calls per %3 ms: %4. Calls during last %5 ms: %6.")
+                    const QString report = lit("(CALL REPORT) Functon: %1. Total calls: %2. Calls per %3 ms: %4. Calls during last %5 ms: %6.")
                                .arg(it->first)
                                .arg(it->second.totalCalls)
                                .arg(m_reportPeriod.count())
                                .arg(callsPerPeriod)
                                .arg(m_reportPeriod.count())
-                               .arg(callsAtLastPeriod),
-                           cl_logDEBUG1);
+                               .arg(callsAtLastPeriod);
+                    NX_LOG(report, cl_logDEBUG1);
 
                     it->second.lastTotalCalls = it->second.totalCalls;
                 }

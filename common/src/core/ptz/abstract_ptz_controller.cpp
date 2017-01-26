@@ -6,8 +6,8 @@
 
 const qreal QnAbstractPtzController::MaxPtzSpeed = 1.0;
 
-QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource): 
-    m_resource(resource) 
+QnAbstractPtzController::QnAbstractPtzController(const QnResourcePtr &resource):
+    m_resource(resource)
 {}
 
 QnAbstractPtzController::~QnAbstractPtzController() {
@@ -18,7 +18,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     data->query = query;
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
-    
+
     if((query & Qn::CapabilitiesPtzField))       { data->capabilities = getCapabilities();                              data->fields |= Qn::CapabilitiesPtzField; }
     if((query & Qn::DevicePositionPtzField)     && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))    data->fields |= Qn::DevicePositionPtzField;
     if((query & Qn::LogicalPositionPtzField)    && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))  data->fields |= Qn::LogicalPositionPtzField;
@@ -38,7 +38,7 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     Qn::PtzCapabilities capabilities = getCapabilities();
 
     switch (command) {
-    case Qn::ContinuousMovePtzCommand:       
+    case Qn::ContinuousMovePtzCommand:
         return (capabilities & Qn::ContinuousPtzCapabilities);
 
     case Qn::ContinuousFocusPtzCommand:
@@ -49,32 +49,32 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
         return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::DevicePositioningPtzCapability);
 
     case Qn::GetLogicalPositionPtzCommand:
-    case Qn::AbsoluteLogicalMovePtzCommand:        
+    case Qn::AbsoluteLogicalMovePtzCommand:
         return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::LogicalPositioningPtzCapability);
 
-    case Qn::ViewportMovePtzCommand:        
+    case Qn::ViewportMovePtzCommand:
         return (capabilities & Qn::ViewportPtzCapability);
 
-    case Qn::GetDeviceLimitsPtzCommand:           
+    case Qn::GetDeviceLimitsPtzCommand:
         return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::DevicePositioningPtzCapability);
 
-    case Qn::GetLogicalLimitsPtzCommand:           
+    case Qn::GetLogicalLimitsPtzCommand:
         return (capabilities & Qn::LimitsPtzCapability) && (capabilities & Qn::LogicalPositioningPtzCapability);
 
-    case Qn::GetFlipPtzCommand:             
+    case Qn::GetFlipPtzCommand:
         return (capabilities & Qn::FlipPtzCapability);
 
     case Qn::CreatePresetPtzCommand:
     case Qn::UpdatePresetPtzCommand:
     case Qn::RemovePresetPtzCommand:
     case Qn::ActivatePresetPtzCommand:
-    case Qn::GetPresetsPtzCommand:          
+    case Qn::GetPresetsPtzCommand:
         return (capabilities & Qn::PresetsPtzCapability);
 
     case Qn::CreateTourPtzCommand:
     case Qn::RemoveTourPtzCommand:
     case Qn::ActivateTourPtzCommand:
-    case Qn::GetToursPtzCommand:            
+    case Qn::GetToursPtzCommand:
         return (capabilities & Qn::ToursPtzCapability);
 
     case Qn::UpdateHomeObjectPtzCommand:
@@ -88,8 +88,8 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::GetDataPtzCommand:
         return true;
 
-    default:                                
-        NX_ASSERT(false); 
+    default:
+        NX_ASSERT(false);
         return false; /* We should never get here. */
     }
 }
@@ -110,3 +110,8 @@ Qn::PtzCommand QnAbstractPtzController::spaceCommand(Qn::PtzCommand command, Qn:
     }
 }
 
+bool deserialize(const QString& /*value*/, QnPtzObject* /*target*/)
+{
+    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    return false;
+}

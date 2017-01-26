@@ -1,6 +1,11 @@
 #include "player_data_consumer.h"
 
+#include <algorithm>
+
+#include <core/resource/media_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/debug_utils.h>
+#include <nx/utils/log/log.h>
 
 #include "seamless_video_decoder.h"
 #include "seamless_audio_decoder.h"
@@ -19,16 +24,31 @@ static const int kMaxMediaQueueLen = 90;
 // Max queue length for decoded video which is awaiting to be rendered.
 static const int kMaxDecodedVideoQueueSize = 2;
 
+/**
+ * Player will emit EOF if and only if it gets several empty packets in a row
+ * Sometime single empty packet can be received in case of Multi server archive server1->server2 switching
+ * or network issue/reconnect.
+ */
+static const int kEmptyPacketThreshold = 3;
+
+QSize qMax(const QSize& size1, const QSize& size2)
+{
+    return size1.height() > size2.height() ? size1 : size2;
+}
+
 } // namespace
 
 PlayerDataConsumer::PlayerDataConsumer(
     const std::unique_ptr<QnArchiveStreamReader>& archiveReader)
-:
+    :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitJumpCounter(0),
     m_buffering(0),
-    m_hurryUpToFrame(0),
-    m_noDelayState(NoDelayState::Disabled)
+    m_noDelayState(NoDelayState::Disabled),
+    m_sequence(0),
+    m_lastFrameTimeUs(AV_NOPTS_VALUE),
+    m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
+    m_emptyPacketCounter(0)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
@@ -46,9 +66,9 @@ PlayerDataConsumer::~PlayerDataConsumer()
 void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
-    QnMutexLocker lock(&m_queueMutex);
-    if (m_videoDecoder)
-        m_videoDecoder->pleaseStop();
+    QnMutexLocker lock(&m_decoderMutex);
+    for (auto& videoDecoder: m_videoDecoders)
+        videoDecoder->pleaseStop();
     if (m_audioDecoder)
         m_audioDecoder->pleaseStop();
     m_queueWaitCond.wakeAll();
@@ -77,18 +97,17 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
 {
     qint64 minTime = std::numeric_limits<qint64>::max();
     qint64 maxTime = 0;
-    m_dataQueue.lock();
-    for (int i = 0; i < m_dataQueue.size(); ++i)
+    auto unsafeQueue = m_dataQueue.lock();
+    for (int i = 0; i < unsafeQueue.size(); ++i)
     {
         auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(
-            m_dataQueue.atUnsafe(i));
+            unsafeQueue.at(i));
         if (video)
         {
             minTime = std::min(minTime, video->timestamp);
             maxTime = std::max(maxTime, video->timestamp);
         }
     }
-    m_dataQueue.unlock();
     return std::max(0ll, maxTime - minTime);
 }
 
@@ -99,17 +118,10 @@ const AudioOutput* PlayerDataConsumer::audioOutput() const
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
-    {
-        QnMutexLocker lock(&m_queueMutex);
-        if (!m_videoDecoder)
-            m_videoDecoder.reset(new SeamlessVideoDecoder());
-        if (!m_audioDecoder)
-            m_audioDecoder.reset(new SeamlessAudioDecoder());
-    }
-
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
+    m_emptyPacketCounter = 0;
 
     auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (videoFrame)
@@ -122,9 +134,19 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     return true; //< Just ignore unknown frame type.
 }
 
-bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/)
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    emit onEOF();
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
+        return true; //< Ignore locally generated packets. It occurs when TCP connection is closed.
+
+    ++m_emptyPacketCounter;
+    if (m_emptyPacketCounter > kEmptyPacketThreshold)
+    {
+        QVideoFramePtr eofPacket(new QVideoFrame());
+        FrameMetadata metadata = FrameMetadata(data);
+        metadata.serialize(eofPacket);
+        enqueueVideoFrame(eofPacket);
+    }
     return true;
 }
 
@@ -155,9 +177,45 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& videoFrame)
 {
+    if (!checkSequence(videoFrame->opaque))
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): Ignoring old frame"), cl_logDEBUG2);
+        return true; //< No error. Just ignore the old frame.
+    }
+
+    quint32 videoChannel = videoFrame->channelNumber;
+    auto archiveReader = dynamic_cast<const QnArchiveStreamReader*>(videoFrame->dataProvider);
+    if (archiveReader)
+    {
+        auto resource = archiveReader->getResource();
+        if (resource)
+        {
+            if (auto camera = resource.dynamicCast<QnMediaResource>())
+            {
+                auto videoLayout = camera->getVideoLayout();
+                if (videoLayout)
+                    m_awaitingFramesMask.setChannelCount(videoLayout->channelCount());
+            }
+        }
+    }
+
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        while (m_videoDecoders.size() <= videoChannel)
+        {
+            auto videoDecoder = new SeamlessVideoDecoder();
+            videoDecoder->setVideoGeometryAccessor(m_videoGeometryAccessor);
+            m_videoDecoders.push_back(SeamlessVideoDecoderPtr(videoDecoder));
+        }
+    }
+    SeamlessVideoDecoder* videoDecoder = m_videoDecoders[videoChannel].get();
+
     QnCompressedVideoDataPtr data = queueVideoFrame(videoFrame);
     if (!data)
-        return true; //< Frame is processed.
+    {
+        //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): queueVideoFrame() -> null"), cl_logDEBUG2);
+        return true; //< The frame is processed.
+    }
 
     // First packet after a jump.
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
@@ -176,20 +234,41 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
     }
     if (displayImmediately)
     {
-        m_hurryUpToFrame = m_videoDecoder->currentFrameNumber();
+        m_hurryUpToFrame.videoChannel = videoChannel;
+        m_hurryUpToFrame.frameNumber = videoDecoder->currentFrameNumber();
         emit hurryUp(); //< Hint to a player to avoid waiting for the currently displaying frame.
     }
 
     QVideoFramePtr decodedFrame;
-    if (!m_videoDecoder->decode(data, &decodedFrame))
+    if (!videoDecoder->decode(data, &decodedFrame))
     {
-        qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
-        return true; //False result means we want to repeat this frame later.
+        NX_LOG(lit("Cannot decode the video frame. The frame is skipped."), cl_logWARNING);
+        // False result means we want to repeat this frame later, thus, returning true.
+    }
+    else
+    {
+        if (decodedFrame)
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): enqueueVideoFrame()"), cl_logDEBUG2);
+            enqueueVideoFrame(std::move(decodedFrame));
+        }
+        else
+        {
+            //NX_LOG(lit("PlayerDataConsumer::processVideoFrame(): decodedFrame is null"), cl_logDEBUG2);
+        }
     }
 
-    if (decodedFrame)
-        enqueueVideoFrame(std::move(decodedFrame));
+    return true;
+}
 
+bool PlayerDataConsumer::checkSequence(int sequence)
+{
+    m_sequence = std::max(m_sequence, sequence);
+    if (sequence && m_sequence && sequence != m_sequence)
+    {
+        //NX_LOG(lit("PlayerDataConsumer::checkSequence(%1): expected %2").arg(sequence).arg(m_sequence), cl_logDEBUG2);
+        return false;
+    }
     return true;
 }
 
@@ -201,9 +280,20 @@ void PlayerDataConsumer::enqueueVideoFrame(QVideoFramePtr decodedFrame)
         m_queueWaitCond.wait(&m_queueMutex);
     if (needToStop())
         return;
+    FrameMetadata metadata = FrameMetadata::deserialize(decodedFrame);
+    if (!checkSequence(metadata.sequence))
+        return; //< ignore old frame
     m_decodedVideo.push_back(std::move(decodedFrame));
     lock.unlock();
     emit gotVideoFrame();
+}
+
+void PlayerDataConsumer::clearUnprocessedData()
+{
+    base_type::clearUnprocessedData();
+    QnMutexLocker lock(&m_queueMutex);
+    m_decodedVideo.clear();
+    m_queueWaitCond.wakeAll();
 }
 
 QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
@@ -216,18 +306,42 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
     lock.unlock();
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
-    if (metadata.frameNum <= m_hurryUpToFrame)
+
+    /**
+     * m_hurryUpToFrame hold frame number from which player should display data without delay.
+     * Additionally, for panoramic cameras frames should be processed without delay unless
+     * it got at least 1 frame for each channel
+     */
+    if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
+        m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
+        metadata.frameNum < m_hurryUpToFrame.frameNumber)
     {
         metadata.noDelay = true;
-        metadata.serialize(result);
     }
+    else
+    {
+        if (!m_awaitingFramesMask.isEmpty())
+            metadata.noDelay = true; //< include noDelay to the first displayed frame
+        m_awaitingFramesMask.removeChannel(metadata.videoChannel);
+    }
+    if (metadata.noDelay)
+        metadata.serialize(result);
 
     m_queueWaitCond.wakeAll();
+
+    if (result)
+        m_lastFrameTimeUs = result->startTime() * 1000;
     return result;
 }
 
 bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 {
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        if (!m_audioDecoder)
+            m_audioDecoder.reset(new SeamlessAudioDecoder());
+    }
+
     AudioFramePtr decodedFrame;
     if (!m_audioDecoder->decode(data, &decodedFrame))
     {
@@ -244,7 +358,7 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
     return true;
 }
 
-void PlayerDataConsumer::onBeforeJump(qint64 /*timeUsec*/)
+void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     QnMutexLocker lock(&m_dataProviderMutex);
@@ -255,6 +369,8 @@ void PlayerDataConsumer::onBeforeJump(qint64 /*timeUsec*/)
     // We supposed to decode/display them at maximum speed unless the last jump command is
     // processed.
     m_noDelayState = NoDelayState::Activated;
+    m_awaitingFramesMask.setMask();
+    m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
 void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
@@ -266,28 +382,85 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
     NX_ASSERT(m_awaitJumpCounter >= 0);
 }
 
-void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/)
+void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/, int sequence)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
-    clearUnprocessedData(); //< Clear input (undecoded) data queue.
-
-    QnMutexLocker lock(&m_dataProviderMutex);
-
-    --m_awaitJumpCounter;
-    if (m_awaitJumpCounter == 0)
     {
-        // This function is called from dataProvider thread. PlayerConsumer may still process the
-        // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
-        // received.
-        m_noDelayState = NoDelayState::WaitForNextBOF;
+        QnMutexLocker lock(&m_dataProviderMutex);
+        --m_awaitJumpCounter;
+        if (m_awaitJumpCounter == 0)
+        {
+            // This function is called from dataProvider thread. PlayerConsumer may still process the
+            // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
+            // received.
+            m_noDelayState = NoDelayState::WaitForNextBOF;
+            m_sequence = sequence;
+        }
     }
+
+    clearUnprocessedData(); //< Clear input (undecoded) data queue.
+    if (m_awaitJumpCounter == 0)
+        emit jumpOccurred(m_sequence);
+    else
+        emit hurryUp();
 }
 
 void PlayerDataConsumer::endOfRun()
 {
-    QnMutexLocker lock(&m_queueMutex);
-    m_videoDecoder.reset();
+    QnMutexLocker lock(&m_decoderMutex);
+    m_videoDecoders.clear();
     m_audioDecoder.reset();
+}
+
+QSize PlayerDataConsumer::currentResolution() const
+{
+    QSize result;
+    for (const auto& decoder: m_videoDecoders)
+        result = qMax(result, decoder->currentResolution());
+
+    return result;
+}
+
+AVCodecID PlayerDataConsumer::currentCodec() const
+{
+    for (const auto& videoDecoder: m_videoDecoders)
+    {
+        auto result = videoDecoder->currentCodec();
+        if (result != AV_CODEC_ID_NONE)
+            return result;
+    }
+    return AV_CODEC_ID_NONE;
+}
+
+void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+{
+    NX_ASSERT(videoGeometryAccessor);
+    m_videoGeometryAccessor = videoGeometryAccessor;
+}
+
+qint64 PlayerDataConsumer::getCurrentTime() const
+{
+    return m_lastFrameTimeUs;
+}
+
+qint64 PlayerDataConsumer::getDisplayedTime() const
+{
+    return m_lastDisplayedTimeUs;
+}
+
+void PlayerDataConsumer::setDisplayedTimeUs(qint64 value)
+{
+    m_lastDisplayedTimeUs = value;
+}
+
+qint64 PlayerDataConsumer::getNextTime() const
+{
+    return AV_NOPTS_VALUE;
+}
+
+qint64 PlayerDataConsumer::getExternalTime() const
+{
+    return m_lastDisplayedTimeUs;
 }
 
 } // namespace media

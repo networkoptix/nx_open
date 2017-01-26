@@ -12,20 +12,21 @@
 #include <QString>
 
 #include <nx/network/aio/timer.h>
-#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/buffer_source.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
-#include <utils/common/cpp14.h>
-
+#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/system_socket.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx_http {
 
-class AsyncServerConnectionTest
+class HttpAsyncServerConnectionTest
 :
     public ::testing::Test
 {
 public:
-    AsyncServerConnectionTest()
+    HttpAsyncServerConnectionTest()
     :
         m_testHttpServer( std::make_unique<TestHttpServer>() )
     {
@@ -50,21 +51,17 @@ public:
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer authInfo,
-        const nx_http::Request& request,
-        nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler )
     {
         m_timer.start(
             std::chrono::seconds(5),
             [completionHandler = std::move(completionHandler)]
             {
-                completionHandler(
-                    nx_http::StatusCode::ok,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource>());
+                completionHandler(nx_http::StatusCode::ok);
             });
     }
 
@@ -75,7 +72,7 @@ private:
 const QString TestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed )
+TEST_F( HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed )
 {
     m_testHttpServer->registerRequestProcessor<TestHandler>(
         TestHandler::PATH,
@@ -116,29 +113,28 @@ public:
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
-        stree::ResourceContainer authInfo,
-        const nx_http::Request& request,
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
         nx_http::Response* const response,
-        std::function<void(
-            const nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler )
+        nx_http::RequestProcessedHandler completionHandler )
     {
         response->headers.emplace(
             "Seq",
             nx_http::getHeaderValue( request.headers, "Seq" ) );
         completionHandler(
-            nx_http::StatusCode::ok,
-            std::unique_ptr<nx_http::AbstractMsgBodySource>() );
+            nx_http::RequestResult(
+                nx_http::StatusCode::ok,
+                std::make_unique<nx_http::BufferSource>("text/plain", "bla-bla-bla")));
     }
 };
 
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
+TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
 {
-    static const int REQUESTS_TO_SEND = 10;
+    static const int REQUESTS_TO_SEND = 100;
 
     m_testHttpServer->registerRequestProcessor<PipeliningTestHandler>(
         PipeliningTestHandler::PATH,
@@ -174,7 +170,7 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
     nx_http::HttpStreamReader httpMsgReader;
 
     nx::Buffer readBuf;
-    readBuf.resize( 4096 );
+    readBuf.resize(4 * 1024 * 1024);
     int dataSize = 0;
     ASSERT_TRUE(sock->setRecvTimeout(500));
     while (msgCounter > 0)
@@ -208,4 +204,72 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
     ASSERT_EQ( 0, msgCounter);
 }
 
+TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
+{
+    static const char testData[] = 
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:16 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e7210bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n"
+        "\r\n"
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:19 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e72190bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n"
+        "\r\n"
+        "GET /cdb/event/subscribe HTTP/1.1\r\n"
+        "Date: Fri, 20 May 2016 05:43:22 -0700\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "User-Agent: Nx Witness/3.0.0.12042 (Network Optix) Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)\r\n"
+        "Authorization: Digest nonce=\"15511187291719590911\", realm=\"VMS\", "
+            "response=\"68cc3d8c30c7bff77a623b36e7210bb3\", uri=\"/cdb/event/subscribe\", username=\"df6a3827-56c7-4ff8-b38e-67993983d5d8\"\r\n"
+        "X-Nx-User-Name: df6a3827-56c7-4ff8-b38e-67993983d5d8\r\n"
+        "Accept-Encoding: gzip\r\n";
+
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+
+    const auto socket = std::make_unique<nx::network::TCPSocket>(
+        SocketFactory::tcpServerIpVersion());
+
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
+
+TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
+{
+    const std::chrono::milliseconds kTimeout = std::chrono::seconds(1);
+    const nx::String kQuery(
+        "GET / HTTP/1.1\r\n"
+        "Host: cloud-demo.hdw.mx\r\n"
+        "Connection: keep-alive\r\n"
+        "\r\n");
+
+    m_testHttpServer->server().setConnectionInactivityTimeout(kTimeout);
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
+
+    const auto socket = std::make_unique<nx::network::TCPSocket>(
+        SocketFactory::tcpServerIpVersion());
+
+    ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
+    ASSERT_EQ(kQuery.size(), socket->send(kQuery.data(), kQuery.size()));
+
+    nx::Buffer buffer(1024, Qt::Uninitialized);
+    ASSERT_GT(socket->recv(buffer.data(), buffer.size(), 0), 0);
+
+    const auto start = std::chrono::steady_clock::now();
+    ASSERT_EQ(0, socket->recv(buffer.data(), buffer.size(), 0));
+    ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
+}
+
+} // namespace nx_http

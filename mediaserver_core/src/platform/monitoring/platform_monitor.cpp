@@ -1,7 +1,7 @@
 #include "platform_monitor.h"
 
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 QList<QnPlatformMonitor::NetworkLoad> QnPlatformMonitor::totalNetworkLoad(NetworkInterfaceTypes types) {
     QList<NetworkLoad> result;
@@ -27,5 +27,5 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
     (QnPlatformMonitor::NetworkPartition,      "network")   \
     (QnPlatformMonitor::UnknownPartition,      "unknown")
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionType, LEXICAL_VALUES_FOR_PT)
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor::PartitionTypes, LEXICAL_VALUES_FOR_PT)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionType, LEXICAL_VALUES_FOR_PT)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionTypes, LEXICAL_VALUES_FOR_PT)

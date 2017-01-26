@@ -15,7 +15,7 @@ namespace stun {
 
 ServerConnection::ServerConnection(
     StreamConnectionHolder<ServerConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock,
+    std::unique_ptr<AbstractStreamSocket> sock,
     const MessageDispatcher& dispatcher)
 :
     BaseType(socketServer, std::move(sock)),
@@ -52,7 +52,8 @@ SocketAddress ServerConnection::getSourceAddress() const
     return BaseType::socket()->getForeignAddress();
 }
 
-void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
+void ServerConnection::addOnConnectionCloseHandler(
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     registerCloseHandler(std::move(handler));
 }
@@ -60,6 +61,12 @@ void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler
 AbstractCommunicatingSocket* ServerConnection::socket()
 {
     return BaseType::socket().get();
+}
+
+void ServerConnection::close()
+{
+    auto socket = BaseType::takeSocket();
+    socket.reset();
 }
 
 void ServerConnection::processMessage( Message message )
@@ -82,13 +89,17 @@ void ServerConnection::processMessage( Message message )
         default:
             NX_ASSERT( false );  //not supported yet
     }
+
+    // Message handler has closed connection.
+    if (!socket())
+        closeConnection(SystemError::noError);
 }
 
 void ServerConnection::setDestructHandler( std::function< void() > handler )
 {
     QnMutexLocker lk( &m_mutex );
     NX_ASSERT( !(handler && m_destructHandler), Q_FUNC_INFO,
-                "Can not set new hadler while previous is not removed" );
+                "Can not set new handler while previous is not removed" );
 
     m_destructHandler = std::move( handler );
 }
@@ -100,7 +111,7 @@ void ServerConnection::processBindingRequest( Message message )
         bindingMethod, std::move(message.header.transactionId)));
 
     response.newAttribute< stun::attrs::XorMappedAddress >(
-        m_peerAddress.port, m_peerAddress.address.ipv4());
+        m_peerAddress.port, ntohl(m_peerAddress.address.ipV4()->s_addr));
 
     sendMessage(std::move(response), nullptr);
 }
@@ -118,8 +129,8 @@ void ServerConnection::processCustomRequest( Message message )
         std::move(messageHeader.transactionId)));
 
     // TODO: verify with RFC
-    response.newAttribute< stun::attrs::ErrorDescription >(
-        404, "Method is not supported");    //TODO #ak replace 404 with constant
+    response.newAttribute< stun::attrs::ErrorCode >(
+        stun::error::notFound, "Method is not supported");
 
     sendMessage(std::move(response), nullptr);
 }

@@ -1,52 +1,53 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
+#pragma once
 
-#ifndef NX_CLOUD_DB_REQUEST_EXECUTION_THREAD_H
-#define NX_CLOUD_DB_REQUEST_EXECUTION_THREAD_H
+#include <atomic>
 
-#include <memory>
+#include <nx/utils/std/thread.h>
 
 #include <utils/common/long_runnable.h>
-#include <utils/common/threadqueue.h>
 
+#include "base_request_executor.h"
+#include "db_connection_holder.h"
 #include "request_executor.h"
-
 
 namespace nx {
 namespace db {
 
-
-class DbRequestExecutionThread
-:
-    public QnLongRunnable
+/**
+ * Connection can be closed by timeout or due to error. 
+ * Use DbRequestExecutionThread::isOpen to test it.
+ */
+class DbRequestExecutionThread:
+    public BaseRequestExecutor
 {
 public:
     DbRequestExecutionThread(
         const ConnectionOptions& connectionOptions,
-        CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const requestQueue );
-    virtual ~DbRequestExecutionThread();
+        QueryExecutorQueue* const queryExecutorQueue);
+    virtual ~DbRequestExecutionThread() override;
 
-    //!Establishes connection to DB
-    /*!
-        This method MUS be called after class instanciation
-        \note Method is needed because we do not use exceptions
-    */
-    bool open();
+    virtual void pleaseStop() override;
+    virtual void join() override;
 
-protected:
-    //!Implementation of QnLongRunnable::run
-    virtual void run() override;
+    virtual ConnectionState state() const override;
+    virtual void setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void start() override;
 
 private:
-    ConnectionOptions m_connectionOptions;
-    QSqlDatabase m_dbConnection;
-    CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const m_requestQueue;
+    std::atomic<ConnectionState> m_state;
+    nx::utils::MoveOnlyFunc<void()> m_onClosedHandler;
+    nx::utils::thread m_queryExecutionThread;
+    std::atomic<bool> m_terminated;
+    int m_numberOfFailedRequestsInARow;
+    DbConnectionHolder m_dbConnectionHolder;
+    const nx::utils::QueueReaderId m_queueReaderId;
+
+    void queryExecutionThreadMain();
+    void processTask(std::unique_ptr<AbstractExecutor> task);
+    void closeConnection();
+
+    static bool isDbErrorRecoverable(DBResult dbResult);
 };
 
-
-}   //db
-}   //nx
-
-#endif  //NX_CLOUD_DB_REQUEST_EXECUTION_THREAD_H
+} // namespace db
+} // namespace nx

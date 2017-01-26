@@ -19,14 +19,22 @@ public:
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-private:
-    template <class T> void addMultichannelResources(QList<T>& result);
+
 protected:
     QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,
         const QByteArray& responseData,
         const QHostAddress& discoveryAddress,
         const QHostAddress& foundHostAddress ) override;
+
+private:
+    bool testCredentials(const QUrl& url, const QAuthenticator& auth) const;
+
+    QAuthenticator determineResourceCredentials(const QnSecurityCamResourcePtr& resource) const;
+
+    template<typename T>
+    void addMultichannelResources(QList<T>& result);
+
 };
 
 #endif // #ifdef ENABLE_AXIS

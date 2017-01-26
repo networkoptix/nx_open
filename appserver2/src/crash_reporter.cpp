@@ -1,23 +1,23 @@
 #include "crash_reporter.h"
 
+#include <QDateTime>
+
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-
 #include <common/common_module.h>
-#include <common/systemexcept_linux.h>
-#include <common/systemexcept_win32.h>
+
+#include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/app_info.h>
-#include <nx/utils/log/log.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 
 #include "ec2_thread_pool.h"
-
-#include <QDateTime>
 
 static const QString DATE_FORMAT = lit("yyyy-MM-dd_hh-mm-ss");
 static const QString SERVER_API_COMMAND = lit("crashserver/api/report");
@@ -25,8 +25,10 @@ static const QString LAST_CRASH = lit("statisticsReportLastCrash");
 static const QString SENT_PREFIX = lit("sent_");
 
 static const uint SENDING_MIN_INTERVAL = 24 * 60 * 60; /* secs => a day */
-static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* 30 mb */
+static const uint SENDING_MIN_SIZE = 1 * 1024; /* less then 1kb is not informative */
+static const uint SENDING_MAX_SIZE = 32 * 1024 * 1024; /* over 30mb is too big */
 static const uint SCAN_TIMER_CYCLE = 10 * 60 * 1000; /* every 10 minutes */
+static const uint KEEP_LAST_CRASHES = 10;
 
 static QFileInfoList readCrashes(const QString& prefix = QString())
 {
@@ -46,7 +48,18 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     NX_LOG(lit("readCrashes: scan %1 for files %2")
            .arg(crashDir.absolutePath()).arg(crashFilter), cl_logDEBUG1);
 
-    return crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files, QDir::Time);
+    auto files = crashDir.entryInfoList(QStringList() << crashFilter, QDir::Files);
+    // Qt has a crossplatform bug in build in sort by QDir::Time
+    // - linux: time decrements along the list
+    // - windows: time increments along the list
+    std::sort(
+        files.begin(), files.end(),
+        [](const QFileInfo& left, const QFileInfo& right)
+        {
+            return left.lastModified() > right.lastModified();
+        });
+
+    return std::move(files);
 }
 
 namespace ec2 {
@@ -82,12 +95,21 @@ CrashReporter::~CrashReporter()
 
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
-    const auto admin = qnResPool->getAdministrator();
-    if (!admin)
+    // remove old crashes
+    {
+        auto allCrashes = readCrashes(lit("*"));
+        for (uint i = 0; i < KEEP_LAST_CRASHES && !allCrashes.isEmpty(); ++i)
+            allCrashes.pop_front();
+
+        for (const auto& crash : allCrashes)
+            QFile::remove(crash.absoluteFilePath());
+    }
+
+    if (!qnGlobalSettings->isInitialized())
         return false;
 
-
-    if (!qnGlobalSettings->isStatisticsAllowed())
+    if (!qnGlobalSettings->isStatisticsAllowed()
+        || qnGlobalSettings->isNewSystem())
     {
         NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
         return false;
@@ -113,6 +135,14 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     while (!crashes.isEmpty())
     {
         const auto& crash = crashes.first();
+
+        if (crash.size() < SENDING_MIN_SIZE)
+        {
+            QFile::remove(crash.absoluteFilePath());
+            NX_LOGX(lit("Remove not informative crash: %1")
+                .arg(crash.absolutePath()), cl_logDEBUG2);
+        }
+        else
         if (crash.size() < SENDING_MAX_SIZE)
             return CrashReporter::send(url, crash, settings);
 
@@ -144,6 +174,12 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
 
 void CrashReporter::scanAndReportByTimer(QSettings* settings)
 {
+    if (nx::utils::AppInfo::applicationVersion().endsWith(lit(".0")))
+    {
+        NX_LOGX(lm("Sending is disabled for developer builds (buildNumber=0)"), cl_logINFO);
+        return;
+    }
+
     scanAndReportAsync(settings);
 
     QnMutexLocker lk(&m_mutex);
@@ -220,11 +256,6 @@ void ReportData::finishReport(nx_http::AsyncHttpClientPtr httpClient)
                           SENT_PREFIX + m_crashFile.fileName()));
     }
 
-    auto allCrashes = readCrashes(lit("*"));
-    allCrashes.pop_front();
-    for (const auto& crash : allCrashes)
-        QFile::remove(crash.absoluteFilePath());
-
     QnMutexLocker lock(&m_host.m_mutex);
     NX_ASSERT(!m_host.m_activeHttpClient || m_host.m_activeHttpClient == httpClient);
     m_host.m_activeHttpClient.reset();
@@ -240,7 +271,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
-    const auto version = QnAppInfo::applicationFullVersion();
+    const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = QnSystemInformation::currentSystemInformation().toString();
     const auto systemRuntime = QnSystemInformation::currentSystemRuntime();
     const auto system = lit( "%1 %2" ).arg( systemInfo ).arg( systemRuntime )

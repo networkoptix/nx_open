@@ -11,7 +11,10 @@
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
+
 #include "core/resource/resource_media_layout.h"
+
+#include <nx/streaming/config.h>
 
 
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
@@ -48,7 +51,7 @@ void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, co
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS ));
     QFontMetrics metric(m_timeFont);
-    
+
     while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > MIN_TEXT_HEIGHT)
     {
         m_timeFont.setPixelSize(m_timeFont.pixelSize()-1);
@@ -133,7 +136,7 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
     yuv420_argb32_simd_intr(m_imageBuffer,
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
-        m_timeImg->bytesPerLine(), 
+        m_timeImg->bytesPerLine(),
         frame->linesize[0], frame->linesize[1], 255);
 
     QPainter p(m_timeImg);
@@ -145,9 +148,9 @@ CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutpu
     p.strokePath(path, QPen(QColor(32,32,32,80)));
 
     // copy and convert RGBA32 image back to frame buffer
-    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
+    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(),
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
-        frame->linesize[0], frame->linesize[1], 
+        frame->linesize[0], frame->linesize[1],
         m_timeImg->width(), m_timeImg->height(), false);
 
     if (m_checkHash)

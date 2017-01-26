@@ -6,10 +6,9 @@
 
 #include <qglobal.h>
 
-#if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
-
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
+#include <nx/utils/log/log.h>
 #include "../file.h"
 
 #include <sstream>
@@ -116,9 +115,25 @@ qint64 QnFile::read( char* buffer, qint64 count )
 
 qint64 QnFile::write( const char* buffer, qint64 count )
 {
+    auto printLogMessage = [](const QString& m, QnLogLevel l)
+    {
+        NX_LOG(lit("QnFile::write failed. %1 Errno: %2")
+                .arg(m)
+                .arg(errno),
+            cl_logERROR);
+    };
 	if( !isOpen() )
+    {
+        printLogMessage(lit("File is not opened."), cl_logERROR);
 		return -1;
-	return ::write( (long)m_impl, buffer, count );
+    }
+	ssize_t writtenBytes = ::write( (long)m_impl, buffer, count );
+    if (writtenBytes == -1)
+        printLogMessage(lit(""), cl_logERROR);
+    else if (writtenBytes < count) 
+        printLogMessage(lit("Failed to write all bytes."), cl_logERROR);
+
+    return writtenBytes;
 }
 
 bool QnFile::isOpen() const
@@ -179,5 +194,3 @@ qint64 QnFile::getFileSize( const QString& fileName )
         return -1;
     return fstat.st_size;
 }
-
-#endif

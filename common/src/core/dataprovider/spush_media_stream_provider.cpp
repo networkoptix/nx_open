@@ -9,7 +9,10 @@
 
 #include <core/resource/camera_resource.h>
 
+namespace {
 static const qint64 CAM_NEED_CONTROL_CHECK_TIME = 1000 * 1;
+static const int kErrorDelayTimeoutMs = 100;
+} // namespace
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
@@ -77,12 +80,12 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
 
     if (!isStreamOpened())
     {
-        QnSleep::msleep(100); // to avoid large CPU usage
+        QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
 
-        closeStream(); // to release resources 
+        closeStream(); // to release resources
 
         setNeedKeyData();
-        if (isInitialized) 
+        if (isInitialized)
 		{
             mFramesLost++;
             m_stat[0].onData(0, false);
@@ -120,7 +123,7 @@ void CLServerPushStreamReader::run()
             openStream();
             continue;
         }
-        else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME) 
+        else if (m_needControlTimer.elapsed() > CAM_NEED_CONTROL_CHECK_TIME)
         {
             m_needControlTimer.restart();
             if (!m_openedWithStreamCtrl && isCameraControlRequired()) {
@@ -155,12 +158,13 @@ void CLServerPushStreamReader::run()
                     m_resource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
                 m_stat[0].onLostConnection();
             }
-
+            if (mFramesLost > MAX_LOST_FRAME)
+                QnSleep::msleep(kErrorDelayTimeoutMs); // to avoid large CPU usage
             continue;
         }
         m_FrameCnt++;
 
-        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag; 
+        if (getResource()->hasFlags(Qn::local_live_cam)) // for all local live cam add MediaFlags_LIVE flag;
             data->flags |= QnAbstractMediaData::MediaFlags_LIVE;
 
         checkTime(data);
@@ -184,7 +188,7 @@ void CLServerPushStreamReader::run()
             mFramesLost = 0;
         }
 
-        if (videoData && needKeyData())
+        if (videoData && needKeyData(videoData->channelNumber))
         {
             // I do not like; need to do smth with it
             if (videoData->flags & AV_PKT_FLAG_KEY)
@@ -233,7 +237,7 @@ void CLServerPushStreamReader::run()
         if (dataCanBeAccepted())
             putData(std::move(data));
         else
-            setNeedKeyData();
+            setNeedKeyData(data->channelNumber);
     }
 
     if (isStreamOpened())
@@ -252,7 +256,8 @@ void CLServerPushStreamReader::beforeRun()
     if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
         m_cameraAudioEnabled = camera->isAudioEnabled();
         //TODO: #GDM get rid of resourceChanged
-        connect(camera.data(),  SIGNAL(resourceChanged(QnResourcePtr)), this, SLOT(at_resourceChanged(QnResourcePtr)), Qt::DirectConnection);
+        connect(camera.data(),  &QnResource::resourceChanged, this,
+            &CLServerPushStreamReader::at_resourceChanged, Qt::DirectConnection);
     }
 }
 

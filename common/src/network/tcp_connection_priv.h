@@ -9,6 +9,7 @@
 #include "utils/common/byte_array.h"
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/httpstreamreader.h>
+#include <core/resource_access/user_access_data.h>
 
 
 static const int TCP_READ_BUFFER_SIZE = 65536;
@@ -23,6 +24,17 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
     <BODY><H1>401 Unauthorized.</H1></BODY>\
     </HTML>"
 );
+
+static const QByteArray STATIC_FORBIDDEN_HTML("\
+    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
+    <HTML>\
+    <HEAD>\
+    <TITLE>Error</TITLE>\
+    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
+    </HEAD>\
+    <BODY><H1>403 Forbidden.</H1></BODY>\
+    </HTML>"
+    );
 
 static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -91,7 +103,7 @@ public:
     bool chunkedMode;
     int clientRequestOffset;
     QDateTime lastModified;
-    QnUuid authUserId;
+    Qn::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
 private:

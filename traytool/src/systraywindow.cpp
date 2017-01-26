@@ -83,7 +83,7 @@ QnSystrayWindow::QnSystrayWindow()
 
     findServiceInfo();
 
-    setWindowTitle(QnTraytoolAppInfo::applicationDisplayName());
+    setWindowTitle(QnTraytoolAppInfo::applicationName());
 
     QTimer* findServicesTimer = new QTimer(this);
     connect(findServicesTimer, &QTimer::timeout, this, &QnSystrayWindow::findServiceInfo);
@@ -153,7 +153,7 @@ void QnSystrayWindow::findServiceInfo() {
 
     if (!isServerInstalled() && m_firstTimeToolTipError)
     {
-        showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("No %1 services installed").arg(QnAppInfo::organizationName()));
+        showMessage(QnTraytoolAppInfo::applicationName(), tr("No %1 services installed").arg(QnAppInfo::organizationName()));
         m_firstTimeToolTipError = false;
     }
 
@@ -227,13 +227,13 @@ void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
         }
 
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_STOPPED && !m_needStartMediaServer) {
-            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Server has been stopped"));
+            showMessage(QnTraytoolAppInfo::applicationName(), tr("Server has been stopped"));
         }
     }
     else if (status == SERVICE_RUNNING)
     {
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING) {
-            showMessage(QnTraytoolAppInfo::applicationDisplayName(), tr("Server has been started"));
+            showMessage(QnTraytoolAppInfo::applicationName(), tr("Server has been started"));
         }
     }
     m_prevMediaServerStatus = status;
@@ -339,7 +339,7 @@ void QnSystrayWindow::at_mediaServerStopAction()
     if (!isServerInstalled())
         return;
 
-    if (QMessageBox::question(0, QnTraytoolAppInfo::applicationDisplayName(), tr("Server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    if (QMessageBox::question(0, QnTraytoolAppInfo::applicationName(), tr("Server will be stopped. Continue?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
         StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
         connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
         QThreadPool::globalInstance()->start(stopTask);
@@ -489,7 +489,7 @@ void QnSystrayWindow::createTrayIcon()
 
     m_trayIcon = new QSystemTrayIcon(this);
     m_trayIcon->setContextMenu(trayIconMenu);
-    m_trayIcon->setIcon(QIcon(lit(":/traytool.png")));
+    m_trayIcon->setIcon(QIcon(lit(":/logo.png")));
 
     connect(m_trayIcon, &QSystemTrayIcon::activated, this, &QnSystrayWindow::iconActivated);
     m_trayIcon->show();

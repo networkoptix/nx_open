@@ -1,37 +1,37 @@
-/**********************************************************
-* Feb 11, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include "stun_message_data.h"
 
+#include "nx/network/stun/extension/stun_extension_types.h"
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API UdpHolePunchingSyn
-:
-    public StunMessageData
+class NX_NETWORK_API UdpHolePunchingSynRequest:
+    public StunRequestData
 {
 public:
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+
+    UdpHolePunchingSynRequest();
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class NX_NETWORK_API UdpHolePunchingSynAck
-:
-    public StunMessageData
+class NX_NETWORK_API UdpHolePunchingSynResponse:
+    public StunResponseData
 {
 public:
+    constexpr static const auto kMethod = stun::extension::methods::udpHolePunchingSyn;
+
     nx::String connectSessionId;
 
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    UdpHolePunchingSynResponse();
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

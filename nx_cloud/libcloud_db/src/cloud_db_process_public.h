@@ -1,13 +1,6 @@
-/**********************************************************
-* Nov 25, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_PROCESS_PUBLIC_H
-#define NX_CLOUD_DB_PROCESS_PUBLIC_H
+#pragma once
 
 #include <utils/common/stoppable.h>
-
 
 namespace nx {
 namespace cdb {
@@ -29,11 +22,11 @@ public:
 
     int exec();
 
+    const CloudDBProcess* impl() const;
+
 private:
     CloudDBProcess* m_impl;
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CLOUD_DB_PROCESS_PUBLIC_H
+} // namespace cdb
+} // namespace nx

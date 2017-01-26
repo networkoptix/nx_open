@@ -14,9 +14,10 @@
 
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/common/util.h>
+#include <network/tcp_listener.h>
 
 namespace {
-    static const qint64 CACHE_SIZE = 1024 * 256;
+    static const qint64 CACHE_SIZE = 1024 * 1024;
 
     struct CacheEntry
     {
@@ -28,6 +29,7 @@ namespace {
 
 
     static QCache<QString, CacheEntry> cachedFiles(CACHE_SIZE);
+    static QCache<QString, int> externalPackageNameMiss(CACHE_SIZE);
     static QnMutex cacheMutex;
 
     static QHash<QString, QByteArray> contentTypes = {
@@ -42,22 +44,27 @@ namespace {
         { "xml",  "application/xml" },
         { "xsl",  "applicaton/xslt+xml" },
         { "zip",  "application/zip" },
-        { "swf",  "application/x-shockwave-flash" }
+        { "swf",  "application/x-shockwave-flash" },
+        { "txt",  "text/plain" }
     };
 
-    const QByteArray kDefaultContentType = "application/xml";
+    const QByteArray kDefaultContentType = "text/html; charset=utf-8";
 
     const QString kExternalResourcesPackageName = "external.dat";
 
-    typedef std::unique_ptr<QIODevice> QIODevicePtr;
-
     QIODevicePtr getStaticFile(const QString& relativePath)
     {
-        {   /* Check external package. */
-            static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-            QIODevicePtr result(new QuaZipFile(packageName, relativePath));
-            if (result->open(QuaZipFile::ReadOnly))
-                return result;
+        if (!externalPackageNameMiss.contains(relativePath))
+        {
+
+            {   /* Check external package. */
+                static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
+                QIODevicePtr result(new QuaZipFile(packageName, relativePath));
+                if (result->open(QuaZipFile::ReadOnly))
+                    return result;
+
+                externalPackageNameMiss.insert(relativePath, nullptr);
+            }
         }
 
         {   /* Check internal resources. */
@@ -70,16 +77,18 @@ namespace {
         return QIODevicePtr();
     }
 
-    QDateTime staticFileLastModified(QIODevice* device)
+    QDateTime staticFileLastModified(const QIODevicePtr& device)
     {
-        if (!device)
-            return QDateTime();
-
-        if (QFile* file = qobject_cast<QFile*>(device))
-            return QFileInfo(*file).lastModified();
-
         static const QString packageName = QDir(qApp->applicationDirPath()).filePath(kExternalResourcesPackageName);
-        return QFileInfo(packageName).lastModified();
+
+        QDateTime result;
+        if (QFile* file = qobject_cast<QFile*>(device.get()))
+            result = QFileInfo(*file).lastModified();
+        else
+            result = QFileInfo(packageName).lastModified();
+
+        // zero msec in result
+        return result.addMSecs(-result.time().msec());
     }
 }
 
@@ -89,7 +98,7 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*_owner*/):
+QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*_owner*/) :
     QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket)
 {
 }
@@ -107,75 +116,87 @@ QByteArray QnFileConnectionProcessor::readStaticFile(const QString& path)
     return QByteArray();
 }
 
-void QnFileConnectionProcessor::run()
+bool QnFileConnectionProcessor::loadFile(
+    const QString& path,
+    QDateTime* outLastModified,
+    QByteArray* outData)
 {
-    Q_D(QnFileConnectionProcessor);
+    QnMutexLocker lock(&cacheMutex);
 
-    initSystemThreadId();
-
-    if (d->clientRequest.isEmpty()) {
-        if (!readRequest())
-            return;
+    CacheEntry* cachedData = cachedFiles.object(path);
+    if (cachedData)
+    {
+        *outData = cachedData->data;
+        *outLastModified = cachedData->lastModified;
+        return true;
     }
-    parseRequest();
-
-
-    d->response.messageBody.clear();
-
-    QUrl url = getDecodedUrl();
-    QString path = url.path();
-    while (path.endsWith(QLatin1String("/")))
-        path.chop(1);
-
-    int rez = nx_http::StatusCode::ok;
-    QByteArray contentType = kDefaultContentType;
-    QByteArray contentEncoding;
 
     QIODevicePtr file = getStaticFile(path);
     if (!file)
-        rez = nx_http::StatusCode::notFound;
+        return false;
 
-    QDateTime lastModified = staticFileLastModified(file.get());
+    *outData = file->readAll();
+    *outLastModified = staticFileLastModified(file);
+    if (outData->size() < cachedFiles.maxCost())
+        cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
+    return true;
+}
+
+QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& contentType)
+{
+    Q_D(QnFileConnectionProcessor);
+#ifndef EDGE_SERVER
+    if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
+    {
+        if (!contentType.contains("image")) {
+            d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+            return "gzip";
+        }
+    }
+#endif
+    return QByteArray();
+}
+
+void QnFileConnectionProcessor::run()
+{
+    Q_D(QnFileConnectionProcessor);
+    initSystemThreadId();
+
+    if (d->clientRequest.isEmpty() && !readRequest())
+        return;
+    parseRequest();
+    d->response.messageBody.clear();
+
+    QUrl url = getDecodedUrl();
+    QString path = QString('/') + QnTcpListener::normalizedPath(url.path());
+    const QString fileFormat = QFileInfo(path).suffix().toLower();
+    QByteArray contentType = contentTypes.value(fileFormat, kDefaultContentType);
+
+    if (path.contains(".."))
+    {
+        sendResponse(nx_http::StatusCode::forbidden, contentType, QByteArray());
+        return;
+    }
+
+    QDateTime lastModified;
+    if (!loadFile(path, &lastModified, &d->response.messageBody))
+    {
+        sendResponse(nx_http::StatusCode::notFound, contentType, QByteArray());
+        return;
+    }
+
+    nx_http::HttpHeader modifiedHeader("Last-Modified", dateTimeToHTTPFormat(lastModified));
+    d->response.headers.insert(modifiedHeader);
     QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())
     {
         QDateTime modifiedSince = QDateTime::fromString(modifiedSinceStr, Qt::RFC2822Date);
         if (lastModified <= modifiedSince)
-            rez = nx_http::StatusCode::notModified;
-        //TODO: #rvasilenko invalid content type will be returned here
+        {
+            sendResponse(nx_http::StatusCode::notModified, contentType, QByteArray());
+            return;
+        }
     }
 
-    if (rez == nx_http::StatusCode::ok)
-    {
-        QnMutexLocker lock( &cacheMutex );
-
-        CacheEntry* cachedData = cachedFiles.object(path);
-        if (cachedData && cachedData->lastModified == lastModified)
-        {
-            d->response.messageBody = cachedData->data;
-        }
-        else
-        {
-            d->response.messageBody = file->readAll();
-#ifndef _DEBUG
-            if (d->response.messageBody.size() < cachedFiles.maxCost())
-                cachedFiles.insert(path, new CacheEntry(d->response.messageBody, lastModified), d->response.messageBody.size());
-#endif
-        }
-
-        const QString fileFormat = QFileInfo(path).suffix().toLower();
-        contentType = contentTypes.value(fileFormat, kDefaultContentType);
-
-#ifndef EDGE_SERVER
-        if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
-        {
-            if (!contentType.contains("image")) {
-                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
-                contentEncoding = "gzip";
-            }
-        }
-#endif
-    }
-    d->response.headers.insert(nx_http::HttpHeader("Last-Modified", dateTimeToHTTPFormat(lastModified)));
-    sendResponse(rez, contentType, contentEncoding);
+    sendResponse(nx_http::StatusCode::ok, contentType, compressMessageBody(contentType));
 }

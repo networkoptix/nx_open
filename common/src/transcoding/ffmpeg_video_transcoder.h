@@ -20,7 +20,7 @@ class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
     Q_DECLARE_TR_FUNCTIONS(QnFfmpegVideoTranscoder)
 public:
-    QnFfmpegVideoTranscoder(CodecID codecId);
+    QnFfmpegVideoTranscoder(AVCodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
@@ -57,6 +57,8 @@ private:
     qint64 m_droppedFrames;
 
     bool m_useRealTimeOptimization;
+    AVPacket* m_outPacket;
+    QnConstMediaContextPtr m_ctxPtr;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

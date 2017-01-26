@@ -5,14 +5,19 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
+#include <nx/streaming/config.h>
+
+#include <motion/motion_detection.h>
+#include <nx/fusion/model_functions.h>
+
 #ifdef Q_OS_OSX
 #include <smmintrin.h>
 #endif
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
-: 
+:
     dataType(_dataType),
-    compressionType(CODEC_ID_NONE),
+    compressionType(AV_CODEC_ID_NONE),
     flags(MediaFlags_None),
     channelNumber(0),
     context(0),
@@ -59,7 +64,7 @@ QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) cons
 QnMetaDataV1::QnMetaDataV1(int initialValue)
 :   //TODO #ak delegate constructor
     QnAbstractMediaData(META_V1),
-    m_data(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
+    m_data(CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
 {
     flags = 0;
     m_input = 0;
@@ -77,7 +82,7 @@ QnMetaDataV1::QnMetaDataV1(
     int initialValue)
 :
     QnAbstractMediaData(META_V1),
-    m_data(allocator, CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
+    m_data(allocator, CL_MEDIA_ALIGNMENT, Qn::kMotionGridWidth*Qn::kMotionGridHeight/8)
 {
     flags = 0;
     m_input = 0;
@@ -128,7 +133,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
 {
     uint64_t* curPtr = (uint64_t*) data;
     curPtr += maskStart*2;
-    uint64_t* maskPtr = (uint64_t*) mask; 
+    uint64_t* maskPtr = (uint64_t*) mask;
     maskPtr += maskStart*2;
 
     for (int i = maskStart; i <= maskEnd; ++i)
@@ -146,7 +151,7 @@ bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int ma
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return mathImage_sse41(data, mask, maskStart, maskEnd);
-    else 
+    else
         return mathImage_sse2(data, mask, maskStart, maskEnd);
 #elif __arm__ && __ARM_NEON__
     //TODO/ARM
@@ -215,7 +220,7 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
 inline bool metadataIsEmpty_sse2(__m128i* src)
 {
     static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0); /* SSE2. */
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
     {
         if (_mm_movemask_epi8(_mm_cmpeq_epi32(src[i], zerroValue)) != 0xffff) /* SSE2. */
             return false;
@@ -226,7 +231,7 @@ inline bool metadataIsEmpty_sse2(__m128i* src)
 inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 {
     static const __m128i ff_mask = _mm_setr_epi32(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff); /* SSE2. */
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
     {
         if (_mm_testz_si128_sse4(src[i], ff_mask) == 0) /* SSE4. */
             return false;
@@ -238,7 +243,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 inline bool metadataIsEmpty_cpu(const char* data)
 {
     const quint32* curPtr = (const quint32*) data;
-    for (size_t i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
+    for (size_t i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/sizeof(quint32)/CHAR_BIT; ++i)
     {
         if (*curPtr++)
             return false;
@@ -251,7 +256,7 @@ bool QnMetaDataV1::isEmpty() const
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
         return metadataIsEmpty_sse41((__m128i*) m_data.data());
-    else 
+    else
         return metadataIsEmpty_sse2((__m128i*) m_data.data());
 #elif __arm__ && __ARM_NEON__
     return metadataIsEmpty_cpu(m_data.data());
@@ -262,9 +267,9 @@ bool QnMetaDataV1::isEmpty() const
 
 void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 {
-    NX_ASSERT( m_data.size() == MD_WIDTH * MD_HEIGHT / CHAR_BIT );
+    NX_ASSERT( m_data.size() == Qn::kMotionGridWidth * Qn::kMotionGridHeight / CHAR_BIT );
 
-    memcpy( m_data.data(), data, MD_WIDTH * MD_HEIGHT / CHAR_BIT );
+    memcpy( m_data.data(), data, Qn::kMotionGridWidth * Qn::kMotionGridHeight / CHAR_BIT );
 
     m_firstTimestamp = timestamp;
     m_duration = duration;
@@ -272,15 +277,15 @@ void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
-    if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
+    if (m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
-    else 
+    else
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     __m128i* dst = (__m128i*) m_data.data();
     __m128i* src = (__m128i*) image;
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
     {
         *dst = _mm_or_si128(*dst, *src); /* SSE2. */
         dst++;
@@ -289,10 +294,10 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     }
 #else
     // remove without SIMD
-    memcpy( m_data.data(), image, MD_WIDTH*MD_HEIGHT/CHAR_BIT );
+    memcpy( m_data.data(), image, Qn::kMotionGridWidth*Qn::kMotionGridHeight/CHAR_BIT );
     //int64_t* dst = (int64_t*) m_data.data();
     //int64_t* src = (int64_t*) image;
-    //for (int i = 0; i < MD_WIDTH*MD_HEIGHT/128; ++i)
+    //for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
     //{
     //    *dst++ |= *src++;
     //    *dst++ |= *src++;
@@ -302,30 +307,30 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 
 bool QnMetaDataV1::isMotionAt(int x, int y, char* mask)
 {
-    NX_ASSERT(x<MD_WIDTH);
-    NX_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<Qn::kMotionGridWidth);
+    NX_ASSERT(y<Qn::kMotionGridHeight);
 
-    int shift = x*MD_HEIGHT + y;
+    int shift = x*Qn::kMotionGridHeight + y;
     unsigned char b = *((unsigned char*)mask + shift/8 );
     return b & (128 >> (shift&7));
 }
 
 bool QnMetaDataV1::isMotionAt(int x, int y) const
 {
-    NX_ASSERT(x<MD_WIDTH);
-    NX_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<Qn::kMotionGridWidth);
+    NX_ASSERT(y<Qn::kMotionGridHeight);
 
-    int shift = x*MD_HEIGHT + y;
+    int shift = x*Qn::kMotionGridHeight + y;
     unsigned char b = *((unsigned char*)m_data.data() + shift/8 );
     return b & (128 >> (shift&7));
 }
 
-void QnMetaDataV1::setMotionAt(int x, int y) 
+void QnMetaDataV1::setMotionAt(int x, int y)
 {
-    NX_ASSERT(x<MD_WIDTH);
-    NX_ASSERT(y<MD_HEIGHT);
+    NX_ASSERT(x<Qn::kMotionGridWidth);
+    NX_ASSERT(y<Qn::kMotionGridHeight);
 
-    int shift = x*MD_HEIGHT + y;
+    int shift = x*Qn::kMotionGridHeight + y;
     quint8* b = (quint8*)m_data.data() + shift/8;
     *b |= (128 >> (shift&7));
 }
@@ -338,14 +343,14 @@ bool QnMetaDataV1::mapMotion(const QRect& imageRect, const QRect& mRect)
     if (motioRect.isNull())
         return false;
 
-    //int localZoneWidth = imageRect.width() / MD_WIDTH;
-    //int localZoneHight = imageRect.height() / MD_HEIGHT;
+    //int localZoneWidth = imageRect.width() / Qn::kMotionGridWidth;
+    //int localZoneHight = imageRect.height() / Qn::kMotionGridHeight;
 
-    int leftZone = motioRect.left() * MD_WIDTH / imageRect.width();
-    int topZone = motioRect.top() * MD_HEIGHT / imageRect.height();
+    int leftZone = motioRect.left() * Qn::kMotionGridWidth / imageRect.width();
+    int topZone = motioRect.top() * Qn::kMotionGridHeight / imageRect.height();
 
-    int rightZone = motioRect.right() * MD_WIDTH / imageRect.width();
-    int bottomZone = motioRect.bottom() * MD_HEIGHT / imageRect.height();
+    int rightZone = motioRect.right() * Qn::kMotionGridWidth / imageRect.width();
+    int bottomZone = motioRect.bottom() * Qn::kMotionGridHeight / imageRect.height();
 
     for (int x = leftZone; x <= rightZone; ++x) {
         for (int y = topZone; y <= bottomZone; ++y)
@@ -368,14 +373,14 @@ bool QnMetaDataV1::containTime(const qint64 timeUsec) const
 
 inline void setBit(quint8* data, int x, int y)
 {
-    bool correctData = (x >= 0 && x < MD_WIDTH) && (y >= 0 && y < MD_HEIGHT);
+    bool correctData = (x >= 0 && x < Qn::kMotionGridWidth) && (y >= 0 && y < Qn::kMotionGridHeight);
 
     NX_ASSERT(correctData);
 
     if (!correctData)
         return;
 
-    int offset = (x * MD_HEIGHT + y) / 8;
+    int offset = (x * Qn::kMotionGridHeight + y) / 8;
     data[offset] |= 0x80 >> (y&7);
 }
 
@@ -386,15 +391,15 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
         *maskStart = 0;
     if (maskEnd)
         *maskEnd = 0;
-    memset(mask, 0, MD_WIDTH * MD_HEIGHT / 8);
+    memset(mask, 0, Qn::kMotionGridWidth * Qn::kMotionGridHeight / 8);
 
     for (int i = 0; i < region.rectCount(); ++i)
     {
         const QRect& rect = region.rects().at(i);
         if (maskStart)
-            *maskStart = qMin((rect.left() * MD_HEIGHT + rect.top()) / 128, *maskStart);
+            *maskStart = qMin((rect.left() * Qn::kMotionGridHeight + rect.top()) / 128, *maskStart);
         if (maskEnd)
-            *maskEnd = qMax((rect.right() * MD_HEIGHT + rect.bottom()) / 128, *maskEnd);
+            *maskEnd = qMax((rect.right() * Qn::kMotionGridHeight + rect.bottom()) / 128, *maskEnd);
         for (int x = rect.left(); x <= rect.right(); ++x)
         {
             for (int y = rect.top(); y <= rect.bottom(); ++y)
@@ -445,4 +450,19 @@ bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs)
 bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
+}
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(/*global namespace*/, MediaQuality,
+    (MEDIA_Quality_High, "high")
+    (MEDIA_Quality_Low, "low")
+    (MEDIA_Quality_ForceHigh, "force-high")
+    (MEDIA_Quality_Auto, "auto")
+    (MEDIA_Quality_CustomResolution, "custom")
+    (MEDIA_Quality_LowIframesOnly, "low-iframes-only")
+    (MEDIA_Quality_None, "")
+)
+
+bool isLowMediaQuality(MediaQuality q)
+{
+    return q == MEDIA_Quality_Low || q == MEDIA_Quality_LowIframesOnly;
 }

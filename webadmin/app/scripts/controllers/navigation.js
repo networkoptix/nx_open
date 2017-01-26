@@ -1,27 +1,34 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('NavigationCtrl', function ($scope, $location, mediaserver, $sessionStorage) {
+    .controller('NavigationCtrl', function ($scope, $location, mediaserver, dialogs, nativeClient) {
         $scope.user = {
             isAdmin: true
         };
+        $scope.noPanel = true;
+
+        nativeClient.init().then(function(result){
+            $scope.settings.liteClient = result.lite;
+        });
+
+        $scope.hasProxy = mediaserver.hasProxy();
+
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = r.data.reply;
-            $scope.settings.remoteAddresses = $scope.settings.remoteAddresses.join('\n');
-
-            // check for safe mode and new server and redirect.
-            if(r.data.reply.serverFlags.includes(Config.newServerFlag) && !r.data.reply.ecDbReadOnly){
-                $location.path("/setup");
-                return;
+            $scope.noPanel = $scope.settings.flags.noHDD || $scope.settings.flags.cleanSystem;
+            if(!$scope.noPanel) {
+                mediaserver.resolveNewSystemAndUser().then(function (user) {
+                    if (user === null) {
+                        return;
+                    }
+                    $scope.user = user;
+                }, function (error) {
+                    if (error.status !== 401 && error.status !== 403) {
+                        dialogs.alert(L.navigaion.cannotGetUser);
+                    }
+                });
             }
-            mediaserver.getUser().then(function(user){
-                $scope.user = {
-                    isAdmin: user.isAdmin,
-                    name: user.name
-                };
-            });
-
         });
         $scope.isActive = function (path) {
             var local_path = $location.path();
@@ -36,14 +43,5 @@ angular.module('webadminApp')
             mediaserver.logout().then(function(){
                 window.location.reload();
             });
-        };
-
-        $scope.webclientEnabled = Config.webclientEnabled;
-        $scope.alertVisible = true;
-
-        $scope.session = $sessionStorage;
-
-        $scope.closeAlert = function(){
-            $scope.session.serverInfoAlertHidden = true;
         };
     });

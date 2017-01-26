@@ -5,7 +5,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QDataStream>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnSoftwareVersion::QnSoftwareVersion(const QString &versionString) {
     deserialize(versionString, this);

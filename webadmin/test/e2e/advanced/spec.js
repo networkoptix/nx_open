@@ -2,175 +2,316 @@
 var Page = require('./po.js');
 describe('Advanced Page', function () {
 
-
-
-    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
-
     var p = new Page();
 
-    it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
+    beforeAll(function() {
         p.get();
-        expect(p.storagesRows.count()).toBeGreaterThan(0);
-        var storage = p.storagesRows.first();
-        expect(storage.element(by.css(".storage-url")).getText()).toMatch(/[\w\d\:]*(\/[\w\d]*)+/);
-        expect(storage.element(by.css(".progress")).getAttribute("title")).toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
-        expect(storage.element(by.css("[title~=Internal]")).isDisplayed()).toBe(true);
     });
 
-
-    it("should show reserved space value",function(){
-        expect("test").toBe("written");
-    });
-
-    it("should show warning tip",function(){
+    it("shows warning about server failure",function(){
         expect(p.dangerAlert.isDisplayed()).toBe(true);
     });
 
-    it("should allow user to change settings: limit, enabled",function(){
-        var storage = p.storagesRows.first();
-        expect(storage.element(by.model("storage.reservedSpaceGb")).isEnabled()).toBe(true);
-        expect(storage.element(by.model("storage.isUsedForWriting")).isDisplayed()).toBe(true);
+    it("should allow user to see storages: free space, limit, totalspace, enabled, some indicator",function(){
+        expect(p.storagesRows.count()).toBeGreaterThan(0);
+        expect(p.storageName.getText()).toMatch(/[\w\:]*([\w\s]*)+/);
+        expect(p.storagePartition.getAttribute("title"))
+            .toMatch(/Reserved\:\s\d+\.?\d*\s*\wB,\s+Free\:\s\d+\.?\d*\s*\wB,\s+Occupied\:\s\d+\.?\d*\s*\wB,\s+Total:\s\d+\.?\d*\s*\wB/);
+        expect(p.storageInternalIcon.isDisplayed()).toBe(true);
     });
 
-    it("should validate GB value",function(){
+    it("allows user to change settings: limit, enabled",function(){
+        expect(p.storageReservedInput.isEnabled()).toBe(true);
+        expect(p.storageIsUsedForWriting.isDisplayed()).toBe(true);
+    });
+
+    it("validates Reserved storage value",function(){
         p.setStorageLimit('');
-        expect(p.saveButton.isEnabled()).toBe(false);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+        expect(p.saveStoragesButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInputParent.getAttribute("class")).toMatch("has-error");
 
         p.setStorageLimit(5);
-        expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
+        expect(p.saveStoragesButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInputParent.getAttribute("class")).not.toMatch("has-error");
 
         p.setStorageLimit('bad value');
-        expect(p.saveButton.isEnabled()).toBe(false);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+        expect(p.saveStoragesButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInputParent.getAttribute("class")).toMatch("has-error");
 
         p.setStorageLimit(5);
-        expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
+        expect(p.saveStoragesButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInputParent.getAttribute("class")).not.toMatch("has-error");
 
         p.setStorageLimit(1000000);
-        expect(p.saveButton.isEnabled()).toBe(false);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-error");
+        expect(p.saveStoragesButton.isEnabled()).toBe(false);
+        expect(p.storageLimitInputParent.getAttribute("class")).toMatch("has-error");
 
         p.setStorageLimit(5);
-        expect(p.saveButton.isEnabled()).toBe(true);
-        expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).not.toMatch("has-error");
-
+        expect(p.saveStoragesButton.isEnabled()).toBe(true);
+        expect(p.storageLimitInputParent.getAttribute("class")).not.toMatch("has-error");
     });
 
-    it("should show warning, then limit is more than free space",function(){
-        p.get();
+    it("shows warning, when limit is more than free space",function(){
         expect(p.reduceArchiveAlert.isDisplayed()).toBe(false);
         p.storageLimitInput.getAttribute("max").then(function(max){
 
             var toset = parseFloat(max).toFixed(0)-1;
             p.setStorageLimit(toset);
 
-            expect(p.saveButton.isEnabled()).toBe(true);
-            expect(p.storageLimitInput.element(by.xpath("..")).getAttribute("class")).toMatch("has-warning");
+            expect(p.saveStoragesButton.isEnabled()).toBe(true);
+            expect(p.storageLimitInputParent.getAttribute("class")).toMatch("has-warning");
             expect(p.reduceArchiveAlert.isDisplayed()).toBe(true);
 
-            // This part of the test will be available, when alert dialogs are removed from the code
-            expect("alert").toBe("removed");
-            // p.saveButton.click().then(function(){
-            //     var alertDialog = ptor.switchTo().alert();
-            //     expect(alertDialog.getText()).toContain("Possible partial remove of the video footage is expected");
-            //     alertDialog.dismiss();
-            // });
+            p.saveStoragesButton.click().then(function(){
+                expect(p.dialog.getText()).toContain("Set reserved space is greater than free space left. " +
+                    "Possible partial remove of the video footage is expected. " +
+                    "Do you want to continue?");
+                p.dialogOkButton.click();
+                p.dialogCloseButton.click();
+            });
         });
     });
 
-
-    it("should save settings and display it after reload",function(){
-        p.get();
+    it("saves settings and displays them after reload",function(){
         p.setStorageLimit(1);
 
-        // This test will be available, when alert dialogs are removed from the code
-        expect("alert").toBe("removed");
-/*        p.saveButton.click().then(function(){
-            var alertDialog = ptor.switchTo().alert();
-            expect(alertDialog.getText()).toContain("Settings saved");
-            alertDialog.accept();
+        p.saveStoragesButton.click().then(function(){
+
+            expect(p.dialog.getText()).toContain("Settings saved");
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
 
             p.get();
+
             expect(p.storageLimitInput.getAttribute("value")).toBe("1");
 
             p.setStorageLimit(5);
 
-            console.log("click 3");
-            p.saveButton.click().then(function(){
-                var alertDialog = ptor.switchTo().alert();
-                expect(alertDialog.getText()).toContain("Settings saved");
-                alertDialog.accept();
+            p.saveStoragesButton.click().then(function(){
+                expect(p.dialog.getText()).toContain("Settings saved");
+                p.dialogCloseButton.click();
 
                 p.get();
                 expect(p.storageLimitInput.getAttribute("value")).toBe("5");
             });
 
-        });*/
-    });
-
-    it("should forbid disabling all storages",function(){
-        p.get();
-        expect(p.selectWritableStorageAlert.isDisplayed()).toBe(false);
-
-        var total = p.storagesRows.count();
-        var d = protractor.promise.defer();
-        var readycounter=0;
-        for(var i=0;i<total;i++){
-            console.log("test checkboxes",i);
-            var row = p.storagesRows.get(i);
-            var checkbox = row.element(by.css(".isUsedForWriting"));//by.model("storage.isUsedForWriting"));
-            checkbox.isSelected().then(function(isSelected){
-
-                if(isSelected) {
-                    checkbox.click();
-                    console.log("click item to deselect");
-                }
-
-                expect(checkbox.isSelected()).toBe(false);
-                readycounter++;
-
-                if(readycounter == total){
-                     d.fulfill("ok");
-                    done();
-                }
-            });
-        }
-        d.promise.then(function(){
-            expect(p.selectWritableStorageAlert.isDisplayed()).toBe(true);
-            expect(p.saveButton.isEnabled()).toBe(false);
         });
     });
 
-    it("should allow cancel changes",function(){
+    it("warns on disabling all storages",function(){
+        expect(p.selectWritableStorageAlert.isDisplayed()).toBe(false);
+
+        p.storagesRows.each( function (row) {
+            var checkbox = row.element(p.isUsedCheckbox.locator());
+            checkbox.isSelected().then( function(isSelected) {
+                if(isSelected) {
+                    checkbox.click();
+                }
+                expect(checkbox.isSelected()).toBe(false);
+            });
+        });
+
+        expect(p.selectWritableStorageAlert.isDisplayed()).toBe(true);
+        p.saveStoragesButton.click();
+        p.helper.checkPresent(p.dialog).then(function () {
+                expect(p.dialog.getText()).toContain('No main storage drive was selected for writing -' +
+                    ' video will not be recorded on this server. Do you want to continue?');
+                p.dialogOkButton.click();
+                expect(p.dialog.getText()).toContain('Settings saved');
+                p.dialogCloseButton.click();
+            });
+
+        browser.refresh();
+        // Check that no storages are selected for writing after refresh
+        p.storagesRows.each( function (row) {
+            expect(row.element(p.isUsedCheckbox.locator()).isSelected()).toBe(false);
+        });
+
+        // Enable first storage for writing again
+        p.storageIsUsedForWriting.click();
+        p.saveStoragesButton.click();
+        p.helper.checkPresent(p.dialog).then(function () {
+            p.dialogCloseButton.click();
+        });
+    });
+
+    it("allows canceling changes",function(){
         p.storageLimitInput.getAttribute("value").then(function(oldlimit){
             p.setStorageLimit(1);
-            p.cancelButton.click();
+            expect(p.storageLimitInput.getAttribute("value")).toBe('1');
+            p.cancelStoragesButton.click();
             expect(p.storageLimitInput.getAttribute("value")).toBe(oldlimit);
         });
     });
 
-    it("should show button for updating system",function(){
+    // Log section tests
+
+    it("Main log level select works and is saved",function(){
+        p.mainLogLevelOptions.each(function(elem) {
+            p.helper.checkPresent(p.mainLogLevelSelect).then( function() {
+                p.mainLogLevelSelect.click();
+            }, function(err) {
+                console.log(err);
+                browser.sleep(500);
+            });
+
+            p.helper.checkDisplayed(elem).then( function() {
+                elem.click();
+                p.saveLogsButton.click();
+            });
+
+            // If confirmation alert appears, close it
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
+
+            expect(elem.isSelected()).toBe(true);
+        })
+    });
+
+    it("Transaction log level select works and is saved",function(){
+        p.transLogLevelOptions.each(function(elem) {
+            p.helper.checkPresent(p.transLogLevelSelect).then( function() {
+                p.transLogLevelSelect.click();
+            }, function(err) {
+                console.log(err);
+                browser.sleep(500);
+            });
+
+            p.helper.checkDisplayed(elem).then( function() {
+                elem.click();
+                p.saveLogsButton.click();
+            });
+
+            // If confirmation alert appears, close it
+            p.helper.closeDialogIfPresent(p.dialog, p.dialogCloseButton);
+
+            expect(elem.isSelected()).toBe(true);
+        })
+    });
+
+    // Manual update tests
+    it("shows button for manual updating system",function(){
         expect(p.upgradeButton.isEnabled()).toBe(true);
     });
 
-
-    it("should upload some bad file and display an error",function(){
+    it("allows to upload some bad file and displays an error",function(){
         var path = require('path');
 
         var fileToUpload = './po.js';
         var absolutePath = path.resolve(__dirname, fileToUpload);
 
-        // This test will be available, when alert dialogs are removed from the code
-        expect("alert").toBe("removed");
-        // p.upgradeButton.sendKeys(absolutePath).then(function(){
+        p.upgradeButton.sendKeys(absolutePath).then(function(){
+            p.helper.waitIfNotPresent( p.dialog, 2000);
+            expect(p.dialog.getText()).toContain("Updating failed");
+            p.dialogCloseButton.click();
+        });
+    });
 
-        //     var alertDialog = browser.switchTo().alert();
+    //Advanced system settings
+    it("All checkboxes are changeable; after save changes are applied",function(){
+        var oldSysSettings = []; // array to store initial state of checkboxes
 
-        //     expect(alertDialog.getText()).toContain("Updating failed");
-        //     alertDialog.accept();
-        // });
+        // We do not want to toggle new system checkbox, so filtering it out
+        p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).each( function(checkbox) {
+            checkbox.isSelected().then( function(wasSelected) {
+                checkbox.click(); // toggle checkbox state
+
+                if (wasSelected) expect(checkbox.isSelected()).toBe(false);
+                else expect(checkbox.isSelected()).toBe(true);
+
+                oldSysSettings.push(wasSelected); // filling array of initial states of checkboxes
+            });
+        });
+
+        p.saveSysSettings();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        // Grab new states of all checkboxes except newSystem, into array
+        var newSysSettings = p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).map( function(checkbox) {
+            return checkbox.isSelected().then( function(isSelected) {
+                return isSelected;
+            });
+        });
+
+        // Check that state of all checkboxes has changed
+        // by comparing two arrays
+        for (var i=0; i < oldSysSettings.length; i++) {
+            expect(oldSysSettings[i]).toBe(!newSysSettings[i]);
+        }
+
+        // Toggling all settings back to initial state
+        // We do not want to toggle new system checkbox, so filtering it out
+        p.sysSettingsCheckboxes.filter( function(checkbox) {
+            return checkbox.getAttribute('id').then( function(id) {
+                return id != 'newSystem';
+            });
+        }).each( function(checkbox) {
+            checkbox.click(); // toggle checkbox state
+        });
+
+        p.saveSysSettings();
+    });
+
+    it("All number input fields are changeable; after save changes are applied",function(){
+        var initialSettings = [];
+
+        p.sysSettingsNumInputs.each( function(field) {
+            field.getAttribute('value').then(function(value) {
+                initialSettings.push(value);
+            });
+            field.sendKeys('5');
+            expect(field.getAttribute('value')).toContain('5');
+        });
+
+        p.saveSysSettings();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        p.sysSettingsNumInputs.each( function(field, index) {
+            // Check that settings are saved after refresh
+            expect(field.getAttribute('value')).toContain('5');
+            // Restore initial settings
+            field.clear()
+                .sendKeys(initialSettings[index]);
+        });
+        p.saveSysSettings();
+    });
+
+    xit("All text input fields are changeable; after save changes are applied",function(){
+        var initialSettings = p.sysSettingsTextInputs.map( function(field, index) {
+            return field.getAttribute('value').then(function(value) {
+                console.log(index, value);
+                return value;
+            })
+        });
+
+        p.sysSettingsTextInputs.each( function(field) {
+            field.sendKeys('someAddedText');
+            expect(field.getAttribute('value')).toContain('someAddedText');
+        });
+
+        p.saveSysSettings();
+        //browser.pause();
+
+        browser.refresh();
+        browser.waitForAngular();
+
+        p.sysSettingsTextInputs.each( function(field, index) {
+            // Check that settings are saved after refresh
+            expect(field.getAttribute('value')).toContain('someAddedText');
+            // Restore initial settings
+            field.clear()
+                .sendKeys(initialSettings[index]);
+        });
+        p.saveSysSettings();
     });
 });

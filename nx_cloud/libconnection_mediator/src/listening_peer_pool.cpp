@@ -1,16 +1,9 @@
-/**********************************************************
-* Jan 12, 2016
-* akolesnikov
-***********************************************************/
-
 #include "listening_peer_pool.h"
 
 #include <nx/utils/log/log.h>
 
-
 namespace nx {
 namespace hpm {
-
 
 QString ListeningPeerData::toString() const
 {
@@ -24,9 +17,8 @@ QString ListeningPeerData::toString() const
     return lm("%1<%2>").arg(hostName).container(opts);
 }
 
-////////////////////////////////////////////////////////////
-//// class ConstDataLocker
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class ConstDataLocker
 
 ListeningPeerPool::ConstDataLocker::ConstDataLocker(
     QnMutexLockerBase locker,
@@ -67,9 +59,8 @@ const ListeningPeerData& ListeningPeerPool::ConstDataLocker::value() const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class DataLocker
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class DataLocker
 
 ListeningPeerPool::DataLocker::DataLocker(
     QnMutexLockerBase locker,
@@ -82,8 +73,7 @@ ListeningPeerPool::DataLocker::DataLocker(
 {
 }
 
-ListeningPeerPool::DataLocker::DataLocker(ListeningPeerPool::DataLocker&& rhs)
-:
+ListeningPeerPool::DataLocker::DataLocker(ListeningPeerPool::DataLocker&& rhs):
     ConstDataLocker(std::move(rhs)),
     m_peerIter(std::move(rhs.m_peerIter))
 {
@@ -108,9 +98,8 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 }
 
 
-////////////////////////////////////////////////////////////
-//// class ListeningPeerPool
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class ListeningPeerPool
 
 ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const ConnectionStrongRef& connection,
@@ -166,7 +155,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
     const auto ids = hostName.split('.');
     if (ids.size() == 2)
     {
-        //hostName is serverID.systemID
+        //hostName is serverId.systemId
         const auto& systemId = ids[1];
         const auto& serverId = ids[0];
 
@@ -206,5 +195,37 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
     return std::move(foundPeers);
 }
 
-}   //hpm
-}   //nx
+data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
+{
+    data::ListeningPeersBySystem result;
+
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& peerPair: m_peers)
+    {
+        data::ListeningPeer peerData;
+        const auto peerConnetion = peerPair.second.peerConnection.lock();
+        if (peerConnetion)
+            peerData.connectionEndpoint = peerConnetion->getSourceAddress().toString().toUtf8();
+
+        for (const auto& forwardedEndpoint: peerPair.second.endpoints)
+            peerData.directTcpEndpoints.push_back(forwardedEndpoint.toString());
+
+        auto& system = result[peerPair.first.systemId];
+        system.emplace(peerPair.first.serverId, std::move(peerData));
+    }
+
+    return result;
+}
+
+std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    std::vector<ConnectionWeakRef> connections;
+    for (const auto peer: m_peers)
+        connections.push_back(peer.second.peerConnection);
+
+    return connections;
+}
+
+} // namespace hpm
+} // namespace nx

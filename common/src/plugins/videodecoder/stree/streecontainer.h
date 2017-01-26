@@ -17,7 +17,7 @@ namespace stree
     };
 
     /*!
-        \a find methods select element with min key greater than searched one
+        \a find method selects element with min key greater than searched one
     */
     template<class KeyType, class MappedType, class Predicate>
        class ConditionMatchContainer

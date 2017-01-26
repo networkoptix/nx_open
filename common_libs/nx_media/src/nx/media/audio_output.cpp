@@ -8,17 +8,57 @@
 #include <nx/audio/audiodevice.h>
 
 #include <QtCore/QMutex>
+#include <utils/media/audio_processor.h>
 
 namespace nx {
 namespace media {
 
+using AudioFilter = std::function<QnCodecAudioFormat(QnByteArray&, QnCodecAudioFormat)>;
+
+QnAudioFormat getCompatibleFormat(QnAudioFormat format, QList<AudioFilter>* outFilters)
+{
+    outFilters->clear();
+
+    if (nx::audio::Sound::isFormatSupported(format))
+        return format;
+
+    if (format.sampleType() == QnAudioFormat::Float)
+    {
+        format.setSampleType(QnAudioFormat::SignedInt);
+        if (nx::audio::Sound::isFormatSupported(format))
+        {
+            outFilters->push_back(QnAudioProcessor::float2int32);
+            return format;
+        }
+        format.setSampleSize(16);
+        outFilters->push_back(QnAudioProcessor::float2int16);
+        if (nx::audio::Sound::isFormatSupported(format))
+            return format;
+    }
+    else if (format.sampleSize() == 32)
+    {
+        format.setSampleSize(16);
+        outFilters->push_back(QnAudioProcessor::int32Toint16);
+        if (nx::audio::Sound::isFormatSupported(format))
+            return format;
+    }
+
+    format.setChannelCount(qMin(format.channelCount(), 2));
+    outFilters->push_back(QnAudioProcessor::downmix);
+    if (nx::audio::Sound::isFormatSupported(format))
+        return format;
+
+    outFilters->clear();
+    return QnAudioFormat(); //< conversion rule not found
+}
+
 //-------------------------------------------------------------------------------------------------
 // AudioOutputPrivate
 
-struct AudioOutputPrivate
+class AudioOutputPrivate
 {
-    AudioOutputPrivate(int initialBufferUsec, int maxBufferUsec)
-    :
+public:
+    AudioOutputPrivate(int initialBufferUsec, int maxBufferUsec):
         bufferSizeUsec(initialBufferUsec),
         frameDurationUsec(0),
         bufferingBytes(0),
@@ -35,13 +75,16 @@ struct AudioOutputPrivate
     const int initialBufferUsec; //< Initial size for the audio buffer
     const int maxBufferUsec; //< Maximum allowed size for the audio buffer
     mutable QMutex mutex;
+
+    QnAudioFormat lastAudioFormat;
+    QnAudioFormat warnedAudioFormat; //< using for log messages
+    QList<AudioFilter> audioFilters;
 };
 
 //-------------------------------------------------------------------------------------------------
 // AudioOutput
 
-AudioOutput::AudioOutput(int initialBufferMs, int maxBufferMs)
-:
+AudioOutput::AudioOutput(int initialBufferMs, int maxBufferMs):
     d_ptr(new AudioOutputPrivate(initialBufferMs, maxBufferMs))
 {
 }
@@ -81,10 +124,11 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
         d->audioOutput->state() == QAudio::ActiveState && //< and playing,
         d->audioOutput->isBufferUnderflow(); //< but no data in the buffer at all
 
-    QnAudioFormat audioFormat(QnCodecAudioFormat(audioFrame->context));
+    QnCodecAudioFormat codecAudioFormat(audioFrame->context);
+    QnAudioFormat audioFormat(codecAudioFormat);
     audioFormat.setCodec(lit("audio/pcm"));
     if (!d->audioOutput || //< first call
-        d->audioOutput->format() != audioFormat || //< Audio format has been changed
+        d->lastAudioFormat != audioFormat || //< Audio format has been changed
         !d->frameDurationUsec || //< Some internal error or empty data
         bufferUnderflow) //< Audio underflow, recreate with larger buffer
     {
@@ -92,7 +136,19 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
         if (bufferUnderflow)
             d->bufferSizeUsec = qMin(d->bufferSizeUsec * kBufferGrowStep, kMaxLiveBufferMs * 1000);
 
-        auto audioOutput = nx::audio::AudioDevice::instance()->createSound(audioFormat);
+        d->lastAudioFormat = audioFormat;
+
+        auto compatibleFormat = getCompatibleFormat(audioFormat, &d->audioFilters);
+        auto audioOutput = nx::audio::AudioDevice::instance()->createSound(compatibleFormat);
+        if (audioOutput == nullptr)
+        {
+            if (d->warnedAudioFormat != audioFormat)
+            {
+                d->warnedAudioFormat = audioFormat;
+                qWarning() << "Can't create compatible audio output for " << audioFormat;
+            }
+            return;
+        }
         d->audioOutput.reset(audioOutput);
 
         d->audioOutput->suspend(); //< Don't play audio while filling internal buffer.
@@ -104,18 +160,20 @@ void AudioOutput::write(const AudioFramePtr& audioFrame)
             return;
     }
 
+    for (const auto& filter: d->audioFilters)
+        codecAudioFormat = filter(audioFrame->data, codecAudioFormat);
     d->audioOutput->write((const quint8*) audioFrame->data.data(), audioFrame->data.size());
 
     // Update sliding window with last audio PTS.
     d->timestampQueue.push_back(audioFrame->timestampUsec);
-    
+
     // max amount of frames in the audio queue
     qint64 elapsed = d->audioOutput->playTimeElapsedUsec();
     int maxFrames = elapsed / d->frameDurationUsec + 1;
-    
+
     // how many frames out of the queue now
-    const int deprecatedFrames = d->timestampQueue.size() - maxFrames;
-    
+    const int deprecatedFrames = (int) d->timestampQueue.size() - maxFrames;
+
     if (deprecatedFrames > 0)
     {
         d->timestampQueue.erase(

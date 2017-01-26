@@ -1,85 +1,103 @@
-/**********************************************************
-* 20 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "abstract_http_request_handler.h"
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 
+namespace nx_http {
 
-namespace nx_http
+//-------------------------------------------------------------------------------------------------
+// RequestResult
+
+RequestResult::RequestResult(StatusCode::Value statusCode):
+    statusCode(statusCode)
 {
-    AbstractHttpRequestHandler::AbstractHttpRequestHandler()
-    {
-    }
+}
 
-    AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
-    {
-    }
+RequestResult::RequestResult(
+    nx_http::StatusCode::Value statusCode,
+    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource)
+    :
+    statusCode(statusCode),
+    dataSource(std::move(dataSource))
+{
+}
 
-    bool AbstractHttpRequestHandler::processRequest(
-        const nx_http::HttpServerConnection& connection,
-        nx_http::Message&& requestMsg,
-        stree::ResourceContainer&& authInfo,
-        std::function<
-            void(
-                nx_http::Message&&,
-                std::unique_ptr<nx_http::AbstractMsgBodySource> )
-            > completionHandler )
-    {
-        NX_ASSERT( requestMsg.type == nx_http::MessageType::request );
 
-        //creating response here to support pipelining
-        Message responseMsg( MessageType::response );
+RequestResult::RequestResult(
+    nx_http::StatusCode::Value statusCode,
+    std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource,
+    ConnectionEvents connectionEvents)
+    :
+    statusCode(statusCode),
+    dataSource(std::move(dataSource)),
+    connectionEvents(std::move(connectionEvents))
+{
+}
 
-        responseMsg.response->statusLine.version = requestMsg.request->requestLine.version;
+//-------------------------------------------------------------------------------------------------
+// AbstractHttpRequestHandler
 
-        const auto& request = *requestMsg.request;
-        auto response = responseMsg.response;
+AbstractHttpRequestHandler::AbstractHttpRequestHandler()
+{
+}
 
-        m_requestMsg = std::move( requestMsg );
-        m_responseMsg = std::move( responseMsg );
-        m_completionHandler = std::move( completionHandler );
+AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
+{
+}
 
-        auto sendResponseFunc = [/*reqID,*/ this](
-            nx_http::StatusCode::Value statusCode,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
+bool AbstractHttpRequestHandler::processRequest(
+    nx_http::HttpServerConnection* const connection,
+    nx_http::Message&& requestMsg,
+    stree::ResourceContainer&& authInfo,
+    ResponseIsReadyHandler completionHandler )
+{
+    NX_ASSERT( requestMsg.type == nx_http::MessageType::request );
+
+    //creating response here to support pipelining
+    Message responseMsg( MessageType::response );
+
+    responseMsg.response->statusLine.version = requestMsg.request->requestLine.version;
+
+    m_responseMsg = std::move( responseMsg );
+    m_completionHandler = std::move( completionHandler );
+
+    auto httpRequestProcessedHandler =
+        [this](RequestResult requestResult)
         {
-            requestDone( /*reqID,*/ statusCode, std::move( dataSource ) );
+            requestDone(std::move(requestResult));
         };
 
-        processRequest(
-            connection,
-            std::move( authInfo ),
-            request,
-            response,
-            sendResponseFunc );
-        return true;
-    }
-
-    nx_http::Response* AbstractHttpRequestHandler::response()
-    {
-        return m_responseMsg.response;
-    }
-
-    void AbstractHttpRequestHandler::requestDone(
-        //size_t reqID,
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
-    {
-        m_responseMsg.response->statusLine.statusCode = statusCode;
-        m_responseMsg.response->statusLine.reasonPhrase = StatusCode::toString( statusCode );
-
-        //this object is allowed to be removed within m_completionHandler, 
-        //  so creating local data
-        auto completionHandlerLocal = std::move( m_completionHandler );
-        auto responseMsgLocal = std::move( m_responseMsg );
-        auto dataSourceLocal = std::move( dataSource );
-
-        completionHandlerLocal(
-            std::move( responseMsgLocal ),
-            std::move( dataSourceLocal ) );
-    }
+    processRequest(
+        connection,
+        std::move(authInfo),
+        std::move(std::move(*requestMsg.request)),
+        m_responseMsg.response,
+        std::move(httpRequestProcessedHandler));
+    return true;
 }
+
+nx_http::Response* AbstractHttpRequestHandler::response()
+{
+    return m_responseMsg.response;
+}
+
+void AbstractHttpRequestHandler::requestDone(RequestResult requestResult)
+{
+    m_responseMsg.response->statusLine.statusCode =
+        requestResult.statusCode;
+    m_responseMsg.response->statusLine.reasonPhrase =
+        StatusCode::toString(requestResult.statusCode);
+
+    //this object is allowed to be removed within m_completionHandler, 
+    //  so creating local data
+    auto completionHandlerLocal = std::move(m_completionHandler);
+    auto responseMsgLocal = std::move(m_responseMsg);
+    auto dataSourceLocal = std::move(requestResult.dataSource);
+
+    completionHandlerLocal(
+        std::move(responseMsgLocal),
+        std::move(dataSourceLocal),
+        std::move(requestResult.connectionEvents));
+}
+
+} // namespace nx_http

@@ -8,8 +8,8 @@
 
 #include <QtCore/QString>
 
-#include <utils/common/model_functions_fwd.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include "../httptypes.h"
 
@@ -27,9 +27,6 @@ enum class FusionRequestErrorClass
     internalError
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorClass)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorClass), (lexical))
-
 enum class FusionRequestErrorDetail
 {
     ok = 0,
@@ -37,12 +34,6 @@ enum class FusionRequestErrorDetail
     deserializationError,
     notAcceptable
 };
-
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorDetail)
-//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorDetail), (lexical))
-
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const FusionRequestErrorDetail&, QString*);
 
 class NX_NETWORK_API FusionRequestResult
 {
@@ -52,6 +43,7 @@ public:
     int errorDetail;
     QString errorText;
 
+    /** Creates OK result */
     FusionRequestResult();
     FusionRequestResult(
         FusionRequestErrorClass _errorClass,
@@ -67,16 +59,19 @@ public:
     nx_http::StatusCode::Value httpStatusCode() const;
 };
 
-
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
 void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
-//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-//    (FusionRequestResult),
-//    (json))
 
-}
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorClass)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx_http::FusionRequestErrorClass), (lexical))
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx_http::FusionRequestErrorDetail)
+//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+void NX_NETWORK_API serialize(const nx_http::FusionRequestErrorDetail&, QString*);
+
+} // namespace nx_http
 
 #endif  //NX_FUSION_REQUEST_RESULT_H

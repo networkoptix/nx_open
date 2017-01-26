@@ -11,21 +11,19 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Installer</name>
+    <name>Nx Witness Installer</name>
 
     <properties>
         <product.title>${wixsetup.name}</product.title>
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <DbSync22Dir>${packages.dir}/${rdep.target}/appserver-2.2.1/share/dbsync-2.2</DbSync22Dir>
         <nxtool>false</nxtool>
-        <final.artifact.name>${installer.name}</final.artifact.name>
-        <NxtoolQuickControlsDir>${libdir}\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
-        <ClientFontsDir>${libdir}\${arch}\bin\${build.configuration}\fonts</ClientFontsDir>
-        <ClientQmlDir>${libdir}\${arch}\bin\${build.configuration}\qml</ClientQmlDir>
-        <Vs2015crtDir>${environment.dir}\wix\vs2015crt\${arch}</Vs2015crtDir>
-        <rdep.packages>appserver-2.2.1 vcredist-2012 vmaxproxy-2.1</rdep.packages>
+        <NxtoolQuickControlsDir>${libdir}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
+        <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
+        <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
+        <rdep.packages>vcredist-2015 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
@@ -33,38 +31,38 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>mediaserver</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/mediaserver/pom.xml</systemPath>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client.bin</artifactId>
+            <artifactId>desktop_client</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client.bin/pom.xml</systemPath>            
+            <systemPath>${root.dir}/client/desktop_client/pom.xml</systemPath>
         </dependency>
-        
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nxtool</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
+            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>
         </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>axclient</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
-        </dependency>					
-    </dependencies>		
+            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <build>
         <directory>${arch}</directory>
@@ -85,47 +83,46 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>        
-           <!-- <plugin>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.6</version>
                 <executions>
                     <execution>
-                        <id>copy-project-resources</id>
+                        <id>copy-parent-certificates</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}</outputDirectory>
-                            <resources>          
+                            <overwrite>true</overwrite>
+                            <resources>
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
-                                    <filtering>false</filtering>
+                                    <directory>${environment.dir}/customization/${parent.customization}/wixsetup</directory>
                                 </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-certificates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
                                 <resource>
-                                    <directory>${root.dir}/wixsetup/maven/bin-resources</directory>
-                                    <filtering>false</filtering>
-                                </resource>                                  
-                                <resource>
-                                    <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
-                                    <filtering>true</filtering>
-                                </resource>	                                
-                                <resource>
-                                    <directory>${parent.customization.dir}/wixsetup</directory>
-                                    <filtering>false</filtering>
-                                </resource>		                
-                                <resource>
-                                    <directory>${customization.dir}/wixsetup</directory>
-                                    <filtering>false</filtering>
-                                </resource>                             
-                            </resources>              
-                            <encoding>UTF-8</encoding>
-                        </configuration>            
+                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>	-->
+            </plugin>
             <plugin>
                 <groupId>com.google.code.maven-replacer-plugin</groupId>
                 <artifactId>replacer</artifactId>
@@ -139,19 +136,21 @@
                         <configuration>
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
-                            <ignoreMissingFile>true</ignoreMissingFile>                                    
+                            <ignoreMissingFile>true</ignoreMissingFile>
                             <replacements>
                                 <replacement>
                                     <token>
-                                        <![CDATA[<PlatformToolset>v110</PlatformToolset>]]></token>
+                                        <![CDATA[<PlatformToolset>v110</PlatformToolset>]]>
+                                    </token>
                                     <value>
-                                        <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]></value>
-                                </replacement>           
+                                        <![CDATA[<PlatformToolSet>${PlatformToolSet}</PlatformToolSet>]]>
+                                    </value>
+                                </replacement>
                             </replacements>
-                        </configuration>								
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>                     
+            </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -167,13 +166,13 @@
                         </goals>
                         <configuration>
                             <executable>${project.build.directory}/build.bat</executable>
-                            <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
+                            <workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>
                         </configuration>
                     </execution>
 
                     <execution>
                         <id>wix-gen</id>
-                        <phase>generate-resources</phase>
+                        <phase>process-classes</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -183,12 +182,12 @@
                                 <argument>wix-gen.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>                    
+                        </configuration>
                     </execution>
 
                     <execution>
                         <id>wix-compile</id>
-                        <phase>process-resources</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -198,21 +197,8 @@
                                 <argument>wix-compile.py</argument>
                             </arguments>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>                    
-                    </execution>                   
-
-                    <execution>
-                        <id>wix-sign</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${project.build.directory}/sign.bat</executable>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <skip>${windows.skip.sign}</skip>
                         </configuration>
-                    </execution>        
+                    </execution>
 
                     <execution>
                         <id>pack</id>
@@ -223,23 +209,10 @@
                         <configuration>
                             <executable>${project.build.directory}/pack.bat</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
-                        </configuration>    
-                    </execution>
-                    
-                    <execution>
-                        <id>integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${project.build.directory}/test.bat</executable>
-                            <workingDirectory>${project.build.directory}</workingDirectory>
-                            <skip>${skip.test}</skip>                        
-                        </configuration>    
+                        </configuration>
                     </execution>
                 </executions>
-            </plugin>        
+            </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -256,36 +229,26 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>							
+                            
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
-                    </execution>	
+                    </execution>
                     <execution>
-                        <id>pack-debug-all</id>
+                        <id>testcamera-package</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-all.xml</descriptor>
+                                <descriptor>${project.build.directory}/assembly-testcamera.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                           
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.testcamera}</finalName>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>pack-debug-apps</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>${project.build.directory}/assembly-debug-apps.xml</descriptor>
-                            </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                        </configuration>
-                    </execution>
-
                     <execution>
                         <id>server-update-package</id>
                         <phase>post-integration-test</phase>
@@ -296,14 +259,96 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                            <finalName>server-update</finalName>							
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_update}</finalName>
                         </configuration>
-                    </execution>	                    
-                </executions>				
-            </plugin> 	            
+                    </execution>
+                    <execution>
+                        <id>pack-debug-client</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_debug}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pack-debug-server</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_debug}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pack-debug-misc.xml</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.misc_debug}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pack-debug-libs.xml</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.libs_debug}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>pack-debug-cloud.xml</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.cloud_debug}</finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-    </build>       
+    </build>
     <profiles>
         <profile>
             <id>nxtool-installer</id>
@@ -317,7 +362,7 @@
             </activation>
             <properties>
                 <nxtool>true</nxtool>
-            </properties>            
-        </profile>    
-    </profiles>    
+            </properties>
+        </profile>
+    </profiles>
 </project>

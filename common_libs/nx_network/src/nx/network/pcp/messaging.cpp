@@ -1,6 +1,7 @@
 #include "messaging.h"
 
 #include "utils/memory/data_stream_helpers.h"
+#include <nx/utils/random.h>
 
 static const int NONCE_SIZE = 12;
 static const int IP_SIZE = 16;
@@ -14,7 +15,7 @@ QDataStream& operator<<(QDataStream& stream, const RequestHeader& data)
     quint8 opcode = static_cast<quint8>(data.opcode);
 
     stream << data.version << opcode << r << data.lifeTime;
-    dsh::write(stream, data.clientIp, IP_SIZE);
+    stream.writeRawData(data.clientIp.data(), data.clientIp.size());
 
     return stream;
 }
@@ -25,7 +26,8 @@ QDataStream& operator>>(QDataStream& stream, RequestHeader& data)
     quint8 opcode;
 
     stream >> data.version >> opcode >> r >> data.lifeTime;
-    dsh::read(stream, data.clientIp, IP_SIZE);
+    data.clientIp.resize(IP_SIZE);
+    stream.readRawData(data.clientIp.data(), IP_SIZE);
 
     data.opcode = static_cast<Opcode>(opcode);
     return stream;
@@ -66,10 +68,9 @@ QDataStream& operator<<(QDataStream& stream, const MapMessage& data)
     quint8 r8 = 0;
     quint16 r16 = 0;
 
-    dsh::write(stream, data.nonce, NONCE_SIZE);
-    stream << data.protocol << r8 << r16
-           << data.internalPort << data.externalPort;
-    dsh::write(stream, data.externalIp, IP_SIZE);
+    stream.writeRawData(data.nonce.data(), data.nonce.size());
+    stream << data.protocol << r8 << r16 << data.internalPort << data.externalPort;
+    stream.writeRawData(data.externalIp.data(), data.externalIp.size());
 
     return stream;
 }
@@ -79,10 +80,13 @@ QDataStream& operator>>(QDataStream& stream, MapMessage& data)
     quint8 r8;
     quint16 r16;
 
-    dsh::read(stream, data.nonce, NONCE_SIZE);
-    stream >> data.protocol >> r8 >> r16
-           >> data.internalPort >> data.externalPort;
-    dsh::read(stream, data.externalIp, IP_SIZE);
+    data.nonce.resize(NONCE_SIZE);
+    stream.readRawData(data.nonce.data(), data.nonce.size());
+
+    stream >> data.protocol >> r8 >> r16 >> data.internalPort >> data.externalPort;
+
+    data.externalIp.resize(IP_SIZE);
+    stream.readRawData(data.externalIp.data(), data.externalIp.size());
 
     return stream;
 }
@@ -92,13 +96,11 @@ QDataStream& operator<<(QDataStream& stream, const PeerMessage& data)
     quint8 r8 = 0;
     quint16 r16 = 0;
 
-    dsh::write(stream, data.nonce, NONCE_SIZE);
-    stream << data.protocol << r8 << r16
-           << data.internalPort << data.externalPort;
-    dsh::write(stream, data.externalIp, IP_SIZE);
-
+    stream.writeRawData(data.nonce.data(), data.nonce.size());
+    stream << data.protocol << r8 << r16 << data.internalPort << data.externalPort;
+    stream.writeRawData(data.externalIp.data(), data.externalIp.size());
     stream << data.remotePort << r16;
-    dsh::write(stream, data.remoteIp, IP_SIZE);
+    stream.writeRawData(data.remoteIp.data(), data.remoteIp.size());
 
     return stream;
 }
@@ -108,23 +110,25 @@ QDataStream& operator>>(QDataStream& stream, PeerMessage& data)
     quint8 r8;
     quint16 r16;
 
-    dsh::read(stream, data.nonce, NONCE_SIZE);
-    stream >> data.protocol >> r8 >> r16
-           >> data.internalPort >> data.externalPort;
-    dsh::read(stream, data.externalIp, IP_SIZE);
+    data.nonce.resize(NONCE_SIZE);
+    stream.readRawData(data.nonce.data(), data.nonce.size());
+
+    stream >> data.protocol >> r8 >> r16 >> data.internalPort >> data.externalPort;
+
+    data.externalIp.resize(IP_SIZE);
+    stream.readRawData(data.externalIp.data(), data.externalIp.size());
 
     stream >> data.remotePort >> r16;
-    dsh::read(stream, data.remoteIp, IP_SIZE);
+
+    data.remoteIp.resize(IP_SIZE);
+    stream.readRawData(data.remoteIp.data(), data.remoteIp.size());
 
     return stream;
 }
 
 QByteArray makeRandomNonce()
 {
-    QByteArray nonce(NONCE_SIZE, Qt::Uninitialized);
-    for (auto& b : nonce)
-        b = static_cast<char>(qrand());
-    return nonce;
+    return nx::utils::random::generate(NONCE_SIZE);
 }
 
 } // namespace pcp

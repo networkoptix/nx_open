@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>hdwitness</artifactId>
@@ -23,7 +16,7 @@
     <properties>
         <product.title>Paxton Integration Module Installer</product.title>    
         <root.dir>${basedir}/../../..</root.dir>
-        <finalName>${installer.name}-paxton-plugin.${release.version}.${buildNumber}.msi</finalName>
+        <finalName>${artifact.name.paxton_plugin}.msi</finalName>
     </properties> 
     <dependencies>
         <dependency>
@@ -36,11 +29,27 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>activex_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
+        </dependency>           
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>paxton-plugin</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/plugins/acs/paxton/pom.xml</systemPath>
+            <systemPath>${root.dir}/plugins/acs/paxton-plugin/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libclient</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/libclient/pom.xml</systemPath>
         </dependency>        
     </dependencies>  
     <build>
@@ -64,6 +73,45 @@
                     </execution>
                 </executions>
             </plugin>         
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-parent-certificates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${environment.dir}/customization/${parent.customization}/wixsetup</directory>
+                                </resource>          
+                            </resources>              
+                        </configuration>            
+                    </execution>          
+                    <execution>
+                        <id>copy-certificates</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${environment.dir}/customization/${customization}/wixsetup</directory>    
+                                </resource>             
+                            </resources>              
+                        </configuration>            
+                    </execution>                      
+                </executions>
+            </plugin>            
            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

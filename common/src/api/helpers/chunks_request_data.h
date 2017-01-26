@@ -7,6 +7,15 @@
 
 struct QnChunksRequestData
 {
+    // Versions here are server versions.
+    enum class RequestVersion
+    {
+        v2_6,
+        v3_0,
+
+        current = v3_0
+    };
+
     QnChunksRequestData();
 
     static QnChunksRequestData fromParams(const QnRequestParamList& params);
@@ -14,8 +23,10 @@ struct QnChunksRequestData
     QUrlQuery toUrlQuery() const;
     bool isValid() const;
 
+    RequestVersion requestVersion = RequestVersion::current;
+
     Qn::TimePeriodContent periodsType;
-    QnVirtualCameraResourceList resList;
+    QnSecurityCamResourceList resList;
     qint64 startTimeMs;
     qint64 endTimeMs;
     qint64 detailLevel;

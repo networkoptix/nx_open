@@ -11,7 +11,6 @@
 #include "nx/streaming/media_data_packet.h"
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/multipartcontentparser.h>
 
 class QnStardotResource : public QnPhysicalCameraResource
 {
@@ -26,8 +25,6 @@ public:
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
-
-    bool isInitialized() const;
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
     virtual bool hasDualStreaming() const override;

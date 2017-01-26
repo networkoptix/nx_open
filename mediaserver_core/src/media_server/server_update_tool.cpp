@@ -118,7 +118,7 @@ QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &u
 void QnServerUpdateTool::sendReply(int code) {
     NX_LOG(lit("QnServerUpdateTool: Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code), cl_logDEBUG2);
 
-    connection2()->getUpdatesManager()->sendUpdateUploadResponce(
+    connection2()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
                 m_updateId, qnCommon->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
@@ -305,10 +305,11 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     }
     if( cl_log.logLevel() >= cl_logDEBUG1 )
     {
-        QString argumentsStr;
+        QString argumentsStr(" APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\" SERVER_PASSWORD_CONFIRM=\"\"");
         for( const QString& arg: arguments )
             argumentsStr += lit(" ") + arg;
-        NX_LOG(lit("QnServerUpdateTool: Launching %1 %2").arg(executable).arg(argumentsStr), cl_logDEBUG1);
+
+        NX_LOG(lit("QnServerUpdateTool: Launching %1 %2").arg(executable).arg(argumentsStr), cl_logINFO);
     }
 
     const SystemError::ErrorCode processStartErrorCode = nx::startProcessDetached( updateDir.absoluteFilePath(executable), arguments );

@@ -11,8 +11,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 
-#include <utils/common/cpp14.h>
-#include <utils/common/string.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/string.h>
 
 
 namespace nx {
@@ -24,12 +24,39 @@ namespace test {
 ////////////////////////////////////////////////////////////
 namespace
 {
-    const size_t READ_BUF_SIZE = 4*1024;
     std::atomic<int> TestConnectionIDCounter(0);
     std::atomic<int> TestConnection_count(0);
 }
 
 //#define DEBUG_OUTPUT
+
+constexpr std::chrono::milliseconds TestConnection::kDefaultRwTimeout;
+
+QString NX_NETWORK_API toString(TestTrafficLimitType type)
+{
+    switch (type)
+    {
+        case TestTrafficLimitType::none: return lit("none");
+        case TestTrafficLimitType::incoming: return lit("incoming");
+        case TestTrafficLimitType::outgoing: return lit("outgoing");
+    }
+
+    NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
+    return QString();
+}
+
+QString NX_NETWORK_API toString(TestTransmissionMode type)
+{
+    switch (type)
+    {
+        case TestTransmissionMode::spam: return lit("spam");
+        case TestTransmissionMode::ping: return lit("ping");
+        case TestTransmissionMode::pong: return lit("pong");
+    }
+
+    NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
+    return QString();
+}
 
 TestConnection::TestConnection(
     std::unique_ptr<AbstractStreamSocket> socket,
@@ -48,8 +75,8 @@ TestConnection::TestConnection(
     m_id( ++TestConnectionIDCounter ),
     m_accepted(true)
 {
-    m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -74,8 +101,8 @@ TestConnection::TestConnection(
     m_id( ++TestConnectionIDCounter ),
     m_accepted(false)
 {
-    m_readBuffer.reserve( READ_BUF_SIZE );
-    m_outData = nx::utils::generateRandomData( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
+    m_outData = nx::utils::random::generate( kReadBufferSize );
 
     ++TestConnection_count;
 }
@@ -104,9 +131,9 @@ void TestConnection::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     m_socket->pleaseStop(std::move(handler));
 }
 
-void TestConnection::pleaseStopSync()
+void TestConnection::pleaseStopSync(bool checkForLocks)
 {
-    m_socket->pleaseStopSync();
+    m_socket->pleaseStopSync(checkForLocks);
 }
 
 int TestConnection::id() const
@@ -128,15 +155,21 @@ const std::chrono::milliseconds kDefaultSendTimeout(17000);
 const std::chrono::milliseconds kDefaultRecvTimeout(17000);
 const size_t kDefaultMaxTimeoutsInARow(5);
 
-void TestConnection::start()
+void TestConnection::start(std::chrono::milliseconds rwTimeout)
 {
+    if (!m_socket->setNonBlockingMode(true) ||
+        !m_socket->setSendTimeout(rwTimeout.count()) ||
+        !m_socket->setRecvTimeout(rwTimeout.count()))
+    {
+        return m_socket->post(std::bind(
+            &TestConnection::onConnected, this,
+            SystemError::getLastOSErrorCode()));
+    }
+        
     if( m_connected )
         return startIO();
 
-    if (!m_socket->setNonBlockingMode(true) || 
-        !m_socket->setSendTimeout(kDefaultSendTimeout.count()) ||
-        !m_socket->setRecvTimeout(kDefaultRecvTimeout.count()) ||
-        (m_localAddress && !m_socket->bind(*m_localAddress)))
+    if (m_localAddress && !m_socket->bind(*m_localAddress))
     {
         return m_socket->post(std::bind(
             &TestConnection::onConnected, this,
@@ -186,8 +219,8 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
-        NX_LOGX(lm("accepted %1. Connect error: %2")
-            .arg(m_accepted).arg(SystemError::toString(errorCode)), cl_logWARNING);
+        NX_LOGX(lm("Connect to %1 error: %2")
+            .strs(m_remoteAddress, SystemError::toString(errorCode)), cl_logWARNING);
 
         return reportFinish( errorCode );
     }
@@ -214,39 +247,16 @@ void TestConnection::startIO()
 void TestConnection::startSpamIO()
 {
     using namespace std::placeholders;
-    if (m_accepted) // server side?
-    {
-        m_socket->readSomeAsync(
-            &m_readBuffer,
-            [this](SystemError::ErrorCode code, size_t bytes)
-            {
-                if (code == SystemError::noError && bytes != 0)
-                {
-                    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-                        .arg(m_accepted).arg(m_outData.size())
-                        .arg(m_socket->getForeignAddress().toString()),
-                        cl_logDEBUG2);
-                    m_socket->sendAsync(
-                        m_outData,
-                        std::bind(&TestConnection::onDataSent, this, _1, _2));
-                }
-
-                onDataReceived(code, bytes);
-            });
-    }
-    else
-    {
-        m_socket->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&TestConnection::onDataReceived, this, _1, _2));
-        NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
-            .arg(m_accepted).arg(m_outData.size())
-            .arg(m_socket->getForeignAddress().toString()),
-            cl_logDEBUG2);
-        m_socket->sendAsync(
-            m_outData,
-            std::bind(&TestConnection::onDataSent, this, _1, _2));
-    }
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, _1, _2));
+    NX_LOGX(lm("accepted %1. Sending %2 bytes of data to %3")
+        .arg(m_accepted).arg(m_outData.size())
+        .arg(m_socket->getForeignAddress().toString()),
+        cl_logDEBUG2);
+    m_socket->sendAsync(
+        m_outData,
+        std::bind(&TestConnection::onDataSent, this, _1, _2));
 }
 
 void TestConnection::startEchoIO()
@@ -261,7 +271,7 @@ void TestConnection::startEchoIO()
                 {
                     // start all over again
                     m_readBuffer.resize(0);
-                    m_readBuffer.reserve(READ_BUF_SIZE);
+                    m_readBuffer.reserve(kReadBufferSize);
                     startEchoIO();
                 });
         });
@@ -306,21 +316,11 @@ void TestConnection::readAllAsync( std::function<void()> handler )
         [this, handler = std::move(handler)](
             SystemError::ErrorCode code, size_t bytes)
         {
-            m_totalBytesReceived += bytes;
-
-            if (code == SystemError::timedOut)
-            {
-                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
-                    return reportFinish( code );
-
-                return readAllAsync(std::move(handler));
-            }
-
-            m_timeoutsInARow = 0;
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
-            if (m_readBuffer.size() >= READ_BUF_SIZE)
+            m_totalBytesReceived += bytes;
+            if (static_cast<size_t>(m_readBuffer.size()) >= kReadBufferSize)
                 handler();
             else
                 return readAllAsync(std::move(handler));
@@ -340,19 +340,10 @@ void TestConnection::sendAllAsync( std::function<void()> handler )
         [this, handler = std::move(handler)](
             SystemError::ErrorCode code, size_t bytes)
         {
-            m_totalBytesSent += bytes;
-
-            if (code == SystemError::timedOut)
-            {
-                if (++m_timeoutsInARow == kDefaultMaxTimeoutsInARow)
-                    return reportFinish( code );
-
-                return readAllAsync(std::move(handler));
-            }
-
             if (code != SystemError::noError || bytes == 0)
                 return reportFinish( code );
 
+            m_totalBytesSent += bytes;
             handler();
         });
 }
@@ -380,7 +371,7 @@ void TestConnection::onDataReceived(
 
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
-    m_readBuffer.reserve( READ_BUF_SIZE );
+    m_readBuffer.reserve( kReadBufferSize );
 
     if (m_limitType == TestTrafficLimitType::incoming &&
         m_totalBytesReceived >= m_trafficLimit)
@@ -442,8 +433,8 @@ QString toString(const ConnectionTestStatistics& data)
 {
     return lm("Connections online: %1, total: %2. Bytes in/out: %3/%4.")
         .arg(data.onlineConnections).arg(data.totalConnections)
-        .arg(bytesToString(data.bytesReceived))
-        .arg(bytesToString(data.bytesSent));
+        .arg(nx::utils::bytesToString(data.bytesReceived))
+        .arg(nx::utils::bytesToString(data.bytesSent));
 }
 
 bool operator==(
@@ -482,14 +473,16 @@ ConnectionTestStatistics operator-(
 RandomDataTcpServer::RandomDataTcpServer(
     TestTrafficLimitType limitType,
     size_t trafficLimit,
-    TestTransmissionMode transmissionMode)
+    TestTransmissionMode transmissionMode,
+    bool doNotBind)
 :
     m_limitType(limitType),
     m_trafficLimit(trafficLimit),
     m_transmissionMode(transmissionMode),
     m_totalConnectionsAccepted(0),
     m_totalBytesReceivedByClosedConnections(0),
-    m_totalBytesSentByClosedConnections(0)
+    m_totalBytesSentByClosedConnections(0),
+    m_doNotBind(doNotBind)
 {
 }
 
@@ -512,7 +505,7 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             auto acceptedConnections = std::move(m_aliveConnections);
             lk.unlock();
 
-            BarrierHandler completionHandlerInvoker(std::move(handler));
+            utils::BarrierHandler completionHandlerInvoker(std::move(handler));
             for (auto& connection: acceptedConnections)
             {
                 auto connectionPtr = connection.get();
@@ -527,11 +520,12 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
-bool RandomDataTcpServer::start()
+bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
 {
+    m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !m_serverSocket->bind(m_localAddress) ||
+    if( !(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
         !m_serverSocket->listen() )
     {
         m_serverSocket.reset();
@@ -597,7 +591,7 @@ void RandomDataTcpServer::onNewConnection(
             .arg(testConnection.get()).arg(testConnection->getLocalAddress().toString()),
             cl_logDEBUG1);
         QnMutexLocker lk(&m_mutex);
-        testConnection->start();
+        testConnection->start(m_rwTimeout);
         m_aliveConnections.emplace_back(std::move(testConnection));
         ++m_totalConnectionsAccepted;
     }
@@ -664,6 +658,7 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
     m_totalIncompleteTasks( 0 ),
+    m_results( &SystemError::toString, true ),
     m_totalConnectionsEstablished( 0 ),
     m_randomEngine(m_randomDevice()),
     m_errorEmulationDistribution(1, 100),
@@ -683,7 +678,7 @@ void ConnectionsGenerator::pleaseStop(
     m_terminated = true;
     auto connections = std::move(m_connections);
     lk.unlock();
-    BarrierHandler allConnectionsStoppedFuture(std::move(handler));
+    utils::BarrierHandler allConnectionsStoppedFuture(std::move(handler));
     for (auto& idAndConnection: connections)
     {
         auto connectionPtr = idAndConnection.second.get();
@@ -731,8 +726,9 @@ void ConnectionsGenerator::resetRemoteAddresses(
     m_remoteAddressesIterator = m_remoteAddresses.begin();
 }
 
-void ConnectionsGenerator::start()
+void ConnectionsGenerator::start(std::chrono::milliseconds rwTimeout)
 {
+    m_rwTimeout = rwTimeout;
     for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
@@ -748,7 +744,7 @@ void ConnectionsGenerator::start()
                 std::placeholders::_1, std::placeholders::_3));
         if (m_localAddress)
             connection->setLocalAddress(*m_localAddress);
-        connection->start();
+        connection->start(m_rwTimeout);
         ++m_totalConnectionsEstablished;
         m_connections.emplace(connection->id(), std::move(connection));
     }
@@ -793,10 +789,9 @@ size_t ConnectionsGenerator::totalIncompleteTasks() const
     return m_totalIncompleteTasks;
 }
 
-const std::map<SystemError::ErrorCode, size_t>&
-    ConnectionsGenerator::returnCodes() const
+const utils::ResultCounter<SystemError::ErrorCode>& ConnectionsGenerator::results()
 {
-    return m_returnCodes;
+    return m_results;
 }
 
 const SocketAddress& ConnectionsGenerator::nextAddress()
@@ -813,12 +808,11 @@ void ConnectionsGenerator::onConnectionFinished(
     int id,
     SystemError::ErrorCode code)
 {
+    m_results.addResult(code);
     NX_LOGX(lm("Connection %1 has finished: %2")
         .arg(id).arg(SystemError::toString(code)), cl_logDEBUG1);
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_returnCodes.emplace(code, 0).first->second++;
-
     {
         std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());
@@ -878,10 +872,104 @@ void ConnectionsGenerator::addNewConnections(
             return;
         }
 
-        connection->start();
+        connection->start(m_rwTimeout);
         m_connections.emplace(connection->id(), std::move(connection));
         ++m_totalConnectionsEstablished;
     }
+}
+
+AddressBinder::AddressBinder()
+:
+    m_currentNumber(0)
+{
+}
+
+SocketAddress AddressBinder::bind()
+{
+    QnMutexLocker lock(&m_mutex);
+    SocketAddress key(QString(QLatin1String("a%1")).arg(m_currentNumber++));
+    NX_CRITICAL(m_map.emplace(key, std::set<SocketAddress>()).second);
+    return key;
+}
+
+void AddressBinder::add(const SocketAddress& key, SocketAddress address)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    NX_CRITICAL(it->second.insert(std::move(address)).second);
+    NX_LOGX(lm("New address %1 is bound to %2").strs(address, key), cl_logDEBUG1);
+}
+
+void AddressBinder::remove(const SocketAddress& key, const SocketAddress& address)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    NX_CRITICAL(it->second.erase(address));
+    NX_LOGX(lm("Address %1 is unbound from %2").strs(address, key), cl_logDEBUG1);
+}
+
+void AddressBinder::remove(const SocketAddress& key)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    m_map.erase(it);
+    NX_LOGX(lm("Key %1 is removed").str(key), cl_logDEBUG1);
+}
+
+std::set<SocketAddress> AddressBinder::get(const SocketAddress& key) const
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_map.find(key);
+    NX_CRITICAL(it != m_map.end());
+    return it->second;
+}
+
+boost::optional<SocketAddress> AddressBinder::random(const SocketAddress& key) const
+{
+    QnMutexLocker lock(&m_mutex);
+    const auto it = m_map.find(key);
+    if (it == m_map.end() || it->second.size() == 0)
+        return boost::none;
+
+    return nx::utils::random::choice(it->second);
+}
+
+MultipleClientSocketTester::MultipleClientSocketTester(AddressBinder* addressBinder)
+:
+    TCPSocket(AF_INET),
+    m_addressBinder(addressBinder)
+{
+}
+
+bool MultipleClientSocketTester::connect(
+    const SocketAddress& address, unsigned int timeout)
+{
+    return TCPSocket::connect(modifyAddress(address), timeout);
+}
+
+void MultipleClientSocketTester::connectAsync(
+    const SocketAddress& address,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+{
+    TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
+}
+
+SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& address)
+{
+    static std::atomic<size_t> enumirator(0);
+    if (m_address == SocketAddress())
+    {
+        auto addressOpt = m_addressBinder->random(address);
+        NX_CRITICAL(addressOpt);
+
+        m_address = std::move(*addressOpt);
+        NX_LOGX(lm("Using %2 instead of %1").strs(address, m_address), cl_logDEBUG2);
+    }
+
+    return m_address;
 }
 
 }   //test

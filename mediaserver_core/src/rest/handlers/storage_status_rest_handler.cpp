@@ -17,46 +17,59 @@
 #include "media_server/settings.h"
 
 
-int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+namespace aux {
+QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
 {
-    QString storageUrl;
-    if(!requireParameter(params, lit("path"), result, &storageUrl))
-        return CODE_INVALID_PARAMETER;
+    QnStorageStatusReply reply;
+    reply.status = storage->initOrUpdate();
+    reply.storage.url  = storage->getUrl();
+    reply.storage = QnStorageSpaceData(storage, false);
 
+    QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+    if (fileStorage)
+        reply.storage.reservedSpace = fileStorage->calcInitialSpaceLimit();
+    else
+        reply.storage.reservedSpace = QnStorageResource::kThirdPartyStorageLimit;
+
+#if defined (Q_OS_WIN)
+    if (!reply.storage.isExternal) 
+    {
+        /* Do not allow to create several local storages on one hard drive. */
+        reply.storage.isWritable = false;
+        reply.storage.isUsedForWriting = false;
+    }
+#endif
+
+    return reply;
+}
+
+QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl)
+{
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
 
-    if (!storage) {
+    if (!storage)
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        qint64 spaceLimit = QnFileStorageResource::isLocal(storageUrl) ?
-                            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
-                            QnFileStorageResource::kNasStorageLimit;
 
+    if (storage)
         storage->setUrl(storageUrl);
-        storage->setSpaceLimit(spaceLimit);
-        if (!storage || !storage->initOrUpdate())
-            return CODE_INVALID_PARAMETER;
-    }
 
-    NX_ASSERT(storage, Q_FUNC_INFO, "Storage must exist here");
-    bool exists = !storage.isNull();
+    return storage;
+}
+}
 
-    QnStorageStatusReply reply;
-    reply.pluginExists = exists;
-    reply.storage.url  = storageUrl;
+int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+{
+    QString storageUrl;
 
-    if (storage) {
-        reply.storage = QnStorageSpaceData(storage, false);
-#ifdef WIN32
-        if (!reply.storage.isExternal) {
-            /* Do not allow to create several local storages on one hard drive. */
-            reply.storage.isWritable = false;
-            reply.storage.isUsedForWriting = false;
-        }
-#endif
-    }
+    if(!requireParameter(params, lit("path"), result, &storageUrl))
+        return nx_http::StatusCode::invalidParameter;
 
-    result.setReply(reply);
-    return CODE_OK;
+    auto storage = aux::getOrCreateStorage(storageUrl);
+    if (!storage)
+        return nx_http::StatusCode::invalidParameter;
+
+    result.setReply(aux::createReply(storage));
+    return nx_http::StatusCode::ok;
 }

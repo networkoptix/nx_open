@@ -22,12 +22,15 @@
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
+#include <core/resource_access/user_access_data.h>
 
 
 #define USE_USER_RESOURCE_PROVIDER
 
 
 struct QnLdapDigestAuthContext;
+class TimeBasedNonceProvider;
+struct CloudManagerGroup;
 
 class QnAuthHelper
 :
@@ -39,11 +42,18 @@ class QnAuthHelper
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
-    QnAuthHelper();
+    QnAuthHelper(
+        TimeBasedNonceProvider* timeBasedNonceProvider,
+        CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();
 
     //!Authenticates request on server side
-    Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
+    Qn::AuthResult authenticate(
+        const nx_http::Request& request,
+        nx_http::Response& response,
+        bool isProxy = false,
+        Qn::UserAccessData* accessRights = 0,
+        AuthMethod::Value* usedAuthMethod = 0);
 
     QnAuthMethodRestrictionList* restrictionList();
 
@@ -53,13 +63,17 @@ public:
         \param periodMillis cannot be greater than \a QnAuthHelper::MAX_AUTHENTICATED_ALIAS_LIFE_TIME_MS
         \note pair<query key name, key value>. Returned key is only valid for \a path
     */
-    QPair<QString, QString> createAuthenticationQueryItemForPath( const QString& path, unsigned int periodMillis );
+    QPair<QString, QString> createAuthenticationQueryItemForPath(
+        const Qn::UserAccessData& accessRights,
+        const QString& path,
+        unsigned int periodMillis);
 
     static QByteArray symmetricalEncode(const QByteArray& data);
 
-    QByteArray generateNonce() const;
+    enum class NonceProvider { automatic, local };
+    QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
-    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+    Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, Qn::UserAccessData* accessRights);
 
     /*!
     \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
@@ -68,8 +82,9 @@ public:
         const QByteArray& authRecord,
         const QByteArray& method,
         nx_http::Response& response,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr) const;
+        Qn::UserAccessData* accessRights = nullptr) const;
+
+    bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -85,18 +100,21 @@ private:
     public:
         nx::utils::TimerManager::TimerGuard timeGuard;
         QString path;
+        Qn::UserAccessData accessRights;
 
         TempAuthenticationKeyCtx() {}
         TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
         :
             timeGuard( std::move( right.timeGuard ) ),
-            path( std::move( right.path ) )
+            path( std::move( right.path ) ),
+            accessRights(right.accessRights)
         {
         }
         TempAuthenticationKeyCtx& operator=( TempAuthenticationKeyCtx&& right )
         {
             timeGuard = std::move( right.timeGuard );
             path = std::move( right.path );
+            accessRights = right.accessRights;
             return *this;
         }
 
@@ -131,13 +149,12 @@ private:
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
         bool isProxy,
-        QnUuid* authUserId,
-        QnUserResourcePtr* const outUserResource = nullptr);
+        Qn::UserAccessData* accessRights);
     Qn::AuthResult doBasicAuth(
         const QByteArray& method,
         const nx_http::header::Authorization& authorization,
         nx_http::Response& responseHeaders,
-        QnUuid* authUserId);
+        Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
 #ifndef USE_USER_RESOURCE_PROVIDER
@@ -146,8 +163,9 @@ private:
 #endif
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
-    std::unique_ptr<AbstractNonceProvider> m_nonceProvider;
-    std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
+    AbstractNonceProvider* m_timeBasedNonceProvider;
+    AbstractNonceProvider* m_nonceProvider;
+    AbstractUserDataProvider* m_userDataProvider;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;

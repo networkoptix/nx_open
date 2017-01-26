@@ -8,6 +8,8 @@
 #include "utils/media/nalUnits.h"
 #include "network/tcp_connection_priv.h"
 
+#include <motion/motion_detection.h>
+
 #include "stardot_resource.h"
 
 #if 0
@@ -45,9 +47,9 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
 
         CLHttpStatus status;
         m_stardotRes->makeStardotRequest(request, status);
-        if (status != CL_HTTP_SUCCESS) 
+        if (status != CL_HTTP_SUCCESS)
         {
-            if (status == CL_HTTP_AUTH_REQUIRED) 
+            if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 m_resource->setStatus(Qn::Unauthorized);
                 QUrl requestedUrl;
@@ -62,9 +64,11 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
     }
 
     QString streamUrl = m_stardotRes->getRtspUrl();
+    m_stardotRes->updateSourceUrl(streamUrl, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(streamUrl).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
     m_multiCodec.setRole(getRole());
     m_multiCodec.setRequest(streamUrl);
+	m_stardotRes->updateSourceUrl(m_multiCodec.getCurrentStreamUrl(), getRole());
     const CameraDiagnostics::Result result = m_multiCodec.openStream();
     if (m_multiCodec.getLastResponseCode() == CODE_AUTH_REQUIRED)
         m_resource->setStatus(Qn::Unauthorized);
@@ -156,7 +160,7 @@ void QnStardotStreamReader::processMotionBinData(const quint8* data, qint64 time
 {
     if (m_lastMetadata == 0) {
         m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
-        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec 
+        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec
         m_lastMetadata->timestamp = timestamp;
     }
 
@@ -170,8 +174,8 @@ void QnStardotStreamReader::processMotionBinData(const quint8* data, qint64 time
         for (int x = 0; x < 16; ++x)
         {
             if (srcLine & srcMask) {
-                int dstX1 = (x * MD_WIDTH + 8)/16;
-                int dstX2 = ((x+1) * MD_WIDTH + 8)/16;
+                int dstX1 = (x * Qn::kMotionGridWidth + 8)/16;
+                int dstX2 = ((x+1) * Qn::kMotionGridWidth + 8)/16;
                 for (int dstX = dstX1; dstX < dstX2; ++dstX)
                     dst[dstX] |= dstMask;
             }
@@ -186,7 +190,7 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
     QnMetaDataV1Ptr rez;
     if (m_lastMetadata) {
         quint32* dst = (quint32*) m_lastMetadata->m_data.data();
-        for (int i = 0; i < MD_WIDTH; ++i)
+        for (int i = 0; i < Qn::kMotionGridWidth; ++i)
             dst[i] = htonl(dst[i]);
         const simd128i* mask = m_stardotRes->getMotionMaskBinData();
         if (mask)

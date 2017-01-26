@@ -15,14 +15,33 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/app_info.h>
+#include "rest/server/rest_connection_processor.h"
+#include <llutil/hardware_id.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
 #ifdef Q_OS_LINUX
 #include "nx1/info.h"
 #endif
+
+namespace
+{
+    const QString kLicenseKey = lit("license_key");
+    const QString kBox = lit("box");
+    const QString kBrand = lit("brand");
+    const QString kVersion = lit("version");
+    const QString kMac = lit("mac");
+    const QString kSerial = lit("serial");
+    const QString kLang = lit("lang");
+    const QString kOldHwidArray = lit("oldhwid[]");
+    const QString kHwid = lit("hwid");
+    const QString kHwidArray = lit("hwid[]");
+    const QString kMode = lit("mode");
+    const QString kInfo = lit("info");
+    const QString kKey = lit("key");
+}
 
 CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
 {
@@ -32,53 +51,46 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
 
     ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->moduleGUID()).data;
     QUrlQuery params;
-    params.addQueryItem(QLatin1String("license_key"), licenseKey);
-    params.addQueryItem(QLatin1String("box"), runtimeData.box);
-    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
-    params.addQueryItem(QLatin1String("version"), QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kLicenseKey, licenseKey);
+    params.addQueryItem(kBox, runtimeData.box);
+    params.addQueryItem(kBrand, runtimeData.brand);
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
-    if( QnAppInfo::armBox() == "nx1" || QnAppInfo::armBox() == "bpi") {
+    if(QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    {
         QString mac = Nx1::getMac();
         QString serial = Nx1::getSerial();
 
         if (!mac.isEmpty())
-            params.addQueryItem(QLatin1String("mac"), mac);
+            params.addQueryItem(kMac, mac);
 
         if (!serial.isEmpty())
-            params.addQueryItem(QLatin1String("serial"), serial);
+            params.addQueryItem(kSerial, serial);
     }
 #endif
 
     QLocale locale;
-    params.addQueryItem(QLatin1String("lang"), QLocale::languageToString(locale.language()));
+    params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
 
-    const QVector<QString> mainHardwareIds = qnLicensePool->mainHardwareIds();
-    const QVector<QString> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
-    int hw = 0;
-    for (const QString& hwid: mainHardwareIds) {
+    const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
+    for (const QString& hwid: hardwareIds)
+    {
+        int version = LLUtil::hardwareIdVersion(hwid);
+
         QString name;
-        if (hw == 0)
-            name = QLatin1String("oldhwid");
-        else if (hw == 1)
-            name = QLatin1String("hwid");
+        if (version == 0)
+            name = kOldHwidArray;
+        else if (version == 1)
+            name = kHwidArray;
         else
-            name = QString(QLatin1String("hwid%1")).arg(hw);
+            name = QString(QLatin1String("%1%2[]")).arg(kHwid).arg(version);
 
         params.addQueryItem(name, hwid);
-
-        hw++;
-    }
-
-    hw = 1;
-    for(const QString& hwid: compatibleHardwareIds) {
-        QString name = QString(QLatin1String("chwid%1")).arg(hw);
-        params.addQueryItem(name, hwid);
-        hw++;
     }
 
     if (infoMode)
-        params.addQueryItem(lit("mode"), lit("info"));
+        params.addQueryItem(kMode, kInfo);
 
     QByteArray request = params.query(QUrl::FullyEncoded).toUtf8();
     CLHttpStatus result = client.doPOST(url.path(), request);
@@ -87,16 +99,18 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     return result;
 }
 
-int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestParams & requestParams, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     ec2::ApiDetailedLicenseData reply;
 
-    QString licenseKey = requestParams.value("key");
-    if (licenseKey.isEmpty()) {
+    QString licenseKey = requestParams.value(kKey);
+    if (licenseKey.isEmpty())
+    {
         result.setError(QnJsonRestResult::MissingParameter, lit("Parameter 'key' is missed"));
         return CODE_OK;
     }
-    if (licenseKey.length() != 19 || licenseKey.count("-") != 3) {
+    if (licenseKey.length() != 19 || licenseKey.count("-") != 3)
+    {
         result.setError(QnJsonRestResult::MissingParameter, lit("Invalid license serial number provided. Serial number MUST be in format AAAA-BBBB-CCCC-DDDD"));
         return CODE_OK;
     }
@@ -136,8 +150,11 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     QnLicenseList licenses;
     licenses << license;
-    const ec2::ErrorCode errorCode = connect->getLicenseManager()->addLicensesSync(licenses);
-    if( errorCode != ec2::ErrorCode::ok) {
+    auto licenseManager = connect->getLicenseManager(owner->accessRights());
+    const ec2::ErrorCode errorCode = licenseManager->addLicensesSync(licenses);
+    NX_ASSERT(errorCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if( errorCode != ec2::ErrorCode::ok)
+    {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error: %1").arg(ec2::toString(errorCode)));
         return CODE_OK;
     }

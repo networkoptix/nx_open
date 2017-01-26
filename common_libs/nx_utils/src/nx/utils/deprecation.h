@@ -1,9 +1,8 @@
-#ifndef QN_DEPRECATION_H
-#define QN_DEPRECATION_H
+#pragma once
 
 /**
  * @file
- * 
+ *
  * Hacks to prevent the usage of some badly designed libraries and library features.
  */
 
@@ -24,7 +23,6 @@ namespace boost {
     struct ptr_multimap {};
 }
 
-
 /* Prevent the usage of Qt Java-style iterators. */
 #include <QtCore/QListIterator>
 #include <QtCore/QLinkedListIterator>
@@ -32,6 +30,7 @@ namespace boost {
 #include <QtCore/QMutableHashIterator>
 #include <QtCore/QVectorIterator>
 #include <QtCore/QMapIterator>
+#include <QtCore/QStringList>
 #define QListIterator           qt_java_style_iterators_are_forbidden
 #define QLinkedListIterator     qt_java_style_iterators_are_forbidden
 //#define QHashIterator           qt_java_style_iterators_are_forbidden
@@ -58,14 +57,6 @@ namespace boost {
 #define qRotate qRotate_is_deprecated_use_std_rotate
 #define qMerge qMerge_is_deprecated_use_std_merge
 
-/* Prevent the usage of local 8-bit encodings for QString. Use toLatin1 instead. */
-//#define toLocal8Bit                                                             \
-//    BOOST_PP_IF(                                                                \
-//        BOOST_PP_IS_EMPTY(QTSERVICE_H), /* Make sure QtService compiles. */     \
-//        toLocal8Bit,                                                            \
-//        toLocal8Bit_is_forbidden                                                \
-//    )
-
 /* qPrintable uses toLocal8Bit, so we have to redefine it. Not a big loss. */
 #undef qPrintable
 #define qPrintable(string) QString(string).toLatin1().constData()
@@ -74,7 +65,7 @@ namespace boost {
 /* Prevent the usage of Q_GLOBAL_STATIC_WITH_INITIALIZER as it is not thread-safe.
  * See http://lists.qt-project.org/pipermail/development/2012-March/002636.html. */
 #undef Q_GLOBAL_STATIC_WITH_INITIALIZER
-#define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED 
+#define Q_GLOBAL_STATIC_WITH_INITIALIZER Q_GLOBAL_STATIC_WITH_INITIALIZER___IS_DEPRECATED
 
 
 /* Prevent usage of custom file dialogs on mac os due to appstore limitations  */
@@ -83,5 +74,3 @@ namespace boost {
 #endif
 
 #endif // __cplusplus
-
-#endif // QN_DEPRECATION_H

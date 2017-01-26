@@ -8,7 +8,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include <cdb/auth_provider.h>
 
@@ -23,7 +23,7 @@ void serializeToUrlQuery(const AuthRequest&, QUrlQuery* const urlQuery);
 
 #define NonceData_Fields (nonce)(validPeriod)
 #define AuthRequest_Fields (nonce)(username)(realm)
-#define AuthResponse_Fields (nonce)(intermediateResponse)(accessRole)(validPeriod)
+#define AuthResponse_Fields (nonce)(intermediateResponse)(authenticatedAccountData)(accessRole)(validPeriod)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

@@ -35,7 +35,7 @@ public:
 
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const QnAbstractBusinessActionPtr& action);
-    bool removeLogForRes(QnUuid resId);
+    bool removeLogForRes(const QnUuid& resId);
 
     QnBusinessActionDataList getActions(
         const QnTimePeriod& period,
@@ -54,28 +54,22 @@ public:
 
 
     QnAuditRecordList getAuditData(const QnTimePeriod& period, const QnUuid& sessionId = QnUuid());
-    int addAuditRecord(const QnAuditRecord& data);
-    int updateAuditRecord(int internalId, const QnAuditRecord& data);
+    int auditRecordMaxId() const;
+    bool addAuditRecords(const std::map<int, QnAuditRecord>& records);
 
     /* Bookmarks API */
 
     // It does not sort by tags or camera names. Caller should sort it manually
-    bool getBookmarks(const QnVirtualCameraResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
+    bool getBookmarks(const QnSecurityCamResourceList &cameras, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 
     bool containsBookmark(const QnUuid &bookmarkId) const;
     QnCameraBookmarkTagList getBookmarkTags(int limit = std::numeric_limits<int>().max());
 
     bool addBookmark(const QnCameraBookmark &bookmark);
     bool updateBookmark(const QnCameraBookmark &bookmark);
-    bool deleteAllBookmarksForCamera(const QString& cameraUniqueId);
+    bool deleteAllBookmarksForCamera(const QnUuid& cameraId);
     bool deleteBookmark(const QnUuid &bookmarkId);
-    bool deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete);
-
-    bool setLastBackupTime(QnServer::StoragePool pool, const QnUuid& camera,
-                           QnServer::ChunksCatalog catalog, qint64 timestampMs);
-
-    qint64 getLastBackupTime(QnServer::StoragePool pool, const QnUuid& camera,
-                             QnServer::ChunksCatalog catalog) const;
+    bool deleteBookmarksToTime(const QMap<QnUuid, qint64>& dataToDelete);
 
     void setBookmarkCountController(std::function<void(size_t)> handler);
 
@@ -87,8 +81,10 @@ protected:
 private:
     bool createDatabase();
     bool cleanupEvents();
+    int getRuntimeActionsRecordCount();
     bool migrateBusinessParamsUnderTransaction();
     bool createBookmarkTagTriggersUnderTransaction();
+    bool bookmarksUniqueIdToCameraGuid();
     bool cleanupAuditLog();
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
@@ -100,6 +96,7 @@ private:
     qint64 m_lastCleanuptime;
     qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
+    int m_runtimeActionsTotalRecords;
     QnDbTransaction m_tran;
     std::function<void(size_t)> m_updateBookmarkCount;
 };

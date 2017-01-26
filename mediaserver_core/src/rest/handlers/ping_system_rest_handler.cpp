@@ -7,8 +7,10 @@
 #include "network/module_finder.h"
 #include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
+#include <network/connection_validator.h>
 #include "utils/common/app_info.h"
 #include <nx/network/simple_http_client.h>
+#include <http/custom_headers.h>
 
 //#define START_LICENSES_DEBUG
 
@@ -21,12 +23,12 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor*)
+        const QnRestConnectionProcessor* /*owner*/)
 {
     Q_UNUSED(path)
 
     QUrl url = params.value(lit("url"));
-    QString password = params.value(lit("password"));
+    QString getKey = params.value(lit("getKey"));
 
     if (url.isEmpty())
     {
@@ -42,31 +44,29 @@ int QnPingSystemRestHandler::executeGet(
         return CODE_OK;
     }
 
-    if (password.isEmpty())
+    if (getKey.isEmpty())
     {
         result.setError(QnRestResult::ErrorDescriptor(
             QnJsonRestResult::MissingParameter, lit("password")));
         return CODE_OK;
     }
 
-    QAuthenticator auth;
-    auth.setUser(lit("admin"));
-    auth.setPassword(password);
-
     QnModuleInformation moduleInformation;
     {
         int status;
-        moduleInformation = remoteModuleInformation(url, auth, status);
+        moduleInformation = remoteModuleInformation(url, getKey, status);
         if (status != CL_HTTP_SUCCESS)
         {
-            if (status == CL_HTTP_AUTH_REQUIRED)
+            if (status == nx_http::StatusCode::unauthorized)
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("UNAUTHORIZED"));
+            else if (status == nx_http::StatusCode::forbidden)
+                result.setError(QnJsonRestResult::CantProcessRequest, lit("FORBIDDEN"));
             else
                 result.setError(QnJsonRestResult::CantProcessRequest, lit("FAIL"));
             return CODE_OK;
         }
     }
-    
+
 
     if (moduleInformation.systemName.isEmpty())
     {
@@ -77,11 +77,8 @@ int QnPingSystemRestHandler::executeGet(
 
     result.setReply(moduleInformation);
 
-    bool customizationOK = moduleInformation.customization == QnAppInfo::customizationName() ||
-                           moduleInformation.customization.isEmpty() ||
-                           QnModuleFinder::instance()->isCompatibilityMode();
-
-    if (!moduleInformation.hasCompatibleVersion() || !customizationOK)
+    auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
+    if (connectionResult != Qn::SuccessConnectionResult)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("INCOMPATIBLE"));
         return CODE_OK;
@@ -99,7 +96,7 @@ int QnPingSystemRestHandler::executeGet(
     {
 
         /* Check if there is a valid starter license in the remote system. */
-        QnLicenseList remoteLicensesList = remoteLicenses(url, auth);
+        QnLicenseList remoteLicensesList = remoteLicenses(url, QAuthenticator());
 
         /* Warn that some of the licenses will be deactivated. */
         QnLicenseListHelper remoteHelper(remoteLicensesList);
@@ -116,11 +113,13 @@ int QnPingSystemRestHandler::executeGet(
 
 QnModuleInformation QnPingSystemRestHandler::remoteModuleInformation(
         const QUrl &url,
-        const QAuthenticator &auth,
+        const QString& getKey,
         int &status)
 {
-    CLSimpleHTTPClient client(url, defaultTimeoutMs, auth);
-    status = client.doGET(lit("api/moduleInformationAuthenticated"));
+    CLSimpleHTTPClient client(url, defaultTimeoutMs, QAuthenticator());
+    status = client.doGET(
+        lit("api/moduleInformationAuthenticated?checkOwnerPermissions=true&%1=%2").
+        arg(QLatin1String(Qn::URL_QUERY_AUTH_KEY_NAME)).arg(getKey));
 
     if (status != CL_HTTP_SUCCESS)
         return QnModuleInformation();

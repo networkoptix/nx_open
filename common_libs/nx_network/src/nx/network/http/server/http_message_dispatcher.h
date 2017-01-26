@@ -1,122 +1,94 @@
-/**********************************************************
-* 4 sep 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_HTTP_MESSAGE_DISPATCHER_H
-#define NX_HTTP_MESSAGE_DISPATCHER_H
+#pragma once
 
 #include <memory>
 
+#include <nx/network/connection_server/message_dispatcher.h>
+#include <nx/utils/std/cpp14.h>
+
 #include "abstract_http_request_handler.h"
 #include "http_server_connection.h"
-#include <nx/network/connection_server/message_dispatcher.h>
-#include "utils/common/cpp14.h"
 
-#define SINGLE_REQUEST_PROCESSOR_PER_REQUEST
+namespace nx_http {
 
+static const nx_http::StringType kAnyMethod;
+static const QString kAnyPath;
 
-namespace nx_http
+// TODO: #ak This class MUST search processor by max string prefix.
+class NX_NETWORK_API MessageDispatcher
 {
-    //TODO #ak this class MUST search processor by max string prefix
+public:
+    virtual ~MessageDispatcher() = default;
 
-    typedef std::function<void(
-            nx_http::Message&&,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> )
-        > HttpRequestCompletionFunc;
-
-    class NX_NETWORK_API MessageDispatcher
+    template<typename RequestHandlerType>
+    bool registerRequestProcessor(
+        const QString& path,
+        std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc,
+        const nx_http::StringType& method = kAnyMethod)
     {
-    public:
-        MessageDispatcher();
-        virtual ~MessageDispatcher();
+        NX_ASSERT(factoryFunc);
+        return m_factories[method].emplace(path, std::move(factoryFunc)).second;
+    }
 
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-        /*!
-            \param messageProcessor Ownership of this object is not passed
-            \note All processors MUST be registered before connection processing is started, since this class methods are not thread-safe
-            \return \a true if \a requestProcessor has been registered, \a false otherwise
-            \note Message processing function MUST be non-blocking
-        */
-        bool registerRequestProcessor(
-            const QString& path,
-            AbstractHttpRequestHandler* messageProcessor )
-        {
-            return m_processors.emplace( path, messageProcessor ).second;
-        }
-#else
-        template<typename RequestHandlerType>
-        bool registerRequestProcessor(
-            const QString& path,
-            std::function<std::unique_ptr<RequestHandlerType>()> factoryFunc )
-        {
-            return m_factories.emplace(
-                path,
-                factoryFunc ).second;
-        }
+    template<typename RequestHandlerType>
+    bool registerRequestProcessor(
+        const QString& path = kAnyPath, const nx_http::StringType& method = kAnyMethod)
+    {
+        return registerRequestProcessor<RequestHandlerType>(
+            path,
+            []() { return std::make_unique<RequestHandlerType>(); },
+            method);
+    }
 
-        template<typename RequestHandlerType>
-        bool registerRequestProcessor( const QString& path )
-        {
-            return m_factories.emplace(
-                path,
-                []()->std::unique_ptr<AbstractHttpRequestHandler>{
-                    return std::make_unique<RequestHandlerType>(); } ).second;
-        }
-#endif
-        //!Pass message to corresponding processor
-        /*!
-            \param message This object is not moved in case of failure to find processor
-            \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
-        */
-        template<class CompletionFuncRefType>
-        bool dispatchRequest(
-            const HttpServerConnection& conn,
-            nx_http::Message&& message,
-            stree::ResourceContainer&& authInfo,
-            CompletionFuncRefType&& completionFunc )
-        {
-            NX_ASSERT( message.type == nx_http::MessageType::request );
+    void addModRewriteRule(QString oldPrefix, QString newPrefix);
 
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-            auto it = m_processors.find( message.request->requestLine.url.path() );
-            if( it == m_processors.end() )
-                return false;
-            return it->second->processRequest(
-                conn,
-                std::move( message ),
-                std::forward<CompletionFuncRefType>( completionFunc ) );
-#else
-            auto it = m_factories.find( message.request->requestLine.url.path() );
-            if( it == m_factories.end() )
-                return false;
-            auto requestProcessor = it->second();
-            auto requestProcessorPtr = requestProcessor.release();  //TODO #ak get rid of this when general lambdas available
+    /**
+     * Pass message to corresponding processor.
+     *
+     *  @param message This object is not moved in case of failure to find processor.
+     *  @return true if request processing passed to corresponding processor and async processing
+     *      has been started,  false otherwise.
+     */
+    template<class CompletionFuncRefType>
+    bool dispatchRequest(
+        HttpServerConnection* const connection,
+        nx_http::Message message,
+        stree::ResourceContainer authInfo,
+        CompletionFuncRefType completionFunc) const
+    {
+        NX_ASSERT(message.type == nx_http::MessageType::request);
+        nx_http::RequestLine& request = message.request->requestLine;
+        applyModRewrite(&request.url);
 
-            return requestProcessorPtr->processRequest(
-                conn,
-                std::move( message ),
-                std::move( authInfo ),
-                [completionFunc, requestProcessorPtr](
-                    nx_http::Message&& responseMsg,
-                    std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
-                {
-                    completionFunc( std::move(responseMsg), std::move(responseMsgBody) );
-                    delete requestProcessorPtr;
-                } );
-#endif
-        }
+        auto handler = makeHandler(request.method, request.url.path());
+        if (!handler)
+            return false;
 
-    private:
-#ifndef SINGLE_REQUEST_PROCESSOR_PER_REQUEST
-        std::map<QString, AbstractHttpRequestHandler*> m_processors;
-#else
-        std::map<
-            QString,
-            std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
-            > m_factories;
-#endif
-    };
-}
+        const auto handlerPtr = handler.get();
+        return handlerPtr->processRequest(
+            connection, std::move(message), std::move(authInfo),
+            [handler = std::move(handler), completionFunc = std::move(completionFunc)](
+                nx_http::Message message,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> bodySource,
+                ConnectionEvents connectionEvents) mutable
+            {
+                completionFunc(
+                    std::move(message),
+                    std::move(bodySource),
+                    std::move(connectionEvents));
 
-#endif  //NX_HTTP_MESSAGE_DISPATCHER_H
+                handler.reset();
+            });
+    }
+
+private:
+    void applyModRewrite(QUrl* url) const;
+    std::unique_ptr<AbstractHttpRequestHandler> makeHandler(
+        const StringType& method, const QString& path) const;
+
+    std::map<QString, QString> m_rewritePrefixes;
+    std::map<nx_http::StringType /*method*/, std::map<
+        QString /*path*/, std::function<std::unique_ptr<AbstractHttpRequestHandler>()>
+    >> m_factories;
+};
+
+} // namespace nx_http

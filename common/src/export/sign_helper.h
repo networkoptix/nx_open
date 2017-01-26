@@ -1,8 +1,6 @@
 #ifndef __SIGN_FRAME_HELPER__
 #define __SIGN_FRAME_HELPER__
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
@@ -22,6 +20,7 @@ class QnSignHelper
     Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
 public:
     QnSignHelper();
+    ~QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
 
@@ -38,7 +37,7 @@ public:
     void draw(QImage& img, bool drawText);
     void draw(QPainter& painter, const QSize& paintSize, bool drawText);
     //void drawTextLine(QPainter& painter, const QSize& paintSize,int lineNum, const QString& text);
-    
+
     //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
     static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
@@ -64,7 +63,7 @@ private:
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
     static void doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size);
-    static void doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
 
 private:
     QPixmap m_logo;
@@ -81,8 +80,7 @@ private:
     QString m_versionStr;
     QString m_hwIdStr;
     QString m_licensedToStr;
+    AVPacket* m_outPacket;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __SIGN_FRAME_HELPER__

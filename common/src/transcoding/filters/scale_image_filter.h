@@ -12,7 +12,7 @@
 class QnScaleImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnScaleImageFilter(const QSize& size, PixelFormat format = PIX_FMT_NONE);
+    QnScaleImageFilter(const QSize& size, AVPixelFormat format = AV_PIX_FMT_NONE);
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
 
@@ -22,7 +22,7 @@ public:
 
 private:
     QSize m_size;
-    PixelFormat m_format;
+    AVPixelFormat m_format;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

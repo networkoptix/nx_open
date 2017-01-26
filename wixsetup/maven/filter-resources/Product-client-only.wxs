@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
-     xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+
     <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
-        <?include BuildVars.wxi ?>
 
         <Property Id="REINSTALLMODE" Value="dmus"/>
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"></Property>        
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -18,7 +18,7 @@
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
         <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
-        
+
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
             <![CDATA[ NOT VersionNT64 ]]>
@@ -35,26 +35,24 @@
 
         <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch">
             <![CDATA[ CLIENT_DIRECTORY_REG = "" ]]>
-        </SetProperty>        
+        </SetProperty>
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
 
         <!-- Logo -->
-        <Icon Id="icon_menu.exe" SourceFile="Binary\eve\eve_logo.ico"/>
-        <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
+        <Icon Id="icon_menu.exe" SourceFile="favicon.ico"/>
+        <Icon Id="icon_desktop.exe" SourceFile="favicon.ico"/>
 
         <!-- Add property to access from custom actions -->
         <Property Id="ARCHITECTURE" Value="$(var.arch)" />
-        <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
+        <!-- <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/> -->
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${display.product.name} Installer Setup" />
-
-        <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
@@ -83,22 +81,20 @@
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
-        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
-        <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
+        <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="minilauncher.exe" ExeCommand=""/>
+        <CustomAction Id="NoDowngrade" Error="NoDowngrade" />
 
+
+        <!-- Trying to kill old applauncher nicely. Notice: new applauncher may be left running during update. -->
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[$(var.clientDirId)]$(var.applauncherName).exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[$(var.clientDirId)]${minilauncher.binary.name}&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <!-- Trying to kill old applauncher forcibly. -->
         <CustomAction Id="CloseAppLauncherAction2_Cmd" Property="CloseAppLauncherAction2"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${display.product.name} Launcher.exe"' Execute="immediate" />
+                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${minilauncher.binary.name}"' Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
-                      Execute="deferred" Return="ignore" Impersonate="no" />
-
-        <CustomAction Id="CloseAppLauncherAction3_Cmd" Property="CloseAppLauncherAction3"
-                      Value='"[WindowsFolder]\System32\taskkill.exe" /F /IM "${product.name} Launcher.exe"' Execute="immediate" />
-        <CustomAction Id="CloseAppLauncherAction3" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -119,23 +115,25 @@
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseAppLauncherAction2_Cmd" Before="CloseAppLauncherAction2">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction2" Before="CloseAppLauncherAction3_Cmd">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction3_Cmd" Before="CloseAppLauncherAction3">NOT $(var.VmsInstalling)</Custom>
-            <Custom Action="CloseAppLauncherAction3" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="CloseAppLauncherAction2" Before="StopServices">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
-        <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
-        <Media Id="2" Cabinet="media2.cab" EmbedCab="yes" />
-        <Media Id="3" Cabinet="media3.cab" EmbedCab="yes" />
-        <Media Id="4" Cabinet="media4.cab" EmbedCab="yes" />
-        <Media Id="5" Cabinet="media5.cab" EmbedCab="yes" />
-        <Media Id="6" Cabinet="media6.cab" EmbedCab="yes" />
-        <Media Id="7" Cabinet="media7.cab" EmbedCab="yes" />
-        <Media Id="8" Cabinet="media8.cab" EmbedCab="yes" />
-        <Media Id="9" Cabinet="media9.cab" EmbedCab="yes" />
-        <Media Id="10" Cabinet="media10.cab" EmbedCab="yes" />
-        <Media Id="11" Cabinet="media11.cab" EmbedCab="yes" />
-        <Media Id="12" Cabinet="media12.cab" EmbedCab="yes" />
+        <Media Id="1" Cabinet="clmisc.cab" EmbedCab="yes" />
+
+        <Media Id="2" Cabinet="cmnff1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="3" Cabinet="cmnff2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="4" Cabinet="cmnlib1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="5" Cabinet="cmnicu.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="6" Cabinet="cmnlib2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="7" Cabinet="cmnqt1.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="8" Cabinet="cmnqt2.cab" EmbedCab="$(var.NoStrip)" />
+        <Media Id="9" Cabinet="cmnqtui.cab" EmbedCab="$(var.NoStrip)" />
+
+        <Media Id="10" Cabinet="clqt1.cab" EmbedCab="yes" />
+        <Media Id="11" Cabinet="clqt2.cab" EmbedCab="yes" />
+        <Media Id="12" Cabinet="clqtpl.cab" EmbedCab="yes" />
+        <Media Id="13" Cabinet="cllibs.cab" EmbedCab="yes" />
+        <Media Id="14" Cabinet="clexec.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
             <Directory Id="MyPicturesFolder">
@@ -152,60 +150,15 @@
             <Directory Id="ProgramMenuFolder" Name="Programs">
                 <Directory Id="ProgramMenuDir" Name="${company.name}">
                     <Component Id="UninstallProgramMenuFolder" DiskId="1">
-                        <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
+                        <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\ProgramMenu' Type='string' Value='' KeyPath='yes' />
                         <RemoveFolder Id='DashMenuDirRem' On='uninstall' />
                     </Component>
                 </Directory>
             </Directory>
 
             <Directory Id="DesktopFolder" Name="Desktop"/>
-            <Directory Id="StartupFolder" Name="Startup"/>            
+            <Directory Id="StartupFolder" Name="Startup"/>
         </Directory>
-
-        <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist90" SourceFile="MergeModules\Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist90Policy" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist100" SourceFile="MergeModules\Microsoft_VC100_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist110" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist140" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_CRT_${arch}.msm" DiskId="1" Language="0"/>
-            <?if ${build.configuration} = debug ?>
-                <Merge Id="VCRedist90Debug" SourceFile="MergeModules\Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist90PolicyDebug" SourceFile="MergeModules\policy_9_0_Microsoft_VC90_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>                
-                <Merge Id="VCRedist100Debug" SourceFile="MergeModules\Microsoft_VC100_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist110Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC110_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-                <Merge Id="VCRedist140Debug" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC140_DebugCRT_${arch}.msm" DiskId="1" Language="0"/>
-            <?endif?>
-        </DirectoryRef>
-
-		<Feature Id="VCRedistVS9" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-			<MergeRef Id="VCRedist90"/>
-			<MergeRef Id="VCRedist90Policy"/>
-			<?if ${build.configuration} = Debug ?>
-                <MergeRef Id="VCRedist90Debug"/>
-                <MergeRef Id="VCRedist90PolicyDebug"/>
-			<?endif?>
-		</Feature>
-
-        <Feature Id="VCRedistVS10" Title="Visual C++ 10.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist100"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist100Debug"/>
-            <?endif?>            
-        </Feature>
-
-        <Feature Id="VCRedistVS11" Title="Visual C++ 11.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist110"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist110Debug"/>
-            <?endif?>
-        </Feature>
-        
-        <Feature Id="VCRedistVS14" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
-            <MergeRef Id="VCRedist140"/>
-            <?if ${build.configuration} = debug ?>
-                <MergeRef Id="VCRedist140Debug"/>
-            <?endif?>
-        </Feature>
 
         <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="AlwaysFiles"/>
@@ -225,7 +178,7 @@
         <UI>
             <!-- These dialog references are needed for CloseApplication above to work correctly -->
             <DialogRef Id="FilesInUse" />
-            <DialogRef Id="MsiRMFilesInUse" />      
+            <DialogRef Id="MsiRMFilesInUse" />
 
             <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
             <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
@@ -263,8 +216,7 @@
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">LICENSE_ALREADY_ACCEPTED</Publish>
             <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsRemoving)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg" Order="2">$(var.VmsRemoving)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">1</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
@@ -279,10 +231,6 @@
             <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
 
             <Publish Dialog="VerifyReadyDlg" Control="Install" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">1</Publish>
-
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Property="WixUI_InstallMode" Value="Remove">1</Publish>
         </UI>
     </Product>
 </Wix>

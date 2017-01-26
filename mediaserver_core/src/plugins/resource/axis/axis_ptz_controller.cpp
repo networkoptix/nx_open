@@ -7,7 +7,7 @@
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
 #include <nx/network/simple_http_client.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_data.h>
@@ -190,7 +190,8 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
     }
 }
 
-CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const {
+CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
+{
     return new CLSimpleHTTPClient(
         m_resource->getHostAddress(), 
         QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 
@@ -384,6 +385,7 @@ bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
         m_cacheUpdateTimer.restart();
     }
 
+    QnMutexLocker lock(&m_mutex);
     for (auto itr = m_cachedData.begin(); itr != m_cachedData.end(); ++itr)
         presets->push_back(QnPtzPreset(itr.key(), itr.value()));
     return true;

@@ -43,19 +43,13 @@ QnResourcePtr QnAbstractArchiveResource::toResourcePtr()
     return toSharedPointer();
 }
 
-void QnAbstractArchiveResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
-{
-    QnResource::updateInner(other, modifiedFields);
-    QnMediaResource::updateInner(other, modifiedFields);
-}
-
 Qn::ResourceStatus QnAbstractArchiveResource::getStatus() const
 {
     return m_localStatus;
 }
 
-void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnAbstractArchiveResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
-    Q_UNUSED(silenceMode)
+    Q_UNUSED(reason)
     m_localStatus = newStatus;
 }

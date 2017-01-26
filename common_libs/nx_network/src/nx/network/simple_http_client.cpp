@@ -222,7 +222,7 @@ int CLSimpleHTTPClient::readHeaders()
     m_header.clear();
     m_responseLine.clear();
     int eofLen = 4;
-    
+
     char* eofPos = 0;
     while (eofPos == 0)
     {
@@ -247,7 +247,7 @@ int CLSimpleHTTPClient::readHeaders()
         int delimPos = line.indexOf(':');
         if (delimPos == -1)
             m_header.insert(line.trimmed(), QByteArray());
-        else 
+        else
         {
             QByteArray paramName = line.left(delimPos).trimmed();
             QByteArray paramValue = line.mid(delimPos+1).trimmed();
@@ -377,7 +377,11 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
             {
                 return CL_HTTP_NOT_ALLOWED;
             }
-            else if( statusLine.statusCode == nx_http::StatusCode::moved )
+            else if( statusLine.statusCode == nx_http::StatusCode::forbidden )
+            {
+                return CL_HTTP_FORBIDDEN;
+            }
+            else if( statusLine.statusCode == nx_http::StatusCode::found )
             {
                 return CL_HTTP_REDIRECT;
             }
@@ -432,7 +436,7 @@ void CLSimpleHTTPClient::readAll(QByteArray& data)
 int CLSimpleHTTPClient::read(char* data, int max_len)
 {
     if (!m_connected) return -1;
-    
+
     int bufferRestLen = 0;
     if (m_dataRestLen)
     {
@@ -451,7 +455,7 @@ int CLSimpleHTTPClient::read(char* data, int max_len)
     }
 
     int readed = m_sock->recv(data, max_len);
-    if (readed<=0) 
+    if (readed<=0)
         close();
 
     if (readed > 0)
@@ -479,7 +483,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     for (int i = 0; i < authParams.size(); ++i)
     {
         QList<QByteArray> param = smartSplit(authParams[i], '=');
-        if (param.size() > 1) 
+        if (param.size() > 1)
         {
             param[0] = param[0].trimmed();
             param[1] = param[1].trimmed();
@@ -495,7 +499,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     }
 }
 
-QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth) 
+QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth)
 {
     QByteArray lp;
     lp.append(auth.user().toUtf8());
@@ -529,7 +533,7 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QTextStream str(&result);
 
     str << (isProxy ? "Proxy-Authorization" : "Authorization") <<
-        ": Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
+        ": Digest username=\"" << auth.user() << "\", realm=\"" << realm <<
         "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
 
     return result;
@@ -557,7 +561,7 @@ QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QSt
     CLSimpleHTTPClient http (host, port, timeout, auth);
     status = http.doGET(fileName);
 
-    
+
     QByteArray file;
     file.reserve(capacity);
 

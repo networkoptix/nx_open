@@ -1,11 +1,10 @@
-#ifndef QN_EVENT_PROCESSORS_H
-#define QN_EVENT_PROCESSORS_H
+#pragma once
+
+#include <utility>
 
 #include <QtCore/QObject>
 #include <QtCore/QEvent>
 #include "warnings.h"
-
-// TODO: #Elric add syntax: connect(QObject *, QEvent::Type, QObject *, const char * /* slot (QObject *, QEvent *) */)
 
 template<class Base>
 class QnEventProcessor: public Base {
@@ -167,11 +166,11 @@ typedef QnEventEater<QnEveryEventProcessor<QObject> > QnEveryEventEater;
 /**
  * This class is used to emit signals from <tt>QnEventProcessor</tt>.
  *
- * Each emitter has 60 connection slots. This is due to the fact that <tt>QObject</tt> 
- * can quickly determine if the signal is connected only for the first 64 signals 
+ * Each emitter has 60 connection slots. This is due to the fact that <tt>QObject</tt>
+ * can quickly determine if the signal is connected only for the first 64 signals
  * (As of Qt 4.7, at least; see <tt>QObjectPrivate::connectedSignals</tt>).
  * Each <tt>QObject</tt> defines a <tt>destroyed</tt> signal, so we have 63
- * signals left. 
+ * signals left.
  */
 class QnEventSignalEmitter: public QObject {
     Q_OBJECT;
@@ -187,7 +186,7 @@ public:
     static const char *signature(int signalIndex);
 
 signals:
-    /* This code is processed by MOC, so we cannot use boost preprocessor to 
+    /* This code is processed by MOC, so we cannot use boost preprocessor to
      * autogenerate it. */
     void activate0(QObject *watched, QEvent *event);
     void activate1(QObject *watched, QEvent *event);
@@ -277,5 +276,129 @@ private:
     QVector<Signal> m_freeList;
 };
 
+/* Container version of createEventSignalizer function: */
+template<class Events = std::initializer_list<QEvent::Type>>
+QnAbstractEventSignalizer* createEventSignalizer(
+    const Events& events,
+    QObject* parent = nullptr)
+{
+    switch (events.size())
+    {
+        case 0:
+            return nullptr;
 
-#endif // QN_EVENT_PROCESSORS_H
+        case 1:
+        {
+            auto singleEventSignalizer = new QnSingleEventSignalizer(parent);
+            singleEventSignalizer->setEventType(*events.begin());
+            return singleEventSignalizer;
+        }
+
+        default:
+        {
+            auto multiEventSignalizer = new QnMultiEventSignalizer(parent);
+            for (auto type : events)
+                multiEventSignalizer->addEventType(type);
+
+            return multiEventSignalizer;
+        }
+    }
+}
+
+/* Single event version of createEventSignalizer function: */
+inline QnAbstractEventSignalizer* createEventSignalizer(
+    QEvent::Type event,
+    QObject* parent)
+{
+    auto singleEventSignalizer = new QnSingleEventSignalizer(parent);
+    singleEventSignalizer->setEventType(event);
+    return singleEventSignalizer;
+}
+
+/* Container version of installEventFilter function (SFINAE overload): */
+template<
+    class Watched = std::initializer_list<QObject*>,
+    class = decltype(std::declval<Watched>().size()),  //< size(), begin() and end()
+    class = decltype(std::declval<Watched>().begin()), //<     functions
+    class = decltype(std::declval<Watched>().end())>   //<         must exist
+bool installEventFilter(const Watched& watched, QObject* filter)
+{
+    if (watched.size() == 0 || !filter)
+        return false;
+
+    for (auto object: watched)
+        object->installEventFilter(filter);
+
+    return true;
+}
+
+/* Raw and smart pointer version of installEventFilter function (SFINAE overload): */
+template<
+    class Watched,
+    /* Bool typecast availability check: */
+    class = decltype(static_cast<bool>(std::declval<Watched>())),
+    /* Dereferenceability and installEventFilter method existance check: */
+    class = decltype(std::declval<Watched>()->installEventFilter(nullptr))>
+bool installEventFilter(const Watched& watched, QObject* filter)
+{
+    if (!watched || !filter)
+        return false;
+
+    watched->installEventFilter(filter);
+    return true;
+}
+
+/**
+* Connects to object(s) event(s) and calls receiver's handler.
+*   watched - raw or smart pointer to QObject descendant,
+*      an initializer list or a container of pointers to QObject descendants
+*   events - a single value of QEvent::Type, an initializer list
+*      or a container of QEvent::Type items
+*   receiver - raw or smart pointer to QObject descendant to handle signals
+*   handler - member function or functor that will be called to handle signals
+*   connectionType - Qt signal/slot connection type
+*      Qt::UniqueConnection is currently not supported
+*      Qt::QueuedConnection should be used with care: unguarded pointer to watched object
+*          is passed to the handler function, so user must provide own guard measures
+*/
+template<
+    class Watched = std::initializer_list<QObject*>,
+    class Events = std::initializer_list<QEvent::Type>,
+    class Receiver,
+    class HandlerFunc>
+QnAbstractEventSignalizer* installEventHandler(
+    const Watched& watched,
+    const Events& events,
+    const Receiver& receiver,
+    HandlerFunc handler,
+    Qt::ConnectionType connectionType = Qt::AutoConnection)
+{
+    auto receiverObject = &*receiver; //< smart to raw pointer
+    if (!receiver)
+        return nullptr;
+
+    QScopedPointer<QnAbstractEventSignalizer> scopedSignalizer(
+        createEventSignalizer(events, receiverObject));
+
+    if (!scopedSignalizer)
+        return nullptr;
+
+    auto signalizer = scopedSignalizer.data();
+
+    if (!installEventFilter(watched, signalizer))
+        return nullptr;
+
+    if (!QObject::connect(signalizer, &QnAbstractEventSignalizer::activated,
+        receiverObject, handler, connectionType))
+    {
+        return nullptr;
+    }
+
+    auto disconnectFunctor = [signalizer] { signalizer->disconnect(); };
+
+    if (!QObject::connect(receiverObject, &QObject::destroyed, signalizer, disconnectFunctor))
+        return nullptr;
+
+    return scopedSignalizer.take(); //< pass scoped ownership to the caller
+}
+

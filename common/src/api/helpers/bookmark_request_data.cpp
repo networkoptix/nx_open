@@ -5,208 +5,221 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
+#include <api/helpers/camera_id_helper.h>
 
-namespace
+namespace {
+
+static const QString kStartTimeParam = lit("startTime");
+static const QString kEndTimeParam = lit("endTime");
+static const QString kSortColumnParam = lit("sortBy");
+static const QString kSortOrderParam = lit("sortOrder");
+static const QString kUseSparsingParam = lit("sparse");
+static const QString kMinVisibleLengthParam = lit("minVisibleLength");
+static const QString kFilterParam = lit("filter");
+static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
+static const QString kDeprecatedMacParam = lit("mac");
+static const QString kCameraIdParam = lit("cameraId");
+static const QString kLimitParam = lit("limit");
+static const QString kGuidParam = lit("guid");
+static const QString kNameParam = lit("name");
+static const QString kDescriptionParam = lit("description");
+static const QString kTimeoutParam = lit("timeout");
+static const QString kDurationParam = lit("duration");
+static const QString kTagParam = lit("tag");
+
+static const qint64 kUsPerMs = 1000;
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+// QnGetBookmarksRequestData
+
+QnGetBookmarksRequestData::QnGetBookmarksRequestData():
+    QnMultiserverRequestData(),
+    filter(),
+    cameras()
 {
-    const QString startTimeKey                  (lit("startTime"));
-    const QString endTimeKey                    (lit("endTime"));
-    const QString sortColumnKey                 (lit("sortBy"));
-    const QString sortOrderKey                  (lit("sortOrder"));
-    const QString useSparsing                   (lit("sparse"));
-    const QString minVisibleLengthMs            (lit("minVisibleLength"));
-    const QString filterKey                     (lit("filter"));
-    const QString physicalIdKey                 (lit("physicalId"));
-    const QString macKey                        (lit("mac"));
-    const QString cameraIdKey                   (lit("cameraId"));
-    const QString limitKey                      (lit("limit"));
-    const QString guidKey                       (lit("guid"));
-    const QString nameKey                       (lit("name"));
-    const QString descriptionKey                (lit("description"));
-    const QString timeoutKey                    (lit("timeout"));
-    const QString durationKey                   (lit("duration"));
-    const QString tagKey                        (lit("tag"));
-
-    const QChar tagsDelimiter = L',';
-    const qint64 USEC_PER_MS = 1000;
 }
 
-/************************************************************************/
-/* QnGetBookmarksRequestData                                          */
-/************************************************************************/
-
-QnGetBookmarksRequestData::QnGetBookmarksRequestData()
-    : QnMultiserverRequestData()
-    , filter()
-    , cameras()
-{}
-
-void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params) {
+void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
+{
     QnMultiserverRequestData::loadFromParams(params);
 
-    if (params.contains(startTimeKey))
-        filter.startTimeMs = parseDateTime(params.value(startTimeKey)) / USEC_PER_MS;
+    if (params.contains(kStartTimeParam))
+        filter.startTimeMs = nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs;
 
-    if (params.contains(endTimeKey))
-        filter.endTimeMs = parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
+    if (params.contains(kEndTimeParam))
+        filter.endTimeMs = nx::utils::parseDateTime(params.value(kEndTimeParam))  / kUsPerMs;
 
-    QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
-    QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);
+    QnLexical::deserialize(params.value(kSortColumnParam), &filter.orderBy.column);
+    QnLexical::deserialize(params.value(kSortOrderParam), &filter.orderBy.order);
 
-    QnLexical::deserialize(params.value(useSparsing), &filter.sparsing.used);
-    QnLexical::deserialize(params.value(minVisibleLengthMs), &filter.sparsing.minVisibleLengthMs);
+    QnLexical::deserialize(params.value(kUseSparsingParam), &filter.sparsing.used);
+    QnLexical::deserialize(params.value(kMinVisibleLengthParam),
+        &filter.sparsing.minVisibleLengthMs);
 
-    if (params.contains(limitKey))
-        filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
+    if (params.contains(kLimitParam))
+        filter.limit = qMax(0LL, params.value(kLimitParam).toLongLong());
 
-    filter.text = params.value(filterKey);
+    filter.text = params.value(kFilterParam);
 
-    for (const auto& id: params.allValues(physicalIdKey)) {
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getNetResourceByPhysicalId(id).dynamicCast<QnVirtualCameraResource>())
-            cameras << camera;
-    }
-    for (const auto& id: params.allValues(macKey)) {
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByMacAddress(id).dynamicCast<QnVirtualCameraResource>())
-            cameras << camera;
-    }
-    for (const auto& id: params.allValues(cameraIdKey)) {
-        QnUuid uuid = QnUuid::fromStringSafe(id);
-        if (uuid.isNull())
-            continue;
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(uuid).dynamicCast<QnVirtualCameraResource>())
-            cameras << camera;
-    }
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(&cameras, params,
+        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 }
 
-
-QnRequestParamList QnGetBookmarksRequestData::toParams() const {
+QnRequestParamList QnGetBookmarksRequestData::toParams() const
+{
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    result.insert(startTimeKey,     QnLexical::serialized(filter.startTimeMs));
-    result.insert(endTimeKey,       QnLexical::serialized(filter.endTimeMs));
-    result.insert(filterKey,        QnLexical::serialized(filter.text));
-    result.insert(limitKey,         QnLexical::serialized(filter.limit));
+    result.insert(kStartTimeParam, QnLexical::serialized(filter.startTimeMs));
+    result.insert(kEndTimeParam, QnLexical::serialized(filter.endTimeMs));
+    result.insert(kFilterParam, QnLexical::serialized(filter.text));
+    result.insert(kLimitParam, QnLexical::serialized(filter.limit));
 
-    result.insert(sortColumnKey,    QnLexical::serialized(filter.orderBy.column));
-    result.insert(sortOrderKey,     QnLexical::serialized(filter.orderBy.order));
+    result.insert(kSortColumnParam, QnLexical::serialized(filter.orderBy.column));
+    result.insert(kSortOrderParam, QnLexical::serialized(filter.orderBy.order));
 
-    result.insert(useSparsing,          QnLexical::serialized(filter.sparsing.used));
-    result.insert(minVisibleLengthMs,   QnLexical::serialized(filter.sparsing.minVisibleLengthMs));
+    result.insert(kUseSparsingParam, QnLexical::serialized(filter.sparsing.used));
+    result.insert(kMinVisibleLengthParam,
+        QnLexical::serialized(filter.sparsing.minVisibleLengthMs));
 
-    for (const auto &camera: cameras)
-        result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));
+    for (const auto& camera: cameras)
+        result.insert(kCameraIdParam, QnLexical::serialized(camera->getId()));
 
     return result;
 }
 
-bool QnGetBookmarksRequestData::isValid() const {
+bool QnGetBookmarksRequestData::isValid() const
+{
     return !cameras.isEmpty()
         && filter.endTimeMs > filter.startTimeMs
         && format != Qn::UnsupportedFormat;
 }
 
-/************************************************************************/
-/* QnGetBookmarkTagsRequestData                                         */
-/************************************************************************/
+//-------------------------------------------------------------------------------------------------
+// QnGetBookmarkTagsRequestData
 
-QnGetBookmarkTagsRequestData::QnGetBookmarkTagsRequestData(int limit)
-    : QnMultiserverRequestData()
-    , limit(limit)
-{}
+QnGetBookmarkTagsRequestData::QnGetBookmarkTagsRequestData(int limit):
+    QnMultiserverRequestData(),
+    limit(limit)
+{
+}
 
-int QnGetBookmarkTagsRequestData::unlimited() {
+int QnGetBookmarkTagsRequestData::unlimited()
+{
     return std::numeric_limits<int>().max();
 }
 
-void QnGetBookmarkTagsRequestData::loadFromParams(const QnRequestParamList& params) {
+void QnGetBookmarkTagsRequestData::loadFromParams(const QnRequestParamList& params)
+{
     QnMultiserverRequestData::loadFromParams(params);
-    limit = QnLexical::deserialized<int>(params.value(limitKey), unlimited());
+    limit = QnLexical::deserialized<int>(params.value(kLimitParam), unlimited());
 }
 
-QnRequestParamList QnGetBookmarkTagsRequestData::toParams() const {
+QnRequestParamList QnGetBookmarkTagsRequestData::toParams() const
+{
     QnRequestParamList result = QnMultiserverRequestData::toParams();
-    result.insert(limitKey,     QnLexical::serialized(limit));
+    result.insert(kLimitParam, QnLexical::serialized(limit));
     return result;
 }
 
-bool QnGetBookmarkTagsRequestData::isValid() const {
+bool QnGetBookmarkTagsRequestData::isValid() const
+{
     return limit >= 0;
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnUpdateBookmarkRequestData
 
-/************************************************************************/
-/* QnUpdateBookmarkRequestData                                          */
-/************************************************************************/
-QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData()
-    : QnMultiserverRequestData()
-    , bookmark()
-{}
-
-QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark &bookmark)
-    : QnMultiserverRequestData()
-    , bookmark(bookmark)
-{}
-
-void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& params) {
-    QnMultiserverRequestData::loadFromParams(params);
-    bookmark.guid           = QnLexical::deserialized<QnUuid>(params.value(guidKey));
-    bookmark.name           = params.value(nameKey);
-    bookmark.description    = params.value(descriptionKey);
-    bookmark.timeout        = QnLexical::deserialized<qint64>(params.value(timeoutKey));
-    bookmark.startTimeMs    = QnLexical::deserialized<qint64>(params.value(startTimeKey));
-    bookmark.durationMs     = QnLexical::deserialized<qint64>(params.value(durationKey));
-    bookmark.cameraId       = params.value(cameraIdKey);
-    bookmark.tags           = params.allValues(tagKey).toSet();
+QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData():
+    QnMultiserverRequestData(),
+    bookmark()
+{
 }
 
-QnRequestParamList QnUpdateBookmarkRequestData::toParams() const {
+QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark):
+    QnMultiserverRequestData(),
+    bookmark(bookmark)
+{
+}
+
+void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& params)
+{
+    QnMultiserverRequestData::loadFromParams(params);
+    bookmark.guid = QnLexical::deserialized<QnUuid>(params.value(kGuidParam));
+    bookmark.name = params.value(kNameParam);
+    bookmark.description = params.value(kDescriptionParam);
+    bookmark.timeout = QnLexical::deserialized<qint64>(params.value(kTimeoutParam));
+    bookmark.startTimeMs = QnLexical::deserialized<qint64>(params.value(kStartTimeParam));
+    bookmark.durationMs = QnLexical::deserialized<qint64>(params.value(kDurationParam));
+
+    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        /*outNotFoundCameraId*/ nullptr,
+        params.toHash(),
+        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
+    if (!camera)
+        bookmark.cameraId = QnUuid();
+    else
+        bookmark.cameraId = camera->getId();
+
+    bookmark.tags = params.allValues(kTagParam).toSet();
+}
+
+QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
+{
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    result.insert(guidKey,          QnLexical::serialized(bookmark.guid));
-    result.insert(nameKey,          bookmark.name);
-    result.insert(descriptionKey,   bookmark.description);
-    result.insert(timeoutKey,       QnLexical::serialized(bookmark.timeout));
-    result.insert(startTimeKey,     QnLexical::serialized(bookmark.startTimeMs));
-    result.insert(durationKey,      QnLexical::serialized(bookmark.durationMs));
-    result.insert(cameraIdKey,      bookmark.cameraId);
-    for (const QString &tag: bookmark.tags)
-        result.insert(tagKey, tag);
+    result.insert(kGuidParam, QnLexical::serialized(bookmark.guid));
+    result.insert(kNameParam, bookmark.name);
+    result.insert(kDescriptionParam, bookmark.description);
+    result.insert(kTimeoutParam, QnLexical::serialized(bookmark.timeout));
+    result.insert(kStartTimeParam, QnLexical::serialized(bookmark.startTimeMs));
+    result.insert(kDurationParam, QnLexical::serialized(bookmark.durationMs));
+    result.insert(kCameraIdParam, bookmark.cameraId.toString());
+    for (const QString& tag: bookmark.tags)
+        result.insert(kTagParam, tag);
 
     return result;
 }
 
-bool QnUpdateBookmarkRequestData::isValid() const {
+bool QnUpdateBookmarkRequestData::isValid() const
+{
     return bookmark.isValid();
 }
 
+//-------------------------------------------------------------------------------------------------
+// QnDeleteBookmarkRequestData
 
-/************************************************************************/
-/* QnDeleteBookmarkRequestData                                          */
-/************************************************************************/
-QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData()
-    : QnMultiserverRequestData()
-    , bookmarkId()
-{}
-
-QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData(const QnUuid &bookmarkId)
-    : QnMultiserverRequestData()
-    , bookmarkId(bookmarkId)
-{}
-
-void QnDeleteBookmarkRequestData::loadFromParams(const QnRequestParamList& params) {
-    QnMultiserverRequestData::loadFromParams(params);
-    bookmarkId = QnLexical::deserialized<QnUuid>(params.value(guidKey));
+QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData():
+    QnMultiserverRequestData(),
+    bookmarkId()
+{
 }
 
-QnRequestParamList QnDeleteBookmarkRequestData::toParams() const  {
+QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData(const QnUuid& bookmarkId):
+    QnMultiserverRequestData(),
+    bookmarkId(bookmarkId)
+{
+}
+
+void QnDeleteBookmarkRequestData::loadFromParams(const QnRequestParamList& params)
+{
+    QnMultiserverRequestData::loadFromParams(params);
+    bookmarkId = QnLexical::deserialized<QnUuid>(params.value(kGuidParam));
+}
+
+QnRequestParamList QnDeleteBookmarkRequestData::toParams() const
+{
     QnRequestParamList result = QnMultiserverRequestData::toParams();
-    result.insert(guidKey, QnLexical::serialized(bookmarkId));
+    result.insert(kGuidParam, QnLexical::serialized(bookmarkId));
     return result;
 }
 
-bool QnDeleteBookmarkRequestData::isValid() const {
+bool QnDeleteBookmarkRequestData::isValid() const
+{
     return !bookmarkId.isNull();
 }

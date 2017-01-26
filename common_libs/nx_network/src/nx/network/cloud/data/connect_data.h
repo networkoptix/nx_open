@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_API_CONNECT_DATA_H
-#define NX_MEDIATOR_API_CONNECT_DATA_H
+#pragma once
 
 #include <list>
 
@@ -14,50 +8,59 @@
 #include "connection_method.h"
 #include "connection_parameters.h"
 #include "stun_message_data.h"
-
+#include "nx/network/cloud/cloud_connect_version.h"
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-/** [connection_mediator, 4.3.5] */
+/**
+ * [connection_mediator, 4.3.5]
+ */
 class NX_NETWORK_API ConnectRequest
 :
-    public StunMessageData
+    public StunRequestData
 {
 public:
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
+
     //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
-    nx::String originatingPeerID;
+    nx::String originatingPeerId;
     nx::String connectSessionId;
     ConnectionMethods connectionMethods;
+    /** If port is zero then mediator uses source port */
+    std::list<SocketAddress> udpEndpointList;
+    /** if \a true, mediator does not report Connect request source address to the server peer.
+        Only addresses found in \a udpEndpointList are reported
+    */
+    bool ignoreSourceAddress;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectRequest();
-
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
 class NX_NETWORK_API ConnectResponse
 :
-    public StunMessageData
+    public StunResponseData
 {
 public:
-    std::list<SocketAddress> publicTcpEndpointList;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connect;
+
+    std::list<SocketAddress> forwardedTcpEndpointList;
     std::list<SocketAddress> udpEndpointList;
     ConnectionParameters params;
+    CloudConnectVersion cloudConnectVersion;
 
     ConnectResponse();
-
-    /**
-        \note after this method call object contents are undefined
-    */
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
-
-#endif   //NX_MEDIATOR_API_CONNECT_DATA_H
+} // namespace api
+} // namespace hpm
+} // namespace nx

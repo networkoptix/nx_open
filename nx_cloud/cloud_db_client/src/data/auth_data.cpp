@@ -5,7 +5,7 @@
 
 #include "auth_data.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/preprocessor/field_name.h>
 
 #include "system_data.h"
@@ -47,11 +47,8 @@ void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQue
         QString::fromStdString(authRequest.realm));
 }
 
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (NonceData)(AuthRequest)(AuthResponse),
-    (json),
-    _Fields)
+    (NonceData)(AuthRequest)(AuthResponse), (json), _Fields, (optional, false))
 
 }   //api
 }   //cdb

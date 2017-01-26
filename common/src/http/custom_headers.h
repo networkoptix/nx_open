@@ -17,6 +17,7 @@ namespace Qn
     static const QByteArray VIDEOWALL_GUID_HEADER_NAME = "X-NetworkOptix-VideoWall";
     static const QByteArray PROXY_TTL_HEADER_NAME = "X-proxy-ttl";
     static const QByteArray CUSTOM_USERNAME_HEADER_NAME = "X-Nx-User-Name";
+    static const QByteArray CUSTOM_CHANGE_REALM_HEADER_NAME = "X-Nx-Allow-Update-Realm";
     static const QByteArray AUTH_SESSION_HEADER_NAME = "X-Auth-Session";
     static const QByteArray USER_HOST_HEADER_NAME = "X-User-Host";
     static const QByteArray USER_AGENT_HEADER_NAME = "User-Agent";
@@ -31,7 +32,7 @@ namespace Qn
     static const QByteArray API_RESULT_CODE_HEADER_NAME = "X-Nx-Result-Code";
     static const QByteArray RTT_MS_HEADER_NAME = "X-Nx-rtt-ms";
 
-    static const QByteArray EC2_SYSTEM_NAME_HEADER_NAME = "X-Nx-EC-SYSTEM-NAME";
+    static const QByteArray EC2_SYSTEM_ID_HEADER_NAME = "X-Nx-Ec-SYSTEM-Id";
     static const QByteArray EC2_CONNECTION_STATE_HEADER_NAME = "X-Nx-EC-CONNECTION-STATE";
     static const QByteArray EC2_CONNECTION_DIRECTION_HEADER_NAME = "X-Nx-Connection-Direction";
     static const QByteArray EC2_CONNECTION_GUID_HEADER_NAME = "X-Nx-Connection-Guid";
@@ -43,8 +44,13 @@ namespace Qn
     static const QByteArray EC2_INTERNAL_RTP_FORMAT = "X-FFMPEG-RTP";
     //!Name of Http header holding ec2 proto version
     static const QByteArray EC2_PROTO_VERSION_HEADER_NAME = "X-Nx-EC-PROTO-VERSION";
+    static const QByteArray EC2_CLOUD_HOST_HEADER_NAME = "X-Nx-EC-CLOUD-HOST";
     static const QByteArray EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME = "X-Nx-base64-encoding-required";
     static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
+
+    static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
+
+    static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
 }
 
 #endif  //CUSTOM_HEADERS_H

@@ -1,4 +1,4 @@
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "hardware_info.h"
 

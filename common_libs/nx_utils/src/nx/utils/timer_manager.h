@@ -61,14 +61,14 @@ public:
 
     public:
         TimerGuard();
-        TimerGuard( TimerId timerID );
-        TimerGuard( TimerGuard&& right );
+        TimerGuard(TimerManager* const timerManager, TimerId timerID);
+        TimerGuard(TimerGuard&& right);
         /*!
-            Calls \a TimerGuard::reset()
+        Calls \a TimerGuard::reset()
         */
         ~TimerGuard();
 
-        TimerGuard& operator=( TimerGuard&& right );
+        TimerGuard& operator=(TimerGuard&& right);
 
         //!Cancels timer and blocks until running handler returns
         void reset();
@@ -77,14 +77,15 @@ public:
         TimerId release();
 
         operator bool_type() const;
-        bool operator==( const TimerGuard& right ) const;
-        bool operator!=( const TimerGuard& right ) const;
+        bool operator==(const TimerGuard& right) const;
+        bool operator!=(const TimerGuard& right) const;
 
     private:
+        TimerManager* m_timerManager;
         TimerId m_timerID;
 
-        TimerGuard( const TimerGuard& right );
-        TimerGuard& operator=( const TimerGuard& right );
+        TimerGuard(const TimerGuard& right);
+        TimerGuard& operator=(const TimerGuard& right);
     };
 
     /*!
@@ -104,6 +105,9 @@ public:
         std::chrono::milliseconds delay);
     //!Adds timer that is executed once after \a delay expiration
     TimerId addTimer(
+        MoveOnlyFunc<void(TimerId)> taskHandler,
+        std::chrono::milliseconds delay);
+    TimerGuard addTimerEx(
         MoveOnlyFunc<void(TimerId)> taskHandler,
         std::chrono::milliseconds delay);
     //!This timer will trigger every \a delay until deleted
@@ -178,7 +182,15 @@ private:
     uint64_t generateNextTimerId();
 };
 
+/** Parses time period like 123ms (milliseconds).
+    Supported suffix: ms, s (second), m (minute), h (hour), d (day).
+    If no suffix is found value considered to be seconds
+*/
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
+    const QString& duration,
+    std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
+
+boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 

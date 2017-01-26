@@ -3,9 +3,9 @@
 #include <memory>
 
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((ImageCorrectionParams), (json), _Fields)
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0
@@ -13,13 +13,13 @@ static const float NORM_RANGE_RANGE = 256.0 - NORM_RANGE_START*2.0;
 
 bool ImageCorrectionParams::operator== (const ImageCorrectionParams& other) const
 {
-    if (!qFuzzyCompare(blackLevel, other.blackLevel))
+    if (!qFuzzyEquals(blackLevel, other.blackLevel))
         return false;
 
-    if (!qFuzzyCompare(whiteLevel, other.whiteLevel))
+    if (!qFuzzyEquals(whiteLevel, other.whiteLevel))
         return false;
 
-    if (!qFuzzyCompare(gamma, other.gamma))
+    if (!qFuzzyEquals(gamma, other.gamma))
         return false;
 
     return enabled == other.enabled;
@@ -40,7 +40,7 @@ float ImageCorrectionResult::calcGamma(int leftPos, int rightPos, int pixels) co
     return qBound<double>(0.5, (qreal) log(recValue) / log(curValue), (qreal) 1.5);
 }
 
-void ImageCorrectionResult::analyseImage(const quint8* yPlane, int width, int height, int stride, 
+void ImageCorrectionResult::analyseImage(const quint8* yPlane, int width, int height, int stride,
                                          const ImageCorrectionParams& data, const QRectF& srcRect)
 {
     if (!data.enabled || yPlane == 0)

@@ -7,6 +7,7 @@
 #include <nx_ec/data/api_email_data.h>
 #include <nx/utils/log/log.h>
 #include <utils/email/email.h>
+#include <utils/crypt/symmetrical.h>
 
 #include "smtpclient/smtpclient.h"
 #include "smtpclient/QnSmtpMime"
@@ -28,30 +29,38 @@ EmailManagerImpl::EmailManagerImpl()
 {
 }
 
-bool EmailManagerImpl::testConnection(const QnEmailSettings &settings) const
+SmtpOperationResult EmailManagerImpl::testConnection(const QnEmailSettings &settings) const
 {
     int port = settings.port ? settings.port : QnEmailSettings::defaultPort(settings.connectionType);
 
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    if (!smtp.connectToHost()) return false;
-    bool result = smtp.login(settings.user, settings.password);
+    SmtpOperationResult lastSmtpResult;
+
+    lastSmtpResult = smtp.connectToHost();
+    if (!lastSmtpResult)
+        return lastSmtpResult;
+
+    if (!settings.user.isEmpty())
+        lastSmtpResult = smtp.login(settings.user, settings.password);
+
     smtp.quit();
-    return result;
+
+    return lastSmtpResult;
 }
 
-bool EmailManagerImpl::sendEmail(
+SmtpOperationResult EmailManagerImpl::sendEmail(
     const QnEmailSettings& settings,
     const ec2::ApiEmailData& data ) const
 {
     if (!settings.isValid())
-        return true;    // empty settings should not give us an error while trying to send email, should them?
+        return SmtpOperationResult();    // empty settings should not give us an error while trying to send email, should them?
 
     MimeMessage message;
     QString sender;
     if (!settings.email.isEmpty())
-        sender = settings.email;
+        sender = QnEmailAddress(settings.email).value();
     else if (settings.user.contains(L'@'))
         sender = settings.user;
     else if (settings.server.startsWith(lit("smtp.")))
@@ -60,9 +69,8 @@ bool EmailManagerImpl::sendEmail(
         sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
 
     message.setSender(EmailAddress(sender));
-    for (const QString &recipient: data.to) {
+    for (const QString &recipient: data.to)
         message.addRecipient(EmailAddress(recipient));
-    }
 
     message.setSubject(data.subject);
     message.addPart(new MimeHtml(data.body));
@@ -76,32 +84,56 @@ bool EmailManagerImpl::sendEmail(
     SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
     SmtpClient smtp(settings.server, port, connectionType);
 
-    if( !smtp.connectToHost() )
+    SmtpOperationResult lastSmtpResult;
+    lastSmtpResult = smtp.connectToHost();
+
+    if (!lastSmtpResult)
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("SMTP. Failed to connect to %1:%2 with %3. %4").arg(settings.server).arg(port)
-            .arg(SmtpClient::toString(connectionType)).arg(SystemError::toString(errorCode)), cl_logWARNING );
-        return false;
+        NX_LOG( lit("SMTP. Failed to connect to %1:%2 with %3. %4 Error: %5")
+            .arg(settings.server)
+            .arg(port)
+            .arg(SmtpClient::toString(connectionType))
+            .arg(SystemError::toString(errorCode)
+            .arg(lastSmtpResult.toString())
+            ), cl_logWARNING );
+        return lastSmtpResult;
     }
-    if( !smtp.login(settings.user, settings.password) )
+
+    if (!settings.user.isEmpty())
     {
-        NX_LOG( lit("SMTP. Failed to login to %1:%2").arg(settings.server).arg(port), cl_logWARNING );
-        smtp.quit();
-        return false;
+        lastSmtpResult = smtp.login(settings.user, settings.password);
+        if (!lastSmtpResult)
+        {
+            NX_LOG( lit("SMTP. Failed to login to %1:%2 Error: %3")
+                .arg(settings.server)
+                .arg(port)
+                .arg(lastSmtpResult.toString()
+                ), cl_logWARNING );
+            smtp.quit();
+            return lastSmtpResult;
+        }
     }
-    if( !smtp.sendMail(message) )
+
+    lastSmtpResult = smtp.sendMail(message);
+    if (!lastSmtpResult)
     {
         const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOG( lit("SMTP. Failed to send mail to %1:%2. %3").arg(settings.server).arg(port).arg(SystemError::toString(errorCode)), cl_logWARNING );
+        NX_LOG( lit("SMTP. Failed to send mail to %1:%2. %3 Error %4")
+            .arg(settings.server)
+            .arg(port)
+            .arg(SystemError::toString(errorCode)
+            .arg(lastSmtpResult.toString())
+            ), cl_logWARNING );
         smtp.quit();
-        return false;
+        return lastSmtpResult;
     }
     smtp.quit();
 
-    return true;
+    return lastSmtpResult;
 }
 
-bool EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data ) const
+SmtpOperationResult EmailManagerImpl::sendEmail( const ec2::ApiEmailData& data ) const
 {
     return sendEmail(
         QnGlobalSettings::instance()->emailSettings(),

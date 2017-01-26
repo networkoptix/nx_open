@@ -11,7 +11,7 @@
 
 #include "camera_bookmark_fwd.h"
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct QnBookmarkSortOrder
 {
@@ -35,14 +35,14 @@ struct QnBookmarkSparsingOptions
 
     static const QnBookmarkSparsingOptions kNosparsing;
 };
-#define QnBookmarkSparsingOptions_Fileds (used)(minVisibleLengthMs)
+#define QnBookmarkSparsingOptions_Fields (used)(minVisibleLengthMs)
 
 /**
- * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
+ * Bookmarked part of the camera archive.
  */
-
-struct QnCameraBookmark {
-    /** Unique id. */
+struct QnCameraBookmark
+{
+    /** Id of the bookmark. */
     QnUuid guid;
 
     /** Name of the bookmark.*/
@@ -66,32 +66,34 @@ struct QnCameraBookmark {
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
 
-    /** Camera unique identifier. */
-    QString cameraId;
+    QnUuid cameraId;
 
     QnCameraBookmark():
         timeout(-1),
         startTimeMs(0),
         durationMs(0)
-    {}
+    {
+    }
 
-    /** \returns True if bookmark is null, false otherwise. */
+    /** @return True if bookmark is null, false otherwise. */
     bool isNull() const;
 
-    /** \returns True if bookmark is valid, false otherwise. */
+    /** @return True if bookmark is valid, false otherwise. */
     bool isValid() const;
 
-    static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
+    static QString tagsToString(
+        const QnCameraBookmarkTags& tags, const QString& delimiter = lit(", "));
 
-    static void sortBookmarks(QnCameraBookmarkList &bookmarks
-        , const QnBookmarkSortOrder orderBy);
+    static void sortBookmarks(QnCameraBookmarkList& bookmarks, const QnBookmarkSortOrder orderBy);
 
-    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-        , const QnBookmarkSortOrder &sortOrder = QnBookmarkSortOrder::defaultOrder
-        , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions()
-        , int limit = std::numeric_limits<int>().max());
+    static QnCameraBookmarkList mergeCameraBookmarks(
+        const QnMultiServerCameraBookmarkList& source,
+        const QnBookmarkSortOrder& sortOrder = QnBookmarkSortOrder::defaultOrder,
+        const QnBookmarkSparsingOptions& sparsing = QnBookmarkSparsingOptions(),
+        int limit = std::numeric_limits<int>().max());
 };
-#define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
+#define QnCameraBookmark_Fields \
+    (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
 
 /**
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
@@ -160,14 +162,14 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
-Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSparsingOptions, (json)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnBookmarkSortOrder)(QnBookmarkSparsingOptions)(QnCameraBookmarkSearchFilter),
+    (json)(metatype)(eq))
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnCameraBookmark)(QnCameraBookmarkTag),
+    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H

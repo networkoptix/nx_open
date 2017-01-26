@@ -102,10 +102,10 @@ void QnCommandLineParser::print(QTextStream &stream) const {
 
     for(const QnCommandLineParameter &parameter: m_parameters) {
         stream.setFieldAlignment(QTextStream::AlignRight);
-        
+
         stream.setFieldWidth(shortNameWidth);
         stream << parameter.shortName();
-        
+
         stream.setFieldWidth(longNameWidth);
         stream << parameter.longName();
 
@@ -116,20 +116,26 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile, ParameterPreservationMode preservationMode) {
-    if(errorFile) {
+bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
+{
+    if (errorFile)
+    {
         QTextStream errorStream(errorFile);
-        return parse(argc, argv, &errorStream, preservationMode);
-    } else {
-        return parse(argc, argv, static_cast<QTextStream *>(NULL), preservationMode);
+        return parse(argc, argv, &errorStream);
+    }
+    else
+    {
+        return parse(argc, argv, static_cast<QTextStream *>(NULL));
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream, ParameterPreservationMode preservationMode) {
+bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *errorStream)
+{
     bool result = true;
-    int pos = 0, skipped = 0;
+    int pos = 0;
 
-    while(pos < argc) {
+    while (pos < argc)
+    {
         /* Extract name. */
         QString argument = QString(QLatin1String(argv[pos]));
         bool isUri = argument.contains(uriDelimiter);
@@ -142,12 +148,9 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
             name += uriDelimiter;   /* So the registering code looks much better. */
 
         int index = m_indexByName.value(name, -1);
-        if(index == -1) {
-            if(preservationMode == RemoveParsedParameters)
-                argv[skipped] = argv[pos];
-
+        if (index == -1)
+        {
             pos++;
-            skipped++;
             continue;
         }
 
@@ -155,17 +158,25 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         /* Extract value. */
         QVariant value;
-        if (paramInfo.size() > 1) {
+        if (paramInfo.size() > 1)
+        {
             value = paramInfo[1];
-        } else if(parameter.impliedValue().isValid()) {
+        }
+        else if (parameter.impliedValue().isValid())
+        {
             value = parameter.impliedValue();
-        } else {
+        }
+        else
+        {
             pos++;
-            if(pos >= argc) {
-                if(errorStream)
-                    *errorStream << tr("No value provided for the '%1' argument.").arg(name) << endl;
+            if (pos >= argc)
+            {
+                if (errorStream)
+                    *errorStream << lit("No value provided for the '%1' argument.").arg(name) << endl;
                 result = false;
-            } else {
+            }
+            else
+            {
                 value = QLatin1String(argv[pos]);
             }
         }
@@ -173,14 +184,17 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         /* Convert to typed value. */
         QVariant typedValue = value;
         bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
-        if(!success) {
-            if(errorStream)
-                *errorStream << tr("Invalid value for '%1' argument - expected %2, provided '%3'.")
-                    .arg(name)
-                    .arg(QLatin1String(QMetaType::typeName(parameter.type())))
-                    .arg(value.toString()) << endl;
+        if (!success)
+        {
+            if (errorStream)
+                *errorStream << lit("Invalid value for '%1' argument - expected %2, provided '%3'.")
+                .arg(name)
+                .arg(QLatin1String(QMetaType::typeName(parameter.type())))
+                .arg(value.toString()) << endl;
             result = false;
-        } else {
+        }
+        else
+        {
             value = typedValue;
         }
 
@@ -188,7 +202,8 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         m_values[index] = value;
 
         /* Write value out if needed. */
-        if(parameter.target() && parameter.metaType() && result) {
+        if (parameter.target() && parameter.metaType() && result)
+        {
             NX_ASSERT(value.userType() == parameter.type());
 
             parameter.metaType()->construct(parameter.target(), value.data());
@@ -197,75 +212,5 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         pos++;
     }
 
-    if(preservationMode == RemoveParsedParameters)
-        argc = skipped;
     return result;
-}
-
-
-
-void parseCmdArgs(
-    int argc,
-    char **argv,
-    std::multimap<QString, QString>* const args)
-{
-    std::multimap<QString, QString>::iterator curParamIter = args->end();
-
-    for (int i = 0; i < argc; ++i)
-    {
-        const char* arg = argv[i];
-
-        const auto argLen = strlen(arg);
-        if (argLen == 0)
-            continue;
-
-        if (arg[0] == '-')
-        {
-            //param
-            if (argLen > 1 && arg[1] == '-')    //long param
-            {
-                //parsing long param
-                const char* sepPos = strchr(arg, '=');
-                if (sepPos == nullptr)
-                    args->emplace(QString::fromUtf8(arg+2), QString()); //no value
-                else
-                    args->emplace(QString::fromUtf8(arg+2, sepPos-(arg+2)), QString::fromUtf8(sepPos+1));
-            }
-            else
-            {
-                //short param value
-                curParamIter = args->emplace(QString::fromUtf8(arg+1), QString());
-            }
-        }
-        else
-        {
-            //we have value
-            if (curParamIter != args->end())
-                curParamIter->second = QString::fromUtf8(arg);
-        }
-    }
-}
-
-bool readArg(
-    const std::multimap<QString, QString>& args,
-    const QString& name,
-    QString* const value)
-{
-    auto iter = args.find(name);
-    if (iter == args.end())
-        return false;
-    *value = iter->second;
-    return true;
-}
-
-bool readArg(
-    const std::multimap<QString, QString>& args,
-    const QString& name,
-    int* const value)
-{
-    QString strValue;
-    if (!readArg(args, name, &strValue))
-        return false;
-    *value = strValue.toInt();
-    return true;
 }

@@ -1,10 +1,10 @@
-#ifndef QN_CAMERA_RESOURCE_STUB_H
-#define QN_CAMERA_RESOURCE_STUB_H
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_resource.h>
 
-class QnCameraResourceStub: public QnVirtualCameraResource {
+class QnCameraResourceStub: public QnVirtualCameraResource
+{
 public:
     QnCameraResourceStub(Qn::LicenseType cameraType = Qn::LC_Professional);
 
@@ -13,12 +13,10 @@ public:
     virtual Qn::ResourceStatus getStatus() const override;
 
     virtual Qn::LicenseType licenseType() const override;
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 
 private:
     Qn::LicenseType m_cameraType;
 };
-
-
-#endif // QN_CAMERA_RESOURCE_STUB_H

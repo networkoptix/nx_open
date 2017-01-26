@@ -19,7 +19,8 @@
     <!-- build:css styles/vendor-index.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" />
-    <link rel="stylesheet" href="bower_components/ui-select/dist/select.css" />
+    <link rel="stylesheet" href="bower_components/hint.css/hint.min.css" />
+    <link rel="stylesheet" href="bower_components/jquery-timepicker-jt/jquery.timepicker.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/inline.css -->
@@ -36,8 +37,9 @@
 
 <!-- build:js scripts/vendor-inline.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/jquery.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/json3/lib/json3.js"></script>
 <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
 <script src="bower_components/angular-resource/angular-resource.js"></script>
 <script src="bower_components/angular-cookies/angular-cookies.js"></script>
@@ -49,27 +51,38 @@
 <script src="bower_components/screenfull/dist/screenfull.js"></script>
 <script src="bower_components/ngstorage/ngStorage.js"></script>
 <script src="bower_components/chartjs/Chart.js"></script>
-<script src="bower_components/ui-select/dist/select.js"></script>
+<script src="bower_components/typeahead-focus/typeahead-focus.js"></script>
+<script src="bower_components/jquery-timepicker-jt/jquery.timepicker.js"></script>
+<script src="bower_components/angular-jquery-timepicker/src/timepickerdirective.js"></script>
 <!-- endbower -->
 
 <script src="scripts/vendor/date.js"></script>
 
 <script src="scripts/vendor/md5.js"></script>
 <script src="scripts/vendor/base64.js"></script>
+<script src="scripts/vendor/qwebchannel.js"></script>
 
 <!-- endbuild -->
 
-<!-- build:js({.tmp,app}) scripts/scripts-inline.js -->
 
+<script src="scripts/language.js"></script>
+<!-- build:js({.tmp,app}) scripts/scripts-inline.js -->
 <script src="scripts/config.js"></script>
 <script src="scripts/app-inline.js"></script>
 
 <script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/cloudAPI.js"></script>
+<script src="scripts/services/poll.js"></script>
+<script src="scripts/services/dialogs.js"></script>
+<script src="scripts/services/nativeClient.js"></script>
 
 <script src="scripts/directives/autofocus.js"></script>
 <script src="scripts/directives/validateField.js"></script>
 <script src="scripts/directives/disableAutocomplete.js"></script>
+<script src="scripts/directives/passwordInput.js"></script>
+<script src="scripts/directives/validateEmail.js"></script>
+<script src="scripts/directives/networkSettings.js"></script>
+<script src="scripts/directives/debug.js"></script>
 
 <script src="scripts/controllers/dialogs/setup.js"></script>
 <!-- endbuild -->

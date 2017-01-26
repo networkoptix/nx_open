@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <memory>
+#include <set>
 
 #include <QByteArray>
 #include <QObject>
@@ -51,10 +52,15 @@ public:
         friend class StreamingChunk;
 
     public:
-        SequentialReadingContext();
+        SequentialReadingContext(StreamingChunk*);
+        ~SequentialReadingContext();
 
     private:
-        int m_currentOffset;
+        quint64 m_currentOffset;
+        StreamingChunk* m_chunk;
+
+        SequentialReadingContext(const SequentialReadingContext&);
+        SequentialReadingContext& operator=(const SequentialReadingContext&);
     };
 
     enum ResultCode
@@ -82,40 +88,35 @@ public:
         \note If chunk is not being modified, then first call returns whole chunk data
         \todo Use container that do not require copying to get array substring
     */
-    bool tryRead( SequentialReadingContext* const ctx, nx::Buffer* const dataBuffer );
+    bool tryRead(
+        SequentialReadingContext* const ctx,
+        nx::Buffer* const dataBuffer,
+        std::size_t maxBytesToRead);
+    /** Blocks until data for read context \a ctx is available */
+    void waitUntilDataAfterOffsetAvailable(const SequentialReadingContext& ctx);
 
     //!Only one thread is allowed to modify chunk data at a time
     /*!
         \return false, if chunk already opened for modification
     */
     bool openForModification();
+    //!Returns \a false if internal buffer is filled. Will return \a true when some data has been read from chunk
+    bool wantMoreData() const;
     //!Add more data to chunk
-    /*!
-        Emits signal \a newDataIsAvailable
-    */
     void appendData( const nx::Buffer& data );
     //!
     void doneModification( ResultCode result );
     bool isClosed() const;
     size_t sizeInBytes() const;
-    //!Blocks until chunk is non-empty and closed (\a StreamingChunk::isClosed returns \a true and \a StreamingChunk::sizeInBytes() > 0)
+    //!Blocks until chunk is non-empty and closed or internal buffer has been filled
     /*!
+        \note (\a StreamingChunk::isClosed returns \a true and \a StreamingChunk::sizeInBytes() > 0)
         \note If it already closed, then returns immediately
+        \return \a true if chunk is fully generated. \a false otherwise
     */
-    void waitForChunkReady();
-
-    //!Disconnects \a receiver from all signals of this class and waits for issued \a emit calls connected to \a receiver to return
-    /*!
-        TODO #ak: move to some base class
-    */
-    void disconnectAndJoin( QObject* receiver );
-
-signals:
-    /*!
-        \param pThis \a this for a case of direct connection
-        \param newSizeBytes new size of chunk (in bytes)
-    */
-    void newDataIsAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );
+    bool waitForChunkReadyOrInternalBufferFilled();
+    /** Disables check on internal buffer size */
+    void disableInternalBufferLimit();
 
 private:
     enum class State
@@ -132,11 +133,17 @@ private:
     mutable QnMutex m_mutex;
     nx::Buffer m_data;
     State m_modificationState;
-    mutable QnMutex m_signalEmitMutex;
     QnWaitCondition m_cond;
 #ifdef DUMP_CHUNK_TO_FILE
     std::ofstream m_dumpFile;
 #endif
+    std::size_t m_maxInternalBufferSize;
+    /** Data offset corresponding to the beginning of \a m_data.
+        Can be greater then zero if data is removed from the front of the buffer 
+        due to very large chunk size (e.g., in case of using it for export)
+    */
+    quint64 m_dataOffsetAtTheFrontOfTheBuffer;
+    std::set<SequentialReadingContext*> m_readers;
 };
 
 
@@ -151,7 +158,7 @@ public:
         End-of stream is signalled with returning no data and returning \a true
         \return true, if some data has been read or end-of file has been reached. false, if no data has been read (more data may be available in the future)
     */
-    virtual bool tryRead( nx::Buffer* const dataBuffer ) = 0;
+    virtual bool tryRead(nx::Buffer* const dataBuffer, std::size_t maxBytesToRead) = 0;
 };
 
 //!Reads from \a StreamingChunk
@@ -163,11 +170,12 @@ class StreamingChunkInputStream
     public AbstractInputByteStream
 {
 public:
-    StreamingChunkInputStream( StreamingChunk* chunk );
+    StreamingChunkInputStream(StreamingChunk* chunk);
 
-    virtual bool tryRead( nx::Buffer* const dataBuffer ) override;
+    virtual bool tryRead(nx::Buffer* const dataBuffer, std::size_t maxBytesToRead) override;
 
-    void setByteRange( const nx_http::header::ContentRange& range );
+    void setByteRange(const nx_http::header::ContentRange& range);
+    void waitForSomeDataAvailable();
 
 private:
     StreamingChunk* m_chunk;

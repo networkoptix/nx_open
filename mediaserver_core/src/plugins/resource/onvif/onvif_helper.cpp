@@ -75,12 +75,6 @@ static const char* PASSWD_CAMERA = "camera";
 // PasswordHelper
 //
 
-PasswordHelper& PasswordHelper::instance()
-{
-    static PasswordHelper inst;
-    return inst;
-}
-
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
 #ifdef ONVIF_DEBUG
@@ -94,9 +88,9 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
     QString info;
 
     if (faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
-        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
+        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value).toLower();
     } else if (faultInfo->faultstring) {
-        info = QString::fromLatin1(faultInfo->faultstring);
+        info = QString::fromLatin1(faultInfo->faultstring).toLower();
     }
 
     info = info.toLower();
@@ -105,6 +99,7 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 #endif
 
     return info.indexOf(QLatin1String("notauthorized")) != -1 ||
+        info.indexOf(QLatin1String("not authorized")) != -1 ||
         info.indexOf(QLatin1String("not permitted")) != -1 ||
         info.indexOf(QLatin1String("failedauthentication")) != -1 ||
         info.indexOf(QLatin1String("operationprohibited")) != -1 ||
@@ -218,37 +213,27 @@ PasswordHelper::PasswordHelper()
 
 void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login, const char* passwd)
 {
-    QString manufacturerStr = QLatin1String(manufacturer);
-    ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
-    if (iter == manufacturerPasswords.end()) {
-        iter = manufacturerPasswords.insert(manufacturerStr, PasswordList());
-    }
-
-    iter.value().insert(QPair<const char*, const char*>(login, passwd));
+    QLatin1String manufacturerStr(manufacturer);
+    manufacturerPasswords[manufacturerStr].emplace_back(login, passwd);
 }
 
-void PasswordHelper::setPasswordInfo(const char* manufacturer)
+void PasswordHelper::setPasswordInfo(const char *manufacturer)
 {
-    QString manufacturerStr = QLatin1String(manufacturer);
-    ManufacturerPasswords::Iterator iter = manufacturerPasswords.find(manufacturerStr);
-    if (iter == manufacturerPasswords.end()) {
-        manufacturerPasswords.insert(manufacturerStr, PasswordList());
-    }
+    QLatin1String manufStr(manufacturer);
+    manufacturerPasswords[manufStr] =
+            std::list<std::pair<const char*, const char*>>();
 }
 
-const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
+const PasswordList PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
 {
 #ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
         << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
 #endif
-    ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
-        manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString()));
+    if (manufacturerPasswords.contains(manufacturer))
+        return manufacturerPasswords[manufacturer];
 
-    if (it == manufacturerPasswords.end())
-        it = manufacturerPasswords.find(QLatin1String(DEFAULT_MANUFACTURER));
-
-    return it.value();
+    return manufacturerPasswords[DEFAULT_MANUFACTURER];
 }
 
 void PasswordHelper::printPasswords() const

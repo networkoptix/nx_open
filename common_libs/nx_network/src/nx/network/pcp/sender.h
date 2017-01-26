@@ -17,11 +17,11 @@ public:
     template <typename Message>
     void send(const RequestHeader& request, const Message& message = Message())
     {
-        const auto buffer = std::make_shared<QByteArray>();
+        auto buffer = std::make_shared<QByteArray>();
         QDataStream stream(buffer.get(), QIODevice::WriteOnly);
 
         stream << request << message;
-        send(buffer);
+        send(std::move(buffer));
     }
 
 private:

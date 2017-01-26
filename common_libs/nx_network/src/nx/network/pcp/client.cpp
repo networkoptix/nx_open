@@ -33,9 +33,15 @@ Guard Client::mapPort(const SocketAddress& address)
     });
 }
 
+//TODO this method MUST follow m_subscription.subscribe API to avoid thread race error
 Guard Client::subscribe(const std::function<void(Mapping)>& callback)
 {
-    return m_subscription.subscribe(callback);
+    nx::utils::SubscriptionId subscriptionId = nx::utils::kInvalidSubscriptionId;
+    m_subscription.subscribe(callback, &subscriptionId);
+    return Guard(
+        [this, subscriptionId](){
+            m_subscription.removeSubscription(subscriptionId);
+        });
 }
 
 } // namespace pcp

@@ -5,8 +5,10 @@
 #include <core/resource/resource_consumer.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <core/resource/resource_media_layout.h>
+#include <utils/common/from_this_to_shared.h>
 
 class QnAbstractStreamDataProvider;
+class QnLiveStreamProvider;
 class QnResource;
 class QnAbstractDataReceptor;
 
@@ -14,6 +16,18 @@ class QnAbstractDataReceptor;
 #define CL_MAX_CHANNEL_NUMBER (10)
 
 struct AVCodecContext;
+
+class QnAbstractVideoCamera:
+    public QnFromThisToShared<QnAbstractVideoCamera>
+
+{
+public:
+    virtual QSharedPointer<QnLiveStreamProvider> getPrimaryReader() = 0;
+    virtual QSharedPointer<QnLiveStreamProvider> getSecondaryReader() = 0;
+
+    virtual void inUse(void* user) = 0;
+    virtual void notInUse(void* user) = 0;
+};
 
 class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnResourceConsumer
 {
@@ -43,7 +57,10 @@ public:
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
     virtual bool hasVideo() const { return true; }
-    bool needConfigureProvider() const;
+    virtual bool needConfigureProvider() const;
+    virtual void startIfNotRunning(){ start(); }
+    virtual QnSharedResourcePointer<QnAbstractVideoCamera> getOwner() const { return QnSharedResourcePointer<QnAbstractVideoCamera>();}
+
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
@@ -58,5 +75,7 @@ protected:
     QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };
+
+typedef QSharedPointer<QnAbstractStreamDataProvider> QnAbstractStreamDataProviderPtr;
 
 #endif // ABSTRACT_STREAM_DATA_PROVIDER

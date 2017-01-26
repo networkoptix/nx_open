@@ -2,27 +2,42 @@
 
 #include <QtNetwork/QNetworkInterface>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 #include <nx_ec/ec_proto_version.h>
+#include <api/model/connection_info.h>
+#include <utils/common/app_info.h>
+#include <utils/common/software_version.h>
+#include <network/cloud_system_data.h>
 
 namespace {
-    /*!
-    This string represents client during search with NetworkOptixModuleFinder class.
-    It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
-    */
-    const QString nxClientId = lit("client.exe");
-    const QString nxECId = lit("Enterprise Controller");
-    const QString nxMediaServerId = lit("Media Server");
-}
+/*!
+This string represents client during search with NetworkOptixModuleFinder class.
+It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from app_info.h)
+*/
+const QString nxClientId = lit("client.exe");
+const QString nxECId = lit("Enterprise Controller");
+const QString nxMediaServerId = lit("Media Server");
+} // namespace
 
-bool QnModuleInformation::isCompatibleToCurrentSystem() const {
-    return hasCompatibleVersion() && systemName == qnCommon->localSystemName();
-}
-
-bool QnModuleInformation::hasCompatibleVersion() const {
-    return  protoVersion == nx_ec::EC2_PROTO_VERSION &&
-            isCompatible(version, qnCommon->engineVersion());
+QnModuleInformation::QnModuleInformation():
+    type(),
+    customization(),
+    version(),
+    systemInformation(),
+    systemName(),
+    name(),
+    port(0),
+    id(),
+    sslAllowed(false),
+    protoVersion(0),
+    runtimeId(),
+    serverFlags(0),
+    realm(QnAppInfo::realm()),
+    ecDbReadOnly(false),
+    cloudSystemId(),
+    cloudHost(QnAppInfo::defaultCloudHost())
+{
 }
 
 void QnModuleInformation::fixRuntimeId()
@@ -64,6 +79,5 @@ QString QnModuleInformation::nxClientId() {
     return ::nxClientId;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(eq), QnModuleInformation_Fields, (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnModuleInformationWithAddresses, (ubjson)(xml)(json)(eq), QnModuleInformationWithAddresses_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnModuleInformation)(QnModuleInformationWithAddresses), (ubjson)(xml)(json)(eq), _Fields)

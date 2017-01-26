@@ -15,10 +15,10 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
 
     QnUuid sessionId = QnUuid(params.value("sessionId"));
     QnTimePeriod period;
-    period.startTimeMs = parseDateTime(params.value("from")) / 1000;
+    period.startTimeMs = nx::utils::parseDateTime(params.value("from")) / 1000;
     period.durationMs = -1;
     if (params.contains("to")) {
-        qint64 endTimeMs = parseDateTime(params.value("to")) / 1000;
+        qint64 endTimeMs = nx::utils::parseDateTime(params.value("to")) / 1000;
         if (endTimeMs > 0)
             period.durationMs = endTimeMs - period.startTimeMs;
     }

@@ -1,13 +1,13 @@
 #include "business_fwd.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnBusiness::EventState,
-                                          (QnBusiness::ActiveState,     "Active")
-                                          (QnBusiness::InactiveState,   "Inactive")
-                                          (QnBusiness::UndefinedState,  "Undefined")
-);
-
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    QnBusiness, EventState,
+    (QnBusiness::ActiveState,     "Active")
+    (QnBusiness::InactiveState,   "Inactive")
+    (QnBusiness::UndefinedState,  "Undefined")
+)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnBusiness, EventReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnBusiness, EventType)

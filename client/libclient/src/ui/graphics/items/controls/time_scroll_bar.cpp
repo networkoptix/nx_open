@@ -1,0 +1,131 @@
+#include "time_scroll_bar.h"
+
+#include <QtWidgets/QStyleOptionSlider>
+
+#include <utils/common/scoped_painter_rollback.h>
+
+#include <ui/common/geometry.h>
+#include <ui/graphics/items/standard/graphics_scroll_bar_p.h>
+#include <ui/style/nx_style.h>
+
+namespace
+{
+    const qreal indicatorHuntingRadius = 3.0;
+
+} // anonymous namespace
+
+class QnTimeScrollBarPrivate : public GraphicsScrollBarPrivate
+{
+    Q_DECLARE_PUBLIC(QnTimeScrollBar)
+public:
+};
+
+
+QnTimeScrollBar::QnTimeScrollBar(QGraphicsItem *parent):
+    base_type(*new QnTimeScrollBarPrivate, Qt::Horizontal, parent),
+    m_indicatorPosition(0),
+    m_indicatorVisible(true)
+{
+    setAcceptHoverEvents(true);
+}
+
+QnTimeScrollBar::~QnTimeScrollBar()
+{
+}
+
+qint64 QnTimeScrollBar::indicatorPosition() const
+{
+    return m_indicatorPosition;
+}
+
+void QnTimeScrollBar::setIndicatorPosition(qint64 indicatorPosition)
+{
+    m_indicatorPosition = indicatorPosition;
+}
+
+bool QnTimeScrollBar::indicatorVisible() const
+{
+    return m_indicatorVisible;
+}
+
+void QnTimeScrollBar::setIndicatorVisible(bool value)
+{
+    m_indicatorVisible = value;
+}
+
+void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    /* Draw scrollbar groove and handle. */
+    base_type::paint(painter, option, widget);
+
+    /* Draw indicator. */
+    if (!m_indicatorVisible)
+        return;
+
+    auto relativePos = m_indicatorPosition - minimum();
+    auto range = maximum() - minimum() + pageStep();
+
+    if (relativePos < 0 || relativePos >= range)
+        return;
+
+    auto grooveFraction = static_cast<qreal>(relativePos) / range;
+    int x = option->rect.left() + static_cast<int>(option->rect.width() * grooveFraction + 0.5);
+
+    /* Paint it. */
+    QnScopedPainterPenRollback penRollback(painter, QPen(palette().text(), 2.0));
+    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+    painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
+}
+
+void QnTimeScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    Q_UNUSED(event);
+    /* No default context menu. */
+}
+
+void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{
+    Q_D(QnTimeScrollBar);
+
+    // copy-paste from the base class, but it's needed to prevent double-setting of slider value
+
+    //TODO: #vkutin #common Figure out WTF is this copypaste
+
+    AbstractLinearGraphicsSlider::mouseMoveEvent(event);
+
+    if (!d->pressedControl)
+        return;
+
+    QStyleOptionSlider opt;
+    initStyleOption(&opt);
+
+    if (!(event->buttons() & Qt::LeftButton
+          ||  ((event->buttons() & Qt::MidButton)
+               && style()->styleHint(QStyle::SH_ScrollBar_MiddleClickAbsolutePosition, &opt, NULL))))
+        return;
+
+    if (d->pressedControl == QStyle::SC_ScrollBarSlider)
+    {
+        QRectF sliderRect = style()->subControlRect(QStyle::CC_ScrollBar, &opt, QStyle::SC_ScrollBarSlider, NULL);
+        qint64 newPosition = valueFromPosition(event->pos() - QnGeometry::cwiseMul(d->relativeClickOffset, sliderRect.size()));
+        int m = style()->pixelMetric(QStyle::PM_MaximumDragDistance, &opt, NULL);
+        if (m >= 0)
+        {
+            QRectF r = rect();
+            r.adjust(-m, -m, m, m);
+            if (!r.contains(event->pos()))
+                newPosition = d->snapBackPosition;
+        }
+
+        qint64 centerPosition = newPosition + pageStep() / 2;
+        qint64 huntingRadius = indicatorHuntingRadius * (maximum() + pageStep() - minimum()) / rect().width();
+        if (m_indicatorPosition - huntingRadius < centerPosition && centerPosition < m_indicatorPosition + huntingRadius)
+            newPosition = m_indicatorPosition - pageStep() / 2;
+
+        d->setSliderPositionIgnoringAdjustments(newPosition);
+    }
+    else
+    {
+        base_type::mouseMoveEvent(event);
+    }
+}

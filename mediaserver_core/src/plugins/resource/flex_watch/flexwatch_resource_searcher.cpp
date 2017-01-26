@@ -3,8 +3,9 @@
 #ifdef ENABLE_ONVIF
 
 #include <nx/network/mac_address.h>
-#include <utils/common/util.h>
+#include <nx/utils/random.h>
 #include <utils/common/sleep.h>
+#include <utils/common/util.h>
 
 #include "flexwatch_resource.h"
 
@@ -56,7 +57,7 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
         if (shouldStop())
             break;
 
-        QByteArray rndPattern = QByteArray::number(qrand(),16);
+        QByteArray rndPattern = QByteArray::number(nx::utils::random::number(), 16);
         while (rndPattern.size() < 4)
             rndPattern = "0" + rndPattern;
         QByteArray pattern = requestPattertn.replace("____", rndPattern);

@@ -6,15 +6,17 @@
 #include <QtCore/QVector>
 #include <QtCore/QRect>
 
-#include <utils/media/audioformat.h> 
+#include <utils/media/audioformat.h>
 
 #include <utils/common/byte_array.h>
 #include <utils/media/sse_helper.h>
-#include <utils/common/aligned_allocator.h>
 #include <utils/memory/abstract_allocator.h>
 #include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
 
+#include <motion/motion_detection.h>
+
+#include "aligned_allocator.h"
 #include "abstract_data_packet.h"
 
 #include "media_context.h"
@@ -23,28 +25,33 @@ class QIODevice;
 
 struct AVCodecContext;
 
-// TODO: #Elric #enum
-enum MediaQuality { 
-    MEDIA_Quality_High = 1,  // high quality
-    MEDIA_Quality_Low = 2,   // low quality
-    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
+enum MediaQuality
+{
+    MEDIA_Quality_High = 1, //< high quality
+    MEDIA_Quality_Low = 2, //< low quality
+    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'.
     // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
     MEDIA_Quality_ForceHigh,
     MEDIA_Quality_Auto,
     MEDIA_Quality_CustomResolution,
+    MEDIA_Quality_LowIframesOnly, //< low quality stream (no transcoding), I-frames only
     MEDIA_Quality_None
 };
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((MediaQuality), (lexical))
+
+bool isLowMediaQuality(MediaQuality q);
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
     enum MediaFlag {
         MediaFlags_None                 = 0x00000,
-        MediaFlags_AVKey                = 0x00001,  /**< KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h, checked via static_assert below. */
+        MediaFlags_AVKey                = 0x00001, /**< KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h, checked via static_assert below. */
         MediaFlags_AfterEOF             = 0x00002,
         MediaFlags_BOF                  = 0x00004,
         MediaFlags_LIVE                 = 0x00008,
-        MediaFlags_Ignore               = 0x00010,
-                     
+        MediaFlags_Ignore               = 0x00010, /**< The frame should not be displayed. */
+
         MediaFlags_ReverseReordered     = 0x00020,
         MediaFlags_ReverseBlockStart    = 0x00040,
         MediaFlags_Reverse              = 0x00080,
@@ -60,19 +67,21 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_HWDecodingUsed       = 0x04000, /**< hardware decoding is used */
         MediaFlags_PlayUnsync           = 0x08000, /**< ignore syncplay mode */
         MediaFlags_Skip                 = 0x10000, /**< ignore packet at all */
+        MediaFlags_GotFromRemotePeer    = 0x20000, /**< packet has been delivered via network */
     };
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
     // TODO: #Elric #enum
     enum DataType {
-        VIDEO, 
-        AUDIO, 
-        CONTAINER, 
-        META_V1, 
+        UNKNOWN = -1,
+        VIDEO = 0,
+        AUDIO,
+        CONTAINER,
+        META_V1,
         EMPTY_DATA
     };
 
-    //QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
+    //QnAbstractMediaData(unsigned int alignment, unsigned int capacity):
     QnAbstractMediaData( DataType _dataType);
     virtual ~QnAbstractMediaData();
 
@@ -84,7 +93,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     virtual size_t dataSize() const = 0;
 
     DataType dataType;
-    CodecID compressionType;
+    AVCodecID compressionType;
     MediaFlags flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more than one sensor
     QnConstMediaContextPtr context;
@@ -103,7 +112,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
-    QnEmptyMediaData(): 
+    QnEmptyMediaData():
         QnAbstractMediaData(EMPTY_DATA),
         m_data(16,0)
     {
@@ -131,7 +140,7 @@ typedef std::shared_ptr<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
-/** 
+/**
 * This structure used for serialized QnMetaDataV1
 * Timestamp and duration specified in milliseconds
 * structure can be directly mapped to deserialized memory buffer to represent MetaData
@@ -140,7 +149,7 @@ Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 struct QnMetaDataV1Light
 {
 
-    /** 
+    /**
     * Structure MUST be prepared before use by calling doMarshalling method
     */
     void doMarshalling()
@@ -156,7 +165,7 @@ struct QnMetaDataV1Light
     quint8 channel;
     quint8 input;
     quint16 reserved;
-    quint8 data[MD_WIDTH*MD_HEIGHT/8];
+    quint8 data[Qn::kMotionGridWidth*Qn::kMotionGridHeight/8];
 };
 #pragma pack(pop)
 bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs);
@@ -174,12 +183,12 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
-    /** 
-    * Merge existing motion image with new motion image. Matrix is allowed col to col 
+    /**
+    * Merge existing motion image with new motion image. Matrix is allowed col to col
     * 0   1
     * |   |
     * \/  \/
-    * |   | 
+    * |   |
     * \/  \/
     * |   |
     * \/  \/
@@ -189,12 +198,12 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     void addMotion(QnConstMetaDataV1Ptr data);
 
     // remove part of motion info by motion mask
-    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = MD_WIDTH*MD_HEIGHT/128 - 1);
+    void removeMotion(const simd128i* data, int startIndex = 0, int endIndex = Qn::kMotionGridWidth*Qn::kMotionGridHeight/128 - 1);
 
-    // ti check if we've got motion at 
+    // ti check if we've got motion at
     static bool isMotionAt(int x, int y, char* mask);
 
-    // ti check if we've got motion at 
+    // ti check if we've got motion at
     bool isMotionAt(int x, int y) const;
 
     void setMotionAt(int x, int y);
@@ -203,7 +212,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     bool isInput(int index) const
     {
-        //unsigned char b = *((unsigned char*)data.data() + MD_WIDTH * MD_HIGHT/8);
+        //unsigned char b = *((unsigned char*)data.data() + Qn::kMotionGridWidth * MD_HIGHT/8);
         //return (b>>index) & 1 ;
         return (m_input >> index) & 1;
     }
@@ -214,7 +223,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     bool isEmpty() const;
 
     /**
-     * @param data Should contain MD_WIDTH * MD_HEIGHT / CHAR_BIT bytes.
+     * @param data Should contain Qn::kMotionGridWidth * Qn::kMotionGridHeight / CHAR_BIT bytes.
      */
     void assign( const void* data, qint64 timestamp, qint64 duration );
 
@@ -228,7 +237,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128 - 1);
 
 
     quint8 m_input;

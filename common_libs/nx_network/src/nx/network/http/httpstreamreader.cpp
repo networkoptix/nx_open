@@ -75,7 +75,7 @@ namespace nx_http
                         *bytesProcessed = currentDataPos;
                     m_state = m_nextState;
                     if( m_breakAfterReadingHeaders ||
-                        m_state == messageDone )    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                        m_state == messageDone )    //MUST break parsing on message boundary so that calling entity has a chance to handle message
                     {
                         return true;
                     }
@@ -108,7 +108,7 @@ namespace nx_http
                             data.mid( currentDataPos, count-currentDataPos ),
                             [this]( const QnByteArrayConstRef& data )
                                 {
-                                    std::unique_lock<std::mutex> lk( m_mutex );
+                                    QnMutexLocker lk(&m_mutex);
                                     m_msgBodyBuffer.append( data.constData(), data.size() );
                                 }
                         );
@@ -159,7 +159,7 @@ namespace nx_http
                     }
                     //we can move to messageDone state in parseLine function if no message body present
                     if( m_state == messageDone )
-                        return true;    //MUST break parsing on message boudary so that calling entity has chance to handle message
+                        return true;    //MUST break parsing on message boundary so that calling entity has chance to handle message
                     break;
                 }
             }
@@ -176,21 +176,32 @@ namespace nx_http
         return m_httpMessage;
     }
 
+    Message HttpStreamReader::takeMessage()
+    {
+        return std::move(m_httpMessage);
+    }
+
     HttpStreamReader::ReadState HttpStreamReader::state() const
     {
         return m_state;
     }
 
+    quint64 HttpStreamReader::messageBodyBytesRead() const
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_messageBodyBytesRead;
+    }
+
     size_t HttpStreamReader::messageBodyBufferSize() const
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        QnMutexLocker lk(&m_mutex);
         return m_msgBodyBuffer.size();
     }
 
     //!Returns internal message body buffer and clears internal buffer
     BufferType HttpStreamReader::fetchMessageBody()
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        QnMutexLocker lk(&m_mutex);
         //BufferType result;
         //m_msgBodyBuffer.swap( result );
         //return result;
@@ -215,6 +226,12 @@ namespace nx_http
     {
         if( m_contentDecoder )
             m_contentDecoder->flush();
+    }
+
+    void HttpStreamReader::forceEndOfMsgBody()
+    {
+        NX_ASSERT(m_state == readingMessageBody);
+        m_state = messageDone;
     }
 
     /*!
@@ -340,14 +357,14 @@ namespace nx_http
         }
         else if( m_httpMessage.type == MessageType::response )
         {
-            if( m_httpMessage.response->statusLine.statusCode == nx_http::StatusCode::noContent )
+            if( !StatusCode::isMessageBodyAllowed(m_httpMessage.response->statusLine.statusCode) )
             {
-                //response with "204 No Content" status code cannot have Message-Body
                 m_contentLength = 0;
                 return true;
             }
         }
 
+        m_contentDecoder.reset();
         HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
         if( contentEncodingIter != m_httpMessage.headers().end() &&
             contentEncodingIter->second != "identity" )
@@ -358,7 +375,7 @@ namespace nx_http
             //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
             auto safeAppendToBufferLambda = [this]( const QnByteArrayConstRef& data )
             {
-                std::unique_lock<std::mutex> lk( m_mutex );
+                QnMutexLocker lk(&m_mutex);
                 m_msgBodyBuffer.append( data.constData(), data.size() );
             };
             contentDecoder->setNextFilter( std::make_shared<CustomOutputStream<decltype(safeAppendToBufferLambda)>>( safeAppendToBufferLambda ) );
@@ -572,7 +589,7 @@ namespace nx_http
         m_isChunkedTransfer = false;
         m_messageBodyBytesRead = 0;
         {
-            std::unique_lock<std::mutex> lk( m_mutex );
+            QnMutexLocker lk(&m_mutex);
             m_msgBodyBuffer.clear();
         }
 

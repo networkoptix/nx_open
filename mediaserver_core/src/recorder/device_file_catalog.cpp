@@ -104,6 +104,22 @@ DeviceFileCatalog::DeviceFileCatalog(
 {
 }
 
+std::unordered_map<int, qint64> DeviceFileCatalog::calcSpaceByStorage() const
+{
+    std::unordered_map<int, qint64> result;
+    QnMutexLocker lock(&m_mutex);
+
+    for (auto catalogIt = m_chunks.cbegin(); catalogIt != m_chunks.cend(); ++catalogIt)
+    {
+        std::unordered_map<int, qint64>::iterator resultIt;
+        bool emplaceResult = false;
+
+        std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
+        resultIt->second += catalogIt->getFileSize();
+    }
+    return result;
+}
+
 QString getDirName(const QString& prefix, int currentParts[4], int i)
 {
     QString result = prefix;
@@ -398,45 +414,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
     return chunk;
 }
 
-void DeviceFileCatalog::setLastSyncTime(int64_t time)
-{
-    qnServerDb->setLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog,
-        time 
-    );
-
-    QnMutexLocker lk(&m_mutex);
-    m_lastSyncTime = time;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
-{
-    int64_t ret = qnServerDb->getLastBackupTime(
-        m_storagePool,
-        guidFromArbitraryData(m_cameraUniqueId),
-        m_catalog
-    );
-    return ret;
-}
-
-int64_t DeviceFileCatalog::getLastSyncTime() const
-{
-    QnMutexLocker lk(&m_mutex);
-    if (m_lastSyncTime == 0)
-    {   // need to unlock here to fetch data from DB.
-        lk.unlock();
-        int64_t dbLastSyncTime = getLastSyncTimeFromDBNoLock();
-        // locking again
-        lk.relock();
-        m_lastSyncTime = dbLastSyncTime;
-        if (m_lastSyncTime == 0)
-            m_lastSyncTime = 1;
-    }
-    return m_lastSyncTime;
-}
-
 QnStorageManager *DeviceFileCatalog::getMyStorageMan() const
 {
     if (m_storagePool == QnServer::StoragePool::Normal)
@@ -489,6 +466,8 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
 void DeviceFileCatalog::rebuildPause(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
+    if (m_pauseList.isEmpty())
+        qWarning() << "Temporary disable rebuild archive (if active) due to high disk usage slow down recorders";
     m_pauseList << value;
 }
 
@@ -496,6 +475,8 @@ void DeviceFileCatalog::rebuildResume(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
     m_pauseList.remove(value);
+    if (m_pauseList.isEmpty())
+        qWarning() << "Rebuild archive is allowed again (if active) due to disk performance is OK";
 }
 
 bool DeviceFileCatalog::needRebuildPause()
@@ -507,14 +488,19 @@ bool DeviceFileCatalog::needRebuildPause()
 void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageResourcePtr &storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
 //    qDebug() << "folder being scanned: " << folder;
+    NX_LOG(lit("%1 Processing directory %2").arg(Q_FUNC_INFO).arg(folder), cl_logDEBUG2);
     QnAbstractStorageResource::FileInfoList files;
+
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
         while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
             QnLongRunnable::msleep(100);
 
         if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
-            return; // cancceled
+        {
+            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
+            return; // canceled
+        }
 
         if (fi.isDir()) {
             QnTimePeriod folderPeriod = timePeriodFromDir(storage, fi.absoluteFilePath());
@@ -537,7 +523,10 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     for(const auto& fi: files)
     {
         if (QnResource::isStopping())
+        {
+            NX_LOG(lit("%1 Stop requested. Cancelling").arg(Q_FUNC_INFO), cl_logDEBUG2);
             break;
+        }
 
         QnConcurrent::run( &tp, [&]()
         {
@@ -697,6 +686,17 @@ qint64 DeviceFileCatalog::lastChunkStartTime() const
 {
     QnMutexLocker lock( &m_mutex );
     return m_chunks.empty() ? 0 : m_chunks[m_chunks.size()-1].startTimeMs;
+}
+
+qint64 DeviceFileCatalog::lastChunkStartTime(int storageIndex) const
+{
+    QnMutexLocker lock( &m_mutex );
+    for (auto itr = m_chunks.rbegin(); itr != m_chunks.rend(); ++itr)
+    {
+        if (itr->storageIndex == storageIndex)
+            return itr->startTimeMs;
+    }
+    return 0;
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration)
@@ -1003,28 +1003,28 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     if (itr == m_chunks.end())
         return result;
 
-    size_t firstIndex = itr - m_chunks.begin();
-    result.push_back(QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs));
+    result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
 
-    for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
+    ++itr;
+    for (; itr != m_chunks.end() && itr->startTimeMs < endTime; ++itr)
     {
         QnTimePeriod& last = result.last();
         qint64 lastEndTime = last.startTimeMs + last.durationMs;
-        if (lastEndTime > m_chunks[i].startTimeMs) {
+        if (lastEndTime > itr->startTimeMs) {
             // overlapped periods
-            if (m_chunks[i].durationMs == -1)
+            if (itr->durationMs == -1)
                 last.durationMs = -1;
             else
-                last.durationMs = qMax(last.durationMs, m_chunks[i].endTimeMs() - last.startTimeMs);
+                last.durationMs = qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
         }
-        else if (qAbs(lastEndTime - m_chunks[i].startTimeMs) <= detailLevel && m_chunks[i].durationMs != -1)
-            last.durationMs = m_chunks[i].startTimeMs - last.startTimeMs + m_chunks[i].durationMs;
+        else if (qAbs(lastEndTime - itr->startTimeMs) <= detailLevel && itr->durationMs != -1)
+            last.durationMs = itr->startTimeMs - last.startTimeMs + itr->durationMs;
         else {
             if (last.durationMs < detailLevel && result.size() > 1 && !keepSmalChunks)
                 result.pop_back();
             if (result.size() >= limit)
                 break;
-            result.push_back(QnTimePeriod(m_chunks[i].startTimeMs, m_chunks[i].durationMs));
+            result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
         }
     }
     //if (!result.isEmpty())

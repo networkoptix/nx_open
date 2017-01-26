@@ -4,13 +4,13 @@
 #include <nx_ec/ec_api.h>
 
 #include <common/common_globals.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
 
     //enum TTHeaderFlag
     //{
-    //    TT_None          = 0x0, 
+    //    TT_None          = 0x0,
     //    TT_ProxyToClient = 0x1
     //};
     //QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TTHeaderFlag)
@@ -21,13 +21,19 @@ namespace ec2 {
     {
         QnTransactionTransportHeader(): sequence(0), flags(Qn::TT_None), distance(0) {}
         QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()):
-            processedPeers(processedPeers), 
-            dstPeers(dstPeers), 
+            processedPeers(processedPeers),
+            dstPeers(dstPeers),
             sequence(0),
-            flags(Qn::TT_None), 
+            flags(Qn::TT_None),
             distance(0) {}
 
+        void fillSequence(
+            const QnUuid& moduleId,
+            const QnUuid& runningInstanceGUID);
+        /** Calls previous method passing it value from \a qnCommon. */
         void fillSequence();
+
+        bool isNull() const;
 
         QnPeerSet processedPeers;
         QnPeerSet dstPeers;

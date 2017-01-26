@@ -19,6 +19,7 @@
 #include "http/custom_headers.h"
 #include "common/common_module.h"
 #include "utils/gzip/gzip_compressor.h"
+#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -173,6 +174,21 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = 0;
         sended = d->socket->send(data, size);
+
+        if (sended < 0 && SystemError::getLastOSErrorCode() == SystemError::wouldBlock)
+        {
+            unsigned int sendTimeout = 0;
+            if (!d->socket->getSendTimeout(&sendTimeout))
+                return false;
+            const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(sendTimeout);
+            nx::network::aio::UnifiedPollSet pollSet;
+            if (!pollSet.add(d->socket->pollable(), nx::network::aio::etWrite))
+                return false;
+            if (pollSet.poll(kPollTimeout) < 1)
+                return false;
+            continue; //< socket in async mode
+        }
+
         if( sended <= 0 )
             break;
         data += sended;
@@ -199,7 +215,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -215,9 +231,13 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
             d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
     }
 
-    nx_http::insertOrReplaceHeader(
-        &d->response.headers,
-        nx_http::HttpHeader("Server", nx_http::serverString() ) );
+    if (d->authenticatedOnce)
+    {
+        //revealing Server name to authenticated entity only
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader("Server", nx_http::serverString() ) );
+    }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
@@ -244,7 +264,14 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
 
-    QnMutexLocker lock( &d->sockMutex );
+    return response;
+}
+
+void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug)
+{
+    Q_D(QnTCPConnectionProcessor);
+    auto response = createResponse(httpStatusCode, contentType, contentEncoding, multipartBoundary, displayDebug);
+    QnMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
 }
 
@@ -444,7 +471,8 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->request = d->request;
     other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
-    other.d_ptr->authUserId = d->authUserId;
+    other.d_ptr->accessRights = d->accessRights;
+    other.d_ptr->authenticatedOnce = d->authenticatedOnce;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
@@ -505,7 +533,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         return result;
     }
 
-    if (const auto& userRes = qnResPool->getResourceById(d->authUserId))
+    if (const auto& userRes = qnResPool->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
@@ -545,7 +573,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     return result;
 }
 
-void QnTCPConnectionProcessor::sendUnauthorizedResponse(bool isProxy, const QByteArray& messageBody)
+void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody)
 {
     Q_D(QnTCPConnectionProcessor);
 
@@ -578,7 +606,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(bool isProxy, const QByt
         }
     }
     sendResponse(
-        isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED,
+        httpResult,
         d->response.messageBody.isEmpty() ? QByteArray() : "text/html; charset=utf-8",
         contentEncoding );
 }

@@ -3,8 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_MS_CLOUD_USER_AUTHENTICATOR_H
-#define NX_MS_CLOUD_USER_AUTHENTICATOR_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -18,23 +17,26 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <utils/common/safe_direct_connection.h>
+#include <utils/common/subscription.h>
 
 #include "abstract_user_data_provider.h"
 
 
 class CdbNonceFetcher;
+class CloudConnectionManager;
 
-//!Add support for authentication using cloud account credentials
+/** Add support for authentication using cloud account credentials. */
 class CloudUserAuthenticator
 :
     public AbstractUserDataProvider,
     public Qn::EnableSafeDirectConnection
 {
 public:
-    /*!
-        \param defaultAuthenticator Used to authenticate requests with local user credentials
-    */
+    /**
+     * @param defaultAuthenticator Used to authenticate requests with local user credentials.
+     */
     CloudUserAuthenticator(
+        CloudConnectionManager* const cloudConnectionManager,
         std::unique_ptr<AbstractUserDataProvider> defaultAuthenticator,
         const CdbNonceFetcher& cdbNonceFetcher);
     ~CloudUserAuthenticator();
@@ -68,28 +70,29 @@ private:
         }
     };
 
+    CloudConnectionManager* const m_cloudConnectionManager;
     std::unique_ptr<AbstractUserDataProvider> m_defaultAuthenticator;
     const CdbNonceFetcher& m_cdbNonceFetcher;
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_cond;
-    //!map<pair<username, nonce>, auth_data>
+    /** map<pair<username, nonce>, auth_data> */
     std::map<
         std::pair<nx_http::StringType, nx_http::BufferType>,
         CloudAuthenticationData> m_authorizationCache;
     QElapsedTimer m_monotonicClock;
-    //!set<pair<username, nonce>, auth_data>
+    /** set<pair<username, nonce>, auth_data> */
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
 
     bool isValidCloudUserName(const nx_http::StringType& userName) const;
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
-        const nx_http::StringType& userName,
-        nx::cdb::api::SystemAccessRole cloudAccessRole) const;
+        const nx_http::StringType& userName) const;
     void fetchAuthorizationFromCloud(
         QnMutexLockerBase* const lk,
         const nx_http::StringType& userid,
         const nx_http::StringType& cloudNonce);
     std::tuple<Qn::AuthResult, QnResourcePtr> authorizeWithCacheItem(
+        QnMutexLockerBase* const lock,
         const CloudAuthenticationData& cacheItem,
         const nx_http::StringType& cloudNonce,
         const nx_http::StringType& nonceTrailer,
@@ -100,5 +103,3 @@ private:
 private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };
-
-#endif  //NX_MS_CLOUD_USER_AUTHENTICATOR_H

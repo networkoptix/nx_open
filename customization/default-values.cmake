@@ -15,9 +15,9 @@ set (mediaserver_core.guid "{821e5e4a-e882-4eec-aa02-71c9c1ff35b9}")
 set (mediaserver.guid "{ee61c3cc-791c-4f9f-9917-9e7c9ce9e907}")
 set (mobile_client.guid "{4d58c9a4-8dbe-480c-a974-634a7e2862ef}")
 set (applauncher.guid "{75b8ee80-e089-4de2-b7a1-d1464a9b4351}")
-set (client.core.guid "{7b7822da-47c1-4758-a07f-c2edcfc63d66}")
-set (client.bin.guid "{6de071a7-831c-43a1-88ae-ee9e12cd4050}")
-set (client.guid "{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}")
+set (libclient_core.guid "{7b7822da-47c1-4758-a07f-c2edcfc63d66}")
+set (desktop_client.guid "{6de071a7-831c-43a1-88ae-ee9e12cd4050}")
+set (libclient.guid "{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}")
 set (axclient.guid "{d3f564c6-315b-426b-8ed3-890d91300374}")
 set (traytool.guid "{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}")
 set (nxtool.guid "{d78c3988-0459-4dce-a1dc-e70df990fa54}")
@@ -35,12 +35,10 @@ set (display.mobile.name "${display.product.name} Mobile")
 # if true, you can use --customization <path> to specify customization
 # Note: config json files should be there
 
-set (default.skin "DarkSkin")
-set (background.cycle "120")
-set (uri.protocol "vms")
+set (uri.protocol "nx-vms")
 
 set (nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
-set (nxtool.company.name "${company.name}")
+set (short.company.name "${company.name}")
 set (company.support.link "${company.support.address}")
 
 # Help and settings URLs
@@ -58,11 +56,5 @@ set (testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set (vmax "false")
 #(true or false)
 
-set (ios.minimum_os_version "6.0")
-set (ios.playButton.tint "#00A1D4")
-
 #VMS-1672: Sometimes unauthorized server is not visible in the servers list
 set (nxec.ec2ProtoVersion "2505")
-
-set (old.android.packagename "${namespace.major}.${namespace.minor}.${namespace.additional}")
-set (new.android.packagename "${namespace.major}.${namespace.minor}.${new.namespace.additional}")

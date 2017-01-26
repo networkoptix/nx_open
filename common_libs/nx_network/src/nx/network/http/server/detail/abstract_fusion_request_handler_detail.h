@@ -12,10 +12,13 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <common/common_globals.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "../fusion_request_result.h"
+#include "../../buffer_source.h"
 
 
 namespace nx_http {
@@ -33,9 +36,7 @@ public:
     }
 
 protected:
-    std::function<void(
-        const nx_http::StatusCode::Value,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> )> m_completionHandler;
+    RequestProcessedHandler m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
     nx_http::Method::ValueType m_requestMethod;
 
@@ -59,8 +60,9 @@ protected:
     {
         auto completionHandler = std::move( m_completionHandler );
         completionHandler(
-            statusCode,
-            std::move(outputMsgBody) );
+            nx_http::RequestResult(
+                statusCode,
+                std::move(outputMsgBody)));
     }
 
     bool getDataFormat(
@@ -245,18 +247,13 @@ class BaseFusionRequestHandlerWithInput
     public BaseFusionRequestHandlerWithOutput<Output>
 {
 private:
-    typedef std::function<void(
-        const nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )
-    > RequestCompletionHandlerType;
-
     //!Implementation of \a AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer authInfo,
-        const nx_http::Request& request,
+        nx_http::Request request,
         nx_http::Response* const /*response*/,
-        RequestCompletionHandlerType completionHandler ) override
+        RequestProcessedHandler completionHandler ) override
     {
         this->m_completionHandler = std::move( completionHandler );
         this->m_requestMethod = request.requestLine.method;

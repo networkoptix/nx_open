@@ -1,7 +1,7 @@
 #ifndef __NETWORK_ADDRESS_ENTRY_H
 #define __NETWORK_ADDRESS_ENTRY_H
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 struct QnNetworkAddressEntry
 {

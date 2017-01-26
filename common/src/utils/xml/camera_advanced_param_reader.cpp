@@ -9,7 +9,7 @@
 #include <core/resource/param.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace {
     const QUrl validatorSchemaUrl = lit("qrc:/camera_advanced_params/schema.xsd");
@@ -131,26 +131,37 @@ bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource) {
 }
 
 namespace QnXmlTag {
-    const QString plugin		    = lit("plugin");
-    const QString pluginName	    = lit("name");
-    const QString pluginVersion	    = lit("version");
-    const QString pluginUniqueId    = lit("unique_id");
-    const QString pluginPacketMode  = lit("packet_mode");
-    const QString parameters        = lit("parameters");
-    const QString group				= lit("group");
-    const QString param				= lit("param");
-    const QString groupName 		= lit("name");
-    const QString groupDescription	= lit("description");
-    const QString paramId			= lit("id");
-    const QString paramDataType		= lit("dataType");
-    const QString paramName 		= lit("name");
-    const QString paramDescription	= lit("description");
-    const QString paramRange		= lit("range");
-    const QString paramInternalRange= lit("internalRange");
-    const QString paramTag			= lit("tag");
-    const QString paramReadOnly		= lit("readOnly");
-    const QString paramReadCmd	    = lit("readCmd");
-    const QString paramWriteCmd	    = lit("writeCmd");
+    const QString plugin                = lit("plugin");
+    const QString pluginName            = lit("name");
+    const QString pluginVersion         = lit("version");
+    const QString pluginUniqueId        = lit("unique_id");
+    const QString pluginPacketMode      = lit("packet_mode");
+    const QString parameters            = lit("parameters");
+    const QString group                 = lit("group");
+    const QString param                 = lit("param");
+    const QString groupName             = lit("name");
+    const QString groupDescription      = lit("description");
+    const QString paramId               = lit("id");
+    const QString paramDataType         = lit("dataType");
+    const QString paramName             = lit("name");
+    const QString paramDescription      = lit("description");
+    const QString paramRange            = lit("range");
+    const QString paramInternalRange    = lit("internalRange");
+    const QString paramTag              = lit("tag");
+    const QString paramReadOnly         = lit("readOnly");
+    const QString paramReadCmd          = lit("readCmd");
+    const QString paramWriteCmd         = lit("writeCmd");
+
+    const QString dependenciesRoot      = lit("dependencies");
+    const QString dependenciesShow      = lit("dependencies-ranges");
+    const QString conditionalShow       = lit("conditional-show");
+    const QString dependenciesRanges    = lit("dependencies-ranges");
+    const QString conditionalRange      = lit("conditional-range");
+
+    const QString dependencyId          = lit("id");
+    const QString conditionId           = lit("id");
+    const QString conditionWatch        = lit("watch");
+    const QString condition             = lit("condition");
 }
 
 bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result) {
@@ -172,7 +183,9 @@ bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvan
 
 	QDomElement root = xmlDom.documentElement();
 	if (root.tagName() != QnXmlTag::plugin) {
-		qWarning() << "Parse xml error: could not find tag" << QnXmlTag::plugin;
+        NX_LOG(lit("Parse xml error: could not find tag %1. Got %2 instead.")
+            .arg(QnXmlTag::plugin)
+            .arg(root.tagName()), cl_logWARNING);
 		return false;
 	}
 
@@ -231,5 +244,139 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
 	param.readOnly      = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramReadOnly));
     param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
     param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
-	return true;
+
+    auto childNodes = elementXml.childNodes();
+
+    if (childNodes.isEmpty())
+        return true;
+
+    for (int i = 0; i < childNodes.size(); ++i)
+    {
+        auto node = childNodes.at(i).toElement();
+
+        if (node.isNull())
+            continue;
+
+        if (node.nodeName() == QnXmlTag::dependenciesRoot)
+        {
+            if (!parseDependencyGroupsXml(node.toElement(), param.dependencies))
+                return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnCameraAdvacedParamsXmlParser::parseDependencyGroupsXml(
+    const QDomElement& elementXml,
+    std::vector<QnCameraAdvancedParameterDependency>& dependencies)
+{
+    auto dependencyGroupNodes = elementXml.childNodes();
+
+    bool isOk = true;
+    for (int i = 0; i < dependencyGroupNodes.size(); ++i)
+    {
+        auto depGroup = dependencyGroupNodes.at(i).toElement();
+
+        if (depGroup.isNull())
+            continue;
+
+        isOk = parseDependenciesXml(depGroup, dependencies);
+
+        if (!isOk)
+            break;
+    }
+
+    return isOk;
+}
+
+bool QnCameraAdvacedParamsXmlParser::parseDependenciesXml(
+    const QDomElement& elementXml,
+    std::vector<QnCameraAdvancedParameterDependency>& dependencies)
+{
+    bool isOk = true;
+    auto dependencyNodes = elementXml.childNodes();
+    for (int i = 0;  i < dependencyNodes.size(); ++i)
+    {
+        auto depNode = dependencyNodes.at(i).toElement();
+
+        if (depNode.isNull())
+            continue;
+
+        QnCameraAdvancedParameterDependency dependency;
+
+        if (depNode.nodeName() == QnXmlTag::conditionalShow)
+        {
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Show;
+        }
+        else if (depNode.nodeName() == QnXmlTag::conditionalRange)
+        {
+            dependency.type = QnCameraAdvancedParameterDependency::DependencyType::Range;
+            dependency.range = depNode.attribute(QnXmlTag::paramRange);
+            dependency.internalRange = depNode.attribute(QnXmlTag::paramInternalRange);
+        }
+
+        dependency.id = depNode.attribute(QnXmlTag::dependencyId);
+
+        isOk = parseConditionsXml(depNode, dependency.conditions);
+
+        if (!isOk)
+            break;
+
+        dependencies.push_back(dependency);
+    }
+
+    return isOk;
+}
+
+bool QnCameraAdvacedParamsXmlParser::parseConditionsXml(
+    const QDomElement &elementXml,
+    std::vector<QnCameraAdvancedParameterCondition> &conditions)
+{
+    auto childNodes = elementXml.childNodes();
+
+    for (int i = 0; i < childNodes.size(); ++i)
+    {
+        auto element = childNodes.at(i).toElement();
+
+        if (element.isNull())
+            continue;
+
+        QnCameraAdvancedParameterCondition condition;
+        condition.paramId = element.attribute(QnXmlTag::conditionWatch);
+
+        auto conditionStr = element.attribute(QnXmlTag::condition);
+
+        if (!parseConditionString(conditionStr, condition))
+            return false;
+
+        conditions.push_back(condition);
+    }
+
+    return true;
+}
+
+bool QnCameraAdvacedParamsXmlParser::parseConditionString(
+    QString conditionString,
+    QnCameraAdvancedParameterCondition &condition)
+{
+    if (conditionString.isEmpty())
+        return false;
+
+    auto separatorPosition = conditionString.indexOf(lit("="));
+
+    if (separatorPosition == -1)
+        return false;
+
+    auto condTypeStr = conditionString.left(separatorPosition);
+    auto condValueStr = conditionString.mid(separatorPosition + 1);
+
+    condition.type = QnCameraAdvancedParameterCondition::fromStringToConditionType(condTypeStr);
+
+    if (condition.type == QnCameraAdvancedParameterCondition::ConditionType::Unknown)
+        return false;
+
+    condition.value = condValueStr;
+
+    return true;
 }

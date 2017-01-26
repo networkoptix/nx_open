@@ -30,15 +30,19 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
-    /*
-    m_size = bitRate() / 32; // use 30+ ms buffers
-    // Multiply by 2 to align OpenAL buffer
-    int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
-    if (m_size % sampleSize)
-        m_size += sampleSize - (m_size % sampleSize);
-    */
-    m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
-
+    #if defined(Q_OS_ANDROID)
+        m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+    #else
+        m_size = 0;
+    #endif
+    if (m_size == 0)
+    {
+        m_size = bitRate() / 32; // use 30+ ms buffers
+        // Multiply by 2 to align OpenAL buffer
+        int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
+        if (m_size % sampleSize)
+            m_size += sampleSize - (m_size % sampleSize);
+    }
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;
@@ -51,8 +55,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
 
     m_queuedDurationUs = 0;
 
-
-    connect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
+    Qn::directConnect(AudioDevice::instance(), &AudioDevice::volumeChanged, this, [this] (float value)
     {
         setVolumeLevel(value);
     });
@@ -61,6 +64,7 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
 
 Sound::~Sound()
 {
+    directDisconnectAll();
     if (!m_deinitialized)
         internalClear();
     delete [] m_proxyBuffer;
@@ -105,8 +109,8 @@ void Sound::setVolumeLevel(float volumeLevel)
 
 int Sound::getOpenAlFormat(const QnAudioFormat &audioFormat)
 {
-    if (audioFormat.sampleType() == QnAudioFormat::Float)
-        return false;
+    /*if (audioFormat.sampleType() == QnAudioFormat::Float)
+        return false;*/
 
     QByteArray requestFormat;
     int bitsPerSample = audioFormat.sampleSize();
@@ -268,7 +272,7 @@ bool Sound::playImpl()
     alGetSourcei(m_source, AL_SOURCE_STATE, &state);
     checkOpenALErrorDebug(m_device);
     // if already playing
-    if (AL_PLAYING != state) 
+    if (AL_PLAYING != state)
     {
         float volume = AudioDevice::instance()->volume();
         alSourcef(m_source, AL_GAIN, volume);
@@ -278,7 +282,7 @@ bool Sound::playImpl()
         ALint queuedBuffers = 0;
         alGetSourcei(m_source, AL_BUFFERS_QUEUED, &queuedBuffers);
         checkOpenALErrorDebug(m_device);
-        if (queuedBuffers) 
+        if (queuedBuffers)
         {
             // play
             auto timerState = m_timer.state();

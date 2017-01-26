@@ -10,7 +10,6 @@
 
 #include "connector_factory.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -19,99 +18,48 @@ const std::chrono::seconds kCloudConnectorTimeout(10);
 
 OutgoingTunnel::OutgoingTunnel(AddressEntry targetPeerAddress)
 :
-    Tunnel(targetPeerAddress.host.toString().toLatin1()),
     m_targetPeerAddress(std::move(targetPeerAddress)),
+    m_timer(std::make_unique<aio::Timer>()),
     m_terminated(false),
-    m_counter(0),
-    m_lastErrorCode(SystemError::noError)
+    m_lastErrorCode(SystemError::noError),
+    m_state(State::init)
 {
-    m_timer.getAioThread();   //binds to aio thread
+    m_timer->bindToAioThread(getAioThread());
 }
 
 OutgoingTunnel::~OutgoingTunnel()
 {
-    NX_ASSERT(m_connectors.empty());
-    if (!m_terminated)
-    {
-        //in this case there MUST be tunnelClosed handler down the stack
-        NX_ASSERT(m_state == State::kClosed);
-
-        for (auto& connectRequest : m_connectHandlers)
-            connectRequest.second.handler(SystemError::interrupted, nullptr);
-        m_connectHandlers.clear();
-    }
-    else
-    {
-        NX_ASSERT(m_connectHandlers.empty());
-    }
+    stopWhileInAioThread();
 }
 
-void OutgoingTunnel::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+void OutgoingTunnel::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    QnMutexLocker lk(&m_mutex);
+    BaseType::bindToAioThread(aioThread);
+    if (m_timer)
+        m_timer->bindToAioThread(aioThread);
+    if (m_connector)
+        m_connector->bindToAioThread(aioThread);
+    if (m_connection)
+        m_connection->bindToAioThread(aioThread);
+}
+
+void OutgoingTunnel::stopWhileInAioThread()
+{
+    //do not need to lock mutex since it is unexpected if 
+    //  someone calls public methods while stopping object
 
     m_terminated = true;
-
-    if (!m_connectors.empty())
-    {
-        BarrierHandler barrier(
-            [this, handler = std::move(handler)]() mutable
-            {
-                m_timer.post(
-                    [this, handler = std::move(handler)]() mutable
-                    {
-                        connectorsTerminated(std::move(handler));
-                    });
-            });
-        for (const auto& connectorData: m_connectors)
-            connectorData.second->pleaseStop(barrier.fork());
-    }
-    else
-    {
-        connectorsTerminatedNonSafe(&lk, std::move(handler));
-    }
+    m_connector.reset();
+    m_connection.reset();
+    m_timer.reset();
+    m_connectHandlers.clear();
 }
 
-void OutgoingTunnel::connectorsTerminated(
-    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
+void OutgoingTunnel::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    QnMutexLocker lk(&m_mutex);
-    connectorsTerminatedNonSafe(&lk, std::move(pleaseStopCompletionHandler));
-}
-
-void OutgoingTunnel::connectorsTerminatedNonSafe(
-    QnMutexLockerBase* const /*lock*/,
-    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
-{
-    m_connectors.clear();
-
-    //cancelling connection
-    if (m_connection)
-        m_connection->pleaseStop(
-            [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
-            {
-                connectionTerminated(std::move(handler));
-            });
-    else
-        connectionTerminated(std::move(pleaseStopCompletionHandler));
-}
-
-void OutgoingTunnel::connectionTerminated(
-    nx::utils::MoveOnlyFunc<void()> pleaseStopCompletionHandler)
-{
-    m_timer.post(
-        [this, handler = std::move(pleaseStopCompletionHandler)]() mutable
-        {
-            m_timer.pleaseStopSync();
-            {
-                //waiting for OutgoingTunnel::pleaseStop still running in another thread to return
-                QnMutexLocker lk(&m_mutex);
-            }
-            for (auto& connectRequest : m_connectHandlers)
-                connectRequest.second.handler(SystemError::interrupted, nullptr);
-            m_connectHandlers.clear();
-            handler();
-        });
+    QnMutexLocker lock(&m_mutex);
+    NX_ASSERT(!m_onClosedHandler, Q_FUNC_INFO, "State handler is already set");
+    m_onClosedHandler = std::move(handler);
 }
 
 void OutgoingTunnel::establishNewConnection(
@@ -124,7 +72,7 @@ void OutgoingTunnel::establishNewConnection(
 
     switch (m_state)
     {
-        case State::kConnected:
+        case State::connected:
             lk.unlock();
             using namespace std::placeholders;
             m_connection->establishNewConnection(
@@ -133,7 +81,7 @@ void OutgoingTunnel::establishNewConnection(
                 [handler = std::move(handler), this](
                     SystemError::ErrorCode errorCode,
                     std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
+                    bool tunnelStillValid) mutable
                 {
                     onConnectFinished(
                         std::move(handler),
@@ -143,9 +91,9 @@ void OutgoingTunnel::establishNewConnection(
                 });
             break;
 
-        case State::kClosed:
+        case State::closed:
         {
-            //just saving handler to notify it before tunnel destruction
+            // Just saving handler to notify it before tunnel destruction.
             ConnectionRequestData data;
             data.socketAttributes = std::move(socketAttributes);
             data.handler = std::move(handler);
@@ -153,7 +101,7 @@ void OutgoingTunnel::establishNewConnection(
                 std::chrono::steady_clock::time_point::max(),
                 std::move(data));
             lk.unlock();
-            m_timer.post(
+            post(
                 [handlerIter, this]
                 {
                     handlerIter->second.handler(m_lastErrorCode, nullptr);
@@ -163,12 +111,12 @@ void OutgoingTunnel::establishNewConnection(
             break;
         }
 
-        case State::kInit:
+        case State::init:
             startAsyncTunnelConnect(&lk);
 
-        case State::kConnecting:
+        case State::connecting:
         {
-            //saving handler for later use
+            // Saving handler for later use.
             const auto timeoutTimePoint =
                 timeout > std::chrono::milliseconds::zero()
                 ? std::chrono::steady_clock::now() + timeout
@@ -179,7 +127,7 @@ void OutgoingTunnel::establishNewConnection(
             data.handler = std::move(handler);
             m_connectHandlers.emplace(timeoutTimePoint, std::move(data));
 
-            m_timer.post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
+            post(std::bind(&OutgoingTunnel::updateTimerIfNeeded, this));
             break;
         }
 
@@ -203,6 +151,24 @@ void OutgoingTunnel::establishNewConnection(
         std::move(handler));
 }
 
+
+QString OutgoingTunnel::stateToString(State state)
+{
+    switch (state)
+    {
+        case State::init:
+            return lm("init");
+        case State::connecting:
+            return lm("connecting");
+        case State::connected:
+            return lm("connected");
+        case State::closed:
+            return lm("closed");
+    }
+
+    return lm("unknown(%1)").arg(static_cast<int>(state));
+}
+
 void OutgoingTunnel::updateTimerIfNeeded()
 {
     QnMutexLocker lk(&m_mutex);
@@ -217,7 +183,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
         (!m_timerTargetClock || *m_timerTargetClock > m_connectHandlers.begin()->first))
     {
         //cancelling current timer
-        m_timer.cancelSync();
+        m_timer->cancelSync();
 
         //starting new timer
         m_timerTargetClock = m_connectHandlers.begin()->first;
@@ -225,7 +191,7 @@ void OutgoingTunnel::updateTimerIfNeededNonSafe(
             m_connectHandlers.begin()->first > curTime
             ? (m_connectHandlers.begin()->first - curTime)
             : std::chrono::milliseconds::zero();    //timeout has already expired
-        m_timer.start(
+        m_timer->start(
             std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
             std::bind(&OutgoingTunnel::onTimer, this));
     }
@@ -274,104 +240,90 @@ void OutgoingTunnel::onConnectFinished(
 
 void OutgoingTunnel::onTunnelClosed(SystemError::ErrorCode errorCode)
 {
-    m_timer.dispatch(
+    dispatch(
         [this, errorCode]()
         {
-            std::function<void(State)> tunnelClosedHandler;
+            nx::utils::MoveOnlyFunc<void()> tunnelClosedHandler;
             {
                 QnMutexLocker lk(&m_mutex);
-                tunnelClosedHandler = std::move(m_stateHandler);
-                m_state = State::kClosed;
+                std::swap(tunnelClosedHandler, m_onClosedHandler);
+                m_state = State::closed;
                 m_lastErrorCode = errorCode;
             }
             if (tunnelClosedHandler)
-                tunnelClosedHandler(State::kClosed);
+                tunnelClosedHandler();
         });
 }
 
 void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/)
 {
-    m_state = State::kConnecting;
-    m_connectors = ConnectorFactory::createAllCloudConnectors(m_targetPeerAddress);
-    for (auto& connector: m_connectors)
-    {
-        auto connectorType = connector.first;
-        connector.second->bindToAioThread(m_timer.getAioThread());
-        connector.second->connect(
-            kCloudConnectorTimeout,
-            [connectorType, this](
-                SystemError::ErrorCode errorCode,
-                std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
-            {
-                //m_timer.post(
-                onConnectorFinished(
-                    connectorType,
-                    errorCode,
-                    std::move(connection));
-            });
-    }
+    using namespace std::placeholders;
+
+    m_state = State::connecting;
+    m_connector = ConnectorFactory::createCrossNatConnector(m_targetPeerAddress);
+    m_connector->bindToAioThread(getAioThread());
+    m_connector->connect(
+        kCloudConnectorTimeout,
+        std::bind(&OutgoingTunnel::onConnectorFinished, this, _1, _2));
 }
 
 void OutgoingTunnel::onConnectorFinished(
-    CloudConnectType connectorType,
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
 {
     QnMutexLocker lk(&m_mutex);
 
-    if (m_terminated)
-        return; //we must not use m_connection anymore
-
-    const auto connectorIter = m_connectors.find(connectorType);
-    if (connectorIter == m_connectors.end())
-        return; //it can happen when stopping OutgoingTunnel
-    auto connector = std::move(connectorIter->second);
-    m_connectors.erase(connectorIter);
+    NX_ASSERT(!m_connection);
+    m_connector.reset();
 
     if (errorCode == SystemError::noError)
     {
-        if (m_connection)
-            return; //tunnel has already been connected, just ignoring this connection
-
-        m_connection = std::move(connection);
-        m_state = State::kConnected;
-        //we've connected to the host. Requesting client connections
-        for (auto& connectRequest: m_connectHandlers)
-        {
-            using namespace std::placeholders;
-            m_connection->establishNewConnection(
-                connectRequest.second.timeout,   //TODO #ak recalculate timeout
-                std::move(connectRequest.second.socketAttributes),
-                [handler = std::move(connectRequest.second.handler), this](
-                    SystemError::ErrorCode errorCode,
-                    std::unique_ptr<AbstractStreamSocket> socket,
-                    bool tunnelStillValid)
-                {
-                    onConnectFinished(
-                        std::move(handler),
-                        errorCode,
-                        std::move(socket),
-                        tunnelStillValid);
-                });
-        }
-
-        m_connectHandlers.clear();
+        setTunnelConnection(std::move(connection));
         return;
     }
 
-    //connection failed
-    if (!m_connectors.empty())
-        return; //waiting for other connectors to complete
-
-    //reporting error to everyone who is waiting
-    auto connectHandlers = std::move(m_connectHandlers);
-    m_state = State::kClosed;
+    // Reporting error to everyone who is waiting.
+    decltype(m_connectHandlers) connectHandlers;
+    connectHandlers.swap(m_connectHandlers);
+    m_state = State::closed;
     m_lastErrorCode = errorCode;
     lk.unlock();
-    for (auto& connectRequest : connectHandlers)
+    for (auto& connectRequest: connectHandlers)
         connectRequest.second.handler(errorCode, nullptr);
-    //reporting tunnel failure
+    // Reporting tunnel failure.
     onTunnelClosed(errorCode);
+}
+
+void OutgoingTunnel::setTunnelConnection(
+    std::unique_ptr<AbstractOutgoingTunnelConnection> connection)
+{
+    m_connection = std::move(connection);
+    m_connection->setControlConnectionClosedHandler(
+        std::bind(&OutgoingTunnel::onTunnelClosed, this, std::placeholders::_1));
+    m_state = State::connected;
+
+    NX_ASSERT(m_connection->getAioThread() == getAioThread());
+
+    // We've connected to the host. Requesting client connections.
+    for (auto& connectRequest: m_connectHandlers)
+    {
+        using namespace std::placeholders;
+        m_connection->establishNewConnection(
+            connectRequest.second.timeout,   //< TODO #ak recalculate timeout.
+            std::move(connectRequest.second.socketAttributes),
+            [handler = std::move(connectRequest.second.handler), this](
+                SystemError::ErrorCode errorCode,
+                std::unique_ptr<AbstractStreamSocket> socket,
+                bool tunnelStillValid) mutable
+            {
+                onConnectFinished(
+                    std::move(handler),
+                    errorCode,
+                    std::move(socket),
+                    tunnelStillValid);
+            });
+    }
+    m_connectHandlers.clear();
 }
 
 } // namespace cloud

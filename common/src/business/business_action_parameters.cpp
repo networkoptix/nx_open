@@ -1,6 +1,6 @@
 #include "business_action_parameters.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {
@@ -10,7 +10,7 @@ namespace
 
 QnBusinessActionParameters::QnBusinessActionParameters()
     : actionResourceId()
-    , soundUrl()
+    , url()
     , emailAddress()
     , userGroup(QnBusiness::EveryOne)
     , fps(10)
@@ -18,8 +18,6 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , recordingDuration(0)
     , recordAfter(0)
     , relayOutputId()
-    , relayAutoResetTimeout(0)
-    , inputPortId()
     , sayText()
     , tags()
     , text()
@@ -29,6 +27,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , presetId()
     , useSource(false)
     , recordBeforeMs(kDefaultRecordBeforeMs)
+    , playToClient(true)
 {}
 
 
@@ -38,4 +37,5 @@ bool QnBusinessActionParameters::isDefault() const
     return (*this) == empty;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record), QnBusinessActionParameters_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnBusinessActionParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields)

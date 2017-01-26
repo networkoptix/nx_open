@@ -4,8 +4,8 @@
 
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
-
+#include <nx/utils/random.h>
+#include <utils/common/util.h>
 
 QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
@@ -68,7 +68,7 @@ qint64 QnQtFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
 }
 
-qint64 QnQtFileStorageResource::getTotalSpace()
+qint64 QnQtFileStorageResource::getTotalSpace() const
 {
     return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
 }
@@ -88,28 +88,30 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-bool QnQtFileStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate() 
 {
-    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp")
+        + QString::number(nx::utils::random::number<uint>());
+
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
-        return true;
+        return Qn::StorageInit_Ok;
     }
     else {
         if (dir.mkpath(tmpDir))
         {
             dir.rmdir(tmpDir);
-            return true;
+            return Qn::StorageInit_Ok;
         }
         else 
-            return false;
+            return Qn::StorageInit_WrongPath;
     }
 
-    return false;
+    return Qn::StorageInit_WrongPath;
 }
 
-QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url)
+QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url) const
 {
     int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);

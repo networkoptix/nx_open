@@ -9,6 +9,8 @@
 #include "streaming_chunk_cache_key.h"
 
 
+using nx::utils::TimerManager;
+
 DataSourceCache::DataSourceCache()
 :
     m_terminated( false )
@@ -29,12 +31,12 @@ DataSourceCache::~DataSourceCache()
     }
 
     for( auto val: timers )
-        nx::utils::TimerManager::instance()->joinAndDeleteTimer( val.first );
+        TimerManager::instance()->joinAndDeleteTimer( val.first );
 }
 
 DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
 {
-    nx::utils::TimerManager::TimerGuard timerGuard;
+    TimerManager::TimerGuard timerGuard;
     QnMutexLocker lk( &m_mutex );
 
     //searching reader in cache
@@ -46,7 +48,9 @@ DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
         {
             //taking existing reader which is already at required position (from previous chunk)
             DataSourceContextPtr item = it->second.first;
-            timerGuard = nx::utils::TimerManager::TimerGuard( it->second.second );
+            timerGuard = TimerManager::TimerGuard(
+                TimerManager::instance(),
+                it->second.second);
             //timerGuard will remove timer after unlocking mutex
             m_timers.erase( timerGuard.get() );
             it = m_cachedDataProviders.erase( it );
@@ -67,7 +71,7 @@ void DataSourceCache::put(
     const unsigned int livetimeMs )
 {
     QnMutexLocker lk( &m_mutex );
-    const quint64 timerID = nx::utils::TimerManager::instance()->addTimer(
+    const quint64 timerID = TimerManager::instance()->addTimer(
         this,
         std::chrono::milliseconds(livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs));
     m_cachedDataProviders.emplace( key, std::make_pair( data, timerID ) );
@@ -78,14 +82,17 @@ void DataSourceCache::removeRange(
     const StreamingChunkCacheKey& beginKey,
     const StreamingChunkCacheKey& endKey )
 {
-    std::list<nx::utils::TimerManager::TimerGuard> timerGuards;
+    std::list<TimerManager::TimerGuard> timerGuards;
     QnMutexLocker lk( &m_mutex );
     for( auto
         it = m_cachedDataProviders.lower_bound( beginKey );
         it != m_cachedDataProviders.end() && (it->first < endKey);
          )
     {
-        timerGuards.emplace_back( nx::utils::TimerManager::TimerGuard( it->second.second ) );
+        timerGuards.emplace_back(
+            TimerManager::TimerGuard(
+                TimerManager::instance(),
+                it->second.second ) );
         it = m_cachedDataProviders.erase( it );
     }
 }

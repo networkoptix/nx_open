@@ -1,60 +1,39 @@
-/**********************************************************
-* Dec 18, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef EMAIL_MANAGER_MOCKED_H
-#define EMAIL_MANAGER_MOCKED_H
+#pragma once
 
 #include <gmock/gmock.h>
 
+#include <nx/utils/move_only_func.h>
+
 #include <libcloud_db/src/managers/email_manager.h>
 
-
-class EmailManagerMocked
-:
+class TestEmailManager:
     public nx::cdb::AbstractEmailManager
 {
+public:
+    typedef nx::utils::MoveOnlyFunc<void(const nx::cdb::AbstractNotification&)>
+        OnNotificationHandler;
+
+    virtual void sendAsync(
+        const nx::cdb::AbstractNotification& notification,
+        std::function<void(bool)> completionHandler) override;
+
+    void setOnReceivedNotification(OnNotificationHandler handler);
+
+private:
+    OnNotificationHandler m_onNotificationHandler;
+};
+
+class EmailManagerMocked:
+    public TestEmailManager
+{
+    typedef TestEmailManager BaseType;
+
 public:
     MOCK_METHOD1(
         sendAsyncMocked,
-        void(QByteArray serializedNotification));
+        void(const nx::cdb::AbstractNotification& notification));
 
     virtual void sendAsync(
-        QByteArray serializedNotification,
-        std::function<void(bool)> completionHandler) override
-    {
-        //sendAsyncMocked(std::move(serializedNotification));
-        sendAsyncMocked(QByteArray());
-        if (completionHandler)
-            completionHandler(true);
-    }
+        const nx::cdb::AbstractNotification& notification,
+        std::function<void(bool)> completionHandler) override;
 };
-
-class EmailManagerStub
-:
-    public nx::cdb::AbstractEmailManager
-{
-public:
-    EmailManagerStub(nx::cdb::AbstractEmailManager* const target)
-    :
-        m_target(target)
-    {
-    }
-
-    virtual void sendAsync(
-        QByteArray serializedNotification,
-        std::function<void(bool)> completionHandler) override
-    {
-        if (!m_target)
-            return;
-        m_target->sendAsync(
-            std::move(serializedNotification),
-            std::move(completionHandler));
-    }
-
-private:
-    nx::cdb::AbstractEmailManager* const m_target;
-};
-
-#endif  //EMAIL_MANAGER_MOCKED_H

@@ -7,6 +7,7 @@
 #include <nx/network/http/httptypes.h>
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
 
 int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
@@ -17,10 +18,10 @@ int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &pa
 
     QnPingReply reply;
     reply.moduleGuid = qnCommon->moduleGUID();
-    reply.systemName = qnCommon->localSystemName();
+    reply.localSystemId = qnGlobalSettings->localSystemId();
     reply.sysIdTime = qnCommon->systemIdentityTime();
     reply.tranLogTime = ec2Connection->getTransactionLogTime();
-    
+
     result.setReply( reply );
     return nx_http::StatusCode::ok;
 }

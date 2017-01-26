@@ -8,4 +8,4 @@ qt_dir=${qt.dir}
 qt_lib=${qt.dir}/lib
 bin_dir="${libdir}/bin/${build.configuration}"
 linux_lib_dir=${libdir}/lib/${build.configuration}
-win_lib_dir=${libdir}/${arch}/bin/${build.configuration}
+win_lib_dir=${libdir}/bin/${build.configuration}

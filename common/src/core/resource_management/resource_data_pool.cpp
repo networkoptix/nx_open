@@ -3,7 +3,7 @@
 #include <QtCore/QFile>
 
 #include <utils/common/warnings.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
 #include "utils/match/wildcard.h"
 
@@ -32,6 +32,8 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
     m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
     m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
+    m_shortVendorByName.insert(lit("acti corporation"), lit("acti"));
+    m_shortVendorByName.insert(lit("innovative security designs"), lit("isd"));
     m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
     m_shortVendorByName.insert(lit("norbain"), lit("vista"));
 }
@@ -54,25 +56,38 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
 
     QString vendor = m_shortVendorByName.value(_vendor.toLower(), _vendor.toLower());
     QString model = _model.toLower();
-    QString key1 = vendor + lit("|") + model;
-   
+    QStringList keyList;
+
+    QString vendorAndModelKey = vendor + lit("|") + model;
+    keyList.append(vendorAndModelKey);
+
+    if (!firmware.isEmpty())
+        keyList.append(vendorAndModelKey + lit("|") + firmware.toLower());
+
     QnResourceData result;
+    
     {
         QnMutexLocker lock(&m_cachedDataMtx);
-        if (!m_cachedResultByKey.contains(key1)) {
-            for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
-			    if (wildcardMatch(itr.key(), key1))
-                    result.add(itr.value());
+
+        for (const auto& key: keyList)
+        {
+            if (!m_cachedResultByKey.contains(key))
+            {
+                for (auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
+                {
+                    if (wildcardMatch(itr.key(), key))
+                        result.add(itr.value());
+                }
+                m_cachedResultByKey.insert(key, result);
             }
-            m_cachedResultByKey.insert(key1, result);
-        } else {
-            result = m_cachedResultByKey[key1];
+            else
+            {
+                result.add(m_cachedResultByKey[key]);
+            }
         }
     }
-    auto additionData = m_dataByKey.find(key1 + lit("|") + firmware.toLower());
-    if (additionData != m_dataByKey.end())
-        result.add(additionData.value());
-    return result;
+
+    return result;    
 }
 
 bool QnResourceDataPool::load(const QString &fileName) {

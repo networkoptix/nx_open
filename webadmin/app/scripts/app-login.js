@@ -5,6 +5,8 @@ angular.module('webadminApp', [
     'ngSanitize',
     'ngRoute',
     'ui.bootstrap',
-    'ui.select',
     'ngStorage'
-]);
+]).run(['mediaserver',function (mediaserver) {
+    mediaserver.getCurrentUser();
+}]);
+

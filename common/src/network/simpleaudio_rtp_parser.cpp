@@ -8,6 +8,7 @@
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/config.h>
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     QnRtpAudioStreamParser(),
@@ -15,7 +16,7 @@ QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
 {
     m_frequency = 8000;
     m_channels = 1;
-    m_codecId = CODEC_ID_PCM_MULAW;
+    m_codecId = AV_CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_S16;
     m_bits_per_coded_sample = 16;
 }
@@ -24,8 +25,8 @@ QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()
 {
 }
 
-void QnSimpleAudioRtpParser::setCodecId(CodecID codecId)
-{   
+void QnSimpleAudioRtpParser::setCodecId(AVCodecID codecId)
+{
     m_codecId = codecId;
 }
 
@@ -47,14 +48,14 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         else if (lines[i].startsWith("a=fmtp"))
         {
             QList<QByteArray> params = lines[i].mid(lines[i].indexOf(' ')+1).split(';');
-            for(QByteArray param: params) 
+            for(QByteArray param: params)
             {
                 param = param.trimmed();
                 //processStringParam("mode-set", m_mode, param);
             }
-        }   
+        }
     }
-    
+
     const auto context = new QnAvCodecMediaContext(m_codecId);
     m_context = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
@@ -96,7 +97,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
-    audioData->compressionType = !m_context? CODEC_ID_NONE : m_context->getCodecId();
+    audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
     if (m_timeHelper) {
         audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);

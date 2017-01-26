@@ -1,95 +1,94 @@
-
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
 #include <network/module_information.h>
+#include <network/base_system_description.h>
 #include <nx/utils/uuid.h>
-#include <nx/network/socket_common.h>
 
-class QnSystemDescription;
-typedef QSharedPointer<QnSystemDescription> QnSystemDescriptionPtr;
-
-enum class QnServerField
-{
-    NoField                 = 0x00
-    , NameField             = 0x01
-    , SystemNameField       = 0x02
-    , HostField             = 0x04
-    , FlagsField            = 0x08
-};
-Q_DECLARE_FLAGS(QnServerFields, QnServerField)
-Q_DECLARE_METATYPE(QnServerFields)
-
-class QnSystemDescription : public QObject
+class QnSystemDescription: public QnBaseSystemDescription
 {
     Q_OBJECT
-    typedef QObject base_type;
+
+    typedef QnBaseSystemDescription base_type;
 
 public:
-    static QnSystemDescriptionPtr createLocalSystem(const QString &systemId
-        , const QString &systemName);
-
-    static QnSystemDescriptionPtr createCloudSystem(const QString &systemId
-        , const QString &systemName);
+    typedef QSharedPointer<QnSystemDescription> PointerType;
 
     virtual ~QnSystemDescription();
 
-    QString id() const;
+public: // overrides
+    QString id() const override;
 
-    QString name() const;
+    QnUuid localId() const override;
 
-    bool isCloudSystem() const;
+    QString name() const override;
 
-    typedef QList<QnModuleInformation> ServersList;
-    ServersList servers() const;
+    QString ownerAccountEmail() const override;
 
-    enum { kDefaultPriority = 0};
-    void addServer(const QnModuleInformation &serverInfo
-        , int priority = kDefaultPriority);
+    QString ownerFullName() const override;
 
-    bool containsServer(const QnUuid &serverId) const;
+    ServersList servers() const override;
 
-    QnModuleInformation getServer(const QnUuid &serverId) const;
+    bool isReachableServer(const QnUuid& serverId) const override;
 
-    QnServerFields updateServer(const QnModuleInformation &serverInfo);
+    bool containsServer(const QnUuid& serverId) const override;
 
-    void removeServer(const QnUuid &serverId);
+    QnModuleInformation getServer(const QnUuid& serverId) const override;
 
-    void setServerHost(const QnUuid &serverId
-        , const QString &host);
+    QUrl getServerHost(const QnUuid& serverId) const override;
 
-    QString getServerHost(const QnUuid &serverId) const;
+    qint64 getServerLastUpdatedMs(const QnUuid& serverId) const override;
 
-    qint64 getServerLastUpdatedMs(const QnUuid &serverId) const;
+    bool isReachable() const override;
 
-signals:
-    void serverAdded(const QnUuid &serverId);
+    bool isConnectable() const override;
 
-    void serverRemoved(const QnUuid &serverId);
+    bool safeMode() const override;
 
-    void serverChanged(const QnUuid &serverId
-        , QnServerFields flags);
+public:
+    enum { kDefaultPriority = 0 };
+    void addServer(const QnModuleInformation& serverInfo,
+        int priority, bool online = true);
 
-private:
-    QnSystemDescription(const QString &systemId
-        , const QString &systemName
-        , const bool isCloudSystem);
+    QnServerFields updateServer(const QnModuleInformation& serverInfo);
+
+    void removeServer(const QnUuid& serverId);
+
+    void setServerHost(const QnUuid& serverId, const QUrl& host);
+
+    void setName(const QString& value);
+
+protected:
+    QnSystemDescription(
+        const QString& systemId,
+        const QnUuid& localSystemId,
+        const QString& systemName);
+
+    static QString extractSystemName(const QString& systemName);
+
+    void handleReachableServerAdded(const QnUuid& serverId);
+
+    void handleServerRemoved(const QnUuid& serverId);
+
+    void updateSafeModeState();
 
 private:
     typedef QHash<QnUuid, QnModuleInformation> ServerInfoHash;
     typedef QHash<QnUuid, QElapsedTimer> ServerLastUpdateTimeHash;
-    typedef QHash<QnUuid, QString> HostsHash;
+    typedef QHash<QnUuid, QUrl> HostsHash;
     typedef QMultiMap<int, QnUuid> PrioritiesMap;
+    typedef QSet<QnUuid> IdsSet;
 
     const QString m_id;
-    const QString m_systemName;
-    const bool m_isCloudSystem;
+    const QnUuid m_localId;
+    const QString m_ownerAccountEmail;
+    const QString m_ownerFullName;
+    QString m_systemName;
     ServerLastUpdateTimeHash m_serverTimestamps;
     ServerInfoHash m_servers;
     PrioritiesMap m_prioritized;
     HostsHash m_hosts;
-
-
+    IdsSet m_reachableServers;
+    bool m_safeMode;
 };

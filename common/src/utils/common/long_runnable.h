@@ -1,16 +1,16 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
-#include <common/config.h>
+#include <atomic>
 
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
 
+#include <nx/utils/compiler_options.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/semaphore.h>
-#include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
-
+#include <utils/common/stoppable.h>
 
 class QnLongRunnablePoolPrivate;
 
@@ -58,8 +58,8 @@ private slots:
     void at_finished();
 
 protected:
-    volatile bool m_needStop;
-    volatile bool m_onPause;
+    std::atomic<bool> m_needStop;
+    std::atomic<bool> m_onPause;
     QnSemaphore m_semaphore;
     uintptr_t m_systemThreadId;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
@@ -89,35 +89,5 @@ private:
     friend class QnLongRunnable;
     QSharedPointer<QnLongRunnablePoolPrivate> d;
 };
-
-
-/**
- * Helper cleanup class to use QnLongRunnable inside Qt smart pointers in a 
- * non-blocking fashion.
- */
-struct QnRunnableCleanup {
-    static inline void cleanup(QnLongRunnable *runnable) {
-        if(!runnable)
-            return;
-
-        if(runnable->isRunning()) {
-            QObject::connect(runnable, SIGNAL(finished()), runnable, SLOT(deleteLater()));
-            runnable->pleaseStop();
-        } else {
-            delete runnable;
-        }
-    }
-
-    static inline void cleanupSync(QnLongRunnable *runnable) {
-        if(!runnable)
-            return;
-
-        if(runnable->isRunning()) 
-            runnable->stop();
-        
-        delete runnable;
-    }
-};
-
 
 #endif // QN_LONG_RUNNABLE_H

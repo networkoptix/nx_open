@@ -33,10 +33,8 @@ void runMultiserverRequest(QUrl url
         url.setPort(route.addr.port);
     }
 
-    if (const QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-        url.setUserName(admin->getName());
-        url.setPassword(QString::fromUtf8(admin->getDigest()));
-    }
+    url.setUserName(server->getId().toByteArray());
+    url.setPassword(server->getAuthKey());
 
     request(url, headers, context);
 }
@@ -52,8 +50,7 @@ void runMultiserverDownloadRequest(QUrl url
     {
         context->executeGuarded([url, requestCompletionFunc, headers, context]()
         {
-            nx_http::downloadFileAsync(url, requestCompletionFunc, headers,
-                                       nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            nx_http::downloadFileAsync(url, requestCompletionFunc, headers);
             context->incRequestsCount();
         });
     };
@@ -77,8 +74,7 @@ void runMultiserverUploadRequest(QUrl url
         context->executeGuarded([url, data, completionFunc, headers
             , contentType, context, user, password]()
         {
-            nx_http::uploadDataAsync(url, data, contentType, headers
-                , completionFunc, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+            nx_http::uploadDataAsync(url, data, contentType, headers, completionFunc);
 
             context->incRequestsCount();
         });

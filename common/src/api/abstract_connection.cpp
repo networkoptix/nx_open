@@ -6,7 +6,7 @@
 
 #include <api/network_proxy_factory.h>
 #include <core/resource/resource.h>
-#include <utils/serialization/lexical_enum.h>
+#include <nx/fusion/serialization/lexical_enum.h>
 
 #include "session_manager.h"
 #include "abstract_reply_processor.h"
@@ -101,7 +101,7 @@ int QnAbstractConnection::sendAsyncRequest(
         } else {
             signal = lit("%1finished(int, const %2 &, int, const QString &)").arg(QSIGNAL_CODE).arg(QLatin1String(replyTypeName)).toLatin1();
         }
-        processor = newReplyProcessor(object);
+        processor = newReplyProcessor(object, m_targetRes ? m_targetRes->getId().toString() : QString());
         processor->connect(signal.constData(), target, slot, Qt::QueuedConnection);
     }
 
@@ -176,7 +176,9 @@ int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int
     if (status != 0)
         return status;
 
-    QScopedPointer<QnAbstractReplyProcessor> processor(newReplyProcessor(object));
+    QScopedPointer<QnAbstractReplyProcessor> processor(newReplyProcessor(
+        object,
+        m_targetRes ? m_targetRes->getId().toString() : QString()));
     processor->processReply(response, -1);
     if(reply)
         *reply = processor->reply();

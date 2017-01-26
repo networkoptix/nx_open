@@ -52,7 +52,7 @@ namespace nx_api
 
         BaseStreamProtocolConnection(
             StreamConnectionHolder<CustomConnectionType>* connectionManager,
-            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+            std::unique_ptr<AbstractStreamSocket> streamSocket )
         :
             BaseType( connectionManager, std::move(streamSocket) ),
             m_serializerState( SerializerState::done )
@@ -67,43 +67,22 @@ namespace nx_api
         {
         }
 
-        void bytesReceived( const nx::Buffer& buf )
+        void bytesReceived(const nx::Buffer& buf)
         {
-            for( size_t pos = 0; pos < (size_t)buf.size(); )
+            size_t pos = 0;
+            if (buf.isEmpty())
             {
-                //parsing message
-                size_t bytesProcessed = 0;
-                switch( m_parser.parse( pos > 0 ? buf.mid((int)pos) : buf, &bytesProcessed ) )
+                //reporting eof of file to the parser
+                invokeMessageParser(buf, &pos);
+                return;
+            }
+
+            for (; pos < (size_t)buf.size(); )
+            {
+                if (!invokeMessageParser(buf, &pos))
                 {
-                    case ParserState::init:
-                    case ParserState::inProgress:
-                        NX_ASSERT( bytesProcessed == (size_t)buf.size() );
-                        return;
-
-                    case ParserState::done:
-                    {
-                        //processing request
-                        //NOTE interleaving is not supported yet
-
-                        {
-                            nx::utils::ObjectDestructionFlag::Watcher watcher(
-                                &m_connectionFreedFlag);
-                            static_cast<CustomConnectionType*>(this)->processMessage(
-                                std::move(m_request));
-                            if (watcher.objectDestroyed())
-                                return; //connection has been removed by handler
-                        }
-
-                        m_parser.reset();
-                        m_request.clear();
-                        m_parser.setMessage( &m_request );
-                        pos += bytesProcessed;
-                        break;
-                    }
-
-                    case ParserState::failed:
-                        //TODO : #ak ignore all following data and close connection?
-                        return;
+                    //TODO : #ak ignore all following data and close connection?
+                    return;
                 }
             }
         }
@@ -157,6 +136,19 @@ namespace nx_api
             MessageType msg,
             std::function<void(SystemError::ErrorCode)> handler)
         {
+            if (m_sendCompletionHandler)
+            {
+                decltype(m_sendCompletionHandler) addHandler;
+                std::swap(addHandler, m_sendCompletionHandler);
+                handler =
+                    [baseHandler = std::move(handler), addHandler = std::move(addHandler)](
+                        SystemError::ErrorCode code)
+                    {
+                        baseHandler(code);
+                        addHandler(code);
+                    };
+            }
+
             auto newTask = std::make_shared<SendTask>(
                 std::move(msg),
                 std::move(handler)); //TODO #ak get rid of shared_ptr here when generic lambdas are available
@@ -178,6 +170,11 @@ namespace nx_api
                 std::move(data),
                 std::move(handler));
             addNewTaskToQueue(std::move(newTask));
+        }
+
+        void setSendCompletionHandler(std::function<void(SystemError::ErrorCode)> handler)
+        {
+            m_sendCompletionHandler = std::move(handler);
         }
 
     private:
@@ -238,6 +235,53 @@ namespace nx_api
         std::deque<SendTask> m_sendQueue;
         nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
+
+        /**
+            @param buf source buffer
+            @param pos Position inside source buffer. Moved by number of bytes read
+        */
+        bool invokeMessageParser(const nx::Buffer& buf, size_t* const pos)
+        {
+            //parsing message
+            size_t bytesProcessed = 0;
+            switch (m_parser.parse(*pos > 0 ? buf.mid((int)*pos) : buf, &bytesProcessed))
+            {
+                case ParserState::init:
+                case ParserState::inProgress:
+                    *pos += bytesProcessed;
+                    NX_ASSERT(*pos == (size_t)buf.size());
+                    return true;
+
+                case ParserState::done:
+                {
+                    //processing request
+                    //NOTE interleaving is not supported yet
+
+                    {
+                        nx::utils::ObjectDestructionFlag::Watcher watcher(
+                            &m_connectionFreedFlag);
+                        static_cast<CustomConnectionType*>(this)->processMessage(
+                            std::move(m_request));
+                        if (watcher.objectDestroyed())
+                            return false; //connection has been removed by handler
+                    }
+
+                    m_parser.reset();
+                    m_request.clear();
+                    m_parser.setMessage(&m_request);
+                    *pos += bytesProcessed;
+                    return true;
+                }
+
+                case ParserState::failed:
+                    //TODO : #ak ignore all further data and close connection?
+                    return false;
+            }
+
+            NX_ASSERT(false);
+            return false;
+        }
+
         void sendMessageInternal( const MessageType& msg )
         {
             //serializing message
@@ -248,7 +292,7 @@ namespace nx_api
 
         void addNewTaskToQueue( std::shared_ptr<SendTask> newTask )
         {
-            this->socket()->dispatch(
+            this->dispatch(
                 [this, newTask]()
                 {
                     m_sendQueue.push_back( std::move( *newTask ) );
@@ -330,7 +374,7 @@ namespace nx_api
     public:
         BaseStreamProtocolConnectionEmbeddable(
             StreamConnectionHolder<self_type>* connectionManager,
-            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+            std::unique_ptr<AbstractStreamSocket> streamSocket )
         :
             base_type(
                 connectionManager,

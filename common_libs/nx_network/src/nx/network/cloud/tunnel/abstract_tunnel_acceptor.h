@@ -17,18 +17,21 @@ class NX_NETWORK_API AbstractTunnelAcceptor
     public QnStoppableAsync
 {
 public:
+    AbstractTunnelAcceptor();
+
     // common connection info setters
     void setConnectionInfo(String connectionId, String remotePeerId);
-    void setMediatorConnection(
-        std::shared_ptr<hpm::api::MediatorServerTcpConnection> connection);
+    void setMediatorConnection(hpm::api::MediatorServerTcpConnection* connection);
+
+    typedef std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractIncomingTunnelConnection>)> AcceptHandler;
 
     /** Shell be called only once to estabilish incomming tunnel connection */
-    virtual void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractIncomingTunnelConnection>)> handler) = 0;
+    virtual void accept(AcceptHandler handler) = 0;
 
 protected:
-    std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    hpm::api::MediatorServerTcpConnection* m_mediatorConnection;
     String m_connectionId;
     String m_remotePeerId;
 };

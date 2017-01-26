@@ -1,57 +1,73 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
+#include <memory>
+
 #include <QtSql/QSqlError>
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
+#include "nx_ec/data/api_misc_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
 #include <utils/common/unused.h>
 #include <nx/utils/singleton.h>
+#include "nx/utils/type_utils.h"
+#include "core/resource_access/user_access_data.h"
+#include "core/resource_access/resource_access_manager.h"
+#include "core/resource/user_resource.h"
 
 
 namespace ec2
 {
-    class LicenseManagerImpl;
 
-    enum ApiObjectType
-    {
-        ApiObject_NotDefined,
-        ApiObject_Server,
-        ApiObject_Camera,
-        ApiObject_User,
-        ApiObject_Layout,
-        ApiObject_Videowall,
-        ApiObject_BusinessRule,
-        ApiObject_Storage,
-        ApiObject_WebPage,
-    };
-    struct ApiObjectInfo
-    {
-        ApiObjectInfo() {}
-        ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
+namespace aux {
+bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
+}
 
-        ApiObjectType type;
-        QnUuid id;
-    };
-    class ApiObjectInfoList: public std::vector<ApiObjectInfo>
-    {
-    public:
-        std::vector<ApiIdData> toIdList() const
-        {
-            std::vector<ApiIdData> result;
-            result.reserve(size());
-            for (size_t i = 0; i < size(); ++i)
-                result.push_back(ApiIdData(at(i).id));
-            return result;
-        }
-    };
+class LicenseManagerImpl;
 
+enum ApiObjectType
+{
+    ApiObject_NotDefined,
+    ApiObject_Server,
+    ApiObject_Camera,
+    ApiObject_User,
+    ApiObject_Layout,
+    ApiObject_Videowall,
+    ApiObject_BusinessRule,
+    ApiObject_Storage,
+    ApiObject_WebPage,
+};
+struct ApiObjectInfo
+{
+    ApiObjectInfo() {}
+    ApiObjectInfo(const ApiObjectType& type, const QnUuid& id): type(type), id(id) {}
+
+    ApiObjectType type;
+    QnUuid id;
+};
+class ApiObjectInfoList: public std::vector<ApiObjectInfo>
+{
+public:
+    std::vector<ApiIdData> toIdList() const
+    {
+        std::vector<ApiIdData> result;
+        result.reserve(size());
+        for (size_t i = 0; i < size(); ++i)
+            result.push_back(ApiIdData(at(i).id));
+        return result;
+    }
+};
+
+class QnDbManagerAccess;
+
+namespace detail
+{
     class QnDbManager
     :
         public QObject,
@@ -59,6 +75,10 @@ namespace ec2
         public Singleton<QnDbManager>
     {
         Q_OBJECT
+
+        friend class ::ec2::QnDbManagerAccess;
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
 
     public:
         QnDbManager();
@@ -70,11 +90,8 @@ namespace ec2
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
-            if (!tran.isLocal) {
+            if (!tran.isLocal()) {
                 QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
                     return ErrorCode::containsBecauseTimestamp;
@@ -84,25 +101,19 @@ namespace ec2
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
-            if (tran.isLocal)
+            if (tran.isLocal())
                 return ErrorCode::ok;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
-            if (!isTranAllowed(tran))
-                return ErrorCode::forbidden;
-
             return executeTransactionInternal(tran);
         }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            if (!isTranAllowed(tran.command))
-                return ErrorCode::forbidden;
-
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(getTransaction());
             ErrorCode result = executeTransactionNoLock(tran, serializedTran);
@@ -110,7 +121,7 @@ namespace ec2
                 if (!lock.commit())
                 {
                     NX_LOG( QnLog::EC2_TRAN_LOG, lit("Commit error while executing transaction %1: %2").
-                        arg(ec2::toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
+                        arg(toString(result)).arg(m_sdb.lastError().text()), cl_logWARNING );
                     return ErrorCode::dbError;
                 }
             }
@@ -123,20 +134,20 @@ namespace ec2
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QN_UNUSED(t1, t2);
             QnWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
         //dumpDatabase
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
-        ErrorCode doQuery(const ApiStoredFilePath& path, qint64& dumpFileSize);
+        ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
+        ErrorCode doQuery(const ApiStoredFilePath& path, ApiDatabaseDumpToFileData& dumpFileSize);
 
-		// --------- misc -----------------------------
+        // --------- misc -----------------------------
         QnUuid getID() const;
+        bool updateId();
 
         ApiObjectType getObjectType(const QnUuid& objectId)
         {
@@ -150,11 +161,9 @@ namespace ec2
         ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
         ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
 
-        bool saveMiscParam( const QByteArray& name, const QByteArray& value );
         bool readMiscParam( const QByteArray& name, QByteArray* value );
 
         //!Reads settings (properties of user 'admin')
-        ErrorCode readSettings(ApiResourceParamDataList& settings);
 
         virtual QnDbTransaction* getTransaction() override;
 
@@ -179,11 +188,12 @@ namespace ec2
         };
 
 
-        friend class QnTransactionLog;
+        friend class ::ec2::QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
         QnReadWriteLock& getMutex() { return m_mutex; }
 
         // ------------ data retrieval --------------------------------------
+        ErrorCode doQueryNoLock(nullptr_t /*dummy*/, ApiResourceParamDataList& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -192,80 +202,102 @@ namespace ec2
 
         //getStoredFiles
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileDataList& data);
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
+        ErrorCode doQueryNoLock(const nullptr_t&, ApiStoredFileDataList& data) { return doQueryNoLock(ApiStoredFilePath(), data); }
 
+        ErrorCode doQueryNoLock(const QByteArray &paramName, ApiMiscData& miscData);
         //getResourceTypes
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
 
         //getStorages
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
+        ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(
+            const ParentId& parentId, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList);
 
         //get resource status
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
 
-        //getCameraUserAttributes
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraAttributesDataList& cameraUserAttributesList);
+        //getCameraUserAttributesList
+        ErrorCode doQueryNoLock(const QnUuid& cameraId, ApiCameraAttributesDataList& cameraUserAttributesList);
 
         //getCamerasEx
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraDataExList& cameraList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataExList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList);
 
         //getServersEx
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataExList& serverList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiMediaServerDataExList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
-        //getUserGroupList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserGroupDataList& groupList);
+        //getUserRoleList
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
+
+        //getPredefinedRoles
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
 
         //getAccessRights
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiAccessRightsDataList& accessRightsList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiVideowallDataList& videowallList);
 
         //getWebPageList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiWebPageDataList& webPageList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
+        ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data);
+
+        // ApiFullInfo abridged for Mobile Client
+        ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLicenseDataList& data);
 
         // ApiDiscoveryDataList
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiDiscoveryDataList& data);
 
-        //getServerUserAttributes
+        //getMediaServerUserAttributesList
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUserAttributesDataList& serverAttrsList);
 
         //getTransactionLog
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
+        ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
-        //getClientInfos
-        ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
+        //getClientInfoList
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
+        // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
+        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
+        {
+            data.clear();
+            return ErrorCode::ok;
+        }
 
         // ------------ transactions --------------------------------------
+
+        template<typename T>
+        ErrorCode executeTransactionInternal(const QnTransaction<T>&)
+        {
+            NX_ASSERT(0, "This function should be explicitely specialized");
+            return ErrorCode::notImplemented;
+        }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraAttributesData>& tran);
@@ -282,7 +314,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
@@ -296,6 +328,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMiscData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -381,7 +414,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemNameData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemIdData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -427,6 +460,7 @@ namespace ec2
         }
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseOverflowData> &);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCleanupDatabaseData>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateSequenceData> &) {
             NX_ASSERT(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
@@ -451,6 +485,9 @@ namespace ec2
         ErrorCode deleteTableRecord(const QnUuid& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 
+        ErrorCode saveMiscParam(const ApiMiscData &params);
+        ErrorCode readSettings(ApiResourceParamDataList& settings);
+
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
         ErrorCode removeObject(const ApiObjectInfo& apiObject);
@@ -462,10 +499,14 @@ namespace ec2
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode saveCameraUserAttributes( const ApiCameraAttributesData& attrs );
         ErrorCode insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId);
+        ErrorCode removeCameraAttributes(const QnUuid& id);
+        ErrorCode removeResourceAccessRights(const QnUuid& id);
+        ErrorCode removeResourceStatus(const QnUuid& id);
         ErrorCode updateCameraSchedule(const std::vector<ApiScheduleTaskData>& scheduleTasks, qint32 internalId);
         ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnUuid& guid);
         ErrorCode removeStorage(const QnUuid& guid);
+        ErrorCode removeParam(const ApiResourceParamWithRefData& data);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
@@ -476,17 +517,16 @@ namespace ec2
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
-        ErrorCode insertOrReplaceLayout(const ApiLayoutData& data, qint32 internalId);
-        ErrorCode updateLayoutItems(const ApiLayoutData& data, qint32 internalLayoutId);
         ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
-        ErrorCode removeUserGroup( const QnUuid& guid );
+        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
+        ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
@@ -509,17 +549,20 @@ namespace ec2
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+        ErrorCode saveLicense(const ApiLicenseData& license, QSqlDatabase& database);
         ErrorCode removeLicense(const ApiLicenseData& license);
+        ErrorCode removeLicense(const ApiLicenseData& license, QSqlDatabase& database);
 
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
         bool createDatabase();
-        bool migrateBusinessEvents();
-        bool doRemap(int id, int newVal, const QString& fieldName);
 
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
+
+        bool isReadOnly() const { return m_dbReadOnly; }
+
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
@@ -533,6 +576,26 @@ namespace ec2
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
+        enum ResyncFlag
+        {
+            None                    =      0,
+            ClearLog                =    0x1,
+            ResyncLog               =    0x2,
+            ResyncLicences          =    0x4,
+            ResyncFiles             =    0x8,
+            ResyncCameraAttributes  =   0x10,
+            ResyncServerAttributes  =   0x20,
+            ResyncServers           =   0x40,
+            ResyncLayouts           =   0x80,
+            ResyncRules             =  0x100,
+            ResyncUsers             =  0x200,
+            ResyncStorages          =  0x400,
+            ResyncClientInfo        =  0x800,
+            ResyncVideoWalls        = 0x1000,
+            ResyncWebPages          = 0x2000,
+        };
+        Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
+
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
@@ -543,8 +606,8 @@ namespace ec2
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class ObjectType, class ObjectListType>
-        bool fillTransactionLogInternal(ApiCommand::Value command);
+        template <class FilterType, class ObjectType, class ObjectListType>
+        bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
 
         template <class ObjectListType>
         bool queryObjects(ObjectListType& objects);
@@ -559,13 +622,18 @@ namespace ec2
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool removeEmptyLayoutsFromTransactionLog();
-        bool tuneDBAfterOpen();
         bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
+        bool cleanupDanglingDbObjects();
         bool fixBusinessRules();
-        bool isTranAllowed(const QnAbstractTransaction& tran) const;
+        bool syncLicensesBetweenDB();
+        bool encryptKvPairs();
 
+        ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
+
+        /** Raise flags if db is not just created. Always returns true. */
+        bool resyncIfNeeded(ResyncFlags flags);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -584,22 +652,171 @@ namespace ec2
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
-        bool m_needResyncLog;
-        bool m_needResyncLicenses;
-        bool m_needResyncFiles;
-        bool m_needResyncCameraUserAttributes;
-        bool m_needResyncServerUserAttributes;
+
         bool m_dbJustCreated;
         bool m_isBackupRestore;
-        bool m_needResyncLayout;
-        bool m_needResyncbRules;
-        bool m_needResyncUsers;
-        bool m_needResyncStorages;
-        bool m_needResyncClientInfoData;
         bool m_dbReadOnly;
+        ResyncFlags m_resyncFlags;
     };
+} // namespace detail
+
+class QnDbManagerAccess
+{
+public:
+    QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
+    ApiObjectType getObjectType(const QnUuid& objectId);
+
+    ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullInfoData& data)
+    {
+        return readApiFullInfoDataComplete(&data);
+    }
+
+    ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
+    {
+        const ErrorCode errorCode =
+            detail::QnDbManager::instance()->readApiFullInfoDataComplete(data);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        filterData(data->resourceTypes);
+        filterData(data->servers);
+        filterData(data->serversUserAttributesList);
+        filterData(data->cameras);
+        filterData(data->cameraUserAttributesList);
+        filterData(data->users);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
+        filterData(data->accessRights);
+        filterData(data->layouts);
+        filterData(data->videowalls);
+        filterData(data->rules);
+        filterData(data->cameraHistory);
+        filterData(data->licenses);
+        filterData(data->discoveryData);
+        filterData(data->allProperties);
+        filterData(data->storages);
+        filterData(data->resStatusList);
+        filterData(data->webPages);
+
+        return ErrorCode::ok;
+    }
+
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
+    {
+        const ErrorCode errorCode =
+            detail::QnDbManager::instance()->readApiFullInfoDataForMobileClient(data, userId);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        filterData(data->servers);
+        filterData(data->serversUserAttributesList);
+        filterData(data->cameras);
+        filterData(data->cameraUserAttributesList);
+        filterData(data->users);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
+        filterData(data->accessRights);
+        filterData(data->layouts);
+        filterData(data->cameraHistory);
+        filterData(data->discoveryData);
+        filterData(data->allProperties);
+        filterData(data->resStatusList);
+
+        return ErrorCode::ok;
+    }
+
+    QnDbHelper::QnDbTransaction* getTransaction();
+    ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
+    ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
+    ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+    void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
+
+    template <typename T1, typename T2>
+    ErrorCode doQuery(const T1 &t1, T2 &t2)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
+        {
+            errorCode = ErrorCode::forbidden;
+            t2 = T2();
+        }
+        return errorCode;
+    }
+
+    template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
+    ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
+    {
+        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
+        if (errorCode != ErrorCode::ok)
+            return errorCode;
+
+        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
+        return errorCode;
+    }
+
+    bool isTranAllowed(const QnAbstractTransaction& tran) const;
+
+    template <typename Param, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+            return ErrorCode::forbidden;
+        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransactionNoLock(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
+        auto outParamContainer = tran.params;
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
+        if (outParamContainer.size() != tran.params.size())
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <class Param, class SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Param> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+            return ErrorCode::forbidden;
+        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+    template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
+    ErrorCode executeTransaction(const QnTransaction<Cont<Param,A>> &tran, SerializedTransaction &&serializedTran)
+    {
+        if (!isTranAllowed(tran))
+            return ErrorCode::forbidden;
+        Cont<Param,A> paramCopy = tran.params;
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
+        if (paramCopy.size() != tran.params.size())
+            return ErrorCode::forbidden;
+
+        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+    }
+
+private:
+    template<typename T>
+    void filterData(T& target)
+    {
+        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
+    }
+
+    Qn::UserAccessData m_userAccessData;
 };
 
-#define dbManager QnDbManager::instance()
+} // namespace ec2
+
+#define dbManager(userAccessData) QnDbManagerAccess(userAccessData)
 
 #endif // __DB_MANAGER_H_

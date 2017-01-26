@@ -4,7 +4,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 // TODO: #MSAPI rename module to rest_result
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
@@ -26,7 +26,7 @@ public:
     };
 
     /** Presents error as corresponding text with some arguments.
-        E.g., ErrorDescriptor(MissingParameter, "id").text() 
+        E.g., ErrorDescriptor(MissingParameter, "id").text()
             will return text like "Missing required parameter 'id'".
         \note Introduced for error text unification
     */
@@ -66,10 +66,19 @@ public:
     }
 
     template<class T>
-    T deserialized() {
+    T deserialized() const {
         T result;
         QJson::deserialize(reply, &result);
         return result;
+    }
+
+    /**
+     * Convenience function which creates serialized JSON result.
+     */
+    static void writeError(QByteArray* outBody, Error error, const QString& errorMessage) {
+        QnJsonRestResult jsonRestResult;
+        jsonRestResult.setError(error, errorMessage);
+        *outBody = QJson::serialized(jsonRestResult);
     }
 };
 

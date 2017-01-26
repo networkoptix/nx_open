@@ -13,7 +13,13 @@
 #include <openssl/opensslconf.h>
 #include <openssl/ssl.h>
 
+#include <QDir>
+
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/future.h>
+#include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max
@@ -24,10 +30,14 @@
 #undef min
 #endif
 
-// #define DEBUG_SSL
+#define DEBUG_LOG(MESSAGE) do \
+{ \
+    if (nx::network::SocketGlobals::debugConfig().sslSocketWrappers) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
-static std::size_t kSslAsyncRecvBufferSize = 1024 * 100;
-static const unsigned char kSslSessionId[] = "Network Optix SSL socket";
+static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
+static const nx::String kSslSessionId("Network Optix SSL socket");
 
 namespace {
 
@@ -54,7 +64,7 @@ public:
         m_initialLockingCallback(CRYPTO_get_locking_callback())
     {
         NX_ASSERT(!m_openSslGlobalLock);
-        // not safe here, new can throw exception 
+        // not safe here, new can throw exception
         m_openSslGlobalLock.reset(new std::mutex[CRYPTO_num_locks()]);
         CRYPTO_set_locking_callback(&OpenSslGlobalLockManager::openSSLGlobalLock);
     }
@@ -115,7 +125,10 @@ public:
 
     void decreasePendingIOCount()
     {
-        NX_ASSERT(m_pendingIoCount !=0);
+        if (m_pendingIoCount == 0)
+            return;
+
+        NX_ASSERT(m_pendingIoCount > 0);
         --m_pendingIoCount;
         if (m_pendingIoCount == 0) {
             // Check if we can invoke the IO operations, if the IO
@@ -178,10 +191,8 @@ public:
             m_readBuffer->resize(old_size+*sslReturn);
             m_readBytes += *sslReturn;
         }
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG2);
-        #endif
+
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -202,16 +213,22 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(m_errorCode, -1);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError, m_readBytes);
-        case SslAsyncOperation::END_OF_STREAM:
-            NX_ASSERT(m_readBytes == 0);
-            return handler(SystemError::noError, 0);
-        default:
-            NX_ASSERT(false);
+        if (handler == nullptr)
+            return;
+        NX_ASSERT(handler != nullptr);
+
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(m_errorCode, -1);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError, m_readBytes);
+            case SslAsyncOperation::END_OF_STREAM:
+                NX_ASSERT(m_readBytes == 0);
+                return handler(SystemError::noError, 0);
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -231,10 +248,7 @@ public:
             m_ssl,m_writeBuffer->constData(),m_writeBuffer->size());
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG1);
-        #endif
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -254,15 +268,17 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(SystemError::connectionAbort, -1);
-        case SslAsyncOperation::END_OF_STREAM:
-            return handler(SystemError::noError, 0);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError, m_writeBuffer->size());
-        default:
-            NX_ASSERT(false);
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(SystemError::connectionAbort, -1);
+            case SslAsyncOperation::END_OF_STREAM:
+                return handler(SystemError::noError, 0);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError, m_writeBuffer->size());
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -279,10 +295,7 @@ public:
         *sslReturn = SSL_do_handshake(m_ssl);
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG1);
-        #endif
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(std::function<void(SystemError::ErrorCode)>&& handler)
@@ -299,15 +312,17 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(SystemError::connectionAbort);
-        case SslAsyncOperation::END_OF_STREAM:
-            return handler(SystemError::connectionReset);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError);
-        default:
-            NX_ASSERT(false);
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(SystemError::connectionAbort);
+            case SslAsyncOperation::END_OF_STREAM:
+                return handler(SystemError::connectionReset);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError);
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -321,7 +336,9 @@ public:
     SslAsyncBioHelper(
         SSL* ssl, AbstractStreamSocket* underly_socket, bool is_server);
 
-    ~SslAsyncBioHelper();
+    virtual ~SslAsyncBioHelper();
+
+    virtual bool isSsl() const { return true; }
 
 public:
     // BIO operation function. These 2 BIO operation function will simulate BIO memory
@@ -344,12 +361,6 @@ public:
         nx::Buffer* buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& handler);
 
-    void waitForAllPendingIOFinish()
-    {
-        m_underlySocket->pleaseStopSync();
-        clear();
-    }
-
     void clear()
     {
         m_readQueue.clear();
@@ -364,10 +375,10 @@ private:
     // We can simply pass all the parameter all around as a function parameter.
     void perform(SslAsyncOperation* operation);
 
-    // Check whether SSL has been shutdown or not for this situations. 
+    // Check whether SSL has been shutdown or not for this situations.
     void checkShutdown(int sslReturn, int sslError);
 
-    // Handle SSL internal error 
+    // Handle SSL internal error
     void handleSslError(int sslReturn, int sslError);
 
     // These 2 functions will issue the read/write operations directly to the underlying
@@ -384,6 +395,7 @@ private:
 
     void continueRead();
     void continueWrite();
+
 protected:
     AbstractStreamSocket* socket()
     {
@@ -464,7 +476,7 @@ private:
     // of member function in AsyncSSL, eg: OnUnderlySocketRecv --> sendAsync
     // --> OnUnderlySocketSend --> delete the object, for each function, there
     // will be a such class on the stack, however, the inner most nested class
-    // will get notification, since this class set the deletion_flag at last. 
+    // will get notification, since this class set the deletion_flag at last.
     // This will result in the outer caller not get any notification afterwards.
     // A simpler and elegant way should use std::shared_ptr/std::weak_ptr, however
     // since our code has performance issue, we'd like to invent some easier way
@@ -473,7 +485,7 @@ private:
     // will check the AsyncSSL's deletion_flag_ pointer, if it is not NULL, which
     // means a DelegionFlag on stack is watching for the deletion operations, so
     // it will cache this pointer and set it to the corresponding value, by this
-    // means we are able to cascade the deletion operation internally. 
+    // means we are able to cascade the deletion operation internally.
     class DeletionFlag
     {
     public:
@@ -609,9 +621,8 @@ void SslAsyncBioHelper::handleSslError(int sslReturn, int sslError)
         errorStack << QLatin1String(err_str);
     }
 
-    NX_LOGX(lm("SSL returns %1, error %2, stack: %3")
-        .arg(sslReturn).arg(sslError)
-        .arg(errorStack.join(QLatin1String(", "))), cl_logDEBUG1);
+    DEBUG_LOG(lm("SSL returns %1, error %2, stack: %3")
+        .strs(sslReturn, sslError).container(errorStack));
 }
 
 void SslAsyncBioHelper::onRecv(
@@ -631,8 +642,8 @@ void SslAsyncBioHelper::onRecv(
         if (transferred == 0) {
             m_eof = true;
         }
-        // Since we gonna invoke user's callback here, a deletion flag will us 
-        // to avoid reuse member object once the user deleted such object 
+        // Since we gonna invoke user's callback here, a deletion flag will us
+        // to avoid reuse member object once the user deleted such object
         DeletionFlag deleted(this);
         // Set up the flag to let the user runs into the read operation's returned buffer
         m_allowBioRead = true;
@@ -673,7 +684,7 @@ void SslAsyncBioHelper::doRead()
     // Checking if we have some data lefts inside of the read buffer, if so
     // we could just call SSL operation right here. And since this function
     // is executed inside of AIO thread, no recursive lock will happened in
-    // user's callback function. 
+    // user's callback function.
     if (static_cast<int>(m_recvBufferReadPos) < m_recvBuffer.size()) {
         m_outstandingRead->increasePendingIOCount();
         onRecv(SystemError::noError,
@@ -681,7 +692,7 @@ void SslAsyncBioHelper::doRead()
     } else {
         // We have to issue our operations right just here since we have no
         // left data inside of the buffer and our user needs to read all the
-        // data out in the buffer here. 
+        // data out in the buffer here.
         m_underlySocket->readSomeAsync(
             &m_recvBuffer,
             std::bind(
@@ -758,8 +769,8 @@ std::size_t SslAsyncBioHelper::bioRead(void* data, std::size_t size)
         if (m_recvBuffer.size() == static_cast<int>(m_recvBufferReadPos)) {
             return 0;
         } else {
-            std::size_t digest_size = 
-                std::min(size, 
+            std::size_t digest_size =
+                std::min(size,
                     static_cast<int>(m_recvBuffer.size()) - m_recvBufferReadPos);
             memcpy(data,
                    m_recvBuffer.constData() + m_recvBufferReadPos,
@@ -789,7 +800,7 @@ void SslAsyncBioHelper::onConnect(SystemError::ErrorCode errorCode)
     if (errorCode != SystemError::noError) {
         m_handshakeStage = HANDSHAKE_NOT_YET;
         // No, we cannot connect to the peer sides, so we just tell our user
-        // that we have expired whatever we've got currently 
+        // that we have expired whatever we've got currently
         for (auto op : m_handshakeQueue) {
             DeletionFlag deleted(this);
             op->setExitStatus(SslAsyncOperation::EXCEPTION, errorCode);
@@ -848,6 +859,9 @@ bool SslAsyncBioHelper::asyncSend(
     const nx::Buffer& buffer,
     std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
 {
+    NX_ASSERT(m_handshakeStage == HANDSHAKE_DONE || !m_isServer,
+        "SSL server is not supposed to send before recv");
+
     m_write->reset(&buffer,std::move(handler));
     asyncPerform(m_write.get());
     return true;
@@ -865,6 +879,8 @@ bool SslAsyncBioHelper::asyncRecv(
 class MixedSslAsyncBioHelper : public SslAsyncBioHelper
 {
 public:
+    bool isSsl() const override { return m_isSsl; }
+
     struct SnifferData
     {
         std::function<void(SystemError::ErrorCode,std::size_t)> completionHandler;
@@ -894,15 +910,15 @@ public:
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& op)
     {
-            // When you see this, it means you screw up since the very first call should 
-            // be a async_recv instead of async_send here . 
+            // When you see this, it means you screw up since the very first call should
+            // be a async_recv instead of async_send here .
             NX_ASSERT(m_isInitialized);
             NX_ASSERT(m_isSsl);
             SslAsyncBioHelper::asyncSend(buffer,std::move(op));
     }
 
     void asyncRecv(
-        nx::Buffer* buffer, 
+        nx::Buffer* buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& completionHandler)
     {
         if (!m_isInitialized) {
@@ -1005,52 +1021,35 @@ private:
 class SslStaticData
 {
 public:
-    EVP_PKEY* pkey;
-    SSL_CTX* serverContext;
-    SSL_CTX* clientContext;
+    std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> pkey;
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> serverContext;
+    std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> clientContext;
 
     SslStaticData()
     :
-        pkey(nullptr),
-        serverContext(nullptr),
-        clientContext(nullptr)
+        pkey(nullptr, &EVP_PKEY_free),
+        serverContext(nullptr, &SSL_CTX_free),
+        clientContext(nullptr, &SSL_CTX_free)
     {
         SSL_library_init();
         OpenSSL_add_all_algorithms();
         SSL_load_error_strings();
-        serverContext = SSL_CTX_new(SSLv23_server_method());
-        clientContext = SSL_CTX_new(SSLv23_client_method());
 
-        SSL_CTX_set_options(serverContext, SSL_OP_SINGLE_DH_USE);
-        SSL_CTX_set_session_id_context(serverContext, kSslSessionId, 4);
+        serverContext.reset(SSL_CTX_new(SSLv23_server_method()));
+        SSL_CTX_set_options(
+            serverContext.get(),
+            SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_SINGLE_DH_USE);
+
+        clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
+        SSL_CTX_set_options(
+            clientContext.get(), 0);
+
+        SSL_CTX_set_session_id_context(
+            serverContext.get(),
+            reinterpret_cast<const unsigned char*>(kSslSessionId.data()),
+            kSslSessionId.size());
     }
 
-    ~SslStaticData()
-    {
-        release();
-    }
-
-    void release()
-    {
-        if (serverContext)
-        {
-            SSL_CTX_free(serverContext);
-            serverContext = nullptr;
-        }
-
-        if (clientContext)
-        {
-            SSL_CTX_free(clientContext);
-            clientContext = nullptr;
-        }
-
-        if (pkey)
-        {
-            EVP_PKEY_free(pkey);
-            pkey = nullptr;
-        }
-    }
-    
     static SslStaticData* instance();
 };
 
@@ -1061,35 +1060,212 @@ SslStaticData* SslStaticData::instance()
     return SslStaticData_instance();
 }
 
-void SslSocket::initSSLEngine(const QByteArray& certData)
+const size_t SslEngine::kBufferSize = 1024 * 10;
+const int SslEngine::kRsaLength = 2048;
+const std::chrono::seconds SslEngine::kCertExpiration =
+    std::chrono::hours(5 * 365 * 24); // 5 years
+
+String SslEngine::makeCertificateAndKey(
+    const String& common, const String& country, const String& company)
 {
-    BIO *bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    X509 *x = PEM_read_bio_X509_AUX(
-        bufio,
-        NULL,
-        SslStaticData::instance()->serverContext->default_passwd_callback,
-        SslStaticData::instance()->serverContext->default_passwd_callback_userdata);
+    SslStaticData::instance();
+    const int serialNumber = nx::utils::random::number();
 
-    SSL_CTX_use_certificate(SslStaticData::instance()->serverContext, x);
-    SSL_CTX_use_certificate(SslStaticData::instance()->clientContext, x);
-    X509_free(x);
-    BIO_free(bufio);
+    auto number = utils::wrapUnique(BN_new(), &BN_free);
+    if (!number || !BN_set_word(number.get(), RSA_F4))
+    {
+        NX_LOG("SSL: Unable to generate big number", cl_logWARNING);
+        return String();
+    }
 
-    bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
-    SslStaticData::instance()->pkey = PEM_read_bio_PrivateKey(
-        bufio,
-        NULL,
-        SslStaticData::instance()->serverContext->default_passwd_callback,
-        SslStaticData::instance()->serverContext->default_passwd_callback_userdata);
+    auto rsa = utils::wrapUnique(RSA_new(), &RSA_free);
+    if (!rsa || !RSA_generate_key_ex(rsa.get(), kRsaLength, number.get(), NULL))
+    {
+        NX_LOG("SSL: Unable to generate RSA", cl_logWARNING);
+        return String();
+    }
 
-    SSL_CTX_use_PrivateKey(SslStaticData::instance()->serverContext, SslStaticData::instance()->pkey);
-    BIO_free(bufio);
-    // Initialize OpenSSL global lock, so server side will initialize it right here
+    auto pkey = utils::wrapUnique(EVP_PKEY_new(), &EVP_PKEY_free);
+    if (!pkey || !EVP_PKEY_assign_RSA(pkey.get(), rsa.release()))
+    {
+        NX_LOG("SSL: Unable to generate PKEY", cl_logWARNING);
+        return String();
+    }
+
+    auto x509 = utils::wrapUnique(X509_new(), &X509_free);
+    if (!x509
+        || !ASN1_INTEGER_set(X509_get_serialNumber(x509.get()), serialNumber)
+        || !X509_gmtime_adj(X509_get_notBefore(x509.get()), 0)
+        || !X509_gmtime_adj(X509_get_notAfter(x509.get()), kCertExpiration.count())
+        || !X509_set_pubkey(x509.get(), pkey.get()))
+    {
+        NX_LOG("SSL: Unable to generate X509 cert", cl_logWARNING);
+        return String();
+    }
+
+    const auto name = X509_get_subject_name(x509.get());
+    const auto nameSet = [&name](const char* field, const String& value)
+    {
+        auto vptr = (unsigned char *)value.data();
+        return X509_NAME_add_entry_by_txt(
+            name, field,  MBSTRING_UTF8, vptr, -1, -1, 0);
+    };
+
+    if (!name
+        || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
+        || !X509_set_issuer_name(x509.get(), name)
+        || !X509_sign(x509.get(), pkey.get(), EVP_sha1()))
+    {
+        NX_LOG("SSL: Unable to sign X509 cert", cl_logWARNING);
+        return String();
+    }
+
+    char writeBuffer[kBufferSize] = { 0 };
+    const auto bio = utils::wrapUnique(BIO_new(BIO_s_mem()), BIO_free);
+    if (!bio
+        || !PEM_write_bio_PrivateKey(bio.get(), pkey.get(), 0, 0, 0, 0, 0)
+        || !PEM_write_bio_X509(bio.get(), x509.get())
+        || !BIO_read(bio.get(), writeBuffer, kBufferSize))
+    {
+        NX_LOG("SSL: Unable to generate cert string", cl_logWARNING);
+        return String();
+    }
+
+    return String(writeBuffer);
 }
 
-void SslSocket::releaseSSLEngine()
+static String x509info(X509& x509)
 {
-    SslStaticData::instance()->release();
+    auto issuer = utils::wrapUnique(X509_NAME_oneline(
+        X509_get_issuer_name(&x509), NULL, 0), &CRYPTO_free);
+
+    if (!issuer || !issuer.get())
+        return String("unavaliable");
+
+    String info(issuer.get() + 1);
+    return info.replace("/", ", ");
+}
+
+static bool x509load(SslStaticData* sslData, const Buffer& certBytes)
+{
+    const size_t maxChainSize = (size_t) SSL_CTX_get_max_cert_list(sslData->serverContext.get());
+    auto bio = utils::wrapUnique(
+        BIO_new_mem_buf(const_cast<void*>((const void*) certBytes.data()), certBytes.size()),
+        &BIO_free);
+
+    auto x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+    auto certSize = i2d_X509(x509.get(), 0);
+    if (!x509 || certSize <= 0)
+    {
+        NX_LOG("SSL: Unable to read primary X509", cl_logDEBUG1);
+        return false;
+    }
+
+    size_t chainSize = (size_t) certSize;
+    if (!SSL_CTX_use_certificate(sslData->serverContext.get(), x509.get()))
+    {
+        NX_LOG(lm("SSL: Unable to use primary X509: %1").arg(x509info(*x509)), cl_logWARNING);
+        return false;
+    }
+
+    NX_LOG(lm("SSL: Primary X509 is loaded: %1").arg(x509info(*x509.get())), cl_logINFO);
+    while (true)
+    {
+        x509 = utils::wrapUnique(PEM_read_bio_X509_AUX(bio.get(), 0, 0, 0), &X509_free);
+        certSize = i2d_X509(x509.get(), 0);
+        if (!x509 || certSize <= 0)
+            return true;
+
+        chainSize += (size_t) certSize;
+        if (chainSize > maxChainSize)
+        {
+            NX_ASSERT(false, "SSL: Certificate chain leght is too long");
+            return true;
+        }
+
+        if (SSL_CTX_add_extra_chain_cert(sslData->serverContext.get(), x509.get()))
+        {
+            NX_LOG(lm("SSL: Chained X509 is loaded: %1").arg(x509info(*x509)), cl_logINFO);
+            x509.release();
+        }
+        else
+        {
+            NX_LOG(lm("SSL: Unable to load chained X509: %1").arg(x509info(*x509)), cl_logWARNING);
+            return false;
+        }
+    }
+}
+
+static bool pKeyLoad(SslStaticData* sslData, const Buffer& certBytes)
+{
+    auto bio = utils::wrapUnique(
+        BIO_new_mem_buf(const_cast<void*>((const void*)certBytes.data()), certBytes.size()),
+        &BIO_free);
+
+    sslData->pkey.reset(PEM_read_bio_PrivateKey(bio.get(), 0, 0, 0));
+    if (!sslData->pkey)
+    {
+        NX_LOG("SSL: Unable to read PKEY", cl_logDEBUG1);
+        return false;
+    }
+
+    if (!SSL_CTX_use_PrivateKey(sslData->serverContext.get(), sslData->pkey.get()))
+    {
+        NX_LOG("SSL: Unable to use PKEY", cl_logWARNING);
+        return false;
+    }
+
+    NX_LOG("SSL: PKEY is loaded (SSL init is complete)", cl_logINFO);
+    return true;
+}
+
+bool SslEngine::useCertificateAndPkey(const String& certData)
+{
+    const auto sslData = SslStaticData::instance();
+    return x509load(sslData, certData) && pKeyLoad(sslData, certData);
+}
+
+void SslEngine::useOrCreateCertificate(
+    const QString& filePath,
+    const String& name, const String& country, const String& company)
+{
+    String certData;
+    QFile file(filePath);
+    if (filePath.isEmpty()
+        || !file.open(QIODevice::ReadOnly)
+        || (certData = file.readAll()).isEmpty())
+    {
+        file.close();
+        NX_LOG(lm("SSL: Unable to find valid SSL certificate '%1', generate new one")
+            .arg(filePath), cl_logALWAYS);
+
+        certData = makeCertificateAndKey(name, country, company);
+
+        NX_ASSERT(!certData.isEmpty());
+        if (!filePath.isEmpty())
+        {
+            QDir(filePath).mkpath(lit(".."));
+            if (!file.open(QIODevice::WriteOnly) ||
+                file.write(certData) != certData.size())
+            {
+                NX_LOG("SSL: Unable to write SSL certificate to file", cl_logERROR);
+            }
+
+            file.close();
+        }
+    }
+
+    NX_LOG(lm("SSL: Load certificate from '%1'").arg(filePath), cl_logINFO);
+    useCertificateAndPkey(certData);
+}
+
+void SslEngine::useRandomCertificate(const String& module)
+{
+    const auto sslCert = nx::network::SslEngine::makeCertificateAndKey(
+        module, "US", "Network Optix");
+
+    NX_CRITICAL(!sslCert.isEmpty());
+    NX_CRITICAL(nx::network::SslEngine::useCertificateAndPkey(sslCert));
 }
 
 class SslSocketPrivate
@@ -1107,9 +1283,16 @@ public:
     // the user what our socket will be. An async version or a sync version. We
     // keep the sync mode for historic reason, but during the support for async,
     // the call for sync is undefined. This is for purpose since it heavily reduce
-    // the pain of 
+    // the pain of
     std::atomic<SslSocket::IOMode> ioMode;
+    std::atomic<bool> emulateBlockingMode;
+    std::atomic<bool> shutdown;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
+
+    typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
+    std::atomic<AsyncPromise*> recvPromisePtr;
+    std::atomic<AsyncPromise*> sendPromisePtr;
+    std::atomic<int> bioReadFlags;
 
     SslSocketPrivate()
     :
@@ -1118,7 +1301,12 @@ public:
         isServerSide(false),
         extraBufferLen(0),
         ecnryptionEnabled(false),
-        ioMode(SslSocket::SYNC)
+        ioMode(SslSocket::SYNC),
+        emulateBlockingMode(false),
+        shutdown(false),
+        recvPromisePtr(nullptr),
+        sendPromisePtr(nullptr),
+        bioReadFlags(0)
     {
     }
 };
@@ -1183,13 +1371,18 @@ void SslSocket::init()
     BIO_set_nbio(wbio, 1);
 
     auto context = d->isServerSide
-        ? SslStaticData::instance()->serverContext
-        : SslStaticData::instance()->clientContext;
+        ? SslStaticData::instance()->serverContext.get()
+        : SslStaticData::instance()->clientContext.get();
 
     NX_ASSERT(context);
     d->ssl.reset(SSL_new(context)); // get new SSL state with context
+
     SSL_set_verify(d->ssl.get(), SSL_VERIFY_NONE, NULL);
-    SSL_set_session_id_context(d->ssl.get(), kSslSessionId, 4);
+    SSL_set_session_id_context(
+        d->ssl.get(),
+        reinterpret_cast<const unsigned char*>(kSslSessionId.data()),
+        kSslSessionId.size());
+
     SSL_set_bio(d->ssl.get(), rbio, wbio);  //d->ssl will free bio when freed
 }
 
@@ -1211,8 +1404,8 @@ int SslSocket::bioRead(BIO* b, char* out, int outl)
     int ret = 0;
     if (out != NULL)
     {
-        //clear_socket_error();
-        ret = sslSock->recvInternal(out, outl, 0);
+        //clear_socket_error();-
+        ret = sslSock->recvInternal(out, outl, sslSock->d_ptr->bioReadFlags.exchange(0));
         BIO_clear_retry_flags(b);
         if (ret <= 0)
         {
@@ -1273,10 +1466,10 @@ long SslSocket::bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/)
     switch (cmd)
     {
         case BIO_C_SET_FD:
-            NX_ASSERT("Invalid proxy socket use!");
+            NX_ASSERT(false, "Invalid proxy socket use!");
             break;
         case BIO_C_GET_FD:
-            NX_ASSERT("Invalid proxy socket use!");
+            NX_ASSERT(false, "Invalid proxy socket use!");
             break;
         case BIO_CTRL_GET_CLOSE:
             ret = bio->shutdown;
@@ -1326,9 +1519,6 @@ int SslSocket::bioFree(BIO* bio)
 SslSocket::~SslSocket()
 {
     Q_D(SslSocket);
-    if (d->ioMode == ASYNC && d->asyncSslHelper)
-            d->asyncSslHelper->waitForAllPendingIOFinish();
-
     delete d->wrappedSocket;
     delete d_ptr;
 }
@@ -1345,21 +1535,21 @@ bool SslSocket::doHandshake()
     int ret = SSL_do_handshake(d->ssl.get());
     if (ret != 1)
     {
-        QByteArray e('0', 1024);
+        QByteArray e(1024, '\0');
         ERR_error_string_n(SSL_get_error(d->ssl.get(), ret), e.data(), e.size());
-        NX_LOGX(lm("handshake (isServer=%1) failed %2: %3")
-            .arg(d->isServerSide).arg(ret).arg(e), cl_logDEBUG1);
+        NX_LOGX(lm("Handshake on %1 failed %2: %3")
+            .strs(d->isServerSide ? "server" : "client").arg(ret).arg(e), cl_logDEBUG1);
     }
     else
     {
-        NX_LOGX(lm("handshake (isServer=%1) success %2")
-            .arg(d->isServerSide).arg(ret), cl_logDEBUG2);
+        NX_LOGX(lm("Handshake on %1 success %2")
+            .strs(d->isServerSide ? "server" : "client", ret), cl_logDEBUG2);
     }
 
     return ret == 1;
 }
 
-int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
+int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
     if (d->extraBufferLen > 0)
@@ -1371,26 +1561,58 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
         int readRest = bufferLen - toReadLen;
         // Does this should be readreset ? -- DPENG
         if (toReadLen > 0) {
-            int readed = d->wrappedSocket->recv((char*) buffer + toReadLen, readRest);
+            int readed = d->wrappedSocket->recv((char*) buffer + toReadLen, readRest, flags);
             if (readed > 0)
                 toReadLen += readed;
         }
         return toReadLen;
     }
-    return d->wrappedSocket->recv(buffer, bufferLen);
+    return d->wrappedSocket->recv(buffer, bufferLen, flags);
 }
 
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
 
+    if (d->emulateBlockingMode)
+    {
+        // The mode was supposed to be switched to blocking, but SSL engine is
+        // still non-blocking.
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->recvPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
+        nx::Buffer localBuffer(bufferLen, '\0');
+        readSomeAsync(
+            &localBuffer,
+            [d](SystemError::ErrorCode code, size_t size)
+            {
+                if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
+            });
+
+        const auto result = promise.get_future().get();
+        if (result.first == SystemError::noError)
+            std::memcpy(localBuffer.data(), buffer, result.second);
+        else
+            SystemError::setLastErrorCode(result.first);
+
+        return result.second;
+    }
+
+    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (!d->ecnryptionEnabled)
         return d->wrappedSocket->recv(buffer, bufferLen, flags);
 
     if (!SSL_is_init_finished(d->ssl.get()))
         doHandshake();
 
+    d->bioReadFlags = flags;
     return SSL_read(d->ssl.get(), (char*) buffer, bufferLen);
 }
 
@@ -1403,8 +1625,37 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
 
+    if (d->emulateBlockingMode)
+    {
+        // The mode was supposed to be switched to blocking, but SSL engine is
+        // still non-blocking.
+        SslSocketPrivate::AsyncPromise promise;
+        auto oldPromisePtr = d->sendPromisePtr.exchange(&promise);
+        NX_ASSERT(oldPromisePtr == nullptr);
+
+        nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
+        sendAsync(
+            localBuffer,
+            [d](SystemError::ErrorCode code, size_t size)
+            {
+                if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                    promisePtr->set_value({code, size});
+            });
+
+        const auto result = promise.get_future().get();
+        if (result.first != SystemError::noError)
+            SystemError::setLastErrorCode(result.first);
+
+        return result.second;
+    }
+
+    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (!d->ecnryptionEnabled)
         return d->wrappedSocket->send(buffer, bufferLen);
 
@@ -1495,6 +1746,15 @@ bool SslSocket::enableClientEncryption()
     return doHandshake();
 }
 
+bool SslSocket::isEncryptionEnabled() const
+{
+    Q_D(const SslSocket);
+    if (d->ioMode == IOMode::ASYNC)
+        return d->asyncSslHelper->isSsl();
+    else
+        return d->ecnryptionEnabled;
+}
+
 void SslSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
@@ -1514,6 +1774,55 @@ void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
     d->wrappedSocket->cancelIOSync(eventType);
 }
 
+bool SslSocket::setNonBlockingMode(bool value)
+{
+    Q_D(SslSocket);
+    if (d->ioMode == SslSocket::SYNC)
+    {
+        d->ioMode = SslSocket::ASYNC;
+        return d->wrappedSocket->setNonBlockingMode(value);
+    }
+
+    // The mode could be switched to non blocking, but SSL engine is
+    // too heavy to switch.
+    d->emulateBlockingMode = !value;
+    return true;
+}
+
+bool SslSocket::getNonBlockingMode(bool* value) const
+{
+    Q_D(const SslSocket);
+    *value = d->emulateBlockingMode ? false : (d->ioMode == SslSocket::ASYNC);
+    return true;
+}
+
+bool SslSocket::shutdown()
+{
+    Q_D(SslSocket);
+    d->shutdown.store(true);
+    if (!d->emulateBlockingMode)
+    {
+        d->wrappedSocket->pleaseStopSync();
+        return d->wrappedSocket->shutdown();
+    }
+
+    utils::promise<void> promise;
+    d->wrappedSocket->pleaseStop(
+        [d, &promise]()
+        {
+            if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
+
+            if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                promisePtr->set_value({SystemError::interrupted, 0});
+
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
+    return d->wrappedSocket->shutdown();
+}
+
 void SslSocket::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
@@ -1527,10 +1836,13 @@ void SslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
+    NX_ASSERT(ioMode() == ASYNC);
     d->wrappedSocket->post(
-        [this,buffer,handler]() mutable {
+        [this, buffer, handler = std::move(handler)]() mutable {
             Q_D(SslSocket);
-            d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
+            if (ioMode() != ASYNC)
+                return handler(SystemError::invalidData, (size_t) -1);
+
             d->asyncSslHelper->asyncRecv(buffer, std::move(handler));
         });
 }
@@ -1540,26 +1852,33 @@ void SslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
+    NX_ASSERT(ioMode() == ASYNC);
     d->wrappedSocket->post(
         [this,&buffer,handler]() mutable {
             Q_D(SslSocket);
-            d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
+            if (ioMode() != ASYNC)
+                return handler(SystemError::invalidData, (size_t) -1);
+
             d->asyncSslHelper->asyncSend(buffer, std::move(handler));
     });
 }
 
-int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen) {
+int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen)
+{
     // For async operation here
     Q_D(SslSocket);
     NX_ASSERT(ioMode() == ASYNC);
     NX_ASSERT(d->asyncSslHelper != NULL);
-    int ret = d->asyncSslHelper->eof() ? 0 :
-        static_cast<int>(d->asyncSslHelper->bioRead(buffer, bufferLen));
 
-    #ifdef DEBUG_SSL
-        NX_LOGX(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
-    #endif
-    return ret == 0 ? -1 : ret;
+    const auto bioRead = [&]()
+    {
+        int ret = static_cast<int>(d->asyncSslHelper->bioRead(buffer, bufferLen));
+        return ret == 0 ? -1 : ret;
+    };
+
+    int ret = d->asyncSslHelper->eof() ? 0 : bioRead();
+    DEBUG_LOG(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret));
+    return ret;
 }
 
 int SslSocket::asyncSendInternal(
@@ -1569,11 +1888,9 @@ int SslSocket::asyncSendInternal(
     Q_D(SslSocket);
     NX_ASSERT(ioMode() == ASYNC);
     NX_ASSERT(d->asyncSslHelper != NULL);
-    auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
 
-    #ifdef DEBUG_SSL
-        NX_LOGX(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
-    #endif
+    auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
+    DEBUG_LOG(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret));
     return ret;
 }
 
@@ -1585,7 +1902,8 @@ void SslSocket::registerTimer(
     return d->wrappedSocket->registerTimer(timeoutMs, std::move(handler));
 }
 
-SslSocket::IOMode SslSocket::ioMode() const {
+SslSocket::IOMode SslSocket::ioMode() const
+{
     Q_D(const SslSocket);
     return d->ioMode.load(std::memory_order_acquire);
 }
@@ -1620,10 +1938,10 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     Q_D(MixedSslSocket);
     NX_ASSERT(d->ioMode == SslSocket::SYNC);
     // check for SSL pattern 0x80 (v2) or 0x16 03 (v3)
-    if (d->initState) 
+    if (d->initState)
     {
         if (d->extraBufferLen == 0) {
-            int readed = d->wrappedSocket->recv(d->extraBuffer, 1);
+            int readed = d->wrappedSocket->recv(d->extraBuffer, 1, flags);
             if (readed < 1)
                 return readed;
             d->extraBufferLen += readed;
@@ -1637,7 +1955,7 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         }
         else if (d->extraBuffer[0] == 0x16)
         {
-            int readed = d->wrappedSocket->recv(d->extraBuffer+1, 1);
+            int readed = d->wrappedSocket->recv(d->extraBuffer + 1, 1, flags);
             if (readed < 1)
                 return readed;
             d->extraBufferLen += readed;
@@ -1653,17 +1971,16 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     if (d->useSSL)
         return SslSocket::recv((char*) buffer, bufferLen, flags);
-    else 
+    else
         return recvInternal(buffer, bufferLen, flags);
 }
 
 int MixedSslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->ioMode == SslSocket::SYNC);
     if (d->useSSL)
         return SslSocket::send((char*) buffer, bufferLen);
-    else 
+    else
         return d->wrappedSocket->send(buffer, bufferLen);
 }
 
@@ -1694,29 +2011,32 @@ void MixedSslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    if (!d->initState && !d->useSSL) {
+    NX_ASSERT(d->ioMode == ASYNC);
+    if (!d->initState && !d->useSSL)
         return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
-    } else {
-        d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
-        MixedSslAsyncBioHelper* ssl_ptr =
-            static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-        if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
-            return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
-            [this,buffer,handler]() mutable {
-                Q_D(MixedSslSocket);
-                MixedSslAsyncBioHelper* ssl_ptr =
-                    static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-                if (!d->initState)
-                    ssl_ptr->set_ssl(d->useSSL);
-                if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
-                    d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
-                } else {
-                    ssl_ptr->asyncRecv(buffer, std::move(handler));
-                }
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+        return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
+
+    d->wrappedSocket->dispatch(
+        [d, helper, buffer, handler = std::move(handler)]() mutable
+        {
+            if (d->ioMode != ASYNC)
+                return handler(SystemError::invalidData, (size_t) -1);
+
+            if (!d->initState)
+                helper->set_ssl(d->useSSL);
+
+            if (helper->is_initialized() && !helper->is_ssl())
+                return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
+
+            d->wrappedSocket->post(
+                [helper, buffer, handler = std::move(handler)]() mutable
+                {
+                    helper->asyncRecv(buffer, std::move(handler));
+                });
         });
-    }
 }
 
 void MixedSslSocket::sendAsync(
@@ -1724,29 +2044,32 @@ void MixedSslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    if (!d->initState && !d->useSSL) {
+    NX_ASSERT(d->ioMode == ASYNC);
+    if (!d->initState && !d->useSSL)
         return d->wrappedSocket->sendAsync(buffer, std::move(handler));
-    } else {
-        d->ioMode.store(SslSocket::ASYNC,std::memory_order_release);
-        MixedSslAsyncBioHelper* ssl_ptr =
-            static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-        if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl())
-            return d->wrappedSocket->sendAsync(buffer,std::move(handler));
 
-        d->wrappedSocket->post(
-            [this,&buffer,handler]() mutable {
-                Q_D(MixedSslSocket);
-                MixedSslAsyncBioHelper* ssl_ptr =
-                    static_cast< MixedSslAsyncBioHelper* >(d->asyncSslHelper.get());
-                if (!d->initState)
-                    ssl_ptr->set_ssl(d->useSSL);
-                if (ssl_ptr->is_initialized() && !ssl_ptr->is_ssl()) {
-                    d->wrappedSocket->sendAsync(buffer, std::move(handler));
-                } else {
-                    ssl_ptr->asyncSend(buffer, std::move(handler));
-                }
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+        return d->wrappedSocket->sendAsync(buffer,std::move(handler));
+
+    d->wrappedSocket->dispatch(
+        [d, helper, &buffer, handler = std::move(handler)]() mutable
+        {
+            if (d->ioMode != ASYNC)
+                return handler(SystemError::invalidData, (size_t) -1);
+
+            if (!d->initState)
+                helper->set_ssl(d->useSSL);
+
+            if (helper->is_initialized() && !helper->is_ssl())
+                return d->wrappedSocket->sendAsync(buffer, std::move(handler));
+
+            d->wrappedSocket->post(
+                [helper, &buffer, handler = std::move(handler)]() mutable
+                {
+                    helper->asyncSend(buffer, std::move(handler));
+                });
         });
-    }
 }
 
 SslServerSocket::SslServerSocket(
@@ -1791,7 +2114,7 @@ void SslServerSocket::acceptAsync(
     m_delegateSocket->acceptAsync(
         std::bind(&SslServerSocket::connectionAccepted, this, _1, _2));
 }
-    
+
 void SslServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
 {
     m_delegateSocket->cancelIOAsync(std::move(handler));

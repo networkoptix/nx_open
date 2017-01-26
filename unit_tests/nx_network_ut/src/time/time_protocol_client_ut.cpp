@@ -10,13 +10,13 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/network/time/multiple_internet_time_fetcher.h>
+#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
 
 
+#if 0
 static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
 
-#if 0
 TEST( InternetTimeFetcher, genericTest )
 {
     std::unique_ptr<MultipleInternetTimeFetcher> timeFetcher;

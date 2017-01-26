@@ -26,22 +26,22 @@ namespace nx_hls
         m_targetDurationMS( targetDurationMS ),
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
-        m_cameraID( videoCamera->resource()->getId() ),
+        m_cameraId( videoCamera->resource()->getId() ),
         m_authSession( authSession )
     {
         //verifying m_playlistManagers will not take much memory
         static_assert(
             ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-            "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
+            "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );
         m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
         if( m_live )
             videoCamera->inUse( this );
     }
-        
+
     void HLSSession::updateAuditInfo(qint64 timeUsec)
     {
         if (!m_auditHandle)
-            m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_cameraID, m_live ? DATETIME_NOW : timeUsec);
+            m_auditHandle = qnAuditManager->notifyPlaybackStarted(m_authSession, m_cameraId, m_live ? DATETIME_NOW : timeUsec);
         if (m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, timeUsec);
     }
@@ -50,7 +50,7 @@ namespace nx_hls
     {
         if( m_live )
         {
-            QnResourcePtr resource = QnResourcePool::instance()->getResourceById( m_cameraID );
+            QnResourcePtr resource = QnResourcePool::instance()->getResourceById( m_cameraId );
             if( resource )
             {
                 //checking resource stream type. Only h.264 is OK for HLS

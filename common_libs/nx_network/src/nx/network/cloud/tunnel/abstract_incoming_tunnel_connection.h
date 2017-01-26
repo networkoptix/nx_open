@@ -18,7 +18,9 @@ class NX_NETWORK_API AbstractIncomingTunnelConnection
     public QnStoppableAsync
 {
 public:
-    AbstractIncomingTunnelConnection(String connectionId);
+    typedef std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractStreamSocket>)> AcceptHandler;
 
     /**
      *  Accepts new connection from peer (like socket)
@@ -28,12 +30,7 @@ public:
      *  \note If handler returns some error, this connection can not be reused
      *      and shell be deleted.
      */
-    virtual void accept(std::function<void(
-        SystemError::ErrorCode,
-        std::unique_ptr<AbstractStreamSocket>)> handler) = 0;
-
-protected:
-    const String m_connectionId;
+    virtual void accept(AcceptHandler handler) = 0;
 };
 
 } // namespace cloud

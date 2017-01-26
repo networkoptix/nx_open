@@ -3,10 +3,8 @@
 
 #include <memory>
 
-#include "plugins/resource/test_camera/testcamera_const.h"
+#include <plugins/resource/test_camera/testcamera_const.h>
 #include "test_camera_processor.h"
-
-//#include "plugins/resources/test_camera/testcamera_resource_searcher.h"
 
 int MEDIA_PORT = 4985;
 
@@ -42,6 +40,7 @@ protected:
                 if (QByteArray((const char*)buffer, readed).startsWith(TestCamConst::TEST_CAMERA_FIND_MSG))
                 {
                     // got discovery message
+                    qDebug() << "Got discovery message from " << peerEndpoint.toString();
                     QByteArray camResponse = QnCameraPool::instance()->getDiscoveryResponse();
                     QByteArray rez(TestCamConst::TEST_CAMERA_ID_MSG);
                     rez.append(';');
@@ -107,7 +106,7 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, this);
+    return new QnTestCameraProcessor(clientSocket);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

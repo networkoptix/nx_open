@@ -14,14 +14,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db_ut</artifactId>
     <packaging>pom</packaging>
-    <name>cloud_db unit tests</name>
+    <name>Nx Cloud Db Unit Tests</name>
 
     <properties>
-        <guid>${cloud_db_ut.guid}</guid>
         <product.title>cloud_db unit tests</product.title>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -lnx_email -ludt -lcloud_db -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_streaming -ludt -lcloud_db -lcloud_db_client -lnx_fusion -lnx_utils -lappserver2</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -32,7 +31,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libcoud_db</artifactId>
+            <artifactId>libcloud_db</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>

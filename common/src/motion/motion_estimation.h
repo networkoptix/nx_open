@@ -12,6 +12,8 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "core/resource/motion_window.h"
 
+#include <motion/motion_detection.h>
+
 static const int FRAMES_BUFFER_SIZE = 2;
 
 class QnMotionEstimation
@@ -20,7 +22,7 @@ public:
     QnMotionEstimation();
     ~QnMotionEstimation();
     /*
-    * Set motion mask as array of quint8 values in range [0..255] . array size is MD_WIDTH * MD_HEIGHT
+    * Set motion mask as array of quint8 values in range [0..255] . array size is Qn::kMotionGridWidth * Qn::kMotionGridHeight
     * As motion data, motion mask is rotated to 90 degree.
     */
     void setMotionMask(const QnMotionRegion& region);
@@ -49,10 +51,10 @@ private:
     QnMutex m_mutex;
     QnFfmpegVideoDecoder* m_decoder;
     QSharedPointer<CLVideoDecoderOutput> m_frames[2];
-    
+
     quint8* m_motionMask;
     quint8* m_motionSensMask;
-    quint8* m_scaledMask; // mask scaled to x * MD_HEIGHT. for internal use
+    quint8* m_scaledMask; // mask scaled to x * Qn::kMotionGridHeight. for internal use
     quint8* m_motionSensScaledMask;
     int m_scaledWidth;
     int m_xStep; // 8, 16, 24 e.t.c value
@@ -67,9 +69,9 @@ private:
     int m_totalFrames;
     bool m_isNewMask;
 
-    int m_linkedMap[MD_WIDTH*MD_HEIGHT];
+    int m_linkedMap[Qn::kMotionGridWidth*Qn::kMotionGridHeight];
     int* m_linkedNums;
-    int m_linkedSquare[MD_WIDTH*MD_HEIGHT];
+    int m_linkedSquare[Qn::kMotionGridWidth*Qn::kMotionGridHeight];
     //quint8 m_sadTransformMatrix[10][256];
 
     QSize m_videoResolution;

@@ -15,25 +15,25 @@ angular.module('webadminApp').directive('fileupload',function(dialogs){
                 dataType: 'json',
                 done: function (e, data) {
                     if(data.result.error==='0'){
-                        dialogs.alert('Updating successfully started. It will take several minutes');
+                        dialogs.alert(L.fileUpload.started);
 
                         //call restart?
                     }else{
                         switch(data.result.errorString){
                             case 'UP_TO_DATE':
-                                dialogs.alert('Updating failed. The provided version is already installed.');
+                                dialogs.alert(L.fileUpload.upToDate);
                                 break;
                             case 'INVALID_FILE':
-                                dialogs.alert('Updating failed. Provided file is not a valid update archive.');
+                                dialogs.alert(L.fileUpload.invalidFile);
                                 break;
                             case 'INCOMPATIBLE_SYSTEM':
-                                dialogs.alert('Updating failed. Provided file is targeted for another system.');
+                                dialogs.alert(L.fileUpload.incompatibleSystem);
                                 break;
                             case 'EXTRACTION_ERROR':
-                                dialogs.alert('Updating failed. Extraction failed, check available storage.');
+                                dialogs.alert(L.fileUpload.extractionError);
                                 break;
                             case 'INSTALLATION_ERROR':
-                                dialogs.alert('Updating failed. Couldn\'t execute installation script.');
+                                dialogs.alert(L.fileUpload.installationError);
                                 break;
                         }
                     }
@@ -50,7 +50,7 @@ angular.module('webadminApp').directive('fileupload',function(dialogs){
             }).prop('disabled', !$.support.fileInput)
             .parent().addClass($.support.fileInput ? undefined : 'disabled');
 
-            scope.text = attrs.text || 'Select files';
+            scope.text = attrs.text || L.fileUpload.selectFiles;
         }
     };
 });

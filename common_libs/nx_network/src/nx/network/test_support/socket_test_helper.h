@@ -1,10 +1,4 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SOCKET_TEST_HELPER_H
-#define SOCKET_TEST_HELPER_H
+#pragma once
 
 #include <list>
 #include <memory>
@@ -17,7 +11,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/mutex.h>
-
+#include <nx/utils/result_counter.h>
 
 namespace nx {
 namespace network {
@@ -38,12 +32,18 @@ enum class TestTransmissionMode
     pong, // reads 4K buffer, sends same buffer back, waits for futher data...
 };
 
+QString NX_NETWORK_API toString(TestTrafficLimitType type);
+QString NX_NETWORK_API toString(TestTransmissionMode type);
+
 //!Reads/writes random data to/from connection
 class NX_NETWORK_API TestConnection
 :
     public QnStoppableAsync
 {
 public:
+    static constexpr std::chrono::milliseconds kDefaultRwTimeout = std::chrono::seconds(17);
+    static constexpr size_t kReadBufferSize = 4 * 1024;
+
     /*!
         \param handler to be called on connection closure or after \a bytesToSendThrough bytes have been sent
     */
@@ -64,12 +64,12 @@ public:
     virtual ~TestConnection();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
-    virtual void pleaseStopSync() override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
 
     int id() const;
     void setLocalAddress(SocketAddress addr);
     SocketAddress getLocalAddress() const;
-    void start();
+    void start(std::chrono::milliseconds rwTimeout = kDefaultRwTimeout);
 
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
@@ -154,7 +154,8 @@ public:
     RandomDataTcpServer(
         TestTrafficLimitType limitType,
         size_t trafficLimit,
-        TestTransmissionMode transmissionMode);
+        TestTransmissionMode transmissionMode,
+        bool doNotBind = false);
     /** In this mode it sends \a dataToSend through connection and closes connection */
     RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
@@ -164,7 +165,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     void setLocalAddress(SocketAddress addr);
-    bool start();
+    bool start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
     SocketAddress addressBeingListened() const;
     virtual ConnectionTestStatistics statistics() const override;
@@ -180,6 +181,8 @@ private:
     size_t m_totalConnectionsAccepted;
     uint64_t m_totalBytesReceivedByClosedConnections;
     uint64_t m_totalBytesSentByClosedConnections;
+    std::chrono::milliseconds m_rwTimeout;
+    bool m_doNotBind;
 
     void onNewConnection(
         SystemError::ErrorCode errorCode,
@@ -226,7 +229,7 @@ public:
     void enableErrorEmulation(int errorPercent);
     void setLocalAddress(SocketAddress addr);
     void resetRemoteAddresses(std::vector<SocketAddress> remoteAddress);
-    void start();
+    void start(std::chrono::milliseconds rwTimeout = TestConnection::kDefaultRwTimeout);
 
     virtual ConnectionTestStatistics statistics() const override;
 
@@ -234,7 +237,7 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
+    const utils::ResultCounter<SystemError::ErrorCode>& results();
 
 private:
     const SocketAddress& nextAddress();
@@ -255,7 +258,7 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_totalIncompleteTasks;
-    std::map<SystemError::ErrorCode, size_t> m_returnCodes;
+    utils::ResultCounter<SystemError::ErrorCode> m_results;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;
@@ -264,6 +267,7 @@ private:
     int m_errorEmulationPercent;
     boost::optional<SocketAddress> m_localAddress;
     nx::utils::MoveOnlyFunc<void()> m_onFinishedHandler;
+    std::chrono::milliseconds m_rwTimeout;
 
     void onConnectionFinished(
         int id,
@@ -272,51 +276,57 @@ private:
     void addNewConnections(std::unique_lock<std::mutex>* const /*lock*/);
 };
 
+class NX_NETWORK_API AddressBinder
+{
+public:
+    AddressBinder();
+    SocketAddress bind();
+    void add(const SocketAddress& key, SocketAddress address);
+    void remove(const SocketAddress& key, const SocketAddress& address);
+    void remove(const SocketAddress& key);
+    std::set<SocketAddress> get(const SocketAddress& key) const;
+    boost::optional<SocketAddress> random(const SocketAddress& key) const;
+
+    struct Manager
+    {
+        AddressBinder* const binder;
+        const SocketAddress key;
+
+        explicit Manager(AddressBinder* b): binder(b), key(b->bind()) {}
+        Manager(AddressBinder* b, SocketAddress k): binder(b), key(std::move(k)) {}
+        void wipe() { binder->remove(key); }
+
+        void add(SocketAddress a) { binder->add(key, std::move(a)); }
+        void remove(const SocketAddress& a) { binder->remove(key, a); }
+    };
+
+private:
+    mutable QnMutex m_mutex;
+    size_t m_currentNumber;
+    std::map<SocketAddress, std::set<SocketAddress>> m_map;
+};
+
 /**
  * A TCPSocket modification which randomly connects to different ports according to @p kShift.
  */
-template<quint16 kShift>
-class MultipleClientSocketTester
+class NX_NETWORK_API MultipleClientSocketTester
 :
     public TCPSocket
 {
 public:
-    MultipleClientSocketTester()
-    :
-        TCPSocket()
-    {
-    }
-
-    bool connect(const SocketAddress& address, unsigned int timeout) override
-    {
-        return TCPSocket::connect(modifyAddress(address), timeout);
-    }
-
+    MultipleClientSocketTester(AddressBinder* addressBinder);
+    bool connect(const SocketAddress& address, unsigned int timeout) override;
     void connectAsync(
         const SocketAddress& address,
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
-    {
-        TCPSocket::connectAsync(modifyAddress(address), std::move(handler));
-    }
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
-    SocketAddress modifyAddress(const SocketAddress& address)
-    {
-        static quint16 modifier = 0;
-        if (m_address == SocketAddress())
-        {
-            m_address = SocketAddress(
-                address.address, address.port + (modifier++ % kShift));
-        }
+    SocketAddress modifyAddress(const SocketAddress& address);
 
-        return m_address;
-    }
-
+    AddressBinder* const m_addressBinder;
     SocketAddress m_address;
 };
 
 } // namespace test
 } // namespace network
 } // namespace nx
-
-#endif  //SOCKET_TEST_HELPER_H

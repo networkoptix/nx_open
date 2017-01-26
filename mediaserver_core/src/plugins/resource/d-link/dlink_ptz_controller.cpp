@@ -1,7 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "dlink_ptz_controller.h"
-#include "utils/math/fuzzy.h"
+#include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
 #include "utils/common/long_runnable.h"
 
@@ -116,7 +116,6 @@ bool QnDlinkPtzController::doQuery(const QString &request, QByteArray* body) con
     }
     QString encodedPath = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters | QUrl::RemoveScheme | QUrl::RemoveAuthority);
 
-    QAuthenticator auth = m_resource->getAuth();
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, m_resource->getAuth());
     CLHttpStatus status = client.doGET(encodedPath);
     if (status == CL_HTTP_SUCCESS && body)

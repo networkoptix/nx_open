@@ -9,6 +9,8 @@
 
 #include <nx/utils/log/log.h>
 
+// TODO: #ak: remove when NX_LOG supports filtering by message class
+//#define NX_STREE_ENABLE_DEBUG_LOGGING
 
 /*!
     Contains implementation of simple search tree
@@ -52,6 +54,24 @@ namespace stree
         std::multimap<int, std::unique_ptr<AbstractNode>> m_children;
     };
 
+    template<typename Key>
+    class DefaultKeyConverter
+    {
+    public:
+        typedef Key KeyType;
+        typedef Key SearchValueType;
+
+        static Key convertToKey(const QVariant& value)
+        {
+            return value.value<Key>();
+        }
+
+        static Key convertToSearchValue(const QVariant& value)
+        {
+            return value.value<Key>();
+        }
+    };
+
     //!Chooses child node to follow based on some condition
     /*!
         All children have unique values. Attempt to add children with existing value will fail
@@ -60,7 +80,10 @@ namespace stree
 
         example of \a ConditionContainer is std::map
     */
-    template<typename Key, template<typename, typename> class ConditionContainer>
+    template<
+        typename Key,
+        template<typename, typename> class ConditionContainer,
+        typename KeyConversionFunc = DefaultKeyConverter<Key>>
     class ConditionNode
     :
         public AbstractNode
@@ -77,31 +100,45 @@ namespace stree
         //!Implementation of AbstractNode::get
         virtual void get( const AbstractResourceReader& in, AbstractResourceWriter* const out ) const override
         {
-            NX_LOG( lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
+            #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                NX_LOG( lit("Stree. Condition. Selecting child by resource %1").arg(m_matchResID), cl_logDEBUG2 );
+            #endif
 
             QVariant value;
             if( !in.get( m_matchResID, &value ) )
             {
-                NX_LOG( lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2 );
+                #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                    NX_LOG( lit("Stree. Condition. Resource (%1) not found in input data").arg(m_matchResID), cl_logDEBUG2 );
+                #endif
                 return;
             }
 
-            const typename Container::key_type& typedValue = value.value<typename Container::key_type>();
+            const typename KeyConversionFunc::SearchValueType& typedValue =
+                KeyConversionFunc::convertToSearchValue(value);
             typename Container::const_iterator it = m_children.find( typedValue );
             if( it == m_children.end() )
             {
-                NX_LOG( lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
+                #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                    NX_LOG( lit("Stree. Condition. Could not find child by value %1").arg(value.toString()), cl_logDEBUG2 );
+                #endif
                 return;
             }
 
-            NX_LOG( lit("Stree. Condition. Found child with value %1 by search value %2").arg(it->first).arg(value.toString()), cl_logDEBUG2 );
+            #ifdef NX_STREE_ENABLE_DEBUG_LOGGING
+                NX_LOG(lm("Stree. Condition. Found child with value %1 by search value %2")
+                    .str(it->first).arg(value.toString()), cl_logDEBUG2);
+            #endif
             it->second->get( in, out );
         }
 
         //!Implementation of AbstractNode::addChild
-        virtual bool addChild( const QVariant& value, std::unique_ptr<AbstractNode> child ) override
+        virtual bool addChild(
+            const QVariant& value,
+            std::unique_ptr<AbstractNode> child) override
         {
-            return m_children.emplace( value.value<typename Container::key_type>(), std::move(child) ).second;
+            return m_children.emplace(
+                KeyConversionFunc::convertToKey(value),
+                std::move(child)).second;
         }
 
     private:

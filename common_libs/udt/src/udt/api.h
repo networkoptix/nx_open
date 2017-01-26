@@ -188,6 +188,7 @@ public:
        const int eid,
        std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
        std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* lwfds = NULL);
+   int epoll_interrupt_wait(int eid);
    int epoll_release(const int eid);
 
       // Functionality:
@@ -264,7 +265,9 @@ private:
    std::map<UDTSOCKET, CUDTSocket*> m_ClosedSockets;   // temporarily store closed sockets
 
    void checkBrokenSockets();
-   void removeSocket(const UDTSOCKET u);
+   void removeSocket(
+       const UDTSOCKET u,
+       std::vector<CMultiplexer>* const multiplexersToRemove);
 
 private:
    CEPoll m_EPoll;                                     // handling epoll data structures and events

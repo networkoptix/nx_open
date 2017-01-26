@@ -344,16 +344,22 @@ UDT_API int epoll_add_ssock(int eid, SYSSOCKET s, const int* events = NULL);
 UDT_API int epoll_remove_usock(int eid, UDTSOCKET u);
 UDT_API int epoll_remove_ssock(int eid, SYSSOCKET s);
 /** 
-    @param readfds map<socket handle, event mask (bit mask of \a EPOLLOpt values)>. 
-        \a UDT_EPOLL_IN in implied. event mask should not be tested for \a UDT_EPOLL_IN
-    Same rules apply to each fd set
-*/
+ * @param readfds map<socket handle, event mask (bit mask of EPOLLOpt values)>. 
+ *   UDT_EPOLL_IN in implied. Event mask should not be tested for UDT_EPOLL_IN.
+ * Same rules apply to each fd set.
+ */
 UDT_API int epoll_wait(
     int eid,
     std::map<UDTSOCKET, int>* readfds, std::map<UDTSOCKET, int>* writefds, int64_t msTimeOut,
     std::map<SYSSOCKET, int>* lrfds = NULL, std::map<SYSSOCKET, int>* wrfds = NULL);
 UDT_API int epoll_wait2(int eid, UDTSOCKET* readfds, int* rnum, UDTSOCKET* writefds, int* wnum, int64_t msTimeOut,
                         SYSSOCKET* lrfds = NULL, int* lrnum = NULL, SYSSOCKET* lwfds = NULL, int* lwnum = NULL);
+/**
+ * Interrupts one epoll_wait call: the one running simultaneously in another thread (if any) 
+ *   or the next call to be made.
+ * Causes epoll_wait to return 0 as if timeout has passed.
+ */
+UDT_API int epoll_interrupt_wait(int eid);
 UDT_API int epoll_release(int eid);
 UDT_API ERRORINFO& getlasterror();
 UDT_API int getlasterror_code();

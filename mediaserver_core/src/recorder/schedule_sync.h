@@ -23,7 +23,7 @@ private:
     struct ChunkKey
     {
         DeviceFileCatalog::Chunk chunk;
-        QString                  cameraID;
+        QString                  cameraId;
         QnServer::ChunksCatalog  catalog;
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);

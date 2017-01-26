@@ -1,12 +1,8 @@
-/**********************************************************
-* Oct 7, 2015
-* akolesnikov
-***********************************************************/
-
 #include "endpoint_selector.h"
 
 #include <cstdlib>
 
+#include <nx/utils/random.h>
 
 namespace nx {
 namespace network {
@@ -20,7 +16,7 @@ void RandomEndpointSelector::selectBestEndpont(
     NX_ASSERT(!endpoints.empty());
     handler(
         nx_http::StatusCode::ok,
-        endpoints[rand() % endpoints.size()]);
+        nx::utils::random::choice(endpoints));
 }
 
 } // namespace cloud

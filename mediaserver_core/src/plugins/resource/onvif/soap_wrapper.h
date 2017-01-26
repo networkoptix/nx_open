@@ -3,9 +3,12 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <list>
+
 #include <QSharedPointer>
 
 #include "onvif_helper.h"
+#include <utils/common/credentials.h>
 
 struct soap;
 class DeviceBindingProxy;
@@ -324,9 +327,10 @@ private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
     QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
+    std::list<QnCredentials> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
+    QnCredentials getForcedCredentials(const QString& manufacturer, const QString& model);
     void calcTimeDrift();
 
-    PasswordHelper &m_passwordsData;
 };
 
 
@@ -380,9 +384,6 @@ public:
     int setAudioSourceConfiguration(SetAudioSrcConfigReq& request, SetAudioSrcConfigResp& response);
     int setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response);
     int setVideoSourceConfiguration(SetVideoSrcConfigReq& request, SetVideoSrcConfigResp& response);
-
-private:
-    PasswordHelper& m_passwordsData;
 };
 
 typedef QSharedPointer<MediaSoapWrapper> MediaSoapWrapperPtr;
@@ -407,9 +408,6 @@ public:
     int doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response);
     int doGetStatus(_onvifPtz__GetStatus& request, _onvifPtz__GetStatusResponse& response);
     int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);
-
-private:
-    PasswordHelper& m_passwordsData;
 };
 
 typedef QSharedPointer<PtzSoapWrapper> PtzSoapWrapperPtr;
@@ -429,9 +427,6 @@ public:
 
     int getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response);
     int move(_onvifImg__Move &request, _onvifImg__MoveResponse &response);
-
-private:
-    PasswordHelper& m_passwordsData;
 };
 
 typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;

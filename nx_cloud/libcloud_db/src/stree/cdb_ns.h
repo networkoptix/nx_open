@@ -19,7 +19,7 @@ enum Value
     operation = 1,
 
     //source data attributes
-    accountID,
+    accountId,
     accountEmail,
     ha1,
     userName,
@@ -27,7 +27,7 @@ enum Value
     accountStatus,
     systemAccessRole,
 
-    systemID,
+    systemId,
     systemStatus,   /** int */
 
     dataAccountRightsOnSystem,
@@ -37,12 +37,12 @@ enum Value
     authorized,
     authAccountRightsOnSystem,
     authAccountEmail,
-    authSystemID,
-    /** Operation data contains accountID equal to the one been authenticated */
+    authSystemId,
+    /** Operation data contains accountId equal to the one being authenticated. */
     authSelfAccountAccessRequested,
-    /** Operation data contains systemID equal to the one been authenticated */
+    /** Operation data contains systemId equal to the one being authenticated. */
     authSelfSystemAccessRequested,
-    /** request has been authenticated by code sent to account email */
+    /** Request has been authenticated by code sent to account email. */
     authenticatedByEmailCode,
     resultCode,
 
@@ -53,7 +53,11 @@ enum Value
     socketIntfIP,
     socketRemoteIP,
 
-    requestPath
+    requestPath,
+
+    credentialsType = 100,
+    credentialsExpirationPeriod,
+    credentialsProlongationPeriod
 };
 }   //namespace attr
 

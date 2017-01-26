@@ -21,16 +21,17 @@
 #include "third_party_audio_data_packet.h"
 #include "third_party_video_data_packet.h"
 
+#include <motion/motion_detection.h>
 
 namespace
 {
     bool isIFrame( QnAbstractMediaDataPtr packet )
     {
-        CodecID codecId = packet->compressionType;
+        AVCodecID codecId = packet->compressionType;
 
-        NX_ASSERT( codecId == CODEC_ID_H264, "IFrame detection", "only CODEC_ID_H264 is supported" );
+        NX_ASSERT( codecId == AV_CODEC_ID_H264, "IFrame detection", "only AV_CODEC_ID_H264 is supported" );
 
-        if( !packet || codecId != CODEC_ID_H264 )
+        if( !packet || codecId != AV_CODEC_ID_H264 )
             return false;
 
         const void * data = packet->data();
@@ -106,10 +107,10 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
     if( !camManager2 )
         return;
 
-    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::PIX_FMT_GRAY8 );
+    MotionDataPicture* motionMask = new MotionDataPicture( nxcip::AV_PIX_FMT_GRAY8 );
     const QnMotionRegion& region = m_thirdPartyRes->getMotionRegion(0);
     //converting region
-    for( int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens )
+    for( int sens = 0; sens < QnMotionRegion::kSensitivityLevelCount; ++sens )
     {
         for( const QRect& rect: region.getRectsBySens(sens) )
         {
@@ -120,8 +121,8 @@ void ThirdPartyStreamReader::updateSoftwareMotion()
                 {
                     NX_ASSERT( y < motionMask->width() && x < motionMask->height() );
                     motionMask->setPixel( y, x, sensitivityToMask[sens] );
-                    //m_motionMask[x * MD_HEIGHT + y] = sensitivityToMask[sens];
-                    //m_motionSensMask[x * MD_HEIGHT + y] = sens;
+                    //m_motionMask[x * Qn::kMotionGridHeight + y] = sensitivityToMask[sens];
+                    //m_motionSensMask[x * Qn::kMotionGridHeight + y] = sens;
                 }
         }
     }
@@ -154,7 +155,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
     }
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
-    m_camManager.setCredentials( m_thirdPartyRes->getAuth().user(), m_thirdPartyRes->getAuth().password() );
+    QAuthenticator auth = m_thirdPartyRes->getAuth();
+    m_camManager.setCredentials( auth.user(), auth.password() );
 
     m_mediaEncoder2.reset();
     m_mediaEncoder2.reset( static_cast<nxcip::CameraMediaEncoder2*>(intf->queryInterface( nxcip::IID_CameraMediaEncoder2 )), refDeleter );
@@ -238,6 +240,15 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
                 initializeAudioContext( audioFormat );
         }
 
+        char mediaUrlBuf[nxcip::MAX_TEXT_LEN];
+        auto error = m_mediaEncoder2->getMediaUrl(mediaUrlBuf);
+
+        if (error == nxcip::NX_NO_ERROR)
+        {
+            QString mediaUrlStr(mediaUrlBuf);
+            m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
+        }   
+
         return CameraDiagnostics::NoErrorResult();
     }
     else
@@ -253,6 +264,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
         }
 
+        m_thirdPartyRes->updateSourceUrl(mediaUrlStr, getRole());
         NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
         //checking url type and creating corresponding data provider
@@ -265,13 +277,20 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
+			m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
         else if( mediaUrl.scheme().toLower() == lit("http") )
         {
-            m_builtinStreamReader.reset( new MJPEGStreamReader(
+            QnMutexLocker lock(&m_streamReaderMutex);
+            m_builtinStreamReader.reset(new MJPEGStreamReader(
                 m_resource,
-                mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString()) ) );
+                mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString())));
+        }
+        else 
+        {
+            return CameraDiagnostics::UnknownErrorResult();
         }
         return m_builtinStreamReader->openStream();
     }
@@ -351,8 +370,15 @@ Qn::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
         return softMotionRole;
 
     //checking stream resolution
-    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION )
+    auto forcedMotionDetection = m_thirdPartyRes->getProperty(QnMediaResource::motionStreamKey());
+    auto forcedPrimaryStreamMotionDetection =
+        forcedMotionDetection == QnMediaResource::primaryStreamValue();
+
+    if( m_videoResolution.width()*m_videoResolution.height() > MAX_PRIMARY_RES_FOR_SOFT_MOTION
+        && !forcedPrimaryStreamMotionDetection)
+    {
         return Qn::CR_SecondaryLiveVideo;
+    }
 
     return softMotionRole;
 }
@@ -452,49 +478,51 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
+    // public function can be called from other thread
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
         ? m_audioLayout.staticCast<const QnResourceAudioLayout>()    //TODO/IMPL
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
 }
 
-CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
+AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )
 {
     switch( compressionType )
     {
-        case nxcip::CODEC_ID_MPEG2VIDEO:
-            return CODEC_ID_MPEG2VIDEO;
-        case nxcip::CODEC_ID_H263:
-            return CODEC_ID_H263;
-        case nxcip::CODEC_ID_MJPEG:
-            return CODEC_ID_MJPEG;
-        case nxcip::CODEC_ID_MPEG4:
-            return CODEC_ID_MPEG4;
-        case nxcip::CODEC_ID_H264:
-            return CODEC_ID_H264;
-        case nxcip::CODEC_ID_THEORA:
-            return CODEC_ID_THEORA;
-        case nxcip::CODEC_ID_PNG:
-            return CODEC_ID_PNG;
-        case nxcip::CODEC_ID_GIF:
-            return CODEC_ID_GIF;
-        case nxcip::CODEC_ID_MP2:
-            return CODEC_ID_MP2;
-        case nxcip::CODEC_ID_MP3:
-            return CODEC_ID_MP3;
-        case nxcip::CODEC_ID_AAC:
-            return CODEC_ID_AAC;
-        case nxcip::CODEC_ID_PCM_S16LE:
-            return CODEC_ID_PCM_S16LE;
-        case nxcip::CODEC_ID_PCM_MULAW:
-            return CODEC_ID_PCM_MULAW;
-        case nxcip::CODEC_ID_AC3:
-            return CODEC_ID_AC3;
-        case nxcip::CODEC_ID_DTS:
-            return CODEC_ID_DTS;
-        case nxcip::CODEC_ID_VORBIS:
-            return CODEC_ID_VORBIS;
+        case nxcip::AV_CODEC_ID_MPEG2VIDEO:
+            return AV_CODEC_ID_MPEG2VIDEO;
+        case nxcip::AV_CODEC_ID_H263:
+            return AV_CODEC_ID_H263;
+        case nxcip::AV_CODEC_ID_MJPEG:
+            return AV_CODEC_ID_MJPEG;
+        case nxcip::AV_CODEC_ID_MPEG4:
+            return AV_CODEC_ID_MPEG4;
+        case nxcip::AV_CODEC_ID_H264:
+            return AV_CODEC_ID_H264;
+        case nxcip::AV_CODEC_ID_THEORA:
+            return AV_CODEC_ID_THEORA;
+        case nxcip::AV_CODEC_ID_PNG:
+            return AV_CODEC_ID_PNG;
+        case nxcip::AV_CODEC_ID_GIF:
+            return AV_CODEC_ID_GIF;
+        case nxcip::AV_CODEC_ID_MP2:
+            return AV_CODEC_ID_MP2;
+        case nxcip::AV_CODEC_ID_MP3:
+            return AV_CODEC_ID_MP3;
+        case nxcip::AV_CODEC_ID_AAC:
+            return AV_CODEC_ID_AAC;
+        case nxcip::AV_CODEC_ID_PCM_S16LE:
+            return AV_CODEC_ID_PCM_S16LE;
+        case nxcip::AV_CODEC_ID_PCM_MULAW:
+            return AV_CODEC_ID_PCM_MULAW;
+        case nxcip::AV_CODEC_ID_AC3:
+            return AV_CODEC_ID_AC3;
+        case nxcip::AV_CODEC_ID_DTS:
+            return AV_CODEC_ID_DTS;
+        case nxcip::AV_CODEC_ID_VORBIS:
+            return AV_CODEC_ID_VORBIS;
         default:
-            return CODEC_ID_NONE;
+            return AV_CODEC_ID_NONE;
     }
 }
 
@@ -533,15 +561,15 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                 {
                     static const int DEFAULT_MOTION_DURATION = 1000*1000;
 
-                    if( srcMotionData->pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                    if( srcMotionData->pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                     {
                         //adding motion data
                         QnMetaDataV1Ptr motion( new QnMetaDataV1() );
                         const nxcip::Picture& motionPicture = *srcMotionData;
 
-                        if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                        if( motionPicture.pixelFormat() == nxcip::AV_PIX_FMT_MONOBLACK )
                         {
-                            NX_ASSERT( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+                            NX_ASSERT( motionPicture.width() == Qn::kMotionGridHeight && motionPicture.height() == Qn::kMotionGridWidth );
                             NX_ASSERT( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
 
                             motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
@@ -615,7 +643,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
 
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
 {
-    const CodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
+    const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     const auto context = new QnAvCodecMediaContext(ffmpegCodecId);
     m_audioContext = QnConstMediaContextPtr(context);
     const auto av = context->getAvCodecContext();
@@ -663,6 +691,8 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
 
 QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
 {
+    // public function can be called from other thread
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
 }
 

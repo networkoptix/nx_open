@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <utils/common/stoppable.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
 
@@ -51,8 +51,6 @@ TEST( QnStoppableAsync, SingleAsync )
     StoppableTestClass s;
     nx::utils::promise< bool > p;
     s.pleaseStop([ & ](){ p.set_value( true ); });
-
-    ASSERT_TRUE( s.isRunning() );
     ASSERT_TRUE( p.get_future().get() );
     ASSERT_FALSE( s.isRunning() );
 }
@@ -83,16 +81,4 @@ TEST( QnStoppableAsync, MultiManual )
     EXPECT_EQ( runningCount(), 1 );
     s3.pleaseStopSync();
     EXPECT_EQ( runningCount(), 0 );
-}
-
-TEST( QnStoppableAsync, MultiAuto )
-{
-    auto s1 = std::make_unique< StoppableTestClass >();
-    auto s2 = std::make_unique< StoppableTestClass >();
-
-    nx::utils::promise< bool > p;
-    QnStoppableAsync::pleaseStop( [ & ](){ p.set_value( true ); },
-                                  std::move( s1 ), std::move( s2 ) );
-
-    ASSERT_TRUE( p.get_future().get() );
 }

@@ -1,18 +1,23 @@
-#ifndef NX_STUN_ASYNC_CLIENT_USER_H
-#define NX_STUN_ASYNC_CLIENT_USER_H
+#pragma once
 
-#include "async_client.h"
+#include <nx/utils/async_operation_guard.h>
+#include <nx/network/stun/abstract_async_client.h>
 
 namespace nx {
 namespace stun {
 
-/** Shared \class AsyncClient usadge wrapper */
-class NX_NETWORK_API AsyncClientUser
-    : public std::enable_shared_from_this<AsyncClientUser>
-    , public QnStoppableAsync
+/**
+ * AsyncClient wrapper which lives in a designated AIO thread.
+ * Can be stopped (to prevent async calls) while AsyncClient still running.
+ */
+class NX_NETWORK_API AsyncClientUser:
+    public network::aio::Timer
 {
 public:
-    ~AsyncClientUser();
+    AsyncClientUser(const AsyncClientUser&) = delete;
+    AsyncClientUser(AsyncClientUser&&) = delete;
+    AsyncClientUser& operator=(const AsyncClientUser&) = delete;
+    AsyncClientUser& operator=(AsyncClientUser&&) = delete;
 
     /** Returns local connection address in case if client is connected to STUN server */
     SocketAddress localAddress() const;
@@ -25,26 +30,23 @@ public:
 
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
+
+    /** Return AbstractAsyncClient for configuration purposes */
+    AbstractAsyncClient* client() const;
 
 protected:
     AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client);
+    virtual ~AsyncClientUser() override;
 
     void sendRequest(Message request, AbstractAsyncClient::RequestHandler handler);
     bool setIndicationHandler(int method, AbstractAsyncClient::IndicationHandler handler);
+    void disconnectFromClient();
 
-private:
-    bool startOperation();
-    void stopOperation();
-    void checkHandler(QnMutexLockerBase* lk);
-
-    QnMutex m_mutex;
-    size_t m_operationsInProgress;
+    std::atomic<bool> m_isEnabled;
+    utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
-    nx::utils::MoveOnlyFunc<void()> m_stopHandler;
-    bool m_pleaseStopHasBeenCalled;
 };
 
-} // namespase stun
-} // namespase nx
-
-#endif // ASYNC_CLIENT_USER_H
+} // namespace stun
+} // namespace nx

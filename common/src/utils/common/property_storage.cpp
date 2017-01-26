@@ -7,7 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <QtGui/QColor>
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 #include "warnings.h"
 #include "command_line_parser.h"
@@ -224,7 +224,7 @@ void QnPropertyStorage::submitToSettings(QSettings *settings) const {
     submitValuesToSettings(settings, m_nameById.keys());
 }
 
-bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, FILE *errorFile) {
+bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, FILE *errorFile) {
     if(errorFile) {
         QTextStream errorStream(errorFile);
         return updateFromCommandLine(argc, argv, &errorStream);
@@ -233,7 +233,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, FILE *erro
     }
 }
 
-bool QnPropertyStorage::updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream) {
+bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTextStream *errorStream) {
     QnPropertyStorageLocker locker(this);
 
     QList<int> ids = m_argumentNamesById.keys();

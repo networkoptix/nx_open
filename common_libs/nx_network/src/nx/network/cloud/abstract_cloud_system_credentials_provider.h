@@ -37,6 +37,8 @@ struct SystemCredentials
     {
         return serverId == rhs.serverId && systemId == rhs.systemId && key == rhs.key;
     }
+
+    String hostName() const { return serverId + String(".") + systemId; }
 };
 
 

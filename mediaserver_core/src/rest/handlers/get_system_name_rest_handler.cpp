@@ -7,16 +7,17 @@
 
 #include <common/common_module.h>
 #include <nx/network/http/httptypes.h>
+#include <api/global_settings.h>
 
 
-int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnGetSystemIdRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
-    result = qnCommon->localSystemName().toUtf8();
+    result = qnGlobalSettings->localSystemId().toByteArray();
     contentType = "application/text";
     return nx_http::StatusCode::ok;
 }
 
-int QnGetSystemNameRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
+int QnGetSystemIdRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/,
                                             const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& /*result*/, QByteArray& /*contentType*/
                                             , const QnRestConnectionProcessor*)
 {

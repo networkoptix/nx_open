@@ -1,31 +1,28 @@
-
 #pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QCoreApplication>
 
-namespace utils
+#include <nx/utils/uuid.h>
+
+namespace utils {
+
+class QnCameraNamesWatcher: public QObject
 {
-    class QnCameraNamesWatcher : public QObject
-    {
-        Q_OBJECT
+    Q_OBJECT
 
-        typedef QObject base_type;
-    public:
-        explicit QnCameraNamesWatcher(bool showCameraIp = false
-            , QObject *parent = nullptr);
+    typedef QObject base_type;
 
-        ~QnCameraNamesWatcher();
+public:
+    explicit QnCameraNamesWatcher(QObject *parent = nullptr);
+    ~QnCameraNamesWatcher();
+    QString getCameraName(const QnUuid& cameraId);
 
-        QString getCameraName(const QString &cameraUuid);
+signals:
+    void cameraNameChanged(const QnUuid& cameraId);
 
-    signals:
-        void cameraNameChanged(const QString &cameraUuid);
+public:
+    QHash<QnUuid, QString> m_names;
+};
 
-    public:
-        typedef QHash<QString, QString> NamesHash;
-
-        bool m_showCameraIp;
-        NamesHash m_names;
-    };
-}
+} // namespace utils

@@ -1,66 +1,87 @@
-/**********************************************************
-* Apr 27, 2016
-* akolesnikov
-***********************************************************/
-
-#pragma once
-
 #include "random.h"
 
 #include <algorithm>
-#include <limits>
+#include <chrono>
 #include <mutex>
 #include <random>
 
+#if defined(Q_OS_MAC)
+    #include <pthread.h>
+#endif
 
 namespace nx {
 namespace utils {
+namespace random {
 
-namespace {
-struct RandomGenerationContext
+QtDevice::QtDevice()
 {
-    std::mutex mutex;
-    std::random_device randomDevice;
-    std::uniform_int_distribution<int> distribution;
-
-    RandomGenerationContext()
-    :
-        distribution(
-            std::numeric_limits<std::int8_t>::min(),
-            std::numeric_limits<std::int8_t>::max())
-    {
-    }
-};
-
-RandomGenerationContext randomGenerationContext;
+    const auto time = std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point();
+    ::qsrand((uint) std::chrono::duration_cast<std::chrono::milliseconds>(time).count());
 }
 
-bool generateRandomData(std::int8_t* data, std::size_t count)
+static uint usedBits(QtDevice::result_type number)
 {
-    try
+    uint result = 0;
+    while ((number & 0xFF) == 0xFF)
     {
-        std::unique_lock<std::mutex> lk(randomGenerationContext.mutex);
-        std::generate(
-            data, data + count,
-            [] { return randomGenerationContext.distribution(
-                            randomGenerationContext.randomDevice); });
-        return true;
+        number >>= 8;
+        result += 8;
     }
-    catch (const std::exception& /*e*/)
-    {
-        return false;
-    }
+
+    return result;
 }
 
-QByteArray generateRandomData(std::size_t count, bool* ok)
+QtDevice::result_type QtDevice::operator()()
+{
+    static auto qrandBits = usedBits(RAND_MAX);
+    static result_type qrandMask = ((result_type) 1 << qrandBits) - 1;
+    static auto neededBits = usedBits(max() - min());
+
+    result_type result = 0;
+    for (uint bits = 0; bits < neededBits; bits += qrandBits)
+        result = (result << qrandBits) | (::qrand() & qrandMask);
+
+    return result + min();
+}
+
+double QtDevice::entropy() const
+{
+    return 0;
+}
+
+QtDevice& qtDevice()
+{
+    // There is a bug in OSX's clang and gcc, so thread_local is not supported :(
+    #if !defined(Q_OS_MAC)
+        thread_local QtDevice rd;
+        return rd;
+    #else
+        static pthread_key_t key;
+        static auto init = pthread_key_create(
+            &key, [](void* p) { if (p) delete static_cast<QtDevice*>(p); });
+
+        static_cast<void>(init);
+        if (auto rdp = static_cast<QtDevice*>(pthread_getspecific(key)))
+            return *rdp;
+
+        const auto rdp = new QtDevice();
+        pthread_setspecific(key, rdp);
+        return *rdp;
+    #endif
+}
+
+QByteArray generate(std::size_t count)
 {
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
-    const bool result = 
-        generateRandomData(reinterpret_cast<std::int8_t*>(data.data()), count);
-    if (ok)
-        *ok = result;
+    for (int i = 0; i != data.size(); ++i)
+    {
+        const auto n = number<short>(0, 255);
+        data[i] = reinterpret_cast<const char&>(n);
+    }
+
     return data;
 }
 
-}   // namespace nx
-}   // namespace utils
+} // namespace random
+} // namespace utils
+} // namespace nx

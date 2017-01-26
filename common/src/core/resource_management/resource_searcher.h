@@ -1,6 +1,8 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
+#include <atomic>
+
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QStringList>
 
@@ -33,16 +35,29 @@ public:
     void setDiscoveryMode( DiscoveryMode mode );
     DiscoveryMode discoveryMode() const;
 
+    /** 
+     * Some searchers should be run first and in sequential order.
+     * It's needed because some devices just are not able to handle  
+     * many search request at the same time. If such a searcher returns 
+     * not empty list of found resources then search process stops and no searcher
+     * checks this url after that.
+     *
+     * Sequential searcher should be as fast as possible in order to not increase search
+     * iteration time very much.
+     *
+     */
+    virtual bool isSequential() const { return false; };
+
     /**
      * Searches for resources.
-     * 
+     *
      * \returns                         List of resources found.
      */
     QnResourceList search();
 
     /**
      * Search for resources may take time. This function can be used to
-     * stop resource search prematurely. 
+     * stop resource search prematurely.
      */
     virtual void pleaseStop();
 
@@ -57,9 +72,9 @@ public:
     virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const;
 
     /**
-     * \returns                         Name of the manufacturer for the resources this searcher adds. 
+     * \returns                         Name of the manufacturer for the resources this searcher adds.
      *                                  For example, 'AreconVision' or 'IQInVision'.
-     */ 
+     */
     virtual QString manufacture() const = 0;
 
 
@@ -67,7 +82,7 @@ public:
     virtual bool isVirtualResource() const { return false; }
 protected:
     /**
-     * This is the actual function that searches for resources. 
+     * This is the actual function that searches for resources.
      * To be implemented in derived classes.
      *
      * \returns                         List of resources found.
@@ -87,7 +102,7 @@ protected:
 private:
     DiscoveryMode m_discoveryMode;
     bool m_localResources;
-    volatile bool m_shouldStop;
+    std::atomic<bool> m_shouldStop;
 };
 
 
@@ -105,7 +120,7 @@ public:
 
 // =====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
     QnAbstractFileResourceSearcher() {}

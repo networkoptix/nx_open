@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <list>
+#include <cstdint>
 
 #include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QString>
@@ -12,6 +13,7 @@
 #include "utils/common/long_runnable.h"
 #include "utils/common/byte_array.h"
 #include "utils/memory/cycle_buffer.h"
+#include <utils/common/connective.h>
 
 class QBufferedFile;
 
@@ -23,7 +25,7 @@ public:
 
     // write all data in a row
     qint64 writeRanges (QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> range);
-    
+
     /*
     * Returns storage usage in range [0..1]
     */
@@ -60,36 +62,25 @@ private:
     int m_writeTime;
     mutable QnMutex m_timingsMutex;
 private:
-    void putData(FileBlockInfo* fb);
+    bool putData(FileBlockInfo* fb);
     FileBlockInfo* popData();
-};
-
-class QnWriterPool
-{
-public:
-    typedef QMap<QnUuid, QueueFileWriter*> WritersMap;
-
-    QnWriterPool();
-    ~QnWriterPool();
-
-    static QnWriterPool* instance();
-
-    QueueFileWriter* getWriter(const QnUuid& writePoolId);
-    WritersMap getAllWriters();
-private:
-    QnMutex m_mutex;
-    WritersMap m_writers;
 };
 
 class QN_EXPORT QBufferedFile: public QIODevice
 {
+    Q_OBJECT
 public:
     /*
     * Buffered file writing.
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize, const QnUuid& writerPoolId);
+    QBufferedFile(
+        const std::shared_ptr<IQnFile>& fileImpl,
+        int ioBlockSize,
+        int minBufferSize,
+        int maxBufferSize,
+        const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
     /*
@@ -106,7 +97,11 @@ public:
 
     virtual qint64 writeData (const char * data, qint64 len ) override;
     virtual qint64 readData (char * data, qint64 len ) override;
-    
+
+signals:
+    void seekDetected(uintptr_t obj, int bufferSizePow);
+    void fileClosed(uintptr_t obj);
+
 protected:
     qint64 writeUnbuffered(const char * data, qint64 len );
 private:
@@ -119,6 +114,7 @@ private:
 private:
     std::shared_ptr<IQnFile> m_fileEngine;
     int m_minBufferSize;
+    int m_maxBufferSize;
     QnMediaCyclicBuffer m_cycleBuffer;
     QueueFileWriter* m_queueWriter;
     unsigned int m_systemDependentFlags;

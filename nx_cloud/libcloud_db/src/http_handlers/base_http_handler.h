@@ -7,14 +7,14 @@
 #define cloud_db_base_http_handler_h
 
 #include <http/custom_headers.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
 
 #include <cloud_db_client/src/data/types.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"
@@ -51,13 +51,13 @@ protected:
     const AuthorizationManager& m_authorizationManager;
 
     bool authorize(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         const stree::AbstractResourceReader& authenticationData,
         const stree::AbstractResourceReader& dataToAuthorize,
         stree::ResourceContainer* const authzInfo )
     {
-        SocketResourceReader socketResources(*connection.socket());
+        SocketResourceReader socketResources(*connection->socket());
         HttpRequestResourceReader httpRequestResources(request);
 
         //performing authorization
@@ -125,7 +125,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         Input inputData ) override
@@ -186,7 +186,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo,
         Input inputData ) override
@@ -247,7 +247,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo ) override
     {
@@ -305,7 +305,7 @@ public:
 
     //!Implementation of AbstractFusionRequestHandler::processRequest
     virtual void processRequest(
-        const nx_http::HttpServerConnection& connection,
+        nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
         stree::ResourceContainer authInfo ) override
     {
@@ -325,6 +325,144 @@ public:
                     QnLexical::serialized(resultCode).toLatin1());
                 this->requestCompleted(resultCodeToFusionRequestResult(resultCode));
             } );
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
+};
+
+//TODO #ak use variadic templates here to decrease number of specializations
+
+template<typename InputData>
+class AbstractFreeMsgBodyHttpHandler
+:
+    public detail::BaseFiniteMsgBodyHttpHandler<InputData, void>
+{
+public:
+    typedef nx::utils::MoveOnlyFunc<void(
+        nx_http::HttpServerConnection* const connection,
+        const AuthorizationInfo& authzInfo,
+        InputData inputData,
+        nx::utils::MoveOnlyFunc<
+            void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+        > completionHandler)> ExecuteRequestFunc;
+
+    AbstractFreeMsgBodyHttpHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc requestFunc)
+    :
+        detail::BaseFiniteMsgBodyHttpHandler<InputData, void>(
+            entityType,
+            actionType,
+            authorizationManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+    }
+
+    //!Implementation of AbstractFusionRequestHandler::processRequest
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo,
+        InputData inputData) override
+    {
+        if (!this->authorize(
+                connection,
+                request,
+                authInfo,
+                stree::ResourceContainer(),
+                &authInfo))
+            return;
+
+        m_requestFunc(
+            connection,
+            AuthorizationInfo(std::move(authInfo)),
+            std::move(inputData),
+            [this](
+                api::ResultCode resultCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody)
+            {
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+
+                if (resultCode == api::ResultCode::ok)
+                    this->requestCompleted(
+                        nx_http::StatusCode::ok,
+                        std::move(responseMsgBody));
+                else
+                    this->requestCompleted(
+                        resultCodeToFusionRequestResult(resultCode));
+        });
+    }
+
+private:
+    ExecuteRequestFunc m_requestFunc;
+};
+
+template<>
+class AbstractFreeMsgBodyHttpHandler<void>
+:
+    public detail::BaseFiniteMsgBodyHttpHandler<void, void>
+{
+public:
+    typedef nx::utils::MoveOnlyFunc<void(
+        nx_http::HttpServerConnection* connection,
+        const AuthorizationInfo& authzInfo,
+        nx::utils::MoveOnlyFunc<
+            void(api::ResultCode, std::unique_ptr<nx_http::AbstractMsgBodySource>)
+        > completionHandler)> ExecuteRequestFunc;
+
+    AbstractFreeMsgBodyHttpHandler(
+        EntityType entityType,
+        DataActionType actionType,
+        const AuthorizationManager& authorizationManager,
+        ExecuteRequestFunc requestFunc)
+    :
+        detail::BaseFiniteMsgBodyHttpHandler<void, void>(
+            entityType,
+            actionType,
+            authorizationManager),
+        m_requestFunc(std::move(requestFunc))
+    {
+        //TODO
+    }
+
+    //!Implementation of AbstractFusionRequestHandler::processRequest
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const connection,
+        const nx_http::Request& request,
+        stree::ResourceContainer authInfo) override
+    {
+        if (!this->authorize(
+                connection,
+                request,
+                authInfo,
+                stree::ResourceContainer(),
+                &authInfo))
+            return;
+
+        m_requestFunc(
+            connection,
+            AuthorizationInfo(std::move(authInfo)),
+            [this](
+                api::ResultCode resultCode,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody)
+            {
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+
+                if (resultCode == api::ResultCode::ok)
+                    this->requestCompleted(
+                        nx_http::StatusCode::ok,
+                        std::move(responseMsgBody));
+                else
+                    this->requestCompleted(
+                        resultCodeToFusionRequestResult(resultCode));
+            });
     }
 
 private:

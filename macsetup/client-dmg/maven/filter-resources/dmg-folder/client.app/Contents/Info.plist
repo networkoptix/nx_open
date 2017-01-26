@@ -2,12 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleDisplayName</key>
 	<string>${display.product.name}</string>
 	<key>CFBundleExecutable</key>
-	<string>${display.product.name}</string>
+	<string>applauncher</string>
 	<key>CFBundleIconFile</key>
 	<string>appIcon.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -23,9 +25,9 @@
 	<key>CFBundleVersion</key>
 	<string>${buildNumber}</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7</string>
-    <key>LSApplicationCategoryType</key>
-    <string>public.app-category.business</string>
+	<string>10.8</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.business</string>
 	<key>LSUIElement</key>
 	<false/>
 	<key>NSHumanReadableCopyright</key>

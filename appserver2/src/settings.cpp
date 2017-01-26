@@ -27,10 +27,8 @@ bool Settings::dbReadOnly() const
     //if booted from SD card, setting ecDbReadOnly to true by default
     bool defaultValue = params::dbReadOnlyDefault;
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    if (QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1")
-    {
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
         defaultValue = Nx1::isBootedFromSD();
-    }
 #endif
 
     return value<bool>( params::dbReadOnly, defaultValue );

@@ -1,6 +1,8 @@
 'use strict';
 
 var Page = function () {
+    var Helper = require('../helper.js');
+    this.helper = new Helper();
 
     this.apiLink = element(by.id("api-doc"));
     this.sdkLinkVideo = element(by.id("sdk-video"));
@@ -12,6 +14,8 @@ var Page = function () {
     this.get = function () {
         browser.get('/#/developers');
     };
+
+    this.body = element(by.css('body'));
 };
 
 module.exports = Page;

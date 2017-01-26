@@ -18,8 +18,6 @@ public:
         DBReady         = 0x0010                    // capable of DB hosting
     };
 
-    static const int chunkLen = 60;
-
     class FileInfo
     {
         typedef std::shared_ptr<QFileInfo> QFileInfoPtr;
@@ -147,12 +145,12 @@ public:
     /**
      * \returns                         Storage total space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.
      */
-    virtual qint64 getTotalSpace() = 0;
+    virtual qint64 getTotalSpace() const = 0;
 
     ///**
     // * \returns                         Whether the storage is physically accessible.
     // */
-    virtual bool initOrUpdate() const = 0;
+    virtual Qn::StorageInitResult initOrUpdate() = 0;
 
     /**
      * \param url                       Url of the file to delete.

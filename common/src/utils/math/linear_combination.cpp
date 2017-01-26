@@ -12,7 +12,7 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QColor>
 
-#include <utils/common/synchronized_flat_storage.h>
+#include <nx/utils/synchronized_flat_storage.h>
 #include <nx/utils/log/assert.h>
 
 namespace {

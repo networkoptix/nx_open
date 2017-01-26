@@ -12,16 +12,18 @@
 
 #include <cloud_db_client/src/data/types.h>
 
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/utils/time.h>
 
+#include <common/common_globals.h> //for Qn::SerializationFormat
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -31,7 +33,6 @@
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
 #include "stree/stree_manager.h"
-
 
 namespace nx {
 namespace cdb {
@@ -50,31 +51,42 @@ AuthenticationManager::AuthenticationManager(
 {
 }
 
-bool AuthenticationManager::authenticate(
+void AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
-    boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-    stree::ResourceContainer* authProperties,
-    nx_http::HttpHeaders* const responseHeaders,
-    std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
+    nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
+    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
+    stree::ResourceContainer authProperties;
+    nx_http::HttpHeaders responseHeaders;
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+
     api::ResultCode authResult = api::ResultCode::notAuthorized;
     auto guard = makeScopedGuard(
-        [&msgBody, &authResult, responseHeaders]()
+        [&authResult, &wwwAuthenticate, &authProperties,
+        &responseHeaders, &msgBody, &completionHandler]()
         {
-            if (authResult == api::ResultCode::ok)
-                return;
-            nx_http::FusionRequestResult result(
-                nx_http::FusionRequestErrorClass::unauthorized,
-                QnLexical::serialized(authResult),
-                static_cast<int>(authResult),
-                "unauthorized");
-            responseHeaders->emplace(
-                Qn::API_RESULT_CODE_HEADER_NAME,
-                QnLexical::serialized(authResult).toLatin1());
-            *msgBody = std::make_unique<nx_http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                QJson::serialized(result));
+            if (authResult != api::ResultCode::ok)
+            {
+                nx_http::FusionRequestResult result(
+                    nx_http::FusionRequestErrorClass::unauthorized,
+                    QnLexical::serialized(authResult),
+                    static_cast<int>(authResult),
+                    "unauthorized");
+                responseHeaders.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(authResult).toLatin1());
+                msgBody = std::make_unique<nx_http::BufferSource>(
+                    Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                    QJson::serialized(result));
+            }
+
+            completionHandler(
+                authResult == api::ResultCode::ok,
+                std::move(authProperties),
+                std::move(wwwAuthenticate),
+                std::move(responseHeaders),
+                std::move(msgBody));
         });
 
     //TODO #ak use QnAuthHelper class to enable all that authentication types
@@ -83,12 +95,12 @@ bool AuthenticationManager::authenticate(
     if (allowedAuthMethods & AuthMethod::noAuth)
     {
         authResult = api::ResultCode::ok;
-        return true;
+        return;
     }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
     {
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
@@ -112,7 +124,8 @@ bool AuthenticationManager::authenticate(
     const auto authSearchInputData = stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
-        inputRes);
+        inputRes,
+        authTraversalResult);
     m_stree.search(
         StreeOperation::authentication,
         authSearchInputData,
@@ -122,7 +135,7 @@ bool AuthenticationManager::authenticate(
         if (authenticated.get().toBool())
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
 
@@ -130,16 +143,16 @@ bool AuthenticationManager::authenticate(
         (authzHeader->authScheme != header::AuthScheme::digest) ||
         (authzHeader->userid().isEmpty()))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
+        addWWWAuthenticateHeader(&wwwAuthenticate);
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
+        addWWWAuthenticateHeader(&wwwAuthenticate);
         authResult = api::ResultCode::notAuthorized;
-        return false;
+        return;
     }
 
     const auto userID = authzHeader->userid();
@@ -157,7 +170,7 @@ bool AuthenticationManager::authenticate(
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
     if (auto password = authTraversalResult.get(attr::userPassword))
@@ -168,7 +181,7 @@ bool AuthenticationManager::authenticate(
                 password.get().toString())))
         {
             authResult = api::ResultCode::ok;
-            return true;
+            return;
         }
     }
 
@@ -176,8 +189,7 @@ bool AuthenticationManager::authenticate(
         userID,
         std::move(validateHa1Func),
         authSearchInputData,
-        authProperties);
-    return authResult == api::ResultCode::ok;
+        &authProperties);
 }
 
 nx::String AuthenticationManager::realm()
@@ -234,7 +246,7 @@ void AuthenticationManager::addWWWAuthenticateHeader(
 
 nx::Buffer AuthenticationManager::generateNonce()
 {
-    const size_t nonce = m_dist(m_rd) | ::time(NULL);
+    const size_t nonce = m_dist(m_rd) | nx::utils::timeSinceEpoch().count();
     return nx::Buffer::number((qulonglong)nonce);
 }
 

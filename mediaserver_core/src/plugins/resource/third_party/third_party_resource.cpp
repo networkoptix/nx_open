@@ -43,7 +43,6 @@ QnThirdPartyResource::QnThirdPartyResource(
     m_cameraManager3( nullptr )
 {
     setVendor( discoveryManager.getVendorName() );
-    setDefaultAuth(QString::fromUtf8(camInfo.defaultLogin), QString::fromUtf8(camInfo.defaultPassword));
 
     if( m_camManager )
         m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
@@ -146,7 +145,7 @@ bool QnThirdPartyResource::mergeResourcesIfNeeded( const QnNetworkResourcePtr& n
         QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
         mergedSomething = true;
     }
-    //TODO #ak to make minimal influence on existing code, merging only few properties. 
+    //TODO #ak to make minimal influence on existing code, merging only few properties.
 
         //But, perharps, other properties should be processed too (in QnResource)
 
@@ -310,7 +309,7 @@ QnTimePeriodList QnThirdPartyResource::getDtsTimePeriodsByMotionRegion(
     if( !regions.isEmpty() )
     {
         //filling in motion mask
-        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::PIX_FMT_MONOBLACK ) );
+        std::auto_ptr<MotionDataPicture> motionDataPicture( new MotionDataPicture( nxcip::AV_PIX_FMT_MONOBLACK ) );
 
         QRegion unitedRegion;
         for( QList<QRegion>::const_iterator
@@ -426,6 +425,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    updateDefaultAuthIfEmpty(QString::fromUtf8(m_camInfo.defaultLogin), QString::fromUtf8(m_camInfo.defaultPassword));
+    QAuthenticator auth = getAuth();
+
     if( !m_camManager )
     {
         QnMutexLocker lk( &m_mutex );
@@ -461,13 +463,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         if( strlen(m_camInfo.defaultLogin) == 0 )
         {
-            const QByteArray userName = getAuth().user().toLatin1();
+            const QByteArray userName = auth.user().toLatin1();
             memset( m_camInfo.defaultLogin, 0, sizeof( m_camInfo.defaultLogin ) );
             strncpy( m_camInfo.defaultLogin, userName.constData(), std::min<size_t>(userName.size(), sizeof(m_camInfo.defaultLogin)-1) );
         }
         if( strlen(m_camInfo.defaultPassword) == 0 )
         {
-            const QByteArray userPassword = getAuth().password().toLatin1();
+            const QByteArray userPassword = auth.password().toLatin1();
             memset( m_camInfo.defaultPassword, 0, sizeof( m_camInfo.defaultPassword ) );
             strncpy( m_camInfo.defaultPassword, userPassword.constData(), std::min<size_t>(userPassword.size(), sizeof(m_camInfo.defaultPassword)-1) );
         }
@@ -480,7 +482,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         m_cameraManager3 = (nxcip::BaseCameraManager3*)m_camManager->getRef()->queryInterface( nxcip::IID_BaseCameraManager3 );
     }
 
-    m_camManager->setCredentials( getAuth().user(), getAuth().password() );
+    m_camManager->setCredentials( auth.user(), auth.password() );
 
     int result = m_camManager->getCameraInfo( &m_camInfo );
     if( result != nxcip::NX_NO_ERROR )
@@ -595,9 +597,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
 		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
-    else 
+    else
         setStreamFpsSharingMethod(Qn::NoFpsSharing);
-        
+
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -649,21 +651,21 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         initializeIOPorts();
     }
 
-    //TODO #ak: current API does not allow to get stream codec, so using CODEC_ID_H264 as true in most cases
+    //TODO #ak: current API does not allow to get stream codec, so using AV_CODEC_ID_H264 as true in most cases
     CameraMediaStreams mediaStreams;
     std::vector<nxcip::Resolution> selectedEncoderResolutions( m_encoderCount );
     selectedEncoderResolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution( PRIMARY_ENCODER_INDEX );
     mediaStreams.streams.push_back( CameraMediaStreamInfo(
-        PRIMARY_ENCODER_INDEX, 
+        PRIMARY_ENCODER_INDEX,
         QSize(selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].width, selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].height),
-        CODEC_ID_H264 ) );
+        AV_CODEC_ID_H264 ) );
     if( SECONDARY_ENCODER_INDEX < m_encoderCount )
     {
         selectedEncoderResolutions[SECONDARY_ENCODER_INDEX] = getSecondStreamResolution();
         mediaStreams.streams.push_back( CameraMediaStreamInfo(
-            SECONDARY_ENCODER_INDEX, 
+            SECONDARY_ENCODER_INDEX,
             QSize(selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].width, selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].height),
-            CODEC_ID_H264 ) );
+            AV_CODEC_ID_H264 ) );
     }
 
     if( m_cameraManager3 )
@@ -676,15 +678,19 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             QBuffer dataSource(&paramDescXML);
 
             if( QnCameraAdvacedParamsXmlParser::validateXml(&dataSource)) {
-                //parsing xml to load param list and get cameraID
+                //parsing xml to load param list and get cameraId
                 QnCameraAdvancedParams params;
                 bool success = QnCameraAdvacedParamsXmlParser::readXml(&dataSource, params);
-#ifdef _DEBUG
+
                 if (!success) {
-                    qWarning() << "Error while parsing xml for the camera" << getPhysicalId();
-                    qWarning() << paramDescXML;
+                    NX_LOG( lit("Error while parsing xml for the camera (third party) %1 %2 %3")
+                        .arg(getVendor())
+                        .arg(getModel())
+                        .arg(getPhysicalId()), cl_logWARNING);
+
+                    NX_LOG(lit("Faulty xml: %1").arg(QString::fromUtf8(paramDescXML)), cl_logWARNING);
                 }
-#endif
+
 				if (success)
                     QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), params);
             }

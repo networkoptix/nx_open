@@ -15,7 +15,7 @@ extern "C" {
 #endif
 };
 
-static QRectF cwiseMul(const QRectF &l, const QSizeF &r) 
+static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
 {
     return QRectF(
         l.left()   * r.width(),
@@ -27,7 +27,7 @@ static QRectF cwiseMul(const QRectF &l, const QSizeF &r)
 
 QnCropImageFilter::QnCropImageFilter(const QRectF& rect): m_rectF(rect)
 {
-    
+
 }
 
 QnCropImageFilter::QnCropImageFilter(const QRect& rect): m_rect(rect)
@@ -43,14 +43,14 @@ CLVideoDecoderOutputPtr QnCropImageFilter::updateImage(const CLVideoDecoderOutpu
     CLVideoDecoderOutputPtr result(new CLVideoDecoderOutput());
     result->setUseExternalData(true);
 
-    if (!m_rectF.isNull() && (m_rect.isNull() || frame->size() != m_size)) 
+    if (!m_rectF.isNull() && (m_rect.isNull() || frame->size() != m_size))
     {
         m_size = frame->size();
         QRect rect(cwiseMul(m_rectF, frame->size()).toRect());
         m_rect = QnCodecTranscoder::roundRect(rect);
     }
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
     {
         int w = m_rect.left();

@@ -10,9 +10,11 @@
 #include <core/resource/resource_fwd.h>
 #include "motion/abstract_motion_archive.h"
 
+#include <motion/motion_detection.h>
+
 static const int MOTION_INDEX_HEADER_SIZE = 16;
 static const int MOTION_INDEX_RECORD_SIZE = 8;
-static const int MOTION_DATA_RECORD_SIZE = MD_WIDTH*MD_HEIGHT/8;
+static const int MOTION_DATA_RECORD_SIZE = Qn::kMotionGridWidth*Qn::kMotionGridHeight/8;
 
 class QnMotionArchive;
 

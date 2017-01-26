@@ -1,11 +1,12 @@
 #include "client_mode.h"
 
 #include <nx/network/cloud/cloud_stream_socket.h>
+#include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 
 static const auto kDefaultTotalConnections = 100;
 static const int kDefaultMaxConcurrentConnections = 1;
@@ -24,95 +25,138 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={"<< bytesToString(kDefaultBytesToReceive).toStdString() <<"}\n"
+        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
         "                       Bytes to receive before closing connection\n"
         "  --bytes-to-send={N}  Bytes to send before closing connection\n"
+        "  --forward-address    Use only forwarded address for connect"
         "  --udt                Force using udt socket. Disables cloud connect\n"
-        "  --ssl                 Use SSL on top of client sockets\n";
+        "  --ssl                Use SSL on top of client sockets\n";
 }
 
-int runInConnectMode(const std::multimap<QString, QString>& args)
+static std::vector<SocketAddress> resolveTargets(
+    SocketAddress targetAddress,
+    const nx::utils::ArgumentParser& args)
 {
-    QString target;
-    if (!readArg(args, "target", &target))
+    std::vector<SocketAddress> targets;
+    if (targetAddress.address.toString().contains('.'))
     {
-        std::cerr << "error. Required parameter \"target\" is missing" << std::endl;
+        targets.push_back(std::move(targetAddress));
+        return targets;
+    }
+
+    // It's likely a system id, add server ids if available.
+    QString serverId;
+    size_t serverCount;
+    if (args.read("server-id", &serverId) && args.read("server-count", &serverCount))
+    {
+        const auto systemSuffix = '.' + targetAddress.address.toString().toUtf8();
+        targets.push_back(SocketAddress(serverId + systemSuffix, 0));
+        for (size_t i = 1; i < serverCount; ++i)
+            targets.push_back(SocketAddress(makeServerName(serverId, i) + systemSuffix));
+
+        return targets;
+    }
+
+    // Or resolve it.
+    std::promise<void> promise;
+    const auto port = targetAddress.port;
+    nx::network::SocketGlobals::addressResolver().resolveDomain(
+        std::move(targetAddress.address),
+        [port, &targets, &promise](std::vector<nx::network::cloud::TypedAddress> addresses)
+        {
+            for (auto& address: addresses)
+                targets.push_back(SocketAddress(std::move(address.address), port));
+
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
+    return targets;
+}
+
+int runInConnectMode(const nx::utils::ArgumentParser& args)
+{
+    auto& mediatorResultCounter = network::cloud::CrossNatConnector::mediatorResponseCounter();
+    mediatorResultCounter.enable();
+
+    QString target;
+    if (!args.read("target", &target))
+    {
+        std::cerr << "Error: Required parameter \"target\" is missing" << std::endl;
         return 1;
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cc-tu-connect", QnUuid::createUuid());
 
     int totalConnections = kDefaultTotalConnections;
-    readArg(args, "total-connections", &totalConnections);
+    args.read("total-connections", &totalConnections);
 
     int maxConcurrentConnections = kDefaultMaxConcurrentConnections;
-    readArg(args, "max-concurrent-connections", &maxConcurrentConnections);
+    args.read("max-concurrent-connections", &maxConcurrentConnections);
 
     nx::network::test::TestTrafficLimitType
         trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
-    QString trafficLimit = bytesToString(kDefaultBytesToReceive);
-    readArg(args, "bytes-to-receive", &trafficLimit);
+    QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
+    args.read("bytes-to-receive", &trafficLimit);
 
-    if (readArg(args, "bytes-to-send", &trafficLimit))
+    if (args.read("bytes-to-send", &trafficLimit))
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
 
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
-    if (args.find("ping") != args.end())
+    if (args.get("ping"))
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
 
-    if (args.find("udt") != args.end())
+    if (args.get("forward-address"))
     {
+        network::cloud::tcp::DirectEndpointConnector::setVerificationRequirement(false);
+        network::cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            (int) network::cloud::CloudConnectType::forwardedTcpPort);
+    }
+
+    if (args.get("udt"))
         SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::udt);
-    }
 
-    if (args.find("ssl") != args.end())
+    if (args.get("ssl"))
+    {
+        if (transmissionMode == nx::network::test::TestTransmissionMode::spam)
+        {
+            std::cerr << "Error: Spam mode does not support SSL, use --ping" << std::endl;
+            return 2;
+        }
+
         SocketFactory::enforceSsl(true);
-
-    SocketAddress targetAddress(target);
-    std::vector<SocketAddress> targetList;
-    if (targetAddress.address.toString().contains('.'))
-    {
-        // looks like normal address, just use it
-        targetList.push_back(std::move(targetAddress));
-    }
-    else
-    {
-        // it's likelly a system id, so resolve it
-        std::promise<void> promise;
-        nx::network::SocketGlobals::addressResolver().resolveDomain(
-            std::move(targetAddress.address),
-            [&targetAddress, &targetList, &promise](
-                std::vector<nx::network::cloud::TypedAddress> list)
-            {
-                for (auto& it : list)
-                {
-                    targetList.push_back(SocketAddress(
-                        std::move(it.address), targetAddress.port));
-                }
-
-                promise.set_value();
-            });
-
-        promise.get_future().wait();
     }
 
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    {
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
+    }
+
+    const auto targetList = resolveTargets(target, args);
     if (targetList.empty())
     {
-        std::cerr << "error. There are no targets to connect to!" << std::endl;
+        std::cerr << "Error: There are no targets to connect to!" << std::endl;
         return 1;
     }
 
-    uint64_t trafficLimitBytes = stringToBytes(trafficLimit);
+    uint64_t trafficLimitBytes = nx::utils::stringToBytes(trafficLimit);
     trafficLimitBytes = trafficLimitBytes ? trafficLimitBytes : kDefaultBytesToReceive;
 
-    std::cout
-        << lm("Target(s): %1\n").arg(containerString(targetList)).toStdString()
-        << lm("Limit(type=%1): %2").arg(static_cast<int>(trafficLimitType))
-           .arg(bytesToString(trafficLimitBytes))
-           .toStdString()
-        << std::endl;
+    QStringList targetStrings;
+    for (const auto t: targetList)
+        targetStrings << t.toString();
 
+    limitStringList(&targetStrings);
+    std::cout << lm("Client mode: %1, limit: %2(%3b), max concurent connections: %4, total: %5")
+        .strs(transmissionMode, trafficLimitType, nx::utils::bytesToString(trafficLimitBytes),
+            maxConcurrentConnections, totalConnections).toStdString() << std::endl;
+
+    std::cout << lm("Target(s): %1").arg(targetStrings.join(lit(", "))).toStdString() << std::endl;
     nx::network::test::ConnectionsGenerator connectionsGenerator(
         std::move(targetList),
         maxConcurrentConnections,
@@ -126,7 +170,7 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         [&finishedPromise]{ finishedPromise.set_value(); });
 
     const auto startTime = std::chrono::steady_clock::now();
-    connectionsGenerator.start();
+    connectionsGenerator.start(rwTimeout);
 
     auto finishedFuture = finishedPromise.get_future();
     printStatsAndWaitForCompletion(
@@ -141,23 +185,21 @@ int runInConnectMode(const std::multimap<QString, QString>& args)
         std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::steady_clock::now() - startTime);
 
-    QStringList returnCodes;
-    for (const auto& code : connectionsGenerator.returnCodes())
-        returnCodes << lm("%2 [%1 time(s)]").arg(code.second)
-            .arg(SystemError::toString(code.first));
-
-    std::cout << "\n\nconnect summary: \n"
-        "  total time: " << testDuration.count() << "s\n"
+    std::cout << "\n\nConnect summary:\n"
+        "  total time: " << testDuration.count() << " s\n"
         "  total connections: " <<
             connectionsGenerator.totalConnectionsEstablished() << "\n"
         "  total bytes sent: " <<
-            bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
+            nx::utils::bytesToString(connectionsGenerator.totalBytesSent()).toStdString() << "\n"
         "  total bytes received: " <<
-            bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
+            nx::utils::bytesToString(connectionsGenerator.totalBytesReceived()).toStdString() << "\n"
         "  total incomplete tasks: " <<
             connectionsGenerator.totalIncompleteTasks() << "\n"
-        "  return codes: " << returnCodes.join(QLatin1Literal("; ")).toStdString() << "\n" <<
-            std::endl;
+        "  mediator results: " <<
+            mediatorResultCounter.stringStatus().toStdString() << "\n" <<
+        "  connect results: " <<
+            connectionsGenerator.results().stringStatus().toStdString() << "\n" <<
+        std::endl;
 
     return 0;
 }
@@ -170,16 +212,20 @@ void printHttpClientOptions(std::ostream* const outStream)
         "  --url={http url}     Url to trigger\n";
 }
 
-int runInHttpClientMode(const std::multimap<QString, QString>& args)
+int runInHttpClientMode(const nx::utils::ArgumentParser& args)
 {
     QString urlStr;
-    if (!readArg(args, "url", &urlStr))
+    if (!args.read("url", &urlStr))
     {
-        std::cerr << "error. Required parameter \"url\" is missing" << std::endl;
+        std::cerr << "Error: Required parameter \"url\" is missing" << std::endl;
         return 1;
     }
 
     nx::network::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId(
+        "cc-tu-http", QnUuid::createUuid());
+
+    NX_LOG(lm("Issuing request to %1").arg(urlStr), cl_logALWAYS);
 
     nx_http::HttpClient client;
     client.setSendTimeoutMs(15000);
@@ -203,6 +249,7 @@ int runInHttpClientMode(const std::multimap<QString, QString>& args)
     }
 
     std::cout << std::endl;
+    NX_LOG(lm("Completed request to %1").arg(urlStr), cl_logALWAYS);
     return 0;
 }
 

@@ -1,7 +1,6 @@
 #ifndef sequrity_cam_resource_h_1239
 #define sequrity_cam_resource_h_1239
 
-#include <QtGui/QRegion>
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
@@ -13,12 +12,17 @@
 #include "common/common_globals.h"
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
+#include "core/dataconsumer/audio_data_transmitter.h"
 
 #include <mutex>
 #include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
+
+#ifdef ENABLE_DATA_PROVIDERS
+typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
+#endif
 
 static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
@@ -29,6 +33,9 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
+
+public:
     QnSecurityCamResource();
     virtual ~QnSecurityCamResource();
 
@@ -37,12 +44,11 @@ public:
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     bool isIOModule() const;
-    Qn::MotionType getCameraBasedMotionType() const;
     Qn::MotionType getDefaultMotionType() const;
     int motionWindowCount() const;
     int motionMaskWindowCount() const;
     int motionSensWindowCount() const;
-
+    bool hasTwoWayAudio() const;
 
     bool hasMotion() const;
     Qn::MotionType getMotionType() const;
@@ -214,12 +220,12 @@ public:
     void setMinDays(int value);
     int minDays() const;
 
-    void setPreferedServerId(const QnUuid& value);
-    QnUuid preferedServerId() const;
+    void setPreferredServerId(const QnUuid& value);
+    QnUuid preferredServerId() const;
 
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
-        \param detailLevel Minimal time period gap (usec) that is of interest to the caller. 
+        \param detailLevel Minimal time period gap (usec) that is of interest to the caller.
             Two time periods lying closer to each other than \a detailLevel usec SHOULD be reported as one
         \note Used only if \a QnSecurityCamResource::isDtsBased() is \a true
         \note Default implementation does nothing
@@ -229,7 +235,7 @@ public:
         qint64 msStartTime,
         qint64 msEndTime,
         int detailLevel );
-    
+
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -242,20 +248,33 @@ public:
 
     //!Set list of IO ports
     void setIOPorts(const QnIOPortDataList& ports);
-    
+
+    virtual bool setProperty(
+		const QString &key,
+		const QString &value,
+		PropertyOptions options = DEFAULT_OPTIONS) override;
+
+    virtual bool setProperty(
+		const QString &key,
+		const QVariant& value,
+		PropertyOptions options = DEFAULT_OPTIONS) override;
+
+    virtual bool removeProperty(const QString& key) override;
+
     //!Returns list if IO ports
     QnIOPortDataList getIOPorts() const;
-    
+
     //!Returns list of IO ports's states
     virtual QnIOStateDataList ioStates() const { return QnIOStateDataList(); }
-    
+
     virtual Qn::BitratePerGopType bitratePerGopType() const;
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    bool isCameraInfoSavedToDisk(const QString &storageUrl) const;
-    void setCameraInfoSavedToDisk(const QString &storageUrl);
+#ifdef ENABLE_DATA_PROVIDERS
+    virtual QnAudioTransmitterPtr getAudioTransmitter();
+#endif
 
 public slots:
     virtual void inputPortListenerAttached();
@@ -265,7 +284,6 @@ public slots:
     virtual void recordingEventDetached();
 
 signals:
-    /* All ::changed signals must have the same profile to be dynamically called from base ::updateInner method. */
     void scheduleDisabledChanged(const QnResourcePtr &resource);
     void scheduleTasksChanged(const QnResourcePtr &resource);
     void groupIdChanged(const QnResourcePtr &resource);
@@ -290,7 +308,7 @@ signals:
         const QString& inputPortID,
         bool value,
         qint64 timestamp );
-    
+
     void cameraOutput(
         const QnResourcePtr& resource,
         const QString& inputPortID,
@@ -302,7 +320,7 @@ protected slots:
     virtual void at_motionRegionChanged();
 
 protected:
-    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
@@ -329,9 +347,6 @@ protected:
     virtual bool isInputPortMonitored() const;
 
 private:
-    void resetCameraInfoDiskFlags() const;
-
-private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
@@ -351,8 +366,6 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
-
-    mutable std::map<QString, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

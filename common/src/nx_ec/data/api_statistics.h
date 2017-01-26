@@ -13,7 +13,7 @@
 #include "api_layout_data.h"
 #include "api_user_data.h"
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
@@ -44,7 +44,7 @@ namespace ec2 {
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)(backupType)
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferredServerId)(backupType)
 
     struct ApiStorageDataStatistics
         : ApiStorageData
@@ -65,7 +65,7 @@ namespace ec2 {
         std::vector<ApiStorageDataStatistics> storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
-    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
+    (flags)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
     (backupType)(backupDaysOfTheWeek)(backupStart)(backupDuration)(backupBitrate)
 
 	struct ApiLicenseStatistics

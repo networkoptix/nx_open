@@ -15,6 +15,7 @@
 #include <nx/network/buffer.h>
 
 #include "../connection_server/base_protocol_message_types.h"
+#include "stun_message_parser_buffer.h"
 
 namespace nx {
 namespace stun {
@@ -73,12 +74,12 @@ namespace stun {
             \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
             \note Reads whole message even if parse error occurred
         */
-        nx_api::ParserState::Type parse(
+        nx_api::ParserState parse(
             const nx::Buffer& /*buf*/,
             size_t* /*bytesProcessed*/ );
 
         //!Returns current parse state
-        nx_api::ParserState::Type state() const {
+        nx_api::ParserState state() const {
             return m_state == HEADER_INITIAL_AND_TYPE
                 ? nx_api::ParserState::init
                 : nx_api::ParserState::inProgress;
@@ -89,7 +90,6 @@ namespace stun {
             m_state = HEADER_INITIAL_AND_TYPE;
         }
     private:
-        class MessageParserBuffer;
         // Attribute value parsing
         attrs::Attribute* parseXORMappedAddress();
         attrs::Attribute* parseErrorCode();

@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/media/av_codec_helper.h>
 
 #define QnMediaContextSerializableData_Fields \
@@ -12,8 +12,8 @@
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaContextSerializableData, (ubjson))
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CodecID)
-QN_FUSION_DECLARE_FUNCTIONS(CodecID, (numeric))
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AVCodecID)
+QN_FUSION_DECLARE_FUNCTIONS(AVCodecID, (numeric))
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AVMediaType)
 QN_FUSION_DECLARE_FUNCTIONS(AVMediaType, (numeric))
@@ -24,7 +24,7 @@ QN_FUSION_DECLARE_FUNCTIONS(AVSampleFormat, (numeric))
 #define RcOverride_Fields (start_frame)(end_frame)(qscale)(quality_factor)
 QN_FUSION_DECLARE_FUNCTIONS(RcOverride, (ubjson))
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(\
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnMediaContextSerializableData)(RcOverride), (ubjson), _Fields)
 
 QByteArray QnMediaContextSerializableData::serialize() const
@@ -67,4 +67,46 @@ bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
         return false;
 
     return true;
+}
+
+void QnMediaContextSerializableData::initializeFrom(const AVCodecContext* context)
+{
+    codecId = context->codec_id;
+    codecType = context->codec_type;
+    if (context->rc_eq)
+    {
+        rcEq = QByteArray(context->rc_eq,
+            (int) strlen(context->rc_eq) + 1); //< Array should include '\0'.
+    }
+    if (context->extradata)
+    {
+        extradata = QByteArray((const char*) context->extradata,
+            context->extradata_size);
+    }
+    if (context->intra_matrix)
+    {
+        intraMatrix.assign(context->intra_matrix,
+            context->intra_matrix + QnAvCodecHelper::kMatrixLength);
+    }
+    if (context->inter_matrix)
+    {
+        interMatrix.assign(context->inter_matrix,
+            context->inter_matrix + QnAvCodecHelper::kMatrixLength);
+    }
+    if (context->rc_override)
+    {
+        rcOverride.assign(context->rc_override,
+            context->rc_override + context->rc_override_count);
+    }
+    channels = context->channels;
+    sampleRate = context->sample_rate;
+    sampleFmt = context->sample_fmt;
+    bitsPerCodedSample = context->bits_per_coded_sample;
+    codedWidth = context->coded_width;
+    codedHeight = context->coded_height;
+    width = context->width;
+    height = context->height;
+    bitRate = context->bit_rate;
+    channelLayout = context->channel_layout;
+    blockAlign = context->block_align;
 }

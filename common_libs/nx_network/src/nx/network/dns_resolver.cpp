@@ -14,27 +14,48 @@
 #include <algorithm>
 #include <atomic>
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
+
+#include <utils/common/guard.h>
+
 namespace nx {
+namespace network {
+
+constexpr auto kDefaultDnsResolveTimeout = std::chrono::seconds(15);
+
+//-------------------------------------------------------------------------------------------------
+// class DnsResolver::ResolveTask
 
 DnsResolver::ResolveTask::ResolveTask(
-    HostAddress _hostAddress,
-    std::function<void(SystemError::ErrorCode, const HostAddress&)> _completionHandler,
-    RequestID _reqID,
-    size_t _sequence )
+    QString hostAddress, Handler handler, RequestId requestId,
+    size_t sequence, int ipVersion)
 :
-    hostAddress( std::move( _hostAddress ) ),
-    completionHandler( _completionHandler ),
-    reqID( _reqID ),
-    sequence( _sequence )
+    hostAddress(std::move(hostAddress)),
+    completionHandler(std::move(handler)),
+    requestId(requestId),
+    sequence(sequence),
+    ipVersion(ipVersion)
 {
+    creationTime = nx::utils::monotonicTime();
 }
 
-DnsResolver::DnsResolver()
-:
-    m_terminated( false ),
-    m_runningTaskReqID( nullptr ),
-    m_currentSequence( 0 )
+//-------------------------------------------------------------------------------------------------
+// class DnsResolver
+
+DnsResolver::DnsResolver():
+    m_terminated(false),
+    m_runningTaskRequestId(nullptr),
+    m_currentSequence(0),
+    m_resolveTimeout(kDefaultDnsResolveTimeout),
+    m_predefinedHostResolver(nullptr)
 {
+    auto predefinedHostResolver = std::make_unique<PredefinedHostResolver>();
+    m_predefinedHostResolver = predefinedHostResolver.get();
+    registerResolver(std::move(predefinedHostResolver), 1);
+    registerResolver(std::make_unique<SystemResolver>(), 0);
+
     start();
 }
 
@@ -45,138 +66,154 @@ DnsResolver::~DnsResolver()
 
 void DnsResolver::pleaseStop()
 {
-    QnMutexLocker lk( &m_mutex );
+    NX_LOGX(lm("DnsResolver::pleaseStop"), cl_logDEBUG2);
+    
+    QnMutexLocker lock(&m_mutex);
     m_terminated = true;
     m_cond.wakeAll();
 }
 
-void DnsResolver::resolveAddressAsync(
-    const HostAddress& addressToResolve,
-    std::function<void (SystemError::ErrorCode, const HostAddress&)>&& completionHandler,
-    RequestID reqID )
+std::chrono::milliseconds DnsResolver::resolveTimeout() const
 {
-    QnMutexLocker lk( &m_mutex );
-    m_taskQueue.push_back( ResolveTask( addressToResolve, completionHandler, reqID, ++m_currentSequence ) );
+    return m_resolveTimeout;
+}
+
+void DnsResolver::setResolveTimeout(std::chrono::milliseconds value)
+{
+    m_resolveTimeout = value;
+}
+
+void DnsResolver::resolveAsync(
+    const QString& hostName, Handler handler, int ipVersion, RequestId requestId)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_taskQueue.push_back(ResolveTask(
+        hostName, std::move(handler), requestId, ++m_currentSequence, ipVersion));
+
     m_cond.wakeAll();
 }
 
-bool DnsResolver::resolveAddressSync( const QString& hostName, HostAddress* const resolvedAddress )
+SystemError::ErrorCode DnsResolver::resolveSync(
+    const QString& hostName,
+    int ipVersion,
+    std::deque<HostAddress>* resolvedAddresses)
 {
-    if( hostName.isEmpty() )
+    for (const auto& resolver: m_resolversByPriority)
     {
-        SystemError::setLastErrorCode( SystemError::hostNotFound );
-        return false;
-    }
-
-    addrinfo hints;
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = AF_INET;    /* Allow only IPv4 */
-    hints.ai_socktype = 0; /* Any socket */
-    hints.ai_flags = AI_ALL;    /* For wildcard IP address */
-    hints.ai_protocol = 0;          /* Any protocol */
-    hints.ai_canonname = NULL;
-    hints.ai_addr = NULL;
-    hints.ai_next = NULL;
-
-    addrinfo* resolvedAddressInfo = nullptr;
-    int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
-
-    if (status == EAI_BADFLAGS)
-    {
-        // if the lookup failed with AI_ALL, try again without it
-        hints.ai_flags = 0;
-        status = getaddrinfo(hostName.toLatin1(), 0, &hints, &resolvedAddressInfo);
-    }
-
-    if (status != 0)
-    {
-        SystemError::ErrorCode code;
-        switch (status)
+        const auto resultCode = resolver.second->resolve(hostName, ipVersion, resolvedAddresses);
+        if (resultCode == SystemError::noError)
         {
-            case EAI_NONAME: code = SystemError::hostNotFound; break;
-            case EAI_AGAIN: code = SystemError::again; break;
-            case EAI_MEMORY: code = SystemError::nomem; break;
-#ifdef __linux__
-            case EAI_SYSTEM: return false; // System error returned in `errno'
-#endif
-
-            // TODO: #mux Translate some other status codes?
-            default: code = SystemError::dnsServerFailure; break;
-        };
-
-        SystemError::setLastErrorCode( SystemError::dnsServerFailure );
-        return false;
+            NX_ASSERT(!resolvedAddresses->empty());
+            return resultCode;
+        }
     }
 
-    resolvedAddress->m_sinAddr = ((struct sockaddr_in*)(resolvedAddressInfo->ai_addr))->sin_addr;
-    resolvedAddress->m_addrStr = hostName;
-    resolvedAddress->m_addressResolved = true;
-
-    freeaddrinfo(resolvedAddressInfo);
-    return true;
+    return SystemError::hostNotFound;
 }
 
-bool DnsResolver::isAddressResolved( const HostAddress& addr ) const
+void DnsResolver::cancel(RequestId requestId, bool waitForRunningHandlerCompletion)
 {
-    return addr.m_addressResolved;
+    QnMutexLocker lock( &m_mutex );
+    // TODO: #ak improve search complexity
+    m_taskQueue.remove_if(
+        [requestId](const ResolveTask& task){ return task.requestId == requestId; } );
+
+    // We are waiting only for handler completion but not resolveSync completion.
+    while (waitForRunningHandlerCompletion && (m_runningTaskRequestId == requestId))
+        m_cond.wait(&m_mutex);
 }
 
-void DnsResolver::cancel( RequestID reqID, bool waitForRunningHandlerCompletion )
+bool DnsResolver::isRequestIdKnown(RequestId requestId) const
 {
-    QnMutexLocker lk( &m_mutex );
+    QnMutexLocker lock( &m_mutex );
     //TODO #ak improve search complexity
-    m_taskQueue.remove_if( [reqID]( const ResolveTask& task ){ return task.reqID == reqID; } );
-    //we are waiting only for handler completion but not resolveAddressSync completion
-    while( waitForRunningHandlerCompletion && (m_runningTaskReqID == reqID) )
-        m_cond.wait( &m_mutex ); //waiting for completion
+    return m_runningTaskRequestId == requestId ||
+        std::find_if(
+            m_taskQueue.cbegin(), m_taskQueue.cend(),
+            [requestId](const ResolveTask& task) { return task.requestId == requestId; }
+        ) != m_taskQueue.cend();
 }
 
-bool DnsResolver::isRequestIDKnown( RequestID reqID ) const
+void DnsResolver::addEtcHost(const QString& name, std::vector<HostAddress> addresses)
 {
-    QnMutexLocker lk( &m_mutex );
-    //TODO #ak improve search complexity
-    return m_runningTaskReqID == reqID ||
-           std::find_if(
-               m_taskQueue.cbegin(), m_taskQueue.cend(),
-               [reqID]( const ResolveTask& task ){ return task.reqID == reqID; } ) != m_taskQueue.cend();
+    m_predefinedHostResolver->addEtcHost(name, std::move(addresses));
+}
+
+void DnsResolver::removeEtcHost(const QString& name)
+{
+    m_predefinedHostResolver->removeEtcHost(name);
+}
+
+void DnsResolver::registerResolver(std::unique_ptr<AbstractResolver> resolver, int priority)
+{
+    m_resolversByPriority.emplace(priority, std::move(resolver));
+}
+
+int DnsResolver::minRegisteredResolverPriority() const
+{
+    if (m_resolversByPriority.empty())
+        return 0;
+
+    return m_resolversByPriority.crbegin()->first;
+}
+
+int DnsResolver::maxRegisteredResolverPriority() const
+{
+    if (m_resolversByPriority.empty())
+        return 0;
+
+    return m_resolversByPriority.cbegin()->first;
 }
 
 void DnsResolver::run()
 {
-    QnMutexLocker lk( &m_mutex );
-    while( !m_terminated )
+    NX_LOGX(lm("DnsResolver::run. Entered"), cl_logDEBUG2);
+
+    QnMutexLocker lock(&m_mutex);
+    while (!m_terminated)
     {
-        while( m_taskQueue.empty() && !m_terminated )
-            m_cond.wait( &m_mutex );
-        if( m_terminated )
+        while (m_taskQueue.empty() && !m_terminated)
+            m_cond.wait(lock.mutex());
+
+        if (m_terminated)
             break;  //not completing posted tasks
 
-        ResolveTask task = m_taskQueue.front();
-
-        lk.unlock();
-
-        HostAddress resolvedAddress;
-        const SystemError::ErrorCode resolveErrorCode =
-            resolveAddressSync( task.hostAddress.toString(), &resolvedAddress )
-            ? SystemError::noError
-            : SystemError::getLastOSErrorCode();
-
-        if( task.reqID )
+        ResolveTask task = std::move(m_taskQueue.front());
+        lock.unlock();
         {
-            lk.relock();
-            if( m_taskQueue.empty() || (m_taskQueue.front().sequence != task.sequence) )
-                continue;   //current task has been cancelled
-            m_runningTaskReqID = task.reqID;
-            m_taskQueue.pop_front();
-            lk.unlock();
+            SystemError::ErrorCode resultCode = SystemError::noError;
+            std::deque<HostAddress> resolvedAddresses;
+            if (isExpired(task))
+                resultCode = SystemError::timedOut;
+            else
+                resultCode = resolveSync(task.hostAddress, task.ipVersion, &resolvedAddresses);
+
+            if (task.requestId)
+            {
+                lock.relock();
+                if (m_taskQueue.empty() || (m_taskQueue.front().sequence != task.sequence))
+                    continue;   //current task has been cancelled
+
+                m_runningTaskRequestId = task.requestId;
+                m_taskQueue.pop_front();
+                lock.unlock();
+            }
+
+            task.completionHandler(resultCode, std::move(resolvedAddresses));
         }
+        lock.relock();
 
-        task.completionHandler( resolveErrorCode, resolvedAddress );
-
-        lk.relock();
-        m_runningTaskReqID = nullptr;
+        m_runningTaskRequestId = nullptr;
         m_cond.wakeAll();
     }
+
+    NX_LOGX(lm("DnsResolver::run. Exiting. %1").arg(m_terminated), cl_logDEBUG2);
 }
 
+bool DnsResolver::isExpired(const ResolveTask& task) const
+{
+    return nx::utils::monotonicTime() >= task.creationTime + m_resolveTimeout;
+}
+
+} // namespace network
 } // namespace nx

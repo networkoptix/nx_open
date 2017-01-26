@@ -5,7 +5,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/network/nettools.h>
-#include "utils/common/string.h"
+#include "nx/utils/string.h"
 #include <nx/utils/log/log.h>
 
 #include "core/resource/camera_resource.h"
@@ -552,71 +552,6 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
     endpoint.__anyAttribute = NULL;
 }
 
-void fixDiscoveredName(QString& name, QString& manufacturer, const QString& location)
-{
-    QString lowerName = name.toLower();
-
-    if (lowerName == lit("nexcom_camera")) {
-        name.clear();
-        manufacturer = lit("Nexcom");
-    }
-    else if (location.toLower() == lit("canon") && lowerName == lit("camera")) {
-        name = manufacturer;
-        manufacturer = location;
-    }
-    else if (lowerName == lit("digital watchdog")) {
-        qSwap(name, manufacturer);
-    }
-    else if (manufacturer.toLower().startsWith(lit("dwc-"))) {
-        name = manufacturer;
-        manufacturer = lit("Digital Watchdog");
-    }
-    else if (lowerName == lit("sony")) {
-        qSwap(name, manufacturer);
-    }
-    else if (lowerName.startsWith(lit("isd "))) {
-        manufacturer = lit("ISD");
-        name = name.mid(4);
-    }
-    else if (name == lit("ISD")) {
-        qSwap(name, manufacturer);
-    }
-    else if (lowerName == lit("networkcamera") && manufacturer.isEmpty()) {
-        name.clear(); // some DW cameras report invalid model in multicast and empty vendor
-    }
-    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("dcs-"))) {
-        name = manufacturer;
-        manufacturer = lit("DLink");
-    }
-    else if (lowerName == lit("networkcamera") && manufacturer.toLower().startsWith(lit("sd8363"))) {
-        name = manufacturer;
-        manufacturer = lit("VIVOTEK");
-    }
-    else if( (lowerName.startsWith(lit("vista_")) || lowerName.startsWith(lit("norbain_"))) && manufacturer.toLower().startsWith(lit("vk2-"))) {
-        name = manufacturer;
-        manufacturer = lit("VISTA");
-    }
-    else if(lowerName.startsWith(lit("axis "))) {
-        manufacturer = lit("AXIS");
-    }
-    else if(lowerName == lit("dahua")) {
-        qSwap(name, manufacturer);
-    }
-    else if(lowerName == lit("vivo_ironman")) {
-        qSwap(name, manufacturer);
-    }
-    else if(lowerName == lit("sentry")) {
-        qSwap(name, manufacturer);
-    }
-    else if(lowerName == lit("vivotek") && manufacturer.toLower().startsWith(lit("sd"))) {
-        qSwap(name, manufacturer);
-    }
-    else if(lowerName.startsWith(lit("acti"))) {
-        name = manufacturer;
-        manufacturer = lit("ACTi");
-    }
-}
-
 template <class T> 
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
     const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
@@ -633,14 +568,21 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
     QString manufacturer = getManufacturer(source, name);
     QString location = extractScope(source, QLatin1String(SCOPES_LOCATION_PREFIX));
-    fixDiscoveredName(name, manufacturer, location);
 
     QString mac = getMac(source, header);
 
-    QString endpointId = replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
+    QString endpointId = nx::utils::replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
-    hash.insert(appropriateAddr, EndpointAdditionalInfo(name, manufacturer, mac, uniqId, host));
+    hash.insert(
+        appropriateAddr, 
+        EndpointAdditionalInfo(
+            name,
+            manufacturer,
+            location,
+            mac,
+            uniqId,
+            host));
 }
 
 template <class T>
@@ -721,7 +663,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     std::pair<std::map<QString, UDPSocket*>::iterator, bool> p = m_ifaceToSock.insert( std::make_pair( iface.address.toString(), (UDPSocket*)NULL ) );
     if( p.second )
     {
-        p.first->second. = new UDPSocket();
+        p.first->second. = new UDPSocket(AF_INET);
         if( !p.first->second->bindToInterface(iface) || !p.first->second->setNonBlockingMode( true ) )
         {
             delete p.first->second;

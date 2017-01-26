@@ -1,8 +1,8 @@
 #include "upnp_async_client.h"
 
 #include "upnp_device_description.h"
-#include "utils/common/model_functions.h"
-#include "utils/serialization/lexical_functions.h"
+#include "nx/fusion/model_functions.h"
+#include "nx/fusion/serialization/lexical_functions.h"
 #include <nx/utils/log/log.h>
 
 namespace nx_upnp {
@@ -48,9 +48,9 @@ public:
         return true;
     }
 
-    virtual bool endElement( const QString& namespaceURI,
-                             const QString& localName,
-                             const QString& qName ) override
+    virtual bool endElement( const QString& /*namespaceURI*/,
+                             const QString& /*localName*/,
+                             const QString& /*qName*/ ) override
     {
         m_awaitedValue = 0;
         return true;
@@ -131,7 +131,7 @@ AsyncClient::~AsyncClient()
     }
 
     for (const auto& client: httpClients)
-        client->terminate();
+        client->pleaseStopSync();
 }
 
 bool AsyncClient::Message::isOk() const
@@ -199,7 +199,8 @@ void AsyncClient::doUpnp( const QUrl& url, const Message& message,
         }
 
         NX_LOGX( lit( "Could not parse message from %1" )
-                 .arg( url.toString() ), cl_logERROR );
+                .arg( url.toString(QUrl::RemovePassword) ),
+            cl_logERROR );
 
         callback( Message() );
     };
@@ -235,10 +236,10 @@ static const QString ENABLED        = lit("NewEnabled");
 static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
-void AsyncClient::externalIp( const QUrl& url,
-                              std::function< void( const HostAddress& ) > callback )
+void AsyncClient::externalIp(
+    const QUrl& url, std::function< void( const HostAddress& ) > callback )
 {
-    AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
+    AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP, {} };
     doUpnp( url, request, [callback]( const Message& response ) {
         callback( response.getParam( EXTERNAL_IP ) );
     } );
@@ -382,9 +383,9 @@ void AsyncClient::getAllMappings(
     } );
 }
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( AsyncClient::Protocol,
-    ( AsyncClient::Protocol::TCP, "tcp" )
-    ( AsyncClient::Protocol::UDP, "udp" )
-)
-
 } // namespace nx_upnp
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS( nx_upnp::AsyncClient, Protocol,
+    ( nx_upnp::AsyncClient::Protocol::TCP, "tcp" )
+    ( nx_upnp::AsyncClient::Protocol::UDP, "udp" )
+)

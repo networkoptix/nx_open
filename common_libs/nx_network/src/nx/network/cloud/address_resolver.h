@@ -1,11 +1,13 @@
-#ifndef NX_CC_DNS_TABLE_H
-#define NX_CC_DNS_TABLE_H
+#pragma once
+
+#include <set>
+#include <deque>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/dns_resolver.h>
 #include <utils/common/guard.h>
 
-#include "cdb_endpoint_fetcher.h"
+#include "cloud_module_url_fetcher.h"
 #include "mediator_connections.h"
 
 
@@ -45,10 +47,12 @@ enum class AddressAttributeType
 
 enum class CloudConnectType
 {
-    kUnknown,
-    kUdtHp,      // UDT over UDP hole punching
-    kTcpHp,      // TCP hole punching
-    kProxy,      // Proxy server address
+    unknown = 0,
+    forwardedTcpPort = 0x01,   /**< E.g., Upnp */
+    udpHp = 0x02,      /**< UDP hole punching */
+    tcpHp = 0x04,      /**< TCP hole punching */
+    proxy = 0x08,      /**< Proxy server address */
+    all = forwardedTcpPort | udpHp | tcpHp | proxy,
 };
 
 struct NX_NETWORK_API AddressAttribute
@@ -84,10 +88,8 @@ class NX_NETWORK_API AddressResolver
         : public QnStoppableAsync
 {
 public:
-    static const QRegExp kCloudAddressRegExp;
-
     typedef hpm::api::MediatorClientTcpConnection MediatorConnection;
-    AddressResolver(std::shared_ptr<MediatorConnection> mediatorConnection);
+    AddressResolver(std::unique_ptr<MediatorConnection> mediatorConnection);
     virtual ~AddressResolver() = default;
 
     //!Add new peer address
@@ -120,10 +122,10 @@ public:
      */
     void resolveDomain(
         const HostAddress& domain,
-        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler );
+        utils::MoveOnlyFunc<void(std::vector<TypedAddress>)> handler);
 
     typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode, std::vector<AddressEntry>)> ResolveHandler;
+        SystemError::ErrorCode, std::deque<AddressEntry>)> ResolveHandler;
 
     //!Resolves hostName like DNS server does
     /*!
@@ -138,11 +140,16 @@ public:
         \a natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync(
-        const HostAddress& hostName, ResolveHandler handler,
-        bool natTraversal = true, void* requestId = nullptr);
+        const HostAddress& hostName,
+        ResolveHandler handler,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion,
+        void* requestId = nullptr);
 
-    std::vector<AddressEntry> resolveSync(
-        const HostAddress& hostName, bool natTraversal);
+    std::deque<AddressEntry> resolveSync(
+        const HostAddress& hostName,
+        NatTraversalSupport natTraversalSupport,
+        int ipVersion);
 
     //!Cancels request
     /*!
@@ -155,12 +162,24 @@ public:
 
     bool isRequestIdKnown(void* requestId) const;
 
+    bool isCloudHostName(const QString& hostName) const;
+
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
+    /**
+     * true: resolve on mediator to have a chanse to get direct IPs, DNS is used in case if
+     *      mediator returned nothing.
+     * false: do not resolve on mediator, set cloud address in case of patter match pattern match,
+     *      DNS is involved only if pattern does not match.
+     */
+    static const bool kResolveOnMediator = false;
+
+    DnsResolver& dnsResolver() { return m_dnsResolver; }
+
 protected:
-    struct HostAddressInfo
+    struct NX_NETWORK_API HostAddressInfo
     {
-        explicit HostAddressInfo(const HostAddress& hostAddress);
+        explicit HostAddressInfo(bool _isLikelyCloudAddress);
 
         const bool isLikelyCloudAddress;
         std::vector<AddressEntry> fixedEntries;
@@ -177,16 +196,16 @@ protected:
         void setMediatorEntries(std::vector< AddressEntry > entries = {});
 
         void checkExpirations();
-        bool isResolved(bool natTraversal = false) const;
-        std::vector<AddressEntry> getAll() const;
+        bool isResolved(NatTraversalSupport natTraversalSupport) const;
+        std::deque<AddressEntry> getAll() const;
 
     private:
         State m_dnsState;
-        std::chrono::system_clock::time_point m_dnsResolveTime;
+        std::chrono::steady_clock::time_point m_dnsResolveTime;
         std::vector<AddressEntry> m_dnsEntries;
 
         State m_mediatorState;
-        std::chrono::system_clock::time_point m_mediatorResolveTime;
+        std::chrono::steady_clock::time_point m_mediatorResolveTime;
         std::vector<AddressEntry> m_mediatorEntries;
     };
 
@@ -197,21 +216,28 @@ protected:
     {
         const HostAddress address;
         bool inProgress;
-        bool natTraversal;
+        NatTraversalSupport natTraversalSupport;
         ResolveHandler handler;
         Guard guard;
 
         RequestInfo(
-            HostAddress _address, bool _natTraversal, ResolveHandler _handler);
+            HostAddress address,
+            NatTraversalSupport natTraversalSupport,
+            ResolveHandler handler);
     };
+
+    virtual bool isMediatorAvailable() const;
 
     void tryFastDomainResolve(HaInfoIterator info);
 
     void dnsResolve(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator);
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needMediator, int ipVersion);
 
     void mediatorResolve(
-        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns);
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
+
+    void mediatorResolveImpl(
+        HaInfoIterator info, QnMutexLockerBase* lk, bool needDns, int ipVersion);
 
     std::vector<Guard> grabHandlers(
         SystemError::ErrorCode lastErrorCode, HaInfoIterator info);
@@ -241,11 +267,14 @@ protected:
     std::multimap<void*, RequestInfo> m_requests;
 
     DnsResolver m_dnsResolver;
-    std::shared_ptr<MediatorConnection> m_mediatorConnection;
+    std::unique_ptr<MediatorConnection> m_mediatorConnection;
+    const QRegExp m_cloudAddressRegExp;
+
+    bool isCloudHostName(
+        QnMutexLockerBase* const lk,
+        const QString& hostName) const;
 };
 
 } // namespace cloud
 } // namespace network
 } // namespace nx
-
-#endif // NX_CC_DNS_TABLE_H

@@ -1,12 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
-
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -19,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db_client</artifactId>
     <packaging>pom</packaging>
-    <name>Nx CloudDb C++ Client</name>
+    <name>Nx CloudDb C++ Client Library</name>
 
     <properties>
         <guid>${cloud_db_client.guid}</guid>
@@ -28,7 +20,7 @@
         <template>lib</template>
 
         <qt.libs>core gui network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -lcommon -lnx_utils -ludt</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

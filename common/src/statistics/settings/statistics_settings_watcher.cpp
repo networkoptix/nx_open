@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/common/delayed.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {

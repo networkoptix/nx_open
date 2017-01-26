@@ -1,6 +1,8 @@
 #include "authutil.h"
 #include <QCryptographicHash>
 
+#include <nx/fusion/model_functions.h>
+
 template <class T, class T2>
 QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar, bool keepEmptyParts)
 {
@@ -121,3 +123,4 @@ QByteArray createHttpQueryAuthParam(
     return (userName.toUtf8().toLower() + ":" + nonce + ":" + authDigest).toBase64();
 }
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((NonceReply), (json), _Fields)

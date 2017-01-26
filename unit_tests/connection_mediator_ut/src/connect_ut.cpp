@@ -8,22 +8,21 @@
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/async_client.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
 
 #include "mediator_mocks.h"
-#include <test_support/socket_globals_holder.h>
 
 
 namespace nx {
@@ -35,26 +34,30 @@ class ConnectTest : public testing::Test
 protected:
     ConnectTest()
     {
-        SocketGlobalsHolder::instance()->reinitialize();
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-        m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
         listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
+            settings,
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
         server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            nx::network::NatTraversalSupport::disabled);
 
-        EXPECT_TRUE(server->bind(std::list< SocketAddress >(1, m_address)));
+        EXPECT_TRUE(server->bind(std::vector<SocketAddress>{SocketAddress::anyAddress}));
         EXPECT_TRUE(server->listen());
+
+        EXPECT_TRUE(server->endpoints().size());
+        m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
         network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 
     nx::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
+    conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
@@ -81,19 +84,21 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect( address() );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
-                                             stun::cc::methods::bind ) );
-        request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
-        request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-        request.newAttribute< stun::cc::attrs::PublicEndpointList >(
+                                             stun::extension::methods::bind ) );
+        request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
+        request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
+        request.newAttribute< stun::extension::attrs::PublicEndpointList >(
             std::list< SocketAddress >( 1, testHttpServer.serverAddress() ) );
 
         request.insertIntegrity( SYSTEM_ID, AUTH_KEY );
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
-        TestSyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
+        nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
@@ -102,12 +107,19 @@ TEST_F( ConnectTest, BindConnect )
                    stun::MessageClass::successResponse );
     }
 
+    const auto address = lit("http://%1.%2/test")
+        .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID));
+
     nx_http::HttpClient client;
+    if( nx::network::cloud::AddressResolver::kResolveOnMediator )
     {
-        ASSERT_TRUE(client.doGet(lit("http://%1.%2/test")
-            .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID))));
+        ASSERT_TRUE( client.doGet(address) );
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
+    }
+    else
+    {
+        ASSERT_FALSE( client.doGet(address) );
     }
 }
 

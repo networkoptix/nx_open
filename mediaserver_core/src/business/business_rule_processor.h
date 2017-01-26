@@ -124,7 +124,8 @@ public slots:
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
     static void fini();
-
+protected:
+    virtual void prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action) = 0;
 protected slots:
     /*
     * Execute action physically. Return true if action success executed
@@ -193,7 +194,7 @@ private:
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
-    QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
+    QMap<QString, QSet<QnUuid>> m_actionInProgress;              // remove duplicates for long actions
     QTimer m_timer;
 
     /*!

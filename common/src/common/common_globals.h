@@ -1,7 +1,8 @@
-#ifndef QN_COMMON_GLOBALS_H
-#define QN_COMMON_GLOBALS_H
+#pragma once
 
+#ifndef BOOST_BIND_NO_PLACEHOLDERS
 #define BOOST_BIND_NO_PLACEHOLDERS
+#endif // BOOST_BIND_NO_PLACEHOLDERS
 #include <cassert>
 #include <limits>
 
@@ -11,19 +12,21 @@
 #include <QtCore/QStringList>
 
 #include <utils/common/unused.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/datetime.h>
+#include <nx/utils/literal.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
+    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-    ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+    ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
-    Permission GlobalPermission
+    Permission GlobalPermission UserRole ConnectionResult
     ,
     Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
@@ -73,7 +76,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
-        ShareIpCapability                   = 0x020
+        ShareIpCapability                   = 0x020,
+        AudioTransmitCapability             = 0x040
     };
     Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
@@ -259,7 +263,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
     //TODO: #GDM split to server-only and client-only flags as they are always local
-    enum ResourceFlag {
+    enum ResourceFlag
+    {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
         streamprovider              = 0x4,
@@ -282,23 +287,42 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         motion                      = 0x10000,      /**< Resource has motion */
         sync                        = 0x20000,      /**< Resource can be used in sync playback mode. */
+
+        /* Server-only flag. */
         foreigner                   = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
+
+        /* Server-only flag. */
         no_last_gop                 = 0x80000,      /**< Do not use last GOP for this when stream is opened */
 
-        deprecated                  = 0x100000,     /**< Resource absent in Server but still used in memory for some reason */
+        /* Client-only flag */
+        fake                        = 0x100000,     /**< Fake server (belonging to other system). */
+
         videowall                   = 0x200000,     /**< Videowall resource */
         desktop_camera              = 0x400000,     /**< Desktop Camera resource */
-        parent_change               = 0x800000,     /**< Camera discovery internal purpose */
 
-        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
+        /* Server-only flag. */
+        parent_change               = 0x800000,     /**< Camera discovery internal purpose. Server-only flag. */
+
+        /* Client-only flag. */
+        depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status. */
+
+        /* Server-only flag. */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
+
         io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
-        local_media = local | media,
+        /* Client-only flag. */
+        exported                    = 0x20000000,   /**< Exported media file. */
+
+
+        local_media = local | media | url,
+        exported_media = local_media | exported,
+
         local_layout = local | layout,
+        exported_layout = local_layout | url | exported,
 
         local_server = local | server,
         remote_server = remote | server,
@@ -312,6 +336,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
+        fake_server = remote_server | fake,
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -335,6 +360,24 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    /** Level of detail for displaying resource info. */
+    enum ResourceInfoLevel
+    {
+        RI_Invalid,
+        RI_NameOnly,       /**< Only resource name */
+        RI_WithUrl,        /**< Resource name and url (if exist) */
+        RI_FullInfo        /**< All info */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
+
+	    enum class StatusChangeReason
+    {
+        Default,
+        CreateInitialData,
+        GotFromRemotePeer
+    };
+
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,
@@ -344,16 +387,18 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
-        SF_None             = 0x000,
-        SF_Edge             = 0x001,
-        SF_RemoteEC         = 0x002,
-        SF_HasPublicIP      = 0x004,
-        SF_IfListCtrl       = 0x008,
-        SF_timeCtrl         = 0x010,
-        SF_AutoSystemName   = 0x020,        /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
-        SF_ArmServer        = 0x040,
-        SF_Has_HDD          = 0x080,
-        SF_NewSystem        = 0x100,        /**< System is just installed, it has default admin password and is not linked to the cloud. */
+        SF_None = 0x000,
+        SF_Edge = 0x001,
+        SF_RemoteEC = 0x002,
+        SF_HasPublicIP = 0x004,
+        SF_IfListCtrl = 0x008,
+        SF_timeCtrl = 0x010,
+        //SF_AutoSystemName = 0x020, /**< System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+        SF_ArmServer = 0x040,
+        SF_Has_HDD = 0x080,
+        SF_NewSystem = 0x100, /**< System is just installed, it has default admin password and is not linked to the cloud. */
+        SF_SupportsTranscoding = 0x200,
+        SF_HasLiteClient = 0x400,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -444,149 +489,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AnyComponent
     };
 
-
-    /**
-     * Generic enumeration holding different data roles used in Qn classes.
-     */
-    enum ItemDataRole {
-        FirstItemDataRole   = Qt::UserRole,
-
-        /* Tree-based. */
-        NodeTypeRole,                               /**< Role for node type, see <tt>Qn::NodeType</tt>. */
-
-        /* Resource-based. */
-        ResourceRole,                               /**< Role for QnResourcePtr. */
-        UserResourceRole,                           /**< Role for QnUserResourcePtr. */
-        LayoutResourceRole,                         /**< Role for QnLayoutResourcePtr. */
-        MediaServerResourceRole,                    /**< Role for QnMediaServerResourcePtr. */
-        VideoWallResourceRole,                      /**< Role for QnVideoWallResourcePtr */
-
-        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
-        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
-        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
-        ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
-
-        VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
-        VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QnUuid. */
-        VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
-
-        /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
-        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
-        LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
-
-        /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
-        ItemPositionRole,                           /**< Role for item's floating point position. Value of type QPointF. */
-        ItemZoomRectRole,                           /**< Role for item's zoom window. Value of type QRectF. */
-        ItemImageEnhancementRole,                   /**< Role for item's image enhancement params. Value of type ImageCorrectionParams. */
-        ItemImageDewarpingRole,                     /**< Role for item's image dewarping params. Value of type QnItemDewarpingParams. */
-        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
-        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
-        ItemFrameDistinctionColorRole,              /**< Role for item's frame distinction color. Value of type QColor. */
-        ItemFlipRole,                               /**< Role for item's flip state. Value of type bool. */
-        ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
-        ItemDisplayInfoRole,                        /**< Role for item's info state. Value of type bool. */
-
-        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
-        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
-        ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-        ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
-
-        ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
-
-        /* Ptz-based. */
-        PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
-        PtzTourRole,                                /**< Role for PTZ tour. Value of type QnPtzTour. */
-        PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
-        PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
-        PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
-
-        /* Context-based. */
-        CurrentLayoutResourceRole,
-        CurrentLayoutMediaItemsRole,
-        CurrentMediaServerResourcesRole,
-
-        /* Arguments. */
-        ActionIdRole,
-        SerializedDataRole,
-        ConnectionInfoRole,
-        FocusElementRole,
-        TimePeriodRole,
-        TimePeriodsRole,
-        MergedTimePeriodsRole,
-        FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
-        TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
-        TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and QnActions::ConnectAction. */
-        ForceRole,                                  /**< Role for 'forced' flag. Used in QnActions::DisconnectAction */
-        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
-        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
-        BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
-        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
-        KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
-
-        /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-
-        TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
-
-        ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
-        DisplayHtmlRole,                            /**< Same as Display role, but use HTML format. */
-        DisplayHtmlHoveredRole,                     /**< Same as DisplayHtmlRole role, but used if mouse over a element */
-
-        ModifiedRole,                               /**< Role for modified state. Value of type bool. */
-        DisabledRole,                               /**< Role for disabled state. Value of type bool. */
-        ValidRole,                                  /**< Role for valid state. Value of type bool. */
-        ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
-        ShortTextRole,                              /**< Role for short text. Value of type QString. */
-        PriorityRole,                               /**< Role for priority value. Value of type quint64. */
-
-        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
-        EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
-        ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
-
-        SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
-
-        StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
-
-        IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
-
-        RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
-        RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
-
-        AuditRecordDataRole,                        /**< Return QnAuditRecord object */
-        ColumnDataRole,                             /**< convert index col count to column enumerator */
-        DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
-        AlternateColorRole,                         /**< Use alternate color in painting */
-        AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
-
-        StorageInfoDataRole,                        /**< return QnStorageModelInfo object at QnStorageConfigWidget */
-        BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
-        TextWidthDataRole,                          /**< used in BackupSettings model */
-
-        ActionEmitterType,                          /** */
-        ActionEmittedBy,                            /** */
-        RoleCount
-    };
-
     // TODO: #Elric #EC2 rename
     enum StreamQuality {
         QualityLowest = 0,
@@ -652,7 +554,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
-        PT_MobileClient = 3,
+        PT_OldMobileClient = 3,
+        PT_MobileClient = 4,
+        PT_CloudServer = 5,
+        PT_OldServer = 6, //< 2.6 or below
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -719,6 +624,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         LC_Start,
 
         /**
+          * Camera with Free license can be recorded without license activation. It always available to use
+          */
+        LC_Free,
+
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,
@@ -748,7 +658,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_WrongPassword, // invalid password
         Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired
-        Auth_ConnectError   // can't connect to the external system to authenticate
+        Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
+        Auth_CloudConnectError   // can't connect to the Cloud to authenticate
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
 
@@ -808,6 +719,15 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
     Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
+    enum StorageInitResult
+    {
+        StorageInit_Ok,
+        StorageInit_CreateFailed,
+        StorageInit_WrongPath,
+        StorageInit_WrongAuth,
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StorageInitResult)
+
     /**
      * Flags describing the actions permitted for the user to do with the
      * selected resource. Calculated in runtime.
@@ -824,25 +744,41 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         ReadWriteSavePermission = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission             = 0x0010,   /**< Permission to edit resource's name. */
 
+        /**
+         * Permission to view resource content.
+         * Currently used for server's health monitor access.
+         * Automatically granted for cameras and web pages if user has ReadPermission for them.
+         */
+        ViewContentPermission           = 0x0020,
+
+        /** Full set of permissions which can be available for server resource. */
+        FullServerPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ViewContentPermission,
+
         /* Layout-specific permissions. */
-        AddRemoveItemsPermission        = 0x0020,   /**< Permission to add or remove items from a layout. */
-        EditLayoutSettingsPermission    = 0x0040,   /**< Permission to setup layout background or set locked flag. */
-        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | AddRemoveItemsPermission | EditLayoutSettingsPermission,
+        AddRemoveItemsPermission        = 0x0040,   /**< Permission to add or remove items from a layout. */
+        EditLayoutSettingsPermission    = 0x0080,   /**< Permission to setup layout background or set locked flag. */
+        ModifyLayoutPermission          = ReadPermission | WritePermission | AddRemoveItemsPermission, /**< Permission to modify without saving. */
+        FullLayoutPermissions           = ReadWriteSavePermission | WriteNamePermission | RemovePermission | ModifyLayoutPermission | EditLayoutSettingsPermission,
 
         /* User-specific permissions. */
         WritePasswordPermission         = 0x0200,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission     = 0x0400,   /**< Permission to edit access rights. */
-        CreateLayoutPermission          = 0x0800,   /**< Permission to create layouts for the user. */
-        ReadEmailPermission             = ReadPermission,
-        WriteEmailPermission            = WritePasswordPermission,
-        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission | RemovePermission |
-                                            WritePasswordPermission | WriteAccessRightsPermission | CreateLayoutPermission,
+        WriteEmailPermission            = 0x0800,   /**< Permission to edit user's email. */
+        WriteFullNamePermission         = 0x1000,   /**< Permission to edit user's full name. */
+        FullUserPermissions             = ReadWriteSavePermission | WriteNamePermission
+                                            | RemovePermission | WritePasswordPermission
+                                            | WriteAccessRightsPermission
+                                            | WriteFullNamePermission | WriteEmailPermission,
 
         /* Media-specific permissions. */
         ExportPermission                = 0x2000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        WritePtzPermission              = 0x1000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission              = 0x4000,   /**< Permission to use camera's PTZ controls. */
+
+        /* Mode-specific permissions. */
+        VideoWallLayoutPermissions      = ModifyLayoutPermission,
+        VideoWallMediaPermissions       = ReadPermission | ViewContentPermission,
 
         AllPermissions = 0xFFFFFFFF
     };
@@ -860,55 +796,52 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     enum GlobalPermission
     {
         /* Generic permissions. */
-        NoGlobalPermissions                     = 0x00000000,   /**< No access */
+        NoGlobalPermissions                     = 0x00000000,   /**< Only live video access. */
 
-        GlobalOwnerPermission                   = 0x00000001,   /**< Root, can edit admins. */
-        GlobalAdminPermission                   = 0x00000002,   /**< Admin, can edit other non-admins. */
-        GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
-        /* DeprecatedGlobalEditUsersPermission  = 0x00000008 */
-        /*DeprecatedEditCamerasPermission       = 0x00000010 */
-        GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
-        /*DeprecatedViewExportArchivePermission = 0x00000040 */
-        GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
+        /* Admin permissions. */
+        GlobalAdminPermission                   = 0x00000001,   /**< Admin, can edit other non-admins. */
+
+        /* Manager permissions. */
+        GlobalEditCamerasPermission             = 0x00000002,   /**< Can edit camera settings. */
+        GlobalControlVideoWallPermission        = 0x00000004,   /**< Can control videowalls. */
+
+        GlobalViewLogsPermission                = 0x00000010,   /**< Can access event log and audit trail. */
+
+        /* Viewer permissions. */
         GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
         GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
-        GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
-        GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
-        /*DeprecatedPanicPermission             = 0x00001000 */
-        GlobalEditVideoWallPermission           = 0x00002000,   /**< Can create and edit videowalls */
+        GlobalViewBookmarksPermission           = 0x00000400,   /**< Can view bookmarks of available cameras. */
+        GlobalManageBookmarksPermission         = 0x00000800,   /**< Can modify bookmarks of available cameras. */
+
+        /* Input permissions. */
+        GlobalUserInputPermission               = 0x00010000,   /**< Can change camera's PTZ state, use 2-way audio, I/O buttons. */
 
         /* Resources access permissions */
-        GlobalAccessAllCamerasPermission        = 0x00100000,   /**< Has access to all cameras. */
-        GlobalAccessAllLayoutsPermission        = 0x00200000,   /**< Has access to all global layouts. */
-        GlobalAccessAllServersPermission        = 0x00400000,   /**< Has access to all servers. */
+        GlobalAccessAllMediaPermission          = 0x01000000,   /**< Has access to all media resources (cameras and web pages). */
 
-        GlobalAccessResourcesPermissionsSet = GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission | GlobalAccessAllServersPermission,
 
-        /* Deprecated permissions. To reuse these values we must clean them up during db migration. */
-        DeprecatedGlobalEditUsersPermission     = 0x00000008,   /**< Deprecated. Can edit user settings. */
-        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Deprecated. Can edit camera settings and change camera's PTZ state. */
-        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Deprecated. Can view and export archives of available cameras. */
-        DeprecatedPanicPermission               = 0x00001000,   /**< Deprecated. Can trigger panic recording. */
+        GlobalCustomUserPermission              = 0x10000000,   /**< Flag that just mark new user as 'custom'. */
 
         /* Shortcuts. */
 
-        /* Live viewer has access to all cameras by default */
-        GlobalLiveViewerPermissionSet       = GlobalViewLivePermission | GlobalAccessAllCamerasPermission | GlobalAccessAllLayoutsPermission,
+        /* Live viewer has access to all cameras and global layouts by default. */
+        GlobalLiveViewerPermissionSet       = GlobalAccessAllMediaPermission,
 
-        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission,
+        /* Viewer can additionally view archive and bookmarks and export video. */
+        GlobalViewerPermissionSet           = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalExportPermission | GlobalViewBookmarksPermission,
+
+        /* Advanced viewer can manage bookmarks and use various input methods. */
+        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalManageBookmarksPermission | GlobalUserInputPermission | GlobalViewLogsPermission,
+
+        /* Admin can do everything. */
+        GlobalAdminPermissionSet            = GlobalAdminPermission | GlobalAdvancedViewerPermissionSet | GlobalControlVideoWallPermission | GlobalEditCamerasPermission,
 
         /* PTZ here is intended - for SpaceX, see VMS-2208 */
-        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalPtzControlPermission,
+        GlobalVideoWallModePermissionSet    = GlobalLiveViewerPermissionSet | GlobalViewArchivePermission | GlobalUserInputPermission |
+                                              GlobalControlVideoWallPermission | GlobalViewBookmarksPermission,
 
         /* Actions in ActiveX plugin mode are limited. */
-        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalPtzControlPermission,
-
-        GlobalAdvancedViewerPermissionSet   = GlobalViewerPermissionSet | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-
-        GlobalAdminPermissionsSet           = GlobalAdvancedViewerPermissionSet | GlobalEditLayoutsPermission       |
-                                              GlobalAdminPermission             | GlobalEditServersPermissions      | GlobalEditVideoWallPermission     |
-                                              GlobalAccessAllServersPermission  ,
-        GlobalOwnerPermissionsSet           = GlobalAdminPermissionsSet | GlobalOwnerPermission,
+        GlobalActiveXModePermissionSet      = GlobalViewerPermissionSet | GlobalUserInputPermission,
     };
 
     Q_DECLARE_FLAGS(GlobalPermissions, GlobalPermission)
@@ -916,6 +849,33 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(GlobalPermission)
 
 
+    /**
+    * An enumeration for user role types: predefined roles, custom groups, custom permissions.
+    */
+    enum class UserRole
+    {
+        CustomUserRole = -2,
+        CustomPermissions = -1,
+        Owner = 0,
+        Administrator,
+        AdvancedViewer,
+        Viewer,
+        LiveViewer,
+    };
+
+    enum ConnectionResult
+    {
+        SuccessConnectionResult,                    /*< Connection available. */
+        NetworkErrorConnectionResult,               /*< Connection could not be established. */
+        UnauthorizedConnectionResult,               /*< Invalid login/password. */
+        LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
+        CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization. */
+        IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
+        IncompatibleVersionConnectionResult,        /*< Server version is too low. */
+        IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
+        ForbiddenConnectionResult                   /*< Connection is not allowed yet. Try again later*/
+    };
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -931,48 +891,19 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 
-enum {MD_WIDTH = 44, MD_HEIGHT = 32};
-
-
-/** Time value for 'now'. */
-#define DATETIME_NOW        std::numeric_limits<qint64>::max()
-
-// TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
-// Note: -1 is used for invalid time
-// Now it is returning when no archive data and archive is played backward
-enum { kNoTimeValue = 0 };
-
-/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
-#define DATETIME_INVALID    std::numeric_limits<qint64>::min()
-
-
-/**
- * \def lit
- * Helper macro to mark strings that are not to be translated.
- */
-#define QN_USE_QT_STRING_LITERALS
-#ifdef QN_USE_QT_STRING_LITERALS
-namespace QnLitDetail { template<int N> void check_string_literal(const char (&)[N]) {} }
-#   define lit(s) (QnLitDetail::check_string_literal(s), QStringLiteral(s))
-#else
-#   define lit(s) QLatin1String(s)
-#endif
-
-template<typename T>
-QString toString( const T& t ) { return t.toString(); }
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner),
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
@@ -986,25 +917,12 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
-    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)
+    (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzDataFields),
+    (Qn::PtzDataFields)(Qn::TTHeaderFlags)(Qn::ResourceInfoLevel),
     (metatype)(numeric)
 )
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TTHeaderFlags),
-    (metatype)(numeric)
-)
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::IOPortTypes),
-    (metatype)(numeric)(lexical)
-
-)
-
-#endif // QN_COMMON_GLOBALS_H

@@ -13,7 +13,7 @@
     <WixVariable Id="WixUIBannerBmp" Value="resources\logo_493x58.bmp" />
     <WixVariable Id="WixUIDialogBmp" Value="resources\logo_493x312.bmp" />
 
-    <Icon Id="logo.ico" SourceFile="resources\logo.ico"/>
+    <Icon Id="logo.ico" SourceFile="favicon.ico"/>
     <Property Id="ARPPRODUCTICON" Value="logo.ico" />
 
     <Property Id="PAXTONDIR">
@@ -78,22 +78,22 @@
   <Fragment>
     <ComponentGroup Id="RootComponents" Directory="AccessControlDir">
       <Component Id="InteropComponent" Guid="{B0E867A3-7B23-4317-8A05-AA6B83772292}">
-        <File Id="Interop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
+        <File Id="Interop.hdwitness.dll" Source="${libdir}\bin\release\Interop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
       <Component Id="AxInteropComponent" Guid="{4237B629-3F2C-423F-9862-EB6CF63E7627}">
-        <File Id="AxInterop.hdwitness.dll" Source="..\..\..\..\build_environment\target\x86\bin\release\AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
+        <File Id="AxInterop.hdwitness.dll" Source="${libdir}\bin\release\AxInterop.${ax.className}_${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
       <Component Id="NxControlComponent" Guid="{8B6FF1C5-2890-410F-947D-5680B66DF25E}">
         <File Id="NxControl.${nxec.ec2ProtoVersion}.dll" Source="..\..\..\nxcontrol\x86\bin\release\${ax.className}Control.${nxec.ec2ProtoVersion}.dll" KeyPath="yes"/>
       </Component>
       <Component Id="NxInterfaceComponent" Guid="{2F8E6482-75C6-4B8B-8EFE-DD0158ACE7F6}">
-        <File Id="NxInterface.1.dll" Source="..\..\..\nxinterface\x86\bin\release\${ax.className}Interface.1.dll" KeyPath="yes"/>
+        <File Id="NxInterface.1.dll" Source="${root.dir}\plugins\nxinterface\x86\bin\release\${ax.className}Interface.1.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
 
     <ComponentGroup Id="OemDriverComponents" Directory="DvrMiniDriversDir">
       <Component Id="OemMiniDriverComponent" Guid="{149E7683-5F12-4AE0-A877-71634D704632}">
-        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="..\..\paxton\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
+        <File Id="${ax.className}.OemDvrMiniDriver.dll" Source="${root.dir}\plugins\acs\paxton-plugin\x86\bin\Release\${ax.className}.OemDvrMiniDriver.Merged.dll" KeyPath="yes"/>
       </Component>
     </ComponentGroup>
   </Fragment>

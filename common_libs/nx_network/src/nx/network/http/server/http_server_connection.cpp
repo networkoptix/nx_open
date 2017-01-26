@@ -1,6 +1,8 @@
+
 #include "http_server_connection.h"
 
 #include <memory>
+
 #include <QtCore/QDateTime>
 
 #include <utils/common/util.h>
@@ -13,14 +15,15 @@ namespace nx_http
 {
     HttpServerConnection::HttpServerConnection(
         StreamConnectionHolder<HttpServerConnection>* socketServer,
-        std::unique_ptr<AbstractCommunicatingSocket> sock,
-        nx_http::AbstractAuthenticationManager* const authenticationManager,
+        std::unique_ptr<AbstractStreamSocket> sock,
+        nx_http::server::AbstractAuthenticationManager* const authenticationManager,
         nx_http::MessageDispatcher* const httpMessageDispatcher )
     :
         BaseType( socketServer, std::move(sock) ),
         m_authenticationManager( authenticationManager ),
         m_httpMessageDispatcher( httpMessageDispatcher ),
-        m_isPersistent( false )
+        m_isPersistent( false ),
+        m_persistentConnectionEnabled(true)
     {
     }
 
@@ -28,7 +31,18 @@ namespace nx_http
     {
     }
 
-    void HttpServerConnection::processMessage( nx_http::Message&& request )
+    void HttpServerConnection::pleaseStop(
+        nx::utils::MoveOnlyFunc<void()> completionHandler)
+    {
+        BaseType::pleaseStop(
+            [this, completionHandler = std::move(completionHandler)]()
+            {
+                m_currentMsgBody.reset(); // we are in aio thread, so this is ok
+                completionHandler();
+            });
+    }
+
+    void HttpServerConnection::processMessage( nx_http::Message&& requestMessage )
     {
         //TODO incoming message body
         //    should use AbstractMsgBodySource also
@@ -37,71 +51,143 @@ namespace nx_http
         //    can add sequence to sendResponseFunc and use it to queue responses
 
         //checking if connection is persistent
-        checkForConnectionPersistency( request );
+        checkForConnectionPersistency(requestMessage);
 
         //TODO #ak performing authentication
         //    authentication manager should be able to return some custom data
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
-        stree::ResourceContainer authInfo;
-        if (!authenticateRequest(*request.request, &authInfo))
+        if (!m_authenticationManager)
+        {
+            onAuthenticationDone(
+                true,
+                stree::ResourceContainer(),
+                std::move(requestMessage),
+                boost::none,
+                nx_http::HttpHeaders(),
+                nullptr);
             return;
+        }
+
+        const nx_http::Request& request = *requestMessage.request;
+        auto strongRef = shared_from_this();
+        std::weak_ptr<HttpServerConnection> weakThis = strongRef;
+        m_authenticationManager->authenticate(
+            *this,
+            request,
+            [this, weakThis = std::move(weakThis),
+                requestMessage = std::move(requestMessage)](
+                    bool authenticationResult,
+                    stree::ResourceContainer authInfo,
+                    boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+                    nx_http::HttpHeaders responseHeaders,
+                    std::unique_ptr<AbstractMsgBodySource> msgBody) mutable
+            {
+                auto strongThis = weakThis.lock();
+                if (!strongThis)
+                    return;
+
+                if (!socket())  //< connection has been removed while request authentication in progress
+                {
+                    closeConnection(SystemError::noError);
+                    return;
+                }
+
+                strongThis->post(
+                    [this,
+                        authenticationResult,
+                        authInfo = std::move(authInfo),
+                        requestMessage = std::move(requestMessage),
+                        wwwAuthenticate = std::move(wwwAuthenticate),
+                        responseHeaders = std::move(responseHeaders),
+                        msgBody = std::move(msgBody)]() mutable
+                    {
+                        onAuthenticationDone(
+                            authenticationResult,
+                            std::move(authInfo),
+                            std::move(requestMessage),
+                            std::move(wwwAuthenticate),
+                            std::move(responseHeaders),
+                            std::move(msgBody));
+                    });
+            });
+    }
+
+    void HttpServerConnection::onAuthenticationDone(
+        bool authenticationResult,
+        stree::ResourceContainer authInfo,
+        nx_http::Message requestMessage,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody)
+    {
+        if (!authenticationResult)
+        {
+            sendUnauthorizedResponse(
+                requestMessage.request->requestLine.version,
+                std::move(wwwAuthenticate),
+                std::move(responseHeaders),
+                std::move(msgBody));
+            return;
+        }
 
         auto strongRef = shared_from_this();
         std::weak_ptr<HttpServerConnection> weakThis = strongRef;
 
-        nx_http::MimeProtoVersion version = request.request->requestLine.version;
-        auto sendResponseFunc = [this, weakThis, version](
-            nx_http::Message&& response,
-            std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
-        {
-            auto strongThis = weakThis.lock();
-            if( !strongThis )
-                return; //connection has been removed while request has been processed
-            strongThis->prepareAndSendResponse(
-                version,
-                std::move(response),
-                std::move(responseMsgBody) );
-        };
+        auto protoVersion = requestMessage.request->requestLine.version;
+        auto sendResponseFunc =
+            [this, weakThis, protoVersion](
+                nx_http::Message response,
+                std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+                ConnectionEvents connectionEvents) mutable
+            {
+                auto strongThis = weakThis.lock();
+                if (!strongThis)
+                    return;
+                if (!socket())  //< connection has been removed while request has been processed
+                {
+                    closeConnection(SystemError::noError);
+                    return;
+                }
 
-        if( !m_httpMessageDispatcher ||
+                strongThis->post(
+                    [this, strongThis = std::move(strongThis),
+                        protoVersion = std::move(protoVersion),
+                        response = std::move(response),
+                        responseMsgBody = std::move(responseMsgBody),
+                        connectionEvents = std::move(connectionEvents)]() mutable
+                    {
+                        prepareAndSendResponse(
+                            std::move(protoVersion),
+                            std::move(response),
+                            std::move(responseMsgBody),
+                            std::move(connectionEvents));
+                    });
+            };
+
+        if (!m_httpMessageDispatcher ||
             !m_httpMessageDispatcher->dispatchRequest(
-                *this,
-                std::move(request),
+                this,
+                std::move(requestMessage),
                 std::move(authInfo),
-                std::move(sendResponseFunc) ) )
+                std::move(sendResponseFunc)))
         {
             //creating and sending error response
-            nx_http::Message response( nx_http::MessageType::response );
+            nx_http::Message response(nx_http::MessageType::response);
             response.response->statusLine.statusCode = nx_http::StatusCode::notFound;
             return prepareAndSendResponse(
-                request.request->requestLine.version,
-                std::move( response ),
-                nullptr );
+                std::move(protoVersion),
+                std::move(response),
+                nullptr);
         }
     }
 
-    bool HttpServerConnection::authenticateRequest(
-        const nx_http::Request& request,
-        stree::ResourceContainer* const authInfo)
+    void HttpServerConnection::sendUnauthorizedResponse(
+        const nx_http::MimeProtoVersion& protoVersion,
+        boost::optional<header::WWWAuthenticate> wwwAuthenticate,
+        nx_http::HttpHeaders responseHeaders,
+        std::unique_ptr<AbstractMsgBodySource> msgBody)
     {
-        if (!m_authenticationManager)
-            return true;    //no authentication manager -> every request is allowed
-
-        boost::optional<header::WWWAuthenticate> wwwAuthenticate;
-        std::unique_ptr<AbstractMsgBodySource> msgBody;
-        nx_http::HttpHeaders responseHeaders;
-        if (m_authenticationManager->authenticate(
-                *this,
-                request,
-                &wwwAuthenticate,
-                authInfo,
-                &responseHeaders,
-                &msgBody))
-        {
-            return true;
-        }
-
         nx_http::Message response(nx_http::MessageType::response);
         std::move(
             responseHeaders.begin(),
@@ -115,16 +201,16 @@ namespace nx_http
                 wwwAuthenticate.get().serialized());
         }
         prepareAndSendResponse(
-            request.requestLine.version,
+            protoVersion,
             std::move(response),
             std::move(msgBody));
-        return false;
     }
 
     void HttpServerConnection::prepareAndSendResponse(
         nx_http::MimeProtoVersion version,
         nx_http::Message&& msg,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody )
+        std::unique_ptr<nx_http::AbstractMsgBodySource> responseMsgBody,
+        ConnectionEvents connectionEvents)
     {
         msg.response->statusLine.version = std::move( version );
         msg.response->statusLine.reasonPhrase =
@@ -142,18 +228,27 @@ namespace nx_http
 
         if( responseMsgBody )
         {
-            nx_http::insertOrReplaceHeader(
-                &msg.response->headers,
-                nx_http::HttpHeader( "Content-Type", responseMsgBody->mimeType() ) );
-
-            const auto contentLength = responseMsgBody->contentLength();
-            if( contentLength )
+            const auto contentType = responseMsgBody->mimeType();
+            if (contentType.isEmpty())
+            {
+                // Switching protocols, no content information should be provided at all
+                responseMsgBody.reset();
+            }
+            else
+            {
                 nx_http::insertOrReplaceHeader(
                     &msg.response->headers,
-                    nx_http::HttpHeader(
-                        "Content-Length",
-                        nx_http::StringType::number(
-                            static_cast<qulonglong>( contentLength.get() ) ) ) );
+                    nx_http::HttpHeader( "Content-Type", contentType ) );
+
+                const auto contentLength = responseMsgBody->contentLength();
+                if( contentLength )
+                    nx_http::insertOrReplaceHeader(
+                        &msg.response->headers,
+                        nx_http::HttpHeader(
+                            "Content-Length",
+                            nx_http::StringType::number(
+                                static_cast<qulonglong>( contentLength.get() ) ) ) );
+            }
         }
         else
         {
@@ -162,10 +257,26 @@ namespace nx_http
                 nx_http::HttpHeader( "Content-Length", "0" ) );
         }
 
-        m_currentMsgBody = std::move(responseMsgBody);
+        if (responseMsgBody)
+            responseMsgBody->bindToAioThread(getAioThread());
+
+        //posting request to the queue
+        m_responseQueue.emplace_back(
+            std::move(msg),
+            std::move(responseMsgBody),
+            std::move(connectionEvents));
+        if (m_responseQueue.size() == 1)
+            sendNextResponse();
+    }
+
+    void HttpServerConnection::sendNextResponse()
+    {
+        NX_ASSERT(!m_responseQueue.empty());
+
+        m_currentMsgBody = std::move(m_responseQueue.front().responseMsgBody);
         sendMessage(
-            std::move( msg ),
-            std::bind( &HttpServerConnection::responseSent, this ) );
+            std::move(m_responseQueue.front().msg),
+            std::bind(&HttpServerConnection::responseSent, this));
     }
 
     void HttpServerConnection::responseSent()
@@ -177,13 +288,7 @@ namespace nx_http
             return;
         }
 
-        using namespace std::placeholders;
-        if( !m_currentMsgBody->readAsync(
-                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
-        {
-            closeConnection(SystemError::getLastOSErrorCode());
-            return;
-        }
+        readMoreMessageBodyData();
     }
 
     void HttpServerConnection::someMsgBodyRead(
@@ -208,25 +313,39 @@ namespace nx_http
 
         sendData(
             std::move( buf ),
-            std::bind( &HttpServerConnection::someMessageBodySent, this ) );
+            std::bind( &HttpServerConnection::readMoreMessageBodyData, this ) );
     }
 
-    void HttpServerConnection::someMessageBodySent()
+    void HttpServerConnection::readMoreMessageBodyData()
     {
         using namespace std::placeholders;
-        if( !m_currentMsgBody->readAsync(
-                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
-        {
-            closeConnection(SystemError::getLastOSErrorCode());
-            return;
-        }
+        m_currentMsgBody->readAsync(
+            std::bind(&HttpServerConnection::someMsgBodyRead, this, _1, _2));
     }
 
     void HttpServerConnection::fullMessageHasBeenSent()
     {
+        NX_ASSERT(!m_responseQueue.empty());
+        if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
+        {
+            auto handler = 
+                std::move(m_responseQueue.front().connectionEvents.onResponseHasBeenSent);
+            handler(this);
+        }
+        m_responseQueue.pop_front();
+
         //if connection is NOT persistent then closing it
-        if( !m_isPersistent )
+        m_currentMsgBody.reset();
+
+        if (!socket() ||           //< socket could be taken by event handler
+            !m_isPersistent)
+        {
             closeConnection(SystemError::noError);
+            return;
+        }
+
+        if (!m_responseQueue.empty())
+            sendNextResponse();
     }
 
     void HttpServerConnection::checkForConnectionPersistency( const Message& msg )
@@ -236,11 +355,19 @@ namespace nx_http
 
         const auto& request = *msg.request;
 
-        if( request.requestLine.version == nx_http::http_1_1 )
-            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() != "close";
-        else if( request.requestLine.version == nx_http::http_1_0 )
-            m_isPersistent = nx_http::getHeaderValue( request.headers, "Connection" ).toLower() == "keep-alive";
-        else    //e.g., RTSP
-            m_isPersistent = false;
+        m_isPersistent = false;
+        if (m_persistentConnectionEnabled)
+        {
+            if (request.requestLine.version == nx_http::http_1_1)
+                m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() != "close";
+            else if (request.requestLine.version == nx_http::http_1_0)
+                m_isPersistent = nx_http::getHeaderValue(request.headers, "Connection").toLower() == "keep-alive";
+        }
     }
+
+    void HttpServerConnection::setPersistentConnectionEnabled(bool value)
+    {
+        m_persistentConnectionEnabled = value;
+    }
+
 }

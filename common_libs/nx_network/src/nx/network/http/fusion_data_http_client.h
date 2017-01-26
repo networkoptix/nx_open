@@ -14,8 +14,8 @@
 #include <common/common_globals.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 
 namespace nx_http {
@@ -52,12 +52,13 @@ void processHttpResponse(
     OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
     if (!success)
     {
-        handler(SystemError::noError, response, OutputData());
+        handler(SystemError::invalidData, response, OutputData());
         return;
     }
 
     handler(SystemError::noError, response, std::move(outputData));
 }
+
 
 template<typename HandlerFunc>
 class BaseFusionDataHttpClient
@@ -65,7 +66,7 @@ class BaseFusionDataHttpClient
     public QnStoppableAsync
 {
 public:
-    BaseFusionDataHttpClient(QUrl url)
+    BaseFusionDataHttpClient(QUrl url, AuthInfo auth)
     :
         m_url(std::move(url)),
         m_httpClient(nx_http::AsyncHttpClient::create())
@@ -74,28 +75,31 @@ public:
             m_httpClient.get(), &nx_http::AsyncHttpClient::done,
             m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){ requestDone(client); },
             Qt::DirectConnection);
+        m_httpClient->setAuth(auth);
     }
-    
+
     virtual ~BaseFusionDataHttpClient() {}
 
     //!Implementation of QnStoppableAsync::pleaseStopAsync
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        m_httpClient->terminate();
+        m_httpClient->pleaseStopSync();
         handler();
     }
 
-    /*!
-        \return \a false if failed to initiate async request
-    */
-    void get(std::function<HandlerFunc> handler)
+    void execute(std::function<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        m_httpClient->doGet(m_url);
+        if (m_requestContentType.isEmpty())
+            m_httpClient->doGet(m_url);
+        else
+            m_httpClient->doPost(m_url, m_requestContentType, std::move(m_requestBody));
     }
 
 protected:
     QUrl m_url;
+    nx_http::StringType m_requestContentType;
+    nx_http::BufferType m_requestBody;
     std::function<HandlerFunc> m_handler;
 
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) = 0;
@@ -106,11 +110,11 @@ private:
 
 }   //detail
 
-
 //!HTTP client that uses \a fusion to serialize/deserialize input/output data
 /*!
     If output data is expected, then only GET request can be used.
-    Input data in this case is serialized to the url by calling \a serializeToUrlQuery(InputData, QUrlQuery*)
+    Input data in this case is serialized to the url by calling \a serializeToUrlQuery(InputData, QUrlQuery*).
+    \note Reports \a SystemError::invalidData on failure to parse response
 */
 template<typename InputData, typename OutputData>
 class FusionDataHttpClient
@@ -127,13 +131,17 @@ public:
     */
     FusionDataHttpClient(
         QUrl url,
+        AuthInfo auth,
         const InputData& input)
     :
-        ParentType(std::move(url))
+        ParentType(std::move(url), std::move(auth))
     {
-        detail::serializeToUrl(input, &this->m_url);
+        this->m_requestBody = QJson::serialized(input);
+        this->m_requestContentType =
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        //detail::serializeToUrl(input, &this->m_url);
     }
-    
+
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
@@ -156,12 +164,12 @@ class FusionDataHttpClient<void, OutputData>
         void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url)
+    FusionDataHttpClient(QUrl url, AuthInfo auth)
     :
-        ParentType(std::move(url))
+        ParentType(std::move(url), std::move(auth))
     {
     }
-    
+
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
@@ -186,13 +194,17 @@ class FusionDataHttpClient<InputData, void>
 public:
     FusionDataHttpClient(
         QUrl url,
+        AuthInfo auth,
         const InputData& input)
     :
-        ParentType(std::move(url))
+        ParentType(std::move(url), std::move(auth))
     {
-        detail::serializeToUrl(input, &m_url);
+        this->m_requestBody = QJson::serialized(input);
+        this->m_requestContentType =
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+        //detail::serializeToUrl(input, &m_url);
     }
-    
+
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
@@ -214,12 +226,12 @@ class FusionDataHttpClient<void, void>
         void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url)
+    FusionDataHttpClient(QUrl url, AuthInfo auth)
     :
-        ParentType(std::move(url))
+        ParentType(std::move(url), std::move(auth))
     {
     }
-    
+
 private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {

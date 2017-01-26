@@ -16,16 +16,15 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
     return m_setStatusInProgress.contains(resource->getId());
 }
 
-void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
+void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
 {
-    //NX_ASSERT(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-    //if (resource.dynamicCast<QnMediaServerResource>())
-    //    return;
-
-    if (!isSetStatusInProgress(resource))
-        updateResourceStatusAsync(resource);
-    else
-        m_awaitingSetStatus << resource->getId();
+    if (reason == Qn::StatusChangeReason::Default)
+    {
+        if (!isSetStatusInProgress(resource))
+            updateResourceStatusAsync(resource);
+        else
+            m_awaitingSetStatus << resource->getId();
+    }
 }
 
 void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &resource)
@@ -34,10 +33,13 @@ void QnResourceStatusWatcher::updateResourceStatusAsync(const QnResourcePtr &res
         return;
 
     m_setStatusInProgress.insert(resource->getId());
-    if (resource.dynamicCast<QnMediaServerResource>())
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusLocal(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
-    else
-        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatus(resource->getId(), resource->getStatus(), this, &QnResourceStatusWatcher::requestFinished2);
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto manager = connection->getResourceManager(Qn::kSystemAccess);
+    manager->setResourceStatus(
+        resource->getId(),
+        resource->getStatus(),
+        this,
+        &QnResourceStatusWatcher::requestFinished2);
 }
 
 void QnResourceStatusWatcher::requestFinished2(int /*reqID*/, ec2::ErrorCode errCode, const QnUuid& id)

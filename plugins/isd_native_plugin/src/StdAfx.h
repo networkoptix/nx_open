@@ -1,2 +1,1 @@
-
-#include <common/common_globals.h>
+#include <nx/utils/compiler_options.h>

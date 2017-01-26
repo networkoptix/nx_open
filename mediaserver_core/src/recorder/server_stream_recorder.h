@@ -20,8 +20,8 @@ class QnServerStreamRecorder: public QnStreamRecorder
     Q_OBJECT
 public:
     QnServerStreamRecorder(
-        const QnResourcePtr                 &dev, 
-        QnServer::ChunksCatalog             catalog, 
+        const QnResourcePtr                 &dev,
+        QnServer::ChunksCatalog             catalog,
         QnAbstractMediaStreamDataProvider*  mediaProvider
     );
 
@@ -35,7 +35,7 @@ public:
     QnDualStreamingHelperPtr getDualStreamingHelper() const;
 
     /*
-    * Ignore current schedule task param and start (or restart) recording with specified params. 
+    * Ignore current schedule task param and start (or restart) recording with specified params.
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
@@ -68,6 +68,7 @@ protected:
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
+    virtual void beforeRun() override;
     virtual void endOfRun() override;
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md) override;
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex) override;
@@ -85,15 +86,26 @@ private:
     bool pauseRebuildIfHighData(QnMutexLockerBase* locker);
     bool resumeRebuildIfLowData(QnMutexLockerBase* locker);
     void resumeRebuild(QnMutexLockerBase* locker);
+    void fileCreated(uintptr_t filePtr) const;
+    int getBufferSize() const;
+    virtual void initIoContext(
+        const QnStorageResourcePtr& storage,
+        const QString& url,
+        AVIOContext** context) override;
+
+    void updateRebuildState();
+    void pauseRebuildIfHighDataNoLock();
+    void resumeRebuildIfLowDataNoLock();
+    bool cleanupQueueIfOverflow();
+    void addQueueSizeUnsafe(qint64 value);
 private slots:
-    void at_recordingFinished(
-        const ErrorStruct   &status,
-        const QString       &filename
-    );
+    void at_recordingFinished(const StreamRecorderErrorStruct& status,
+        const QString& filename);
+
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
-    const size_t m_maxRecordQueueSizeBytes;
-    const size_t m_maxRecordQueueSizeElements;
+    const qint64 m_maxRecordQueueSizeBytes;
+    const int m_maxRecordQueueSizeElements;
     mutable QnMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
@@ -112,12 +124,14 @@ private:
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
-    size_t m_queuedSize;
+    qint64 m_queuedSize;
+    static std::atomic<qint64> m_totalQueueSize;
+    static std::atomic<int> m_totalRecorders;
     QnMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
-    bool m_rebuildBlocked;
+    std::atomic<bool> m_rebuildBlocked;
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
 };

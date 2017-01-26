@@ -5,6 +5,8 @@
 #include <QtGui/QMatrix4x4>
 #include <QtCore/QtMath>
 
+#include <nx/streaming/config.h>
+
 #include <utils/math/math.h>
 #include <utils/media/frame_info.h>
 
@@ -166,7 +168,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
     int bottom = frame->height;
     QSize imageSize(right - left, bottom - top);
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     int prevRoundMode = _MM_GET_ROUNDING_MODE();

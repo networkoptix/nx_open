@@ -17,10 +17,13 @@
 
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include <nx/utils/log/log.h>
+
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+
 #include <network/authenticate_helper.h>
+#include <network/system_helpers.h>
+
 #include <nx/network/nettools.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
@@ -28,7 +31,22 @@
 #include <server/host_system_password_synchronizer.h>
 #include <core/resource_management/resource_properties.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
+#include <transaction/transaction_message_bus.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <network/authutil.h>
+
+#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
+#include <api/resource_property_adaptor.h>
+
+#include <QtCore/QJsonDocument>
+#include <QtXmlPatterns/QXmlSchema>
+#include <QtXmlPatterns/QXmlSchemaValidator>
+#include <QtXml/QDomDocument>
+
+#include "server_connector.h"
+#include "server/server_globals.h"
 
 namespace
 {
@@ -36,21 +54,10 @@ namespace
     static const QByteArray PREV_SYSTEM_NAME_KEY("prevSystemName");
     static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
     static const QByteArray SYSTEM_IDENTITY_TIME("sysIdTime");
+    static const QByteArray AUTH_KEY("authKey");
 }
 
 static QnMediaServerResourcePtr m_server;
-
-QByteArray decodeAuthKey(const QByteArray& authKey) {
-    // convert from v2.2 format and encode value
-    QByteArray prefix("SK_");
-    if (authKey.startsWith(prefix)) {
-        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
-        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
-    } else {
-        return authKey;
-    }
-}
 
 QnUuid serverGuid()
 {
@@ -85,90 +92,69 @@ QString getDataDirectory()
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (PasswordData),
+    (ConfigureSystemData),
     (json),
-    _Fields,
-    (optional, true));
+    _Fields)
 
-PasswordData::PasswordData(const QnRequestParams &params)
+bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString)
 {
-    password = params.value(lit("password"));
-    oldPassword = params.value(lit("oldPassword"));
-    realm = params.value(lit("realm")).toLatin1();
-    passwordHash = params.value(lit("passwordHash")).toLatin1();
-    passwordDigest = params.value(lit("passwordDigest")).toLatin1();
-    cryptSha512Hash = params.value(lit("cryptSha512Hash")).toLatin1();
-}
+    if (!userRes)
+    {
+        if (errString)
+            *errString = lit("Temporary unavailable. Please try later.");
+        return false;
+    }
 
-bool PasswordData::hasPassword() const
-{
-    return
-        !password.isEmpty() ||
-        !passwordHash.isEmpty() ||
-        !passwordDigest.isEmpty();
-}
-
-bool changeAdminPassword(PasswordData data)
-{
-    //genereating cryptSha512Hash
+    //generating cryptSha512Hash
     if (data.cryptSha512Hash.isEmpty() && !data.password.isEmpty())
         data.cryptSha512Hash = linuxCryptSha512(data.password.toUtf8(), generateSalt(LINUX_CRYPT_SALT_LENGTH));
 
-
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (!admin)
-        return false;
-
     //making copy of admin user to be able to rollback local changed on DB update failure
-    QnUserResourcePtr updatedAdmin = QnUserResourcePtr(new QnUserResource(*admin));
+    QnUserResourcePtr updatedUser = QnUserResourcePtr(new QnUserResource(*userRes));
 
     if (data.password.isEmpty() &&
-        updatedAdmin->getHash() == data.passwordHash &&
-        updatedAdmin->getDigest() == data.passwordDigest &&
-        updatedAdmin->getCryptSha512Hash() == data.cryptSha512Hash)
+        updatedUser->getHash() == data.passwordHash &&
+        updatedUser->getDigest() == data.passwordDigest &&
+        updatedUser->getCryptSha512Hash() == data.cryptSha512Hash &&
+        (!isEnabled.isDefined() || updatedUser->isEnabled() == isEnabled.value()))
     {
         //no need to update anything
         return true;
     }
 
+    if (isEnabled.isDefined())
+        updatedUser->setEnabled(isEnabled.value());
+
     if (!data.password.isEmpty())
     {
-        /* check old password */
-        if (!admin->checkPassword(data.oldPassword))
-            return false;
-
         /* set new password */
-        updatedAdmin->setPassword(data.password);
-        updatedAdmin->generateHash();
-
-        ec2::ApiUserData apiUser;
-        fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser, data.password) != ec2::ErrorCode::ok)
-            return false;
-        updatedAdmin->setPassword(QString());
+        updatedUser->setPassword(data.password);
+        updatedUser->generateHash();
     }
-    else
+    else if (!data.passwordHash.isEmpty())
     {
-        updatedAdmin->setRealm(data.realm);
-        updatedAdmin->setHash(data.passwordHash);
-        updatedAdmin->setDigest(data.passwordDigest);
+        updatedUser->setRealm(data.realm);
+        updatedUser->setHash(data.passwordHash);
+        updatedUser->setDigest(data.passwordDigest);
         if (!data.cryptSha512Hash.isEmpty())
-            updatedAdmin->setCryptSha512Hash(data.cryptSha512Hash);
-
-        ec2::ApiUserData apiUser;
-        fromResourceToApi(updatedAdmin, apiUser);
-        if (QnAppServerConnectionFactory::getConnection2()->getUserManager()->saveSync(apiUser) != ec2::ErrorCode::ok)
-            return false;
+            updatedUser->setCryptSha512Hash(data.cryptSha512Hash);
     }
 
-    //applying changes to local resource
-    //TODO #ak following changes are done non-atomically
-    admin->setRealm(updatedAdmin->getRealm());
-    admin->setHash(updatedAdmin->getHash());
-    admin->setDigest(updatedAdmin->getDigest());
-    admin->setCryptSha512Hash(updatedAdmin->getCryptSha512Hash());
+    ec2::ApiUserData apiUser;
+    fromResourceToApi(updatedUser, apiUser);
+    auto errCode = QnAppServerConnectionFactory::getConnection2()
+        ->getUserManager(Qn::kSystemAccess)
+        ->saveSync(apiUser, data.password);
+    NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+    if (errCode != ec2::ErrorCode::ok)
+    {
+        if (errString)
+            *errString = lit("Internal server database error: %1").arg(toString(errCode));
+        return false;
+    }
+    updatedUser->setPassword(QString());
 
-    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedAdmin);
+    HostSystemPasswordSynchronizer::instance()->syncLocalHostRootPasswordWithAdminIfNeeded(updatedUser);
     return true;
 }
 
@@ -186,15 +172,6 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 
         if (errStr)
             *errStr = lit("All password hashes MUST be supplied all together along with realm");
-        return false;
-    }
-
-    if (!passwordData.password.isEmpty() && passwordData.oldPassword.isEmpty())
-    {
-        //these values MUST be all filled or all NOT filled
-        NX_LOG(lit("Old password MUST be provided"), cl_logDEBUG2);
-        if (errStr)
-            *errStr = lit("Old password MUST be provided");
         return false;
     }
 
@@ -221,44 +198,169 @@ bool backupDatabase() {
     return true;
 }
 
-bool changeSystemName(nx::SystemName systemName, qint64 sysIdTime, qint64 tranLogTime)
+void dropConnectionsToRemotePeers()
 {
-    if (qnCommon->localSystemName() == systemName.value())
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->stop();
+
+    qnTransactionBus->dropConnections();
+}
+
+void resumeConnectionsToRemotePeers()
+{
+    if (QnServerConnector::instance())
+        QnServerConnector::instance()->start();
+}
+
+bool changeLocalSystemId(const ConfigureSystemData& data)
+{
+    if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
 
-    qnCommon->setLocalSystemName(systemName.value());
     QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
     }
 
-    systemName.saveToConfig();
-    server->setSystemName(systemName.value());
-    qnCommon->setSystemIdentityTime(sysIdTime, qnCommon->moduleGUID());
-    if (systemName.isDefault())
-        server->setServerFlags(server->getServerFlags() | Qn::SF_AutoSystemName);
-    else
-        server->setServerFlags(server->getServerFlags() & ~Qn::SF_AutoSystemName);
-    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(tranLogTime);
+    if (!data.wholeSystem)
+        dropConnectionsToRemotePeers();
 
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+
+    // add foreign users
+    for (const auto& user: data.foreignUsers)
+    {
+        if (connection->getUserManager(Qn::kSystemAccess)->saveSync(user) != ec2::ErrorCode::ok)
+        {
+            if (!data.wholeSystem)
+                resumeConnectionsToRemotePeers();
+            return false;
+        }
+    }
+
+    // add foreign resource params
+    ec2::ApiResourceParamWithRefDataList dummyData;
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    {
+        if (!data.wholeSystem)
+            resumeConnectionsToRemotePeers();
+        return false;
+    }
+
+    // apply remove settings
+    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    for(const auto& foreignSetting: data.foreignSettings)
+    {
+        for(QnAbstractResourcePropertyAdaptor* setting: settings)
+        {
+            if (setting->key() == foreignSetting.name)
+            {
+                setting->setSerializedValue(foreignSetting.value);
+                break;
+            }
+        }
+    }
+
+    qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
+
+    if (data.localSystemId.isNull())
+        qnGlobalSettings->resetCloudParams();
+    qnGlobalSettings->setLocalSystemId(data.localSystemId);
+    qnGlobalSettings->synchronizeNowSync();
+
+    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+
+    // update auth key if system name is changed
+    server->setAuthKey(QnUuid::createUuid().toString());
+    nx::ServerSetting::setAuthKey(server->getAuthKey().toLatin1());
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
-    QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->save(apiServer, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer) != ec2::ErrorCode::ok)
+    {
+        NX_LOG("Failed to update server auth key while configuring system", cl_logWARNING);
+    }
+
+    if (!data.foreignServer.id.isNull())
+    {
+        // add foreign server to pass auth if admin user is disabled
+        if (connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(data.foreignServer) != ec2::ErrorCode::ok)
+        {
+            NX_LOG("Failed to add foreign server while configuring system", cl_logWARNING);
+        }
+    }
+
+    if (!data.wholeSystem)
+        resumeConnectionsToRemotePeers();
 
     return true;
 }
 
-qint64 getSysIdTime()
+bool resetSystemToStateNew()
+{
+    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
+    if (!qnGlobalSettings->synchronizeNowSync())
+        return false;
+
+    auto adminUserResource = qnResPool->getAdministrator();
+    PasswordData data;
+    data.password = helpers::kFactorySystemPassword;
+    return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
+}
+
+// -------------- nx::ServerSetting -----------------------
+
+qint64 nx::ServerSetting::getSysIdTime()
 {
     return MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
 }
 
-void setSysIdTime(qint64 value)
+void nx::ServerSetting::setSysIdTime(qint64 value)
 {
     auto settings = MSSettings::roSettings();
-    settings->setValue(SYSTEM_IDENTITY_TIME, QString());
+    settings->setValue(SYSTEM_IDENTITY_TIME, value);
 }
+
+QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
+{
+    // convert from v2.2 format and encode value
+    QByteArray prefix("SK_");
+    if (authKey.startsWith(prefix)) {
+        QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
+    }
+    else {
+        return authKey;
+    }
+}
+
+QByteArray nx::ServerSetting::getAuthKey()
+{
+    QByteArray authKey = MSSettings::roSettings()->value(AUTH_KEY).toByteArray();
+    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    if (!authKey.isEmpty())
+    {
+        // convert from v2.2 format and encode value
+        QByteArray prefix("SK_");
+        if (!authKey.startsWith(prefix))
+            setAuthKey(authKey);
+        else
+            authKey = decodeAuthKey(authKey);
+    }
+    return authKey;
+}
+
+void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
+{
+    QByteArray prefix("SK_");
+    QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
+    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+}
+
+
+// -------------- nx::SystemName -----------------------
 
 nx::SystemName::SystemName(const SystemName& other):
     m_value(other.m_value)
@@ -286,12 +388,19 @@ QString nx::SystemName::prevValue() const
         return m_prevValue;
 }
 
-void nx::SystemName::saveToConfig()
+bool nx::SystemName::saveToConfig()
 {
+    const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
     auto settings = MSSettings::roSettings();
+    if (!settings->isWritable())
+    {
+        m_prevValue = prevValueBak;
+        return false;
+    }
     settings->setValue(SYSTEM_NAME_KEY, m_value);
     settings->setValue(PREV_SYSTEM_NAME_KEY, m_prevValue);
+    return true;
 }
 
 void nx::SystemName::loadFromConfig()
@@ -309,4 +418,44 @@ void nx::SystemName::resetToDefault()
 bool nx::SystemName::isDefault() const
 {
     return m_value.startsWith(AUTO_GEN_SYSTEM_NAME);
+}
+
+void nx::SystemName::clear()
+{
+    m_value.clear();
+    m_prevValue.clear();
+}
+
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
+{
+    static const QByteArray kDefaultContentType("text/plain");
+    static const QByteArray kJsonContentType("application/json");
+    static const QByteArray kXMLContentType("application/xml");
+    static const QByteArray kHTMLContentType("text/html; charset=utf-8");
+
+    if (msgBody.isEmpty())
+        return QByteArray();
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(msgBody, &error);
+    if(error.error == QJsonParseError::NoError)
+        return kJsonContentType;
+
+    const QRegExp regExpr(lit("<html[^<]*>"));
+
+    int pos = regExpr.indexIn(QString::fromUtf8(msgBody));
+    while (pos >= 0)
+    {
+        // Check that <html pattern found not inside string
+        int quoteCount = QByteArray::fromRawData(msgBody.data(), pos).count('\"');
+        if (quoteCount % 2 == 0)
+            return kHTMLContentType;
+        pos = regExpr.indexIn(msgBody, pos+1);
+    }
+
+    QDomDocument xmlDoc;
+    if (xmlDoc.setContent(msgBody))
+        return kXMLContentType;
+
+    return kDefaultContentType;
 }

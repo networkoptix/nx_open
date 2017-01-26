@@ -12,7 +12,7 @@ namespace
         QnCameraBookmark result;
         result.guid = QnUuid::createUuid();
         result.name = lit("Bookmark");
-        result.cameraId = "testcamera";
+        result.cameraId =  guidFromArbitraryData(lit("testcamera"));
         result.startTimeMs = startTimeMs;
         result.durationMs = kDefaultBookmarkDurationMs;
         NX_ASSERT(result.isValid(), Q_FUNC_INFO, "This function must create valid bookmarks");

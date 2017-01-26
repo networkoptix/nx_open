@@ -15,14 +15,18 @@
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 #include "platform/monitoring/global_monitor.h"
+#include <platform/platform_abstraction.h>
 
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
+#include <media_server/serverutil.h>
+#include <media_server/media_server_module.h>
 
 #include "health/system_health.h"
+#include "platform/platform_abstraction.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -31,11 +35,54 @@ struct QnModuleInformation;
 class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
+struct BeforeRestoreDbData;
 namespace ec2 {
     class CrashReporter;
 }
 
-class MediaServerProcess : public QnLongRunnable
+struct CloudManagerGroup;
+
+void restartServer(int restartTimeout);
+
+class CmdLineArguments
+{
+public:
+    QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
+    QString ec2TranLogLevel;
+    QString permissionsLogLevel;
+    QString rebuildArchive;
+    QString devModeKey;
+    QString allowedDiscoveryPeers;
+    QString ifListFilter;
+    bool cleanupDb;
+
+    QString configFilePath;
+    QString rwConfigFilePath;
+    bool showVersion;
+    bool showHelp;
+    QString engineVersion;
+    QString enforceSocketType;
+    QString enforcedMediatorEndpoint;
+    QString ipVersion;
+
+
+    CmdLineArguments() :
+        logLevel(
+#ifdef _DEBUG
+            lit("DEBUG")),
+#else
+        lit("INFO")),
+#endif
+        cleanupDb(false),
+        showVersion(false),
+        showHelp(false)
+    {
+    }
+};
+
+class MediaServerProcess: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -49,15 +96,19 @@ public:
 
     /** Entry point */
     static int main(int argc, char* argv[]);
+
+    void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
+
+    const CmdLineArguments cmdLineArguments() const;
+    void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
+
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
-
 private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
-    void at_localInterfacesChanged();
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -77,23 +128,25 @@ private slots:
     void at_updatePublicAddress(const QHostAddress& publicIP);
 
 private:
+
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
-    bool initTcpListener(const CloudConnectionManager& cloudConnectionManager);
+    void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
+    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
+    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
-    QHostAddress getPublicAddress();
+    Qn::ServerFlags calcServerFlags();
+    void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
     void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
-    void saveAdminPswdHash();
     bool isStopping() const;
-
-    /**
-     * Fix statistics allowed flag by value, set in the installer.
-     * Note that installer value will override the existing one.
-     */
-    void updateStatisticsAllowedSettings();
+    void resetSystemState(CloudConnectionManager& cloudConnectionManager);
+    void performActionsOnExit();
+    void parseCommandLineParameters(int argc, char* argv[]);
+    void updateAllowedInterfaces();
+    void addCommandLineParametersFromConfig();
 private:
     int m_argc;
     char** m_argv;
@@ -106,8 +159,6 @@ private:
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
-    QHostAddress m_publicAddress;
-    QList<QHostAddress> m_localAddresses;
     std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
@@ -116,6 +167,11 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
+    QVector<QString> m_hardwareGuidList;
+    nx::SystemName m_systemName;
+    std::unique_ptr<QnPlatformAbstraction> m_platform;
+    CmdLineArguments m_cmdLineArguments;
+    QnUuid m_obsoleteGuid;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

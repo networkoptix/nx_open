@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include <functional>
@@ -10,20 +9,29 @@ typedef QSharedPointer<QnRaiiGuard> QnRaiiGuardPtr;
 class NX_UTILS_API QnRaiiGuard
 {
 public:
-    typedef std::function<void ()> Handler;
+    typedef std::function<void()> Handler;
 
-    static QnRaiiGuardPtr create(const Handler &creationHandler
-        , const Handler &destructionHandler);
+public:
+    explicit QnRaiiGuard(const Handler& creationHandler, const Handler& destructionHandler);
 
-    static QnRaiiGuardPtr createDestructable(const Handler &destructionHandler);
+    QnRaiiGuard(QnRaiiGuard&& other);
 
-    static QnRaiiGuardPtr createEmpty();
-
-    explicit QnRaiiGuard(const Handler &creationHandler
-        , const Handler &destructionHandler);
+    QnRaiiGuard(const QnRaiiGuard&) = delete;
+    QnRaiiGuard& operator=(const QnRaiiGuard&) = delete;
 
     ~QnRaiiGuard();
 
+    void enableDestructionHandler();
+    void disableDestructionHandler();
+
+    static QnRaiiGuardPtr create(
+        const Handler& creationHandler, const Handler& destructionHandler);
+    static QnRaiiGuardPtr createDestructible(const Handler& destructionHandler);
+    static QnRaiiGuardPtr createEmpty();
+
 private:
-    const Handler m_destructionHandler;
+    bool m_destructionHandlerEnabled = true;
+    Handler m_destructionHandler;
 };
+
+Q_DECLARE_METATYPE(QnRaiiGuardPtr)

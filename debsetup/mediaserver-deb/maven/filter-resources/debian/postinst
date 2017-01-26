@@ -31,9 +31,7 @@ CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
 # This is necessary because changed configuration options should take effect
 # immediately.
-if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
-  stop $COMPANY_NAME-mediaserver
-fi
+service $COMPANY_NAME-mediaserver stop || true
 
 # Default MS parameters
 PORT_DEFAULT="7001"
@@ -164,11 +162,11 @@ case "$1" in
             PORT="$($CFG_HELPER port)"
             [ -z "$PORT" ] && PORT="$($EC_CFG_HELPER port)"
             [ -z "$PORT" ] && PORT=$(find_free_port $PORT_DEFAULT)
-            PORT=$(ask_for_value port "$PORT")
+            #PORT=$(ask_for_value port "$PORT")
             $CFG_HELPER port "$PORT"
 
             if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
-                APPSERVER_PASSWORD=$(ask_for_value appserverPassword "$APPSERVER_PASSWORD")
+                APPSERVER_PASSWORD="admin"
                 $CFG_HELPER appserverPassword "$APPSERVER_PASSWORD"
                 $CFG_HELPER lowPriorityPassword 1
             fi
@@ -179,18 +177,18 @@ case "$1" in
 
             SYSTEM_NAME="$($CFG_HELPER systemName)"
             [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
-            SYSTEM_NAME=$(ask_for_value systemName "$SYSTEM_NAME")
+            SYSTEM_NAME=
             $CFG_HELPER systemName "$SYSTEM_NAME"
 
             CAMERA_SETTINGS_OPTIMIZATION="$($CFG_HELPER cameraSettingsOptimization)"
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$($EC_CFG_HELPER allowCameraChanges)
             [ -z "$CAMERA_SETTINGS_OPTIMIZATION" ] && CAMERA_SETTINGS_OPTIMIZATION=$CAMERA_SETTINGS_OPTIMIZATION_DEFAULT
-            CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
+            #CAMERA_SETTINGS_OPTIMIZATION=$(ask_for_value cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION")
             $CFG_HELPER cameraSettingsOptimization "$CAMERA_SETTINGS_OPTIMIZATION"
 
             STATISTICS_REPORT_ALLOWED="$($CFG_HELPER statisticsReportAllowed)"
             [ -z "$STATISTICS_REPORT_ALLOWED" ] && STATISTICS_REPORT_ALLOWED=$STATISTICS_REPORT_ALLOWED_DEFAULT
-            STATISTICS_REPORT_ALLOWED=$(ask_for_value statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED")
+            #STATISTICS_REPORT_ALLOWED=$(ask_for_value statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED")
             $CFG_HELPER statisticsReportAllowed "$STATISTICS_REPORT_ALLOWED"
         else
             PORT="$($CFG_HELPER port)"
@@ -216,14 +214,17 @@ case "$1" in
             mv $EC_DIR/var/hostedfiles $BASE_DIR/var/vms_storedfiles
         fi
 
-        "$CERTGEN" -i
+        if [ '${arch}' != 'arm' ]; then "$CERTGEN" -i; fi
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
             [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             cp "$OLD_DB_PATH" "$DB_PATH"
         fi
 
-        [ -n "$UPGRADING" ] && $DBSYNC
+        if [ '${arch}' != 'arm' ]
+        then
+            [ -n "$UPGRADING" ] && $DBSYNC
+        fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
@@ -235,9 +236,18 @@ case "$1" in
   ;;
 esac
 
-if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
-    invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
-fi
-update-rc.d -f $COMPANY_NAME-mediaserver remove >/dev/null || exit $?
+# Dirty huck to prevent apport to catch our crash dumps
+echo manual > /etc/init/apport.override
+systemctl disable apport >/dev/null 2>&1 || true
+service apport stop >/dev/null 2>&1 || true
 
-exit 0
+if [ $(which systemctl) ]; then
+    # Systemd has a recursion problem with forwarding init.d script
+    rm /etc/init.d/$COMPANY_NAME-mediaserver
+
+    # Systemd requires explicit enable for service to start it on boot
+    systemctl enable $COMPANY_NAME-mediaserver || exit $?
+fi
+
+service $COMPANY_NAME-mediaserver start || exit $?
+

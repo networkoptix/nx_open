@@ -8,8 +8,8 @@
 #include <nx/network/ssl_socket.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/common/string.h>
-#include <utils/common/ssl_gen_cert.h>
+#include <nx/utils/string.h>
+#include <nx/fusion/serialization/lexical.h>
 
 namespace nx {
 namespace cctu {
@@ -26,41 +26,15 @@ void printListenOptions(std::ostream* const outStream)
     "                               Specify credentials to use to connect to mediator\n"
     "  --server-id={server_id}      Id used when registering on mediator (optional)\n"
     "  --server-count=N             Random generated server Ids (to emulate several servers)\n"
-    "  --local-address={ip:port}    Local address to listen\n"
+    "  --local-address={ip:port}    Local address to listen (default: 127.0.0.1:0)\n"
+    "  --forward-address[=address]  Bind local address to mediator (default is local-address)\n"
     "  --udt                        Use udt instead of tcp. Only if listening local address\n"
     "  --ssl                        Uses SSL on top of server socket type\n";
-}
-
-static const void limitStringList(QStringList* list)
-{
-    if (list->size() <= kMaxAddressesToPrint)
-        return;
-
-    const auto size = list->size();
-    list->erase(list->begin() + kMaxAddressesToPrint, list->end());
-    *list << lm("... (%1 total)").arg(size);
 }
 
 class CloudServerSocketGenerator
 {
 public:
-    std::unique_ptr<AbstractStreamServerSocket> make(
-        String systemId, String authKey, std::vector<String> serverIds)
-    {
-        auto multipleServerSocket = std::make_unique<network::MultipleServerSocket>();
-        for (auto& id : serverIds)
-        {
-            auto socket = make(systemId, authKey, id);
-            if (!socket)
-                return nullptr;
-
-            if (!multipleServerSocket->addSocket(std::move(socket)))
-                return nullptr;
-        }
-
-        return std::move(multipleServerSocket);
-    }
-
     std::unique_ptr<AbstractStreamServerSocket> make(
         String systemId, String authKey, String serverId)
     {
@@ -71,6 +45,9 @@ public:
         auto socket = std::make_unique<network::cloud::CloudServerSocket>(
             currentContext.mediatorConnector->systemConnection());
 
+        if (connectionMethonds)
+            socket->setSupportedConnectionMethods(*connectionMethonds);
+
         currentContext.socket = socket.get();
         return std::move(socket);
     }
@@ -78,9 +55,9 @@ public:
     struct SocketContext
     {
         std::unique_ptr<hpm::api::MediatorConnector> mediatorConnector;
+        std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
         network::cloud::CloudServerSocket* socket;
         QString listeningAddress;
-        SystemError::ErrorCode listeningStatus;
 
         SocketContext(const SocketContext&) = delete;
         SocketContext(SocketContext&&) = default;
@@ -91,149 +68,229 @@ public:
         :
             mediatorConnector(new hpm::api::MediatorConnector),
             socket(nullptr),
-            listeningAddress(QString::fromUtf8(serverId)),
-            listeningStatus(SystemError::noError)
+            listeningAddress(QString::fromUtf8(serverId))
         {
             mediatorConnector->mockupAddress(network::SocketGlobals::mediatorConnector());
             mediatorConnector->setSystemCredentials(
                 hpm::api::SystemCredentials(systemId, serverId, authKey));
+
             mediatorConnector->enable(true);
+            mediatorConnection = mediatorConnector->systemConnection();
         }
     };
 
-    ~CloudServerSocketGenerator()
+    bool registerOnMediatorSync()
     {
-        for (auto& context: socketContexts)
-            context.socket->pleaseStopSync();
-    }
-
-    std::vector<SocketContext> socketContexts;
-};
-
-int runInListenMode(const std::multimap<QString, QString>& args)
-{
-    using namespace nx::network;
-
-    auto transmissionMode = test::TestTransmissionMode::spam;
-    if (args.find("ping") != args.end())
-        transmissionMode = test::TestTransmissionMode::pong;
-
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket;
-    const auto guard = makeScopedGuard([&serverSocket]()
-    {
-        if (serverSocket)
-            serverSocket->pleaseStopSync();
-    });
-
-    CloudServerSocketGenerator cloudServerSocketGenerator;
-    test::RandomDataTcpServer server(
-        test::TestTrafficLimitType::none, 0, transmissionMode);
-
-    auto credentialsIter = args.find("cloud-credentials");
-    auto localAddressIter = args.find("local-address");
-    if (credentialsIter != args.end())
-    {
-        const auto cloudCredentials = credentialsIter->second.split(":");
-        if (cloudCredentials.size() != 2)
-        {
-            std::cerr << "error. Parameter cloud-credentials MUST have format system_id:authentication_key" << std::endl;
-            return 1;
-        }
-
-        std::vector<String> serverIds;
-        {
-            QString serverId = generateRandomName(7);
-            readArg(args, "server-id", &serverId);
-            serverIds.push_back(serverId.toUtf8());
-
-            int serverCount = 1;
-            readArg(args, "server-count", &serverCount);
-            for (int i = serverIds.size(); i < serverCount; i++)
-                serverIds.push_back((serverId + QString::number(i)).toUtf8());
-        }
-
-        serverSocket = cloudServerSocketGenerator.make(
-            cloudCredentials[0].toUtf8(), cloudCredentials[1].toUtf8(), serverIds);
-
         QStringList sucessfulListening;
         QStringList failedListening;
-        for (auto& context: cloudServerSocketGenerator.socketContexts)
+        nx::utils::promise<void> registerPromise;
         {
-            if (context.socket->registerOnMediatorSync())
+            nx::utils::BarrierHandler barrier(
+                [&registerPromise](){ registerPromise.set_value(); });
+
+            for (auto& context: socketContexts)
             {
-                sucessfulListening << context.listeningAddress;
-            }
-            else
-            {
-                const auto error = SystemError::getLastOSErrorText();
-                failedListening << lm("%1(%2)")
-                    .arg(context.listeningAddress).arg(error);
+                context.socket->registerOnMediator(
+                    [&, handler = barrier.fork(), contextPtr = &context](hpm::api::ResultCode code) mutable
+                    {
+                        if (code != hpm::api::ResultCode::ok)
+                        {
+                            failedListening << lm("%1(registeration: %2)")
+                                .arg(context.listeningAddress)
+                                .arg(QnLexical::serialized(code));
+
+                            return handler();
+                        }
+
+                        if (!forwardedAddress)
+                        {
+                            sucessfulListening << context.listeningAddress;
+                            return handler();
+                        }
+
+                        contextPtr->mediatorConnection->bind(
+                            nx::hpm::api::BindRequest({*forwardedAddress}),
+                            [&, handler = std::move(handler)](nx::hpm::api::ResultCode code)
+                            {
+                                if (code != hpm::api::ResultCode::ok)
+                                {
+                                    failedListening << lm("%1(bind: %2)")
+                                        .arg(context.listeningAddress)
+                                        .arg(QnLexical::serialized(code));
+                                }
+                                else
+                                {
+                                    sucessfulListening << context.listeningAddress;
+                                }
+
+                                return handler();
+                            });
+                    });
             }
         }
+
+        registerPromise.get_future().wait();
 
         if (!failedListening.isEmpty())
         {
             limitStringList(&failedListening);
-            std::cerr << "warning. Addresses failed to listen: " <<
+            std::cerr << "Warning: Addresses failed to listen: " <<
                 failedListening.join(lit(", ")).toStdString() << std::endl;
         }
 
         if (!sucessfulListening.isEmpty())
         {
             limitStringList(&sucessfulListening);
-            std::cout << "listening on mediator. Addresses: " <<
+            std::cout << "Listening on mediator, addresses: " <<
                 sucessfulListening.join(lit(", ")).toStdString() << std::endl;
         }
+
+        return !sucessfulListening.isEmpty();
+    }
+
+    std::vector<SocketContext> socketContexts;
+    boost::optional<SocketAddress> forwardedAddress;
+    boost::optional<hpm::api::ConnectionMethods> connectionMethonds;
+};
+
+int runInListenMode(const nx::utils::ArgumentParser& args)
+{
+    const auto beginTime = std::chrono::steady_clock::now();
+    using namespace nx::network;
+
+    auto transmissionMode = test::TestTransmissionMode::spam;
+    if (args.get("ping"))
+        transmissionMode = test::TestTransmissionMode::pong;
+
+    auto multiServerSocket = new network::MultipleServerSocket();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
+    const auto guard = makeScopedGuard([&serverSocket]()
+    {
+        if (serverSocket)
+            serverSocket->pleaseStopSync();
+    });
+
+    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
+
+    CloudServerSocketGenerator cloudServerSocketGenerator;
+    test::RandomDataTcpServer server(
+        test::TestTrafficLimitType::none, 0, transmissionMode, true);
+
+    SocketAddress localAddress(HostAddress::localhost);
+    if (const auto address = args.get("local-address"))
+        localAddress = SocketAddress(*address);
+    {
+        std::unique_ptr<AbstractStreamServerSocket> localServer;
+        if (args.get("udt"))
+            localServer = std::make_unique<UdtStreamServerSocket>(AF_INET);
         else
+            localServer = std::make_unique<TCPServerSocket>(AF_INET);
+
+        if (!localServer->bind(localAddress))
         {
-            std::cerr << "error. All sockets failed to listen on mediator. "
-                << std::endl;
+            std::cout << "Error: can bot bind to " << localAddress.toString().toStdString() << std::endl;
+            return 1;
+        }
+
+        localAddress = localServer->getLocalAddress();
+        NX_CRITICAL(multiServerSocket->addSocket(std::move(localServer)));
+        std::cout << "Listening on local " << (args.get("udt") ? "UDT" : "TCP")
+            << " address " << localAddress.toString().toStdString() << std::endl;
+    }
+
+    if (const auto address = args.get("forward-address"))
+    {
+        // TODO: uncoment when CLOUD-730 is fixed
+        // cloudServerSocketGenerator.connectionMethonds = hpm::api::ConnectionMethod::none;
+
+        cloudServerSocketGenerator.forwardedAddress =
+            address->isEmpty() ? localAddress : SocketAddress(*address);
+
+        std::cout << "Mediator address forwarding: "
+            << cloudServerSocketGenerator.forwardedAddress->toString().toStdString() << std::endl;
+    }
+
+    if (const auto credentials = args.get("cloud-credentials"))
+    {
+        const auto cloudCredentials = credentials->split(":");
+        if (cloudCredentials.size() != 2)
+        {
+            std::cerr << "Error: Parameter cloud-credentials MUST have format "
+                << "system_id:authentication_key" << std::endl;
+            return 16;
+        }
+
+        String systemId = cloudCredentials[0].toUtf8();
+        String authKey = cloudCredentials[1].toUtf8();
+        std::vector<String> serverIds;
+        {
+            QString serverId = QnUuid::createUuid().toSimpleString().toUtf8();
+            args.read("server-id", &serverId);
+            serverIds.push_back(serverId.toUtf8());
+
+            size_t serverCount = 1;
+            args.read("server-count", &serverCount);
+            for (size_t i = serverIds.size(); i < serverCount; i++)
+                serverIds.push_back(makeServerName(serverId, i));
+        }
+
+        for (auto& id : serverIds)
+        {
+            auto socket = cloudServerSocketGenerator.make(systemId, authKey, id);
+            if (!multiServerSocket->addSocket(std::move(socket)))
+            {
+                std::cout << "Error: could not add server " << id.data() << std::endl;
+                return 15;
+            }
+        }
+
+        if (!cloudServerSocketGenerator.registerOnMediatorSync())
+        {
+            std::cerr << "Error: All sockets failed to listen on mediator. " << std::endl;
             return 2;
         }
     }
-    else if (localAddressIter != args.end())
-    {
-        const bool isUdt = args.find("udt") != args.end();
 
-        if (isUdt)
-            serverSocket = std::make_unique<UdtStreamServerSocket>();
-        else
-            serverSocket = std::make_unique<TCPServerSocket>();
-        server.setLocalAddress(SocketAddress(localAddressIter->second));
-        std::cout << "listening on local "<<(isUdt ? "udt" : "tcp")<<" address "
-            << localAddressIter->second.toStdString() << std::endl;
-    }
-    else
+    if (args.get("ssl"))
     {
-        std::cerr << "error. You have to specifiy --cloud-credentials or --local-address " << std::endl;
-        return 3;
-    }
+        if (transmissionMode == test::TestTransmissionMode::spam)
+        {
+            std::cerr << "Error: spam mode does not support SSL, use --ping" << std::endl;
+            return 7;
+        }
 
-    if (args.find("ssl") != args.end())
-    {
-        const auto sslCert = tmpnam(nullptr);
-        if (const auto ret = generateSslCertificate(sslCert, "cctu", "US", "cctu"))
-            return ret;
+        const auto certificate = network::SslEngine::makeCertificateAndKey(
+            "cloud_connect_test_util", "US", "NX");
 
-        QFile file(QString::fromUtf8(sslCert));
-        if(!file.open(QIODevice::ReadOnly))
+        if (certificate.isEmpty())
         {
             std::cerr << "Could not generate SSL certificate" << std::endl;
             return 4;
         }
 
-        nx::network::SslSocket::initSSLEngine(file.readAll());
+        NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
         serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
     }
 
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    {
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
+    }
+
     server.setServerSocket(std::move(serverSocket));
-    if (!server.start())
+    if (!server.start(rwTimeout))
     {
         auto osErrorText = SystemError::getLastOSErrorText().toStdString();
-        std::cerr << "error. Failed to start accepting connections. Reason: "
+        std::cerr << "Error: Failed to start accepting connections. Reason: "
             << osErrorText << std::endl;
         return 5;
     }
+
+    const auto passed = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::steady_clock::now() - beginTime);
+    std::cout << "Sever has started in: " << passed.count() << " s." << std::endl;
 
     const int result = printStatsAndWaitForCompletion(
         &server,
@@ -248,15 +305,15 @@ int printStatsAndWaitForCompletion(
     using nx::network::test::ConnectionTestStatistics;
     using namespace std::chrono;
 
-    constexpr const auto kUpdateStatisticsInterval = std::chrono::seconds(1);
-    constexpr const auto kStatisticsResetInterval = std::chrono::seconds(10);
-    constexpr const auto zeroStatistics = ConnectionTestStatistics{ 0, 0, 0, 0 };
-    constexpr const auto invalidStatistics =
-        ConnectionTestStatistics{ (uint64_t)-1, (uint64_t)-1, (size_t)-1, (size_t)-1 };
+    const std::chrono::seconds kUpdateStatisticsInterval(1);
+    const std::chrono::minutes kStatisticsResetInterval(1);
+    const ConnectionTestStatistics kZeroStatistics{0, 0, 0, 0};
+    const ConnectionTestStatistics kInvalidStatistics{
+        (uint64_t) -1, (uint64_t) -1, (size_t) -1, (size_t) -1};
 
     std::cout << "\nUsage statistics:" << std::endl;
-    ConnectionTestStatistics prevStatistics = invalidStatistics;
-    ConnectionTestStatistics baseStatisticsData = zeroStatistics;
+    ConnectionTestStatistics prevStatistics = kInvalidStatistics;
+    ConnectionTestStatistics baseStatisticsData = kZeroStatistics;
     boost::optional<steady_clock::time_point> sameStatisticsInterval;
     std::string prevStatToDisplayStr;
     for (;;)
@@ -267,7 +324,7 @@ int printStatsAndWaitForCompletion(
         const auto data = connectionPool->statistics();
         auto statToDisplay = data - baseStatisticsData;
 
-        if (statToDisplay != zeroStatistics &&
+        if (statToDisplay != kZeroStatistics &&
             data == prevStatistics)
         {
             if (!sameStatisticsInterval)
@@ -285,8 +342,11 @@ int printStatsAndWaitForCompletion(
 
                     //resetting statistics
                     baseStatisticsData = data;
-                    prevStatistics = invalidStatistics;
-                    statToDisplay = zeroStatistics;
+                    baseStatisticsData.totalConnections -= baseStatisticsData.onlineConnections;
+                    baseStatisticsData.onlineConnections = 0;
+
+                    prevStatistics = kInvalidStatistics;
+                    statToDisplay = kZeroStatistics;
                     sameStatisticsInterval.reset();
                 }
             }
@@ -309,6 +369,22 @@ int printStatsAndWaitForCompletion(
     }
 
     return 0;
+}
+
+String makeServerName(const QString& prefix, size_t number)
+{
+    static const QString kFormat = QLatin1String("%1-%2");
+    return kFormat.arg(prefix).arg((uint) number, 5, 10, QLatin1Char('0')).toUtf8();
+}
+
+void limitStringList(QStringList* list)
+{
+    if (list->size() <= kMaxAddressesToPrint)
+        return;
+
+    const auto size = list->size();
+    list->erase(list->begin() + kMaxAddressesToPrint, list->end());
+    *list << lm("... (%1 total)").arg(size);
 }
 
 } // namespace cctu

@@ -25,7 +25,7 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "core/resource/resource_name.h"
+#include "database/server_db.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -35,12 +35,15 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
 
     connect(qnResPool, &QnResourcePool::resourceAdded,
-        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); });
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, true ); },
+		Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved,
-        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); });
+        this, [this](const QnResourcePtr& resource) { toggleInputPortMonitoring( resource, false ); },
+		Qt::QueuedConnection);
 
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionReceived,
-        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction));
+        this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
+		Qt::QueuedConnection);
 
     connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleChanged,
             this, &QnBusinessRuleProcessor::at_businessRuleChanged);
@@ -49,7 +52,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleReset,
             this, &QnBusinessRuleProcessor::at_businessRuleReset);
 
-    connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer);
+    connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
     start();
 }
@@ -79,11 +82,9 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         }
         case QnBusiness::DiagnosticsAction:
         case QnBusiness::ShowPopupAction:
-        case QnBusiness::PlaySoundAction:
-        case QnBusiness::PlaySoundOnceAction:
-        case QnBusiness::SayTextAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
+        case QnBusiness::ExecHttpRequestAction:
             return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
         default:
             if (!res)
@@ -94,12 +95,33 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
+    if (action->isReceivedFromRemoteHost())
+        return false;
+
+    if (action->isProlonged())
+    {
+        QString actionKey = action->getExternalUniqKey();
+        if (res)
+            actionKey += QString(L'_') + res->getUniqueId();
+        if (m_actionInProgress.contains(actionKey))
+            return false; //< do not proxy until finish locally started action
+    }
+
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
+    return routeToServer && routeToServer->getId() != getGuid();
 }
 
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
+    if (action->isProlonged())
+    {
+        // remove started actions because it actions for other server
+        QString actionKey = action->getExternalUniqKey();
+        if (res)
+            actionKey += QString(L'_') + res->getUniqueId();
+        m_actionInProgress.remove(actionKey);
+    }
+
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
     if (routeToServer)
     {
@@ -115,6 +137,9 @@ void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& a
         ec2::fromApiToResource(actionData, actionToSend);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+        // we need to save action to the log before proxy. It need for event log for 'view video' operation.
+        // Otherwise foreign server can't perform this
+        qnServerDb->saveActionToDB(action);
     }
 }
 
@@ -136,6 +161,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         NX_ASSERT(0, Q_FUNC_INFO, "No action to execute");
         return; // something wrong. It shouldn't be
     }
+    prepareAdditionActionParams(action);
 
     QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 
@@ -146,6 +172,22 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
         if (action->getParams().useSource)
             resources << qnResPool->getResources<QnNetworkResource>(action->getSourceResources());
         break;
+
+    case QnBusiness::SayTextAction:
+    case QnBusiness::PlaySoundAction:
+    case QnBusiness::PlaySoundOnceAction:
+        {
+            // execute say to client once and before proxy
+            if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+            {
+                broadcastBusinessAction(action);
+                // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                if (resources.isEmpty())
+                    qnServerDb->saveActionToDB(action);
+            }
+            break;
+        }
+
     default:
         break;
     }
@@ -166,6 +208,7 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
+    auto bRuleId = action->getBusinessRuleId();
     QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
     if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
@@ -173,11 +216,17 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == QnBusiness::ActiveState) {
-            if (++m_actionInProgress[actionKey] > 1)
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
+            runningRules.insert(bRuleId);
+            if (runningRules.size() > 2)
                 return true; // ignore duplicated start
-        } else if (action->getToggleState() == QnBusiness::InactiveState) {
-            if (--m_actionInProgress[actionKey] > 0)
+        } else if (action->getToggleState() == QnBusiness::InactiveState)
+        {
+            QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
+            runningRules.remove(bRuleId);
+            if (!runningRules.isEmpty())
                 return true; // ignore duplicated stop
             m_actionInProgress.remove(actionKey);
         }
@@ -188,9 +237,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
         return true;
 
     case QnBusiness::ShowPopupAction:
-    case QnBusiness::PlaySoundOnceAction:
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::SayTextAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
@@ -443,7 +489,7 @@ void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec
 
 bool QnBusinessRuleProcessor::broadcastBusinessAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->broadcastBusinessAction(
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->broadcastBusinessAction(
         action, this, &QnBusinessRuleProcessor::at_broadcastBusinessActionFinished );
     return true;
 }

@@ -1,20 +1,19 @@
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <QtCore/QDateTime>
 #include <QtCore/QDebug>
+#include <QtCore/QElapsedTimer>
 
 #include <recording/time_period_list.h>
+#include <nx/utils/test_support/test_options.h>
 
 namespace {
 #ifdef _DEBUG
     const qint64 bigDataTestsLimitMs = 5000;
 #else
-    const qint64 bigDataTestsLimitMs = 1000;
+    const qint64 bigDataTestsLimitMs = 2000;
 #endif
 }
-
-//#define QN_NO_BIG_DATA_TEST
 
 void PrintTo(const QnTimePeriod& period, ::std::ostream* os) {
     const QString fmt = "%1 - %2";
@@ -27,7 +26,7 @@ void PrintTo(const QnTimePeriod& period, ::std::ostream* os) {
 }
 
 void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
-    const QString fmt = "{%1 - %2} ";   
+    const QString fmt = "{%1 - %2} ";
     for (const QnTimePeriod &period: periodList) {
         QString result;
         if (!period.isInfinite())
@@ -40,10 +39,6 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
 
 TEST( QnTimePeriodsListTest, mergeBigData )
 {
-#ifdef QN_NO_BIG_DATA_TEST
-    return;
-#endif
-
     /* Two years of chunks. */
     qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
 
@@ -70,20 +65,18 @@ TEST( QnTimePeriodsListTest, mergeBigData )
         start += (chunkLengthMs + chunkSpaceMs);
     }
 
-    qint64 timestamp1 = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer t;
+    t.start();
     QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(lists);
-    qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
+    qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
-    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
 {
-#ifdef QN_NO_BIG_DATA_TEST
-    return;
-#endif
-
     /* Two years of chunks. */
     qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
 
@@ -110,14 +103,15 @@ TEST( QnTimePeriodsListTest, unionBigData )
         start += (chunkLengthMs + chunkSpaceMs);
     }
 
-    qint64 timestamp1 = QDateTime::currentMSecsSinceEpoch();
+    QElapsedTimer t;
+    t.start();
     for (int i = 1; i < mergingListsCount; ++i)
         QnTimePeriodList::unionTimePeriods(lists[0], lists[i]);
-
-    qint64 timestamp2 = QDateTime::currentMSecsSinceEpoch();
+    qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    ASSERT_LE(timestamp2 - timestamp1, bigDataTestsLimitMs);
+    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )

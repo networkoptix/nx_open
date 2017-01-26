@@ -54,7 +54,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
         //NX_ASSERT( cameraRes );
         //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
-        const bool isAmbarellaChipset = true; 
+        const bool isAmbarellaChipset = true;
 #endif
 
         if (role == Qn::CR_SecondaryLiveVideo)
@@ -62,7 +62,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
             const float fps = 5.0;
             const int desiredBitrateKbps = 512;
 
-            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() << 
+            t << "VideoInput.1.h264.2.Resolution=" << res->getSecondaryResolution().width() <<
                 "x" << res->getSecondaryResolution().height() << "\r\n";
             t << "VideoInput.1.h264.2.FrameRate=" << fps << "\r\n";
 #ifndef USE_VBR
@@ -99,7 +99,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         }
         t.flush();
 
-        
+
         request.append(result.toLatin1());
         status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
         QnSleep::msleep(100);
@@ -135,7 +135,7 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
     }
 
     url = urlLst.at(0);
-    
+
 
     if (url.isEmpty())
     {
@@ -147,11 +147,13 @@ CameraDiagnostics::Result QnISDStreamReader::openStreamInternal(bool isCameraCon
         return CameraDiagnostics::NoMediaTrackResult( requestedUrl.toString() );
     }
 
+    res->updateSourceUrl(url, getRole());
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
 
     //m_resource.dynamicCast<QnNetworkResource>()->setMediaPort(8554);
 
     m_rtpStreamParser.setRequest(url);
+	res->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 
@@ -191,7 +193,7 @@ QnAbstractMediaDataPtr QnISDStreamReader::getNextData()
     for (int i = 0; i < 10; ++i)
     {
         rez = m_rtpStreamParser.getNextData();
-        if (rez) 
+        if (rez)
         {
             //QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(rez);
             //ToDo: if (videoData)

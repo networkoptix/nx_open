@@ -16,12 +16,8 @@ namespace
 
 namespace ite
 {
-    INIT_OBJECT_COUNTER(VideoPacket)
-    DEFAULT_REF_COUNTER(VideoPacket)
-
     VideoPacket::VideoPacket(const uint8_t * data, unsigned size, uint64_t ts)
-    :   m_refManager(this),
-        m_data(nullptr),
+    :   m_data(nullptr),
         m_size(0),
         m_time(ts),
         m_flags(0)
@@ -91,7 +87,7 @@ namespace ite
 
     nxcip::CompressionType VideoPacket::codecType() const
     {
-        return nxcip::CODEC_ID_H264;
+        return nxcip::AV_CODEC_ID_H264;
     }
 
     unsigned int VideoPacket::flags() const

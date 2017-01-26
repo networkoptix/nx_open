@@ -1,10 +1,8 @@
-REM place %FILE%.msi here
-
-SET FILE=${finalName}-server-only.msi
+SET FILE=${artifact.name.server}.exe
 
 :update
-    msiexec.exe /quiet /norestart /l*v %FILE%.log /i %FILE% INSTALL_SERVER=1 INSTALL_CLIENT=0
-    type %FILE%.log
+    start /wait %FILE% /silent /norestart -l %FILE%.log
+    type %FILE%.log %FILE%_000_ServerPackage.log
     exit /b
 
 if "%1" != "" (

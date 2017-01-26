@@ -1,10 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
     <parent>
-        <artifactId>cpp</artifactId>
+        <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
         <version>3.0.0-SNAPSHOT</version>
-        <relativePath>../cpp</relativePath>
+        <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
@@ -12,145 +11,43 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Client Library</name>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-		
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_network</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type> 
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_audio</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type> 
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
-        </dependency>           
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>appserver2</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>client.core</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/client.core/pom.xml</systemPath>
-        </dependency>
-    </dependencies>
+    <name>Client Package</name>
 
     <properties>
-        <guid>${client.guid}</guid>
-        <product.title>${client.name}</product.title>
-        <product.display.title>${client.display.name}</product.display.title>
-        <template>lib</template>
-
-        <qt.libs>core core-private gui widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
-        <global.libs>-lcommon -lnx_network -lnx_streaming -lnx_audio -lappserver2 -lclient.core -ludt -lcloud_db_client</global.libs>
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
-        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
-
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <buildLib>sharedlib</buildLib>
-        <rdep.packages>openssl ffmpeg quazip festival festival-vox roboto-ttf help</rdep.packages>
-        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
+        <root.dir>${basedir}/..</root.dir>
+        <template>app</template>
+        <qt.libs></qt.libs>
     </properties>
+
+    <modules>
+        <module>applauncher</module>
+        <module>desktop_client</module>
+        <module>libclient</module>
+        <module>libclient_core</module>
+        <module>minilauncher</module>
+        <module>mobile_client</module>
+    </modules>
+
     <profiles>
+        <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
-            <id>windows</id>
+            <id>paxton</id>
             <activation>
                 <os>
                     <family>Windows</family>
-                </os>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>launcher-compile</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>build-${arch}.bat</executable>
-                                    <workingDirectory>${basedir}/launcher</workingDirectory>
-                                    <arguments>
-                                        <commandlineArgs>${build.configuration}</commandlineArgs>
-                                    </arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>windows-staticlib</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-            </activation>
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-tx1</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
                 </os>
                 <property>
-                    <name>box</name>
-                    <value>tx1</value>
+                    <name>arch</name>
+                    <value>x86</value>
                 </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
             </activation>
-            <properties>
-                <!-- cut off festival -->
-                <rdep.packages>openssl ffmpeg quazip roboto-ttf</rdep.packages>
-            </properties>
+            <modules>
+                <module>activex_client</module>
+            </modules>
         </profile>
-   </profiles>
+    </profiles>
+
 </project>

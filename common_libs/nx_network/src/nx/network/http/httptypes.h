@@ -23,8 +23,7 @@
 
 #include <nx/network/buffer.h>
 #include <nx/utils/log/assert.h>
-
-#include "qnbytearrayref.h"
+#include <nx/utils/qnbytearrayref.h>
 
 
 /*!
@@ -39,6 +38,7 @@
 namespace nx_http
 {
     const int DEFAULT_HTTP_PORT = 80;
+    const int DEFAULT_HTTPS_PORT = 443;
 
     /*!
         TODO consider using another container.
@@ -59,6 +59,8 @@ namespace nx_http
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
     */
     int NX_NETWORK_API strcasecmp( const StringType& one, const StringType& two );
+    
+    int NX_NETWORK_API defaultPortForScheme( const StringType& scheme );
 
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */
@@ -191,6 +193,13 @@ namespace nx_http
         return BufferNpos;
     }
 
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict = false);
+
 
     //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
     bool NX_NETWORK_API parseHeader(
@@ -218,6 +227,7 @@ namespace nx_http
         {
             undefined = 0,
             _continue = 100,
+            upgrade = 101,
 
             ok = 200,
             noContent = 204,
@@ -225,7 +235,8 @@ namespace nx_http
             lastSuccessCode = 299,
             multipleChoices = 300,
             movedPermanently = 301,
-            moved = 302,
+            found = 302,
+            seeOther = 303,
             notModified = 304,
 
             badRequest = 400,
@@ -235,6 +246,7 @@ namespace nx_http
             notAllowed = 405,
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
+            unsupportedMediaType = 415,
             rangeNotSatisfiable = 416,
             invalidParameter = 451,
 
@@ -243,8 +255,14 @@ namespace nx_http
             serviceUnavailable = 503
         };
 
-        NX_NETWORK_API StringType toString( Value );
-        NX_NETWORK_API StringType toString( int );
+        NX_NETWORK_API StringType toString(Value);
+        NX_NETWORK_API StringType toString(int);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(Value statusCode);
+        /** Returns \a true if \a  statusCode is 2xx */
+        NX_NETWORK_API bool isSuccessCode(int statusCode);
+
+        NX_NETWORK_API bool isMessageBodyAllowed(int statusCode);
     };
 
     class NX_NETWORK_API Method
@@ -256,6 +274,7 @@ namespace nx_http
         static const StringType HEAD;
         static const StringType POST;
         static const StringType PUT;
+        static const StringType OPTIONS;
     };
 
     //!Represents string like HTTP/1.1, RTSP/1.0
@@ -264,6 +283,12 @@ namespace nx_http
     public:
         StringType protocol;
         StringType version;
+
+        MimeProtoVersion() = default;
+        MimeProtoVersion(MimeProtoVersion&&) = default;
+        MimeProtoVersion& operator=(MimeProtoVersion&&) = default;
+        MimeProtoVersion(const MimeProtoVersion&) = default;
+        MimeProtoVersion& operator=(const MimeProtoVersion&) = default;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -290,9 +315,16 @@ namespace nx_http
         QUrl url;
         MimeProtoVersion version;
 
+        RequestLine() = default;
+        RequestLine(RequestLine&&) = default;
+        RequestLine& operator=(RequestLine&&) = default;
+        RequestLine(const RequestLine&) = default;
+        RequestLine& operator=(const RequestLine&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        StringType toString() const;
     };
 
     class NX_NETWORK_API StatusLine
@@ -303,9 +335,15 @@ namespace nx_http
         StringType reasonPhrase;
 
         StatusLine();
+        StatusLine(StatusLine&&) = default;
+        StatusLine& operator=(StatusLine&&) = default;
+        StatusLine(const StatusLine&) = default;
+        StatusLine& operator=(const StatusLine&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        StringType toString() const;
     };
 
     void NX_NETWORK_API serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
@@ -317,6 +355,12 @@ namespace nx_http
         HttpHeaders headers;
         BufferType messageBody;
 
+        Request() = default;
+        Request(Request&&) = default;
+        Request& operator=(Request&&) = default;
+        Request(const Request&) = default;
+        Request& operator=(const Request&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         /*!
@@ -324,7 +368,7 @@ namespace nx_http
         */
         void serialize( BufferType* const dstBuffer ) const;
         BufferType serialized() const;
-
+        StringType toString() const;
         BufferType getCookieValue(const BufferType& name) const;
     };
 
@@ -335,13 +379,27 @@ namespace nx_http
         HttpHeaders headers;
         BufferType messageBody;
 
+        Response() = default;
+        Response(Response&&) = default;
+        Response& operator=(Response&&) = default;
+        Response(const Response&) = default;
+        Response& operator=(const Response&) = default;
+
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
         //!Appends serialized multipart data block to \a dstBuffer
         void serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary ) const;
-        BufferType toString() const;
-        BufferType toMultipartString(const ConstBufferRefType& boundary) const;
+        StringType toString() const;
+        StringType toMultipartString(const ConstBufferRefType& boundary) const;
+    };
+
+    class NX_NETWORK_API RtspResponse
+    :
+        public Response
+    {
+    public:
+        bool parse(const ConstBufferRefType& data);
     };
 
     namespace MessageType
@@ -379,7 +437,7 @@ namespace nx_http
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
         const HttpHeaders& headers() const { return type == MessageType::request ? request->headers : response->headers; };
-        BufferType toString() const;
+        StringType toString() const;
     };
 
     //!Contains http header structures
@@ -388,13 +446,6 @@ namespace nx_http
         /** common header name constants */
         extern NX_NETWORK_API const StringType kContentType;
         extern NX_NETWORK_API const StringType kUserAgent;
-
-
-        //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
-        void NX_NETWORK_API parseDigestAuthParams(
-            const ConstBufferRefType& authenticateParamsStr,
-            QMap<BufferType, BufferType>* const params,
-            char sep = ',' );
 
         //!Http authentication scheme enumeration
         namespace AuthScheme

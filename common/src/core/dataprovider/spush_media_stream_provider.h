@@ -47,7 +47,7 @@ private:
     virtual CameraDiagnostics::Result openStream() override final;
     virtual void run() override final; // in a loop: takes data from device and puts into queue
     CameraDiagnostics::Result openStreamWithErrChecking(bool forceStreamCtrl);
-    bool isCameraControlRequired() const;
+    virtual bool isCameraControlRequired() const;
 
 private:
     bool m_needReopen;

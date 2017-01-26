@@ -17,9 +17,6 @@ class QnDirectModuleFinder : public QObject {
 public:
     explicit QnDirectModuleFinder(QObject *parent);
 
-    void setCompatibilityMode(bool compatibilityMode);
-    bool isCompatibilityMode() const;
-
     void addUrl(const QUrl &url);
     void removeUrl(const QUrl &url);
     void setUrls(const QSet<QUrl> &urls);
@@ -45,8 +42,6 @@ private slots:
     void at_checkTimer_timeout();
 
 private:
-    bool m_compatibilityMode;
-
     QSet<QUrl> m_urls;
     const int m_maxConnections;
     QQueue<QUrl> m_requestQueue;

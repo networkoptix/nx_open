@@ -1,8 +1,3 @@
-/**********************************************************
-* 21 jan 2014
-* a.kolesnikov
-***********************************************************/
-
 #include <condition_variable>
 #include <mutex>
 #include <vector>
@@ -12,7 +7,7 @@
 #include <common/common_globals.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
-
+#include <nx/utils/random.h>
 
 class RequestsGenerator
 :
@@ -142,16 +137,14 @@ private:
 
     Request getRequestToPerform() const
     {
-        if( !m_updateRequests.empty() && (rand() & 1) )
+        if( !m_updateRequests.empty() && nx::utils::random::number(0, 1) )
         {
-            const int requestIndex = rand() % m_updateRequests.size();
-            return Request(
-                m_updateRequests[requestIndex].first,
-                m_updateRequests[requestIndex].second );
+            const auto& request = nx::utils::random::choice( m_updateRequests );
+            return Request( request.first, request.second );
         }
         else
         {
-            return Request( m_getRequestUrls[rand() % m_getRequestUrls.size()] );
+            return Request( nx::utils::random::choice( m_getRequestUrls ) );
         }
     }
 };

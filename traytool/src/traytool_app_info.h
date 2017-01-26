@@ -2,9 +2,9 @@
 
 struct QnTraytoolAppInfo
 {
-    /** History name, used as a key in windows registry, appdata folder, etc. */
+    /** Real application name, visible to the user. */
     static QString applicationName();
 
-    /** Real application name, visible to the user. */
-    static QString applicationDisplayName();
+    /** Client registry key. */
+    static QString clientName();
 };

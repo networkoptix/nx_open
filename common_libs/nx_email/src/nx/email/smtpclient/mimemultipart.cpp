@@ -24,6 +24,7 @@
 #include <QCryptographicHash>
 #include <QTime>
 
+#include <nx/utils/random.h>
 
 static const QString MULTI_PART_NAMES[] = {
     QString(QLatin1String("multipart/mixed")),         //    Mixed
@@ -42,7 +43,7 @@ MimeMultiPart::MimeMultiPart(MultiPartType type)
     this->cEncoding = _8Bit;
 
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QByteArray().append(qrand()));
+    md5.addData(nx::utils::random::generate(1));
     cBoundary = QLatin1String(md5.result().toHex());
 }
 

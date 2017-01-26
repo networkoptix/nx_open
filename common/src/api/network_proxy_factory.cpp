@@ -11,6 +11,7 @@
 #include "http/custom_headers.h"
 #include "utils/common/synctime.h"
 #include "network/authutil.h"
+#include <network/tcp_listener.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -64,13 +65,7 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
 
 QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
 {
-    QString urlPath = query.url().path();
-    
-    if (urlPath.startsWith(QLatin1String("/")))
-        urlPath.remove(0, 1);
-
-    if (urlPath.endsWith(QLatin1String("/")))
-        urlPath.chop(1);
+    QString urlPath = QnTcpListener::normalizedPath(query.url().path());
 
     if ( urlPath == QLatin1String("api/ping") )
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
@@ -84,7 +79,7 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
-	return QList<QNetworkProxy>() << proxyToResource(qnResPool->getIncompatibleResourceById(resourceGuid, true));
+    return QList<QNetworkProxy>() << proxyToResource(qnResPool->getIncompatibleResourceById(resourceGuid, true));
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(
@@ -107,10 +102,9 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    if (server) {
+    if (server)
+    {
         QnUuid id = server->getOriginalGuid();
-		if (id.isNull())
-			id = server->getId();
         QnRoute route = QnRouter::instance()->routeTo(id);
         if (!route.gatewayId.isNull() || camera) {
             NX_ASSERT(!route.addr.isNull() || route.reverseConnect);

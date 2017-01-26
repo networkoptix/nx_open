@@ -10,6 +10,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/mutex.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "client_query_processor.h"
 
@@ -23,6 +24,8 @@ namespace ec2
     class FixedUrlClientQueryProcessor
     {
     public:
+        FixedUrlClientQueryProcessor &getAccess(const Qn::UserAccessData &) { return *this; }
+
         FixedUrlClientQueryProcessor( ClientQueryProcessor* clientProcessor, const QUrl& ecURL )
         :
             m_clientProcessor( clientProcessor ),
@@ -30,15 +33,15 @@ namespace ec2
         {
         }
 
-        template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
+        template<class InputData, class HandlerType>
+            void processUpdateAsync(ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl ecUrl;
             {
                 QnMutexLocker lk( &m_mutex );
                 ecUrl = m_ecURL;
             }
-            m_clientProcessor->processUpdateAsync( ecUrl, tran, handler );
+            m_clientProcessor->processUpdateAsync( ecUrl, cmdCode, input, handler );
         }
 
         template<class InputData, class OutputData, class HandlerType>

@@ -1,29 +1,19 @@
-/**********************************************************
-* Dec 29, 2015
-* akolesnikov
-***********************************************************/
+#include <nx/network/ssl_socket.h>
+#include <utils/db/test_support/test_with_db_helper.h>
 
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
+#define USE_GMOCK
+#include <nx/network/test_support/run_test.h>
 
-#include <nx/network/socket_global.h>
-#include <nx/utils/log/log.h>
-
-#include <libconnection_mediator/src/test_support/socket_globals_holder.h>
-
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    SocketGlobalsHolder socketGlobalsInstance;
-    ::testing::InitGoogleMock(&argc, argv);
+    return nx::network::test::runTest(
+        argc, argv,
+        [](const nx::utils::ArgumentParser& args)
+        {
+            nx::network::SslEngine::useRandomCertificate("cloud_connect_ut");
+            if (const auto value = args.get("tmp"))
+                nx::db::test::TestWithDbHelper::setTemporaryDirectoryPath(*value);
 
-    for (int i = 0; i < argc; ++i)
-    {
-        std::string arg(argv[i]);
-        if (arg.find("--log-level=") == 0)
-            QnLog::initLog(QString::fromStdString(arg.substr(6)));
-    }
-
-    const int result = RUN_ALL_TESTS();
-    return result;
+            return nx::utils::test::DeinitFunctions();
+        });
 }

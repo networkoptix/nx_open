@@ -1,4 +1,5 @@
 #include "rtp_stream_provider.h"
+#include <core/resource/camera_resource.h>
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -12,7 +13,7 @@ QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& re
 
 QnRtpStreamReader::~QnRtpStreamReader()
 {
-
+    stop();
 }
 
 void QnRtpStreamReader::setRequest(const QString& request)
@@ -22,7 +23,20 @@ void QnRtpStreamReader::setRequest(const QString& request)
 
 QnAbstractMediaDataPtr QnRtpStreamReader::getNextData() 
 {
-    return m_rtpReader.getNextData();
+    if (!isStreamOpened())
+        return QnAbstractMediaDataPtr(0);
+
+    if (needMetaData())
+        return getMetaData();
+
+    QnAbstractMediaDataPtr result;
+    for (int i = 0; i < 2 && !result; ++i)
+        result = m_rtpReader.getNextData();
+
+    if (!result)
+        closeStream();
+
+    return result;
 }
 
 CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
@@ -30,10 +44,13 @@ CameraDiagnostics::Result QnRtpStreamReader::openStreamInternal(bool isCameraCon
     Q_UNUSED(isCameraControlRequired);
     Q_UNUSED(params);
 
-    //m_rtpReader.setRequest("liveVideoTest");
-    //m_rtpReader.setRequest("stream1");
     m_rtpReader.setRole(getRole());
     m_rtpReader.setRequest(m_request);
+
+	auto virtRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+
+	if (virtRes)
+		virtRes->updateSourceUrl(m_rtpReader.getCurrentStreamUrl(), getRole());
 
     return m_rtpReader.openStream();
 }
@@ -51,6 +68,12 @@ bool QnRtpStreamReader::isStreamOpened() const
 QnConstResourceAudioLayoutPtr QnRtpStreamReader::getDPAudioLayout() const
 {
     return m_rtpReader.getAudioLayout();
+}
+
+void QnRtpStreamReader::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_rtpReader.pleaseStop();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

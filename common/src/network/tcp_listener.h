@@ -19,7 +19,7 @@ class QnTcpListenerPrivate;
 class QnTcpListener: public QnLongRunnable
 {
 public:
-    static const int DEFAULT_MAX_CONNECTIONS = 1000;
+    static const int DEFAULT_MAX_CONNECTIONS = 2000;
 
     bool authenticate(const nx_http::Request& headers, nx_http::Response& responseHeaders) const;
 
@@ -38,6 +38,7 @@ public:
     void waitForPortUpdated();
 
     int getPort() const;
+    SocketAddress getLocalEndpoint() const;
 
     /** Remove ownership from connection.*/
     void removeOwnership(QnLongRunnable* processor);
@@ -46,8 +47,18 @@ public:
 
     bool isSslEnabled() const;
 
+    SystemError::ErrorCode lastError() const;
+
     static void setDefaultPage(const QByteArray& path);
     static QByteArray defaultPage();
+
+    /**
+    * All handler will be matched as usual if request path starts with addition prefix
+    */
+    static void setPathIgnorePrefix(const QString& path);
+
+    /** Norlimize url path. cut off web prefix and '/' chars */
+    static QString normalizedPath(const QString& path);
 
 public slots:
     virtual void pleaseStop() override;
@@ -64,6 +75,8 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress);
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
+
+    void setLastError(SystemError::ErrorCode error);
 
 private:
     void removeDisconnectedConnections();

@@ -1,6 +1,6 @@
 #include "optional.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace {
     const QString undefined(lit("__qn_undefined_value__"));

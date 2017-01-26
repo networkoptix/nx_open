@@ -1,6 +1,4 @@
-#ifndef QN_RESOURCE_H
-#define QN_RESOURCE_H
-
+#pragma once
 #include <atomic>
 #include <QtCore/QDateTime>
 #include <QtCore/QMap>
@@ -13,13 +11,14 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+
 #include <utils/common/id.h>
+#include <utils/common/functional.h>
 
 #include <core/ptz/ptz_fwd.h>
 
 #include <common/common_globals.h>
-#include "resource_command_processor.h"
 #include "shared_resource_pointer.h"
 #include "resource_fwd.h"
 #include "resource_type.h"
@@ -34,7 +33,7 @@ class QnInitResPool: public QThreadPool
 public:
 };
 
-class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
+class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
     Q_FLAGS(Qn::PtzCapabilities)
@@ -50,6 +49,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
+
     QnResource();
     QnResource(const QnResource&);
     virtual ~QnResource();
@@ -72,7 +72,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false);
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
@@ -156,7 +156,7 @@ public:
     QnAbstractStreamDataProvider* createDataProvider(Qn::ConnectionRole role);
 #endif
 
-    QString getUrl() const;
+    virtual QString getUrl() const;
     virtual void setUrl(const QString &url);
 
     void addTag(const QString& tag);
@@ -170,7 +170,7 @@ public:
     bool hasUnprocessedCommands() const;
 #endif
 
-    bool isInitialized() const;
+    virtual bool isInitialized() const;
 
     static void stopAsyncTasks();
     static void pleaseStopAsyncTasks();
@@ -179,7 +179,9 @@ public:
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
     Qn::PtzCapabilities getPtzCapabilities() const;
-    bool hasPtzCapabilities(Qn::PtzCapabilities capabilities) const;
+
+    /** Check if camera has any of provided capabilities. */
+    bool hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const;
     void setPtzCapabilities(Qn::PtzCapabilities capabilities);
     void setPtzCapability(Qn::PtzCapabilities capability, bool value);
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
@@ -188,11 +190,12 @@ public:
      * This is intended as this API cannot be used with QnResource anyway
      * because of threading issues. */
 
-    bool hasProperty(const QString &key) const;
-    QString getProperty(const QString &key) const;
+    virtual bool hasProperty(const QString &key) const;
+    virtual QString getProperty(const QString &key) const;
     static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
 
-    ec2::ApiResourceParamDataList getProperties() const;
+    ec2::ApiResourceParamDataList getRuntimeProperties() const;
+    ec2::ApiResourceParamDataList getAllProperties() const;
 
     enum PropertyOptions
     {
@@ -202,21 +205,34 @@ public:
         NO_ALLOW_EMPTY      = 1 << 2,
     };
 
-    bool setProperty(const QString &key, const QString &value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key,
+		const QString &value,
+        PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool setProperty(const QString &key, const QVariant& value,
-                     PropertyOptions options = DEFAULT_OPTIONS);
+    virtual bool setProperty(
+		const QString &key,
+		const QVariant& value,
+        PropertyOptions options = DEFAULT_OPTIONS);
+
+    virtual bool removeProperty(const QString& key);
+
+    template<typename Update>
+    bool updateProperty(const QString &key, const Update& update)
+    {
+        QnMutexLocker lk(&m_mutex); // recursive
+        return setProperty(key, update(getProperty(key)));
+    }
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class
-    void emitModificationSignals( const QSet<QByteArray>& modifiedFields );
+    void emitModificationSignals(const QSet<QByteArray>& modifiedFields);
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
     void setRemovedFromPool(bool value);
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
-    void statusChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -255,7 +271,7 @@ public:
     static int commandProcQueueSize();
 #endif
 
-    void update(const QnResourcePtr& other, bool silenceMode = false);
+    void update(const QnResourcePtr& other);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -278,7 +294,7 @@ public:
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
 #ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role);
@@ -286,7 +302,7 @@ protected:
 
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
-    virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};
+    virtual CameraDiagnostics::Result initInternal() { return CameraDiagnostics::NoErrorResult(); };
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -304,9 +320,11 @@ private:
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
     bool emitDynamicSignal(const char *signal, void **arguments);
-    void afterUpdateInner(const QSet<QByteArray>& modifiedFields);
+
     void emitPropertyChanged(const QString& key);
-    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus);
+    void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
+
+    bool useLocalProperties() const;
 
     friend class InitAsyncTask;
 
@@ -339,26 +357,26 @@ private:
         bool replaceIfExists;
 
         LocalPropertyValue()
-        :
-            markDirty( false ),
-            replaceIfExists( false )
+            :
+            markDirty(false),
+            replaceIfExists(false)
         {
         }
 
         LocalPropertyValue(
             const QString& _value,
             bool _markDirty,
-            bool _replaceIfExists )
-        :
-            value( _value ),
-            markDirty( _markDirty ),
-            replaceIfExists( _replaceIfExists )
+            bool _replaceIfExists)
+            :
+            value(_value),
+            markDirty(_markDirty),
+            replaceIfExists(_replaceIfExists)
         {
         }
     };
 
     /** Resource pool this this resource belongs to. */
-    QnResourcePool *m_resourcePool;
+    QnResourcePool* m_resourcePool;
 
     /** Identifier of this resource. */
     QnUuid m_id;
@@ -374,7 +392,7 @@ private:
     QStringList m_tags;
 
     bool m_initialized;
-    QnMutex m_initAsyncMutex;
+    static QnMutex m_initAsyncMutex;
 
     qint64 m_lastInitTime;
     CameraDiagnostics::Result m_prevInitializationResult;
@@ -387,21 +405,19 @@ private:
 };
 
 template<class Resource>
-QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
-    if(resource == NULL) {
+QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource)
+{
+    if (!resource)
         return QnSharedResourcePointer<Resource>();
-    } else {
-        return resource->toSharedPointer().template staticCast<Resource>();
-    }
+    return resource->toSharedPointer().template staticCast<Resource>();
 }
 
 template<class Resource>
-QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource) {
+QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource)
+{
     using ::toSharedPointer; /* Let ADL kick in. */
     return toSharedPointer(resource);
 }
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
-
-#endif // QN_RESOURCE_H

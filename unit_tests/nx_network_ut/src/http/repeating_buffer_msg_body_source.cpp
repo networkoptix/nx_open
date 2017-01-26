@@ -8,10 +8,19 @@
 
 RepeatingBufferMsgBodySource::RepeatingBufferMsgBodySource(
     const nx_http::StringType& mimeType,
-    nx::Buffer buffer )
+    nx::Buffer buffer)
 :
-    m_mimeType( mimeType ),
-    m_buffer( std::move(buffer) )
+    m_mimeType(mimeType),
+    m_buffer(std::move(buffer))
+{
+}
+
+RepeatingBufferMsgBodySource::~RepeatingBufferMsgBodySource()
+{
+    stopWhileInAioThread();
+}
+
+void RepeatingBufferMsgBodySource::stopWhileInAioThread()
 {
 }
 
@@ -25,9 +34,10 @@ boost::optional<uint64_t> RepeatingBufferMsgBodySource::contentLength() const
     return boost::none;
 }
 
-bool RepeatingBufferMsgBodySource::readAsync(
-    std::function<void( SystemError::ErrorCode, nx_http::BufferType )> completionHandler )
+void RepeatingBufferMsgBodySource::readAsync(
+    nx::utils::MoveOnlyFunc<
+        void(SystemError::ErrorCode, nx_http::BufferType)
+    > completionHandler)
 {
-    completionHandler( SystemError::noError, m_buffer );
-    return true;
+    completionHandler(SystemError::noError, m_buffer);
 }

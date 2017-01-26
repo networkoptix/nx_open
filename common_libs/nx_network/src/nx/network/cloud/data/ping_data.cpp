@@ -7,40 +7,49 @@ namespace hpm {
 namespace api {
 
 PingRequest::PingRequest()
+:
+    PingRequest(std::list<SocketAddress>())
 {
 }
 
 PingRequest::PingRequest(std::list<SocketAddress> _endpoints)
 :
+    StunRequestData(kMethod),
     endpoints(std::move(_endpoints))
 {
 }
 
-void PingRequest::serialize(nx::stun::Message* const message)
+void PingRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(endpoints));
 }
 
-bool PingRequest::parse(const nx::stun::Message& message)
+bool PingRequest::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
         message, &endpoints);
 }
 
 
-void PingResponse::serialize(nx::stun::Message* const message)
+PingResponse::PingResponse()
+:
+    StunResponseData(kMethod)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+}
+
+void PingResponse::serializeAttributes(nx::stun::Message* const message)
+{
+    message->newAttribute< stun::extension::attrs::PublicEndpointList >(
         std::move(endpoints));
 }
 
-bool PingResponse::parse(const nx::stun::Message& message)
+bool PingResponse::parseAttributes(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+    return readAttributeValue<stun::extension::attrs::PublicEndpointList>(
         message, &endpoints);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

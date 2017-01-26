@@ -1,43 +1,84 @@
-#ifndef __EC2_USER_DATA_H_
-#define __EC2_USER_DATA_H_
+#pragma once
 
 #include "api_globals.h"
 #include "api_resource_data.h"
+#include <core/resource/resource_type.h>
+#include <utils/common/app_info.h>
 
-namespace ec2
+namespace ec2 {
+
+struct ApiUserData: ApiResourceData
 {
-    struct ApiUserData : ApiResourceData {
-        ApiUserData():
-            isAdmin(false),
-            permissions(Qn::NoGlobalPermissions),
-            isLdap(false),
-            isEnabled(true),
-            isCloud(false)
-        {}
+    ApiUserData():
+        isAdmin(false),
+        permissions(Qn::NoGlobalPermissions),
+        realm(QnAppInfo::realm()),
+        isLdap(false),
+        isEnabled(true),
+        isCloud(false),
+        fullName()
+    {
+        typeId = QnResourceTypePool::kUserTypeUuid;
+    }
 
-        /** Really this flag must be named isOwner, but we must keep it to maintain mobile client compatibility. */
-        bool isAdmin;
+    /**
+     * See fillId() in ApiIdData.
+     */
+    void fillId()
+    {
+         // ATTENTION: This logic is similar to QnUserResource::fillId().
+         if (isCloud)
+         {
+             if (!email.isEmpty())
+                 id = guidFromArbitraryData(email);
+             else
+                 id = QnUuid();
+         }
+         else
+         {
+             id = QnUuid::createUuid();
+         }
+    }
 
-        /** Global user permissions. */
-        Qn::GlobalPermissions permissions;
+    /**
+     * Actually, this flag should be named isOwner, but we must keep it to maintain mobile client
+     * ompatibility.
+     */
+    bool isAdmin;
 
-        /** Id of the access rights group. */
-        QnUuid groupId;
+    /** Global user permissions. */
+    Qn::GlobalPermissions permissions;
 
-        QString email;
-        QnLatin1Array digest;
-        QnLatin1Array hash;
-        //!Hash suitable to be used in /etc/shadow file
-        QnLatin1Array cryptSha512Hash;
-        QString realm;
-		bool isLdap;
-		bool isEnabled;
+    QnUuid userRoleId;
 
-        /** Flag if user is created from the Cloud. */
-        bool isCloud;
-    };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)(cryptSha512Hash)(realm)(isLdap)(isEnabled)(groupId)(isCloud)
+    QString email;
+    QnLatin1Array digest;
+    QnLatin1Array hash;
+    QnLatin1Array cryptSha512Hash; /**< Hash suitable to be used in /etc/shadow file. */
+    QString realm;
+	bool isLdap;
+	bool isEnabled;
 
-}
+    /** Whether the user is created from the Cloud. */
+    bool isCloud;
 
-#endif // __EC2_USER_DATA_H_
+    /** Full user name. */
+    QString fullName;
+
+    bool operator==(const ApiUserData& rhs) const;
+};
+#define ApiUserData_Fields ApiResourceData_Fields \
+    (isAdmin) \
+    (permissions) \
+    (email) \
+    (digest) \
+    (hash) \
+    (cryptSha512Hash) \
+    (realm) \
+    (isLdap) \
+    (isEnabled) \
+    (userRoleId)  \
+    (isCloud)  \
+    (fullName)
+
+} // namespace ec2

@@ -174,7 +174,11 @@ bool VMaxStreamFetcher::vmaxConnect()
             m_vmaxConnectionCond.wait(&m_connectMtx, PROCESS_TIMEOUT);
 
         if (m_vmaxConnection) {
-            m_vmaxConnection->vMaxConnect(m_res->getUrl(), getCurrentChannelMask(), m_res->getAuth(), m_isLive);
+            m_vmaxConnection->vMaxConnect(
+                m_res->getUrl(),
+                getCurrentChannelMask(),
+                m_res->getAuth(),
+                m_isLive);
             return true;
         }
     }

@@ -13,24 +13,39 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
 {
     ec2::ApiUserData user;
 
-    QnUuid userId  = owner->authUserId();
-    if (userId.isNull())
+    auto accessRights = owner->accessRights();
+    if (accessRights.isNull())
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue(owner->request().headers, "Cookie"));
-        QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &userId);
+        QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &accessRights);
     }
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     ec2::ApiUserDataList users;
-    if (ec2Connection->getUserManager()->getUsersSync(&users) !=  ec2::ErrorCode::ok)
+    ec2::ErrorCode errCode =
+        ec2Connection->getUserManager(accessRights)
+                     ->getUsersSync(&users);
+    if (errCode !=  ec2::ErrorCode::ok)
     {
-        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error. Can't execute query 'getUsers'"));
-        return nx_http::StatusCode::internalServerError;
+        if (errCode == ec2::ErrorCode::forbidden)
+        {
+            result.setError(
+                QnJsonRestResult::Forbidden,
+                lit("Forbidden"));
+            return nx_http::StatusCode::forbidden;
+        }
+        else
+        {
+            result.setError(
+                QnJsonRestResult::CantProcessRequest,
+                lit("Internal server error. Can't execute query 'getUsers'"));
+            return nx_http::StatusCode::internalServerError;
+        }
     }
 
-    auto iter = std::find_if(users.cbegin(), users.cend(), [userId](const ec2::ApiUserData& user)
+    auto iter = std::find_if(users.cbegin(), users.cend(), [accessRights](const ec2::ApiUserData& user)
     {
-        return user.id == userId;
+        return user.id == accessRights.userId;
     });
 
     if (iter == users.cend())

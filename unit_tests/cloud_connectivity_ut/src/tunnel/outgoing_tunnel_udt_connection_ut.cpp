@@ -1,11 +1,13 @@
-
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/tunnel/udp/outgoing_tunnel_connection.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
-#include <utils/common/cpp14.h>
-
+#include <nx/utils/test_support/test_options.h>
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace network {
@@ -19,7 +21,7 @@ class OutgoingTunnelConnectionTest
 public:
     OutgoingTunnelConnectionTest()
     :
-        m_serverSocket(std::make_unique<UdtStreamServerSocket>()),
+        m_serverSocket(std::make_unique<UdtStreamServerSocket>(AF_INET)),
         m_first(true)
     {
     }
@@ -89,7 +91,7 @@ protected:
             if (minTimeoutMillis && maxTimeoutMillis)
             {
                 connectContext.timeout = std::chrono::milliseconds(
-                    *minTimeoutMillis + rand() % (*maxTimeoutMillis - *minTimeoutMillis));
+                    nx::utils::random::number(*minTimeoutMillis, *maxTimeoutMillis));
                 connectContext.startTime = std::chrono::steady_clock::now();
             }
 
@@ -101,9 +103,9 @@ protected:
                     std::unique_ptr<AbstractStreamSocket> connection,
                     bool stillValid)
             {
+                connectContext.endTime = std::chrono::steady_clock::now();
                 connectContext.connectedPromise.set_value(
                     ConnectResult{ errorCode, std::move(connection), stillValid });
-                connectContext.endTime = std::chrono::steady_clock::now();
             });
         }
         return connections;
@@ -167,13 +169,15 @@ TEST_F(OutgoingTunnelConnectionTest, common)
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
     const auto localAddress = udtConnection->getLocalAddress();
 
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    tunnelConnection.start();
 
     auto connectContexts = startConnections(&tunnelConnection, connectionsToCreate);
 
@@ -208,12 +212,14 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
 
     ASSERT_TRUE(start()) << SystemError::getLastOSErrorText().toStdString();
 
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverEndpoint()));
 
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    tunnelConnection.start();
 
     m_serverSocket->pleaseStopSync();
     m_serverSocket.reset();
@@ -233,15 +239,20 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         ASSERT_EQ(nullptr, result.connection);
         ASSERT_TRUE(result.stillValid);
 
-        const auto connectTime =
-            connectContexts[i].endTime - connectContexts[i].startTime;
+        #ifdef _DEBUG
+            if (!utils::TestOptions::areTimeAssertsDisabled())
+            {
+                const auto connectTime =
+                    connectContexts[i].endTime - connectContexts[i].startTime;
 
-        auto connectTimeDiff = 
-            connectTime > connectContexts[i].timeout
-            ? connectTime - connectContexts[i].timeout
-            : connectContexts[i].timeout - connectTime;
-        //NOTE some timeout fault will always be there, so this NX_ASSERT may fail sometimes
-        ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
+                auto connectTimeDiff =
+                    connectTime > connectContexts[i].timeout
+                    ? connectTime - connectContexts[i].timeout
+                    : connectContexts[i].timeout - connectTime;
+
+                ASSERT_LE(connectTimeDiff, acceptableTimeoutFault);
+            }
+        #endif
     }
 
     tunnelConnection.pleaseStopSync();
@@ -256,13 +267,15 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
 
     for (int i = 0; i < loopLength; ++i)
     {
-        auto udtConnection = std::make_unique<UdtStreamSocket>();
+        auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(udtConnection->connect(serverEndpoint()))
             << SystemError::getLastOSErrorText().toStdString();
 
         OutgoingTunnelConnection tunnelConnection(
+            nx::network::SocketGlobals::aioService().getRandomAioThread(),
             QnUuid::createUuid().toByteArray(),
             std::move(udtConnection));
+        tunnelConnection.start();
 
         auto connectContexts = startConnections(&tunnelConnection, connectionsToCreate);
 
@@ -272,10 +285,13 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
         {
             auto future = connectContext.connectedPromise.get_future();
             ASSERT_TRUE(future.valid());
-            auto result = future.get();
-            ASSERT_TRUE(
-                result.errorCode == SystemError::noError || 
-                result.errorCode == SystemError::interrupted);
+            if (future.wait_for(std::chrono::seconds::zero()) == std::future_status::ready)
+            {
+                auto result = future.get();
+                ASSERT_TRUE(
+                    result.errorCode == SystemError::noError || 
+                    result.errorCode == SystemError::interrupted);
+            }
         }
     }
 }
@@ -294,22 +310,35 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
         });
 
     const auto serverAddress = serverEndpoint();
-    auto udtConnection = std::make_unique<UdtStreamSocket>();
+    auto udtConnection = std::make_unique<UdtStreamSocket>(AF_INET);
     ASSERT_TRUE(udtConnection->connect(serverAddress, 3000))
         << SystemError::getLastOSErrorText().toStdString();
 
     Timeouts udpTunnelKeepAlive;
     udpTunnelKeepAlive.keepAlivePeriod = std::chrono::seconds(1);
     OutgoingTunnelConnection tunnelConnection(
+        nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection),
         udpTunnelKeepAlive);
+    tunnelConnection.start();
 
     nx::utils::promise<void> controlConnectionClosedPromise;
     tunnelConnection.setControlConnectionClosedHandler(
-        [&controlConnectionClosedPromise]
+        [&controlConnectionClosedPromise](SystemError::ErrorCode /*errorCode*/)
         {
             controlConnectionClosedPromise.set_value();
+        });
+
+    auto tunnelConnectionGuard = makeScopedGuard(
+        [&tunnelConnection]{ tunnelConnection.pleaseStopSync(); });
+    auto controlConnectionGuard = makeScopedGuard(
+        [this]
+        {
+            if (!m_controlConnection)
+                return;
+            m_controlConnection->pleaseStopSync();
+            m_controlConnection.reset();
         });
 
     ASSERT_EQ(
@@ -318,14 +347,25 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
             controlConnectionEstablishedTimeout));
 
     ASSERT_NE(nullptr, m_controlConnection);
-    m_controlConnection->pleaseStopSync();
-    m_controlConnection.reset();
+    controlConnectionGuard.fire();
 
     //waiting for control connection to close
+    const auto t1 = std::chrono::steady_clock::now();
     ASSERT_EQ(
         std::future_status::ready,
         controlConnectionClosedPromise.get_future().wait_for(
-            udpTunnelKeepAlive.maxConnectionInactivityPeriod()*15/10));
+            udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 10));
+
+    #ifdef _DEBUG
+        if (!utils::TestOptions::areTimeAssertsDisabled())
+        {
+            EXPECT_LT(
+                std::chrono::steady_clock::now() - t1,
+                udpTunnelKeepAlive.maxConnectionInactivityPeriod() * 15 / 10);
+        }
+    #else
+        static_cast<void>(t1);
+    #endif
 
     auto connectContexts = startConnections(&tunnelConnection, 1);
     auto future = connectContexts[0].connectedPromise.get_future();
@@ -333,8 +373,6 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
     ASSERT_FALSE(result.stillValid);    //tunnel is invalid since control connection has timed out
     ASSERT_NE(nullptr, result.connection);  //but connection still succeeded
     ASSERT_EQ(SystemError::noError, result.errorCode);
-
-    tunnelConnection.pleaseStopSync();
 }
 
 }   //namespace udp

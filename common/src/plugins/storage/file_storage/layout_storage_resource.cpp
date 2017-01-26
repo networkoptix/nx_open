@@ -1,16 +1,13 @@
 #include "layout_storage_resource.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
+#include <nx/utils/random.h>
+#include <plugins/resource/avi/filetypesupport.h>
+#include <recording/time_period_list.h>
 #include <utils/common/util.h>
 #include <utils/fs/file.h>
-
-#include <recording/time_period_list.h>
-
-#include <plugins/resource/avi/filetypesupport.h>
 
 namespace {
 
@@ -19,13 +16,16 @@ namespace {
 
     /* Max future nov-file version that should be opened by the current client version. */
     const quint32 kMaxVersion = 1024;
+
+    /* Protocol for items on the exported layouts. */
+    static const QString kLayoutProtocol(lit("layout://"));
 }
 
 class QnLayoutFile: public QIODevice
 {
 public:
     QnLayoutFile(QnLayoutFileStorageResource& storageResource, const QString& fileName):
-        m_file(QnLayoutFileStorageResource::removeProtocolPrefix(storageResource.getUrl())),
+        m_file(storageResource.getUrl()),
         m_mutex(QnMutex::Recursive),
         m_storageResource(storageResource),
         m_fileOffset(0),
@@ -102,7 +102,7 @@ public:
             }
             openMode |= QIODevice::ReadOnly;
         }
-        m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
+        m_file.setFileName(m_storageResource.getUrl());
         if (!m_file.open(openMode))
             return false;
         m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
@@ -154,12 +154,18 @@ QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    if (getUrl().isEmpty()) {
-        int postfixPos = url.indexOf(QLatin1Char('?'));
+    if (getUrl().isEmpty())
+    {
+        QString layoutUrl = url;
+        NX_ASSERT(url.startsWith(kLayoutProtocol));
+        if (layoutUrl.startsWith(kLayoutProtocol))
+            layoutUrl = layoutUrl.mid(kLayoutProtocol.length());
+
+        int postfixPos = layoutUrl.indexOf(L'?');
         if (postfixPos == -1)
-            setUrl(url);
+            setUrl(layoutUrl);
         else
-            setUrl(url.left(postfixPos));
+            setUrl(layoutUrl.left(postfixPos));
     }
 
 #ifdef _DEBUG
@@ -204,6 +210,7 @@ void QnLayoutFileStorageResource::closeOpenedFiles()
         QnLayoutFile* file = *itr;
         file->lockFile();
         file->storeStateAndClose();
+        file->unlockFile();
     }
     m_index.entryCount = 0;
 }
@@ -214,6 +221,7 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     for (QSet<QnLayoutFile*>::Iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
     {
         QnLayoutFile* file = *itr;
+        file->lockFile();
         file->restoreState();
         file->unlockFile();
     }
@@ -240,7 +248,7 @@ QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
 {
-    return QFile::remove(removeProtocolPrefix(url));
+    return QFile::remove(url);
 }
 
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
@@ -255,28 +263,32 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
-        if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
+        if (storageUrl == newName || storageUrl == oldName)
             storage->closeOpenedFiles();
     }
 
     bool rez = true;
-    if (dataInOldFile) {
-        QFile::remove(removeProtocolPrefix(newName));
-        rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+    if (dataInOldFile)
+    {
+        QFile::remove(newName);
+        rez = QFile::rename(oldName, newName);
     }
-    else {
-        QFile::remove(removeProtocolPrefix(oldName));
+    else
+    {
+        QFile::remove(oldName);
     }
 
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr)
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
-        if (storageUrl == removeProtocolPrefix(newName)) {
+        if (storageUrl == newName)
+        {
             storage->setUrl(newName); // update binary offsetvalue
             storage->restoreOpenedFiles();
         }
-        else if (storageUrl == removeProtocolPrefix(oldName)) {
+        else if (storageUrl == oldName)
+        {
             storage->setUrl(newName);
             storage->restoreOpenedFiles();
         }
@@ -288,7 +300,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
 
 bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {
-    QDir dir(removeProtocolPrefix(url));
+    QDir dir(url);
     QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
     for(const QFileInfo& fi: list)
         removeFile(fi.absoluteFilePath());
@@ -298,7 +310,7 @@ bool QnLayoutFileStorageResource::removeDir(const QString& url)
 bool QnLayoutFileStorageResource::isDirExists(const QString& url)
 {
     QDir d(url);
-    return d.exists(removeProtocolPrefix(url));
+    return d.exists(url);
 }
 
 int QnLayoutFileStorageResource::getCapabilities() const
@@ -308,17 +320,17 @@ int QnLayoutFileStorageResource::getCapabilities() const
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)
 {
-    return QFile::exists(removeProtocolPrefix(url));
+    return QFile::exists(url);
 }
 
 qint64 QnLayoutFileStorageResource::getFreeSpace()
 {
-    return getDiskFreeSpace(removeProtocolPrefix(getUrl()));
+    return getDiskFreeSpace(getUrl());
 }
 
-qint64 QnLayoutFileStorageResource::getTotalSpace()
+qint64 QnLayoutFileStorageResource::getTotalSpace() const
 {
-    return getDiskTotalSpace(removeProtocolPrefix(getUrl()));
+    return getDiskTotalSpace(getUrl());
 }
 
 QnAbstractStorageResource::FileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
@@ -334,31 +346,27 @@ qint64 QnLayoutFileStorageResource::getFileSize(const QString& url) const
     return 0; // not implemented
 }
 
-bool QnLayoutFileStorageResource::initOrUpdate() const
+Qn::StorageInitResult QnLayoutFileStorageResource::initOrUpdate()
 {
-    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp") + QString::number(qrand());
+    QString tmpDir = closeDirPath(getPath()) + QLatin1String("tmp")
+        + QString::number(nx::utils::random::number<uint>());
+
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
-        return true;
+        return Qn::StorageInit_Ok;
     }
     else {
         if (dir.mkpath(tmpDir))
         {
             dir.rmdir(tmpDir);
-            return true;
+            return Qn::StorageInit_Ok;
         }
         else
-            return false;
+            return Qn::StorageInit_WrongPath;
     }
 
-    return false;
-}
-
-QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
-{
-    int prefix = url.indexOf(QLatin1String("://"));
-    return prefix == -1 ? url : url.mid(prefix + 3);
+    return Qn::StorageInit_WrongPath;
 }
 
 QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
@@ -368,7 +376,7 @@ QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
 
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
-    QFile file(removeProtocolPrefix(getUrl()));
+    QFile file(getUrl());
     if (!file.open(QIODevice::ReadOnly))
         return false;
 
@@ -406,7 +414,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
     QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
 
-    QFile file(removeProtocolPrefix(getUrl()));
+    QFile file(getUrl());
     qint64 fileSize = file.size() -  getPostfixSize();
     if (fileSize > 0)
         readIndexHeader();
@@ -444,7 +452,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
     if (m_index.entryCount == 0)
         readIndexHeader();
 
-    QFile file(removeProtocolPrefix(getUrl()));
+    QFile file(getUrl());
     if (!file.open(QIODevice::ReadOnly))
         return -1;
 
@@ -476,12 +484,14 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
+    NX_ASSERT(!value.startsWith(kLayoutProtocol), "Only file links must have layout protocol.");
+
     setId(QnUuid::createUuid());
     QnStorageResource::setUrl(value);
     if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))
     {
         // find nov file inside binary
-        QFile f(removeProtocolPrefix(value));
+        QFile f(value);
         if (f.open(QIODevice::ReadOnly))
         {
             qint64 postfixPos = f.size() - sizeof(quint64) * 2;
@@ -524,17 +534,18 @@ QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr
     return chunks;
 }
 
-QString QnLayoutFileStorageResource::updateNovParent(const QString& novName, const QString& itemName) {
-    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
-    QString normNovName = novName;
-    if (!normNovName.startsWith(layoutPrefix()))
-        normNovName = layoutPrefix() + normNovName;
-    return normNovName + QLatin1String("?") + normItemName;
+QString QnLayoutFileStorageResource::itemUniqueId(const QString& layoutUrl,
+    const QString& itemUniqueId)
+{
+    static const QChar kDelimiter = L'?';
+
+    QString itemIdInternal = itemUniqueId.mid(itemUniqueId.lastIndexOf(kDelimiter) + 1);
+    QString layoutUrlInternal = layoutUrl;
+    NX_ASSERT(!layoutUrlInternal.startsWith(kLayoutProtocol));
+    return kLayoutProtocol + layoutUrlInternal + kDelimiter + itemIdInternal;
 }
 
-QString QnLayoutFileStorageResource::layoutPrefix() {
-    static QLatin1String prefix("layout://");
-    return prefix;
+QString QnLayoutFileStorageResource::getPath() const
+{
+    return getUrl();
 }
-
-#endif // ENABLE_ARCHIVE

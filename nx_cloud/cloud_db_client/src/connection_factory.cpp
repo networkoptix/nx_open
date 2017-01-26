@@ -5,26 +5,22 @@
 
 #include "connection_factory.h"
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/cloud/random_online_endpoint_selector.h>
 
 #include "cdb_connection.h"
+#include "event_connection.h"
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-ConnectionFactory::ConnectionFactory()
-:
-    m_endPointFetcher(
-        "cdb",
-        std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
+ConnectionFactory::ConnectionFactory():
+    m_endPointFetcher(std::make_unique<nx::network::cloud::RandomOnlineEndpointSelector>())
 {
 }
 
 void ConnectionFactory::connect(
-    const std::string& /*login*/,
-    const std::string& /*password*/,
     std::function<void(api::ResultCode, std::unique_ptr<api::Connection>)> completionHandler)
 {
     //TODO #ak downloading xml with urls
@@ -36,14 +32,32 @@ void ConnectionFactory::connect(
         std::unique_ptr<api::Connection>());
 }
 
+std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
+{
+    return std::make_unique<Connection>(&m_endPointFetcher);
+}
+
 std::unique_ptr<api::Connection> ConnectionFactory::createConnection(
-    const std::string& login,
+    const std::string& username,
     const std::string& password)
 {
-    return std::make_unique<Connection>(
-        &m_endPointFetcher,
-        login,
-        password);
+    auto connection = createConnection();
+    connection->setCredentials(username, password);
+    return connection;
+}
+
+std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection()
+{
+    return std::make_unique<EventConnection>(&m_endPointFetcher);
+}
+
+std::unique_ptr<api::EventConnection> ConnectionFactory::createEventConnection(
+    const std::string& username,
+    const std::string& password)
+{
+    auto connection = createEventConnection();
+    connection->setCredentials(username, password);
+    return connection;
 }
 
 std::string ConnectionFactory::toString(api::ResultCode resultCode) const
@@ -51,13 +65,11 @@ std::string ConnectionFactory::toString(api::ResultCode resultCode) const
     return QnLexical::serialized(resultCode).toStdString();
 }
 
-void ConnectionFactory::setCloudEndpoint(
-    const std::string& host,
-    unsigned short port)
+void ConnectionFactory::setCloudUrl(const std::string& url)
 {
-    m_endPointFetcher.setEndpoint(SocketAddress(host.c_str(), port));
+    m_endPointFetcher.setUrl(QUrl(QString::fromStdString(url)));
 }
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx

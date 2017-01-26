@@ -34,21 +34,7 @@
     <String Id="StdString_Warning"                                  Overridable="yes">Warnung</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Konfiguration</String>
 
-    <!-- AllFieldsAreMandatoryDlg -->
-    <String Id="AllFieldsAreMandatoryDlg_AllFieldsAreMandatory"     Overridable="yes">Alle Felder sind Pflichtfelder</String>
 
-    <!-- AppServerDlg -->
-    <String Id="AppServerDlg_EntcontrollerConfig"                   Overridable="yes">Enterprise Controller-Konfiguration</String>
-    <String Id="AppServerDlg_EntcontrollerParameters"               Overridable="yes">Bitte geben Sie die Parameter für den Enterprise Controller an</String>
-    <String Id="AppServerDlg_Port"                                  Overridable="yes">Port</String>
-    <String Id="AppServerDlg_Login"                                 Overridable="yes">Benutzerkennung</String>
-    <String Id="AppServerDlg_CreatePassword"                        Overridable="yes">Passwort erstellen</String>
-    <String Id="AppServerDlg_Network"                               Overridable="yes">Netzwerk</String>    
-    <String Id="AppServerDlg_ProxyPort"                             Overridable="yes">Proxy Port</String>
-    <String Id="AppServerDlg_ConfirmPassword"                       Overridable="yes">Passwort bestätigen</String>   
-    <String Id="AppServerDlg_ExtraParameters"                       Overridable="yes">Zusätzliche Parameter</String>   
-    <String Id="AppServerDlg_OptimizeCamerasSettings"               Overridable="yes">Dem System die Kamera-Einstellungen zu optimieren (empfohlen)</String>   
-    <String Id="AppServerDlg_StatisticsReportAllowed"               Overridable="yes">Senden von anonymen Nutzungs- und Absturzstatistiken an die Software Entwickler (Empfohlen)</String>   
 
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">${product.name} ausprobieren</String>
@@ -60,40 +46,19 @@
     <!-- NxtoolDlg -->
     <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
     <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
-    
+
     <!-- DowngradeWarningDlg -->
-    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String> 
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String>
 
-    <!-- EmptyPasswordDlg -->
-    <String Id="EmptyPasswordDlg_Title"                             Overridable="yes">Ungültiges Passwort</String>
-    <String Id="EmptyPasswordDlg_EmptyPassword"                     Overridable="yes">Passwort darf nicht leer sein</String>     
-    <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Warnung</String>     
 
-    <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Schnellinstallation (Installation aller Komponenten)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Nur Client (Ich möchte Videos in anderen Archiven ansehen)</String>
-    <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Fortgeschritten</String>
-    <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Bitte wählen Sie den Installationstyp</String>
-    <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Installationstyp</String>       
 
-    <!-- InvalidPasswordDlg -->
-    <String Id="InvalidPasswordDlg_InvalidPasswordWarning"          Overridable="yes">Passwörter müssen übereinstimmen und nicht leer sein</String>    
 
     <!-- MediaDirDlg -->
     <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Klicken Sie auf Weiter, um den Standardordner zu verwenden oder klicken Sie auf Ändern, um einen anderen zu wählen.</String>
     <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Media-Stammordner</String>
     <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Bitte wählen den Media-Stammordner:</String>
-    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>    
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>
 
-    <!-- MediaServerDlg -->
-    <String Id="MediaServerDlg_Host"                                Overridable="yes">Host</String>
-    <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
-    <String Id="MediaServerDlg_Login"                               Overridable="yes">Benutzerkennung</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Passwort</String>  
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Media Server Port</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Media Server Konfiguration</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Media Server</String>  
 
     <!-- MyExitDialog -->
 
@@ -101,59 +66,41 @@
     <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Komponenten</String>
     <String Id="MyFeaturesDlg_Client"                               Overridable="yes">${client.name} (Ich möchte Videos in anderen Archiven ansehen)</String>
     <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">${mediaserver.name} (Ich möchte auf diesem Rechner lokal aufzeichnen)</String>
-    <String Id="MyFeaturesDlg_EnterpriseController"                 Overridable="yes">${appserver.name} (Datenbankmanagement. Sollte je Netzwerk nur einmal installiert werden.)</String>    
 
-    <!-- PasswordDlg -->
-    <String Id="PasswordDlg_DescriptionLabel"                       Overridable="yes">Bitte geben Sie das Administratorkennwort ein</String>
-    <String Id="PasswordDlg_TitleLabel"                             Overridable="yes">Administratoranmeldeinformationen</String>
-    <String Id="PasswordDlg_GroupBox"                               Overridable="yes">Administratoranmeldeinformationen</String>
-    <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Benutzerkennung</String>
-    <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Passwort erstellen</String>
-    <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Passwort bestätigen</String>    
 
-    <!-- PasswordShouldMatchDlg -->
-    <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Konfigurationsfehler</String>    
-    <String Id="PasswordShouldMatchDlg_Warning"                     Overridable="yes">Warnung</String>    
-    <String Id="PasswordShouldMatchDlg_PasswordShouldMatchDlg"      Overridable="yes">Passwörter müssen übereinstimmen</String>    
 
-    <!-- PortDuplicateDlg -->
-    <String Id="PortDuplicateDlg_InvalidPorts"                      Overridable="yes">Ungültige Ports angegeben</String>    
-    <String Id="PortDuplicateDlg_Warning"                           Overridable="yes">Warnung</String>    
-    <String Id="PortDuplicateDlg_PortSetTwice"                      Overridable="yes">Jeden Port nur einmal verwenden. Bitte überprüfen Sie Ihre Konfiguration.</String>    
 
-    <!-- PortIsBusyDlg -->
-    <String Id="PortIsBusyDlg_PortOccupied"                         Overridable="yes">Port [BUSYPORT] ist belegt.</String>    
-    <String Id="PortIsBusyDlg_Warning"                              Overridable="yes">Warnung</String>    
-    <String Id="PortIsBusyDlg_PortOccupiedMessage"                  Overridable="yes">Der angegebene Port ist bereits belegt. Drücken Sie nur dann auf "Weiter", wenn Sie genau wissen, was Sie tuen.</String>    
 
     <!-- Product -->
-    <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>    
-    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>    
-    <String Id="Product_ArchMismatch"                               Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+    <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie ${product.name} nachdem Setup beendet ist.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie ${nxtool.name} nachdem Setup beendet ist.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">Dieses Paket ist ausschliesllich für 64-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
 
     <!-- SelectionWarningDlg -->
-    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>    
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>
 
-    <!-- UninstallOptionsDlg -->
-    <String Id="UninstallOptionsDlg_UninstallOptions"               Overridable="yes">Optionen für das Deinstallieren</String>
-    <String Id="UninstallOptionsDlg_KeepDatabase"                   Overridable="yes">${product.name} Datenbank behalten</String>
-    <String Id="UninstallOptionsDlg_RemoveDatabase"                 Overridable="yes">${product.name} Datenbank entfernen</String>
-    <String Id="UninstallOptionsDlg_Current"                        Overridable="yes">Akutell</String>  
-    <String Id="UninstallOptionsDlgVersionToKeep"                   Overridable="yes">Diese Version behalten:</String>   
-    
+
     <!-- UpgradeDlg -->
-    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>    
-    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>    
-    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>    
-    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "123". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>    
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "admin". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>
 
     <!-- WixSchedFirewallExceptions -->
-    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>    
-    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Konfigurieren der Windows-Firewall</String>    
-    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Konfigurieren der Windows-Firewall</String>    
-    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installieren der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>    
-    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Deinstallieren der Windows-Firewall-Konfiguration</String>    
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installieren der Windows-Firewall-Konfiguration</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Deinstallieren der Windows-Firewall-Konfiguration</String>
     
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
+    <String Id="Product_ServerIsTooOld"                             Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>
 </WixLocalization>

@@ -1,13 +1,9 @@
 #include "async_client_user.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx {
 namespace stun {
-
-AsyncClientUser::~AsyncClientUser()
-{
-    QnMutexLocker lk( &m_mutex );
-    NX_ASSERT(m_pleaseStopHasBeenCalled, Q_FUNC_INFO, "pleaseStop was not called");
-}
 
 SocketAddress AsyncClientUser::localAddress() const
 {
@@ -20,108 +16,103 @@ SocketAddress AsyncClientUser::remoteAddress() const
 }
 
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AbstractAsyncClient> client)
-    : m_operationsInProgress(0)
-    , m_client(std::move(client))
-    , m_pleaseStopHasBeenCalled(false)
+:
+    m_client(std::move(client))
 {
+    NX_LOGX("Ready", cl_logDEBUG2);
+}
+
+AsyncClientUser::~AsyncClientUser()
+{
+    // Just in case it's called from own AIO thread without explicit pleaseStop.
+    disconnectFromClient();
 }
 
 void AsyncClientUser::setOnReconnectedHandler(
     AbstractAsyncClient::ReconnectHandler handler)
 {
     m_client->addOnReconnectedHandler(
-        [this, self = shared_from_this(), handler = std::move(handler)]()
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
         {
-            if (!self->startOperation())
-                return;
+            if (auto lock = guard->lock())
+                return post(std::move(handler));
 
-            handler();
-            self->stopOperation();
+            NX_LOG(lm("AsyncClientUser(%1). Ignoring reconnect handler")
+                .arg(this), cl_logDEBUG1);
         },
-        this);
+        m_asyncGuard.sharedGuard().get());
 }
 
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    QnMutexLocker lk(&m_mutex);
-    NX_ASSERT(!m_stopHandler, Q_FUNC_INFO, "pleaseStop is called 2nd time");
-    m_stopHandler = std::move(handler);
-    m_pleaseStopHasBeenCalled = true;
-    m_client.reset();
-    checkHandler(&lk);
+    disconnectFromClient();
+    network::aio::Timer::pleaseStop(std::move(handler));
 }
 
-void AsyncClientUser::sendRequest(Message request,
-                                  AbstractAsyncClient::RequestHandler handler)
+void AsyncClientUser::pleaseStopSync(bool checkForLocks)
+{
+    disconnectFromClient();
+    network::aio::Timer::pleaseStopSync(checkForLocks);
+}
+
+AbstractAsyncClient* AsyncClientUser::client() const
+{
+    return m_client.get();
+}
+
+void AsyncClientUser::sendRequest(
+    Message request, AbstractAsyncClient::RequestHandler handler)
 {
     m_client->sendRequest(
         std::move(request),
-        [this, self = shared_from_this(), handler = std::move(handler)](
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)](
             SystemError::ErrorCode code, Message message) mutable
         {
-            if (!self->startOperation())
-            {
-                m_client->removeOnReconnectedHandlers(this); // break the cycle
-                return;
-            }
+            if (auto lock = guard->lock())
+                return post(
+                    [handler = std::move(handler), code, message = std::move(message)]() mutable
+                    {
+                        handler(code, std::move(message));
+                    });
 
-            handler(code, std::move(message));
-            self->stopOperation();
-        });
+            NX_LOG(lm("AsyncClientUser(%1). Ignore response %2 handler")
+                .arg(this).arg(message.header.transactionId.toHex()), cl_logDEBUG1);
+        },
+        m_asyncGuard.sharedGuard().get());
 }
 
-bool AsyncClientUser::setIndicationHandler(int method,
-                                         AbstractAsyncClient::IndicationHandler handler)
+bool AsyncClientUser::setIndicationHandler(
+    int method, AbstractAsyncClient::IndicationHandler handler)
 {
-    auto wrapper = [method](const std::shared_ptr<AsyncClientUser>& self,
-                            const AbstractAsyncClient::IndicationHandler& handler,
-                            Message message)
-    {
-        if (!self->startOperation())
-        {
-            self->m_client->ignoreIndications(method); // break the cycle
-            return;
-        }
-
-        handler(std::move(message));
-        self->stopOperation();
-    };
-
-    using namespace std::placeholders;
     return m_client->setIndicationHandler(
         method,
-        std::bind(
-            std::move(wrapper), shared_from_this(), std::move(handler), _1));
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)](Message message)
+        {
+            if (auto lock = guard->lock())
+                return post(std::bind(std::move(handler), std::move(message)));
+
+            NX_LOG(lm("AsyncClientUser(%1). Ignore indication %2 handler")
+                .arg(this).arg(message.header.method), cl_logDEBUG1);
+        },
+        m_asyncGuard.sharedGuard().get());
 }
 
-bool AsyncClientUser::startOperation()
+void AsyncClientUser::disconnectFromClient()
 {
-    QnMutexLocker lk(&m_mutex);
-    if (m_stopHandler)
-        return false;
+    auto guard = m_asyncGuard.sharedGuard();
+    auto guardPtr = guard.get();
+    m_client->cancelHandlers(
+        guardPtr,
+        [guard = std::move(guard)]() mutable
+        {
+            // Guard shall be kept here up to the end of cancellation to prevent reuse of the
+            // same address (new subscriptions might be accidently removed).
+            guard.reset();
+        });
 
-    ++m_operationsInProgress;
-    return true;
+    m_asyncGuard.reset();
+    NX_LOG(lm("AsyncClientUser(%1). Disconnected from client").arg(this), cl_logDEBUG2);
 }
 
-void AsyncClientUser::stopOperation()
-{
-    QnMutexLocker lk(&m_mutex);
-    --m_operationsInProgress;
-    checkHandler(&lk);
-}
-
-void AsyncClientUser::checkHandler(QnMutexLockerBase* lk)
-{
-    if (m_stopHandler && m_operationsInProgress == 0)
-    {
-        const auto client = std::move(m_client);
-        const auto handler = std::move(m_stopHandler);
-
-        lk->unlock();
-        handler();
-    }
-}
-
-} // namespase stun
-} // namespase nx
+} // namespace stun
+} // namespace nx

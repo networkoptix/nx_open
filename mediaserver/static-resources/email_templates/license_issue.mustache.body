@@ -1,0 +1,24 @@
+<h1>{{event}}</h1>
+{{#aggregated}}
+<p>{{reason}}</p>
+<table class="description">
+    <thead>
+        <tr>
+            <th>Camera</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#reasonContext}}
+            {{#disabledCameras}}
+                <tr>
+                    <td><b>{{.}}</b></td>
+                    <td>{{{timestamp}}}</td>
+                </tr>
+            {{/disabledCameras}}
+        {{/reasonContext}}
+    </tbody>
+</table>
+{{/aggregated}}
+
+

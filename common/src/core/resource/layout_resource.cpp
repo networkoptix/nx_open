@@ -1,4 +1,3 @@
-
 #include "layout_resource.h"
 
 #include <list>
@@ -10,9 +9,9 @@
 
 QnLayoutResource::QnLayoutResource():
     base_type(),
+    m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this)),
     m_cellAspectRatio(-1.0),
-    m_cellSpacing(-1.0, -1.0),
-    m_userCanEdit(false),
+    m_cellSpacing(-1.0),
     m_backgroundSize(1, 1),
     m_backgroundOpacity(0.7),
     m_locked(false)
@@ -21,207 +20,180 @@ QnLayoutResource::QnLayoutResource():
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
 }
 
-QString QnLayoutResource::getUniqueId() const {
-    if (hasFlags(Qn::local | Qn::url))
+QString QnLayoutResource::getUniqueId() const
+{
+    if (isFile())
         return getUrl();
     return base_type::getUniqueId();
 }
 
-Qn::ResourceStatus QnLayoutResource::getStatus() const {
+Qn::ResourceStatus QnLayoutResource::getStatus() const
+{
     return Qn::Online;
 }
 
 
-QnLayoutResourcePtr QnLayoutResource::clone() const {
-    QnMutexLocker locker( &m_mutex );
-
+QnLayoutResourcePtr QnLayoutResource::clone() const
+{
     QnLayoutResourcePtr result(new QnLayoutResource());
-    result->setId(QnUuid::createUuid());
-    result->setName(m_name);
-    result->setParentId(m_parentId);
-    result->setCellSpacing(m_cellSpacing);
-    result->setCellAspectRatio(m_cellAspectRatio);
-    result->setBackgroundImageFilename(m_backgroundImageFilename);
-    result->setBackgroundOpacity(m_backgroundOpacity);
-    result->setBackgroundSize(m_backgroundSize);
-    result->setUserCanEdit(m_userCanEdit);
 
-    QnLayoutItemDataList items = m_itemByUuid.values();
+    {
+        QnMutexLocker locker(&m_mutex);
+        result->setId(QnUuid::createUuid());
+        result->setName(m_name);
+        result->setParentId(m_parentId);
+        result->setCellSpacing(m_cellSpacing);
+        result->setCellAspectRatio(m_cellAspectRatio);
+        result->setBackgroundImageFilename(m_backgroundImageFilename);
+        result->setBackgroundOpacity(m_backgroundOpacity);
+        result->setBackgroundSize(m_backgroundSize);
+    }
+
+    QnLayoutItemDataList items = m_items->getItems().values();
     QHash<QnUuid, QnUuid> newUuidByOldUuid;
-    for(int i = 0; i < items.size(); i++) {
+    for (int i = 0; i < items.size(); i++)
+    {
         QnUuid newUuid = QnUuid::createUuid();
         newUuidByOldUuid[items[i].uuid] = newUuid;
         items[i].uuid = newUuid;
     }
-    for(int i = 0; i < items.size(); i++)
+    for (int i = 0; i < items.size(); i++)
         items[i].zoomTargetUuid = newUuidByOldUuid.value(items[i].zoomTargetUuid, QnUuid());
-    result->setItems(items);
 
+    result->setItems(items);
     return result;
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataList& items) {
+QString QnLayoutResource::toSearchString() const
+{
+    if (isFile())
+        return getName() + L' ' + getUrl();
+    return getName();
+}
+
+void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
+{
     QnLayoutItemDataMap map;
-    for(const QnLayoutItemData &item: items)
+    for (const QnLayoutItemData &item : items)
         map[item.uuid] = item;
     setItems(map);
 }
 
-void QnLayoutResource::setItems(const QnLayoutItemDataMap &items) {
-    QnMutexLocker locker( &m_mutex );
-    setItemsUnderLock(items);
-}
-
-void QnLayoutResource::setItemsUnderLock(const QnLayoutItemDataMap &items) {
-    foreach(const QnLayoutItemData &item, m_itemByUuid)
-        if(!items.contains(item.uuid))
-            removeItemUnderLock(item.uuid);
-
-    foreach(const QnLayoutItemData &item, items) {
-        if(m_itemByUuid.contains(item.uuid)) {
-            updateItemUnderLock(item.uuid, item);
-        } else {
-            addItemUnderLock(item);
-        }
-    }
-}
-
-QnLayoutItemDataMap QnLayoutResource::getItems() const {
-    QnMutexLocker locker( &m_mutex );
-
-    return m_itemByUuid;
-}
-
-static QString removeProtocolPrefix(const QString& url)
+void QnLayoutResource::setItems(const QnLayoutItemDataMap &items)
 {
-    int prefix = url.indexOf(QLatin1String("://"));
-    return prefix == -1 ? url : url.mid(prefix + 3);
+    m_items->setItems(items);
+}
+
+QnLayoutItemDataMap QnLayoutResource::getItems() const
+{
+    return m_items->getItems();
 }
 
 void QnLayoutResource::setUrl(const QString& value)
 {
-    QString oldValue = removeProtocolPrefix(getUrl());
-    QnResource::setUrl(value);
-    QString newValue = removeProtocolPrefix(getUrl());
+    NX_ASSERT(!value.startsWith(lit("layout:")));
 
-#ifdef ENABLE_ARCHIVE
-    if (!oldValue.isEmpty() && oldValue != newValue)
+    QString oldValue = getUrl();
+    QnResource::setUrl(value);
+
+    if (!oldValue.isEmpty() && oldValue != value)
     {
+        NX_ASSERT(isFile());
         // Local layout renamed
-        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr)
+        for (auto item : m_items->getItems())
         {
-            QnLayoutItemData& item = itr.value();
-            item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
+            item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(value,
+                item.resource.uniqueId);
+            m_items->updateItem(item);
         }
     }
-#endif
 }
 
-QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const {
-    QnMutexLocker locker( &m_mutex );
-
-    return m_itemByUuid.value(itemUuid);
+QnLayoutItemData QnLayoutResource::getItem(const QnUuid &itemUuid) const
+{
+    return m_items->getItem(itemUuid);
 }
 
-void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
-    base_type::updateInner(other, modifiedFields);
+Qn::Notifier QnLayoutResource::storedItemAdded(const QnLayoutItemData& item)
+{
+    return [r = toSharedPointer(this), item]{ emit r->itemAdded(r, item); };
+}
+
+Qn::Notifier QnLayoutResource::storedItemRemoved(const QnLayoutItemData& item)
+{
+    return [r = toSharedPointer(this), item]{ emit r->itemRemoved(r, item); };
+}
+
+Qn::Notifier QnLayoutResource::storedItemChanged(const QnLayoutItemData& item)
+{
+    return [r = toSharedPointer(this), item]{ emit r->itemChanged(r, item); };
+}
+
+void QnLayoutResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+{
+    base_type::updateInternal(other, notifiers);
 
     QnLayoutResourcePtr localOther = other.dynamicCast<QnLayoutResource>();
-    if(localOther) {
-        setItemsUnderLock(localOther->m_itemByUuid);
-        m_cellAspectRatio = localOther->m_cellAspectRatio;
-        m_cellSpacing = localOther->m_cellSpacing;
-        m_userCanEdit = localOther->m_userCanEdit;
-        m_backgroundImageFilename = localOther->m_backgroundImageFilename;
-        m_backgroundSize = localOther->m_backgroundSize;
-        m_backgroundOpacity = localOther->m_backgroundOpacity;
-        m_locked = localOther->m_locked;
-    }
-}
-
-void QnLayoutResource::addItem(const QnLayoutItemData &item) {
-    QnMutexLocker locker( &m_mutex );
-    addItemUnderLock(item);
-}
-
-void QnLayoutResource::removeItem(const QnLayoutItemData &item) {
-    removeItem(item.uuid);
-}
-
-void QnLayoutResource::removeItem(const QnUuid &itemUuid) {
-    QnMutexLocker locker( &m_mutex );
-    removeItemUnderLock(itemUuid);
-}
-
-void QnLayoutResource::updateItem(const QnUuid &itemUuid, const QnLayoutItemData &item) {
-    QnMutexLocker locker( &m_mutex );
-    updateItemUnderLock(itemUuid, item);
-}
-
-void QnLayoutResource::addItemUnderLock(const QnLayoutItemData &item) {
-    if(m_itemByUuid.contains(item.uuid)) {
-        qnWarning("Item with UUID %1 is already in this layout resource.", item.uuid.toString());
-        return;
-    }
-
-    m_itemByUuid[item.uuid] = item;
-
-    m_mutex.unlock();
-    emit itemAdded(::toSharedPointer(this), item);
-    m_mutex.lock();
-}
-
-void QnLayoutResource::updateItemUnderLock(const QnUuid &itemUuid, const QnLayoutItemData &item) {
-    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end()) {
-        qnWarning("There is no item with UUID %1 in this layout.", itemUuid.toString());
-        return;
-    }
-
-    if(*pos == item) {
-        QHash<int, QVariant>::const_iterator i = item.dataByRole.constBegin();
-        while (i != item.dataByRole.constEnd()) {
-            pos->dataByRole[i.key()] = i.value();
-            ++i;
-        }
-        return;
-    }
-
-    *pos = item;
-
-    m_mutex.unlock();
-    emit itemChanged(::toSharedPointer(this), item);
-    m_mutex.lock();
-}
-
-void QnLayoutResource::removeItemUnderLock(const QnUuid &itemUuid) {
-    QnLayoutItemDataMap::iterator pos = m_itemByUuid.find(itemUuid);
-    if(pos == m_itemByUuid.end())
-        return;
-
-    std::list<QnLayoutItemData> removedItems;
-
-    //removing associated zoom items
-    for( auto it = m_itemByUuid.begin(); it != m_itemByUuid.end(); )
+    if (localOther)
     {
-        if( it->zoomTargetUuid == itemUuid )
+        if (!qFuzzyEquals(m_cellAspectRatio, localOther->m_cellAspectRatio))
         {
-            removedItems.push_front( *it );
-            it = m_itemByUuid.erase( it );
+            m_cellAspectRatio = localOther->m_cellAspectRatio;
+            notifiers << [r = toSharedPointer(this)]{ emit r->cellAspectRatioChanged(r); };
         }
-        else
+
+        if (!qFuzzyEquals(m_cellSpacing, localOther->m_cellSpacing))
         {
-            ++it;
+            m_cellSpacing = localOther->m_cellSpacing;
+            notifiers << [r = toSharedPointer(this)]{ emit r->cellSpacingChanged(r); };
         }
+
+        if (m_backgroundImageFilename != localOther->m_backgroundImageFilename)
+        {
+            m_backgroundImageFilename = localOther->m_backgroundImageFilename;
+            notifiers << [r = toSharedPointer(this)]{ emit r->backgroundImageChanged(r); };
+        }
+
+        if (m_backgroundSize != localOther->m_backgroundSize)
+        {
+            m_backgroundSize = localOther->m_backgroundSize;
+            notifiers << [r = toSharedPointer(this)]{ emit r->backgroundSizeChanged(r); };
+        }
+
+        if (!qFuzzyEquals(m_backgroundOpacity, localOther->m_backgroundOpacity))
+        {
+            m_backgroundOpacity = localOther->m_backgroundOpacity;
+            notifiers << [r = toSharedPointer(this)]{ emit r->backgroundOpacityChanged(r); };
+        }
+
+        if (m_locked != localOther->m_locked)
+        {
+            m_locked = localOther->m_locked;
+            notifiers << [r = toSharedPointer(this)]{ emit r->lockedChanged(r); };
+        }
+
+        setItemsUnderLockInternal(m_items.data(), localOther->m_items.data(), notifiers);
     }
+}
 
-    removedItems.push_back( *pos );
-    m_itemByUuid.erase(pos);
+void QnLayoutResource::addItem(const QnLayoutItemData &item)
+{
+    m_items->addItem(item);
+}
 
-    m_mutex.unlock();
-    for( auto item: removedItems )
-        emit itemRemoved(::toSharedPointer(this), item);
-    m_mutex.lock();
+void QnLayoutResource::removeItem(const QnLayoutItemData &item)
+{
+    m_items->removeItem(item);
+}
+
+void QnLayoutResource::removeItem(const QnUuid &itemUuid)
+{
+    m_items->removeItem(itemUuid);
+}
+
+void QnLayoutResource::updateItem(const QnLayoutItemData &item)
+{
+    m_items->updateItem(item);
 }
 
 QnTimePeriod QnLayoutResource::getLocalRange() const
@@ -234,20 +206,23 @@ void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
     m_localRange = value;
 }
 
-void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole)
+{
+    QnMutexLocker locker(&m_mutex);
 
     m_dataByRole = dataByRole;
 }
 
-void QnLayoutResource::setData(int role, const QVariant &value) {
-    QnMutexLocker locker( &m_mutex );
+void QnLayoutResource::setData(int role, const QVariant &value)
+{
+    QnMutexLocker locker(&m_mutex);
 
     m_dataByRole[role] = value;
 }
 
-QHash<int, QVariant> QnLayoutResource::data() const {
-    QnMutexLocker locker( &m_mutex );
+QHash<int, QVariant> QnLayoutResource::data() const
+{
+    QnMutexLocker locker(&m_mutex);
 
     return m_dataByRole;
 }
@@ -255,73 +230,58 @@ QHash<int, QVariant> QnLayoutResource::data() const {
 /********* Properties getters and setters **********/
 
 /********* Cell aspect ratio propert **********/
-float QnLayoutResource::cellAspectRatio() const {
-    QnMutexLocker locker( &m_mutex );
+float QnLayoutResource::cellAspectRatio() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_cellAspectRatio;
 }
 
-void QnLayoutResource::setCellAspectRatio(float cellAspectRatio) {
+void QnLayoutResource::setCellAspectRatio(float cellAspectRatio)
+{
     {
-        QnMutexLocker locker( &m_mutex );
-        if(qFuzzyCompare(m_cellAspectRatio, cellAspectRatio))
+        QnMutexLocker locker(&m_mutex);
+        if (qFuzzyEquals(m_cellAspectRatio, cellAspectRatio))
             return;
         m_cellAspectRatio = cellAspectRatio;
     }
     emit cellAspectRatioChanged(::toSharedPointer(this));
 }
 
-bool QnLayoutResource::hasCellAspectRatio() const {
+bool QnLayoutResource::hasCellAspectRatio() const
+{
     return cellAspectRatio() > 0.0;
 }
 
 /********* Cell spacing property **********/
-QSizeF QnLayoutResource::cellSpacing() const {
-    QnMutexLocker locker( &m_mutex );
+qreal QnLayoutResource::cellSpacing() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_cellSpacing;
 }
 
-void QnLayoutResource::setCellSpacing(const QSizeF &cellSpacing) {
+void QnLayoutResource::setCellSpacing(qreal spacing)
+{
     {
-        QnMutexLocker locker( &m_mutex );
-        if(qFuzzyEquals(m_cellSpacing, cellSpacing))
+        QnMutexLocker locker(&m_mutex);
+        if(qFuzzyEquals(m_cellSpacing, spacing))
             return;
-        m_cellSpacing = cellSpacing;
+
+        m_cellSpacing = spacing;
     }
     emit cellSpacingChanged(::toSharedPointer(this));
 }
 
-void QnLayoutResource::setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing) {
-    setCellSpacing(QSizeF(horizontalSpacing, verticalSpacing));
-}
-
-/********* User Can Edit property **********/
-bool QnLayoutResource::userCanEdit() const {
-    QnMutexLocker locker( &m_mutex );
-    return m_userCanEdit;
-}
-
-void QnLayoutResource::setUserCanEdit(bool value) {
-    {
-        QnMutexLocker locker( &m_mutex );
-        if(m_userCanEdit == value)
-            return;
-        m_userCanEdit = value;
-    }
-
-    emit userCanEditChanged(::toSharedPointer(this));
-}
-
-
-
 /********* Background size property **********/
-QSize QnLayoutResource::backgroundSize() const {
-    QnMutexLocker locker( &m_mutex );
+QSize QnLayoutResource::backgroundSize() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundSize;
 }
 
-void QnLayoutResource::setBackgroundSize(QSize size) {
+void QnLayoutResource::setBackgroundSize(QSize size)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_backgroundSize == size)
             return;
         m_backgroundSize = size;
@@ -330,14 +290,16 @@ void QnLayoutResource::setBackgroundSize(QSize size) {
 }
 
 /********* Background image id property **********/
-QString QnLayoutResource::backgroundImageFilename() const {
-    QnMutexLocker locker( &m_mutex );
+QString QnLayoutResource::backgroundImageFilename() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundImageFilename;
 }
 
-void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
+void QnLayoutResource::setBackgroundImageFilename(const QString &filename)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_backgroundImageFilename == filename)
             return;
         m_backgroundImageFilename = filename;
@@ -346,16 +308,18 @@ void QnLayoutResource::setBackgroundImageFilename(const QString &filename) {
 }
 
 /********* Background opacity property **********/
-qreal QnLayoutResource::backgroundOpacity() const {
-    QnMutexLocker locker( &m_mutex );
+qreal QnLayoutResource::backgroundOpacity() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_backgroundOpacity;
 }
 
-void QnLayoutResource::setBackgroundOpacity(qreal value) {
+void QnLayoutResource::setBackgroundOpacity(qreal value)
+{
     {
         qreal bound = qBound<qreal>(0.0, value, 1.0);
-        QnMutexLocker locker( &m_mutex );
-        if (qFuzzyCompare(m_backgroundOpacity, bound))
+        QnMutexLocker locker(&m_mutex);
+        if (qFuzzyEquals(m_backgroundOpacity, bound))
             return;
         m_backgroundOpacity = bound;
     }
@@ -363,14 +327,16 @@ void QnLayoutResource::setBackgroundOpacity(qreal value) {
 }
 
 /********* Locked property **********/
-bool QnLayoutResource::locked() const {
-    QnMutexLocker locker( &m_mutex );
+bool QnLayoutResource::locked() const
+{
+    QnMutexLocker locker(&m_mutex);
     return m_locked;
 }
 
-void QnLayoutResource::setLocked(bool value) {
+void QnLayoutResource::setLocked(bool value)
+{
     {
-        QnMutexLocker locker( &m_mutex );
+        QnMutexLocker locker(&m_mutex);
         if (m_locked == value)
             return;
         m_locked = value;
@@ -380,10 +346,35 @@ void QnLayoutResource::setLocked(bool value) {
 
 bool QnLayoutResource::isFile() const
 {
-    return flags().testFlag(Qn::url) && !getUrl().isEmpty();
+    NX_EXPECT(hasFlags(Qn::exported_layout) == !getUrl().isEmpty());
+    return hasFlags(Qn::exported_layout);
 }
 
-bool QnLayoutResource::isGlobal() const
+bool QnLayoutResource::isShared() const
 {
-    return getParentId().isNull();
+    return getParentId().isNull() && !isFile();
 }
+
+QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
+{
+    QSet<QnUuid> result;
+    for (const auto& item: m_items->getItems())
+        result << item.resource.id;
+    return result;
+}
+
+QSet<QnResourcePtr> QnLayoutResource::layoutResources() const
+{
+    return layoutResources(m_items->getItems());
+}
+
+QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap& items)
+{
+    QSet<QnResourcePtr> result;
+    for (const auto& item : items)
+    {
+        if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
+            result << resource;
+    }
+    return result;
+};

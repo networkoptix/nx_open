@@ -1,8 +1,7 @@
 #include "thumbnails_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "utils/common/util.h"
+#include <core/resource/media_resource.h>
 
 QnThumbnailsArchiveDelegate::QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr baseDelegate):
     QnAbstractArchiveDelegate(),
@@ -11,7 +10,9 @@ QnThumbnailsArchiveDelegate::QnThumbnailsArchiveDelegate(QnAbstractArchiveDelega
     m_rangeEnd(AV_NOPTS_VALUE),
     m_frameStep(0),
     m_lastMediaTime(0),
-    m_baseDelegate(baseDelegate)
+    m_baseDelegate(baseDelegate),
+    m_nextChannelNum(0),
+    m_channelCount(1)
 {
 }
 
@@ -27,6 +28,14 @@ bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource)
 
 {
     m_lastMediaTime = 0;
+    m_nextChannelNum = 0;
+    QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+    if (mediaRes)
+    {
+        if (QnConstResourceVideoLayoutPtr videoLayout = mediaRes->getVideoLayout(nullptr))
+            m_channelCount = videoLayout->channelCount();
+    }
+
     bool rez = m_baseDelegate->open(resource);
     if (rez)
         m_currentPos = m_rangeStart;
@@ -76,7 +85,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 
     bool delegateForMediaStep = m_baseDelegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessMediaStep;
     bool holeDetected = false;
-    if (!delegateForMediaStep) 
+    if (!delegateForMediaStep)
     {
         qint64 startTime = m_baseDelegate->startTime();
         if (startTime != qint64(AV_NOPTS_VALUE)) {
@@ -94,14 +103,31 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
             return QnAbstractMediaDataPtr();
 
         holeDetected = seekRez > m_currentPos;
-        m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep;
+        if (holeDetected)
+            m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep; //< align to grid
     }
-    
+
     QnAbstractMediaDataPtr result;
+    /*
     do {
         result = m_baseDelegate->getNextData();
     }
     while (result && result->dataType != QnAbstractMediaData::VIDEO && result->dataType != QnAbstractMediaData::EMPTY_DATA);
+    */
+    while (1)
+    {
+        result = m_baseDelegate->getNextData();
+        if (!result || result->dataType == QnAbstractMediaData::EMPTY_DATA)
+            break;
+        if (result->dataType == QnAbstractMediaData::VIDEO &&
+            result->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey) &&
+            (int)result->channelNumber == m_nextChannelNum)
+        {
+            m_nextChannelNum = (m_nextChannelNum + 1) % m_channelCount;
+            break;
+        }
+
+    }
 
     if (result) {
         if (!delegateForMediaStep) {
@@ -130,5 +156,3 @@ QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLast
 {
     return m_baseDelegate->getLastUsedChunkInfo();
 }
-
-#endif // ENABLE_ARCHIVE

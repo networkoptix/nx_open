@@ -3,7 +3,7 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 #include "api_peer_data.h"
 #include "api_fwd.h"
 #include "api_tran_state_data.h"

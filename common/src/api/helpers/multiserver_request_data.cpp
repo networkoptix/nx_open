@@ -1,63 +1,77 @@
 #include "multiserver_request_data.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
-namespace
+namespace {
+
+static const QString kLocalParam(lit("local"));
+static const QString kFormatParam(lit("format"));
+static const QString kExtraFormattingParam(lit("extraFormatting"));
+
+static const Qn::SerializationFormat kDefaultFormat = Qn::SerializationFormat::JsonFormat;
+
+} // namespace
+
+QnMultiserverRequestData::QnMultiserverRequestData():
+    isLocal(false),
+    format(kDefaultFormat),
+    extraFormatting(false)
 {
-    const QString localKey                  (lit("local"));
-    const QString formatKey                 (lit("format"));
-    const QString extraFormattingKey        (lit("extraFormatting"));
-
-    Qn::SerializationFormat defaultFormat()
-    {
-#ifdef _DEBUG_PROTOCOL
-        return Qn::JsonFormat;
-#else
-        return Qn::UbjsonFormat;
-#endif
-    }
 }
 
-QnMultiserverRequestData::QnMultiserverRequestData()
-    : isLocal(false)
-    , format(defaultFormat())
-    , extraFormatting(false)
-{}
-
-QnMultiserverRequestData::QnMultiserverRequestData( const QnMultiserverRequestData &src )
-    : isLocal(src.isLocal)
-    , format(src.format)
-    , extraFormatting(src.extraFormatting)
-{}
-
-void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params) {
-    isLocal = params.contains(localKey);
-    extraFormatting = params.contains(extraFormattingKey);
-    QnLexical::deserialize(params.value(formatKey), &format);
+QnMultiserverRequestData::QnMultiserverRequestData(const QnRequestParamList& params):
+    QnMultiserverRequestData()
+{
+    loadFromParams(params);
 }
 
-QnRequestParamList QnMultiserverRequestData::toParams() const {
+QnMultiserverRequestData::QnMultiserverRequestData(const QnMultiserverRequestData& src):
+    isLocal(src.isLocal),
+    format(src.format),
+    extraFormatting(src.extraFormatting)
+{
+}
+
+void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
+{
+    isLocal = params.contains(kLocalParam);
+    extraFormatting = params.contains(kExtraFormattingParam);
+    format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
+}
+
+void QnMultiserverRequestData::loadFromParams(const QnRequestParams& params)
+{
+    isLocal = params.contains(kLocalParam);
+    extraFormatting = params.contains(kExtraFormattingParam);
+    QnLexical::deserialize(params.value(kFormatParam), &format);
+}
+
+QnRequestParamList QnMultiserverRequestData::toParams() const
+{
     QnRequestParamList result;
     if (isLocal)
-        result.insert(localKey, QString());
+        result.insert(kLocalParam, QString());
     if (extraFormatting)
-        result.insert(extraFormattingKey, QString());
-    result.insert(formatKey,    QnLexical::serialized(format));
+        result.insert(kExtraFormattingParam, QString());
+    result.insert(kFormatParam, QnLexical::serialized(format));
     return result;
 }
 
-QUrlQuery QnMultiserverRequestData::toUrlQuery() const {
+QUrlQuery QnMultiserverRequestData::toUrlQuery() const
+{
     QUrlQuery urlQuery;
-    for(const auto& param: toParams())
+    for (const auto& param: toParams())
         urlQuery.addQueryItem(param.first, param.second);
     return urlQuery;
 }
 
-bool QnMultiserverRequestData::isValid() const {
+bool QnMultiserverRequestData::isValid() const
+{
     return true;
 }
 
-void QnMultiserverRequestData::makeLocal(Qn::SerializationFormat localFormat) {
+void QnMultiserverRequestData::makeLocal(Qn::SerializationFormat localFormat)
+{
     isLocal = true;
     format = localFormat;
 }

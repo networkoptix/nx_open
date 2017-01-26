@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 25, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <boost/optional.hpp>
@@ -13,7 +8,7 @@
 #include <mutex>
 #include <stdexcept>
 #include <system_error>
-
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace utils {
@@ -94,18 +89,7 @@ public:
     std::future_status wait_for(
         const std::chrono::duration<Rep, Period>& timeout_duration) const
     {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        if (m_cond.wait_for(
-                lk,
-                timeout_duration,
-                [this] { return m_satisfied; }))
-        {
-            return std::future_status::ready;
-        }
-        else
-        {
-            return std::future_status::timeout;
-        }
+        return wait_until(std::chrono::steady_clock::now() + timeout_duration);
     }
 
     template<class Clock, class Duration>
@@ -113,17 +97,12 @@ public:
         const std::chrono::time_point<Clock, Duration>& timeout_time) const
     {
         std::unique_lock<std::mutex> lk(m_mutex);
-        if (m_cond.wait_until(
-                lk,
-                timeout_time,
-                [this] { return m_satisfied; }))
+        while (!m_satisfied)
         {
-            return std::future_status::ready;
+            if (m_cond.wait_until(lk, timeout_time) == std::cv_status::timeout)
+                return std::future_status::timeout;
         }
-        else
-        {
-            return std::future_status::timeout;
-        }
+        return std::future_status::ready;
     }
 
 protected:

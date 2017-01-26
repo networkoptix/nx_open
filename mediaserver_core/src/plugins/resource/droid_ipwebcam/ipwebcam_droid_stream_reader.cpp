@@ -3,6 +3,7 @@
 #include "ipwebcam_droid_stream_reader.h"
 
 #include "nx/streaming/video_data_packet.h"
+#include <core/resource/camera_resource.h>
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include <nx/network/http/httptypes.h>
@@ -139,7 +140,7 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
                     mDataRemainedBeginIndex = -1;
 
 
-                videoData->compressionType = CODEC_ID_MJPEG;
+                videoData->compressionType = AV_CODEC_ID_MJPEG;
                 videoData->width = 1920;
                 videoData->height = 1088;
 
@@ -170,23 +171,27 @@ CameraDiagnostics::Result QnPlDroidIpWebCamReader::openStreamInternal(bool isCam
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
 
-    QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
+    auto nres = getResource().dynamicCast<QnNetworkResource>();
+	auto virtRes = getResource().dynamicCast<QnVirtualCameraResource>();
+
     mHttpClient = new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth());
     mDataRemainedBeginIndex = -1;
+	QUrl requestedUrl;
+	requestedUrl.setHost(nres->getHostAddress());
+	requestedUrl.setPort(nres->httpPort());
+	requestedUrl.setScheme(QLatin1String("http"));
+	requestedUrl.setPath(QLatin1String("videofeed"));
+
+	if (virtRes)
+		virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
+
     const CLHttpStatus status = mHttpClient->doGET(QLatin1String("videofeed"));
     switch( status )
     {
         case CL_HTTP_SUCCESS:
             return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-        {
-            QUrl requestedUrl;
-            requestedUrl.setHost( nres->getHostAddress() );
-            requestedUrl.setPort( nres->httpPort() );
-            requestedUrl.setScheme( QLatin1String("http") );
-            requestedUrl.setPath( QLatin1String("videofeed") );
-            return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
-        }
+            return CameraDiagnostics::NotAuthorisedResult(requestedUrl.toString());
         default:
             return CameraDiagnostics::RequestFailedResult(QLatin1String("videofeed"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
     }

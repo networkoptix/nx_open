@@ -6,15 +6,15 @@
 #include <nx/utils/log/log.h>
 
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
+const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
 
 QnStorageResource::QnStorageResource():
+    base_type(),
     m_spaceLimit(0),
     m_maxStoreTime(0),
     m_usedForWriting(false),
     m_storageBitrateCoeff(0.0),
-    m_isBackup(false),
-    m_writed(0.0),
-    m_writedCoeff(1.0)
+    m_isBackup(false)
 {
     addFlags(Qn::remote);
     setStatus(Qn::Offline);
@@ -75,7 +75,7 @@ void QnStorageResource::setUsedForWriting(bool isUsedForWriting) {
     emit isUsedForWritingChanged(::toSharedPointer(this));
 }
 
-bool QnStorageResource::isUsedForWriting() const 
+bool QnStorageResource::isUsedForWriting() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_usedForWriting;
@@ -128,25 +128,43 @@ QString QnStorageResource::urlToPath(const QString& url)
         return QUrl(url).path();
 }
 
+QString QnStorageResource::urlWithoutCredentials(const QString& url)
+{
+    if (!url.contains(lit("://")))
+        return url;
+    
+    QUrl result(url);
+    result.setUserName(QString());
+    result.setPassword(QString());
+
+    return result.toString();
+}
+
 float QnStorageResource::getAvarageWritingUsage() const
 {
     return 0.0;
 }
 
-void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnStorageResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
 {
     NX_ASSERT(other->getParentId() == getParentId() && other->getUrl() == getUrl());
-    QnResource::updateInner(other, modifiedFields);
+
+    base_type::updateInternal(other, notifiers);
 
     QnStorageResource* localOther = dynamic_cast<QnStorageResource*>(other.data());
-    if (localOther) {
+    if (localOther)
+    {
         if (m_usedForWriting != localOther->m_usedForWriting)
-            modifiedFields << "isUsedForWritingChanged";
-        m_usedForWriting = localOther->m_usedForWriting;
+        {
+            m_usedForWriting = localOther->m_usedForWriting;
+            notifiers << [r = toSharedPointer(this)]{emit r->isUsedForWritingChanged(r);};
+        }
 
         if (m_isBackup != localOther->m_isBackup)
-            modifiedFields << "isBackupChanged";
-        m_isBackup = localOther->m_isBackup;
+        {
+            m_isBackup = localOther->m_isBackup;
+            notifiers << [r = toSharedPointer(this)]{ emit r->isBackupChanged(r); };
+        }
 
         m_spaceLimit = localOther->m_spaceLimit;
         m_maxStoreTime = localOther->m_maxStoreTime;
@@ -156,7 +174,7 @@ void QnStorageResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>
 void QnStorageResource::setUrl(const QString& value)
 {
     QnResource::setUrl(value);
-    if (getId().isNull() && !getParentId().isNull()) 
+    if (getId().isNull() && !getParentId().isNull())
         setId(fillID(getParentId(), value));
 }
 
@@ -170,8 +188,8 @@ QnUuid QnStorageResource::fillID(const QnUuid& mserverId, const QString& url)
 bool QnStorageResource::isExternal() const
 {
     QString storageUrl = getUrl();
-    return 
-        storageUrl.trimmed().startsWith(lit("\\\\"))            || 
+    return
+        storageUrl.trimmed().startsWith(lit("\\\\"))            ||
         QUrl(storageUrl).path().mid(1).startsWith(lit("\\\\"))  ||
         storageUrl.indexOf(lit("://")) != -1;
 }
@@ -194,40 +212,10 @@ void QnStorageResource::setBackup(bool value) {
     emit isBackupChanged(::toSharedPointer(this));
 }
 
-bool QnStorageResource::isBackup() const 
-{ 
-    QnMutexLocker lk(&m_mutex);
-    return m_isBackup; 
-}
-
-void QnStorageResource::addWrited(qint64 value)
+bool QnStorageResource::isBackup() const
 {
     QnMutexLocker lk(&m_mutex);
-    m_writed += static_cast<double>(value) / (1024 * 1024);
-}
-
-void QnStorageResource::resetWrited()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_writed = 0.0;
-}
-
-void QnStorageResource::setWritedCoeff(double value)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_writedCoeff = value;
-}
-
-double QnStorageResource::getWritedCoeff() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_writedCoeff;
-}
-
-double QnStorageResource::calcUsageCoeff() const
-{
-    QnMutexLocker lk(&m_mutex);
-    return m_writed / m_writedCoeff;
+    return m_isBackup;
 }
 
 bool QnStorageResource::isWritable() const {

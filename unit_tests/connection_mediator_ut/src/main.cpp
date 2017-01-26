@@ -1,30 +1,19 @@
-/**********************************************************
-* 8 sep 2014
-* a.kolesnikov
-***********************************************************/
+#include <QtCore/QCoreApplication>
 
-#include <gtest/gtest.h>
+#include <nx/network/test_support/run_test.h>
+#include <utils/db/test_support/test_with_db_helper.h>
 
-#include <QCoreApplication>
-
-#include <nx/utils/log/log.h>
-#include <nx/network/socket_global.h>
-
-#include <test_support/socket_globals_holder.h>
-
-
-int main( int argc, char **argv )
+int main(int argc, char** argv)
 {
-    SocketGlobalsHolder socketGlobalsInstance;
-    ::testing::InitGoogleTest(&argc, argv);
+    QCoreApplication app(argc, argv);
+    return nx::network::test::runTest(
+        argc, argv,
+        [](const nx::utils::ArgumentParser& args)
+        {
+            if (const auto value = args.get("tmp"))
+                nx::db::test::TestWithDbHelper::setTemporaryDirectoryPath(*value);
 
-    for (int i = 0; i < argc; ++i)
-    {
-        std::string arg(argv[i]);
-        if (arg.find("--log=") == 0)
-            QnLog::initLog(QString::fromStdString(arg.substr(6)));
-    }
-
-    const int result = RUN_ALL_TESTS();
-    return result;
+            return nx::utils::test::DeinitFunctions();
+        },
+        nx::network::InitializationFlags::disableUdt);
 }

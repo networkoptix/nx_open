@@ -11,6 +11,7 @@
 
 #include <QtCore/QString>
 
+#include <nx/utils/string.h>
 #include <utils/common/app_info.h>
 
 #ifdef _WIN32
@@ -34,6 +35,14 @@ namespace nx_http
 #endif
     }
 
+    int defaultPortForScheme(const StringType& scheme)
+    {
+        if (strcasecmp(scheme, StringType("http")) == 0)
+            return DEFAULT_HTTP_PORT;
+        if (strcasecmp(scheme, StringType("https")) == 0)
+            return DEFAULT_HTTPS_PORT;
+        return -1;
+    }
 
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
     {
@@ -223,6 +232,8 @@ namespace nx_http
             {
                 case _continue:
                     return StringType("Continue");
+                case upgrade:
+                    return StringType("Switching Protocols");
                 case ok:
                     return StringType("OK");
                 case noContent:
@@ -231,10 +242,12 @@ namespace nx_http
                     return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
-                case moved:
-                    return StringType("Moved");
                 case movedPermanently:
                     return StringType("Moved Permanently");
+                case found:
+                    return StringType("Found");
+                case seeOther:
+                    return StringType("See Other");
                 case notModified:
                     return StringType("Not Modified");
                 case badRequest:
@@ -263,12 +276,37 @@ namespace nx_http
                     return StringType("Unknown_") + StringType::number(val);
             }
         }
+
+
+        bool isSuccessCode(Value statusCode)
+        {
+            return isSuccessCode(static_cast<int>(statusCode));
+        }
+        
+        bool isSuccessCode(int statusCode)
+        {
+            return statusCode >= ok && statusCode <= lastSuccessCode;
+        }
+
+        bool isMessageBodyAllowed(int statusCode)
+        {
+            switch (statusCode)
+            {
+                case noContent:
+                case notModified:
+                    return false;
+
+                default:
+                    return true;
+            }
+        }
     }
 
     const StringType Method::GET( "GET" );
     const StringType Method::HEAD( "HEAD" );
     const StringType Method::POST( "POST" );
     const StringType Method::PUT( "PUT" );
+    const StringType Method::OPTIONS( "OPTIONS" );
 
     //namespace Version
     //{
@@ -381,6 +419,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType RequestLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class StatusLine
@@ -441,6 +485,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType StatusLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class Request
@@ -449,7 +499,8 @@ namespace nx_http
     bool parseRequestOrResponse(
         const ConstBufferRefType& data,
         MessageType* message,
-        MessageLineType MessageType::*messageLine )
+        MessageLineType MessageType::*messageLine,
+        bool parseHeadersNonStrict)
     {
         enum ParseState
         {
@@ -486,7 +537,12 @@ namespace nx_http
                         StringType headerName;
                         StringType headerValue;
                         if( !parseHeader( &headerName, &headerValue, currentLine ) )
-                            return false;
+                        {
+                            if(parseHeadersNonStrict)
+                                break;
+                            else
+                                return false;
+                        }
                         message->headers.insert( std::make_pair( headerName, headerValue ) );
                         break;
                     }
@@ -529,6 +585,13 @@ namespace nx_http
     }
 
     BufferType Request::serialized() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
+    StringType Request::toString() const
     {
         BufferType buf;
         serialize( &buf );
@@ -588,19 +651,20 @@ namespace nx_http
     }
 
 
-    BufferType Response::toString() const
+    StringType Response::toString() const
     {
         BufferType buf;
         serialize( &buf );
         return buf;
     }
 
-    BufferType Response::toMultipartString(const ConstBufferRefType& boundary) const
+    StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     {
         BufferType buf;
         serializeMultipartResponse( &buf, boundary );
         return buf;
     }
+
 
     namespace MessageType
     {
@@ -713,7 +777,7 @@ namespace nx_http
         type = MessageType::none;
     }
 
-    BufferType Message::toString() const
+    StringType Message::toString() const
     {
         BufferType str;
         switch( type )
@@ -747,6 +811,8 @@ namespace nx_http
                         return "Basic";
                     case digest:
                         return "Digest";
+                    case automatic:
+                        return "Automatic";
                     default:
                         return "None";
                 }
@@ -758,6 +824,8 @@ namespace nx_http
                     return basic;
                 if( ::strcasecmp( str, "Digest" ) == 0 )
                     return digest;
+                if( ::strcasecmp( str, "Automatic" ) == 0 )
+                    return automatic;
                 return none;
             }
 
@@ -767,70 +835,9 @@ namespace nx_http
                     return basic;
                 if( str == "Digest" )
                     return digest;
+                if( str == "Automatic" )
+                    return automatic;
                 return none;
-            }
-        }
-
-        namespace
-        {
-            std::vector<QnByteArrayConstRef> splitQuotedString( const QnByteArrayConstRef& src, char sep )
-            {
-                std::vector<QnByteArrayConstRef> result;
-                QnByteArrayConstRef::size_type curTokenStart = 0;
-                bool quoted = false;
-                for( QnByteArrayConstRef::size_type
-                    pos = 0;
-                    pos < src.size();
-                    ++pos )
-                {
-                    const char ch = src[pos];
-                    if( !quoted && (ch == sep) )
-                    {
-                        result.push_back( src.mid( curTokenStart, pos - curTokenStart ) );
-                        curTokenStart = pos + 1;
-                    }
-                    else if( ch == '"' )
-                    {
-                        quoted = !quoted;
-                    }
-                }
-                result.push_back( src.mid( curTokenStart ) );
-
-                return result;
-            }
-        }
-
-        void parseDigestAuthParams(
-            const ConstBufferRefType& authenticateParamsStr,
-            QMap<BufferType, BufferType>* const params,
-            char sep )
-        {
-            const std::vector<ConstBufferRefType>& paramsList = splitQuotedString( authenticateParamsStr, sep );
-            for( const ConstBufferRefType& token : paramsList )
-            {
-                const auto& nameAndValue = splitQuotedString( token.trimmed(), '=' );
-                if( nameAndValue.empty() )
-                    continue;
-                ConstBufferRefType value = nameAndValue.size() > 1 ? nameAndValue[1] : ConstBufferRefType();
-                params->insert( nameAndValue[0].trimmed(), value.trimmed( "\"" ) );
-            }
-        }
-
-        void serializeAuthParams(
-            BufferType* const dstBuffer,
-            const QMap<BufferType, BufferType>& params )
-        {
-            for( QMap<BufferType, BufferType>::const_iterator
-                it = params.begin();
-                it != params.end();
-                ++it )
-            {
-                if( it != params.begin() )
-                    dstBuffer->append( ", " );
-                dstBuffer->append( it.key());
-                dstBuffer->append( "=\"" );
-                dstBuffer->append( it.value() );
-                dstBuffer->append( "\"" );
             }
         }
 
@@ -860,7 +867,7 @@ namespace nx_http
 
         bool DigestCredentials::parse( const BufferType& str, char separator )
         {
-            parseDigestAuthParams( str, &params, separator );
+            nx::utils::parseNameValuePairs(str, separator, &params);
             auto usernameIter = params.find( "username" );
             if( usernameIter != params.cend() )
                 userid = usernameIter.value();
@@ -869,7 +876,7 @@ namespace nx_http
 
         void DigestCredentials::serialize( BufferType* const dstBuffer ) const
         {
-            serializeAuthParams( dstBuffer, params );
+            nx::utils::serializeNameValuePairs(params, dstBuffer);
         }
 
 
@@ -1079,8 +1086,9 @@ namespace nx_http
 
             authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
 
-            parseDigestAuthParams(
+            nx::utils::parseNameValuePairs(
                 ConstBufferRefType( str, authSchemeEndPos + 1 ),
+                ',',
                 &params );
 
             return true;
@@ -1090,7 +1098,7 @@ namespace nx_http
         {
             dstBuffer->append( AuthScheme::toString( authScheme ) );
             dstBuffer->append( " " );
-            serializeAuthParams( dstBuffer, params );
+            nx::utils::serializeNameValuePairs(params, dstBuffer);
         }
 
         BufferType WWWAuthenticate::serialized() const

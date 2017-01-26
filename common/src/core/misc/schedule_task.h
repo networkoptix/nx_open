@@ -94,6 +94,8 @@ public:
     void setEndTime(int value) { m_data.m_endTime = value; }
 
     Qn::RecordingType getRecordingType() const { return m_data.m_recordType; }
+    void setRecordingType(Qn::RecordingType value) { m_data.m_recordType = value; }
+
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
     void setBeforeThreshold(int value)  { m_data.m_beforeThreshold = value; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }

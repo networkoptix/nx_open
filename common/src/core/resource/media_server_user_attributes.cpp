@@ -4,10 +4,10 @@
 ***********************************************************/
 
 #include "media_server_user_attributes.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnMediaServerUserAttributes::QnMediaServerUserAttributes()
-    : serverID()
+    : serverId()
     , maxCameras(0)
     , isRedundancyEnabled(false)
     , name()
@@ -16,7 +16,7 @@ QnMediaServerUserAttributes::QnMediaServerUserAttributes()
 }
 
 void QnMediaServerUserAttributes::assign(
-    const QnMediaServerUserAttributes   &right, 
+    const QnMediaServerUserAttributes   &right,
     QSet<QByteArray>                    *const modifiedFields
 )
 {
@@ -37,9 +37,9 @@ void QnMediaServerUserAttributes::assign(
 QnMediaServerUserAttributesPool::QnMediaServerUserAttributesPool(QObject *parent):
     QObject(parent)
 {
-    setElementInitializer( []( const QnUuid& serverID, QnMediaServerUserAttributesPtr& userAttributes ){
+    setElementInitializer( []( const QnUuid& serverId, QnMediaServerUserAttributesPtr& userAttributes ){
         userAttributes = QnMediaServerUserAttributesPtr( new QnMediaServerUserAttributes() );
-        userAttributes->serverID = serverID;
+        userAttributes->serverId = serverId;
     } );
 }
 

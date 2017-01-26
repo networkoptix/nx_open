@@ -5,11 +5,15 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
+#include <cmath>
 #include "buffered_file.h"
 #include <QSharedPointer>
 #include "utils/common/util.h"
 #include <core/resource/storage_resource.h>
+#include <utils/common/writer_pool.h>
 #include "recorder/storage_manager.h"
+#include <nx/streaming/config.h>
+#include "nx/utils/log/log.h"
 
 #ifdef Q_OS_WIN
 #include "windows.h"
@@ -20,6 +24,7 @@ extern "C"
 static const int SECTOR_SIZE = 32768;
 static const qint64 AVG_USAGE_AGGREGATE_TIME = 15 * 1000000ll; // aggregation time in usecs
 static const int DATA_PRIORITY_THRESHOLD = SECTOR_SIZE * 2;
+const int kMkvMaxHeaderOffset = 1024;
 
 // -------------- QueueFileWriter ------------
 
@@ -37,16 +42,15 @@ QueueFileWriter::~QueueFileWriter()
 
 qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
 {
-    if (m_needStop)
-        return -1;
-
     FileBlockInfo fb(file);
     fb.ranges = std::move(ranges);
 
 #if 1
     QnMutexLocker lock(&fb.mutex);
-    putData(&fb);
-    fb.condition.wait(&fb.mutex);
+    if (putData(&fb))
+        fb.condition.wait(&fb.mutex);
+    else
+        return -1;
 #else
     // use native NCQ
     for (const auto& range: fb.ranges) {
@@ -62,18 +66,22 @@ qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCycl
 
 void QueueFileWriter::removeOldWritingStatistics(qint64 currentTime)
 {
-    while (!m_writeTimings.isEmpty() && m_writeTimings.front().first < currentTime - AVG_USAGE_AGGREGATE_TIME) 
+    while (!m_writeTimings.isEmpty() && m_writeTimings.front().first < currentTime - AVG_USAGE_AGGREGATE_TIME)
     {
         m_writeTime -= m_writeTimings.front().second;
         m_writeTimings.dequeue();
     }
 }
 
-void QueueFileWriter::putData(FileBlockInfo* fb)
+bool QueueFileWriter::putData(FileBlockInfo* fb)
 {
     QnMutexLocker lock(&m_dataMutex);
+    if (m_needStop)
+        return false;
+
     m_dataQueue.push_back(fb);
     m_dataWaitCond.wakeAll();
+    return true;
 }
 
 QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
@@ -83,7 +91,7 @@ QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
     QnMutexLocker lock(&m_dataMutex);
     while (m_dataQueue.empty() && !m_needStop)
         m_dataWaitCond.wait(&m_dataMutex, 100);
-    
+
     int minBlockSize = INT_MAX;
     auto resultItr = m_dataQueue.end();
     for (auto itr = m_dataQueue.begin(); itr != m_dataQueue.end(); ++itr) {
@@ -95,7 +103,7 @@ QueueFileWriter::FileBlockInfo* QueueFileWriter::popData()
     }
     if (resultItr == m_dataQueue.end())
         return 0;
-    
+
     FileBlockInfo* result = *resultItr;
     m_dataQueue.erase(resultItr);
     return result;
@@ -168,45 +176,15 @@ void QueueFileWriter::run()
     }
 }
 
-// -------------- WriterPool ------------
-QnWriterPool::QnWriterPool() 
-{
-
-}
-QnWriterPool::~QnWriterPool()
-{
-    for(QueueFileWriter* writer: m_writers.values())
-        delete writer;
-}
-
-QnWriterPool::WritersMap QnWriterPool::getAllWriters()
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_writers;
-}
-
-QueueFileWriter* QnWriterPool::getWriter(const QnUuid& writerPoolId)
-{
-
-    QnMutexLocker lock(&m_mutex);
-    WritersMap::iterator itr = m_writers.find(writerPoolId);
-    if (itr == m_writers.end())
-        itr = m_writers.insert(writerPoolId, new QueueFileWriter());
-    NX_ASSERT(m_writers.size() < 16); // increase this value if you need more storages
-    return itr.value();
-}
-
-Q_GLOBAL_STATIC(QnWriterPool, QnWriterPool_instance)
-
-QnWriterPool* QnWriterPool::instance()
-{
-    return QnWriterPool_instance();
-}
-
 // -------------- QBufferedFile -------------
 
-QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileBlockSize, int minBufferSize, const QnUuid& writerPoolId): 
-    m_fileEngine(fileImpl), 
+QBufferedFile::QBufferedFile(
+    const std::shared_ptr<IQnFile>& fileImpl,
+    int fileBlockSize,
+    int minBufferSize,
+    int maxBufferSize,
+    const QnUuid& writerPoolId):
+    m_fileEngine(fileImpl),
     m_cycleBuffer(fileBlockSize+minBufferSize, SECTOR_SIZE),
     m_queueWriter(0),
     m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
@@ -216,6 +194,7 @@ QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileB
 {
     m_systemDependentFlags = 0;
     m_minBufferSize = minBufferSize;
+    m_maxBufferSize = maxBufferSize;
     m_isDirectIO = false;
     m_bufferPos = 0;
     m_actualFileSize = 0;
@@ -225,6 +204,7 @@ QBufferedFile::QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int fileB
 
 QBufferedFile::~QBufferedFile()
 {
+    emit fileClosed((uintptr_t)this);
     close();
 }
 qint64 QBufferedFile::size() const
@@ -232,7 +212,7 @@ qint64 QBufferedFile::size() const
     if (isWritable() && m_cycleBuffer.maxSize())
         return m_actualFileSize;
     else
-        return m_fileEngine->size(); 
+        return m_fileEngine->size();
 }
 
 qint64 QBufferedFile::writeUnbuffered(const char * data, qint64 len )
@@ -256,7 +236,7 @@ int QBufferedFile::writeBuffer(int toWrite)
     toWrite = 0;
     for (const auto& range: ranges)
         toWrite += range.size;
-    
+
     qint64 writed = m_queueWriter->writeRanges(this, std::move(ranges));
     if (writed != toWrite)
         return writed; // IO error
@@ -277,7 +257,8 @@ void QBufferedFile::flushBuffer()
         else if (toWrite > m_cycleBuffer.size()) {
             std::vector<char> fillerData;
             fillerData.resize(toWrite - m_cycleBuffer.size());
-            m_cycleBuffer.push_back(fillerData.data(), fillerData.size());
+            m_cycleBuffer.push_back(fillerData.data(),
+                (QnMediaCyclicBuffer::size_type) fillerData.size());
         }
     }
     qint64 writed = writeBuffer(toWrite);
@@ -299,7 +280,7 @@ void QBufferedFile::close()
             m_fileEngine->open(QIODevice::WriteOnly, 0); // reopen without direct IO
             m_fileEngine->truncate(m_actualFileSize);
         }
-#endif		
+#endif
         m_fileEngine->close();
     }
     m_lastSeekPos = AV_NOPTS_VALUE;
@@ -311,6 +292,25 @@ bool QBufferedFile::updatePos()
     if (bufferOffset < 0 || bufferOffset > m_cycleBuffer.size())
     {
         flushBuffer();
+		if (m_lastSeekPos > kMkvMaxHeaderOffset)
+		{
+			int fileBlockSize = m_cycleBuffer.maxSize() - m_minBufferSize;
+			int curPow = std::log(m_minBufferSize / 1024) / std::log(2);
+			int newBufSize = (1 << (curPow + 1)) * 1024;
+
+            NX_LOG(lit("Seek detected for File: %1. Current FfmpegBufSize: %2. Enlarging up to %3. Delta = %4")
+                    .arg((uintptr_t)this)
+                    .arg(m_minBufferSize)
+                    .arg(newBufSize)
+                    .arg(newBufSize - m_minBufferSize),
+                   cl_logDEBUG1);
+
+			if (newBufSize < m_maxBufferSize)
+            {
+				m_minBufferSize = newBufSize;
+				emit seekDetected(reinterpret_cast<uintptr_t>(this), newBufSize);
+			}
+		}
         if (m_isDirectIO)
             m_filePos = qPower2Floor((quint64) m_lastSeekPos, SECTOR_SIZE);
         else
@@ -370,7 +370,7 @@ qint64 QBufferedFile::writeData ( const char * data, qint64 len )
         m_cycleBuffer.insert(m_bufferPos, data, toWrite);
         m_bufferPos += toWrite;
         m_actualFileSize = qMax(m_actualFileSize, m_filePos + m_cycleBuffer.size());
-        if (m_cycleBuffer.size() == m_cycleBuffer.maxSize()) 
+        if (m_cycleBuffer.size() == m_cycleBuffer.maxSize())
         {
             int writed = writeBuffer(m_cycleBuffer.maxSize() - m_minBufferSize);
             if (writed > 0) {
@@ -403,7 +403,8 @@ bool QBufferedFile::prepareBuffer(int bufferSize)
         if (m_cycleBuffer.size() < bufferSize) {
             std::vector<char> fillerData;
             fillerData.resize(bufferSize - m_cycleBuffer.size());
-            m_cycleBuffer.push_back(fillerData.data(), fillerData.size());
+            m_cycleBuffer.push_back(fillerData.data(),
+                (QnMediaCyclicBuffer::size_type) fillerData.size());
         }
         m_fileEngine->seek(m_filePos);
     }

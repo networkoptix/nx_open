@@ -15,7 +15,23 @@ class QnArchiveStreamReader;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
+    enum class MediaType
+    {
+        Undefined,
+        Video,
+        Audio,
+        Subtitles,
+        MetaData
+    };
+
+    RtspServerTrackInfo():
+        clientPort(-1),
+        clientRtcpPort(0),
+        sequence(0),
+        firstRtpTime(-1),
+        mediaSocket(0),
+        rtcpSocket(0),
+        mediaType(MediaType::Undefined)
     {
 
     }
@@ -28,7 +44,20 @@ struct RtspServerTrackInfo
     bool openServerSocket(const QString& peerAddress);
 
     quint32 getSSRC() const {
+        QnMutexLocker lock(&m_mutex);
         return encoder ? encoder->getSSRC() : 0;
+    }
+
+    void setEncoder(const QnRtspEncoderPtr& value)
+    {
+        QnMutexLocker lock(&m_mutex);
+        encoder = value;
+    }
+
+    QnRtspEncoderPtr getEncoder() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return encoder;
     }
 
     int clientPort;
@@ -37,9 +66,16 @@ struct RtspServerTrackInfo
     qint64 firstRtpTime;
     AbstractDatagramSocket* mediaSocket;
     AbstractDatagramSocket* rtcpSocket;
+    MediaType mediaType;
+
+private:
     QnRtspEncoderPtr encoder;
+    mutable QnMutex m_mutex;
     static QnMutex m_createSocketMutex;
 };
+
+enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
+
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
@@ -84,6 +120,7 @@ private:
     void initResponse(int code = 200, const QString& message = "OK");
     void generateSessionId();
     void sendResponse(int code, const QByteArray& contentType);
+    Mode getStreamingMode() const;
 
     int numOfVideoChannels();
     int composeDescribe();
@@ -104,6 +141,7 @@ private:
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();
     void createPredefinedTracks(QSharedPointer<const QnResourceVideoLayout> videoLayout);
+    void updatePredefinedTracks();
     QSharedPointer<QnArchiveStreamReader> getArchiveDP();
     void notifyMediaRangeUsed(qint64 timestampUsec);
     QnRtspFfmpegEncoder* createRtspFfmpegEncoder(bool isVideo);

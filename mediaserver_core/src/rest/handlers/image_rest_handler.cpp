@@ -1,32 +1,25 @@
 #include "image_rest_handler.h"
 
-extern "C"
-{
-    #include <libswscale/swscale.h>
-    #ifdef WIN32
-        #define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
-    #endif
-    #include <libavutil/pixdesc.h>
-    #ifdef WIN32
-        #undef AVPixFmtDescriptor
-    #endif
-}
-
 #include <QtCore/QBuffer>
+
+extern "C" {
+#include <libavutil/avutil.h> //< for AV_NOPTS_VALUE
+} // extern "C"
 
 #include <network/tcp_connection_priv.h>
 #include <utils/math/math.h>
 #include <core/resource/network_resource.h>
-#include <core/resource/camera_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/streaming/media_data_packet.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
-#include <qmath.h>
 #include <camera/get_image_helper.h>
-#include <http/custom_headers.h>
 #include <utils/common/util.h>
+#include <rest/server/rest_connection_processor.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <nx/utils/log/log.h>
+#include <api/helpers/camera_id_helper.h>
 
-int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
+int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time) const
 {
     result.append("<root>\n");
     result.append("No video for time ");
@@ -38,59 +31,90 @@ int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
     return CODE_INVALID_PARAMETER;
 }
 
-int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
-{
-    Q_UNUSED(path)
+namespace {
 
-    QnVirtualCameraResourcePtr res;
+static const QString kCameraIdParam = lit("cameraId");
+static const QString kDeprecatedResIdParam = lit("res_id");
+static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
+
+} // namespace
+
+int QnImageRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
+{
+    NX_LOG(lit("QnImageRestHandler: received request %1").arg(path), cl_logDEBUG1);
+
     QString errStr;
-    bool resParamFound = false;
     qint64 time = AV_NOPTS_VALUE;
     QnThumbnailRequestData::RoundMethod roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
     QByteArray format("jpg");
     QSize dstSize;
     int rotate = -1;
 
-    //validating input parameters
-    auto widthIter = params.find( "width" );
-    auto heightIter = params.find( "height" );
-    if( (widthIter != params.end()) && (heightIter == params.end() || heightIter->second.toInt() < 1) )
-        return nx_http::StatusCode::badRequest; //width cannot be specified without height, but only height is acceptable
+    QString notFoundCameraId = QString::null;
+    QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        &notFoundCameraId,
+        params.toHash(),
+        {kCameraIdParam, kDeprecatedResIdParam, kDeprecatedPhysicalIdParam});
+    if (!camera)
+    {
+        result.append("<root>\n");
+        if (notFoundCameraId.isNull())
+            result.append(lit("Missing 'cameraId' parameter"));
+        else
+            result.append(lit("Camera resource %1 not found").arg(notFoundCameraId));
+        result.append("</root>\n");
+        return CODE_INVALID_PARAMETER;
+    }
+
+    // Validating input parameters.
+    auto widthIt = params.find("width");
+    auto heightIt = params.find("height");
+    // Width cannot be specified without height, but height-only is acceptable.
+    if (widthIt != params.end() && (heightIt == params.end() || heightIt->second.toInt() < 1))
+        return nx_http::StatusCode::badRequest;
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "res_id" || params[i].first == Qn::CAMERA_UNIQUE_ID_HEADER_NAME )
+        if (params[i].first == "time")
         {
-            resParamFound = true;
-            res = qSharedPointerDynamicCast<QnVirtualCameraResource> (qnResPool->getNetResourceByPhysicalId(params[i].second));
-            if (!res)
-                errStr = QString("Camera resource %1 not found").arg(params[i].second);
-        }
-        else if (params[i].first == "time") {
             if (params[i].second.toLower().trimmed() == "latest")
                 time = QnThumbnailRequestData::kLatestThumbnail;
             else
-                time = parseDateTime(params[i].second.toUtf8());
+                time = nx::utils::parseDateTime(params[i].second.toUtf8());
         }
-        else if (params[i].first == "rotate") {
+        else if (params[i].first == "rotate")
+        {
             rotate = params[i].second.toInt();
         }
-        else if (params[i].first == "method") {
+        else if (params[i].first == "method")
+        {
             QString val = params[i].second.toLower().trimmed();
             if (val == lit("before"))
+            {
                 roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
-            else if (val == lit("precise") || val == lit("exact")) {
-#               ifdef EDGE_SERVER
+            }
+            else if (val == lit("precise") || val == lit("exact"))
+            {
+                #if defined(EDGE_SERVER)
                     roundMethod = QnThumbnailRequestData::KeyFrameBeforeMethod;
-                    qWarning() << "Get image performance hint: Ignore precise round method to reduce CPU usage";
-#               else
+                    qWarning() << "Get image performance hint: "
+                        << "Ignore precise round method to reduce CPU usage";
+                #else
                     roundMethod = QnThumbnailRequestData::PreciseMethod;
-#               endif
+                #endif
             }
             else if (val == lit("after"))
+            {
                 roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+            }
         }
-        else if (params[i].first == "format") {
+        else if (params[i].first == "format")
+        {
             format = params[i].second.toUtf8();
             if (format == "jpg")
                 format = "jpeg";
@@ -98,27 +122,36 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
                 format = "tiff";
         }
         else if (params[i].first == "height")
+        {
             dstSize.setHeight(params[i].second.toInt());
+        }
         else if (params[i].first == "width")
+        {
             dstSize.setWidth(params[i].second.toInt());
+        }
     }
-    if (!resParamFound)
-        errStr = QLatin1String("parameter 'physicalId' is absent");
-    else if (time == (qint64)AV_NOPTS_VALUE)
+    if (time == (qint64) AV_NOPTS_VALUE)
         errStr = QLatin1String("parameter 'time' is absent");
     else if (dstSize.height() >= 0 && dstSize.height() < 8)
         errStr = QLatin1String("Parameter height must be >= 8");
     else if (dstSize.width() >= 0 && dstSize.width() < 8)
         errStr = QLatin1String("Parameter width must be >= 8");
-
-    if (!errStr.isEmpty()) {
+    if (!errStr.isEmpty())
+    {
         result.append("<root>\n");
         result.append(errStr);
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
 
-    CLVideoDecoderOutputPtr outFrame = QnGetImageHelper::getImage(res, time, dstSize, roundMethod, rotate);
+    if (!qnResourceAccessManager->hasPermission(
+        owner->accessRights(), camera, Qn::Permission::ReadPermission))
+    {
+        return nx_http::StatusCode::forbidden;
+    }
+
+    CLVideoDecoderOutputPtr outFrame =
+        QnGetImageHelper::getImage(camera, time, dstSize, roundMethod, rotate);
     if (!outFrame)
         return noVideoError(result, time);
 
@@ -129,7 +162,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     }
     else
     {
-        // prepare image using QT
+        // Prepare image using Qt.
         QImage image = outFrame->toImage();
         QBuffer output(&result);
         image.save(&output, format);
@@ -145,11 +178,12 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
     contentType = QByteArray("image/") + format;
     return CODE_OK;
-
 }
 
-int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result,
-                                    QByteArray& contentType, const QnRestConnectionProcessor* owner)
+int QnImageRestHandler::executePost(
+    const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/, QByteArray& result,
+    QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     return executeGet(path, params, result, contentType, owner);
 }

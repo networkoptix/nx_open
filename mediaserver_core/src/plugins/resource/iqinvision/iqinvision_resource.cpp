@@ -10,7 +10,6 @@ const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 QnPlIqResource::QnPlIqResource()
 {
     setVendor(lit("IqEye"));
-    setDefaultAuth(lit("root"), lit("system"));
 }
 
 QString QnPlIqResource::getDriverName() const
@@ -43,6 +42,10 @@ void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
 CameraDiagnostics::Result QnPlIqResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
+
+    updateDefaultAuthIfEmpty(lit("root"), lit("system"));
+
+
     const CLHttpStatus status = setOID(QLatin1String("1.2.6.5"), QLatin1String("1")); // Reset crop to maximum size
     switch( status )
     {
@@ -65,7 +68,6 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
     QString request = QLatin1String("get.oid?") + oid;
 
     CLHttpStatus status;
-    
     result = QLatin1String(downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth()));
 
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -92,7 +94,6 @@ CLHttpStatus QnPlIqResource::setOID(const QString& oid, const QString& val)
 {
     QString request = QLatin1String("set.oid?OidTR") + oid + QLatin1String("=") + val;
     CLHttpStatus status;
-
     downloadFile(status, request,  getHostAddress(), 80, 1000, getAuth());
 
     if (status == CL_HTTP_AUTH_REQUIRED)

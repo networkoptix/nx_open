@@ -17,60 +17,6 @@ UINT __stdcall CopyAppServerNotificationFiles(MSIHANDLE hInstall) {
     return CopyProfile(hInstall, "CopyAppServerNotificationFiles", FALSE);
 }
 
-UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    DWORD   dwValue = 0;
-    CRegKey RegKey;
-
-    CAtlString registryPath;
-    CAtlString arch;
-
-    hr = WcaInitialize(hInstall, "FindConfiguredStorages");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    arch = GetProperty(hInstall, L"ARCHITECTURE");
-
-    registryPath = GetProperty(hInstall, L"MEDIASERVER_REGISTRY_PATH");
-    registryPath += L"\\storages";
-
-    int flags = KEY_READ;
-    if (arch == "x86") {
-        flags |= KEY_WOW64_32KEY;
-    } else {
-        flags |= KEY_WOW64_64KEY;
-    }
-
-    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, flags) != ERROR_SUCCESS) {
-        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
-        goto LExit;
-    }
-
-    DWORD dwType;
-    ULONG nBytes = 4;
-    DWORD count = 0;
-
-    RegKey.QueryValue(L"size", &dwType, &count, &nBytes);
-
-    {
-        CAtlString countString;
-        countString.Format(L"%d", count);
-        // TODO: no need for NUMBER_OF_STORAGES. save all storages instead.
-        MsiSetProperty(hInstall, L"NUMBER_OF_STORAGES", countString);
-    }
-
-    RegKey.Close();
-
-LExit:
-
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
 UINT __stdcall DetectIfSystemIsStandalone(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -323,16 +269,19 @@ UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     try {
-        CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+        CString dbFolder = GetProperty(hInstall, L"CustomActionData");
 
         CString localAppDataFolder = GetAppDataLocalFolderPath();
-        fileToDelete.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+        dbFolder.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
 
-        WcaLog(LOGMSG_STANDARD, "Deleting %S and -shm,-val.", fileToDelete);
+        WcaLog(LOGMSG_STANDARD, "Deleting ecs and mserver %S with -shm,-val.", dbFolder);
 
-        DeleteFile(fileToDelete);
-        DeleteFile(fileToDelete + L"-shm");
-        DeleteFile(fileToDelete + L"-wal");
+        DeleteFile(dbFolder + L"\\ecs.sqlite");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-shm");
+        DeleteFile(dbFolder + L"\\ecs.sqlite-wal");
+        DeleteFile(dbFolder + L"\\mserver.sqlite");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-shm");
+        DeleteFile(dbFolder + L"\\mserver.sqlite-wal");
     } catch (const Error& e) {
         WcaLog(LOGMSG_STANDARD, "DeleteDatabaseFile(): Error: %S", e.msg());
     }
@@ -374,6 +323,42 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall DeleteAllRegistryKeys(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CRegKey RegKey;
+
+    CAtlString registryPath, keyParent, keyName;
+
+    hr = WcaInitialize(hInstall, "DeleteAllRegistryKeys");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    registryPath = GetProperty(hInstall, L"CustomActionData");
+
+    int lastSlashPos = registryPath.ReverseFind(L'\\');
+
+    keyParent = registryPath.Mid(0, lastSlashPos);
+    keyName = registryPath.Mid(lastSlashPos + 1);
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, keyParent, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)keyParent);
+        goto LExit;
+    }
+
+    RegKey.RecurseDeleteKey(keyName);
+
+    RegKey.Close();
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -385,33 +370,52 @@ UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     {
-        CAtlString params, fromFile, versionPath, versionName;
+        CAtlString params, fromDir, fromFile, versionPath, versionName;
         params = GetProperty(hInstall, L"CustomActionData");
 
         // Extract "from" and "to" files from filesString
         int curPos = 0;
-        fromFile = params.Tokenize(_T(";"), curPos);
+        fromDir = params.Tokenize(_T(";"), curPos);
         versionPath = params.Tokenize(_T(";"), curPos);
         versionName = params.Tokenize(_T(";"), curPos);
 
+        CString localAppDataFolder = GetAppDataLocalFolderPath();
+        fromDir.Replace(L"#LocalAppDataFolder#", localAppDataFolder);
+
+        WcaLog(LOGMSG_STANDARD, "DB dir: %S", fromDir);
         CRegKey key;
         static const int MAX_VERSION_SIZE = 50;
         TCHAR szBuffer[MAX_VERSION_SIZE + 1];
-        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ | KEY_WRITE) == ERROR_SUCCESS) {
+        if (key.Open(HKEY_LOCAL_MACHINE, versionPath, KEY_READ) == ERROR_SUCCESS) {
             ULONG chars;
             CAtlString version;
+
+            WcaLog(LOGMSG_STANDARD, "Opened key: %S", versionPath);
 
             if (key.QueryStringValue(versionName, 0, &chars) == ERROR_SUCCESS) {
                 chars = min(chars, MAX_VERSION_SIZE);
                 key.QueryStringValue(versionName, szBuffer, &chars);
                 version = szBuffer;
+            } else {
+                WcaLog(LOGMSG_STANDARD, "Unable to query value %S", versionName);
             }
 
-            key.DeleteValue(versionName);
             key.Close();
 
-            if (!version.IsEmpty())
+            if (!version.IsEmpty()) {
+                fromFile = fromDir + "\\ecs.sqlite";
+                WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
                 CopyFile(fromFile, fromFile + "." + version, FALSE);
+
+                fromFile = fromDir + "\\mserver.sqlite";
+                WcaLog(LOGMSG_STANDARD, "Copying %S to %S", fromFile, fromFile + "." + version);
+                CopyFile(fromFile, fromFile + "." + version, FALSE);
+            }
+            else {
+                WcaLog(LOGMSG_STANDARD, "Version is empty");
+            }
+        } else {
+            WcaLog(LOGMSG_STANDARD, "Couldn't open registry key %S", versionPath);
         }
     }
 

@@ -1,49 +1,45 @@
-/**********************************************************
-* 10 jul 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef DAYTIME_NIST_FETCHER_H
-#define DAYTIME_NIST_FETCHER_H
+#pragma once
 
 #include <memory>
 
 #include <QtCore/QByteArray>
-#include <nx/utils/thread/mutex.h>
 
-#include "abstract_accurate_time_fetcher.h"
 #include <nx/network/abstract_socket.h>
 
+#include "abstract_accurate_time_fetcher.h"
 
-//!Fetches time using Time (rfc868) protocol
-/*!
-    Result time is accurate to second boundary only
-*/
-class NX_NETWORK_API TimeProtocolClient
-:
+namespace nx {
+namespace network {
+
+constexpr const unsigned int kSecondsFrom19000101To19700101 = 2208988800UL;
+constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protocol
+
+/**
+ * Fetches time using Time (rfc868) protocol.
+ * Result time is accurate to second boundary only.
+ */
+class NX_NETWORK_API TimeProtocolClient:
     public AbstractAccurateTimeFetcher
 {
 public:
-    TimeProtocolClient( const QString& timeServer );
+    TimeProtocolClient(const QString& timeServerHost);
     virtual ~TimeProtocolClient();
 
-    //!Implementation of \a QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-    //!Implementation of \a QnJoinable::join
-    virtual void join() override;
+    virtual void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread);
 
-    //!Implementation of \a AbstractAccurateTimeFetcher::getTimeAsync
-    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
+    virtual void getTimeAsync(CompletionHandler completionHandler) override;
 
 private:
-    const QString m_timeServer;
-    std::shared_ptr<AbstractStreamSocket> m_tcpSock;
+    const SocketAddress m_timeServerEndpoint;
+    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     QByteArray m_timeStr;
-    std::function<void(qint64, SystemError::ErrorCode)> m_handlerFunc;
-    mutable QnMutex m_mutex;
+    CompletionHandler m_completionHandler;
 
-    void onConnectionEstablished( SystemError::ErrorCode errorCode );
-    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
+    void getTimeAsyncInAioThread(CompletionHandler completionHandler);
+    void onConnectionEstablished(SystemError::ErrorCode errorCode);
+    void onSomeBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead);
 };
 
-#endif  //DAYTIME_NIST_FETCHER_H
+} // namespace network
+} // namespace nx

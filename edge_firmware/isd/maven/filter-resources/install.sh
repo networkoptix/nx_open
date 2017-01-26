@@ -1,19 +1,12 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-BETA=
-
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
+export DISTRIB=${artifact.name.server}
 
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop
-    cp /usr/local/apps/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf /tmp/mediaserver.conf
     rm -Rf /usr/local/apps/${deb.customization.company.name}/mediaserver/lib
     tar xfv $DISTRIB.tar.gz -C /
-    cat /tmp/mediaserver.conf >> /usr/local/apps/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf     
     /etc/init.d/S99$COMPANY_NAME-mediaserver start
 }
 

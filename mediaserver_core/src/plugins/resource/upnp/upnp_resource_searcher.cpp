@@ -3,11 +3,12 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/network/system_socket.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include "core/resource_management/resource_pool.h"
 #include <nx/network/nettools.h>
-#include <nx/network/system_socket.h>
+#include <nx/network/socket.h>
 
 #include <utils/common/app_info.h>
 
@@ -99,7 +100,7 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 {
     if (m_receiveSocket == 0)
     {
-        UDPSocket* udpSock = new UDPSocket();
+        UDPSocket* udpSock = new UDPSocket(AF_INET);
         udpSock->setReuseAddrFlag(true);
         udpSock->setRecvBufferSize(RECV_BUFFER_SIZE);
         udpSock->bind( SocketAddress( HostAddress::anyHost, GROUP_PORT ) );

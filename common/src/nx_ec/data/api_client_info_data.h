@@ -6,11 +6,9 @@
 
 namespace ec2 {
 
-    struct ApiClientInfoData
-        : ApiData
+    struct ApiClientInfoData: ApiIdData
     {
-        QnUuid id;
-		QnUuid parentId;
+        QnUuid parentId;
 
         QString skin;
         QString fullVersion;
@@ -18,12 +16,12 @@ namespace ec2 {
         QString systemRuntime;
 
         QString cpuArchitecture, cpuModelName;
-		qint64 phisicalMemory;
+        qint64 physicalMemory;
         QString openGLVersion, openGLVendor, openGLRenderer;
     };
-#define ApiClientInfoData_Fields (id)(parentId) \
+#define ApiClientInfoData_Fields ApiIdData_Fields (parentId) \
     (skin)(fullVersion)(systemInfo)(systemRuntime) \
-    (cpuArchitecture)(cpuModelName)(phisicalMemory) \
+    (cpuArchitecture)(cpuModelName)(physicalMemory) \
     (openGLVersion)(openGLVendor)(openGLRenderer)
 
 } // namespace ec2

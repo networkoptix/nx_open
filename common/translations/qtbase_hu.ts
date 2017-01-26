@@ -25,7 +25,7 @@
     <message>
         <location filename="../../qtbase/src/widgets/widgets/qtabbar.cpp" line="+2275"/>
         <source>Close Tab</source>
-        <translation>Fül bezárása</translation>
+        <translation>Lap bezárása</translation>
     </message>
 </context>
 <context>

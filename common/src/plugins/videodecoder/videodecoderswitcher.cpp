@@ -25,7 +25,7 @@ VideoDecoderSwitcher::VideoDecoderSwitcher(
 }
 
 //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
-PixelFormat VideoDecoderSwitcher::GetPixelFormat() const
+AVPixelFormat VideoDecoderSwitcher::GetPixelFormat() const
 {
     return m_decoder->GetPixelFormat();
 }

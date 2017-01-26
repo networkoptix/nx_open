@@ -5,16 +5,22 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${finalName}.dmg"
+DMG_FILE="${artifact.name.client}.dmg"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 
 AS_SRC=app-store
-PKG_FILE="${finalName}.pkg"
+PKG_FILE="${artifact.name.client}.pkg"
+
+QT_DIR="${qt.dir}"
+QT_VERSION="${qt.version}"
 
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$SRC/${display.product.name}.app"
+mkdir -p "$SRC/Nx Witness.app/Contents/Resources"
+cp logo.icns "$SRC/Nx Witness.app/Contents/Resources/appIcon.icns"
+cp logo.icns .VolumeIcon.icns
 
 function hexify
 {
@@ -42,8 +48,9 @@ function patch_dsstore
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
-python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
+python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
+security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
 
 # Boris, move this to a separate script (of even folder), please
 rm -rf "$AS_SRC"
@@ -63,7 +70,7 @@ then
         codesign -f -v -s "${mac.app.sign.identity}" "$f"
     done
 
-    for f in $AS_SRC/"${display.product.name}".app/Contents/MacOS/{imageformats,platforms,styles}/*.dylib
+    for f in $AS_SRC/"${display.product.name}".app/Contents/MacOS/{imageformats,platforms,styles,audio}/*.dylib
     do
         codesign -f -v -s "${mac.app.sign.identity}" "$f"
     done
@@ -84,6 +91,11 @@ SetFile -c icnC $SRC/.VolumeIcon.icns
 hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DMG_FILE"
 
 [ "$1" == "rwonly" ] && exit 0
+
+mv update.json $SRC
+cd dmg-folder
+zip -y -r ../${artifact.name.client_update}.zip ./*.app *.json
+cd ..
 
 rm -rf $TMP
 mkdir -p $TMP

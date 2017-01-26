@@ -1,10 +1,10 @@
+#include <gtest/gtest.h>
+
 #include "upnp_port_mapper_mocked.h"
 
 #include <common/common_globals.h>
 #include <api/global_settings.h>
-
-#include <gtest/gtest.h>
-#include <queue>
+#include <nx/utils/test_support/sync_queue.h>
 
 namespace nx_upnp {
 namespace test {
@@ -14,36 +14,7 @@ std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )
     return std::make_pair( port, PortMapper::Protocol::TCP );
 }
 
-template<typename T>
-class TestSyncQueue
-{
-public:
-    void push( const T& item )
-    {
-        QMutexLocker lock( &m_mutex );
-        m_queue.push( item );
-        if( m_queue.size() == 1)
-            m_condition.wakeOne();
-    }
-
-    T pop()
-    {
-        QMutexLocker locak( &m_mutex );
-        while( m_queue.empty() )
-            m_condition.wait( &m_mutex );
-
-        T val = std::move( m_queue.front() );
-        m_queue.pop();
-        return val;
-    }
-
-private:
-    QMutex m_mutex;
-    QWaitCondition m_condition;
-    std::queue< T > m_queue;
-};
-
-static SocketAddress popAddress( TestSyncQueue< SocketAddress >* queue7001 )
+static SocketAddress popAddress( nx::utils::TestSyncQueue< SocketAddress >* queue7001 )
 {
     auto address = queue7001->pop();
     if( address.address == HostAddress() ) // external IP is not resolved yet
@@ -60,7 +31,7 @@ TEST( UpnpPortMapper, NormalUsage )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001 and 80
-    TestSyncQueue< SocketAddress > queue7001;
+    nx::utils::TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( info ); } ) );
@@ -73,7 +44,7 @@ TEST( UpnpPortMapper, NormalUsage )
     EXPECT_EQ( addr7001.first, tcpPort( map7001.port ) );
     EXPECT_EQ( addr7001.second.first.toString(), lit( "192.168.0.10:7001" ) );
 
-    TestSyncQueue< SocketAddress > queue80;
+    nx::utils::TestSyncQueue< SocketAddress > queue80;
     EXPECT_TRUE( portMapper.enableMapping( 80, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue80.push( info ); } ) );
@@ -107,7 +78,7 @@ TEST( UpnpPortMapper, ReuseExisting )
         std::make_pair( SocketAddress( lit( "192.168.0.10" ), 7001 ), QString() ) ) ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
-    TestSyncQueue< SocketAddress > queue7001;
+    nx::utils::TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( std::move( info ) ); } ) );
@@ -129,7 +100,7 @@ TEST( UpnpPortMapper, CheckMappings )
     AsyncClientMock& clientMock = portMapper.clientMock();
 
     // Map 7001
-    TestSyncQueue< SocketAddress > queue7001;
+    nx::utils::TestSyncQueue< SocketAddress > queue7001;
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress info )
                  { queue7001.push( std::move(info) ); } ) );

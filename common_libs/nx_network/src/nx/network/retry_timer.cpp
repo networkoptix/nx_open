@@ -5,6 +5,7 @@
 
 #include "retry_timer.h"
 
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -37,6 +38,14 @@ RetryPolicy::RetryPolicy(
     m_delayMultiplier(delayMultiplier),
     m_maxDelay(maxDelay)
 {
+}
+
+bool RetryPolicy::operator==(const RetryPolicy& rhs) const
+{
+    return m_maxRetryCount == rhs.m_maxRetryCount
+        && m_initialDelay == rhs.m_initialDelay
+        && m_delayMultiplier == rhs.m_delayMultiplier
+        && m_maxDelay == rhs.m_maxDelay;
 }
 
 void RetryPolicy::setMaxRetryCount(unsigned int retryCount)
@@ -85,61 +94,38 @@ std::chrono::milliseconds RetryPolicy::maxDelay() const
 //// class RetryTimer
 ////////////////////////////////////////////////////////////
 
-RetryTimer::RetryTimer(const RetryPolicy& policy)
-:
+RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
+    aio::BasicPollable(aioThread),
     m_retryPolicy(policy),
     m_triesMade(0)
 {
     reset();
+    m_timer = std::make_unique<aio::Timer>(aioThread);
 }
 
 RetryTimer::~RetryTimer()
 {
-}
-
-void RetryTimer::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    m_timer.pleaseStop(std::move(completionHandler));
-}
-
-void RetryTimer::pleaseStopSync()
-{
-    m_timer.pleaseStopSync();
-}
-
-aio::AbstractAioThread* RetryTimer::getAioThread()
-{
-    return m_timer.getAioThread();
+    stopWhileInAioThread();
 }
 
 void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_timer.bindToAioThread(aioThread);
-}
-
-void RetryTimer::post(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.post(std::move(func));
-}
-
-void RetryTimer::dispatch(nx::utils::MoveOnlyFunc<void()> func)
-{
-    m_timer.dispatch(std::move(func));
+    aio::BasicPollable::bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc)
 {
-    if (m_retryPolicy.maxRetryCount() != RetryPolicy::kInfiniteRetries &&
-        m_triesMade >= m_retryPolicy.maxRetryCount())
-    {
+    if (retriesLeft() == 0)
         return false;
-    }
 
     if ((m_triesMade > 0) &&
         (m_retryPolicy.delayMultiplier() > 0) &&
         (m_currentDelay < m_effectiveMaxDelay))
     {
         auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        if (newDelay == std::chrono::milliseconds::zero())
+            newDelay = std::chrono::milliseconds(1);
         if (newDelay < m_currentDelay)
         {
             //overflow
@@ -151,8 +137,21 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
     }
 
     ++m_triesMade;
-    m_timer.start(m_currentDelay, std::move(doAnotherTryFunc));
+    m_timer->start(m_currentDelay, std::move(doAnotherTryFunc));
     return true;
+}
+
+unsigned int RetryTimer::retriesLeft() const
+{
+    if (m_retryPolicy.maxRetryCount() == RetryPolicy::kInfiniteRetries)
+        return RetryPolicy::kInfiniteRetries;
+
+    return m_retryPolicy.maxRetryCount() - m_triesMade;
+}
+
+boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
+{
+    return m_timer->timeToEvent();
 }
 
 std::chrono::milliseconds RetryTimer::currentDelay() const
@@ -168,6 +167,11 @@ void RetryTimer::reset()
         ? std::chrono::milliseconds::max()
         : m_retryPolicy.maxDelay();
     m_triesMade = 0;
+}
+
+void RetryTimer::stopWhileInAioThread()
+{
+    m_timer.reset();
 }
 
 }   //network

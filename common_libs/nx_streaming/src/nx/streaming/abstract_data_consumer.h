@@ -6,7 +6,7 @@
 #include <nx/streaming/data_packet_queue.h>
 
 class QN_EXPORT QnAbstractDataConsumer
-:                                                         
+:
     public QnLongRunnable,
     public QnAbstractDataReceptor
 {
@@ -28,7 +28,7 @@ public:
 
     //virtual qint64 getDisplayedTime() const { return 0; }
     virtual bool isRealTimeSource() const { return false; }
-
+    virtual void pleaseStop() override;
 protected:
 
     friend class QnArchiveStreamReader;
@@ -36,10 +36,14 @@ protected:
     void run();
     virtual void setSpeed(float /*value*/) {}
     virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
+    virtual void beforeRun();
     virtual void endOfRun();
-
+private:
+    void resumeDataQueue();
 protected:
     QnDataPacketQueue m_dataQueue;
+private:
+    QnMutex m_pleaseStopMutex;
 };
 
 #endif // abstract_data_consumer_h_2111

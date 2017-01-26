@@ -1,9 +1,9 @@
 #include "license_usage_helper.h"
 
-#ifdef ENABLE_SENDMAIL
-
 #include <numeric>
 #include <functional>
+
+#include <QtCore/QJsonObject>
 
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/fill.hpp>
@@ -12,11 +12,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
-#include "qjsonobject.h"
+
 
 //#define QN_NO_LICENSE_CHECK
 
@@ -82,10 +81,12 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
 {
 
     /* Call update if server was added or removed or changed its status. */
-    auto updateIfNeeded = [this](const QnResourcePtr &resource) {
-        if (resource.dynamicCast<QnMediaServerResource>())
-            emit licenseUsageChanged();
-    };
+    auto updateIfNeeded =
+        [this](const QnResourcePtr &resource)
+        {
+            if (resource->hasFlags(Qn::server) && !resource->hasFlags(Qn::fake))
+                emit licenseUsageChanged();
+        };
 
     connect(qnResPool,      &QnResourcePool::resourceAdded,     this,   updateIfNeeded);
     connect(qnResPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
@@ -407,12 +408,14 @@ void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourceList &propose
     invalidate();
 }
 
-bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera) {
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera)
+{
     return isOverflowForCamera(camera, camera->isLicenseUsed());
 }
 
-bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed) {
-    bool requiresLicense = false;
+bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourcePtr &camera, bool cachedLicenceUsed)
+{
+    bool requiresLicense = cachedLicenceUsed;
     requiresLicense &= !m_proposedToDisable.contains(camera);
     requiresLicense |= m_proposedToEnable.contains(camera);
     return requiresLicense && !isValid(camera->licenseType());
@@ -437,12 +440,8 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
 
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>())
+    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
     {
-        QnResourcePtr server = camera->getParentResource();
-        if (!server || server->getStatus() != Qn::Online)
-            continue;
-
         Qn::LicenseType lt = camera->licenseType();
         bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
@@ -615,5 +614,3 @@ QnVideoWallLicenseUsageProposer::~QnVideoWallLicenseUsageProposer() {
         return;
     m_helper->propose(-m_count);
 }
-
-#endif //ENABLE_SENDMAIL

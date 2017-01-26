@@ -14,7 +14,7 @@
 #include <QTimer>
 
 #include "core/resource/resource_fwd.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
 
@@ -81,6 +81,7 @@ public:
     QString version() const;
     QString brand() const;
     QString expiration() const; // TODO: #Ivan Passing date as a string is totally evil. Please make sure your code is easy to use!!!
+    bool neverExpire() const;
 
     QByteArray rawLicense() const;
 
@@ -197,8 +198,7 @@ public:
     void reset();
     bool isEmpty() const;
 
-    QVector<QString> mainHardwareIds() const;
-    QVector<QString> compatibleHardwareIds() const;
+    QVector<QString> hardwareIds() const;
     QString currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:

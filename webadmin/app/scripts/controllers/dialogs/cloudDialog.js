@@ -1,10 +1,12 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName, cloudSystemID, cloudAccountName) {
+    .controller('CloudDialogCtrl', function ($scope, $modalInstance, mediaserver, cloudAPI, connect, systemName,
+                                             cloudSystemID, cloudAccountName) {
 
         //1. Detect action: connect or disconnect
         $scope.connect = connect;
+        $scope.Config = Config;
         if(connect) {
             $scope.title = 'Connect system to <span class="product-name">Nx Cloud</span>';
             $scope.actionLabel = 'Connect System';
@@ -28,6 +30,8 @@ angular.module('webadminApp')
             if(result.data.errorString && result.data.errorString !== ''){
                 $scope.errorMessage += ': ' + result.data.errorString;
                 $scope.succeed = false;
+            }else {
+                $modalInstance.close('success');
             }
         }
         function errorHandler(result){
@@ -90,15 +94,18 @@ angular.module('webadminApp')
                 cloudAPI.connect( $scope.settings.systemName, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(message){
                         //2. Save settings to local server
-                        mediaserver.saveCloudSystemCredentials(message.data.systemId, message.data.authKey,
+                        mediaserver.saveCloudSystemCredentials(message.data.id, message.data.authKey,
                             $scope.settings.cloudEmail).then(successHandler,errorHandler);
                     }, cloudErrorHandler);
             }else{
+                console.error("this method is obsolete and do not work anymore");
+                /*
                 cloudAPI.disconnect( cloudSystemID, $scope.settings.cloudEmail, $scope.settings.cloudPassword).then(
                     function(){
                         //2. Save settings to local server
                         mediaserver.clearCloudSystemCredentials().then(successHandler,errorHandler);
                     }, cloudErrorHandler);
+                */
             }
         };
     });

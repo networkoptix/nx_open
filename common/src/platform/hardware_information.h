@@ -8,7 +8,7 @@ class HardwareInformation
 public:
     static const HardwareInformation& instance();
 
-    qint64    phisicalMemory;
+    qint64    physicalMemory;
     QString   cpuArchitecture;
     QString   cpuModelName;
 

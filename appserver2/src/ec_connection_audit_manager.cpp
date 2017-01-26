@@ -9,6 +9,7 @@
 #include "business/business_strings_helper.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "business/business_event_rule.h"
+#include <api/global_settings.h>
 
 namespace ec2
 {
@@ -23,7 +24,7 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
         for (const auto& value: params)
-            auditRecord.resources.push_back(value.cameraID);
+            auditRecord.resources.push_back(value.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -31,7 +32,7 @@ namespace ec2
     {
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_CameraUpdate);
-        auditRecord.resources.push_back(params.cameraID);
+        auditRecord.resources.push_back(params.cameraId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -39,7 +40,7 @@ namespace ec2
     {
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-        auditRecord.resources.push_back(params.serverID);
+        auditRecord.resources.push_back(params.serverId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -48,7 +49,24 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
         for (const auto& value: params)
-            auditRecord.resources.push_back(value.serverID);
+            auditRecord.resources.push_back(value.serverId);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageData& params, const QnAuthSession& authInfo)
+    {
+        Q_UNUSED(command);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+        auditRecord.resources.push_back(params.parentId);
+        qnAuditManager->addAuditRecord(auditRecord);
+    }
+
+    void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command, const ApiStorageDataList& params, const QnAuthSession& authInfo)
+    {
+        Q_UNUSED(command);
+        QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+        for (const auto& value: params)
+            auditRecord.resources.push_back(value.parentId);
         qnAuditManager->addAuditRecord(auditRecord);
     }
 
@@ -93,11 +111,7 @@ namespace ec2
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
-        QnUserResourcePtr adminUser = qnResPool->getAdministrator();
-        if (!adminUser)
-            return;
-        QnUuid adminId = adminUser->getId();
-        if (param.resourceId == adminId)
+        if (qnGlobalSettings->isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
@@ -135,7 +149,7 @@ namespace ec2
                 }
                 break;
             }
-            case ApiCommand::removeBusinessRule:
+            case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
                 auto msgProc = QnCommonMessageProcessor::instance();

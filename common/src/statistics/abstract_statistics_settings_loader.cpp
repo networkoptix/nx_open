@@ -1,6 +1,6 @@
 
 #include "abstract_statistics_settings_loader.h"
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace
 {
@@ -19,7 +19,8 @@ QnStatisticsSettings::QnStatisticsSettings()
     , filters()
 {}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStatisticsSettings, (json)(ubjson)(xml)(csv_record)(eq), QnStatisticsSettings_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnStatisticsSettings), (json)(ubjson)(xml)(csv_record)(eq), _Fields)
 
 QnAbstractStatisticsSettingsLoader::QnAbstractStatisticsSettingsLoader(QObject *parent)
     : base_type(parent)

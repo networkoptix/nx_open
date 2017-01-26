@@ -1,0 +1,10 @@
+<resources>
+    <oem name = "AdvantechADAM">
+    <resource name="AdvantechADAMCommon" id="1a67aa50-8aa2-431f-8d30-bacbb65b88ba" type="Camera"/>
+	<resource name = "ADAM-6050" public="AdvantechADAMCommon"/>
+	<resource name = "ADAM-6051" public="AdvantechADAMCommon"/>
+    <resource name = "ADAM-6052" public="AdvantechADAMCommon"/>
+	<resource name = "ADAM-6060" public="AdvantechADAMCommon"/>
+	<resource name = "ADAM-6066" public="AdvantechADAMCommon"/>
+    </oem>
+</resources>

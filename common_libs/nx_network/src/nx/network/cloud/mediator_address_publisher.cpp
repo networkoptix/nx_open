@@ -1,142 +1,127 @@
 #include "mediator_address_publisher.h"
 
-#include "common/common_globals.h"
 #include <nx/utils/log/log.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
 
-const std::chrono::milliseconds MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
-    = std::chrono::minutes( 10 );
+const std::chrono::milliseconds MediatorAddressPublisher::kDefaultRetryInterval =
+    std::chrono::minutes(10);
 
 MediatorAddressPublisher::MediatorAddressPublisher(
-        std::shared_ptr< hpm::api::MediatorServerTcpConnection > mediatorConnection)
-    : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
-    , m_state( State::kInit )
-    , m_mediatorConnection( std::move(mediatorConnection) )
+    std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection)
+:
+    m_retryInterval(kDefaultRetryInterval),
+    m_isRequestInProgress(false),
+    m_mediatorConnection(std::move(mediatorConnection))
 {
-}
+    bindToAioThread(m_mediatorConnection->getAioThread());
 
-void MediatorAddressPublisher::setUpdateInterval(std::chrono::milliseconds updateInterval)
-{
-    QnMutexLocker lk( &m_mutex );
-    m_updateInterval = updateInterval;
-}
-
-void MediatorAddressPublisher::updateAddresses( std::list< SocketAddress > addresses )
-{
-    for( auto it = addresses.begin(); it != addresses.end(); )
-    {
-        if ( it->address.isLocalIp() )
-            it = addresses.erase( it );
-        else
-            ++it;
-    }
-
-    QnMutexLocker lk( &m_mutex );
-    if( m_reportedAddresses == addresses )
-        return;
-
-    NX_LOGX( lm( "New addresses: %1" ).container( addresses ), cl_logDEBUG1 );
-    m_reportedAddresses = std::move( addresses );
-
-    if( m_state == State::kInit )
-    {
-        m_state = State::kProgress;
-        pingReportedAddresses( &lk );
-    }
-}
-
-void MediatorAddressPublisher::setupUpdateTimer( QnMutexLockerBase* /*lk*/ )
-{
-    if( m_state == State::kTerminated )
-        return;
-
-    m_timer.start(
-        m_updateInterval,
+    m_mediatorConnection->setOnReconnectedHandler(
         [this]()
         {
-            QnMutexLocker lk( &m_mutex );
-            pingReportedAddresses( &lk );
+            NX_LOGX(lm("Mediator client reported reconnect"), cl_logDEBUG2);
+            m_publishedAddresses.clear();
+            publishAddressesIfNeeded();
         });
 }
 
-void MediatorAddressPublisher::pingReportedAddresses( QnMutexLockerBase* lk )
+MediatorAddressPublisher::~MediatorAddressPublisher()
 {
-    if( m_state == State::kTerminated )
-        return;
-
-    if( m_reportedAddresses == m_pingedAddresses )
-        return publishPingedAddresses( lk );
-
-    auto addresses = m_reportedAddresses;
-    lk->unlock();
-    m_mediatorConnection->ping(
-        nx::hpm::api::PingRequest(std::move(addresses)),
-        [this](
-            nx::hpm::api::ResultCode resultCode,
-            nx::hpm::api::PingResponse responseData)
-        {
-            QnMutexLocker lk( &m_mutex );
-            if (resultCode != nx::hpm::api::ResultCode::ok)
-            {
-                m_pingedAddresses.clear();
-                m_publishedAddresses.clear();
-                return setupUpdateTimer( &lk );
-            }
-
-            m_pingedAddresses = std::move(responseData.endpoints);
-            NX_LOGX( lm( "Pinged addresses: %1" )
-                     .container( m_publishedAddresses ), cl_logDEBUG1 );
-
-            publishPingedAddresses( &lk );
-        });
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
-void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
+void MediatorAddressPublisher::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    if( m_state == State::kTerminated )
-        return;
+    BaseType::bindToAioThread(aioThread);
+    m_mediatorConnection->bindToAioThread(aioThread);
+}
 
-    auto addresses = m_pingedAddresses;
-    lk->unlock();
-    m_mediatorConnection->bind(
-        nx::hpm::api::BindRequest(std::move(addresses)),
-        [this](nx::hpm::api::ResultCode resultCode)
-        {
-            QnMutexLocker lk( &m_mutex );
-            if (resultCode != nx::hpm::api::ResultCode::ok)
-            {
-                m_pingedAddresses.clear();
-                m_publishedAddresses.clear();
-                return setupUpdateTimer( &lk );
-            }
-
-            m_publishedAddresses = m_pingedAddresses;
-            NX_LOGX( lm( "Published addresses: %1" )
-                     .container( m_publishedAddresses ), cl_logDEBUG1 );
-
-            setupUpdateTimer( &lk );
-        });
+void MediatorAddressPublisher::setRetryInterval(std::chrono::milliseconds interval)
+{
+    m_mediatorConnection->dispatch([this, interval](){ m_retryInterval = interval; });
 }
 
 void MediatorAddressPublisher::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
+    m_mediatorConnection->pleaseStop(std::move(handler));
+}
+
+void MediatorAddressPublisher::updateAddresses(
+    std::list<SocketAddress> addresses,
+    utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> updateHandler)
+{
+    m_mediatorConnection->dispatch(
+        [this, addresses = std::move(addresses), handler = std::move(updateHandler)]() mutable
+        {
+            m_serverAddresses = std::move(addresses);
+            if (handler)
+                m_updateHandlers.push_back(std::move(handler));
+            NX_LOGX(lm("New addresses: %1").container(m_serverAddresses), cl_logDEBUG1);
+            publishAddressesIfNeeded();
+        });
+}
+
+void MediatorAddressPublisher::publishAddressesIfNeeded()
+{
+    if (m_publishedAddresses == m_serverAddresses)
     {
-        QnMutexLocker lk( &m_mutex );
-        m_state = State::kTerminated;
+        NX_LOGX(lm("No need to publish addresses: they are already published. Reporting success..."),
+            cl_logDEBUG2);
+        reportResultToTheCaller(hpm::api::ResultCode::ok);
+        return;
     }
 
-    nx::BarrierHandler barrier( std::move(handler) );
-    m_timer.pleaseStop( barrier.fork() );
-
-    QnMutexLocker lk( &m_mutex );
-    if( m_mediatorConnection )
+    if (m_isRequestInProgress)
     {
-        lk.unlock();
-        m_mediatorConnection->pleaseStop( barrier.fork() );
+        NX_LOGX(lm("Publish address request has already been issued. Ignoring new one..."), cl_logDEBUG2);
+        return;
     }
+
+    NX_LOGX(lm("Issuing bind request to mediator..."), cl_logDEBUG2);
+
+    m_isRequestInProgress = true;
+    m_mediatorConnection->bind(
+        nx::hpm::api::BindRequest(m_serverAddresses),
+        [this, addresses = m_serverAddresses](nx::hpm::api::ResultCode resultCode)
+        {
+            NX_LOGX(lm("Publish addresses (%1) completed with result %2")
+                .container(m_publishedAddresses).str(resultCode), cl_logDEBUG1);
+
+            m_isRequestInProgress = false;
+
+            reportResultToTheCaller(resultCode);
+
+            if (resultCode != nx::hpm::api::ResultCode::ok)
+            {
+                m_publishedAddresses.clear();
+                return m_mediatorConnection->start(
+                    m_retryInterval,
+                    [this](){ publishAddressesIfNeeded(); });
+            }
+
+            m_publishedAddresses = addresses;
+            publishAddressesIfNeeded();
+        });
+}
+
+void MediatorAddressPublisher::stopWhileInAioThread()
+{
+    m_mediatorConnection.reset();
+}
+
+void MediatorAddressPublisher::reportResultToTheCaller(hpm::api::ResultCode resultCode)
+{
+    if (m_updateHandlers.empty())
+        return;
+
+    decltype(m_updateHandlers) handlers;
+    std::swap(handlers, m_updateHandlers);
+
+    for (auto& handler: handlers)
+        handler(resultCode);
 }
 
 } // namespace cloud

@@ -2,6 +2,7 @@
 #define __STORAGE_MANAGER_H__
 
 #include <random>
+#include <functional>
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QString>
@@ -23,14 +24,17 @@
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
 #include <set>
+#include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
 #include "api/model/recording_stats_reply.h"
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <recorder/camera_info.h>
 
 #include <atomic>
 #include <future>
 #include <mutex>
 #include <array>
+#include <vector>
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
@@ -46,10 +50,23 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
     friend class TestHelper;
+    friend class nx::caminfo::ServerWriterHandler;
+
 public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
     typedef QMap<QString, QSet<QDate>> UsedMonthsMap; /* Map by camera unique id. */
+
+	struct StorageSpaceInfo
+	{
+		qint64 occupiedSpace;
+		double usageCoeff;
+		StorageSpaceInfo()
+			: occupiedSpace(0),
+			  usageCoeff(0.0)
+		{}
+	};
+    typedef std::unordered_map<int, StorageSpaceInfo> StorageSpaceInfoMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
@@ -91,7 +108,7 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QString& cameraUniqueId, const QString &catalogPrefix);
 
-    static QnTimePeriodList getRecordedPeriods(const QnVirtualCameraResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
+    static QnTimePeriodList getRecordedPeriods(const QnSecurityCamResourceList &cameras, qint64 startTime, qint64 endTime, qint64 detailLevel, bool keepSmallChunks,
                                                const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     QnRecordingStatsReply getChunkStatistics(qint64 bitrateAnalizePeriodMs);
 
@@ -99,15 +116,25 @@ public:
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
 
     QnStorageResourcePtr getOptimalStorageRoot(
-        QnAbstractMediaStreamDataProvider                   *provider,
-        std::function<bool(const QnStorageResourcePtr &)>   pred =
+        QnAbstractMediaStreamDataProvider *provider,
+        std::function<bool(const QnStorageResourcePtr &)> pred =
             [](const QnStorageResourcePtr &storage) {
                 return !storage->hasFlags(Qn::storage_fastscan) ||
                         storage->getFreeSpace() > storage->getSpaceLimit();
-            }
-    );
+            });
 
     QnStorageResourceList getStorages() const;
+
+    /*
+     * Return writable storages with checkBox 'usedForWriting'
+     */
+    QSet<QnStorageResourcePtr> getUsedWritableStorages() const;
+
+    /*
+     * Return all storages which can be used for writing
+     */
+    QSet<QnStorageResourcePtr> getAllWritableStorages() const;
+
     QnStorageResourceList getStoragesInLexicalOrder() const;
     bool hasRebuildingStorages() const;
 
@@ -158,8 +185,9 @@ public slots:
 private:
     friend class TestStorageThread;
 
+    void createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
-                                    const QnVirtualCameraResourceList &cameras,
+                                    const QnSecurityCamResourceList &cameras,
                                     qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,
                                     const QList<QnServer::ChunksCatalog> &catalogs, int limit);
     bool isArchiveTimeExistsInternal(const QString& cameraUniqueId, qint64 timeMs);
@@ -174,14 +202,14 @@ private:
 
     QString toCanonicalPath(const QString& path);
     StorageMap getAllStorages() const;
-    QSet<QnStorageResourcePtr> getWritableStorages() const;
+	QSet<QnStorageResourcePtr> getWritableStorages(
+        std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
+		
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                      ec2::ApiCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
-
-    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ec2::ApiCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
+                                      nx::caminfo::ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
 
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
@@ -206,6 +234,19 @@ private:
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
+	friend struct OccupiedSpaceAccess; // for unit tests
+
+	void calculateOccupiedSpace();
+	void addSpaceInfoOccupiedValue(int storageIndex, qint64 value);
+	void subtractSpaceInfoOccupiedValue(int storageIndex, qint64 value);
+	qint64 getSpaceInfoOccupiedValue(int storageIndex);
+	void setSpaceInfoUsageCoeff(int storageIndex, double coeff);
+	double getSpaceInfoUsageCoeff(int storageIndex);
+
+	template<typename F>
+	void applySpaceInfoAction(int storageIndex, F action);
+
+    QStringList getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const;
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
         const QString               &oldName,
@@ -228,18 +269,14 @@ private:
     mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
-    bool m_storagesStatisticsReady;
     QTimer m_timer;
 
-    bool m_warnSended;
+    std::atomic<bool> m_warnSended;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
     TestStorageThread* m_testStorageThread;
     QMap<QnUuid, bool> m_diskFullWarned;
 
-    //RebuildState m_rebuildState;
-    //QnStorageResourcePtr m_rebuildStorage;
-    //double m_rebuildProgress;
     QnStorageScanData m_archiveRebuildInfo;
     bool m_rebuildCancelled;
 
@@ -261,6 +298,15 @@ private:
 
     std::random_device m_rd;
     std::mt19937 m_gen;
+    bool m_isRenameDisabled;
+    mutable QnMutex m_occupiedSpaceInfoMutex;
+    StorageSpaceInfoMap m_occupiedSpaceInfo;
+
+    nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
+    nx::caminfo::Writer m_camInfoWriter;
+
+    nx::caminfo::ServerReaderHandler m_camInfoReadHandler;
+    nx::caminfo::Reader m_camInfoReader;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

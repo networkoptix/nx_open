@@ -5,25 +5,26 @@
 
 namespace ec2
 {
-    class QnCameraNotificationManager: public AbstractCameraManager
+    class QnCameraNotificationManager: public AbstractCameraNotificationManager
     {
     public:
         QnCameraNotificationManager();
 
-        void triggerNotification(const QnTransaction<ApiCameraData>& tran);
-        void triggerNotification(const QnTransaction<ApiCameraDataList>& tran);
-        void triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran);
-        void triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran);
-        void triggerNotification(const QnTransaction<ApiIdData>& tran);
-        void triggerNotification(const QnTransaction<ApiServerFootageData>& tran);
+        void triggerNotification(const QnTransaction<ApiCameraData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiCameraDataList>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiServerFootageData>& tran, NotificationSource source);
     };
 
+    typedef std::shared_ptr<QnCameraNotificationManager> QnCameraNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnCameraManager: public QnCameraNotificationManager
+    class QnCameraManager: public AbstractCameraManager
     {
     public:
-        QnCameraManager(QueryProcessorType* const queryProcessor);
+        QnCameraManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         //!Implementation of AbstractCameraManager::getCameras
         virtual int getCameras(impl::GetCamerasHandlerPtr handler) override;
@@ -45,5 +46,6 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 }

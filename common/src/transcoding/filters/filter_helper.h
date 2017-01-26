@@ -21,7 +21,7 @@ public:
     void setDewarpingParams(const QnMediaDewarpingParams& params1, const QnItemDewarpingParams& params2); // fisheye image filter
     void setContrastParams(const ImageCorrectionParams& params); // contrast image filter
     void setTimeCorner(Qn::Corner corner, qint64 offset, qint64 timeMsec); // time image filter, time in milliseconds since epoch, zero time means take from frame
-    void setCodec(CodecID codecID);
+    void setCodec(AVCodecID codecID);
     
     const static QSize defaultResolutionLimit;
 
@@ -45,7 +45,7 @@ private:
     QnItemDewarpingParams m_itemDewarpingParams;
     ImageCorrectionParams m_contrastParams;
     Qn::Corner m_timestampCorner;
-    CodecID m_codecID;
+    AVCodecID m_codecID;
     qint64 m_onscreenDateOffset;
     qint64 m_timeMs;
 };

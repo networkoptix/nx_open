@@ -1,19 +1,52 @@
-#define GTEST_HAS_POSIX_RE 0
-#include <gtest/gtest.h>
-#include <qcoreapplication.h>
-#include <QCommandLineParser>
+#include <QtCore>
+#include "utils.h"
 
-#include "storage/abstract_storage_resource.h"
-#include <nx/network/socket_global.h>
+#include <nx/network/test_support/run_test.h>
 
-extern test::StorageTestGlobals tg;
+nx::ut::cfg::Config config;
 
-int main(int argc, char **argv)
+static void fillConfig(const QStringList& arguments)
 {
-	nx::network::SocketGlobals::InitGuard sgGuard;
-    QCoreApplication app(argc, argv);
+    QCommandLineParser parser;
+    parser.addOptions({ {{"t", "tmp"}, "Temporary working directory path. Default: 'tmp'", "tmp"},
+                       {"ftp-storage-url", "Ftp storage url"},
+                       {"smb-storage-url", "Smb storage url"} });
+    parser.addHelpOption();
+    parser.parse(arguments);
 
-    ::testing::InitGoogleTest(&argc, argv);
-    const int result = RUN_ALL_TESTS();
-    return result;
+    if (parser.isSet("help"))
+    {
+        parser.showHelp();
+        QCoreApplication::exit(0);
+        return;
+    }
+
+    if (parser.isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser.value("tmp")))
+        config.tmpDir = parser.value("tmp");
+    else
+        config.tmpDir = QDir(QDir::tempPath()).absoluteFilePath("nx_ut");
+
+    if (parser.isSet("ftp-storage-url"))
+        config.ftpUrl = parser.value("ftp-storage-url");
+    if (parser.isSet("smb-storage-url"))
+        config.smbUrl = parser.value("smb-storage-url");
+}
+
+static void fillConfig(QCoreApplication& app)
+{
+    fillConfig(app.arguments());
+}
+
+int main(int argc, char** argv)
+{
+#ifndef ENABLE_CLOUD_TEST
+    QCoreApplication app(argc, argv);
+    fillConfig(app);
+#else
+    QStringList arguments;
+    for (int i = 0; i < argc; ++i)
+        arguments.push_back(QString::fromUtf8(argv[i]));
+    fillConfig(arguments);
+#endif
+    return nx::network::test::runTest(argc, argv);
 }

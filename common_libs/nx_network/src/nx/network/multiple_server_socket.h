@@ -3,7 +3,7 @@
 
 #include <queue>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "nx/network/aio/timer.h"
 #include "system_socket.h"
@@ -46,7 +46,7 @@ public:
     bool getSendTimeout(unsigned int* millis) const override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
-    aio::AbstractAioThread* getAioThread() override;
+    aio::AbstractAioThread* getAioThread() const override;
     void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::*
@@ -57,6 +57,7 @@ public:
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
+    Pollable* pollable() override;
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
@@ -93,6 +94,8 @@ protected:
 
     void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
                   AbstractStreamSocket* socket);
+
+    void cancelIoFromAioThread();
 
 protected:
     bool m_nonBlockingMode;

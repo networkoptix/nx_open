@@ -3,7 +3,7 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnMediaDewarpingParams {
@@ -64,6 +64,8 @@ public:
     /** Horizontal stretch. Value 1.0 means no stretch */ 
     qreal hStretch;
 };
+
+#define QnMediaDewarpingParams_Fields (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius)(hStretch)
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnMediaDewarpingParams::ViewMode)
 

@@ -8,7 +8,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_server.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 
 namespace nx {
@@ -17,8 +17,6 @@ namespace cloud {
 namespace udp {
 namespace test {
 
-const SocketAddress kMediatorAddress("127.0.0.1:12345");
-const SocketAddress k2ndPeerAddress("127.0.0.1:12346");
 const String kRemotePeerId("SomePeerId");
 const String kConnectionSessionId("SomeSessionId");
 const std::chrono::milliseconds kSocketTimeout(2000);
@@ -47,18 +45,14 @@ class UdpHolePunchingTunnelAcceptorTest
 protected:
     UdpHolePunchingTunnelAcceptorTest()
     :
-        stunClientMock(std::make_shared<network::test::StunAsyncClientMock>()),
+        stunClientMock(std::make_shared<stun::test::AsyncClientMock>()),
         manualAcceptorStop(false),
         udpStunServer(&stunMessageDispatcher),
         isUdpServerEnabled(true),
         connectionRequests(0)
     {
-        EXPECT_CALL(*stunClientMock, remoteAddress())
-            .Times(::testing::AnyNumber())
-            .WillRepeatedly(::testing::Return(kMediatorAddress));
-
         stunMessageDispatcher.registerRequestProcessor(
-            stun::cc::methods::connectionAck,
+            stun::extension::methods::connectionAck,
             [this](
                 std::shared_ptr<stun::AbstractServerConnection> c,
                 stun::Message m)
@@ -66,8 +60,11 @@ protected:
                 onUdpRequest(std::move(c), std::move(m));
             });
 
-        NX_CRITICAL(udpStunServer.bind(kMediatorAddress));
+        NX_CRITICAL(udpStunServer.bind(SocketAddress("127.0.0.1:0")));
         NX_CRITICAL(udpStunServer.listen());
+        EXPECT_CALL(*stunClientMock, remoteAddress())
+            .Times(::testing::AnyNumber())
+            .WillRepeatedly(::testing::Return(udpStunServer.address()));
     }
 
     void createAndStartAcceptor(size_t socketsToAccept)
@@ -80,9 +77,9 @@ protected:
 
         nx::hpm::api::ConnectionParameters connectionParameters;
         connectionParameters.rendezvousConnectTimeout = kSocketTimeout;
-        tunnelAcceptor.reset(new TunnelAcceptor(k2ndPeerAddress, connectionParameters));
+        tunnelAcceptor.reset(new TunnelAcceptor({get2ndPeerAddress()}, connectionParameters));
         tunnelAcceptor->setConnectionInfo(kConnectionSessionId, kRemotePeerId);
-        tunnelAcceptor->setMediatorConnection(mediatorConnection);
+        tunnelAcceptor->setMediatorConnection(mediatorConnection.get());
         tunnelAcceptor->setUdpRetransmissionTimeout(kUdpRetryTimeout);
         tunnelAcceptor->setUdpMaxRetransmissions(1);
 
@@ -134,51 +131,99 @@ protected:
         ASSERT_TRUE(ack.parse(message));
         ASSERT_EQ(ack.connectSessionId, kConnectionSessionId);
 
-        SocketAddress udtAddress = connection->getSourceAddress();
+        SocketAddress destinationAddress = connection->getSourceAddress();
         NX_LOGX(lm("Got connectionAck from %1")
-            .arg(udtAddress.toString()), cl_logALWAYS);
+            .str(destinationAddress), cl_logDEBUG1);
 
+        SocketAddress sourceAddress = get2ndPeerAddress();
         NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2")
-            .arg(k2ndPeerAddress.toString())
-            .arg(udtAddress.toString()), cl_logDEBUG2);
+            .str(sourceAddress).str(destinationAddress), cl_logDEBUG2);
 
         if (connectionRequests)
-            connectControlSocket(udtAddress);
+            connectControlSocket(sourceAddress, destinationAddress);
 
         stun::Message response(stun::Header(
             stun::MessageClass::successResponse,
-            stun::cc::methods::connectionAck,
+            stun::extension::methods::connectionAck,
             std::move(message.header.transactionId)));
-        response.newAttribute<stun::cc::attrs::ResultCode>(
+        response.newAttribute<stun::extension::attrs::ResultCode>(
             hpm::api::ResultCode::ok);
         connection->sendMessage(std::move(response));
     }
 
-    void connectControlSocket(const SocketAddress& address)
+    void connectControlSocket(
+        const SocketAddress& sourceAddress,
+        const SocketAddress& destinationAddress)
     {
-        auto socket = std::make_unique<UdtStreamSocket>();
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setRendezvous(true));
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
-        ASSERT_TRUE(socket->bind(k2ndPeerAddress));
+        ASSERT_TRUE(socket->bind(sourceAddress));
+        auto socketPtr = socket.get();
         socket->connectAsync(
-            address,
-            [this, address](SystemError::ErrorCode code)
+            destinationAddress,
+            [=](SystemError::ErrorCode code)
             {
                 NX_LOGX(lm("Rendevous UDT connection from %1 to %2: %3")
-                    .arg(k2ndPeerAddress.toString()).arg(address.toString())
+                    .str(sourceAddress).str(destinationAddress)
                     .arg(SystemError::toString(code)), cl_logDEBUG1);
 
                 ASSERT_EQ(code, SystemError::noError);
-                connectClientSocket(address);
+                selectControlSocket(socketPtr, destinationAddress);
             });
 
         connectSockets.push_back(std::move(socket));
     }
 
+    void selectControlSocket(
+        UdtStreamSocket* socket,
+        const SocketAddress& destinationAddress)
+    {
+        stun::Message request(stun::Header(
+            stun::MessageClass::request,
+            stun::extension::methods::tunnelConnectionChosen));
+
+        auto buffer = std::make_shared<Buffer>();
+        buffer->reserve(1000);
+        stun::MessageSerializer serializer;
+        size_t processed;
+        serializer.setMessage(&request);
+        serializer.serialize(buffer.get(), &processed);
+
+        socket->sendAsync(
+            *buffer,
+            [=](SystemError::ErrorCode code, size_t size)
+        {
+            ASSERT_EQ(code, SystemError::noError);
+            ASSERT_EQ(buffer->size(), size);
+            buffer->resize(0);
+            socket->readSomeAsync(
+                buffer.get(),
+                [=](SystemError::ErrorCode code, size_t /*size*/)
+                {
+                    ASSERT_EQ(code, SystemError::noError);
+
+                    stun::Message response;
+                    stun::MessageParser parser;
+                    parser.setMessage(&response);
+
+                    size_t processed;
+                    ASSERT_EQ(parser.parse(*buffer, &processed),
+                              nx_api::ParserState::done);
+                    ASSERT_EQ(response.header.messageClass,
+                              stun::MessageClass::successResponse);
+                    ASSERT_EQ(response.header.method,
+                              stun::extension::methods::tunnelConnectionChosen);
+
+                    connectClientSocket(destinationAddress);
+                });
+        });
+    }
+
     void connectClientSocket(const SocketAddress& address)
     {
-        auto socket = std::make_unique<UdtStreamSocket>();
+        auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
         ASSERT_TRUE(socket->setSendTimeout(kSocketTimeout.count()));
         ASSERT_TRUE(socket->setNonBlockingMode(true));
         socket->connectAsync(
@@ -198,6 +243,17 @@ protected:
         connectSockets.push_back(std::move(socket));
     }
 
+    SocketAddress get2ndPeerAddress()
+    {
+        if (!m_udtAddressKeeper)
+        {
+            m_udtAddressKeeper.reset(new UdtStreamSocket(AF_INET));
+            EXPECT_TRUE(m_udtAddressKeeper->bind(SocketAddress("127.0.0.1:0")));
+        }
+
+        return m_udtAddressKeeper->getLocalAddress();
+    }
+
     void TearDown() override
     {
         for (auto& socket : connectSockets)
@@ -210,20 +266,21 @@ protected:
             mediatorConnection->pleaseStopSync();
     }
 
-    std::shared_ptr<network::test::StunAsyncClientMock> stunClientMock;
+    std::shared_ptr<stun::test::AsyncClientMock> stunClientMock;
     std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection;
 
     bool manualAcceptorStop;
+    std::unique_ptr<AbstractStreamSocket> m_udtAddressKeeper;
     std::unique_ptr<TunnelAcceptor> tunnelAcceptor;
     stun::MessageDispatcher stunMessageDispatcher;
-    stun::UDPServer udpStunServer;
+    stun::UdpServer udpStunServer;
 
     bool isUdpServerEnabled;
     size_t connectionRequests;
-    TestSyncQueue<SystemError::ErrorCode> connectResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> connectResults;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectSockets;
 
-    TestSyncQueue<SystemError::ErrorCode> acceptResults;
+    utils::TestSyncQueue<SystemError::ErrorCode> acceptResults;
     std::unique_ptr<AbstractIncomingTunnelConnection> tunnelConnection;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
 };
@@ -252,18 +309,22 @@ TEST_F(UdpHolePunchingTunnelAcceptorTest, UdtConnectTimeout)
 
 TEST_F(UdpHolePunchingTunnelAcceptorTest, ConnectPleaseStop)
 {
+    manualAcceptorStop = true;
     std::random_device device;
     std::mt19937 generator(device());
     std::uniform_int_distribution<int64_t> distribution(0, kUdpRetryTimeout.count() * 2);
     for (size_t i = 0; i < kPleaseStopRunCount; ++i)
     {
         const auto delay = distribution(generator);
-        NX_LOG(lm("== %1 == delay: %2 ms").arg(i).arg(delay), cl_logALWAYS);
+        NX_LOG(lm("== %1 == delay: %2 ms").arg(i).arg(delay), cl_logDEBUG2);
 
         createAndStartAcceptor(1);
         std::this_thread::sleep_for(std::chrono::milliseconds(delay));
         tunnelAcceptor->pleaseStopSync();
         tunnelAcceptor.reset();
+
+        if (!acceptResults.isEmpty())
+            ASSERT_NE(acceptResults.pop(), SystemError::noError);
         ASSERT_TRUE(acceptResults.isEmpty());
     }
 }

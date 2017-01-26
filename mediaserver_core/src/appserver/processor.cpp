@@ -23,7 +23,11 @@
 #include "utils/common/util.h"
 #include "core/resource/camera_user_attribute_pool.h"
 #include "utils/license_usage_helper.h"
-#include "media_server/settings.h"
+#include <media_server/settings.h>
+#include <api/global_settings.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
     : m_serverId(serverId)
@@ -50,13 +54,18 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // previous comment: camera MUST be in the pool already;
         // but now (new version) camera NOT in resource pool!
 
-        if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(camera->getUrl()))
+        QString urlStr = camera->getUrl();
+        const QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+        if (resourceData.contains(QString("ignoreMultisensors")))
+            urlStr = urlStr.left(urlStr.indexOf('?'));
+
+        if (camera->isManuallyAdded() && !QnResourceDiscoveryManager::instance()->containManualCamera(urlStr))
             continue; //race condition. manual camera just deleted
-        if( camera->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(camera->getId()))
-            continue;   //ignoring newly discovered camera
 
         QString uniqueId = camera->getUniqueId();
-        camera->setId(camera->uniqueIdToId(uniqueId));
+        if( camera->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceByUniqueId(uniqueId))
+            continue;   //ignoring newly discovered camera
+
         addNewCamera(camera);
     }
 
@@ -64,9 +73,12 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferedServerId() == qnCommon->moduleGUID(); // return camera back without mutex
+    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == qnCommon->moduleGUID(); // return camera back without mutex
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-    bool takeCameraWithoutLock = ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy();
+    const bool takeCameraWithoutLock =
+        (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
+        qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
+        cameraResource->hasFlags(Qn::desktop_camera);
     if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
@@ -126,37 +138,62 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     ec2::ApiCameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
-    userAttrsData.preferedServerId = qnCommon->moduleGUID();
+    userAttrsData.preferredServerId = qnCommon->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }
 
-void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
+ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
+    const ec2::ApiCameraData& apiCameraData,
+    const ec2::ApiResourceParamDataList& properties)
 {
-    if( cameraResource->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceById(cameraResource->getId()))
+    QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
+    if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
+        qnResPool->removeResource(existCamRes);
+
+    /**
+     * Save properties before camera to avoid race condition.
+     * Camera will start initialization as soon as ApiCameraData object will appear
+     */
+
+    ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
+        ->getResourceManager(Qn::kSystemAccess)
+        ->saveSync(apiCameraData.id, properties);
+    if (errorCode != ec2::ErrorCode::ok)
+    {
+        NX_LOG(QString::fromLatin1("Can't add camera's properties to database. DB error code %1").arg(ec2::toString(errorCode)), cl_logWARNING);
+        return errorCode;
+    }
+
+    errorCode = QnAppServerConnectionFactory::getConnection2()
+        ->getCameraManager(Qn::kSystemAccess)
+        ->addCameraSync(apiCameraData);
+    if (errorCode != ec2::ErrorCode::ok)
+        NX_LOG(QString::fromLatin1("Can't add camera to database. DB error code %1").arg(ec2::toString(errorCode)), cl_logWARNING);
+
+    return errorCode;
+}
+
+void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const
+{
+    QString uniqueId = cameraResource->getUniqueId();
+    bool resourceExists = static_cast<bool>(
+        qnResPool->getResourceByUniqueId(uniqueId)
+    );
+    if (cameraResource->hasFlags(Qn::search_upd_only) && !resourceExists)
         return;   //ignoring newly discovered camera
 
     cameraResource->setFlags(cameraResource->flags() & ~Qn::parent_change);
-    NX_ASSERT(!cameraResource->getId().isNull());
 
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::ApiCameraData apiCameraData;
+    fromResourceToApi(cameraResource, apiCameraData);
+    apiCameraData.id = cameraResource->uniqueIdToId(uniqueId);
 
-    ec2::ApiCameraData apiCamera;
-    fromResourceToApi(cameraResource, apiCamera);
-
-    ec2::ErrorCode errorCode = connection->getCameraManager()->addCameraSync(apiCamera);
-    if( errorCode != ec2::ErrorCode::ok ) {
-        NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+    ec2::ErrorCode errCode = addAndPropagateCamResource(apiCameraData, cameraResource->getRuntimeProperties());
+    if (errCode != ec2::ErrorCode::ok)
         return;
-    }
 
-    propertyDictionary->saveParams( cameraResource->getId() );
-    QnResourcePtr existCamRes = qnResPool->getResourceById(cameraResource->getId());
-    if (existCamRes && existCamRes->getTypeId() != cameraResource->getTypeId())
-        qnResPool->removeResource(existCamRes);
-    QnCommonMessageProcessor::instance()->updateResource(cameraResource);
-
-    if (!existCamRes && m_defaultUserAttrs)
+    if (!resourceExists && m_defaultUserAttrs)
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
         if (!userAttrCopy->scheduleDisabled) {
@@ -165,30 +202,33 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             if (!helper.isValid())
                 userAttrCopy->scheduleDisabled = true;
         }
-        userAttrCopy->cameraID = cameraResource->getId();
+        userAttrCopy->cameraId = apiCameraData.id;
 
         ec2::ApiCameraAttributesDataList attrsList;
         fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
-        ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->saveUserAttributesSync(attrsList);
+        errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
-            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)), cl_logWARNING );
             return;
         }
         QSet<QByteArray> modifiedFields;
         {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraID );
+            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraID);
+        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraId);
         if( res )   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }
 
-    QnResourcePtr rpRes = qnResPool->getResourceById(cameraResource->getId());
-    rpRes->setStatus(Qn::Offline);
-    rpRes->initAsync(true);
+    QnResourcePtr rpRes = qnResPool->getResourceById(apiCameraData.id);
+    if (rpRes)
+    {
+        rpRes->setStatus(Qn::Offline);
+        rpRes->initAsync(true);
+    }
 }
 
 void QnAppserverResourceProcessor::at_mutexTimeout()

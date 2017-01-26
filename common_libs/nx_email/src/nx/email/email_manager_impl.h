@@ -9,11 +9,11 @@ class EmailManagerImpl
 public:
     EmailManagerImpl();
 
-    bool sendEmail(
+    SmtpOperationResult sendEmail(
         const QnEmailSettings& settings,
         const ec2::ApiEmailData& message) const;
-    bool sendEmail( const ec2::ApiEmailData& message ) const;
-    bool testConnection(const QnEmailSettings &settings) const;
+    SmtpOperationResult sendEmail( const ec2::ApiEmailData& message ) const;
+    SmtpOperationResult testConnection(const QnEmailSettings &settings) const;
 };
 
 #endif // EMAIL_MANAGER_IMPL_H

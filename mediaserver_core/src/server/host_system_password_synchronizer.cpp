@@ -26,9 +26,14 @@
 
 HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 {
-    connect(
+    Qn::directConnect(
         QnResourcePool::instance(), &QnResourcePool::resourceChanged,
         this, &HostSystemPasswordSynchronizer::at_adminUserChanged );
+}
+
+HostSystemPasswordSynchronizer::~HostSystemPasswordSynchronizer()
+{
+    directDisconnectAll();
 }
 
 void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr& user )
@@ -36,7 +41,7 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
 #ifdef __linux__
     QnMutexLocker lk( &m_mutex );
 
-    if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
+    if( QnAppInfo::isBpi() || QnAppInfo::isNx1() )
     {
         //#5785 changing root password on nx1 only if DB is located on HDD
         QList<QnPlatformMonitor::PartitionSpace> partitions =

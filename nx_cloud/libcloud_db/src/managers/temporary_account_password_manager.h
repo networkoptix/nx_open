@@ -1,16 +1,17 @@
-/**********************************************************
-* Dec 15, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
-#define NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+#pragma once
 
 #include "access_control/abstract_authentication_data_provider.h"
 
+#include <boost/multi_index_container.hpp>
+#include <boost/multi_index/global_fun.hpp>
+#include <boost/multi_index/identity.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index/ordered_index.hpp>
+
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/counter.h>
+
 #include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
@@ -21,35 +22,36 @@
 namespace nx {
 namespace cdb {
 
-namespace conf
-{
-class Settings;
-}
+namespace conf {
 
-class TemporaryAccountPasswordEx
+class Settings;
+
+} // namespace
+
+class TemporaryAccountCredentialsEx
 :
-    public data::TemporaryAccountPassword
+    public data::TemporaryAccountCredentials
 {
 public:
-    QnUuid id;
+    std::string id;
     std::string accessRightsStr;
 
-    TemporaryAccountPasswordEx() {}
-    TemporaryAccountPasswordEx(const TemporaryAccountPasswordEx& right)
+    TemporaryAccountCredentialsEx() {}
+    TemporaryAccountCredentialsEx(const TemporaryAccountCredentialsEx& right)
     :
-        data::TemporaryAccountPassword(right),
+        data::TemporaryAccountCredentials(right),
         id(right.id),
         accessRightsStr(right.accessRightsStr)
     {
     }
-    TemporaryAccountPasswordEx(data::TemporaryAccountPassword&& right)
+    TemporaryAccountCredentialsEx(data::TemporaryAccountCredentials&& right)
     :
-        data::TemporaryAccountPassword(std::move(right))
+        data::TemporaryAccountCredentials(std::move(right))
     {
     }
 };
 
-#define TemporaryAccountPasswordEx_Fields TemporaryAccountPassword_Fields (id)(accessRightsStr)
+#define TemporaryAccountCredentialsEx_Fields TemporaryAccountCredentials_Fields (id)(accessRightsStr)
 
 class TemporaryAccountPasswordManager
 :
@@ -68,49 +70,91 @@ public:
         stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    void createTemporaryPassword(
+    void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
-        data::TemporaryAccountPassword tmpPasswordData,
+        data::TemporaryAccountCredentials tmpPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
 
+    std::string generateRandomPassword() const;
+    /**
+     * Adds password and password digest.
+     * If \a data->login is empty, random login is generated
+     */
+    void addRandomCredentials(data::TemporaryAccountCredentials* const data);
+
+    nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::db::QueryContext* const queryContext,
+        std::string accountEmail);
+    void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail);
+
+    nx::db::DBResult registerTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        data::TemporaryAccountCredentials tempPasswordData);
+
+    boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
+        const std::string& login) const;
+
 private:
+    typedef boost::multi_index::multi_index_container<
+        TemporaryAccountCredentialsEx,
+        boost::multi_index::indexed_by<
+            boost::multi_index::ordered_unique<boost::multi_index::member<
+                TemporaryAccountCredentialsEx,
+                std::string,
+                &TemporaryAccountCredentialsEx::id>>,
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                data::TemporaryAccountCredentials,
+                std::string,
+                &data::TemporaryAccountCredentials::login>>,
+            boost::multi_index::ordered_non_unique<boost::multi_index::member<
+                data::TemporaryAccountCredentials,
+                std::string,
+                &data::TemporaryAccountCredentials::accountEmail>>
+        >
+    > TemporaryCredentialsDictionary;
+
+    constexpr static const int kIndexById = 0;
+    constexpr static const int kIndexByLogin = 1;
+    constexpr static const int kIndexByAccountEmail = 2;
+
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     QnCounter m_startedAsyncCallsCounter;
-    //!map<account email, password data>
-    std::multimap<std::string, TemporaryAccountPasswordEx> m_accountPassword;
+    TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
 
-    bool checkTemporaryPasswordForExpiration(
-        QnMutexLockerBase* const lk,
-        std::multimap<std::string, TemporaryAccountPasswordEx>::iterator passwordIter);
+    bool isTemporaryPasswordExpired(
+        const TemporaryAccountCredentialsEx& temporaryCredentials) const;
+    void removeTemporaryCredentialsFromDbDelayed(
+        const TemporaryAccountCredentialsEx& temporaryCredentials);
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchTemporaryPasswords(
-        QSqlDatabase* connection,
-        int* const /*dummyResult*/);
+    nx::db::DBResult fetchTemporaryPasswords(nx::db::QueryContext* queryContext);
 
     nx::db::DBResult insertTempPassword(
-        QSqlDatabase* const connection,
-        TemporaryAccountPasswordEx tempPasswordData);
-    void tempPasswordAddedToDb(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::DBResult resultCode,
-        TemporaryAccountPasswordEx tempPasswordData,
-        std::function<void(api::ResultCode)> completionHandler);
+        nx::db::QueryContext* const queryContext,
+        TemporaryAccountCredentialsEx tempPasswordData);
+    void saveTempPasswordToCache(TemporaryAccountCredentialsEx tempPasswordData);
 
     nx::db::DBResult deleteTempPassword(
-        QSqlDatabase* const connection,
-        QnUuid tempPasswordID);
-    void tempPasswordDeleted(
-        QnCounter::ScopedIncrement asyncCallLocker,
-        nx::db::DBResult resultCode,
-        QnUuid tempPasswordID,
-        std::function<void(api::ResultCode)> completionHandler);
+        nx::db::QueryContext* const queryContext,
+        std::string tempPasswordID);
    
+    boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
+        const QnMutexLockerBase& lk,
+        const std::string& username,
+        std::function<bool(const nx::Buffer&)> checkPasswordHash);
+    void runExpirationRulesOnSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        const TemporaryAccountCredentialsEx& temporaryCredentials);
+
+    template<typename Index, typename Iterator>
+    void updateExpirationRulesAfterSuccessfulLogin(
+        const QnMutexLockerBase& lk,
+        Index& index,
+        Iterator it);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_TEMPORARY_ACCOUNT_PASSWORD_MANAGER_H
+} // namespace cdb
+} // namespace nx

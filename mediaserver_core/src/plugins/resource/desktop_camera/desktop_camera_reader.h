@@ -17,9 +17,15 @@ public:
     QnDesktopCameraStreamReader(const QnResourcePtr& res);
     virtual ~QnDesktopCameraStreamReader();
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
-
+    void setNeedVideoData(bool value);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
+
+    /*
+     * isCameraControlRequired param using for DesktopCamera as:
+     * - value 'false' means open audio stream only
+     * - value 'true' means audio + video
+     */
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
@@ -27,8 +33,14 @@ protected:
     virtual void pleaseReopenStream() override;
     virtual void pleaseStop() override;
 
+    /**
+    * A bit hack here: if open desktop camera without configuration then only audio stream is opened.
+    * Otherwise (default) video + audio is opened
+    */
+    virtual bool isCameraControlRequired() const override;
 private:
     int processTextResponse();
+    QnAbstractMediaDataPtr createEmptyPacket();
 private:
     static const int MEDIA_STREAM_COUNT = 2;
 

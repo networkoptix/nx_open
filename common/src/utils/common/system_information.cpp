@@ -2,11 +2,12 @@
 
 #include <QtCore/QRegExp>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include <utils/common/app_info.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (ubjson)(xml)(json)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnSystemInformation), (ubjson)(xml)(json)(datastream)(eq)(hash), _Fields)
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),
@@ -44,36 +45,44 @@ QnSystemInformation QnSystemInformation::currentSystemInformation() {
 
     #include <windows.h>
 
-    static QString resolveGetVersionEx(DWORD min, DWORD maj, bool ws)
+    static QString resolveGetVersionEx(DWORD major, DWORD minor, bool ws)
     {
-        if (min == 5 && maj == 0) return lit("2000");
-        if (min == 5 && maj == 1) return lit("XP");
-        if (min == 5 && maj == 2) 
+        if (major == 5 && minor == 0) return lit("2000");
+        if (major == 5 && minor == 1) return lit("XP");
+        if (major == 5 && minor == 2) 
             return GetSystemMetrics(SM_SERVERR2) ? lit("Server 2003") : lit("Server 2003 R2");
 
-        if (min == 6 && maj == 0) return ws ? lit("Vista")  : lit("Server 2008");
-        if (min == 6 && maj == 1) return ws ? lit("7")      : lit("Server 2008 R2");
-        if (min == 6 && maj == 2) return ws ? lit("8")      : lit("Server 2012");
-        if (min == 6 && maj == 3) return ws ? lit("8.1")    : lit("Server 2012 R2");
-
-        if (min == 10 && maj == 0) 
-            return ws ? lit("10 Insider Preview") : lit("Server Technical Preview");
+        if (major == 6 && minor == 0) return ws ? lit("Vista") : lit("Server 2008");
+        if (major == 6 && minor == 1) return ws ? lit("7") : lit("Server 2008 R2");
+        if (major == 6 && minor == 2) return ws ? lit("8") : lit("Server 2012");
+        if (major == 6 && minor == 3) return ws ? lit("8.1") : lit("Server 2012 R2");
+        if (major == 10 && minor == 0) return ws ? lit("10") : lit("Server 2016");
         
-        return lit("Unknown %1.%2").arg(min).arg(maj);
+        return lit("Unknown %1.%2").arg(major).arg(minor);
     }
 
     QString QnSystemInformation::currentSystemRuntime() {
-        OSVERSIONINFOEX osvi;
+        OSVERSIONINFOEXW osvi; 
         ZeroMemory(&osvi, sizeof(osvi));
         osvi.dwOSVersionInfoSize = sizeof(osvi);
 
-        if (GetVersionEx(reinterpret_cast<OSVERSIONINFO*>(&osvi)))
-            return lit("Windows %1").arg(
-                resolveGetVersionEx(
+        NTSTATUS(WINAPI *getVersion)(LPOSVERSIONINFOEXW);
+        if ((FARPROC&)getVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion"))
+        {
+            if (SUCCEEDED(getVersion(&osvi)))
+            {
+                QString name = lit("Windows %1").arg(resolveGetVersionEx(
                     osvi.dwMajorVersion, osvi.dwMinorVersion,
                     osvi.wProductType == VER_NT_WORKSTATION));
 
-        return QLatin1String("Windows without GetVersionEx");
+                if (osvi.wServicePackMajor)
+                    name += lit(" sp%1").arg(osvi.wServicePackMajor);
+
+                return name;
+            }
+        }
+
+        return QLatin1String("Windows without RtlGetVersion");
     }
 
 #elif defined(Q_OS_LINUX)

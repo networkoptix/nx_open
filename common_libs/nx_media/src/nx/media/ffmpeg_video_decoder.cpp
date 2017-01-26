@@ -1,65 +1,120 @@
-#ifndef DISABLE_FFMPEG
+#include <nx/utils/log/log.h>
 
+#include "config.h"
 #include "ffmpeg_video_decoder.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
-} // extern "C"
+#include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
+};
 
 #include <utils/media/ffmpeg_helper.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
+#include <QtMultimedia/QAbstractVideoBuffer>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 namespace nx {
 namespace media {
 
 namespace {
 
-    void copyPlane(unsigned char* dst, const unsigned char* src, int width, int dst_stride, int src_stride, int height)
+QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+{
+    switch (pixFormat)
     {
-        for (int i = 0; i < height; ++i)
-        {
-            memcpy(dst, src, width);
-            dst += dst_stride;
-            src += src_stride;
-        }
+        case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUVJ420P:
+            return QVideoFrame::Format_YUV420P;
+        case AV_PIX_FMT_BGRA:
+            return QVideoFrame::Format_BGRA32;
+        case AV_PIX_FMT_NV12:
+            return QVideoFrame::Format_NV12;
+        default:
+            return QVideoFrame::Format_Invalid;
     }
-
 }
 
+} // namespace
 
-class InitFfmpegLib
+class AvFrameMemoryBufferPrivate: public QAbstractVideoBufferPrivate
 {
 public:
-
-    InitFfmpegLib()
+    AVFrame* frame;
+    QAbstractVideoBuffer::MapMode mapMode;
+public:
+    AvFrameMemoryBufferPrivate(AVFrame* _frame):
+        QAbstractVideoBufferPrivate(),
+        frame(av_frame_alloc()),
+        mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_register_all();
-        if (av_lockmgr_register(&InitFfmpegLib::lockmgr) != 0)
-            qCritical() << "Failed to register ffmpeg lock manager";
+        av_frame_move_ref(frame, _frame);
     }
 
-    static int lockmgr(void** mtx, enum AVLockOp op)
+    virtual ~AvFrameMemoryBufferPrivate()
     {
-        QnMutex** qMutex = (QnMutex**) mtx;
-        switch (op)
+        av_buffer_unref(&frame->buf[0]);
+        av_frame_free(&frame);
+    }
+
+    virtual int map(
+        QAbstractVideoBuffer::MapMode /*mode*/,
+        int* numBytes,
+        int linesize[4],
+        uchar* data[4]) override
+    {
+        int planes = 0;
+        *numBytes = 0;
+
+        const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat)frame->format);
+
+        for (int i = 0; i < 4 && frame->data[i]; ++i)
         {
-            case AV_LOCK_CREATE:
-                *qMutex = new QnMutex();
-                return 0;
-            case AV_LOCK_OBTAIN:
-                (*qMutex)->lock();
-                return 0;
-            case AV_LOCK_RELEASE:
-                (*qMutex)->unlock();
-                return 0;
-            case AV_LOCK_DESTROY:
-                delete *qMutex;
-                return 0;
-            default:
-                return 1;
+            ++planes;
+            data[i] = frame->data[i];
+            linesize[i] = frame->linesize[i];
+
+            int bytesPerPlane = linesize[i] * frame->height;
+            if (i > 0)
+            {
+                bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
+                bytesPerPlane *= descr->comp->step;
+            }
+            *numBytes += bytesPerPlane;
         }
+        return planes;
+    }
+};
+
+class AvFrameMemoryBuffer: public QAbstractVideoBuffer
+{
+    Q_DECLARE_PRIVATE(AvFrameMemoryBuffer)
+public:
+    AvFrameMemoryBuffer(AVFrame* frame):
+        QAbstractVideoBuffer(
+            *(new AvFrameMemoryBufferPrivate(frame)),
+            NoHandle)
+    {
+    }
+
+    virtual MapMode mapMode() const override
+    {
+        return d_func()->mapMode;
+    }
+
+    virtual uchar* map(MapMode mode, int *numBytes, int *bytesPerLine) override
+    {
+        Q_D(AvFrameMemoryBuffer);
+        *bytesPerLine = d->frame->linesize[0];
+        AVPixelFormat pixFmt = (AVPixelFormat)d->frame->format;
+        *numBytes = avpicture_get_size(pixFmt, d->frame->linesize[0], d->frame->height);
+        return d->frame->data[0];
+    }
+
+    virtual void unmap() override
+    {
     }
 };
 
@@ -69,14 +124,15 @@ public:
 class FfmpegVideoDecoderPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(FfmpegVideoDecoder)
-    FfmpegVideoDecoder* q_ptr;
+        FfmpegVideoDecoder* q_ptr;
 
 public:
     FfmpegVideoDecoderPrivate()
-    :
+        :
         codecContext(nullptr),
-        frame(avcodec_alloc_frame()),
-        lastPts(AV_NOPTS_VALUE)
+        frame(av_frame_alloc()),
+        lastPts(AV_NOPTS_VALUE),
+        scaleContext(nullptr)
     {
     }
 
@@ -84,14 +140,19 @@ public:
     {
         closeCodecContext();
         av_free(frame);
+        sws_freeContext(scaleContext);
     }
 
     void initContext(const QnConstCompressedVideoDataPtr& frame);
     void closeCodecContext();
 
+    // convert color space if QT doesn't support it
+    AVFrame* convertPixelFormat(const AVFrame* srcFrame);
+
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+    SwsContext* scaleContext;
 };
 
 void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -106,67 +167,146 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
     //codecContext->thread_count = 4; //< Uncomment this line if decoder with internal buffer is required
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
     {
-        qWarning() << "Can't open decoder for codec" << frame->compressionType;
+        NX_LOG(lit("Can't open decoder for codec %1").arg(frame->compressionType), cl_logDEBUG1);
         closeCodecContext();
         return;
     }
+
+    // keep frame unless we call 'av_buffer_unref'
+    codecContext->refcounted_frames = 1;
 }
 
 void FfmpegVideoDecoderPrivate::closeCodecContext()
 {
     QnFfmpegHelper::deleteAvCodecContext(codecContext);
-    codecContext = 0;
+    codecContext = nullptr;
 }
+
+AVFrame* FfmpegVideoDecoderPrivate::convertPixelFormat(const AVFrame* srcFrame)
+{
+    static const AVPixelFormat dstAvFormat = AV_PIX_FMT_YUV420P;
+
+    if (!scaleContext)
+    {
+        scaleContext = sws_getContext(
+            srcFrame->width, srcFrame->height, (AVPixelFormat)srcFrame->format,
+            srcFrame->width, srcFrame->height, dstAvFormat,
+            SWS_BICUBIC, NULL, NULL, NULL);
+    }
+
+    AVFrame* dstFrame = av_frame_alloc();
+    int numBytes = avpicture_get_size(dstAvFormat, srcFrame->linesize[0], srcFrame->height);
+    if (numBytes <= 0)
+        return nullptr; //< can't allocate frame
+    numBytes += FF_INPUT_BUFFER_PADDING_SIZE; //< extra alloc space due to ffmpeg doc
+    dstFrame->buf[0] = av_buffer_alloc(numBytes);
+    avpicture_fill(
+        (AVPicture*)dstFrame,
+        dstFrame->buf[0]->data,
+        dstAvFormat,
+        srcFrame->linesize[0],
+        srcFrame->height);
+    dstFrame->width = srcFrame->width;
+    dstFrame->height = srcFrame->height;
+    dstFrame->format = dstAvFormat;
+
+    sws_scale(
+        scaleContext,
+        srcFrame->data, srcFrame->linesize,
+        0, srcFrame->height,
+        dstFrame->data, dstFrame->linesize);
+
+    return dstFrame;
+}
+
 
 //-------------------------------------------------------------------------------------------------
 // FfmpegDecoder
 
-FfmpegVideoDecoder::FfmpegVideoDecoder()
-:
+QSize FfmpegVideoDecoder::s_maxResolution;
+
+FfmpegVideoDecoder::FfmpegVideoDecoder(
+    const ResourceAllocatorPtr& allocator,
+    const QSize& resolution)
+    :
     AbstractVideoDecoder(),
     d_ptr(new FfmpegVideoDecoderPrivate())
 {
-    static InitFfmpegLib init;
+    QN_UNUSED(allocator, resolution);
 }
 
 FfmpegVideoDecoder::~FfmpegVideoDecoder()
 {
 }
 
-bool FfmpegVideoDecoder::isCompatible(const CodecID codec, const QSize& resolution)
+bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
 {
     Q_UNUSED(codec);
-    Q_UNUSED(resolution)
-    return true;
+
+    const QSize maxRes = maxResolution(codec);
+    if (maxRes.isEmpty())
+        return true;
+
+    if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
+        return true;
+
+    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
+        .arg(maxRes.width()).arg(maxRes.height())
+        .arg(resolution.width()).arg(resolution.height()),
+        cl_logWARNING);
+
+    if (conf.unlimitFfmpegMaxResolution)
+    {
+        NX_LOG(lit(
+            "[ffmpeg_video_decoder] Config unlimitFfmpegMaxResolution is true => ignore limit"),
+            cl_logWARNING);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
-int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
+QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
+{
+    QN_UNUSED(codec);
+
+    return s_maxResolution;
+}
+
+int FfmpegVideoDecoder::decode(
+    const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {
     Q_D(FfmpegVideoDecoder);
 
     if (!d->codecContext)
     {
-        d->initContext(frame);
+        d->initContext(compressedVideoData);
         if (!d->codecContext)
-            return -1;
+            return -1; //< error
     }
 
     AVPacket avpkt;
     av_init_packet(&avpkt);
-    if (frame)
+    if (compressedVideoData)
     {
-        avpkt.data = (unsigned char*) frame->data();
-        avpkt.size = static_cast<int>(frame->dataSize());
-        avpkt.dts = avpkt.pts = frame->timestamp;
-        if (frame->flags & QnAbstractMediaData::MediaFlags_AVKey)
+        avpkt.data = (unsigned char*)compressedVideoData->data();
+        avpkt.size = static_cast<int>(compressedVideoData->dataSize());
+        avpkt.dts = avpkt.pts = compressedVideoData->timestamp;
+        if (compressedVideoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
             avpkt.flags = AV_PKT_FLAG_KEY;
 
         // It's already guaranteed by QnByteArray that there is an extra space reserved. We must
         // fill the padding bytes according to ffmpeg documentation.
         if (avpkt.data)
+        {
+            static_assert(QN_BYTE_ARRAY_PADDING >= FF_INPUT_BUFFER_PADDING_SIZE,
+                "FfmpegVideoDecoder: Insufficient padding size");
             memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+        }
 
-        d->lastPts = frame->timestamp;
+        d->lastPts = compressedVideoData->timestamp;
     }
     else
     {
@@ -178,55 +318,62 @@ int FfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVide
         avpkt.size = 0;
     }
 
-    int gotData = 0;
-    avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
-    if (gotData <= 0)
-        return gotData; //< Negative value means error. Zero value means buffering.
+    int gotPicture = 0;
+    int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
+    if (res <= 0 || !gotPicture)
+        return res; //< Negative value means error, zero means buffering.
 
-    ffmpegToQtVideoFrame(result);
-    return d->frame->coded_picture_number;
+    QSize frameSize(d->frame->width, d->frame->height);
+    qint64 startTimeMs = d->frame->pkt_dts / 1000;
+    int frameNum = d->frame->coded_picture_number;
+    if (d->codecContext->codec_id == AV_CODEC_ID_MJPEG)
+    {
+        // Workaround for MJPEG decoder bug: it always sets coded_picture_number to 0, and
+        // need monotonic frame number to associate decoder's input and output frames.
+        frameNum = qMax(0, d->codecContext->frame_number - 1);
+    }
+
+    auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
+
+    // Frame moved to the buffer. buffer keeps reference to a frame.
+    QAbstractVideoBuffer* buffer;
+    if (qtPixelFormat != QVideoFrame::Format_Invalid)
+    {
+        buffer = new AvFrameMemoryBuffer(d->frame);
+        d->frame = av_frame_alloc();
+    }
+    else
+    {
+        AVFrame* newFrame = d->convertPixelFormat(d->frame);
+        if (!newFrame)
+            return -1; //< can't convert pixel format
+        qtPixelFormat = toQtPixelFormat((AVPixelFormat)newFrame->format);
+        buffer = new AvFrameMemoryBuffer(newFrame);
+    }
+
+    QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
+    videoFrame->setStartTime(startTimeMs);
+
+    outDecodedFrame->reset(videoFrame);
+    return frameNum;
 }
 
-void FfmpegVideoDecoder::ffmpegToQtVideoFrame(QVideoFramePtr* result)
+double FfmpegVideoDecoder::getSampleAspectRatio() const
 {
-    Q_D(FfmpegVideoDecoder);
-
-    const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
-    const int numBytes = avpicture_get_size(PIX_FMT_YUV420P, alignedWidth, d->frame->height);
-    const int lineSize = alignedWidth;
-
-    auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, lineSize);
-    auto videoFrame = new QVideoFrame(
-        alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_YUV420P);
-    // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.
-    videoFrame->setStartTime(d->frame->pkt_dts / 1000);
-
-    videoFrame->map(QAbstractVideoBuffer::WriteOnly);
-    uchar* buffer = videoFrame->bits();
-
-    quint8* dstData[3];
-    dstData[0] = buffer;
-    dstData[1] = buffer + lineSize * d->frame->height;
-    dstData[2] = dstData[1] + lineSize * d->frame->height / 4;
-    
-    for (int i = 0; i < 3; ++i)
+    Q_D(const FfmpegVideoDecoder);
+    if (d->codecContext && d->codecContext->width > 8 && d->codecContext->height > 8)
     {
-        const int k = (i == 0 ? 0 : 1);
-        copyPlane(
-            dstData[i], 
-            d->frame->data[i], 
-            d->frame->width >> k, 
-            lineSize >> k, 
-            d->frame->linesize[i], 
-            d->frame->height >> k);
+        double result = av_q2d(d->codecContext->sample_aspect_ratio);
+        if (result > 1e-7)
+            return result;
     }
-    
-    videoFrame->unmap();
+    return 1.0;
+}
 
-    result->reset(videoFrame);
+void FfmpegVideoDecoder::setMaxResolution(const QSize& maxResolution)
+{
+    s_maxResolution = maxResolution;
 }
 
 } // namespace media
 } // namespace nx
-
-#endif // DISABLE_FFMPEG

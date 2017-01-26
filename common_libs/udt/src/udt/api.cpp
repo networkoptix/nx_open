@@ -206,7 +206,7 @@ int CUDTUnited::startup()
    m_bClosing = false;
    #ifndef _WIN32
       pthread_mutex_init(&m_GCStopLock, NULL);
-      pthread_cond_init(&m_GCStopCond, NULL);
+      pthread_cond_init_monotonic(&m_GCStopCond);
       pthread_create(&m_GCThread, NULL, garbageCollect, this);
    #else
       m_GCStopLock = CreateMutex(NULL, false, NULL);
@@ -1104,6 +1104,11 @@ int CUDTUnited::epoll_wait(
    return m_EPoll.wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
 }
 
+int CUDTUnited::epoll_interrupt_wait(const int eid)
+{
+    return m_EPoll.interruptWait(eid);
+}
+
 int CUDTUnited::epoll_release(const int eid)
 {
    return m_EPoll.release(eid);
@@ -1220,12 +1225,27 @@ void CUDTUnited::checkBrokenSockets()
    for (vector<UDTSOCKET>::iterator k = tbc.begin(); k != tbc.end(); ++ k)
       m_Sockets.erase(*k);
 
+   std::vector<CMultiplexer> multiplexersToRemove;
    // remove those timeout sockets
    for (vector<UDTSOCKET>::iterator l = tbr.begin(); l != tbr.end(); ++ l)
-      removeSocket(*l);
+      removeSocket(*l, &multiplexersToRemove);
+
+   cg.unlock();
+
+   // Removing multiplexer with no mutex locked since it implies waiting for send/receive thread to exit
+   for (auto& multiplexer: multiplexersToRemove)
+   {
+       multiplexer.m_pChannel->shutdown();
+       delete multiplexer.m_pSndQueue;
+       delete multiplexer.m_pRcvQueue;
+       delete multiplexer.m_pTimer;
+       delete multiplexer.m_pChannel;
+   }
 }
 
-void CUDTUnited::removeSocket(const UDTSOCKET u)
+void CUDTUnited::removeSocket(
+    const UDTSOCKET u,
+    std::vector<CMultiplexer>* const multiplexersToRemove)
 {
    map<UDTSOCKET, CUDTSocket*>::iterator i = m_ClosedSockets.find(u);
 
@@ -1277,12 +1297,8 @@ void CUDTUnited::removeSocket(const UDTSOCKET u)
    m->second.m_iRefCount --;
    if (0 == m->second.m_iRefCount)
    {
-      m->second.m_pChannel->close();
-      delete m->second.m_pSndQueue;
-      delete m->second.m_pRcvQueue;
-      delete m->second.m_pTimer;
-      delete m->second.m_pChannel;
-      m_mMultiplexer.erase(m);
+       multiplexersToRemove->push_back(m->second);
+       m_mMultiplexer.erase(m);
    }
 }
 
@@ -1390,7 +1406,7 @@ void CUDTUnited::updateMux(CUDTSocket* s, const sockaddr* addr, const UDPSOCKET*
    }
    catch (CUDTException& e)
    {
-      m.m_pChannel->close();
+      m.m_pChannel->shutdown();
       delete m.m_pChannel;
       throw e;
    }
@@ -1435,6 +1451,8 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
    }
 }
 
+static const int kGarbageCollectTickPeriodMs = 100;
+
 #ifndef _WIN32
    void* CUDTUnited::garbageCollect(void* p)
 #else
@@ -1454,15 +1472,9 @@ void CUDTUnited::updateMux(CUDTSocket* s, const CUDTSocket* ls)
       #endif
 
       #ifndef _WIN32
-         timeval now;
-         timespec timeout;
-         gettimeofday(&now, 0);
-         timeout.tv_sec = now.tv_sec + 1;
-         timeout.tv_nsec = now.tv_usec * 1000;
-
-         pthread_cond_timedwait(&self->m_GCStopCond, &self->m_GCStopLock, &timeout);
+         pthread_cond_wait_monotonic_timeout(&self->m_GCStopCond, &self->m_GCStopLock, kGarbageCollectTickPeriodMs * 1000);
       #else
-         WaitForSingleObject(self->m_GCStopCond, 1000);
+         WaitForSingleObject(self->m_GCStopCond, kGarbageCollectTickPeriodMs);
       #endif
    }
 
@@ -2073,6 +2085,24 @@ int CUDT::epoll_wait(
    }
 }
 
+int CUDT::epoll_interrupt_wait(const int eid)
+{
+    try
+    {
+        return s_UDTUnited.epoll_interrupt_wait(eid);
+    }
+    catch (CUDTException e)
+    {
+        s_UDTUnited.setError(new CUDTException(e));
+        return ERROR;
+    }
+    catch (...)
+    {
+        s_UDTUnited.setError(new CUDTException(-1, 0, 0));
+        return ERROR;
+    }
+}
+
 int CUDT::epoll_release(const int eid)
 {
    try
@@ -2299,6 +2329,11 @@ int epoll_wait(
     std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
    return CUDT::epoll_wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
+}
+
+int epoll_interrupt_wait(int eid)
+{
+    return CUDT::epoll_interrupt_wait(eid);
 }
 
 #define SET_RESULT(val, num, fds, it) \

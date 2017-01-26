@@ -1,16 +1,22 @@
 
 #include "test_camera.h"
+#include "nx/network/socket.h"
 
 #include <QDebug>
 
+#include <nx/utils/random.h>
 #include "nx/streaming/media_data_packet.h"
 #include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "plugins/resource/test_camera/testcamera_const.h"
+
 #include "utils/common/sleep.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
 
+namespace {
+    static const unsigned int kSendTimeoutMs = 1000;
+}
 
 QList<QnCompressedVideoDataPtr> QnFileCache::getMediaData(const QString& fileName)
 {
@@ -63,11 +69,11 @@ QnFileCache* QnFileCache::instance()
 
 QnTestCamera::QnTestCamera(quint32 num): m_num(num)
 {
-    bool ok;
+    //bool ok;
     m_mac = "92-61";
     m_num = htonl(m_num);
     QByteArray last = QByteArray((const char*) &m_num, 4).toHex();
-    while (!last.isEmpty()) 
+    while (!last.isEmpty())
     {
         m_mac += '-';
         m_mac += last.left(2);
@@ -77,7 +83,6 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
     m_isEnabled = true;
     m_offlineDuration = 0;
     m_checkTimer.restart();
-    srand(QDateTime::currentMSecsSinceEpoch());
 }
 
 QByteArray QnTestCamera::getMac() const
@@ -103,12 +108,17 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
 int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int size) {
     int sent = 0, sentTotal = 0;
     while (sentTotal < size) {
-        sent = socket->send(static_cast<const quint8*>(data)+ sentTotal, size - sentTotal);
+        sent = socket->send(static_cast<const quint8*>(data) + sentTotal, size - sentTotal);
         if (sent < 1) {
-            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sent << "of" << size;
+            qWarning() << "TCP socket '" <<  socket->getForeignAddress().toString() <<
+              "' write error for camera" << m_mac << " has sent" << sent << "of" << size;
+            SystemError::ErrorCode ercode = 0;
+            if (socket->getLastError(&ercode)) {
+              qWarning() << "TCP socket '" << socket->getForeignAddress().toString() <<
+                "'error code " << ercode;
+            }
             break;
         }
-
         sentTotal += sent;
     }
 
@@ -133,9 +143,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
         QnCompressedVideoDataPtr video = data[i];
         if (i == 0)
         {
-            //m_context = QnMediaContextPtr( new QnMediaContext(video->context));
-            QByteArray byteArray;
-            QnFfmpegHelper::serializeCodecContext(video->context->ctx(), &byteArray);
+            QByteArray byteArray = video->context->serialize();
 
             quint32 packetLen = htonl(byteArray.size());
             quint16 codec = video->compressionType;
@@ -188,10 +196,15 @@ void QnTestCamera::startStreaming(AbstractStreamSocket* socket, bool isSecondary
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
     if (fileList.isEmpty())
         return;
+
+    socket->setSendTimeout(kSendTimeoutMs);
+
+    qDebug() << "Start streaming to " << socket->getForeignAddress().toString();
+
     while (1)
     {
         QString fileName = fileList[fileIndex];
-        
+
         QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
         if (data.isEmpty())
         {
@@ -219,11 +232,11 @@ void QnTestCamera::makeOfflineFlood()
         }
     }
 
-    if (m_isEnabled && (rand() % 100 < m_offlineFreq))
+    if (m_isEnabled && (nx::utils::random::number(0, 99) < m_offlineFreq))
     {
         m_isEnabled = false;
         m_offlineTimer.restart();
-        m_offlineDuration = 2000 + (rand() % 2000);
+        m_offlineDuration = nx::utils::random::number(2000, 4000);
     }
 
 }

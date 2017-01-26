@@ -1,14 +1,9 @@
-/**********************************************************
-* apr 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include <future>
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/future.h>
 #include <nx/utils/timer_manager.h>
-
 
 namespace nx {
 namespace utils {
@@ -18,10 +13,11 @@ TEST(TimerManager, singleShot)
 {
     const std::chrono::seconds delay(1);
 
+    nx::utils::promise<void> triggeredPromise;
+
     TimerManager timerManager;
     timerManager.start();
 
-    std::promise<void> triggeredPromise;
     timerManager.addTimer(
         [&triggeredPromise](TimerId) { triggeredPromise.set_value(); },
         delay);
@@ -29,8 +25,6 @@ TEST(TimerManager, singleShot)
     ASSERT_EQ(
         std::future_status::ready,
         triggeredPromise.get_future().wait_for(delay*2));
-
-    timerManager.stop();
 }
 
 TEST(TimerManager, nonStopTimer)
@@ -58,6 +52,29 @@ TEST(TimerManager, nonStopTimer)
     timerManager.stop();
 }
 
-}   //test
-}   //utils
-}   //nx
+TEST(parseTimerDuration, correct_input)
+{
+    using namespace std::chrono;
+
+    const auto defaultValue = seconds(5);
+
+    ASSERT_EQ(seconds(1), parseTimerDuration("1s", defaultValue));
+    ASSERT_EQ(seconds(1), parseTimerDuration("1000ms", defaultValue));
+    ASSERT_EQ(hours(1), parseTimerDuration("1h", defaultValue));
+    ASSERT_EQ(hours(24), parseTimerDuration("1d", defaultValue));
+    ASSERT_EQ(seconds(0), parseTimerDuration("0s", defaultValue));
+}
+
+TEST(parseTimerDuration, incorrect_input)
+{
+    using namespace std::chrono;
+
+    const auto defaultValue = seconds(5);
+
+    ASSERT_EQ(defaultValue, parseTimerDuration("s", defaultValue));
+    ASSERT_EQ(defaultValue, parseTimerDuration("", defaultValue));
+}
+
+} // namespace test
+} // namespace utils
+} // namespace nx

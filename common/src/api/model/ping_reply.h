@@ -6,24 +6,25 @@
 #ifndef NX_PING_RESPONSE_H
 #define NX_PING_RESPONSE_H
 
+#include <nx_ec/transaction_timestamp.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 
 //!mediaserver's response to \a ping request
 class QnPingReply
 {
 public:
-    QnPingReply(): sysIdTime(0), tranLogTime(0) {}
+    QnPingReply(): sysIdTime(0) {}
 
     QnUuid moduleGuid;
-    QString systemName;
+    QnUuid localSystemId;
     qint64 sysIdTime;
-    qint64 tranLogTime;
+    ec2::Timestamp tranLogTime;
 };
 
-#define QnPingReply_Fields (moduleGuid)(systemName)(sysIdTime)(tranLogTime)
+#define QnPingReply_Fields (moduleGuid)(localSystemId)(sysIdTime)(tranLogTime)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnPingReply, (json))
 

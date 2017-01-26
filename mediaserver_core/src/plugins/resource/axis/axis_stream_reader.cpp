@@ -7,6 +7,7 @@
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/nalUnits.h>
@@ -37,7 +38,7 @@ QnAxisStreamReader::~QnAxisStreamReader()
 
 int QnAxisStreamReader::toAxisQuality(Qn::StreamQuality quality)
 {
-    switch(quality)
+    switch (quality)
     {
         case Qn::QualityLowest:
             return 50;
@@ -66,11 +67,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     // ==== init if needed
     Qn::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
-    QnPlAxisResourcePtr res = getResource().dynamicCast<QnPlAxisResource>();
 
     int channels = 1;
-    if (res->hasParam(QLatin1String("channelsAmount")))
-        channels = res->getProperty(lit("channelsAmount")).toUInt();
+    if (m_axisRes->hasParam(QLatin1String("channelsAmount")))
+        channels = m_axisRes->getProperty(lit("channelsAmount")).toUInt();
 
 
     QByteArray profileNumber("S");
@@ -82,10 +82,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     if (channels > 1)
     {
         // multiple channel encoder
-        profileSufix = QString::number(res->getChannelNumAxis());
+        profileSufix = QString::number(m_axisRes->getChannelNumAxis());
     }
 
-    if (res->hasVideo(this))
+    if (m_axisRes->hasVideo(this))
     {
         static const QByteArray OLD_PRIMARY_STREAM_PROFILE_NAME = "netOptixPrimary";
         static const QByteArray OLD_SECONDARY_STREAM_PROFILE_NAME = "netOptixSecondary";
@@ -98,21 +98,22 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             profileDescription = QString(lit("%1 Primary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
             oldProfileName = OLD_PRIMARY_STREAM_PROFILE_NAME;
         }
-        else {
+        else
+        {
             profileName = lit("%1Secondary%2").arg(QnAppInfo::productNameShort()).arg(profileSufix).toUtf8();
             profileDescription = QString(lit("%1 Secondary Stream")).arg(QnAppInfo::productNameShort()).toUtf8();
             oldProfileName = OLD_SECONDARY_STREAM_PROFILE_NAME;
         }
 
 
-        // ================ profile setup ======================== 
-    
+        // ================ profile setup ========================
+
         // -------------- check if profile already exists
 
         std::set<QByteArray> profilesToRemove;
         for (int i = 0; i < 3; ++i)
         {
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+            CLSimpleHTTPClient http(m_axisRes->getHostAddress(), QUrl(m_axisRes->getUrl()).port(80), m_axisRes->getNetworkTimeout(), m_axisRes->getAuth());
             const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=list&group=StreamProfile");
             CLHttpStatus status = http.doGET(requestPath);
 
@@ -121,13 +122,13 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
                 if (status == CL_HTTP_AUTH_REQUIRED)
                 {
                     getResource()->setStatus(Qn::Unauthorized);
-                    return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
+                    return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
                 }
-                else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
+                else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned)
                 {
-                    NX_LOG( lit("Axis camera must be have old firmware!!!!  ip = %1").arg(res->getHostAddress()) , cl_logERROR);
+                    NX_LOG(lit("Axis camera must be have old firmware!!!!  ip = %1").arg(m_axisRes->getHostAddress()), cl_logERROR);
                     m_oldFirmwareWarned = true;
-                    return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
+                    return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String("old firmware"));
                 }
 
                 return CameraDiagnostics::RequestFailedResult(requestPath, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
@@ -135,53 +136,68 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
 
             QByteArray body;
             http.readAll(body);
-            if (body.isEmpty()) {
-                msleep(rand() % 50);
+            if (body.isEmpty())
+            {
+                msleep(nx::utils::random::number(0, 50));
                 continue; // sometime axis returns empty profiles list
             }
-        
+
             QList<QByteArray> lines = body.split('\n');
+            bool profileFound = false;
             for (int i = 0; i < lines.size(); ++i)
             {
-                if (lines[i].endsWith(QByteArray("Name=") +profileName))
+                if (lines[i].endsWith(QByteArray("Name=") + profileName))
                 {
                     action = "update"; // profile already exists, so update instead of add
                     QList<QByteArray> params = lines[i].split('.');
                     if (params.size() >= 2)
-                        profileNumber = params[params.size()-2];
+                    {
+                        QByteArray token = params[params.size()-2];
+                        if (!profileFound)
+                        {
+                            action = "update"; // profile already exists, so update instead of add
+                            profileNumber = token;
+                        }
+                        else
+                        {
+                            profilesToRemove.insert( token );
+                        }
+                        profileFound = true;
+                    }
+
                 }
-                else if( lines[i].endsWith(QByteArray("Name=") + oldProfileName) )
+                else if (lines[i].endsWith(QByteArray("Name=") + oldProfileName))
                 {
                     //removing this profile
                     auto tokens = lines[i].split('.');
-                    if( tokens.size() > 3 )
-                        profilesToRemove.insert( tokens[2] );
+                    if (tokens.size() > 3)
+                        profilesToRemove.insert(tokens[2]);
                 }
             }
         }
 
         //removing old profiles
-        for( const auto& profileToRemove: profilesToRemove )
+        for (const auto& profileToRemove : profilesToRemove)
         {
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
-            const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile."+profileToRemove);
-            const int httpStatus = http.doGET( requestPath );    //ignoring error code
-            if( httpStatus != CL_HTTP_SUCCESS )
+            CLSimpleHTTPClient http(m_axisRes->getHostAddress(), QUrl(m_axisRes->getUrl()).port(80), m_axisRes->getNetworkTimeout(), m_axisRes->getAuth());
+            const QString& requestPath = QLatin1String("/axis-cgi/param.cgi?action=remove&group=root.StreamProfile." + profileToRemove);
+            const int httpStatus = http.doGET(requestPath);    //ignoring error code
+            if (httpStatus != CL_HTTP_SUCCESS)
             {
-                NX_LOG( lit("Failed to remove old Axis profile %1 on camera %2").
-                    arg(QLatin1String(profileToRemove)).arg(res->getHostAddress()), cl_logDEBUG1 );
+                NX_LOG(lit("Failed to remove old Axis profile %1 on camera %2").
+                    arg(QLatin1String(profileToRemove)).arg(m_axisRes->getHostAddress()), cl_logDEBUG1);
             }
         }
 
         // ------------------- determine stream parameters ----------------------------
         float fps = params.fps;
-        const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
+        const QnPlAxisResource::AxisResolution& resolution = m_axisRes->getResolution(
             role == Qn::CR_LiveVideo
-                ? PRIMARY_ENCODER_INDEX
-                : SECONDARY_ENCODER_INDEX );
+            ? PRIMARY_ENCODER_INDEX
+            : SECONDARY_ENCODER_INDEX);
 
-        if (resolution.size.isEmpty()) 
-            qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
+        if (resolution.size.isEmpty())
+            qWarning() << "Can't determine max resolution for axis camera " << m_axisRes->getName() << "use default resolution";
         Qn::StreamQuality quality = params.quality;
 
         QByteArray paramsStr;
@@ -192,10 +208,10 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
         paramsStr.append("&fps=").append(QByteArray::number(fps));
         if (quality != Qn::QualityPreSet)
             paramsStr.append("&compression=").append(QByteArray::number(toAxisQuality(quality)));
-        paramsStr.append("&audio=").append(res->isAudioEnabled() ? "1" : "0");
+        paramsStr.append("&audio=").append(m_axisRes->isAudioEnabled() ? "1" : "0");
 
         // --------------- update or insert new profile ----------------------
-    
+
         if (action == QByteArray("add") || isCameraControlRequired)
         {
             QString streamProfile;
@@ -209,20 +225,22 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
             str << "&StreamProfile." << profileNumber << ".Parameters=" << QUrl::toPercentEncoding(QLatin1String(paramsStr));
             str.flush();
 
-            CLSimpleHTTPClient http (res->getHostAddress(), QUrl(res->getUrl()).port(80), res->getNetworkTimeout(), res->getAuth());
+            CLSimpleHTTPClient http(m_axisRes->getHostAddress(), QUrl(m_axisRes->getUrl()).port(80), m_axisRes->getNetworkTimeout(), m_axisRes->getAuth());
             CLHttpStatus status = http.doGET(streamProfile);
 
             if (status == CL_HTTP_AUTH_REQUIRED)
             {
                 getResource()->setStatus(Qn::Unauthorized);
-                return CameraDiagnostics::NotAuthorisedResult( res->getUrl() );
+                return CameraDiagnostics::NotAuthorisedResult(m_axisRes->getUrl());
             }
             else if (status != CL_HTTP_SUCCESS)
+            {
                 return CameraDiagnostics::RequestFailedResult(CameraDiagnostics::RequestFailedResult(streamProfile, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status))));
+            }
 
             if (role != Qn::CR_SecondaryLiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
             {
-                res->setMotionMaskPhysical(0);
+                m_axisRes->setMotionMaskPhysical(0);
             }
         }
     }
@@ -231,21 +249,22 @@ CameraDiagnostics::Result QnAxisStreamReader::openStreamInternal(bool isCameraCo
     //stream << "rtsp://" << QUrl(m_resource->getUrl()).host() << ":" << (QUrl(m_resource->getUrl()).port()+1) << "/"; // for port forwarding purpose
     stream << "axis-media/media.amp";
     QByteArray paramsSeparator = "?";
-    if (!profileName.isEmpty()) {
+    if (!profileName.isEmpty())
+    {
         stream << paramsSeparator << "streamprofile=" << profileName;
         paramsSeparator = "&";
     }
 
     if (channels > 1)
     {
-        stream << paramsSeparator << "camera=" << res->getChannelNumAxis();
+        stream << paramsSeparator << "camera=" << m_axisRes->getChannelNumAxis();
     }
 
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(request).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
-    
 
     // ============== requesting a video ==========================
     m_rtpStreamParser.setRequest(request);
+    m_axisRes->updateSourceUrl(m_rtpStreamParser.getCurrentStreamUrl(), getRole());
     return m_rtpStreamParser.openStream();
 }
 
@@ -270,9 +289,10 @@ QnMetaDataV1Ptr QnAxisStreamReader::getCameraMetadata()
 
 void QnAxisStreamReader::fillMotionInfo(const QRect& rect)
 {
-    if (m_lastMetadata == 0) {
+    if (m_lastMetadata == 0)
+    {
         m_lastMetadata = QnMetaDataV1Ptr(new QnMetaDataV1());
-        m_lastMetadata->m_duration = 1000*1000*10; // 10 sec 
+        m_lastMetadata->m_duration = 1000 * 1000 * 10; // 10 sec
     }
     for (int x = rect.left(); x <= rect.right(); ++x)
     {
@@ -285,7 +305,7 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
 {
     if (len < 1)
         return;
-    QList<QByteArray> params = QByteArray((const char*)payload,len).split(';');
+    QList<QByteArray> params = QByteArray((const char*)payload, len).split(';');
     for (int i = 0; i < params.size(); ++i)
     {
         const QByteArray& param = params.at(i);
@@ -301,7 +321,7 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
 
 void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* curNal = (const quint8*)videoData->data();
     const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
     //int prefixSize = 3;
@@ -309,7 +329,7 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
     //    prefixSize = 4;
 
     const quint8* nextNal = curNal;
-    for (;curNal < end; curNal = nextNal)
+    for (; curNal < end; curNal = nextNal)
     {
         nextNal = NALUnit::findNextNAL(curNal, end);
         quint8 nalUnitType = *curNal & 0x1f;
@@ -333,20 +353,20 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
                 {
                     int msgLen = (payload[0] << 8) + payload[1];
                     int msgType = (payload[2] << 8) + payload[3];
-                    switch(msgType)
+                    switch (msgType)
                     {
-                    case AXIS_SEI_PRODUCT_INFO:
-                        break;
-                    case AXIS_SEI_TIMESTAMP:
-                        break;
-                    case AXIS_SEI_TRIGGER_DATA:
-                        processTriggerData(payload+4, msgLen-4);
-                        break;
-                    default:
-                        break;
+                        case AXIS_SEI_PRODUCT_INFO:
+                            break;
+                        case AXIS_SEI_TIMESTAMP:
+                            break;
+                        case AXIS_SEI_TRIGGER_DATA:
+                            processTriggerData(payload + 4, msgLen - 4);
+                            break;
+                        default:
+                            break;
                     }
-                    payload += msgLen+2;
-                    len -= msgLen+2;
+                    payload += msgLen + 2;
+                    len -= msgLen + 2;
                 }
             }
         }
@@ -356,12 +376,12 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoData* videoData)
 
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* curNal = (const quint8*)videoData->data();
     const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
 
     const quint8* nextNal = curNal;
-    for (;curNal < end; curNal = nextNal)
+    for (; curNal < end; curNal = nextNal)
     {
         nextNal = NALUnit::findNextNAL(curNal, end);
         quint8 nalUnitType = *curNal & 0x1f;
@@ -379,36 +399,39 @@ void QnAxisStreamReader::pleaseStop()
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()
 {
-    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid) 
+    if (getRole() == Qn::CR_LiveVideo && m_axisRes->getMotionType() != Qn::MT_SoftwareGrid)
         m_axisRes->readMotionInfo();
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    if (needMetaData()) 
+    if (needMetaData())
         return getMetaData();
 
     QnAbstractMediaDataPtr rez;
     for (int i = 0; i < 10; ++i)
     {
         rez = m_rtpStreamParser.getNextData();
-        if (rez) 
+        if (rez)
         {
-            if (rez->dataType == QnAbstractMediaData::VIDEO) {
+            if (rez->dataType == QnAbstractMediaData::VIDEO)
+            {
                 parseMotionInfo(static_cast<QnCompressedVideoData*>(rez.get()));
                 //if (isGotFrame(videoData))
                 break;
             }
-            else if (rez->dataType == QnAbstractMediaData::AUDIO) {
+            else if (rez->dataType == QnAbstractMediaData::AUDIO)
+            {
                 break;
             }
         }
-        else {
+        else
+        {
             closeStream();
             break;
         }
     }
-    
+
     return rez;
 }
 

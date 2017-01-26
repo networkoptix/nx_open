@@ -7,11 +7,12 @@
 #include <map>
 #include <memory>
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
+#include "node.h"
+#include "range_match_container.h"
 #include "streecontainer.h"
 #include "wildcardmatchcontainer.h"
-#include "node.h"
 
 
 namespace stree
@@ -30,6 +31,8 @@ namespace stree
                 return wildcard;
             else if( str == lit("presence") )
                 return presence;
+            else if( str == lit("range") )
+                return range;
             else
                 return unknown;
         }
@@ -242,6 +245,8 @@ namespace stree
                 return std::make_unique<ConditionNode<ResValueType, MinGreaterMatchContainer>>( matchResID );
             case MatchType::presence:
                 return std::make_unique<ResPresenceNode>( matchResID );
+            case MatchType::range:
+                return std::make_unique<ConditionNode<ResValueType, RangeMatchContainer, RangeConverter<ResValueType>>>( matchResID );
             default:
                 NX_ASSERT(false);
                 return NULL;
@@ -262,6 +267,8 @@ namespace stree
                 return std::make_unique<ConditionNode<QString, WildcardMatchContainer>>( matchResID );
             case MatchType::presence:
                 return std::make_unique<ResPresenceNode>(matchResID);
+            case MatchType::range:
+                return std::make_unique<ConditionNode<QString, RangeMatchContainer, RangeConverter<QString>>>(matchResID);
             default:
                 NX_ASSERT(false);
                 return NULL;

@@ -29,7 +29,7 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
     if (c->getSampleRate())
         setSampleRate(c->getSampleRate());
 
-    if (c->getChannels()) 
+    if (c->getChannels())
         setChannelCount(c->getChannels());
 
     //setCodec("audio/pcm");
@@ -38,21 +38,25 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
     switch(c->getSampleFmt())
     {
         case AV_SAMPLE_FMT_U8: ///< unsigned 8 bits
+        case AV_SAMPLE_FMT_U8P:
             setSampleSize(8);
             setSampleType(QnAudioFormat::UnSignedInt);
             break;
 
         case AV_SAMPLE_FMT_S16: ///< signed 16 bits
+        case AV_SAMPLE_FMT_S16P:
             setSampleSize(16);
             setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case AV_SAMPLE_FMT_S32:///< signed 32 bits
+        case AV_SAMPLE_FMT_S32P:
             setSampleSize(32);
             setSampleType(QnAudioFormat::SignedInt);
             break;
 
         case AV_SAMPLE_FMT_FLT:
+        case AV_SAMPLE_FMT_FLTP:
             setSampleSize(32);
             setSampleType(QnAudioFormat::Float);
             break;
@@ -88,6 +92,17 @@ void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
 {
     QnAbstractMediaData::assign(other);
     duration = other->duration;
+}
+
+quint64 QnCompressedAudioData::getDurationMs() const
+{
+    if (!context)
+        return 0;
+
+    if (context->getSampleRate())
+        return (quint64)((context->getFrameSize() / (double)context->getSampleRate()) * 1000);
+    else
+        return 0;
 }
 
 

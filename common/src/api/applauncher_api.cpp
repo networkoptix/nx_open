@@ -108,7 +108,7 @@ namespace applauncher
                 case TaskType::isVersionInstalled:
                     *ptr = new IsVersionInstalledRequest();
                     break;
-                    
+
                 case TaskType::getInstalledVersions:
                     *ptr = new GetInstalledVersionsRequest();
                     break;
@@ -271,7 +271,7 @@ namespace applauncher
         {
             return lit("%1\n%2\n\n").arg(QLatin1String(TaskType::toString(type))).arg(version.toString()).toLatin1();
         }
-        
+
         bool IsVersionInstalledRequest::deserialize( const QnByteArrayConstRef& data )
         {
             const QList<QnByteArrayConstRef>& lines = data.split('\n');
@@ -328,7 +328,7 @@ namespace applauncher
                     case ioError:
                         return "ioError";
                     default:
-                        return "otherError";
+                        return "otherError " + QByteArray::number(val);
                 }
             }
         }
@@ -536,7 +536,7 @@ namespace applauncher
         {
             return Response::serialize() + QByteArray::number(installed ? 1 : 0) + "\n\n";
         }
-        
+
         bool IsVersionInstalledResponse::deserialize( const QnByteArrayConstRef& data )
         {
             if( !Response::deserialize(data) )

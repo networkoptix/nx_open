@@ -20,25 +20,14 @@ namespace
 
 namespace ite
 {
-    INIT_OBJECT_COUNTER(CameraManager)
-    DEFAULT_REF_COUNTER(CameraManager)
-
-    CameraManager::CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev)
-    :   m_refManager(this),
-        m_devMapper(devMapper),
-        m_txDevice(txDev),
-        m_errorStr(nullptr)
+    CameraManager::CameraManager(const RxDevicePtr &rxDev)
+    :   m_rxDevice(rxDev),
+        m_errorStr(nullptr),
+        m_cameraId(rxDev->getTxDevice()->txID())
     {
-        updateCameraInfo(info);
-
-        unsigned frequency;
-        unsigned short txID;
-        std::vector<unsigned short> rxIDs;
-        DeviceMapper::parseInfo(info, txID, frequency, rxIDs);
+        m_rxDevice->setCamera(this);
+        m_info = m_rxDevice->getCameraInfo();
     }
-
-    CameraManager::~CameraManager()
-    {}
 
     void * CameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
@@ -74,12 +63,12 @@ namespace ite
 
     int CameraManager::getParamValue(const char * paramName, char * valueBuf, int * valueBufSize) const
     {
-        return AdvancedSettings(m_txDevice, m_rxDevice).getParamValue(paramName, valueBuf, valueBufSize);
+        return AdvancedSettings(m_rxDevice->getTxDevice(), m_rxDevice).getParamValue(paramName, valueBuf, valueBufSize);
     }
 
     int CameraManager::setParamValue(const char * paramName, const char * value)
     {
-        return AdvancedSettings(m_txDevice, m_rxDevice).setParamValue(*this, paramName, value);
+        return AdvancedSettings(m_rxDevice->getTxDevice(), m_rxDevice).setParamValue(*this, paramName, value);
     }
 
     void CameraManager::needUpdate(unsigned group)
@@ -108,8 +97,8 @@ namespace ite
 
             if (m_rxDevice->changeChannel(m_newChannel))
             {
-                stopStreams(true);
-                m_devMapper->forgetTx(txID());
+                //stopStreams(true);
+                //m_devMapper->forgetTx(txID());
             }
         }
     }
@@ -122,32 +111,19 @@ namespace ite
         return nxcip::NX_NO_ERROR;
     }
 
-    int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
+    int CameraManager::getEncoder(int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr)
     {
-        State state = tryLoad();
-        switch (state)
+        std::lock_guard<std::mutex> lock(m_mutex);
+        if (!m_rxDevice || !rxDeviceRef()->deviceReady())
         {
-            case STATE_NO_CAMERA:
-            case STATE_NO_RECEIVER:
-            case STATE_NOT_LOCKED:
-            case STATE_NO_ENCODERS:
-                return nxcip::NX_TRY_AGAIN;
-
-            case STATE_READY:
-            case STATE_READING:
-                break;
+            ITE_LOG() << FMT("[getEnCoder] No rxDevice");
+            return nxcip::NX_NO_DATA;
         }
 
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        //if (m_encoders.empty())
-        //    return nxcip::NX_TRY_AGAIN;
-
-        if (static_cast<unsigned>(encoderIndex) >= m_encoders.size())
+        if (static_cast<unsigned>(encoderIndex) >= RxDevice::streamsCountPassive())
             return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-        m_encoders[encoderIndex]->addRef();
-        *encoderPtr = m_encoders[encoderIndex].get();
+        *encoderPtr = new MediaEncoder(this, encoderIndex);
         return nxcip::NX_NO_ERROR;
     }
 
@@ -160,7 +136,8 @@ namespace ite
     int CameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
     {
         *capabilitiesMask = nxcip::BaseCameraManager::nativeMediaStreamCapability |
-                            nxcip::BaseCameraManager::needIFrameDetectionCapability;
+                            nxcip::BaseCameraManager::needIFrameDetectionCapability |
+                            nxcip::BaseCameraManager::shareIpCapability;
         return nxcip::NX_NO_ERROR;
     }
 
@@ -215,190 +192,10 @@ namespace ite
 
     // internals
 
-    CameraManager::State CameraManager::checkState() const
-    {
-        if (! m_txDevice)
-            return STATE_NO_CAMERA;
-
-        if (! m_rxDevice)
-            return STATE_NO_RECEIVER;
-
-        if (! m_rxDevice->isLocked() || ! m_rxDevice->isReading())
-            return STATE_NOT_LOCKED;
-
-        if (m_rxDevice->isLocked() && m_rxDevice->isReading() && m_encoders.size() == 0)
-            return STATE_NO_ENCODERS;
-
-        if (m_openedStreams.empty())
-            return STATE_READY;
-
-        return STATE_READING;
-    }
-
-    CameraManager::State CameraManager::tryLoad()
-    {
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
-        State state = checkState();
-        switch (state)
-        {
-            case STATE_NO_CAMERA:
-                return state; // can do nothing
-
-            case STATE_NO_RECEIVER:
-            case STATE_NOT_LOCKED:
-            {
-                if (! captureAnyRxDevice())
-                    break;
-                //break;
-            }
-
-            case STATE_NO_ENCODERS:
-            {
-                reloadMedia();
-                break;
-            }
-
-            case STATE_READY:
-            case STATE_READING:
-                return state;
-        }
-
-        return checkState();
-    }
-
-    void CameraManager::reloadMedia()
-    {
-        stopEncoders();
-        if (m_rxDevice && m_rxDevice->isLocked())
-        {
-            initEncoders();
-            if (! m_rxDevice->isReading())
-                freeRx();
-        }
-    }
-
-    bool CameraManager::stopIfNeedIt()
-    {
-        static const unsigned WAIT_TO_STOP_MS = 10000;
-
-        if (m_stopTimer.isStarted() && m_stopTimer.elapsedMS() > WAIT_TO_STOP_MS)
-            return stopStreams();
-
-        return false;
-    }
-
-    void CameraManager::updateCameraInfo(const nxcip::CameraInfo& info)
-    {
-        memcpy(&m_info, &info, sizeof(nxcip::CameraInfo));
-    }
-
-    bool CameraManager::captureAnyRxDevice()
-    {
-        // reopen same device
-        if (m_rxDevice)
-        {
-            if (m_rxDevice->isLocked() && m_rxDevice->txID() == txID())
-            {
-                m_stopTimer.stop();
-                return true;
-            }
-            //else
-            freeRx();
-        }
-
-        RxDevicePtr dev = captureFreeRxDevice();
-
-        if (dev)
-        {
-            m_rxDevice = dev;
-            return true;
-        }
-
-        return false;
-    }
-
-    RxDevicePtr CameraManager::captureFreeRxDevice()
-    {
-        RxDevicePtr best;
-
-        std::vector<RxDevicePtr> supportedRxDevices;
-        m_devMapper->getRx4Tx(txID(), supportedRxDevices);
-
-        for (size_t i = 0; i < supportedRxDevices.size(); ++i)
-        {
-            RxDevicePtr dev = supportedRxDevices[i];
-
-            bool isGood = true;
-            if (dev->lockCamera(m_txDevice)) // delay inside
-            {
-                isGood = dev->good();
-                if (isGood)
-                {
-                    if (!best || dev->strength() > best->strength())
-                        best.swap(dev);
-                }
-
-                // unlock all but best
-                if (dev)
-                    dev->unlockC();
-            }
-            else
-                debug_printf("[camera] can't lock Rx for Tx: %d\n", txID());
-        }
-
-        if (supportedRxDevices.empty())
-            debug_printf("[camera] no Rx for Tx: %d\n", txID());
-
-        return best;
-    }
-
-    void CameraManager::freeRx(bool resetRx)
-    {
-        if (m_rxDevice)
-        {
-            m_rxDevice->unlockC(resetRx);
-            m_rxDevice.reset();
-        }
-        m_stopTimer.stop();
-    }
-
-    void CameraManager::initEncoders()
-    {
-        if (!m_rxDevice || !m_rxDevice->isLocked())
-            return;
-
-        unsigned streamsCount = m_rxDevice->streamsCount();
-        if (! streamsCount)
-            streamsCount = 2; // HACK
-
-        m_encoders.reserve(streamsCount);
-        for (unsigned i = 0; i < streamsCount; ++i)
-        {
-            if (i >= m_encoders.size())
-            {
-                auto enc = std::shared_ptr<MediaEncoder>( new MediaEncoder(this, i), refDeleter );
-                m_encoders.push_back(enc);
-            }
-
-            m_rxDevice->subscribe(i);
-        }
-    }
-
-    void CameraManager::stopEncoders()
-    {
-        for (unsigned i = 0; i < m_rxDevice->streamsCount(); ++i)
-            m_rxDevice->unsubscribe(i);
-    }
-
     // from StreamReader thread
-
     void CameraManager::openStream(unsigned encNo)
     {
         m_stopTimer.stop();
-
-        std::lock_guard<std::mutex> lock( m_mutex ); // LOCK
-
         m_openedStreams.insert(encNo);
     }
 
@@ -423,8 +220,6 @@ namespace ite
         if (m_openedStreams.size() && ! force)
             return false;
 
-        stopEncoders();
-        freeRx();
         return true;
     }
 }

@@ -4,8 +4,8 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
-#include <utils/serialization/lexical.h>
-#include <utils/math/fuzzy.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/math/fuzzy.h>
 
 #include "camera_user_attribute_pool.h"
 #include "resource_media_layout.h"
@@ -20,6 +20,9 @@ namespace {
     const QString motionStreamKey               = lit("motionStream");
     const QString rotationKey                   = lit("rotation");
     const QString panicRecordingKey             = lit("panic_mode");
+
+    const QString primaryStreamValue            = lit("primary");
+    const QString secondaryStreamValue          = lit("secondary");
 
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
@@ -47,25 +50,25 @@ public:
     static QString shortDisplayString(Qn::StreamQuality value) {
         /* Note that '//:' are comments for translators. */
         switch(value) {
-        case Qn::QualityLowest:       
+        case Qn::QualityLowest:
             //: Short for 'Lowest'
             return tr("Lst");
-        case Qn::QualityLow:          
+        case Qn::QualityLow:
             //: Short for 'Low'
             return tr("Lo");
-        case Qn::QualityNormal:       
+        case Qn::QualityNormal:
             //: Short for 'Medium'
             return tr("Me");
-        case Qn::QualityHigh:         
+        case Qn::QualityHigh:
             //: Short for 'High'
             return tr("Hi");
-        case Qn::QualityHighest:      
+        case Qn::QualityHighest:
             //: Short for 'Best'
             return tr("Bst");
-        case Qn::QualityPreSet:       
+        case Qn::QualityPreSet:
             //: Short for 'Preset'
             return tr("Ps");
-        case Qn::QualityNotDefined:   
+        case Qn::QualityNotDefined:
             //: Short for 'Undefined'
             return tr("-");
         default:
@@ -158,7 +161,7 @@ QnMediaDewarpingParams QnMediaResource::getDewarpingParams() const {
 }
 
 
-void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) 
+void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
 {
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), toResource()->getId() );
@@ -168,18 +171,6 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params)
         (*userAttributesLock)->dewarpingParams = params;
     }
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
-}
-
-void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
-{
-    Q_UNUSED(modifiedFields)
-    QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
-    if (other_casted) {
-        //if (m_dewarpingParams != other_casted->m_dewarpingParams) {   //moved to QnCameraUserAttributePool
-        //    m_dewarpingParams = other_casted->m_dewarpingParams;
-        //    modifiedFields << "mediaDewarpingParamsChanged";
-        //}
-    }
 }
 
 qreal QnMediaResource::customAspectRatio() const {
@@ -231,6 +222,16 @@ QString QnMediaResource::dynamicVideoLayoutKey() {
 
 QString QnMediaResource::motionStreamKey() {
     return ::motionStreamKey;
+}
+
+QString QnMediaResource::primaryStreamValue()
+{
+    return ::primaryStreamValue;
+}
+
+QString QnMediaResource::secondaryStreamValue()
+{
+    return ::secondaryStreamValue;
 }
 
 QString QnMediaResource::rotationKey() {

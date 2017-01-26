@@ -2,6 +2,7 @@
 #define GUARD_H
 
 #include <functional>
+#include <memory>
 
 
 /** RAII wrapper for @class std::function<void()> */
@@ -87,6 +88,33 @@ template<class Func>
 ScopedGuard<Func> makeScopedGuard(Func func)
 {
     return ScopedGuard<Func>(std::move(func));
+}
+
+template<typename Func>
+class SharedGuard
+{
+public:
+    SharedGuard(Func func):
+        m_func(std::move(func))
+    {
+    }
+
+    ~SharedGuard()
+    {
+        m_func();
+    }
+
+private:
+    Func m_func;
+};
+
+/**
+ * @param func Will be invoked when last instance of returned value has been removed.
+ */
+template<typename Func>
+std::shared_ptr<SharedGuard<Func>> makeSharedGuard(Func func)
+{
+    return std::make_shared<SharedGuard<Func>>(std::move(func));
 }
 
 #endif // GUARD_H

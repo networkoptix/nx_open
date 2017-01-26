@@ -3,38 +3,17 @@
 #include <deque>
 
 #include <QtMultimedia/QVideoFrame>
-
-#include <utils/media/jpeg_utils.h>
-#include <utils/media/h264_utils.h>
+#include <QtCore/QMutexLocker>
 
 #include "abstract_video_decoder.h"
 #include "video_decoder_registry.h"
 #include "frame_metadata.h"
+#include <utils/media/utils.h>
 
 namespace nx {
 namespace media {
 
 namespace {
-
-QSize mediaSizeFromRawData(const QnConstCompressedVideoDataPtr& frame)
-{
-    const auto& context = frame->context;
-    QSize result;
-    switch (context->getCodecId())
-    {
-        case CODEC_ID_H264:
-            extractSpsPps(frame, &result, nullptr);
-            return result;
-        case CODEC_ID_MJPEG:
-        {
-            nx_jpg::ImageInfo imgInfo;
-            nx_jpg::readJpegImageInfo((const quint8*) frame->data(), frame->dataSize(), &imgInfo);
-            return QSize(imgInfo.width, imgInfo.height);
-        }
-        default:
-            return result;
-    }
-}
 
 /**
  * This data is used to compare current and previous frame so as to reset video decoder if needed.
@@ -43,23 +22,25 @@ struct FrameBasicInfo
 {
     FrameBasicInfo()
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
     }
 
     FrameBasicInfo(const QnConstCompressedVideoDataPtr& frame)
     :
-        codec(CODEC_ID_NONE)
+        codec(AV_CODEC_ID_NONE)
     {
         codec = frame->compressionType;
         size = QSize(frame->width, frame->height);
         if (size.isEmpty())
-            size = mediaSizeFromRawData(frame);
+            size = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
     }
 
     QSize size;
-    CodecID codec;
+    AVCodecID codec;
 };
+
+static QMutex mutex;
 
 } // namespace
 
@@ -78,7 +59,6 @@ public:
     const FrameMetadata findMetadata(int frameNum);
     void clearMetadata();
     int decoderFrameNumToLocalNum(int value) const;
-
 public:
     std::deque<QVideoFramePtr> queue; /**< Temporary  buffer for decoded data. */
     VideoDecoderPtr videoDecoder;
@@ -90,6 +70,8 @@ public:
 
     /** Associate extra information with output frames which corresponds to input frames. */
     std::deque<FrameMetadata> metadataQueue;
+
+    SeamlessVideoDecoder::VideoGeometryAccessor videoGeometryAccessor;
 };
 
 SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent)
@@ -136,8 +118,7 @@ int SeamlessVideoDecoderPrivate::decoderFrameNumToLocalNum(int value) const
 //-------------------------------------------------------------------------------------------------
 // SeamlessVideoDecoder
 
-SeamlessVideoDecoder::SeamlessVideoDecoder()
-:
+SeamlessVideoDecoder::SeamlessVideoDecoder():
     QObject(),
     d_ptr(new SeamlessVideoDecoderPrivate(this))
 {
@@ -145,6 +126,12 @@ SeamlessVideoDecoder::SeamlessVideoDecoder()
 
 SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
+}
+
+void SeamlessVideoDecoder::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
+{
+    Q_D(SeamlessVideoDecoder);
+    d->videoGeometryAccessor = videoGeometryAccessor;
 }
 
 void SeamlessVideoDecoder::pleaseStop()
@@ -159,13 +146,18 @@ bool SeamlessVideoDecoder::decode(
         result->reset();
 
     FrameBasicInfo frameInfo(frame);
-    bool isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
-    if (!frameInfo.size.isEmpty())
-        isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
+    bool isSimilarParams;
+    {
+        QMutexLocker lock(&mutex);
+        isSimilarParams = frameInfo.codec == d->prevFrameInfo.codec;
+        if (!frameInfo.size.isEmpty())
+            isSimilarParams &= frameInfo.size == d->prevFrameInfo.size;
+    }
     if (!isSimilarParams)
     {
         if (d->videoDecoder)
         {
+            double sar = d->videoDecoder->getSampleAspectRatio();
             for (;;)
             {
                 QVideoFramePtr decodedFrame;
@@ -173,8 +165,12 @@ bool SeamlessVideoDecoder::decode(
                     QnConstCompressedVideoDataPtr(), &decodedFrame);
                 if (!decodedFrame)
                     break; //< decoder's buffer is flushed
-                const FrameMetadata metadata = d->findMetadata(
+                FrameMetadata metadata = d->findMetadata(
                     d->decoderFrameNumToLocalNum(decodedFrameNum));
+                // some decoders doesn't fill sar in spite of it isn't 1.0
+                metadata.sar = qFuzzyCompare(sar, 1.0)
+                    ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
+                    : sar;
                 metadata.serialize(decodedFrame);
                 d->queue.push_back(std::move(decodedFrame));
             }
@@ -184,9 +180,14 @@ bool SeamlessVideoDecoder::decode(
         d->videoDecoder.reset();
 
         d->videoDecoder = VideoDecoderRegistry::instance()->createCompatibleDecoder(
-            frame->compressionType, QSize(frame->width, frame->height));
+            frame->compressionType, frameInfo.size);
+        if (d->videoDecoder)
+            d->videoDecoder->setVideoGeometryAccessor(d->videoGeometryAccessor);
         d->decoderFrameOffset = d->frameNumber;
-        d->prevFrameInfo = frameInfo;
+        {
+            QMutexLocker lock(&mutex);
+            d->prevFrameInfo = frameInfo;
+        }
         d->clearMetadata();
     }
 
@@ -198,15 +199,25 @@ bool SeamlessVideoDecoder::decode(
         decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
         if (decodedFrame)
         {
-            const FrameMetadata metadata = d->findMetadata(
+            FrameMetadata metadata = d->findMetadata(
                 d->decoderFrameNumToLocalNum(decodedFrameNum));
-            metadata.serialize(decodedFrame);
-            d->queue.push_back(std::move(decodedFrame));
+            if (!metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
+            {
+                double sar = d->videoDecoder->getSampleAspectRatio();
+                metadata.sar = qFuzzyCompare(sar, 1.0)
+                    ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
+                    : sar;
+                metadata.serialize(decodedFrame);
+                d->queue.push_back(std::move(decodedFrame));
+            }
         }
     }
 
     if (d->queue.empty())
-        return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
+    {
+        // Return false if decoding fails and no queued frames are left.
+        return decodedFrameNum >= 0;
+    }
 
     *result = std::move(d->queue.front());
     d->queue.pop_front();
@@ -217,6 +228,20 @@ int SeamlessVideoDecoder::currentFrameNumber() const
 {
     Q_D(const SeamlessVideoDecoder);
     return d->frameNumber;
+}
+
+QSize SeamlessVideoDecoder::currentResolution() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    QMutexLocker lock(&mutex);
+    return d->prevFrameInfo.size;
+}
+
+AVCodecID SeamlessVideoDecoder::currentCodec() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    QMutexLocker lock(&mutex);
+    return d->prevFrameInfo.codec;
 }
 
 } // namespace media

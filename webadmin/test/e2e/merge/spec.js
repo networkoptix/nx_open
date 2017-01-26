@@ -2,41 +2,53 @@
 
 var Page = require('./po.js');
 describe('Merge Dialog', function () {
-    //it("should stop test",function(){expect("other test").toBe("uncommented");});return;
-
     var p = new Page();
 
-    expect("tests for merging systems").toBe("written");
-    return;
-
-    it("should open merge dialog",function(){
+    beforeAll(function(){
         p.get();
+        p.helper.getTab("System").click();
+    });
+
+    beforeEach(function(){
         expect(p.mergeButton.isDisplayed()).toBe(true);
         expect(p.mergeButton.isEnabled()).toBe(true);
         p.mergeButton.click();
-        expect(p.mergeDialog.isDisplayed()).toBe(true);
+    });
 
+    afterEach(function(){
+        p.dialogCloseButton.click();
+    });
+
+    it("can be opened",function(){
+        p.helper.waitIfNotPresent(p.mergeDialog, 1000);
+
+        expect(p.mergeDialog.isDisplayed()).toBe(true);
     });
 
     it("should suggest servers or show message in dropdown",function(){
-        var urls = p.systemSuggestionsList.all(by.repeater("system in systems.discoveredUrls"));
 
+        p.helper.waitIfNotPresent( (element(by.id("otherSystemUrl"))), 1000);
+
+        var urls = p.systemSuggestionsList.all(by.repeater("system in systems.discoveredUrls"));
         var nomessage = p.systemSuggestionsList.element(by.id("no-systems-message"));
 
         urls.count().then(function(val){
-            if(val == 0){
+            if(val == 0) {
                 expect(nomessage.isPresent()).toBe(true);
                 //expect(nomessage.getText()).toEqual("No systems found");
-            }else{
+            }
+            else {
                 expect(nomessage.isPresent()).toBe(false);
-                expect(url.first().getText()).toMatch(/[\w\d\s]+\s+\(\d+\.\d+\.\d+\.\d+\)\s+([\w\d\s]+)/);//{{system.name}} ({{system.ip}}) ({{system.systemName}})
+                // Regexp {{system.name}} ({{system.ip}}) ({{system.systemName}}), Server (192.168.0.25) (testFPS250)
+                expect(urls.first().element(by.css('a')).getInnerHtml()).toMatch(/[\w\s]+\s+\(\d+\.\d+\.\d+\.\d+\)\s+\(([\w\s\W]+)\)/);
             }
         });
     });
 
     it("should validate url",function(){
         p.urlInput.clear();
-        p.passwordInput.sendKeys('1');
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
 
         expect(p.findSystemButton.isEnabled()).toBe(false);
 
@@ -62,82 +74,151 @@ describe('Merge Dialog', function () {
 
     it("should require password",function(){
         p.urlInput.sendKeys("http://good.url");
+        p.loginInput.sendKeys(p.helper.admin);
         p.passwordInput.clear();
 
         expect(p.findSystemButton.isEnabled()).toBe(false);
 
-        p.passwordInput.sendKeys('1');
+        p.passwordInput.sendKeys(p.helper.password);
 
         expect(p.findSystemButton.isEnabled()).toBe(true);
     });
 
-    // This is not working because all available systems have incompatible versions
-    it("should find system first, after that - allow to join system",function(){
+    // Fails, because request  /proxy/https/good.url/web/api/getNonce?userName=admin fails silently
+    xit("rejects attempt to merge with non-existing system", function() {
+        p.urlInput.sendKeys('http://good.url');
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.helper.checkContainsString(p.dialog, 'Connection failed: System is unreachable').then( function() {
+            p.dialog.element(by.buttonText('Close')).click();
+        });
+    });
+
+    it("rejects attempt to merge using wrong other system password", function() {
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys('wrong');
+        p.findSystemButton.click();
+        expect(p.alertDialog.getText()).toContain('Connection failed: Login or password are incorrect');
+        p.alertDialog.element(by.buttonText('Close')).click();
+    });
+
+    it("rejects attempt to merge if other system has incompatible version", function() {
+        p.urlInput.sendKeys(p.helper.incompatibleSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.helper.checkPresent(p.alertDialog).then(function() {
+            expect(p.alertDialog.getText()).toContain('Connection failed: Found system has incompatible version.');
+            p.alertDialog.element(by.buttonText('Close')).click();
+        }, function (err) {
+            console.log(err);
+            fail('No alert appeared, this must be a bug');
+        });
+    });
+    
+    it("After other system access is gained, it is possible to select another system in dropdown and Merge with it", function() {
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.currentPasswordInput.sendKeys(p.helper.password);
+
+        p.urlInput.clear()
+            .sendKeys(p.helper.incompatibleSystem);
+
+        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
+        p.mergeSystemsButton.click();
+        p.helper.checkPresent(p.alertDialog).then(function() {
+            expect(p.alertDialog.getText()).toContain('Merge failed: Found system has incompatible version.');
+            p.alertDialog.element(by.buttonText('Close')).click();
+        }, function (err) {
+            console.log(err);
+            fail('No alert appeared, this must be a bug');
+        });
+    });
+
+    it("rejects attempt to merge using wrong current system password", function() {
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.currentPasswordInput.sendKeys('wrong');
+        p.mergeSystemsButton.click();
+        p.helper.checkPresent(p.alertDialog).then(function() {
+            expect(p.alertDialog.getText()).toContain('Wrong password');
+            p.alertDialog.element(by.buttonText('Close')).click();
+        }, function (err) {
+            console.log(err);
+            fail('No alert appeared, this must be a bug');
+        });
+    });
+
+    it("Without current system password merge button is disabled", function() {
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.currentPasswordInput.clear();
+        expect(p.mergeSystemsButton.isEnabled()).toBe(false);
+    });
+
+    it("Both systems can be selected to use their name and password", function() {
+        // Connect to active system
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
+        p.currentPasswordInput.sendKeys(p.helper.password);
+
+        // Select another system
+        p.externalSystemCheckbox.click();
+        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
+        expect(p.currentSystemCheckbox.isSelected()).toBe(false);
+        expect(p.externalSystemCheckbox.isSelected()).toBe(true);
+
+        // Select our system back
+        p.currentSystemCheckbox.click();
+        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
+        expect(p.currentSystemCheckbox.isSelected()).toBe(true);
+        expect(p.externalSystemCheckbox.isSelected()).toBe(false);
+    });
+
+    it("displays Merge button, current system password and select of main system after other system access is gained",function(){
+        // Merge button and system select are not visible, before any system is discovered
         expect(p.findSystemButton.isDisplayed()).toBe(true);
         expect(p.mergeSystemsButton.isDisplayed()).toBe(false);
         expect(p.currentSystemCheckbox.isDisplayed()).toBe(false);
 
-        p.urlInput.clear();
-        p.urlInput.sendKeys("http://192.168.56.101:9000/");
-        p.passwordInput.clear();
-        p.passwordInput.sendKeys("123");
+        // Connect to active system
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click().then(null, function () {
+            fail('Button Find System is not clickable.');
+        });
 
-
-        // p.findSystemButton.click();
-
-        //1. All apeared
+        // New controls are visible now
         expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
         expect(p.currentSystemCheckbox.isDisplayed()).toBe(true);
-        expect(p.extarnalSystemCheckbox.isDisplayed()).toBe(true);
+        expect(p.currentPasswordInput.isEnabled()).toBe(true);
+        expect(p.externalSystemCheckbox.isDisplayed()).toBe(true);
 
+        p.currentPasswordInput.sendKeys(p.helper.password);
         expect(p.mergeSystemsButton.isEnabled()).toBe(true);
         expect(p.currentSystemCheckbox.isSelected()).toBe(true);
-        expect(p.extarnalSystemCheckbox.isSelected()).toBe(false);
-
-        //3. select another system
-                // browser.pause();
-
-        p.extarnalSystemCheckbox.click();
-        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
-        expect(p.currentSystemCheckbox.isSelected()).toBe(false);
-        expect(p.extarnalSystemCheckbox.isSelected()).toBe(true);
-
-        //2. select our system back
-                browser.pause();
-
-        p.currentSystemCheckbox.click();
-        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
-        expect(p.currentSystemCheckbox.isSelected()).toBe(true);
-        expect(p.extarnalSystemCheckbox.isSelected()).toBe(false);
-
+        expect(p.externalSystemCheckbox.isSelected()).toBe(false);
     });
 
-    it("should force to find system again if smth changes",function(){
-        expect("finding again").toBe("discussed");return;
-
+    it("Find system button is disabled if url input is cleared",function(){
+        p.urlInput.sendKeys(p.helper.activeSystem);
+        p.loginInput.sendKeys(p.helper.admin);
+        p.passwordInput.sendKeys(p.helper.password);
+        p.findSystemButton.click();
         p.urlInput.clear();
         expect(p.findSystemButton.isEnabled()).toBe(false);
         expect(p.mergeSystemsButton.isEnabled()).toBe(false);
         expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
-
-        p.urlInput.clear();
-        p.urlInput.sendKeys("http://192.168.56.101:9000/");
-        expect(p.findSystemButton.isEnabled()).toBe(true);
-        expect(p.mergeSystemsButton.isEnabled()).toBe(false);
-        expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
-
-        browser.pause();
-
-        p.findSystemButton.click();
-        //We found another system - flush radiobuttons
-        expect(p.findSystemButton.isEnabled()).toBe(true);
-        expect(p.mergeSystemsButton.isEnabled()).toBe(true);
-        expect(p.mergeSystemsButton.isDisplayed()).toBe(true);
     });
-
-    it("should join system",function(){
-        expect("merging systems").toBe("tested manually");
-    });
-
-
 });

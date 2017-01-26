@@ -1,6 +1,8 @@
 
 #ifdef ENABLE_ONVIF
 
+#include <set>
+
 #include "openssl/evp.h"
 
 #include "soap_wrapper.h"
@@ -23,6 +25,7 @@
 #include "core/resource/resource.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include "media_server/settings.h"
 
 namespace {
 
@@ -109,9 +112,91 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
+const int kSoapDefaultSendTimeoutSeconds = 10;
+const int kSoapDefaultRecvTimeoutSeconds = 10;
+const int kSoapDefaultConnectTimeoutSeconds = 5;
+const int kSoapDefaultAcceptTimeoutSeconds = 5;
+
+
+struct SoapTimeouts
+{
+    SoapTimeouts(): 
+        sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
+        recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
+        connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
+        acceptTimeoutSeconds(kSoapDefaultAcceptTimeoutSeconds)
+    {};
+
+    SoapTimeouts(const QString& serialized):
+        SoapTimeouts()
+    {
+        if (serialized.isEmpty())
+            return;
+
+        const int kTimeoutsCount = 4;
+
+        bool success = false;
+        auto timeouts = serialized.split(';');
+        auto paramsNum = timeouts.size();
+
+        std::vector<std::chrono::seconds*> fieldsToSet =
+        {
+            &sendTimeoutSeconds,
+            &recvTimeoutSeconds,
+            &connectTimeoutSeconds,
+            &acceptTimeoutSeconds
+        };
+
+        if (paramsNum == 1)
+        {
+            auto timeout = timeouts[0].toInt(&success);
+
+            if (!success)
+                return;
+
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+        }
+        else if (paramsNum == 4)
+        {
+            for (auto i = 0; i < kTimeoutsCount; ++i)
+            {
+                auto timeout = timeouts[i].toInt(&success);
+
+                if (!success)
+                    continue;
+
+                *(fieldsToSet[i]) = std::chrono::seconds(timeout);
+            }
+        }
+    }
+
+    QString serialize()
+    { 
+        return lit("%1;%2;%3;%4")
+            .arg(sendTimeoutSeconds.count())
+            .arg(recvTimeoutSeconds.count())
+            .arg(connectTimeoutSeconds.count())
+            .arg(acceptTimeoutSeconds.count());
+    };
+
+    std::chrono::seconds sendTimeoutSeconds;
+    std::chrono::seconds recvTimeoutSeconds;
+    std::chrono::seconds connectTimeoutSeconds;
+    std::chrono::seconds acceptTimeoutSeconds;
+};
+
+SoapTimeouts getSoapTimeouts()
+{
+    auto serializedTimeouts = MSSettings::roSettings()
+        ->value( nx_ms_conf::ONVIF_TIMEOUTS, QString()).toString();
+
+    return SoapTimeouts(serializedTimeouts);
+}
+
 /*
 int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
-{ 
+{
     _wsse__Security *security = soap_wsse_add_Security(soap);
     soap_wsse_add_UsernameTokenText(soap, id, username, password);
     security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
@@ -122,15 +207,8 @@ int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *u
 } // anonymous namespace
 
 
-
-const int SOAP_RECEIVE_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 10; // "+" in seconds, "-" in mseconds
-const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
-const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const QLatin1String DEFAULT_ONVIF_LOGIN = QLatin1String("admin");
 const QLatin1String DEFAULT_ONVIF_PASSWORD = QLatin1String("admin");
-//static const int DIGEST_TIMEOUT_SEC = 60;
-
 
 
 SOAP_NMAC struct Namespace onvifOverriddenNamespaces[] =
@@ -194,10 +272,13 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
         m_soapProxy = new T();
     else
         m_soapProxy = new T( SOAP_IO_KEEPALIVE, SOAP_IO_KEEPALIVE );
-    m_soapProxy->soap->send_timeout = SOAP_SEND_TIMEOUT;
-    m_soapProxy->soap->recv_timeout = SOAP_RECEIVE_TIMEOUT;
-    m_soapProxy->soap->connect_timeout = SOAP_CONNECT_TIMEOUT;
-    m_soapProxy->soap->accept_timeout = SOAP_ACCEPT_TIMEOUT;
+
+    auto timeouts = getSoapTimeouts();
+
+    m_soapProxy->soap->send_timeout = timeouts.sendTimeoutSeconds.count();
+    m_soapProxy->soap->recv_timeout = timeouts.recvTimeoutSeconds.count();
+    m_soapProxy->soap->connect_timeout = timeouts.connectTimeoutSeconds.count();
+    m_soapProxy->soap->accept_timeout = timeouts.acceptTimeoutSeconds.count();
 
     soap_register_plugin(m_soapProxy->soap, soap_wsse);
 
@@ -207,7 +288,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
 template <class T>
 SoapWrapper<T>::~SoapWrapper()
 {
-    if (m_invoked) 
+    if (m_invoked)
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
@@ -298,8 +379,7 @@ bool SoapWrapper<T>::isConflictError()
 // DeviceSoapWrapper
 // -------------------------------------------------------------------------- //
 DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -334,98 +414,92 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
         result.setUser(parts[0]);
         result.setPassword(parts[1]);
     }
-    
+
     return result;
+}
+
+std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
+    const QString& manufacturer,
+    const QString& model) const
+{
+    QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto credentials = resData.value<QList<QnCredentials>>(
+        Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    return credentials.toStdList();
+}
+
+QnCredentials DeviceSoapWrapper::getForcedCredentials(
+    const QString& manufacturer,
+    const QString& model)
+{
+    QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto credentials = resData.value<QnCredentials>(
+        Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+
+    return credentials;
 }
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
+    calcTimeDrift();
 
-    QAuthenticator auth = getDefaultPassword(manufacturer, model);
-    if (!auth.isNull()) {
-        setLogin(auth.user());
-        setPassword(auth.password());
+    auto forcedCredentials = getForcedCredentials(manufacturer, model);
+
+    if (!forcedCredentials.user.isEmpty())
+    {
+        setLogin(forcedCredentials.user);
+        setPassword(forcedCredentials.password.value());
         return true;
     }
 
-    calcTimeDrift();
+    std::list<QnCredentials> possibleCredentials;
+    const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
+    const auto& oldPasswords = PasswordHelper::instance()->getPasswordsByManufacturer(manufacturer);
 
-    PasswordList passwords = m_passwordsData.getPasswordsByManufacturer(manufacturer);
-    PasswordList::ConstIterator passwdIter = passwords.begin();
+    std::set<QnCredentials> oldCredentialsSet;
 
-    QString login;
-    QString passwd;
-    int soapRes = SOAP_OK;
-    do {
+    for (const auto& creds: oldPasswords)
+    {
+        QnCredentials auth(QLatin1String(creds.first), QLatin1String(creds.second));
+        oldCredentialsSet.insert(auth);
+        possibleCredentials.push_back(auth);
+    }
+
+    for (const auto& creds: credentialsFromResourceData)
+    {
+        if (!oldCredentialsSet.count(creds))
+            possibleCredentials.push_back(creds);
+    }
+
+    for (const auto& auth: possibleCredentials)
+    {
         if (QnResource::isStopping())
             return false;
 
-        QTime timer;
-        timer.restart();
+        setLogin(auth.user);
+        setPassword(auth.password.value());
 
-        setLogin(login);
-        setPassword(passwd);
+        NetIfacesReq request;
+        NetIfacesResp response;
+        auto soapRes = getNetworkInterfaces(request, response);
 
-        NetIfacesReq request1;
-        NetIfacesResp response1;
-        soapRes = getNetworkInterfaces(request1, response1);
-
-        NX_LOG( QString::fromLatin1("Trying login = '%1' password = '%2'. url=%3. time = %4)").arg(login).arg(passwd).arg(getEndpointUrl()).arg(timer.elapsed()), cl_logDEBUG2 );
-
-        if (soapRes == SOAP_OK || !isNotAuthenticated()) {
-            NX_LOG( lit("Finished picking password"), cl_logDEBUG2 );
+        if (soapRes == SOAP_OK || !isNotAuthenticated())
             return soapRes == SOAP_OK;
-        }
+    }
 
-        if (passwdIter == passwords.end()) {
-#if 0
-            //If we had no luck in picking a password, let's try to create a user
-            qDebug() << "Trying to create a user admin/admin";
-            setLogin(QString());
-            setPassword(QString());
+    if (!possibleCredentials.empty())
+    {
+        auto first = possibleCredentials.cbegin();
+        setLogin(first->user);
+        setPassword(first->password.value());
+    }
+    else
+    {
+        setLogin(QString());
+        setPassword(QString());
+    }
 
-            onvifXsd__User newUser;
-            newUser.Username = QString(DEFAULT_ONVIF_LOGIN).toStdString();
-            std::string pass = QString(DEFAULT_ONVIF_PASSWORD).toStdString();
-            newUser.Password = const_cast<std::string*>(&pass);
-
-            for (int i = 0; i <= 2; ++i) {
-                CreateUsersReq request2;
-                CreateUsersResp response2;
-
-                switch (i) {
-                    case 0: newUser.UserLevel = onvifXsd__UserLevel__Administrator; qDebug() << "Trying to create Admin"; break;
-                    case 1: newUser.UserLevel = onvifXsd__UserLevel__Operator; qDebug() << "Trying to create Operator"; break;
-                    case 2: newUser.UserLevel = onvifXsd__UserLevel__User; qDebug() << "Trying to create Regular User"; break;
-                    default: newUser.UserLevel = onvifXsd__UserLevel__Administrator; qWarning() << "OnvifResourceInformationFetcher::findResources: unknown user index."; break;
-                }
-                request2.User.push_back(&newUser);
-
-                soapRes = createUsers(request2, response2);
-                if (soapRes == SOAP_OK) {
-                    qDebug() << "User created!";
-                    setLogin(DEFAULT_ONVIF_LOGIN);
-                    setPassword(DEFAULT_ONVIF_PASSWORD);
-                    return true;
-                }
-
-                qDebug() << "User is NOT created";
-            }
-#endif
-
-            setLogin(QString());
-            setPassword(QString());
-            return false;
-        }
-
-        login = QString::fromUtf8(passwdIter->first);
-        passwd = QString::fromUtf8(passwdIter->second);
-        ++passwdIter;
-
-    } while (true);
-
-    setLogin(QString());
-    setPassword(QString());
     return false;
 }
 
@@ -540,8 +614,7 @@ int DeviceIOWrapper::setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSetti
 // MediaSoapWrapper
 // -------------------------------------------------------------------------- //
 MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 
 }
@@ -694,8 +767,7 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 // ImagingSoapWrapper
 // -------------------------------------------------------------------------- //
 ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 
@@ -721,12 +793,12 @@ int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetIm
     return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
-int ImagingSoapWrapper::getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response) 
+int ImagingSoapWrapper::getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response)
 {
     return invokeMethod(&ImagingBindingProxy::GetMoveOptions, &request, &response);
 }
 
-int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &response) 
+int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &response)
 {
     return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
 }
@@ -736,8 +808,7 @@ int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &
 // PtzSoapWrapper
 // -------------------------------------------------------------------------- //
 PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
-    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive),
-    m_passwordsData(PasswordHelper::instance())
+    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, timeDrift, tcpKeepAlive)
 {
 }
 

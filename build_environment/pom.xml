@@ -65,6 +65,24 @@
                     </execution>
                 </executions>
             </plugin>    
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-launcher-file</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo message="${release.version}.${buildNumber}" file="${launcher.version.dir}/${launcher.version.file}"/>
+								<echo message="${release.version}.${buildNumber} to ${launcher.version.dir}/${launcher.version.file}"/>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>         
         </plugins>
     </build>    
     

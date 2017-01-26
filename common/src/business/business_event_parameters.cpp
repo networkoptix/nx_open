@@ -5,7 +5,7 @@
 #include "events/abstract_business_event.h"
 
 #include <utils/common/id.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QnBusinessEventParameters::QnBusinessEventParameters():
     eventType(QnBusiness::UndefinedEvent),
@@ -45,5 +45,5 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
     return guidFromArbitraryData(paramKey);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record), QnEventMetaData_Fields, (optional, true) )
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record), QnBusinessEventParameters_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnEventMetaData)(QnBusinessEventParameters), (ubjson)(json)(eq)(xml)(csv_record), _Fields)

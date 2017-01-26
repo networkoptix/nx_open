@@ -10,7 +10,7 @@
 #include "utils/common/synctime.h"
 #include <business/business_event_connector.h>
 #include <business/business_event_parameters.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
@@ -34,7 +34,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
         }
     }
     if (params.contains("timestamp"))
-        businessParams.eventTimestampUsec = parseDateTime(params["timestamp"]);
+        businessParams.eventTimestampUsec = nx::utils::parseDateTime(params["timestamp"]);
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
     if (params.contains("state")) {

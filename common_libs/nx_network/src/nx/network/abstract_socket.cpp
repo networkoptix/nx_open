@@ -1,6 +1,7 @@
-
 #include "abstract_socket.h"
 
+#include <nx/network/aio/pollable.h>
+#include <nx/utils/thread/mutex_lock_analyzer.h>
 
 ////////////////////////////////////////////////////////////
 //// class AbstractSocket
@@ -69,8 +70,17 @@ void AbstractCommunicatingSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> han
     cancelIOAsync(nx::network::aio::EventType::etNone, std::move(handler));
 }
 
-void AbstractCommunicatingSocket::pleaseStopSync()
+void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
 {
+    #ifdef USE_OWN_MUTEX
+        if (checkForLocks)
+        {
+            const auto pollablePtr = pollable();
+            if (!pollablePtr || !pollablePtr->isInSelfAioThread())
+                MutexLockAnalyzer::instance()->expectNoLocks();
+        }
+    #endif
+
     cancelIOSync(nx::network::aio::EventType::etNone);
 }
 
@@ -96,9 +106,52 @@ void AbstractCommunicatingSocket::readAsyncAtLeastImpl(
         });
 }
 
-////////////////////////////////////////////////////////////
-//// class AbstractDatagramSocket
-////////////////////////////////////////////////////////////
+std::chrono::seconds KeepAliveOptions::maxDelay() const
+{
+    return time + interval * probeCount;
+}
+
+KeepAliveOptions::KeepAliveOptions(
+    std::chrono::seconds time, std::chrono::seconds interval, size_t probeCount)
+:
+    time(time),
+    interval(interval),
+    probeCount(probeCount)
+{
+}
+
+KeepAliveOptions::KeepAliveOptions(size_t time, size_t interval, size_t count):
+    KeepAliveOptions(std::chrono::seconds(time), std::chrono::seconds(interval), count)
+{
+}
+
+bool KeepAliveOptions::operator==(const KeepAliveOptions& rhs) const
+{
+    return time == rhs.time && interval == rhs.interval && probeCount == rhs.probeCount;
+}
+
+QString KeepAliveOptions::toString() const
+{
+    // TODO: Use JSON serrialization instead?
+    return lm("{ %1, %2, %3 }").arg(time.count()).arg(interval.count()).arg(probeCount);
+}
+
+boost::optional<KeepAliveOptions> KeepAliveOptions::fromString(const QString& string)
+{
+    QStringRef stringRef(&string);
+    if (stringRef.startsWith(QLatin1String("{")) && stringRef.endsWith(QLatin1String("}")))
+        stringRef = stringRef.mid(1, stringRef.length() - 2);
+
+    const auto split = stringRef.split(QLatin1String(","));
+    if (split.size() != 3)
+        return boost::none;
+
+    KeepAliveOptions options;
+    options.time = std::chrono::seconds((size_t) split[0].trimmed().toUInt());
+    options.interval = std::chrono::seconds((size_t) split[1].trimmed().toUInt());
+    options.probeCount = (size_t) split[2].trimmed().toUInt();
+    return options;
+}
 
 bool AbstractDatagramSocket::setDestAddr(
     const QString& foreignAddress,

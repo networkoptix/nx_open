@@ -23,7 +23,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     char* host = 0;
     getMacFromPrimaryIF(mac, &host);
 
-    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX)) 
+    if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
     {
         QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (ownServer && !ownServer->isRedundancy()) {
@@ -50,11 +50,11 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
             if (camRes->hasFlags(Qn::desktop_camera) && camRes->isReadyToDetach())
                 return QByteArray(); // do not block desktop cameras that are ready to detach
 
-            if (camRes->preferedServerId() == qnCommon->moduleGUID())
+            if (camRes->preferredServerId() == qnCommon->moduleGUID())
                 return qnCommon->moduleGUID().toRfc4122(); // block
             QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());
             if (mServer && mServer->getStatus() == Qn::Online)
-                return qnCommon->moduleGUID().toRfc4122(); // block
+                return mServer->getId().toRfc4122(); // block
         }
     }
     else if (name.startsWith(CAM_HISTORY_PREFIX))
@@ -65,7 +65,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
                 return qnCommon->moduleGUID().toRfc4122(); // block
         }
     }
-        
+
     return QByteArray();
 }
 

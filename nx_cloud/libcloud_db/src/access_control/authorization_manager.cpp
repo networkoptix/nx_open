@@ -5,7 +5,7 @@
 
 #include "authorization_manager.h"
 
-#include <utils/serialization/lexical.h>
+#include <nx/fusion/serialization/lexical.h>
 
 #include "managers/account_manager.h"
 #include "managers/system_manager.h"
@@ -40,8 +40,8 @@ bool AuthorizationManager::authorize(
     const auto authenticatedAccountEmail = 
         authenticationProperties.get<std::string>(attr::authAccountEmail);
     const auto authenticatedSystemID =
-        authenticationProperties.get<std::string>(attr::authSystemID);
-    const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemID);
+        authenticationProperties.get<std::string>(attr::authSystemId);
+    const auto requestedSystemID = dataToAuthorize.get<std::string>(attr::systemId);
     stree::ResourceContainer auxSearchAttrs;
     if (authenticatedAccountEmail)
     {
@@ -92,16 +92,18 @@ bool AuthorizationManager::authorize(
     auxSearchAttrs.put(attr::entity, QnLexical::serialized(requestedEntity));
     auxSearchAttrs.put(attr::action, QnLexical::serialized(requestedAction));
 
-    stree::ResourceWriterProxy<bool> resProxy(authzInfo, attr::authorized);
+    stree::ResourceContainer additionalResourceContainer;
+    stree::ResourceWriterProxy resProxy(authzInfo, &additionalResourceContainer);
     m_stree.search(
         StreeOperation::authorization,
         stree::MultiSourceResourceReader(
             authenticationProperties,
             dataToAuthorize,
-            auxSearchAttrs),
+            auxSearchAttrs,
+            additionalResourceContainer),
         &resProxy);
 
-    if (auto authorized = resProxy.take())
+    if (auto authorized = additionalResourceContainer.get<bool>(attr::authorized))
         return authorized.get();
     //no "autorized" attr has been set. This is actually error in authorization rules xml
     NX_ASSERT(false);

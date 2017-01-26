@@ -39,7 +39,12 @@ public:
     virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
-    int copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq);
+    int copyLastGopFromCamera(
+        QnVideoCameraPtr camera, 
+        bool usePrimaryStream, 
+        qint64 skipTime, 
+        quint32 cseq,
+        bool iFramesOnly);
     QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
 
@@ -64,7 +69,7 @@ public:
     void setAllowAdaptiveStreaming(bool value);
     void setResource(const QnResourcePtr& resource);
 protected:
-    //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
+    //QnMediaContextPtr getGeneratedContext(AVCodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     void createDataPacketTCP(QnByteArray& sendBuffer, const QnAbstractMediaDataPtr& media, int rtpTcpChannel);
@@ -76,12 +81,16 @@ protected:
     void setLiveQualityInternal(MediaQuality quality);
     qint64 dataQueueDuration();
     void sendMetadata(const QByteArray& metadata);
-    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
+    void getEdgePackets(
+        const QnDataPacketQueue::RandomAccess& unsafeQueue,
+        qint64& firstVTime,
+        qint64& lastVTime,
+        bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
-    void cleanupQueueToPos(int lastIndex, int ch);
+    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
 private:
-    //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+    //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
@@ -116,7 +125,7 @@ private:
     QnAdaptiveSleep m_adaptiveSleep;
     bool m_useUTCTime; // use absolute UTC file for RTP (used for proprietary format)
     int m_fastChannelZappingSize;
-    
+
     qint64 m_firstLiveTime;
     qint64 m_lastLiveTime;
     QElapsedTimer m_liveTimer;
@@ -131,7 +140,7 @@ private:
     int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
-    int m_videoChannels;
+    quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

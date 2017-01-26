@@ -1,26 +1,64 @@
-/**********************************************************
-* Jan 13, 2016
-* akolesnikov
-***********************************************************/
-
 #include "listen_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-void ListenRequest::serialize(nx::stun::Message* const message)
+ListenRequest::ListenRequest():
+    StunRequestData(kMethod),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
 {
-    message->newAttribute<stun::cc::attrs::SystemId>(systemId);
-    message->newAttribute<stun::cc::attrs::ServerId>(serverId);
 }
 
-bool ListenRequest::parse(const nx::stun::Message& message)
+void ListenRequest::serializeAttributes(nx::stun::Message* const message)
 {
-    return 
-        readStringAttributeValue<stun::cc::attrs::SystemId>(message, &systemId) &&
-        readStringAttributeValue<stun::cc::attrs::ServerId>(message, &serverId);
+    message->newAttribute<stun::extension::attrs::SystemId>(systemId);
+    message->newAttribute<stun::extension::attrs::ServerId>(serverId);
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+}
+
+bool ListenRequest::parseAttributes(const nx::stun::Message& message)
+{
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
+
+    return
+        readStringAttributeValue<stun::extension::attrs::SystemId>(message, &systemId) &&
+        readStringAttributeValue<stun::extension::attrs::ServerId>(message, &serverId);
+}
+
+ListenResponse::ListenResponse():
+    StunResponseData(kMethod),
+    cloudConnectVersion(kCurrentCloudConnectVersion)
+{
+}
+
+typedef stun::extension::attrs::StringAttribute<stun::extension::attrs::tcpConnectionKeepAlive> TcpKeepAlive;
+
+void ListenResponse::serializeAttributes(nx::stun::Message* const message)
+{
+    if (tcpConnectionKeepAlive)
+        message->newAttribute<TcpKeepAlive>(tcpConnectionKeepAlive->toString().toUtf8());
+    message->addAttribute(stun::extension::attrs::cloudConnectVersion, (int)cloudConnectVersion);
+}
+
+bool ListenResponse::parseAttributes(const nx::stun::Message& message)
+{
+    nx::String keepAliveOptions;
+    if (readStringAttributeValue<TcpKeepAlive>(message, &keepAliveOptions))
+    {
+        tcpConnectionKeepAlive = KeepAliveOptions::fromString(QString::fromUtf8(keepAliveOptions));
+        return (bool)tcpConnectionKeepAlive; //< Empty means parsing has failed.
+    }
+    else
+    {
+        tcpConnectionKeepAlive = boost::none;
+    }
+
+    if (!readEnumAttributeValue(message, stun::extension::attrs::cloudConnectVersion, &cloudConnectVersion))
+        cloudConnectVersion = kDefaultCloudConnectVersion; //< If not present - old version.
+
+    return true;
 }
 
 } // namespace api

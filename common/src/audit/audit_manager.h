@@ -2,6 +2,7 @@
 #define __AUDIT_MANAGER_H__
 
 #include <atomic>
+#include <deque>
 
 #include <QTimer>
 #include <QElapsedTimer>
@@ -12,8 +13,11 @@
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
+#include <nx/utils/singleton.h>
 
-class QnAuditManager: public QObject
+class QnAuditManager:
+    public QObject,
+    public Singleton<QnAuditManager>
 {
     Q_OBJECT
 public:
@@ -24,7 +28,6 @@ public:
 
     QnAuditManager();
 
-    static QnAuditManager* instance();
 public:
     static QnAuditRecord prepareRecord(const QnAuthSession& authInfo, Qn::AuditRecordType recordType);
 
@@ -52,6 +55,7 @@ private slots:
     void at_timer();
 private:
     int registerNewConnection(const QnAuthSession &data, bool explicitCall);
+    bool hasSimilarRecentlyRecord(const QnAuditRecord& data) const;
 
     struct AuditConnection
     {
@@ -100,6 +104,7 @@ private:
     QTimer m_timer;
     std::atomic<bool> m_enabled;
     QElapsedTimer m_sessionCleanupTimer;
+    std::deque<QnAuditRecord> m_recentlyAddedRecords;
 private:
     bool canJoinRecords(const QnAuditRecord& left, const QnAuditRecord& right);
     void cleanupExpiredSessions();

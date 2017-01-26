@@ -29,12 +29,8 @@ namespace
 
 namespace ite
 {
-    INIT_OBJECT_COUNTER(MediaEncoder)
-    DEFAULT_REF_COUNTER(MediaEncoder)
-
     MediaEncoder::MediaEncoder(CameraManager * const cameraManager, int encoderNumber)
-    :   m_refManager(this),
-        m_cameraManager(cameraManager),
+    :   m_cameraManager(cameraManager),
         m_encoderNumber(encoderNumber)
     {
     }
@@ -77,6 +73,10 @@ namespace ite
     int MediaEncoder::getResolutionList(nxcip::ResolutionInfo * infoList, int * infoListCount) const
     {
         nxcip::ResolutionInfo res;
+
+        std::lock_guard<std::mutex> lock(m_cameraManager->get_mutex());
+        if (!m_cameraManager->rxDeviceRef())
+            return nxcip::NX_NO_DATA;
 
         std::shared_ptr<RxDevice> rxDev = m_cameraManager->rxDevice().lock();
         if (rxDev)
@@ -124,7 +124,15 @@ namespace ite
 
     nxcip::StreamReader * MediaEncoder::getLiveStreamReader()
     {
+        std::lock_guard<std::mutex> lock(m_cameraManager->get_mutex());
+        if (!m_cameraManager->rxDeviceRef())
+            return nullptr;
+
         StreamReader * stream = new StreamReader(m_cameraManager, m_encoderNumber);
+
+        debug_printf(
+            "[MediaEncoder::getLiveStreamReader] trying to get a stream reader from Rx DONE!\n");
+
         return stream;
     }
 
@@ -133,31 +141,56 @@ namespace ite
         if (!config)
             return nxcip::NX_INVALID_PARAM_VALUE;
 
+        std::unique_lock<std::mutex> lock(m_cameraManager->get_mutex());
+        if (!m_cameraManager->rxDeviceRef() || !m_cameraManager->rxDeviceRef()->deviceReady())
+            return nxcip::NX_NO_DATA;
+
         *ppStream = nullptr;
         RxDevicePtr rxDev = m_cameraManager->rxDevice().lock();
-        if (! rxDev)
+
+        debug_printf(
+            "[MediaEncoder::getConfiguredLiveStreamReader] trying to get a stream reader from Rx %d\n",
+            rxDev->rxID()
+        );
+
+        if (!rxDev || !rxDev->deviceReady())
             return nxcip::NX_OTHER_ERROR;
 
-        // config in a first arrived stream, another is locked
-        if (! rxDev->configureTx(m_encoderNumber)) // delay inside
-            return nxcip::NX_TRY_AGAIN;
-
-        nxcip::LiveStreamConfig curConfig;
-        memset(&curConfig, 0, sizeof(nxcip::LiveStreamConfig));
-        //curConfig.codec = nxcip::CODEC_ID_H264;
-
-        if (! rxDev->getEncoderParams(m_encoderNumber, curConfig))
-            return nxcip::NX_TRY_AGAIN;
-
-        validate(*config, curConfig);
-
-        if (curConfig.framerate != config->framerate ||
-            curConfig.bitrateKbps != config->bitrateKbps)
+#if 0 // Open the stream any case (non-configured).
+        // config in first arrived stream, another is locked
+        if (rxDev->configureTx()) // delay inside
         {
-            if (! rxDev->setEncoderParams(m_encoderNumber, *config))
-                return nxcip::NX_INVALID_PARAM_VALUE;
-        }
+            debug_printf(
+                "[MediaEncoder::getConfiguredLiveStreamReader] Rx: %d. Tx configured successfully\n",
+                rxDev->rxID()
+            );
 
+            nxcip::LiveStreamConfig curConfig;
+            memset(&curConfig, 0, sizeof(nxcip::LiveStreamConfig));
+            //curConfig.codec = nxcip::CODEC_ID_H264;
+
+            if (! rxDev->getEncoderParams(m_encoderNumber, curConfig))
+                return nxcip::NX_TRY_AGAIN;
+
+            validate(*config, curConfig);
+
+            debug_printf(
+                "[MediaEncoder::getConfiguredLiveStreamReader] Rx: %d. setting encoder params\n",
+                rxDev->rxID()
+            );
+
+            if (curConfig.framerate != config->framerate ||
+                curConfig.bitrateKbps != config->bitrateKbps)
+            {
+                if (! rxDev->setEncoderParams(m_encoderNumber, *config))
+                    return nxcip::NX_INVALID_PARAM_VALUE;
+            }
+        }
+        else
+            return nxcip::NX_TRY_AGAIN;
+#endif
+
+        lock.unlock();
         *ppStream = getLiveStreamReader();
         if (*ppStream == nullptr)
             return nxcip::NX_OTHER_ERROR;

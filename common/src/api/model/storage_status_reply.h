@@ -6,8 +6,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/id.h>
+#include <common/common_globals.h>
 
 struct QnStorageSpaceData {
     QString url;
@@ -30,11 +31,12 @@ struct QnStorageSpaceData {
 struct QnStorageStatusReply {
     bool pluginExists;
     QnStorageSpaceData storage;
+    Qn::StorageInitResult status;
 
     QnStorageStatusReply();
 };
 
-#define QnStorageStatusReply_Fields (pluginExists)(storage)
+#define QnStorageStatusReply_Fields (pluginExists)(storage)(status)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageSpaceData, (eq)(metatype))
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(metatype))

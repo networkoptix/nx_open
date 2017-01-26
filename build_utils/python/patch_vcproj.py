@@ -16,6 +16,8 @@ namespaces_dict = {'ms' : ms_namespace}
 
 parent_map = {}
 arch = 'x64'
+qt_default_path = '%ENVIRONMENT%\\packages\\windows-{0}\\qt-5.6.0'
+qt_path = ''
 
 def indent(elem, level=0):
     i = "\n" + level*"  "
@@ -36,7 +38,7 @@ def add_prebuild_events(root):
     """
     <Target Name="BeforeClean">
         <Message Text="Cleaning moc generated files"/>
-        <Exec Command="del \$\(ProjectDir\)..\\\$\(Platform\)\\build\\${arch}\\generated\\moc_*.* /F /Q" />
+        <Exec Command="del \$\(ProjectDir\)..\\\${arch}\\build\\$\(Configuration\)\\generated\\moc_*.* /F /Q" />
     </Target>    
     <ItemDefinitionGroup>
         <Link>
@@ -50,9 +52,9 @@ def add_prebuild_events(root):
     print "Adding custom header with pre-build steps"
        
     target = Element('Target', {'Name': 'BeforeClean'})
-    root.insert(0, target)   
+    root.append(target)   
     target.append(Element('Message', {'Text': 'Cleaning moc generated files'}))
-    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\$(Platform)\\build\\{0}\\generated\\moc_*.* /F /Q'.format(arch)}))
+    target.append(Element('Exec', {'Command': 'del $(ProjectDir)..\\{0}\\build\\$(Configuration)\\generated\\moc_*.* /F /Q'.format(arch)}))
     indent(target, 1)
     
     group = Element('ItemDefinitionGroup')
@@ -86,10 +88,28 @@ def fix_mocables(root):
         return
 
     print "Removing moc custom build steps"
-    nodesToRemove = [parent_map[node] for node in nodes]
-    for itemGroupNode in nodesToRemove:
-        root.remove(itemGroupNode)        
-
+    for node in nodes:
+        include = node.attrib
+        itemGroupNode = parent_map[node]
+        itemGroupNode.remove(node)
+        itemGroupNode.append(Element('ClInclude', include))
+        indent(itemGroupNode, 1)
+            
+def enable_fastlink(root):
+    """Set GenerateDebugInformation to DebugFastLink for debug build"""
+    kFastLink = 'DebugFastLink'
+    xpath = "./ms:ItemDefinitionGroup/ms:Link/ms:GenerateDebugInformation"
+    debugInfoNodes = root.findall(xpath, namespaces_dict)
+    nodes = [node for node in debugInfoNodes if node.text.lower() == 'true']
+    if len(nodes) < 1:
+        return
+        
+    print "Enabling FastLink"  
+    for node in nodes:
+        defGroup = parent_map[parent_map[node]]
+        if 'debug' in defGroup.get('Condition').lower():
+            node.text = kFastLink
+            
 def fix_qrc(root):
     """Removing additional inputs from qrc, since we rebuild it manually."""
     #xpath = "./Project/ItemGroup/CustomBuild[contains(@Include,'.qrc')]/AdditionalInputs"
@@ -110,6 +130,38 @@ def fix_qrc(root):
             allowed = [f for f in files if not f.endswith('.png') and not f.endswith('.ico') and not f.endswith('.qm')]
             inputNode.text = ';'.join(allowed)
 
+def add_qt_path(root):
+    """Adding runtime path to QT libs."""
+    #xpath = "./Project/PropertyGroup"
+   
+    print "Adding path to QT libs: {}".format(qt_path)
+    target = Element('PropertyGroup')
+    root.insert(3, target)
+    
+    env = Element('LocalDebuggerEnvironment')
+    env.text= 'PATH={0}\\bin$(LocalDebuggerEnvironment)'.format(qt_path)
+    target.append(env)
+    indent(target, 1)
+    
+def ignore_link_4221(root):
+    """Adding librarian additional parameter to ignore this warning."""
+    #xpath = "./Project/ItemDefinitionGroup/Lib/AdditionalOptions"
+    
+    print "Suppress linker 4221 message"
+    xpath = "./ms:ItemDefinitionGroup/ms:Lib"
+    nodes = root.findall(xpath, namespaces_dict)
+    for node in nodes:
+        existing = node.findall("./ms:AdditionalOptions", namespaces_dict)
+        if existing:
+            for e in existing:
+                e.text = '/ignore:4221 ' + e.text
+        else:  
+            target = Element('AdditionalOptions')
+            target.text = '/ignore:4221 %(AdditionalOptions)'
+            node.append(target)
+        indent(node, 2)
+       
+            
 def patch_project(project):
     print "Patching {0}...".format(project)
     tree = ET.parse(project)
@@ -121,17 +173,27 @@ def patch_project(project):
     fix_qrc(root)
     fix_mocables(root)
     add_prebuild_events(root)
+    add_qt_path(root)
+    enable_fastlink(root)
+    ignore_link_4221(root)
     tree.write(project, encoding="utf-8", xml_declaration=True)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('project', type=str, help='Project to be patched.')
     parser.add_argument('-a', '--arch', help='Target architecture.')
+    parser.add_argument('-q', '--qt-dir', help='Path to Qt.')
     args = parser.parse_args()
     
     if args.arch:
         global arch
         arch = args.arch
+    
+    global qt_path
+    if args.qt_dir:
+        qt_path = args.qt_dir.replace('/', '\\')
+    else:
+        qt_path = qt_default_path.format(arch)
     
     patch_project(args.project)
 

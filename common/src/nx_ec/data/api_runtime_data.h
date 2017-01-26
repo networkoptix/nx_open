@@ -5,10 +5,21 @@
 #include "api_data.h"
 #include "api_peer_data.h"
 #include "api_routing_data.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2
 {
+    enum RuntimeFlag
+    {
+        RF_None = 0x000,
+        RF_MasterCloudSync = 0x0001 /**< Sync transactions with cloud */
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RuntimeFlag)
+    Q_DECLARE_FLAGS(RuntimeFlags, RuntimeFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(RuntimeFlags)
+
+
     /**
     * This structure contains all runtime data per peer. Runtime data is absent in a DB.
     */
@@ -23,10 +34,13 @@ namespace ec2
             ApiDataWithVersion(),
             prematureLicenseExperationDate(0),
             serverTimePriority(0),
-            updateStarted(false)
+            updateStarted(false),
+            flags(RF_None)
+
         {}
 
-        /* This operator must not be replaced with fusion implementation as is skips brand checking */
+        /* This operator must not be replaced with fusion implementation as is skips brand
+         * and customization checking */
         bool operator==(const ApiRuntimeData& other) const {
             return version == other.version &&
                    peer == other.peer &&
@@ -37,12 +51,12 @@ namespace ec2
                    videoWallControlSession == other.videoWallControlSession &&
                    serverTimePriority == other.serverTimePriority &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate &&
-                   mainHardwareIds == other.mainHardwareIds &&
-                   compatibleHardwareIds == other.compatibleHardwareIds &&
+                   hardwareIds == other.hardwareIds &&
                    updateStarted == other.updateStarted &&
                    nx1mac == other.nx1mac &&
                    nx1serial == other.nx1serial &&
-                   userId == other.userId;
+                   userId == other.userId &&
+                   flags == other.flags;
         }
 
         ApiPeerData peer;
@@ -50,6 +64,7 @@ namespace ec2
         QString platform;
         QString box;
         QString brand;
+        QString customization;
         QString publicIP;
         qint64 prematureLicenseExperationDate;
 
@@ -62,8 +77,7 @@ namespace ec2
         /** Priority of this peer as the time synchronization server. */
         quint64 serverTimePriority;
 
-        QVector<QString> mainHardwareIds;
-        QVector<QString> compatibleHardwareIds;
+        QVector<QString> hardwareIds;
 
         QString nx1mac;
         QString nx1serial;
@@ -72,16 +86,23 @@ namespace ec2
 
         /** Id of the user, under which peer is logged in (for client peers only) */
         QnUuid userId;
+
+        RuntimeFlags flags;
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)(nx1mac)(nx1serial)\
-                                                        (userId)
+                                                        (hardwareIds)(updateStarted)(nx1mac)(nx1serial)\
+                                                        (userId)(flags)(customization)
 
 
 } // namespace ec2
 
 Q_DECLARE_METATYPE(ec2::ApiRuntimeData);
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (ec2::RuntimeFlag)(ec2::RuntimeFlags),
+    (metatype)(numeric)
+)
 
 #endif // __API_RUNTIME_DATA_H_

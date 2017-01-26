@@ -4,6 +4,7 @@
 #include "utils/common/long_runnable.h"
 #include "media_server/media_server_module.h"
 #include "core/multicast/multicast_http_client.h"
+#include "nx/network/socket_global.h"
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -12,6 +13,8 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 #include "media_server/serverutil.h"
+#include "../utils.h"
+#include "mediaserver_launcher.h"
 
 namespace
 {
@@ -39,9 +42,9 @@ public:
         StateStopping
     };
 
-    MulticastHttpTestWorker(MediaServerProcess& processor): 
+    MulticastHttpTestWorker(MediaServerLauncher& launcher):
         m_client("Server Unit Tests"),
-        m_processor(processor),
+        m_launcher(launcher),
         m_processorStarted(false),
         m_state(StateSingleTest),
         m_requests(0),
@@ -49,7 +52,7 @@ public:
         newPassword(lit("0")),
         oldPassword(lit("admin"))
     {
-        connect(&processor, &MediaServerProcess::started, this, [this]() { m_processorStarted = true; } );
+        connect(&launcher, &MediaServerLauncher::started, this, [this]() { m_processorStarted = true; } );
     }
 
     void setState(State value)
@@ -136,7 +139,7 @@ public:
         m_runningRequestId = QUuid();
         if (++m_requests == 5)
             setState(StateParralelTest);
-        else 
+        else
         {
             QnMulticast::Request request;
             request.method = lit("GET");
@@ -146,14 +149,14 @@ public:
             request.auth.setPassword(lit("12345"));
             using namespace std::placeholders;
             m_runningRequestId = m_client.execRequest(
-                request, 
+                request,
                 std::bind(
                     &MulticastHttpTestWorker::callbackTimeout,
                     this,
                     std::placeholders::_1,
                     std::placeholders::_2,
                     std::placeholders::_3
-                ), 
+                ),
                 50
             );
         }
@@ -171,14 +174,14 @@ public:
 
         using namespace std::placeholders;
         m_runningRequestId = m_client.execRequest(
-            request, 
+            request,
             std::bind(
                 &MulticastHttpTestWorker::callbackTimeout,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2,
                 std::placeholders::_3
-            ), 
+            ),
             50
         );
     }
@@ -191,7 +194,7 @@ public:
         request.url = QUrl(lit("api/configure?password=%1&oldPassword=%2").arg(newPassword).arg(oldPassword));
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(oldPassword);
-        
+
         auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
         {
             m_runningRequestId = QUuid();
@@ -202,10 +205,10 @@ public:
             QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
             ASSERT_TRUE(!d.isEmpty());
             oldPassword = newPassword;
-            if (++m_requests == MT_REQUESTS) 
+            if (++m_requests == MT_REQUESTS)
             {
                 ASSERT_EQ(m_firstRequest, MT_REQUESTS);
-                m_processor.stopAsync();
+                m_launcher.stopAsync();
                 setState(StateStopping);
             }
             newPassword = QString::number(m_requests);
@@ -241,10 +244,9 @@ public:
                     ++m_firstRequest;
                 ++m_requests;
                 qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
-                if (m_requests == MT_REQUESTS * 2) 
+                if (m_requests == MT_REQUESTS * 2)
                 {
                     ASSERT_EQ(m_firstRequest, MT_REQUESTS);
-                    //m_processor.stopAsync();
                     m_requests = 0;
                     setState(StatePasswordlTest);
                 }
@@ -259,12 +261,12 @@ public:
     {
         if (!m_processorStarted)
             return;
-        if (m_processor.getTcpPort() == 0)
+        if (m_launcher.apiUrl().port() == 0)
             return; // wait for TCP listener will start
 
         if (!m_runningRequestId.isNull())
             return;
-        
+
         if (m_state == StateSingleTest)
             doSingleTest();
         else if (m_state == StateAuthTest)
@@ -276,10 +278,11 @@ public:
         else if (m_state == StatePasswordlTest)
             doPasswordTest();
     }
+
 private:
     QnMulticast::HTTPClient m_client;
     QUuid m_runningRequestId;
-    MediaServerProcess& m_processor;
+    MediaServerLauncher& m_launcher;
     bool m_processorStarted;
     State m_state;
     int m_requests;
@@ -290,31 +293,17 @@ private:
 
 TEST(MulticastHttpTest, main)
 {
-    //QApplication::instance()->args();
-    int argc = 2;
-    char* argv[] = {"", "-e" };
+    nx::network::SocketGlobalsHolder::instance()->reinitialize(false);
 
-    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
-    QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
-    MSSettings::roSettings()->setValue(lit("serverGuid"), QnUuid::createUuid().toString());
-    MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
-    QString dbDir = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory())).toString();
-    QFile::remove(dbDir + lit("mserver.sqlite"));
-    QFile::remove(dbDir + lit("ecs.sqlite"));
-    QFile::remove(dbDir + lit("ecs.sqlite-shm"));
-    QFile::remove(dbDir + lit("ecs.sqlite-wal"));
-    QFile::remove(dbDir + lit("ecs_static.sqlite"));
-    MSSettings::roSettings()->setValue(lit("systemName"), QnUuid::createUuid().toString()); // random value
-    MSSettings::roSettings()->setValue(lit("port"), 0);
-    MediaServerProcess mserverProcessor(argc, argv);
+
+    MediaServerLauncher launcher;
 
     QTimer timer;
-    MulticastHttpTestWorker worker(mserverProcessor);
+    MulticastHttpTestWorker worker(launcher);
     QObject::connect(&timer, &QTimer::timeout, &worker, &MulticastHttpTestWorker::at_timer);
     timer.start(100);
 
-    mserverProcessor.run();
+    launcher.run();
 
     ASSERT_TRUE(1);
 }

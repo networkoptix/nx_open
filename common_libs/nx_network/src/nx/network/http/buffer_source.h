@@ -18,14 +18,20 @@ namespace nx_http
     public:
         BufferSource(
             StringType mimeType,
-            BufferType msgBody );
+            BufferType msgBody);
+        ~BufferSource();
+
+        virtual void stopWhileInAioThread() override;
 
         //!Implementation of AbstractMsgBodySource::mimeType
         virtual StringType mimeType() const override;
         //!Implementation of AbstractMsgBodySource::contentLength
         virtual boost::optional<uint64_t> contentLength() const override;
         //!Implementation of AbstractMsgBodySource::readAsync
-        virtual bool readAsync( std::function<void( SystemError::ErrorCode, BufferType )> completionHandler ) override;
+        virtual void readAsync(
+            nx::utils::MoveOnlyFunc<
+                void(SystemError::ErrorCode, BufferType)
+            > completionHandler) override;
 
     private:
         const StringType m_mimeType;

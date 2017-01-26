@@ -1,36 +1,45 @@
-/**********************************************************
-* Feb 11, 2016
-* akolesnikov
-***********************************************************/
-
 #include "udp_hole_punching_connection_initiation_data.h"
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-void UdpHolePunchingSyn::serialize(nx::stun::Message* const message)
+constexpr const stun::extension::methods::Value UdpHolePunchingSynRequest::kMethod;
+
+UdpHolePunchingSynRequest::UdpHolePunchingSynRequest():
+    StunRequestData(kMethod)
 {
 }
 
-bool UdpHolePunchingSyn::parse(const nx::stun::Message& message)
+void UdpHolePunchingSynRequest::serializeAttributes(nx::stun::Message* const /*message*/)
+{
+}
+
+bool UdpHolePunchingSynRequest::parseAttributes(const nx::stun::Message& /*message*/)
 {
     return true;
 }
 
-void UdpHolePunchingSynAck::serialize(nx::stun::Message* const message)
+
+constexpr const stun::extension::methods::Value UdpHolePunchingSynResponse::kMethod;
+
+UdpHolePunchingSynResponse::UdpHolePunchingSynResponse():
+    StunResponseData(kMethod)
 {
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionId);
 }
 
-bool UdpHolePunchingSynAck::parse(const nx::stun::Message& message)
+void UdpHolePunchingSynResponse::serializeAttributes(nx::stun::Message* const message)
 {
-    return readStringAttributeValue<stun::cc::attrs::ConnectionId>(
+    message->newAttribute<stun::extension::attrs::ConnectionId>(connectSessionId);
+}
+
+bool UdpHolePunchingSynResponse::parseAttributes(const nx::stun::Message& message)
+{
+    return readStringAttributeValue<stun::extension::attrs::ConnectionId>(
         message,
         &connectSessionId);
 }
 
-}   //api
-}   //hpm
-}   //nx
+} // namespace api
+} // namespace hpm
+} // namespace nx

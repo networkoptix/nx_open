@@ -1,12 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
-
     <parent>
         <artifactId>common_libs</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -25,13 +17,33 @@
         <guid>${nx_media.guid}</guid>
         <product.title>${company.name} nx_media</product.title>
 
-        <qt.libs>core gui multimedia opengl multimedia-private</qt.libs>
-        <global.libs>-lcommon</global.libs>
+        <qt.libs>core gui multimedia multimedia-private</qt.libs>
+        <global.libs>-lcommon -lnx_streaming</global.libs>
 
         <rdep.packages>ffmpeg</rdep.packages>
         <rdep.android.packages>libjpeg-turbo</rdep.android.packages>
         <rdep.ios.packages>libjpeg-turbo</rdep.ios.packages>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
@@ -40,9 +52,10 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
+                <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
             </properties>
         </profile>
 
@@ -51,12 +64,12 @@
             <activation>
                 <os>
                     <family>unix</family>
-                </os> 
-            </activation>            
+                </os>
+            </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>  
+        </profile>
 
         <profile>
             <id>mobile-android</id>
@@ -69,19 +82,6 @@
             </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-        <profile>
-            <id>mobile-ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>ios</value>
-                </property>
-            </activation>
-            <properties>
-                <ios.defines>DISABLE_FFMPEG</ios.defines>
             </properties>
         </profile>
         <profile>
@@ -98,9 +98,10 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
+                <linux.defines>ENABLE_PROXY_DECODER</linux.defines>
+                <rdep.linux.packages>quazip opengl-es-mali proxy-decoder</rdep.linux.packages>
             </properties>
         </profile>
-    </profiles> 
+    </profiles>
 
 </project>

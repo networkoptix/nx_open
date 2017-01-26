@@ -110,10 +110,10 @@ void QnIpRangeCheckerAsync::onDone( nx_http::AsyncHttpClientPtr httpClient )
 
     std::set<nx_http::AsyncHttpClientPtr>::iterator it = m_socketsBeingScanned.find( httpClient );
     NX_ASSERT( it != m_socketsBeingScanned.end() );
-    if( httpClient->totalBytesRead() > 0 )
+    if( httpClient->bytesRead() > 0 )
         m_openedIPs.push_back( httpClient->url().host() );
 
-    httpClient->terminate();
+    httpClient->pleaseStopSync();
     m_socketsBeingScanned.erase( it );
 
     launchHostCheck();

@@ -3,7 +3,7 @@
 #include <cassert>
 
 #include <utils/math/math.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "ptz_math.h"
 

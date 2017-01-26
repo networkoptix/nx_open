@@ -12,6 +12,7 @@
 
 #include <QCryptographicHash>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/random.h>
 
 
 namespace 
@@ -32,7 +33,7 @@ QByteArray generateSalt( int length )
     QByteArray salt;
     salt.resize( length );
     for( int i = 0; i < length; ++i )
-        salt[i] = BASE64[rand() % (sizeof(BASE64)/sizeof(*BASE64) - 1)];
+        salt[i] = BASE64[nx::utils::random::number() % (sizeof(BASE64)/sizeof(*BASE64) - 1)];
 
     return salt;
 }

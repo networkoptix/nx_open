@@ -1,12 +1,14 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 
 import os
+import posixpath
 import rdep_dependencies
 import platform_detection
 
 #TODO: This needs a better place
 DEPENDENCY_VERSIONS = {
     "qt": "${qt.version}",
+    "gcc": "${gcc.version}",
     "gtest": "${gtest.version}",
     "gmock": "${gmock.version}",
     "ffmpeg": "${ffmpeg.version}",
@@ -35,10 +37,14 @@ def get_package_version(package):
     return version
 
 def get_versioned_package_name(package):
-    version = get_package_version(package)
-    if version:
-        return package + "-" + version
-    return package
+    result = []
+    for pack in package.split('|'):
+        target, pack = posixpath.split(pack)
+        version = get_package_version(pack)
+        if version:
+            pack += "-" + version
+        result.append(posixpath.join(target, pack) if target else pack)
+    return "|".join(result)
 
 def get_packages(target):
     packages = """${rdep.global.packages} ${rdep.packages}"""
@@ -49,7 +55,7 @@ def get_packages(target):
         packages += """ ${rdep.windows.packages}"""
     elif target_platform == "linux":
         packages += """ ${rdep.linux.packages}"""
-        if target in [ "bpi", "rpi", "isd", "isd_s2" ]:
+        if target in [ "bpi", "rpi", "isd", "isd_s2", "tx1" ]:
             packages += """ ${rdep.linux.arm.packages}"""
     elif target_platform == "macosx":
         packages += """ ${rdep.mac.packages}"""
@@ -67,8 +73,6 @@ if __name__ == '__main__':
     target = "${rdep.target}"
     debug = "${build.configuration}" == "debug"
     target_dir = "${libdir}"
-    if "windows" in "${platform}":
-        target_dir = os.path.join(target_dir, "${arch}")
     packages = get_packages(target)
 
     print "------------------------------------------------------------------------"

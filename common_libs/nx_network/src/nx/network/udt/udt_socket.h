@@ -6,7 +6,7 @@
 #include "../abstract_socket.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
-#include "../aio/pollset.h"
+#include "../aio/event_type.h"
 
 
 namespace nx {
@@ -72,11 +72,10 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override;
 
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
-    //!Implementation of AbstractSocket::post
+    virtual Pollable* pollable() override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of AbstractSocket::dispatch
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
@@ -99,7 +98,7 @@ class NX_NETWORK_API UdtStreamSocket
     public UdtSocket<AbstractStreamSocket>
 {
 public:
-    UdtStreamSocket();
+    explicit UdtStreamSocket(int ipVersion = AF_INET);
     UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -112,6 +111,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) override;
+
     virtual int recv( void* buffer, unsigned int bufferLen, int flags = 0 ) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
     //  What's difference between foreign address with peer address 
@@ -146,7 +146,9 @@ public:
         nx::utils::MoveOnlyFunc<void()> handler) override;
 
 private:
-    std::unique_ptr<aio::AsyncSocketImplHelper<Pollable>> m_aioHelper;
+    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+
+    std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
 
 private:
@@ -158,10 +160,11 @@ class NX_NETWORK_API UdtStreamServerSocket
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:
-    UdtStreamServerSocket();
+    explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);

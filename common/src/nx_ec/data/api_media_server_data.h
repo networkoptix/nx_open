@@ -3,10 +3,11 @@
 
 #include "api_globals.h"
 #include "api_resource_data.h"
+#include <core/resource/resource_type.h>
 
 namespace ec2
 {
-    namespace backup 
+    namespace backup
     {
         //TODO: #rvasilenko move out to more general space
         enum DayOfWeek
@@ -31,7 +32,13 @@ namespace ec2
 
     struct ApiStorageData: ApiResourceData
     {
-        ApiStorageData(): spaceLimit(0), usedForWriting(0), isBackup(false) {}
+        ApiStorageData():
+            spaceLimit(0),
+            usedForWriting(0),
+            isBackup(false)
+        {
+            typeId = QnResourceTypePool::kStorageTypeUuid;
+        }
 
         qint64          spaceLimit;
         bool            usedForWriting;
@@ -45,23 +52,24 @@ namespace ec2
     (usedForWriting)            \
     (storageType)               \
     (addParams)                 \
-    (isBackup)                  
+    (isBackup)
 
 
     struct ApiMediaServerData: ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), not_used(Qn::PM_None) {}
+        ApiMediaServerData():
+            flags(Qn::SF_None)
+        {
+            typeId = QnResourceTypePool::kServerTypeUuid;
+        }
 
-        QString         apiUrl;
         QString         networkAddresses;
         Qn::ServerFlags flags;
-        Qn::PanicMode   not_used;
-        QString         version; 
+        QString         version;
         QString         systemInfo;
         QString         authKey;
-        QString         systemName; //! < Server system name. It can be invalid sometimes, but it matters only when server is in incompatible state.
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(not_used)(version)(systemInfo)(authKey)(systemName)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (networkAddresses)(flags)(version)(systemInfo)(authKey)
 
     QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerData, (eq))
 
@@ -69,18 +77,19 @@ namespace ec2
     struct ApiMediaServerUserAttributesData: ApiData
     {
         ApiMediaServerUserAttributesData();
+        QnUuid getIdForMerging() const { return serverId; } //< See ApiIdData::getIdForMerging().
 
-        QnUuid          serverID;
+        QnUuid          serverId;
         QString         serverName;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
 
         // redundant storage settings
         Qn::BackupType      backupType;
-        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum 
+        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum
         int                 backupStart;         // Seconds from 00:00:00. Error if bDOW set and this is not set
         int                 backupDuration;      // Duration of synchronization period in seconds. -1 if not set.
-        int                 backupBitrate;       // Bitrate cap in bytes per second. Negative value if not capped. 
+        int                 backupBitrate;       // Bitrate cap in bytes per second. Negative value if not capped.
                                                  // Not capped by default
     };
 
@@ -94,7 +103,7 @@ namespace ec2
     (backupBitrate)                                     \
 
 #define ApiMediaServerUserAttributesData_Fields     \
-    (serverID)                                      \
+    (serverId)                                      \
     (serverName)                                    \
     ApiMediaServerUserAttributesData_Fields_Short
 
@@ -112,8 +121,15 @@ namespace ec2
         std::vector<ApiResourceParamData> addParams;
         ApiStorageDataList storages;
 
+        ApiMediaServerDataEx( const ApiMediaServerDataEx& mediaServerData )
+        :
+            ApiMediaServerData(mediaServerData),
+            status( Qn::Offline )
+        {
+        }
+
         ApiMediaServerDataEx( ApiMediaServerData&& mediaServerData )
-        :   
+        :
             ApiMediaServerData( std::move( mediaServerData ) ),
             status( Qn::Offline )
         {
@@ -141,6 +157,8 @@ namespace ec2
             storages = std::move( mediaServerData.storages );
             return *this;
         }
+
+        ApiMediaServerDataEx& operator=(const ApiMediaServerDataEx&) = default;
     };
 #define ApiMediaServerDataEx_Fields ApiMediaServerData_Fields ApiMediaServerUserAttributesData_Fields_Short (status)(addParams) (storages)
 

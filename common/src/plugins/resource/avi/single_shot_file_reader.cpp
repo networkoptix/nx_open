@@ -1,10 +1,9 @@
 #include "single_shot_file_reader.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
 #include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 #include "core/resource/storage_resource.h"
 #include <core/resource/storage_plugin_factory.h>
 
@@ -16,20 +15,20 @@ QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(const QnResourcePtr& 
 
 QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
 {
-    CodecID compressionType;
+    AVCodecID compressionType;
     QString lowerFileName = getResource()->getUrl().toLower();
 
 
     if (lowerFileName.endsWith(QLatin1String(".png")))
-        compressionType = CODEC_ID_PNG;
+        compressionType = AV_CODEC_ID_PNG;
     else if (lowerFileName.endsWith(QLatin1String(".jpeg")) || lowerFileName.endsWith(QLatin1String(".jpg")))
-        compressionType = CODEC_ID_MJPEG;
+        compressionType = AV_CODEC_ID_MJPEG;
     else if (lowerFileName.endsWith(QLatin1String(".tiff")) || lowerFileName.endsWith(QLatin1String(".tif")))
-        compressionType = CODEC_ID_TIFF;
+        compressionType = AV_CODEC_ID_TIFF;
     else if (lowerFileName.endsWith(QLatin1String(".gif")))
-        compressionType = CODEC_ID_GIF;
+        compressionType = AV_CODEC_ID_GIF;
     else if (lowerFileName.endsWith(QLatin1String(".bmp")))
-        compressionType = CODEC_ID_BMP;
+        compressionType = AV_CODEC_ID_BMP;
     else
         return QnAbstractMediaDataPtr();
 
@@ -76,5 +75,3 @@ CameraDiagnostics::Result QnSingleShotFileStreamreader::diagnoseMediaStreamConne
     //TODO/IMPL
     return CameraDiagnostics::NotImplementedResult();
 }
-
-#endif // ENABLE_ARCHIVE

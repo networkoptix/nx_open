@@ -10,6 +10,9 @@
 #include <nx/network/http/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
+#include <utils/common/safe_direct_connection.h>
+#include <api/http_client_pool.h>
+#include <core/resource/resource_fwd.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -20,7 +23,9 @@
 
 namespace rest
 {
-    class ServerConnection: public QObject
+    class ServerConnection:
+        public QObject,
+        public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT
     public:
@@ -34,6 +39,8 @@ namespace rest
         struct EmptyResponseType {};
         typedef Result<EmptyResponseType>::type PostCallback;   // use this type for POST requests without result data
 
+        typedef Result<QnJsonRestResult>::type GetCallback; /**< Default callback type for GET requests without result data. */
+
         /**
         * Load information about cross-server archive
         * @return value > 0 on success or <= 0 if it isn't started.
@@ -42,7 +49,20 @@ namespace rest
         */
         Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
-        Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
+        /**
+        * Get camera thumbnail for specified time.
+        *
+        * Returns immediately. On request completion callback is called.
+        *
+        * @param targetThread Callback thread. If not specified, callback is called in IO thread.
+        * @return Request handle.
+        */
+        Handle cameraThumbnailAsync(
+            const QnThumbnailRequestData& request,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = 0);
+
+        Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);
@@ -52,19 +72,33 @@ namespace rest
             , QThread *targetThread = nullptr);
 
         /**
-        * Reset the cloud credentials.
-        */
-        Handle resetCloudSystemCredentials(Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
+         * Detach the system from cloud. Admin password will be changed to provided (if provided).
+         * @param resetAdminPassword Change administrator password to the provided one.
+         */
+        Handle detachSystemFromCloud(const QString& resetAdminPassword,
+            Result<QnRestResult>::type callback, QThread *targetThread = nullptr);
 
         /**
          * Save the credentials returned by cloud to the database.
          */
         Handle saveCloudSystemCredentials(
-            const QString &cloudSystemID,
+            const QString &cloudSystemId,
             const QString &cloudAuthKey,
             const QString &cloudAccountName,
             Result<QnRestResult>::type callback,
             QThread *targetThread = nullptr);
+
+        Handle startLiteClient(
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle getFreeSpaceForUpdateFiles(
+            Result<QnUpdateFreeSpaceReply>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle checkCloudHost(
+            Result<QnCloudHostCheckReply>::type callback,
+            QThread* targetThread = nullptr);
 
         /**
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
@@ -73,27 +107,9 @@ namespace rest
         */
         void cancelRequest(const Handle& requestId);
 
+    private slots:
+        void onHttpClientDone(int requestId, nx_http::AsyncHttpClientPtr httpClient);
     private:
-        enum class HttpMethod
-        {
-            Unknown,
-            Get,
-            Post
-        };
-
-        struct Request
-        {
-            Request(): method(HttpMethod::Unknown), authType(nx_http::AsyncHttpClient::authBasicAndDigest) {}
-            bool isValid() const { return method != HttpMethod::Unknown && url.isValid(); }
-
-            HttpMethod method;
-            QUrl url;
-            nx_http::AsyncHttpClient::AuthType authType;
-            nx_http::HttpHeaders headers;
-            nx_http::StringType contentType;
-            nx_http::StringType messageBody;
-        };
-
         template <typename ResultType> Handle executeGet(
             const QString& path,
             const QnRequestParamList& params,
@@ -109,18 +125,27 @@ namespace rest
             QThread* targetThread);
 
         template <typename ResultType>
-        Handle executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
-        Handle executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);
-        Handle executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread);
+        Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
+        Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);
+        Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread);
 
         QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;
-        Request prepareRequest(HttpMethod method, const QUrl& url, const nx_http::StringType& contentType = nx_http::StringType(), const nx_http::StringType& messageBody = nx_http::StringType());
+
+        nx_http::ClientPool::Request prepareRequest(
+            nx_http::Method::ValueType method,
+            const QUrl& url,
+            const nx_http::StringType& contentType = nx_http::StringType(),
+            const nx_http::StringType& messageBody = nx_http::StringType());
 
         typedef std::function<void (Handle, SystemError::ErrorCode, int, nx_http::StringType contentType, nx_http::BufferType msgBody)> HttpCompletionFunc;
-        Handle sendRequest(const Request& request, HttpCompletionFunc callback);
+        Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
+
+        QnMediaServerResourcePtr getServerWithInternetAccess() const;
+
+        void trace(int handle, const QString& message) const;
     private:
         QnUuid m_serverId;
-        QMap<Handle, nx_http::AsyncHttpClientPtr> m_runningRequests;
+        QMap<Handle, HttpCompletionFunc> m_runningRequests;
         mutable QnMutex m_mutex;
     };
 }

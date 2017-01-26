@@ -31,9 +31,9 @@ public:
     };
 
     // TODO: #Elric #enum
-    enum Flag 
-    { 
-        Flag_SlowSource = 1, 
+    enum Flag
+    {
+        Flag_SlowSource = 1,
         Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not set, ArchiveReader is going to process negative speed
         Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
         Flag_CanSendMotion       = 8,       // motion supported
@@ -64,7 +64,7 @@ public:
     virtual bool hasVideo() const { return true; }
 
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }
-    
+
     // this call inform delegate that reverse mode on/off
     virtual void onReverseMode(qint64 displayTime, bool value) { Q_UNUSED(displayTime); Q_UNUSED(value); }
 
@@ -74,6 +74,8 @@ public:
     // MediaStreamQuality. By default, this function is not implemented. Return: true if need seek for change quality
     /*!
         \param fastSwitch Do not wait for next I-frame of new stream, but give data starting with previous I-frame
+        \param resolution Is used only when quality == MEDIA_Quality_CustomResolution;
+            width can be <= 0 which is treated as "auto".
     */
     virtual bool setQuality(MediaQuality /*quality*/, bool /*fastSwitch*/, const QSize& /*resolution*/ ) {  return false; }
 
@@ -100,6 +102,7 @@ public:
     //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
 
+    virtual int getSequence() const { return 0;  }
 protected:
     Flags m_flags;
 };

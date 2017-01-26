@@ -11,7 +11,8 @@
 /**
   * Class that receives, parses and stores statistics data from one server.
   */
-class QnMediaServerStatisticsStorage: QObject {
+class QnMediaServerStatisticsStorage: public QObject
+{
     Q_OBJECT
 public:
     /**
@@ -20,7 +21,7 @@ public:
      * \param serverId          Id of server resource to use.
      * \param parent            Parent object.
      */
-    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent = nullptr);
 
     /**
      *  Register the consumer object.
@@ -40,8 +41,8 @@ public:
     QnStatisticsHistory history() const;
     qint64 historyId() const;
 
-    /** 
-     * \returns                 Data update period. Is taken from the server's response. 
+    /**
+     * \returns                 Data update period. Is taken from the server's response.
      */
     int updatePeriod() const;
 

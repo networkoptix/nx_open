@@ -2,23 +2,22 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
-#include <QtCore/QTextStream>
+#include <fstream>
+
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
-#include <QtCore/QLocale>
 
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-#   include <sys/types.h>
-#   include <linux/unistd.h>
-static pid_t gettid(void) { return syscall(__NR_gettid); }
+    #include <sys/types.h>
+    #include <linux/unistd.h>
+    static pid_t gettid(void) { return syscall(__NR_gettid); }
 #endif
 
-
 const char *qn_logLevelNames[] = {"UNKNOWN", "NONE", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
-const char UTF8_BOM[] = "\xEF\xBB\xBF";
 
 QnLogLevel QnLog::logLevelFromString(const QString &value) {
-    const QString str = value.toUpper().trimmed();
+    QString str = value.toUpper().trimmed();
+    if (str == QLatin1String("DEBUG1")) str = QLatin1String("DEBUG");
 
     for (uint i = 0; i < sizeof(qn_logLevelNames)/sizeof(char*); ++i) {
         if (str == QLatin1String(qn_logLevelNames[i]))
@@ -32,6 +31,25 @@ QString QnLog::logLevelToString(QnLogLevel value) {
     return QLatin1String(qn_logLevelNames[value]);
 }
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+
+void QnLog::writeToStdout(const QString& str, QnLogLevel logLevel)
+{
+    switch (logLevel)
+    {
+        case cl_logERROR:
+        case cl_logWARNING:
+            std::cerr << str.toStdString() << std::endl;
+            break;
+
+        default:
+            std::cout << str.toStdString() << std::endl;
+            break;
+    }
+}
+
+#endif // !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+
 // -------------------------------------------------------------------------- //
 // QnLogPrivate
 // -------------------------------------------------------------------------- //
@@ -41,11 +59,11 @@ public:
         m_logLevel(static_cast<QnLogLevel>(0)) /* Log nothing by default. */
     {}
 
-	~QnLogPrivate() {
-		m_file.close();
-	}
+    ~QnLogPrivate() {
+        m_file.close();
+    }
 
-    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) 
+    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel)
     {
         m_baseName = baseName;
         m_maxFileSize = maxFileSize;
@@ -53,29 +71,16 @@ public:
         m_curNum = 0;
 
         m_logLevel = logLevel;
-
-        if (m_file.fileName() != currFileName())
-        {
-            if (m_file.isOpen())
-                m_file.close();
-            m_file.setFileName(currFileName());
-        }
-
-        if (m_file.isOpen() && m_file.openMode().testFlag(QIODevice::WriteOnly))
-            return true;   //file already opened
-
-        const bool rez = m_file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Unbuffered);
-        if (rez && m_file.size() == 0)
-            m_file.write(UTF8_BOM);
-        return rez;
+        openFileImpl();
+        return !m_file.fail();
     }
 
-    void setLogLevel(QnLogLevel logLevel) 
+    void setLogLevel(QnLogLevel logLevel)
     {
         m_logLevel = logLevel;
     }
 
-    QnLogLevel logLevel() const 
+    QnLogLevel logLevel() const
     {
         return m_logLevel;
     }
@@ -85,54 +90,43 @@ public:
         if (logLevel > m_logLevel)
             return;
 
-        std::ostringstream ostr;
-        const auto curDateTime = QDateTime::currentDateTime();
-        const auto curTime = curDateTime.time();
-        ostr << curDateTime.date().toString(Qt::ISODate).toUtf8().constData()<<" "
-            <<curTime.toString(Qt::ISODate).toUtf8().constData()<<"."<<std::setw(3)<<std::setfill('0')<<curTime.msec()<<std::setfill(' ')
-            << " " << std::setw(6) <<
-#ifdef Q_OS_LINUX
-            gettid()
-#else
-            QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).constData()
-#endif
-            << " " << std::setw(7) << qn_logLevelNames[logLevel] << ": " << msg.toUtf8().constData() << std::endl;
+        static constexpr int kPreambuleMaxLength = 48;
 
-        const std::string& str = ostr.str();
+        QString str;
+        str.reserve(msg.size() + kPreambuleMaxLength);
+        str += QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz ");
+        #if defined(Q_OS_LINUX)
+            str += lit(" %1").arg(gettid(), 6);
+        #else
+            str += lit(" %1").arg((qint64) QThread::currentThreadId(), 6, 16);
+        #endif
+        str += lit(" %1: ").arg(qn_logLevelNames[logLevel], 7);
+        str += msg;
+
+        std::unique_lock<std::mutex> lk(m_mutex);
+
+        if (m_baseName == lit("-") || m_file.fail())
         {
-            QnMutexLocker mutx( &m_mutex );
-            if (!m_file.isOpen()) {
-
-                switch (logLevel) {
-                case cl_logERROR:
-                case cl_logWARNING:
-                    std::cerr << str;
-                    std::cerr.flush();
-                    break;
-                default:
-                    std::cout << str;
-                    std::cout.flush();
-                    break;
-                }
-                return;
-            }
-            m_file.write(str.c_str());
-            m_file.flush();
-            if (m_file.size() >= m_maxFileSize)
-                openNextFile();
+            QnLog::writeToStdout(str, logLevel);
+            return;
         }
+
+        m_file << str.toStdString() << std::endl;
+        m_file.flush();
+        if (m_file.tellp() >= m_maxFileSize)
+            openNextFile();
     }
 
     QString syncCurrFileName() const
     {
-        QnMutexLocker lock( &m_mutex );
-        return m_baseName + QLatin1String(".log");
+        std::unique_lock<std::mutex> lk( m_mutex );
+        return currFileName();
     }
 
 private:
     void openNextFile()
     {
-        m_file.close(); // close current file
+        m_file.close();
 
         int max_existing_num = m_maxBackupFiles;
         while (max_existing_num)
@@ -142,7 +136,7 @@ private:
             --max_existing_num;
         }
 
-        if (max_existing_num<m_maxBackupFiles) // if we do not need to delete backupfiles
+        if (max_existing_num < m_maxBackupFiles) // if we do not need to delete backupfiles
         {
             QFile::rename(currFileName(), backupFileName(max_existing_num+1));
         }
@@ -156,9 +150,38 @@ private:
             QFile::rename(currFileName(), backupFileName(m_maxBackupFiles)); // move current to the most latest backup
         }
 
-        m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-        if (m_file.size() == 0)
-            m_file.write(UTF8_BOM);
+        openFileImpl();
+    }
+
+    void openFileImpl()
+    {
+        if (m_file.is_open())
+            return;
+
+        #ifdef Q_OS_WIN
+            m_file.open(currFileName().toStdWString(), std::ios_base::in | std::ios_base::out);
+        #else
+            m_file.open(currFileName().toStdString(), std::ios_base::in | std::ios_base::out);
+        #endif
+
+        if (!m_file.fail())
+        {
+            // File exists, prepare to append.
+            m_file.seekp(std::ios_base::streamoff(0), std::ios_base::end);
+            return;
+        }
+
+        #ifdef Q_OS_WIN
+            m_file.open(currFileName().toStdWString(), std::ios_base::out);
+        #else
+            m_file.open(currFileName().toStdString(), std::ios_base::out);
+        #endif
+
+        if (m_file.fail())
+            return;
+
+        // Ensure 1st char is UTF8 BOM.
+        m_file.write("\xEF\xBB\xBF", 3);
     }
 
     QString currFileName() const
@@ -189,10 +212,8 @@ private:
     quint8 m_curNum;
     QString m_baseName;
     QnLogLevel m_logLevel;
-
-    QFile m_file;
-
-    mutable QnMutex m_mutex;
+    std::fstream m_file;
+    mutable std::mutex m_mutex;
 };
 
 
@@ -213,7 +234,7 @@ public:
 
     QnLog* get( int logID )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         QnLog*& log = m_logs[logID];
         if( !log )
             log = new QnLog();
@@ -222,23 +243,22 @@ public:
 
     bool exists( int logID )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_logs.find(logID) != m_logs.cend();
     }
 
     bool put( int logID, QnLog* log )
     {
-        QnMutexLocker lk( &m_mutex );
+        std::unique_lock<std::mutex> lk( m_mutex );
         return m_logs.insert( std::make_pair( logID, log ) ).second;
     }
 
 private:
     std::map<int, QnLog*> m_logs;
-    QnMutex m_mutex;
+    std::mutex m_mutex;
 };
 
-Q_GLOBAL_STATIC(QnLogs, qn_logsInstance);
-
+bool QnLog::s_disableLogConfiguration(false);
 
 QnLog::QnLog()
 :
@@ -265,6 +285,9 @@ const std::unique_ptr< QnLog >& QnLog::instance( int logID )
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
     if(!d)
         return false;
+
+    if(s_disableLogConfiguration)
+        return true;
 
     return d->create(baseName, maxFileSize, maxBackupFiles, logLevel);
 }
@@ -338,12 +361,38 @@ void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QS
 
 void QnLog::initLog(const QString &logLevelStr, int logID )
 {
+    if (s_disableLogConfiguration)
+        return;
+
     logs()->init( logID, logLevelStr );
 }
 
 bool QnLog::initLog(QnLog *externalInstance, int logID )
 {
+    if (s_disableLogConfiguration)
+        return true;
+
     return logs()->init( logID, std::unique_ptr< QnLog >( externalInstance ) );
+}
+
+void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
+{
+    QnLogLevel logLevel(cl_logNONE);
+
+    if (const auto value = arguments.get("log-file", "lf"))
+    {
+        logLevel = cl_logDEBUG1;
+        instance()->create(*value, 1024 * 1024 * 10, 5, logLevel);
+    }
+
+    if (const auto value = arguments.get("log-level", "ll"))
+    {
+        logLevel = logLevelFromString(*value);
+        NX_CRITICAL(logLevel != cl_logUNKNOWN);
+    }
+
+    instance()->setLogLevel(logLevel);
+    s_disableLogConfiguration = true;
 }
 
 QString QnLog::logFileName( int logID )
@@ -353,7 +402,7 @@ QString QnLog::logFileName( int logID )
 
 const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 {
-    QnMutexLocker lk( &m_mutex );
+    std::unique_lock<std::mutex> lk( m_mutex );
     //TODO #ak aren't we supposed to explcitly create log with init call?
     auto& log = m_logs[logID];
     if( !log )
@@ -363,13 +412,13 @@ const std::unique_ptr< QnLog >& QnLog::Logs::get( int logID )
 
 bool QnLog::Logs::exists(int logID) const
 {
-    QnMutexLocker lk(&m_mutex);
+    std::unique_lock<std::mutex> lk(m_mutex);
     return m_logs.find(logID) != m_logs.end();
 }
 
 bool QnLog::Logs::init( int logID, std::unique_ptr< QnLog > log )
 {
-    QnMutexLocker lk( &m_mutex );
+    std::unique_lock<std::mutex> lk( m_mutex );
     return m_logs.emplace( logID, std::move( log ) ).second;
 }
 

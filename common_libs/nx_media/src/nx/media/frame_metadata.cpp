@@ -7,23 +7,33 @@ namespace {
 
 static const QString kMetadataFlagsKey(lit("metadata"));
 
-static const int kNotInitialized = -1; //< Metadata is not initialized.
-
 } // namespace
-
-FrameMetadata::FrameMetadata()
-:
+FrameMetadata::FrameMetadata():
     flags(QnAbstractMediaData::MediaFlags_None),
     noDelay(false),
-    frameNum(kNotInitialized)
+    frameNum(-1),
+    sar(1.0),
+    videoChannel(0),
+    sequence(0),
+    dataType(QnAbstractMediaData::UNKNOWN)
 {
 }
 
-FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame)
-:
+FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
+    FrameMetadata()
+{
+    videoChannel = frame->channelNumber;
+    flags = frame->flags;
+    sequence = frame->opaque;
+    dataType = frame->dataType;
+}
+
+FrameMetadata::FrameMetadata(const QnEmptyMediaDataPtr& frame):
     FrameMetadata()
 {
     flags = frame->flags;
+    sequence = frame->opaque;
+    dataType = frame->dataType;
 }
 
 void FrameMetadata::serialize(const QVideoFramePtr& frame) const
@@ -43,7 +53,7 @@ FrameMetadata FrameMetadata::deserialize(const QnConstVideoFramePtr& frame)
 
 bool FrameMetadata::isNull() const
 {
-    return frameNum == kNotInitialized;
+    return dataType == QnAbstractMediaData::UNKNOWN;
 }
 
 } // namespace media

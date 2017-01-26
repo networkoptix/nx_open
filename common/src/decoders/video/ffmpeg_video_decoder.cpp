@@ -28,6 +28,7 @@
 #include "utils/media/frame_type_extractor.h"
 
 #include <nx/streaming/av_codec_media_context.h>
+#include <utils/media/utils.h>
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -56,7 +57,7 @@ struct FffmpegLog
 };
 
 
-QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+QnFfmpegVideoDecoder::QnFfmpegVideoDecoder(AVCodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     //m_width(0),
@@ -112,17 +113,18 @@ void QnFfmpegVideoDecoder::flush()
     //avcodec_flush_buffers(c); // does not flushing output frames
     int got_picture = 0;
     AVPacket avpkt;
+    av_init_packet(&avpkt);
     avpkt.data = 0;
     avpkt.size = 0;
     while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
 
 
-AVCodec* QnFfmpegVideoDecoder::findCodec(CodecID codecId)
+AVCodec* QnFfmpegVideoDecoder::findCodec(AVCodecID codecId)
 {
     AVCodec* codec = 0;
 
-    if (codecId != CODEC_ID_NONE)
+    if (codecId != AV_CODEC_ID_NONE)
         codec = avcodec_find_decoder(codecId);
 
     return codec;
@@ -155,7 +157,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
-    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264)
+    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == AV_CODEC_ID_H264)
     {
         m_forceSliceDecoding = 0;
         int nextSliceCnt = 0;
@@ -187,7 +189,7 @@ void QnFfmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
 
     m_context->thread_type = m_context->thread_count > 1 && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
-    if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
+    if (m_context->codec_id == AV_CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
     {
         // ignoring deblocking filter type 1 for better perfomace between H264 slices.
         m_context->flags2 |= CODEC_FLAG2_FAST;
@@ -201,14 +203,13 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
 
     m_frameTypeExtractor = new FrameTypeExtractor(QnConstMediaContextPtr(new QnAvCodecMediaContext(m_context)));
 
 #ifdef _USE_DXVA
-    if (m_codecId == CODEC_ID_H264)
+    if (m_codecId == AV_CODEC_ID_H264)
     {
         m_context->get_format = FFMpegCallbacks::ffmpeg_GetFormat;
         m_context->get_buffer = FFMpegCallbacks::ffmpeg_GetFrameBuf;
@@ -218,8 +219,8 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     }
 #endif
 
-    m_frame = avcodec_alloc_frame();
-    m_deinterlacedFrame = avcodec_alloc_frame();
+    m_frame = av_frame_alloc();
+    m_deinterlacedFrame = av_frame_alloc();
 
     //if(m_codec->capabilities&CODEC_CAP_TRUNCATED)    c->flags|= CODEC_FLAG_TRUNCATED;
 
@@ -229,7 +230,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
 
     determineOptimalThreadType(data);
 
-    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
     NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
@@ -241,7 +242,7 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     }
     //NX_ASSERT(m_context->codec);
 
-//    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
+//    avpicture_fill((AVPicture *)picture, m_buffer, AV_PIX_FMT_YUV420P, c->width, c->height);
 }
 
 void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
@@ -272,14 +273,14 @@ void QnFfmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
-    if (m_passedContext) {
-        avcodec_copy_context(m_context, m_passedContext);
-    }
+    if (m_passedContext)
+        QnFfmpegHelper::copyAvCodecContex(m_context, m_passedContext);
+
     determineOptimalThreadType(data);
     //m_context->thread_count = qMin(5, QThread::idealThreadCount() + 1);
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
-    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
+    m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == AV_CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
     avcodec_open2(m_context, m_codec, NULL);
 
@@ -361,7 +362,7 @@ void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
 bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     if (data && m_codecId!= data->compressionType) {
-        if (m_codecId != CODEC_ID_NONE && data->context)
+        if (m_codecId != AV_CODEC_ID_NONE && data->context)
             resetDecoder(data);
         m_codecId = data->compressionType;
     }
@@ -391,7 +392,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data())
         {
 
-            if (data->compressionType == CODEC_ID_MJPEG)
+            if (data->compressionType == AV_CODEC_ID_MJPEG)
             {
                 uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
                 if (m_lightModeFrameCounter < period)
@@ -449,30 +450,37 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         // ### handle errors
         if (m_context->pix_fmt == -1)
-            m_context->pix_fmt = PixelFormat(0);
+            m_context->pix_fmt = AVPixelFormat(0);
 
 
         bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
-        // workaround ffmpeg crush
+        // workaround ffmpeg crash
         if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
         {
-            int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
             const quint8* dataEnd = avpkt.data + avpkt.size;
             const quint8* curPtr = avpkt.data;
-            if ((curPtr[nalLen]&0x1f) == nuDelimiter)
-                curPtr = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-
-            if (dataEnd - curPtr > nalLen && (curPtr[nalLen]&0x1f) == nuSPS)
+			// New version scan whole data to find SPS unit.
+			// It is slower but some cameras do not put SPS the begining of a data.
+            while (curPtr < dataEnd - 2)
             {
-                SPSUnit sps;
-                const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-                sps.decodeBuffer(curPtr + nalLen, end);
-                sps.deserialize();
-                processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
-                m_spsFound = true;
-            }
+                const int nalLen = curPtr[2] == 0x01 ? 3 : 4;
+                if (curPtr + nalLen >= dataEnd)
+                    break;
 
-            if (!m_spsFound)
+                auto nalUnitType = curPtr[nalLen] & 0x1f;
+                if (nalUnitType == nuSPS)
+                {
+                    SPSUnit sps;
+                    const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+                    sps.decodeBuffer(curPtr + nalLen, end);
+                    sps.deserialize();
+                    processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
+                    m_spsFound = true;
+                    break;
+                }
+                curPtr = NALUnit::findNALWithStartCode(curPtr + nalLen, dataEnd, true);
+            }
+            if (!m_spsFound && m_context->extradata_size == 0)
                 return false; // no sps has found yet. skip frame
         }
         else if (data->context)
@@ -520,7 +528,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
                 got_picture = 1;
                 m_tmpQtFrame.setUseExternalData(true);
-                m_tmpQtFrame.format = PIX_FMT_RGBA;
+                m_tmpQtFrame.format = AV_PIX_FMT_RGBA;
                 m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
                 m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
                 m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
@@ -535,6 +543,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     }
     else {
         AVPacket avpkt;
+        av_init_packet(&avpkt);
         avpkt.data = 0;
         avpkt.size = 0;
         avpkt.pts = avpkt.dts = m_prevTimestamp;
@@ -551,7 +560,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         else
             outFrame->metadata.reset();
 
-        PixelFormat correctedPixelFormat = GetPixelFormat();
+        AVPixelFormat correctedPixelFormat = GetPixelFormat();
         if (!outFrame->isExternalData() &&
             (outFrame->width != m_context->width || outFrame->height != m_context->height ||
             outFrame->format != correctedPixelFormat || outFrame->linesize[0] != m_frame->linesize[0]))
@@ -559,6 +568,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->reallocate(m_context->width, m_context->height, correctedPixelFormat, m_frame->linesize[0]);
         }
 
+#if 0
+        // todo: ffmpeg-test . implement me
         if (m_frame->interlaced_frame && m_context->thread_count > 1)
         {
 
@@ -577,10 +588,12 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 outFrame->pkt_dts = m_frame->pkt_dts;
             }
         }
-        else {
+        else
+#endif
+        {
             if (!outFrame->isExternalData())
             {
-                if (outFrame->format == PIX_FMT_YUV420P)
+                if (outFrame->format == AV_PIX_FMT_YUV420P)
                 {
                     // optimization
                     for (int i = 0; i < 3; ++ i)
@@ -593,7 +606,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
                 // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
-                outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
+                outFrame->pkt_dts = m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }
 
@@ -626,8 +639,9 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             outFrame->pkt_dts = copyFromFrame->pkt_dts;
         }
         outFrame->format = correctedPixelFormat;
+        outFrame->fillRightEdge();
         outFrame->sample_aspect_ratio = getSampleAspectRatio();
-        return m_context->pix_fmt != PIX_FMT_NONE;
+        return m_context->pix_fmt != AV_PIX_FMT_NONE;
     }
     return false; // no picture decoded at current step
 }
@@ -638,45 +652,30 @@ double QnFfmpegVideoDecoder::getSampleAspectRatio() const
         return m_prevSampleAspectRatio;
 
     double result = av_q2d(m_context->sample_aspect_ratio);
-
-    if (qAbs(result)< 1e-7)
+    if (qAbs(result) >= 1e-7)
     {
-        result = 1.0;
-        if (m_context->width == 720) { // TODO: #vasilenko add a table!
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (720.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (720.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (720.0/240.0);
-        } else if(m_context->width == 704) {
-            if (m_context->height == 480)
-                result = (4.0/3.0) / (704.0/480.0);
-            else if (m_context->height == 576)
-                result = (4.0/3.0) / (704.0/576.0);
-            else if (m_context->height == 240)
-                result = (4.0/3.0) / (704.0/240.0);
-        }
+        m_prevSampleAspectRatio = result;
+        return result;
     }
 
-    m_prevSampleAspectRatio = result;
-
-    return result;
+    QSize srcSize(m_context->width, m_context->height);
+    m_prevSampleAspectRatio = nx::media::getDefaultSampleAspectRatio(srcSize);
+    return m_prevSampleAspectRatio;
 }
 
-PixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
+AVPixelFormat QnFfmpegVideoDecoder::GetPixelFormat() const
 {
     if (m_usedQtImage)
-        return PIX_FMT_RGBA;
+        return AV_PIX_FMT_RGBA;
     // Filter deprecated pixel formats
     switch(m_context->pix_fmt)
     {
-    case PIX_FMT_YUVJ420P:
-        return PIX_FMT_YUV420P;
-    case PIX_FMT_YUVJ422P:
-        return PIX_FMT_YUV422P;
-    case PIX_FMT_YUVJ444P:
-        return PIX_FMT_YUV444P;
+    case AV_PIX_FMT_YUVJ420P:
+        return AV_PIX_FMT_YUV420P;
+    case AV_PIX_FMT_YUVJ422P:
+        return AV_PIX_FMT_YUV422P;
+    case AV_PIX_FMT_YUVJ444P:
+        return AV_PIX_FMT_YUV444P;
     default:
         return m_context->pix_fmt;
     }

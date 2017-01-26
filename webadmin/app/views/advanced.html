@@ -60,8 +60,7 @@
                     </td>
                     <td>
                         <div class="input-group" ng-if="storage.isWritable"
-                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,
-                             'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
                             <input type="number"  class="form-control input-sm"
                                    ng-model="storage.reservedSpaceGb"
                                    name="reservedSpaceGb"
@@ -169,23 +168,35 @@
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate >
-        <div class="form-group" ng-repeat="(setting,value) in systemSettings">
-            <label class="col-sm-6" for="{{setting}}">{{settingsConfig[setting].label}}</label>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
             <div class="col-sm-6">
-                <input ng-if="settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
                        style="height: 22px"
                        id="{{setting}}"
                        ng-model="systemSettings[setting]"/>
 
-                <input ng-if="settingsConfig[setting].type == 'number' " type="number"
+                <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
                        id="{{setting}}"
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <input ng-if="settingsConfig[setting].type == 'text'" type="text"
+                <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
                        id="{{setting}}"
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'password'" type="password"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
+
+                <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
+                    <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -193,7 +204,13 @@
         <div class="col-sm-offset-4  col-sm-8">
             <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
         </div>
+
     </form>
-
-
+    <br>
+    <div class="alert alert-danger row" role="alert">
+        <b>Warning!</b> Some changes will be applied only after you restart <b>all</b> the servers in the system.<br><br>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+        </div>
+    </div>
 </div>

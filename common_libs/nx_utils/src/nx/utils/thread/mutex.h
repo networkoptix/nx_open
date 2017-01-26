@@ -30,6 +30,7 @@ public:
         int lockID = 0 );
     void unlock();
     bool tryLock();
+    bool isRecursive() const;
 
 private:
     QnMutexImpl* m_impl;
@@ -160,5 +161,22 @@ typedef QReadLocker QnReadLocker;
 typedef QWriteLocker QnWriteLocker;
 
 #endif  //USE_OWN_MUTEX
+
+class QnMutexUnlocker
+{
+public:
+    QnMutexUnlocker(QnMutexLockerBase* const locker):
+        m_locker(locker)
+    {
+        m_locker->unlock();
+    }
+    ~QnMutexUnlocker()
+    {
+        m_locker->relock();
+    }
+
+private:
+    QnMutexLockerBase* const m_locker;
+};
 
 #endif  //NX_MUTEX_H

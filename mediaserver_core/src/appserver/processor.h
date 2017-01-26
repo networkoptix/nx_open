@@ -25,6 +25,11 @@ public:
     virtual bool isBusy() const override;
     virtual void processResources(const QnResourceList &resources) override;
 
+    static ec2::ErrorCode addAndPropagateCamResource(
+        const ec2::ApiCameraData& apiCameraData,
+        const ec2::ApiResourceParamDataList& properties
+    );
+
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnUuid m_serverId;
@@ -44,7 +49,7 @@ private:
 private:
     void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
 
-    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
+    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource) const;
 
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
 

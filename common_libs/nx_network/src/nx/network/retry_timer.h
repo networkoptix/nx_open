@@ -7,10 +7,11 @@
 
 #include <chrono>
 #include <limits>
+#include <memory>
 
 #include <utils/common/stoppable.h>
 
-#include "aio/abstract_pollable.h"
+#include "aio/basic_pollable.h"
 #include "aio/timer.h"
 
 
@@ -39,6 +40,8 @@ public:
         unsigned int delayMultiplier,
         std::chrono::milliseconds maxDelay);
 
+    bool operator==(const RetryPolicy& rhs) const;
+
     void setMaxRetryCount(unsigned int retryCount);
     unsigned int maxRetryCount() const;
 
@@ -53,7 +56,8 @@ public:
     void setMaxDelay(std::chrono::milliseconds delay);
     std::chrono::milliseconds maxDelay() const;
 
-private:
+// TODO: consider to make it a simple struct
+//private:
     unsigned int m_maxRetryCount;
     std::chrono::milliseconds m_initialDelay;
     unsigned int m_delayMultiplier;
@@ -68,30 +72,29 @@ private:
 */
 class NX_NETWORK_API RetryTimer
 :
-    public aio::AbstractPollable
+    public aio::BasicPollable
 {
 public:
-    RetryTimer(const RetryPolicy& policy);
+    RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread = nullptr);
     virtual ~RetryTimer();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
-    virtual void pleaseStopSync() override;
-
-    virtual aio::AbstractAioThread* getAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override;
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
-    /** Returns \a false, if maximum retries have been done */
+    /** Returns false, if maximum retries have been done. */
     bool scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFunc);
 
+    unsigned int retriesLeft() const;
+    boost::optional<std::chrono::nanoseconds> timeToEvent() const;
     std::chrono::milliseconds currentDelay() const;
 
-    /** Resets internal state to default values */
+    /** Resets internal state to default values. */
     void reset();
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
-    aio::Timer m_timer;
+    std::unique_ptr<aio::Timer> m_timer;
     const RetryPolicy m_retryPolicy;
     std::chrono::milliseconds m_currentDelay;
     std::chrono::milliseconds m_effectiveMaxDelay;

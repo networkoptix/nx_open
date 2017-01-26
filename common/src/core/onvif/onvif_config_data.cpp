@@ -1,13 +1,8 @@
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "onvif_config_data.h"
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (QnOnvifConfigData),
-    (json),
-    _Fields,
-    (optional, true)
-)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnOnvifConfigData), (json), _Fields)
 
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnOnvifConfigDataPtr *target) {
     if(value.type() == QJsonValue::Null) {

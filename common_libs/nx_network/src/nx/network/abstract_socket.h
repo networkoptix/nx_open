@@ -1,10 +1,4 @@
-/**********************************************************
-* 28 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef ABSTRACT_SOCKET_H
-#define ABSTRACT_SOCKET_H
+#pragma once
 
 #include <chrono>
 #include <cstdint> /* For std::uintptr_t. */
@@ -16,7 +10,7 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
 
-#include "aio/pollset.h"
+#include "aio/event_type.h"
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
@@ -26,6 +20,9 @@
 // forward
 namespace nx {
 namespace network {
+
+class Pollable;
+
 namespace aio {
 
 class AbstractAioThread;
@@ -65,6 +62,7 @@ public:
     */
     virtual bool bind( const SocketAddress& localAddress ) = 0;
     bool bind( const QString& localAddress, unsigned short localPort );
+
     //!Bind to local network interface by its name
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -72,8 +70,10 @@ public:
     //virtual bool bindToInterface( const QnInterfaceAndAddr& iface ) = 0;
     //!Get local address, socket is bound to
     virtual SocketAddress getLocalAddress() const = 0;
+
     //!Close socket
     virtual bool close() = 0;
+
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
     virtual bool isClosed() const = 0;
 
@@ -85,48 +85,57 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setReuseAddrFlag( bool reuseAddr ) = 0;
+
     //!Reads reuse addr flag
     /*!
         \param val Filled with flag value in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getReuseAddrFlag( bool* val ) const = 0;
+
     //!if \a val is \a true turns non-blocking mode on, else turns it off
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setNonBlockingMode( bool val ) = 0;
+
     //!Reads non-blocking mode flag
     /*!
         \param val Filled with non-blocking mode flag in case of success. In case of error undefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getNonBlockingMode( bool* val ) const = 0;
+
     //!Reads MTU (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getMtu( unsigned int* mtuValue ) const = 0;
+
     //!Set socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setSendBufferSize( unsigned int buffSize ) = 0;
+
     //!Reads socket's send buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendBufferSize( unsigned int* buffSize ) const = 0;
+
     //!Set socket's receive buffer (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool setRecvBufferSize( unsigned int buffSize ) = 0;
+
     //!Reads socket's read buffer size (in bytes)
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getRecvBufferSize( unsigned int* buffSize ) const = 0;
+
     //!Change socket's receive timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -135,12 +144,14 @@ public:
     */
     virtual bool setRecvTimeout( unsigned int millis ) = 0;
     bool setRecvTimeout( std::chrono::milliseconds m ) { return setRecvTimeout( m.count() ); }
+
     //!Get socket's receive timeout (in millis)
     /*!
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getRecvTimeout( unsigned int* millis ) const = 0;
+
     //!Change socket's send timeout (in millis)
     /*!
         \param ms. New timeout value. 0 - no timeout
@@ -149,28 +160,36 @@ public:
     */
     virtual bool setSendTimeout( unsigned int ms ) = 0;
     bool setSendTimeout( std::chrono::milliseconds m ) { return setSendTimeout( m.count() ); }
+
     //!Get socket's send timeout (in millis)
     /*!
         \param millis In case of error value is udefined
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) const = 0;
+
     //!Get socket's last error code. Needed in case of \a aio::etError
     /*!
         \return \a true if read error code successfully, \a false otherwise
     */
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const = 0;
+
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket
     */
     virtual SOCKET_HANDLE handle() const = 0;
+
+    //!Returns handle for PollSet
+    virtual nx::network::Pollable* pollable() = 0;
+
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) = 0;
+
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
@@ -182,7 +201,7 @@ public:
     /*!
         \note if socket is not bound to any thread yet, binds it automatically
     */
-    virtual nx::network::aio::AbstractAioThread* getAioThread() = 0;
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const = 0;
 
     //!Binds current socket to specified AIOThread
     /*!
@@ -211,6 +230,7 @@ public:
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
+
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
@@ -330,7 +350,7 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of QnStoppable::pleaseStopSync
-    virtual void pleaseStopSync() override;
+    virtual void pleaseStopSync(bool checkForLocks = true) override;
 
 private:
     void readAsyncAtLeastImpl(
@@ -353,20 +373,34 @@ struct NX_NETWORK_API StreamSocketInfo
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    /** timeout, in seconds, with no activity until the first keep-alive
-     *  packet is sent */
-    int timeSec;
+    /** Timeout, in seconds, with no activity until the first keep-alive packet is sent. */
+    std::chrono::seconds time;
 
-    /** interval, in seconds, between when successive keep-alive packets
-     *  are sent if no acknowledgement is received */
-    int intervalSec;
+    /**
+     * Interval, in seconds, between when successive keep-alive packets are sent if no
+     * acknowledgement is received.
+     */
+    std::chrono::seconds interval;
 
-    /** the number of unacknowledged probes to send before considering
-     *  the connection dead and notifying the application layer */
-    int probeCount;
+    /**
+     * The number of unacknowledged probes to send before considering the connection dead and
+     * notifying the application layer.
+     */
+    size_t probeCount;
 
-    KeepAliveOptions( int time = 0, int interval = 0, int probes = 0 )
-        : timeSec( time ), intervalSec( interval ), probeCount( probes ) {}
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+
+    KeepAliveOptions(
+        std::chrono::seconds time = std::chrono::seconds::zero(),
+        std::chrono::seconds interval = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    KeepAliveOptions(size_t time, size_t interval, size_t count);
+    bool operator==(const KeepAliveOptions& rhs) const;
+
+    QString toString() const;
+    static boost::optional<KeepAliveOptions> fromString(const QString& string);
 };
 
 //!Interface for connection-orientied sockets
@@ -407,8 +441,10 @@ public:
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
         \note due to some OS limitations some values might not be actually set eg
-            windows: probeCount is not supported
-            macosx: only boolean enabled/disabled is supported
+            linux: full support
+            windows: only timeSec and intervalSec support
+            macosx: only timeSec support
+            other unix: only boolean enabled/disabled is supported
     */
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) = 0;
     //!Reads keep alive options
@@ -436,8 +472,12 @@ public:
         const QString& foreignAddress,
         unsigned short foreignPort,
         unsigned int timeoutMillis = kDefaultTimeoutMillis) = 0;
+
     //!Do SSL handshake and use encryption on succeeding data exchange
     virtual bool enableClientEncryption() = 0;
+
+    //!Has handshake has been initiated
+    virtual bool isEncryptionEnabled() const = 0;
 };
 
 //!Interface for server socket, accepting stream connections
@@ -584,5 +624,3 @@ public:
     virtual bool leaveGroup( const QString &multicastGroup ) = 0;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
-
-#endif  //ABSTRACT_SOCKET_H

@@ -5,8 +5,8 @@ angular.module('webadminApp', [
     'ngSanitize',
     'ngRoute',
     'ui.bootstrap',
-    'ui.select',
-    'ngStorage'
+    'ngStorage',
+    'typeahead-focus'
 ]).config(function ($routeProvider) {
     $routeProvider
         .when('/setup', {

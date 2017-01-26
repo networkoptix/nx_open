@@ -18,12 +18,12 @@ public:
     virtual ~QnMServerBusinessRuleProcessor();
 
     virtual QnUuid getGuid() const override;
-    
+
     /*
     * How long to keep event log in usecs
     */
     void setEventLogPeriod(qint64 periodUsec);
-
+    virtual void prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action) override;
 protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action) override;
     void onRemoveResource(const QnResourcePtr &resource);
@@ -33,7 +33,10 @@ private:
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action);
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
+    bool executeHttpRequestAction(const QnAbstractBusinessActionPtr& action);
     bool executePtzAction(const QnAbstractBusinessActionPtr& action);
+    bool executeSayTextAction(const QnAbstractBusinessActionPtr& action);
+    bool executePlaySoundAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey
@@ -86,30 +89,34 @@ private:
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
     bool sendMailInternal(const QnSendMailBusinessActionPtr& action, int aggregatedResCount );
     void sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount);
+
+    /**
+     * This method is called once per action, calculates all recipients and packs them into
+     * emailAddress action parameter with new delimiter.
+     */
     void updateRecipientsList(const QnSendMailBusinessActionPtr& action) const;
-    QStringList getRecipients(const QnSendMailBusinessActionPtr& action) const;
 
     static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
 
-    static QVariantHash eventDescriptionMap(
-        const QnAbstractBusinessActionPtr& action, 
-        const QnBusinessAggregationInfo &aggregationInfo, 
-        QnEmailAttachmentList& attachments, 
-        bool useIp);
+    static QVariantMap eventDescriptionMap(
+        const QnAbstractBusinessActionPtr& action,
+        const QnBusinessAggregationInfo &aggregationInfo,
+        QnEmailAttachmentList& attachments);
 
-    static QVariantHash eventDetailsMap(
+    static QVariantMap eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QnInfoDetail& aggregationData,
-        bool useIp,
+        Qn::ResourceInfoLevel detailLevel,
         bool addSubAggregationData = true );
 
     static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo& aggregationInfo,
-        bool useIp);
+        Qn::ResourceInfoLevel detailLevel);
+
     static QVariantList aggregatedEventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QList<QnInfoDetail>& aggregationDetailList,
-        bool useIp );
+        Qn::ResourceInfoLevel detailLevel);
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

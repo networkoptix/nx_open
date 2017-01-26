@@ -1,37 +1,36 @@
-/**********************************************************
-* 16 nov 2012
-* a.kolesnikov
-***********************************************************/
-
 #include "timer_manager.h"
 
 #include <map>
 #include <string>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QAtomicInt>
 
 #include "log/log.h"
-
 
 namespace nx {
 namespace utils {
 
 using namespace std;
 
-TimerManager::TimerGuard::TimerGuard()
-:
+TimerManager::TimerGuard::TimerGuard():
+    m_timerManager(nullptr),
     m_timerID(0)
 {
 }
 
-TimerManager::TimerGuard::TimerGuard(TimerId timerID)
+TimerManager::TimerGuard::TimerGuard(
+    TimerManager* const timerManager,
+    TimerId timerID)
 :
+    m_timerManager(timerManager),
     m_timerID(timerID)
 {
 }
 
-TimerManager::TimerGuard::TimerGuard(TimerGuard&& right)
-:
+TimerManager::TimerGuard::TimerGuard(TimerGuard&& right):
+    m_timerManager(right.m_timerManager),
     m_timerID(right.m_timerID)
 {
     right.m_timerID = 0;
@@ -50,6 +49,7 @@ TimerManager::TimerGuard& TimerManager::TimerGuard::operator=(
 
     reset();
 
+    m_timerManager = right.m_timerManager;
     m_timerID = right.m_timerID;
     right.m_timerID = 0;
     return *this;
@@ -60,7 +60,7 @@ void TimerManager::TimerGuard::reset()
 {
     if (!m_timerID)
         return;
-    TimerManager::instance()->joinAndDeleteTimer(m_timerID);
+    m_timerManager->joinAndDeleteTimer(m_timerID);
     m_timerID = 0;
 }
 
@@ -146,6 +146,14 @@ TimerId TimerManager::addTimer(
     return timerId;
 }
 
+TimerManager::TimerGuard TimerManager::addTimerEx(
+    MoveOnlyFunc<void(TimerId)> taskHandler,
+    std::chrono::milliseconds delay)
+{
+    auto timerId = addTimer(std::move(taskHandler), delay);
+    return TimerGuard(this, timerId);
+}
+
 TimerId TimerManager::addNonStopTimer(
     MoveOnlyFunc<void(TimerId)> func,
     std::chrono::milliseconds repeatPeriod,
@@ -214,6 +222,10 @@ void TimerManager::deleteTimer(const TimerId& timerID)
 
 void TimerManager::joinAndDeleteTimer(const TimerId& timerID)
 {
+    NX_ASSERT(timerID, lm("Timer id should be a positive number, 0 given."));
+    if (timerID == 0)
+        return;
+
     QnMutexLocker lk(&m_mtx);
     //having locked \a m_mtx we garantee, that execution of timer timerID will not start
 
@@ -246,10 +258,12 @@ void TimerManager::run()
 
     while (!m_terminated)
     {
+        boost::optional<std::chrono::milliseconds> timeToWait;
+
         try
         {
             qint64 currentTime = m_monotonicClock.elapsed();
-            for (;;)
+            while (!m_terminated)
             {
                 if (m_timeToTask.empty())
                     break;
@@ -264,13 +278,15 @@ void TimerManager::run()
                 m_taskToTime.erase(timerID);
                 m_timeToTask.erase(taskIter);
                 m_runningTaskID = timerID;
-                lk.unlock();
 
-                NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
-                taskContext.func(timerID);
-                NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
+                {
+                    // Using unlocker to ensure exception-safety.
+                    QnMutexUnlocker unlocker(&lk);
 
-                lk.relock();
+                    NX_LOGX(lm("Executing task %1").arg(timerID), cl_logDEBUG2);
+                    taskContext.func(timerID);
+                    NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
+                }
 
                 if (!taskContext.singleShot)
                     addTaskNonSafe(
@@ -285,27 +301,37 @@ void TimerManager::run()
                 lk.unlock();
                 //giving chance to another thread to remove task
                 lk.relock();
-
-                if (m_terminated)
-                    break;
             }
 
-            currentTime = m_monotonicClock.elapsed();
-            if (m_timeToTask.empty())
-                m_cond.wait(lk.mutex());
-            else if (m_timeToTask.begin()->first.first > currentTime)
-                m_cond.wait(lk.mutex(), m_timeToTask.begin()->first.first - currentTime);
+            if (m_terminated)
+                break;
 
-            continue;
+            currentTime = m_monotonicClock.elapsed();
+            if (!m_timeToTask.empty())
+            {
+                if (m_timeToTask.begin()->first.first <= currentTime)
+                    continue;   //< Time to execute another task.
+
+                timeToWait = std::chrono::milliseconds(
+                    m_timeToTask.begin()->first.first - currentTime);
+            }
         }
         catch (exception& e)
         {
             NX_LOG(lit("TimerManager. Error. Exception in %1:%2. %3")
                 .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())),
                 cl_logERROR);
+            timeToWait = kErrorSkipTimeout;
+            m_runningTaskID = 0;
         }
 
-        m_cond.wait(lk.mutex(), kErrorSkipTimeout.count());
+        if (m_terminated)
+            break;
+
+        if (timeToWait)
+            m_cond.wait(lk.mutex(), timeToWait->count());
+        else
+            m_cond.wait(lk.mutex());
     }
 
     NX_LOG(lit("TimerManager stopped"), cl_logDEBUG1);
@@ -374,20 +400,30 @@ TimerManager::TaskContext::TaskContext(
 {
 }
 
-
-
 std::chrono::milliseconds parseTimerDuration(
-    const QString& duration,
+    const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
 {
+    QString duration = durationNotTrimmed.trimmed();
+
     std::chrono::milliseconds res;
     bool ok(true);
-    const auto toUInt = [&](int suffixLen)
-    {
-        return suffixLen
-            ? duration.left(duration.length() - suffixLen).toULongLong(&ok)
-            : duration.toULongLong(&ok);
-    };
+    const auto toUInt =
+        [&](int suffixLen) -> qulonglong
+        {
+            const auto& stringWithoutSuffix = 
+                suffixLen
+                ? duration.left(duration.length() - suffixLen)
+                : duration;
+
+            if (stringWithoutSuffix.isEmpty())
+            {
+                ok = false;
+                return 0;
+            }
+
+            return stringWithoutSuffix.toULongLong(&ok);
+        };
 
     if (duration.endsWith(lit("ms"), Qt::CaseInsensitive))
         res = std::chrono::milliseconds(toUInt(2));
@@ -402,8 +438,23 @@ std::chrono::milliseconds parseTimerDuration(
     else
         res = std::chrono::seconds(toUInt(0));
 
-    return (ok && res.count()) ? res : defaultValue;
+    return ok ? res : defaultValue;
 }
 
-}   //namespace utils
-}   //namespace nx
+boost::optional<std::chrono::milliseconds> parseOptionalTimerDuration(
+    const QString& durationNotTrimmed,
+    std::chrono::milliseconds defaultValue)
+{
+    QString duration = durationNotTrimmed.trimmed().toLower();
+    if (duration == lit("none") || duration == lit("disabled"))
+        return boost::none;
+
+    const auto value = parseTimerDuration(duration, defaultValue);
+    if (value.count() == 0)
+        return boost::none;
+    else
+        return value;
+}
+
+} // namespace utils
+} // namespace nx

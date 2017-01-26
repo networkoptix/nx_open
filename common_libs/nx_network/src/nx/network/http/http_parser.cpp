@@ -6,60 +6,58 @@
 #include "http_parser.h"
 
 
-namespace nx_http
+namespace nx_http {
+
+MessageParser::MessageParser()
+:
+    m_msg(nullptr)
 {
-    MessageParser::MessageParser()
-    :
-        m_msg( nullptr )
+}
+
+void MessageParser::setMessage(Message* const msg)
+{
+    m_msg = msg;
+}
+
+nx_api::ParserState MessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
+{
+    if (buf.isEmpty())
     {
+        if (m_httpStreamReader.state() != HttpStreamReader::readingMessageBody)
+            return nx_api::ParserState::inProgress;
+        m_httpStreamReader.forceEndOfMsgBody();
+        *m_msg = m_httpStreamReader.takeMessage();
+        return nx_api::ParserState::done;
     }
 
-    void MessageParser::setMessage( Message* const msg )
+    if (!m_httpStreamReader.parseBytes(buf, nx_http::BufferNpos, bytesProcessed))
+        return nx_api::ParserState::failed;
+
+    switch (m_httpStreamReader.state())
     {
-        m_msg = msg;
-    }
+        //TODO #ak currently, always reading full message before going futher.
+        //  Have to add support for infinite request message body to async server
+        //case HttpStreamReader::pullingLineEndingBeforeMessageBody:
+        //case HttpStreamReader::readingMessageBody:
+        case HttpStreamReader::messageDone:
+            *m_msg = m_httpStreamReader.takeMessage();
+            if (m_msg->type == MessageType::request)
+                m_msg->request->messageBody = m_httpStreamReader.fetchMessageBody();
+            else if (m_msg->type == MessageType::response)
+                m_msg->response->messageBody = m_httpStreamReader.fetchMessageBody();
+            return nx_api::ParserState::done;
 
-    //!Returns current parse state
-    /*!
-        Methods returns if:\n
-            - end of message found
-            - source data depleted
+        case HttpStreamReader::parseError:
+            return nx_api::ParserState::failed;
 
-        \param buf
-        \param bytesProcessed Number of bytes from \a buf which were read and parsed is stored here
-        \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
-        \note Reads whole message even if parse error occured
-    */
-    ParserState::Type MessageParser::parse( const nx::Buffer& buf, size_t* bytesProcessed )
-    {
-        if( !m_httpStreamReader.parseBytes( buf, nx_http::BufferNpos, bytesProcessed ) )
-            return ParserState::failed;
-
-        switch( m_httpStreamReader.state() ) 
-        {
-            //TODO #ak currently, always reading full message before going futher.
-            //  Have to add support for infinite request message body to async server
-            //case HttpStreamReader::pullingLineEndingBeforeMessageBody:
-            //case HttpStreamReader::readingMessageBody:
-            case HttpStreamReader::messageDone:
-                *m_msg = m_httpStreamReader.message();
-                if (m_msg->type == MessageType::request)
-                    m_msg->request->messageBody = m_httpStreamReader.fetchMessageBody();
-                else if (m_msg->type == MessageType::response)
-                    m_msg->response->messageBody = m_httpStreamReader.fetchMessageBody();
-                return ParserState::done;
-
-            case HttpStreamReader::parseError:
-                return ParserState::failed;
-
-            default:
-                return ParserState::inProgress;
-        }
-    }
-
-    //!Resets parse state and prepares for parsing different data
-    void MessageParser::reset()
-    {
-        m_httpStreamReader.resetState();
+        default:
+            return nx_api::ParserState::inProgress;
     }
 }
+
+void MessageParser::reset()
+{
+    m_httpStreamReader.resetState();
+}
+
+}   // namespace nx_http

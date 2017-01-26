@@ -1,11 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -37,11 +30,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>client.bin</artifactId>
+            <artifactId>desktop_client</artifactId>
             <version>${project.version}</version>
             <type>pom</type> 
             <scope>system</scope>
-            <systemPath>${root.dir}/client.bin/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/desktop_client/pom.xml</systemPath>
         </dependency>			
     </dependencies>			
 
@@ -72,11 +65,10 @@
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <failOnError>false</failOnError>
                             <skip>skip-deb</skip>                        
                             <target>							
                                 <chmod file="${project.build.directory}/*.sh" perm="755"/>							
-                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build-dist.sh" failifexecutionfails="true" />                                        
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/build-dist.sh"  failonerror="true" failifexecutionfails="true" />                                        
                             </target>
                         </configuration>
                     </execution>					

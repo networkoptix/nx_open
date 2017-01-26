@@ -3,7 +3,7 @@
 
 #include <QtCore/QTimer>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <common/common_module.h>
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
@@ -153,7 +153,9 @@ bool QnStatisticsManager::registerStatisticsModule(const QString &alias
 
 bool QnStatisticsManager::isStatisticsSendingAllowed() const
 {
-    return qnGlobalSettings->isInitialized() && qnGlobalSettings->isStatisticsAllowed();
+    return qnGlobalSettings->isInitialized() &&
+           qnGlobalSettings->isStatisticsAllowed() &&
+           !qnGlobalSettings->isNewSystem();
 }
 
 void QnStatisticsManager::unregisterModule(const QString &alias)
@@ -307,6 +309,7 @@ void QnStatisticsManager::sendStatistics()
     QnSendStatisticsRequestData request;
     request.statisticsServerUrl = settings.statisticsServerUrl;
     request.metricsList = totalFiltered;
+    request.format = Qn::SerializationFormat::UbjsonFormat;
     m_handle = connection->sendStatisticsAsync(request, callback, QThread::currentThread());
 }
 
@@ -326,7 +329,7 @@ void QnStatisticsManager::saveCurrentStatistics()
     // Appends mandatory metrics
 
     const auto sessionId = QnUuid::createUuid();
-    const auto systemName = qnCommon->localSystemName();
+    const auto systemName = qnGlobalSettings->systemName();
     metrics.insert(kSessionIdMetricTag, sessionId.toString());
     metrics.insert(kClientMachineIdMetricTag, m_clientId.toString());
     metrics.insert(kSystemNameMetricTag, systemName);

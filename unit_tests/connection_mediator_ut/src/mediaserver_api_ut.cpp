@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <utils/thread/sync_queue.h>
+#include <nx/utils/test_support/sync_queue.h>
 
 #include "mediator_mocks.h"
 
@@ -14,7 +14,7 @@ TEST( MediaserverApi, DISABLED_Hardcode )
     nx::stun::MessageDispatcher dispatcher;
     CloudDataProviderMock cloud;
     MediaserverApi api( &cloud, &dispatcher );
-    TestSyncMultiQueue< SocketAddress, bool > results;
+    nx::utils::TestSyncMultiQueue< SocketAddress, bool > results;
 
     // 1. success
     api.pingServer( lit("localhost:7001"),

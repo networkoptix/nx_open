@@ -10,14 +10,32 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
+#include <utils/crypt/symmetrical.h>
+
+namespace {
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
+
+bool storeUrlForRole(Qn::ConnectionRole role)
+{
+    switch (role)
+    {
+        case Qn::CR_LiveVideo:
+        case Qn::CR_SecondaryLiveVideo:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+} //anonymous namespace
 
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
@@ -60,8 +78,10 @@ float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality,
     return qMax(192.0, result);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
 {
+    QN_UNUSED(role);
+
     auto result = rawSuggestBitrateKbps(quality, resolution, fps);
 
     if (bitratePerGopType() != Qn::BPG_None)
@@ -345,14 +365,14 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 
         switch( it->codec )
         {
-            case CODEC_ID_H264:
+            case AV_CODEC_ID_H264:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MPEG4:
+            case AV_CODEC_ID_MPEG4:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MJPEG:
+            case AV_CODEC_ID_MJPEG:
                 it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:
@@ -434,13 +454,59 @@ void QnVirtualCameraResource::saveParamsAsync()
     propertyDictionary->saveParamsAsync(getId());
 }
 
+void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
+{
+    auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
+        getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+
+    if (decodedCredentials.isEmpty() || decodedCredentials == lit(":"))
+    {
+        setDefaultAuth(login, password);
+        saveParams();
+    }
+}
+
+QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
+{
+    if (!storeUrlForRole(role))
+        return QString();
+
+    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::CAMERA_STREAM_URLS).toUtf8()).object();
+    const auto roleStr = QString::number(role);
+    return streamUrls[roleStr].toString();
+}
+
+void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
+{
+    if (!storeUrlForRole(role) || url.isEmpty())
+        return;
+
+    auto cachedUrl = m_cachedStreamUrls.find(role);
+    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+
+    if (cachedUrlExists && cachedUrl->second == url)
+        return;
+
+    auto urlUpdater = 
+        [url, role](QString oldValue)
+        {
+            const auto roleStr = QString::number(role);
+            QJsonObject streamUrls = QJsonDocument::fromJson(oldValue.toUtf8()).object();
+            streamUrls[roleStr] = url;
+            return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
+        };
+
+    if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
+        saveParams();
+}
+
 int QnVirtualCameraResource::saveAsync()
 {
     ec2::ApiCameraData apiCamera;
     fromResourceToApi(toSharedPointer(this), apiCamera);
 
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    return conn->getCameraManager()->addCamera(apiCamera, this, []{});
+    return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 
 void QnVirtualCameraResource::issueOccured() {
@@ -483,7 +549,23 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
-const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
+QnAspectRatio QnVirtualCameraResource::aspectRatio() const
+{
+    qreal customAr = customAspectRatio();
+    if (!qFuzzyIsNull(customAr))
+        return QnAspectRatio::closestStandardRatio(customAr);
+
+    const auto s = mediaStreams();
+    if (!s.streams.empty())
+    {
+        const QSize size = s.streams[0].getResolution();
+        return QnAspectRatio::closestStandardRatio(static_cast<qreal>(size.width()) / size.height());
+    }
+
+    return QnAspectRatio();
+}
+
+const QLatin1String CameraMediaStreamInfo::anyResolution("*");
 
 QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
 {
@@ -517,7 +599,7 @@ QSize CameraMediaStreamInfo::getResolution() const
         return QSize();
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
-        (CameraMediaStreamInfo)(CameraMediaStreams) \
-        (CameraBitrateInfo)(CameraBitrates), \
-        (json), _Fields )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (CameraMediaStreamInfo)(CameraMediaStreams)(CameraBitrateInfo)(CameraBitrates),
+    (json),
+    _Fields)

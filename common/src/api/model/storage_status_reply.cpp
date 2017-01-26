@@ -33,4 +33,5 @@ QnStorageSpaceData::QnStorageSpaceData( const QnStorageResourcePtr &storage, boo
 QnStorageStatusReply::QnStorageStatusReply()
     : pluginExists(true)
     , storage()
+    , status(Qn::StorageInit_Ok)
 {}

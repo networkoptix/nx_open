@@ -6,12 +6,29 @@ QnMediaCyclicBuffer::QnMediaCyclicBuffer(size_type bufferSize, int align):
     m_buffer(0),
     m_maxSize(bufferSize),
     m_size(0),
-    m_offset(0)
+    m_offset(0),
+    m_align(align)
 {
     if (bufferSize > 0) {
+        NX_ASSERT(bufferSize >= align);
         m_buffer = (value_type*) qMallocAligned(bufferSize, align);
         NX_ASSERT(m_buffer, Q_FUNC_INFO, "not enough memory");
     }
+}
+
+bool QnMediaCyclicBuffer::resize(size_type size)
+{
+    value_type* buffer = (value_type*)qMallocAligned(size, m_align);
+    NX_ASSERT(buffer, Q_FUNC_INFO, "not enough memory");
+
+    if (buffer != nullptr)
+    {
+        qFreeAligned(m_buffer);
+        m_buffer = buffer;
+        m_maxSize = size;
+    }
+
+    return buffer != nullptr;
 }
 
 QnMediaCyclicBuffer::~QnMediaCyclicBuffer()
@@ -39,7 +56,7 @@ void QnMediaCyclicBuffer::insert(size_type pos, const value_type* data, size_typ
 void QnMediaCyclicBuffer::pop_front(size_type size)
 {
     NX_ASSERT(m_size >= size);
-    
+
     m_size -= size;
     m_offset += size;
     if (m_offset >= m_maxSize)

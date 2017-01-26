@@ -14,79 +14,53 @@ struct AVCodecContext;
 
 bool QnFfmpegAudioDecoder::m_first_instance = true;
 
-AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
-{
-    if (fmt.sampleSize() == 8)
-        return AV_SAMPLE_FMT_U8;
-    else if(fmt.sampleSize() == 16 && fmt.sampleType() == QnAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S16;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::SignedInt)
-        return AV_SAMPLE_FMT_S32;
-    else if(fmt.sampleSize() == 32 && fmt.sampleType() == QnAudioFormat::Float)
-        return AV_SAMPLE_FMT_FLT;
-    else
-        return AV_SAMPLE_FMT_NONE;
-}
-
 // ================================================
 
 QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
-    c(0),
-    m_codec(data->compressionType)
+    m_audioDecoderCtx(0),
+    m_initialized(false),
+    m_codec(data->compressionType),
+    m_outFrame(av_frame_alloc())
 {
     if (m_first_instance)
     {
         m_first_instance = false;
     }
 
-//    CodecID codecId = internalCodecIdToFfmpeg(m_codec);
+//    AVCodecID codecId = internalCodecIdToFfmpeg(m_codec);
 
-    if (m_codec != CODEC_ID_NONE)
+    if (m_codec != AV_CODEC_ID_NONE)
     {
         codec = avcodec_find_decoder(m_codec);
     }
     else
     {
         codec = 0;
-        c = 0;
+        m_audioDecoderCtx = 0;
         return;
     }
 
-    c = avcodec_alloc_context3(codec);
+    m_audioDecoderCtx = avcodec_alloc_context3(codec);
 
     if (data->context)
     {
-        QnFfmpegHelper::mediaContextToAvCodecContext(c, data->context);
+        QnFfmpegHelper::mediaContextToAvCodecContext(m_audioDecoderCtx, data->context);
     }
     else {
         NX_ASSERT(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
-        /*
-        c->codec_id = m_codec;
-        c->codec_type = AVMEDIA_TYPE_AUDIO;
-        c->sample_fmt = audioFormatQtToFfmpeg(data->format);
-        c->channels = data->format.channels();
-        c->sample_rate = data->format.frequency();
-        c->bits_per_coded_sample = qMin(24, data->format.sampleSize());
-
-        c->bit_rate = data->format.bitrate;
-        c->block_align = data->format.block_align;
-        c->channel_layout = data->format.channel_layout;
-
-        if (data->format.extraData.size() > 0)
-        {
-            c->extradata_size = data->format.extraData.size();
-            c->extradata = (quint8*) av_malloc(c->extradata_size);
-            memcpy(c->extradata, &data->format.extraData[0], c->extradata_size);
-        }
-        */
     }
-    avcodec_open2(c, codec, NULL);
+    m_initialized = avcodec_open2(m_audioDecoderCtx, codec, NULL) >= 0;
+}
+
+bool QnFfmpegAudioDecoder::isInitialized() const
+{
+    return m_initialized;
 }
 
 QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
-    QnFfmpegHelper::deleteAvCodecContext(c);
-    c = 0;
+    QnFfmpegHelper::deleteAvCodecContext(m_audioDecoderCtx);
+    av_frame_free(&m_outFrame);
 }
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
@@ -104,33 +78,39 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
     int outbuf_len = 0;
 
-    while (size > 0) 
+    while (size > 0)
     {
-
-        int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
-
-        if (outbuf_len + out_size > (int)result.capacity())
-        {
-            //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
-            result.reserve(result.capacity() * 2);
-            outbuf = (quint8*) result.data() + outbuf_len;
-        }
-
         AVPacket avpkt;
         av_init_packet(&avpkt);
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
-        // TODO: #vasilenko avoid using deprecated methods
-        int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
-
-        if (len < 0) 
+        int got_frame = 0;
+        // todo: ffmpeg-test
+        // TODO: #dmishin get rid of deprecated functions
+        int inputConsumed = avcodec_decode_audio4(m_audioDecoderCtx, m_outFrame, &got_frame, &avpkt);
+        if (inputConsumed < 0)
             return false;
+        if (got_frame)
+        {
+            int decodedBytes = m_outFrame->nb_samples * QnFfmpegHelper::audioSampleSize(m_audioDecoderCtx);
+            if (outbuf_len + decodedBytes > (int)result.capacity())
+            {
+                //NX_ASSERT(false, Q_FUNC_INFO, "Too small output buffer for audio decoding!");
+                result.reserve(result.capacity() * 2);
+                outbuf = (quint8*)result.data() + outbuf_len;
+            }
 
-        outbuf_len+=out_size;
-        outbuf+=out_size;
-        size -= len;
-        inbuf_ptr += len;
+            if (!m_audioHelper)
+                m_audioHelper.reset(new QnFfmpegAudioHelper(m_audioDecoderCtx));
+            m_audioHelper->copyAudioSamples(outbuf, m_outFrame);
+
+            outbuf_len += decodedBytes;
+            outbuf += decodedBytes;
+        }
+
+        size -= inputConsumed;
+        inbuf_ptr += inputConsumed;
 
     }
     result.finishWriting(outbuf_len);

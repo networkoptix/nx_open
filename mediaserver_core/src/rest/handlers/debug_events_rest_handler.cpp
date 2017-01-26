@@ -78,7 +78,7 @@ int QnDebugEventsRestHandler::testNetworkIssue(const QnRequestParams & params, Q
     return nx_http::StatusCode::notImplemented;
 }
 
-int QnDebugEventsRestHandler::testCameraDisconnected(const QnRequestParams & params, QnJsonRestResult &result) {
+int QnDebugEventsRestHandler::testCameraDisconnected(const QnRequestParams & params, QnJsonRestResult &/*result*/) {
 
     QnVirtualCameraResourcePtr camera = qnResPool->getAllCameras(QnResourcePtr()).first();
 

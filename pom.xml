@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness</name>
+    <name>Nx Witness</name>
 
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
@@ -30,14 +30,19 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <cloud_connect_test_util.guid>{931F412E-DCC2-426B-93CD-1F551CA69D93}</cloud_connect_test_util.guid>
+        <media_db_util.guid>{931E412E-4CB2-426B-93CD-1F581CA69D93}</media_db_util.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
+        <nx_speech_synthesizer.guid>{08927adb-9495-49a3-990d-e56d699203f7}</nx_speech_synthesizer.guid>
         <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <nx_media.guid>{3fbafa12-f3a7-4fd2-bafc-256427399a56}</nx_media.guid>
         <nx_network.guid>{71fb3cab-00f4-41a3-af08-ae0a61b8c79e}</nx_network.guid>
         <nx_utils.guid>{81BDC343-5614-4C4D-90E8-147A024BEAF4}</nx_utils.guid>
+        <nx_fusion.guid>{0ac7e9d9-df58-456f-a568-0bd7ca5eacda}</nx_fusion.guid>
+        <nx_vms_utils.guid>{c4174ab7-1537-498b-8c4d-091d05e4735a}</nx_vms_utils.guid>
         <udt.guid>{7f5cd83f-b59e-4020-b35b-de4edaf66233}</udt.guid>
         <cloud_db_client.guid>{0F7C2BCF-DA0B-4E2E-8F4B-564AE63FAD73}</cloud_db_client.guid>
         <nx_audio.guid>{d335c660-3c62-4048-a1eb-b1606159a2dd}</nx_audio.guid>
+        <nx_bpi_videonode_plugin.guid>{5e528d46-180a-4ea2-85b0-eeccef76ef79}</nx_bpi_videonode_plugin.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <appserver2_ut.guid>{9ad34f32-99ec-4174-9991-1dedc7177123}</appserver2_ut.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
@@ -54,9 +59,9 @@
         <mediaserver.guid>{ee61c3cc-791c-4f9f-9917-9e7c9ce9e907}</mediaserver.guid>
         <mobile_client.guid>{4d58c9a4-8dbe-480c-a974-634a7e2862ef}</mobile_client.guid>
         <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
-        <client.core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client.core.guid>
-        <client.bin.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</client.bin.guid>
-        <client.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</client.guid>
+        <libclient_core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</libclient_core.guid>
+        <desktop_client.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</desktop_client.guid>
+        <libclient.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</libclient.guid>
         <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>
         <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
@@ -66,41 +71,59 @@
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
         <libcloud_db.guid>{BBA5BB95-B669-42C4-8074-EE0E361C094E}></libcloud_db.guid>
+        <time_server.guid>{5640EBAF-8312-4C7C-851E-A48F0B5E2208}</time_server.guid>
         <cloud_db.guid>{44ADCF67-21B0-403D-A771-C138B11CDB83}></cloud_db.guid>
         <cloud_db_ut.guid>{626088EE-4911-4676-9152-F49BA62E1729}</cloud_db_ut.guid>
         <connection_mediator.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</connection_mediator.guid>
         <connection_mediator_ut.guid>{85C18AB2-22ED-450B-BF13-3792189C771F}</connection_mediator_ut.guid>
+        <vms_gateway_ut.guid>{DFBAE289-29C2-4026-A8F6-B8A2D131DC75}</vms_gateway_ut.guid>
         <libconnection_mediator.guid>{109DCEE1-AADA-4C88-9FE4-8521525EF7FF}</libconnection_mediator.guid>
+        <cloud_connect_auto_test.guid>{D2C6C354-447F-4786-9270-FD2F73552322}</cloud_connect_auto_test.guid>
+        <libvms_gateway.guid>{76E39CFB-F504-428A-B67E-2544D4222E28}</libvms_gateway.guid>
+        <vms_gateway.guid>{A2C631CB-073C-4F1A-9B47-63C52B68B71C}</vms_gateway.guid>
+        <testcamera.guid>{f98dae04-4b22-4d73-b55a-038cfa0f3cfe}</testcamera.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
-        <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
-        <appserver.name>Enterprise Controller</appserver.name>
-        <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
+
         <client.name>${company.name} ${product.name} Client</client.name>
-        <client.display.name>${company.name} ${display.product.name} Client</client.display.name>
+        <client.display.name>${display.product.name} Client</client.display.name>
+
         <mobile_client.name>${company.name} ${product.name} Mobile Client</mobile_client.name>
-        <mobile_client.display.name>${company.name} ${display.product.name} Mobile Client</mobile_client.display.name>
-        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
-        <applauncher.name>${product.name} Launcher</applauncher.name>
-        <applauncher.display.name>${display.product.name} Launcher</applauncher.display.name>
+        <mobile_client.display.name>${display.product.name} Mobile Client</mobile_client.display.name>
+
+        <mediaserver.name>${company.name} Media Server</mediaserver.name>
+        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
+
+        <!-- >
+            When you are adding new names to this list, please note the following:
+            1) Names are actual only for binary project. Libraries should not require the name.
+            2) Different ".name" and ".display.name" options are implementation of the migration hack HD Witness -> Nx Witness.
+               They are NOT needed for all new projects. Just use single ".name".
+        </!-->
+
+        <nxtool.name>${short.company.name} Server Tool</nxtool.name>
+        <applauncher.name>${company.name} ${display.product.name} Launcher</applauncher.name>
+        <traytool.name>${display.product.name} Tray Assistant</traytool.name>
+        <testcamera.name>${company.name} Test Camera</testcamera.name>
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
-        <!--ftpstorageplugin.name>${company.name} Ftp storage plugin</ftpstorageplugin.name-->
-        <mediaserver.name>${company.name} Media Server</mediaserver.name>
-        <mediaserver.display.name>${display.product.name} Media Server</mediaserver.display.name>
-        <mediaserver_core.name>${company.name} Media Server Core</mediaserver_core.name>
-        <mediaserver_core.display.name>${display.product.name} Media Server Core</mediaserver_core.display.name>
-        <mediaproxy.name>${company.name} Media Proxy</mediaproxy.name>
-        <mediaproxy.display.name>${company.name} Media Proxy</mediaproxy.display.name>
-        <nxtool.name>${nxtool.company.name} Server Tool</nxtool.name>
-        <nxtool.display.name>${nxtool.company.name} Server Tool</nxtool.display.name>
-        <testcamera.name>${company.name} Test Camera</testcamera.name>
-        <traytool.name>${product.name} Tray Assistant</traytool.name>
-        <traytool.display.name>${display.product.name} Tray Assistant</traytool.display.name>
+        <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
+        <cloud_connect_auto_test.name>${company.name} Cloud Connect Auto Test</cloud_connect_auto_test.name>
+        <minilauncher.name>${company.name} ${display.product.name} Launcher</minilauncher.name>
+        <media_db_util.name>${company.name} ${display.product.name} Media DB Utility</media_db_util.name>
+
+        <product.display.title>${product.title}</product.display.title>
+
+        <!-- Binary Filenames and paths (defaults for linux) -->
+        <client.binary.name>client-bin</client.binary.name>
+        <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+        <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+        <installation.root>/opt/${deb.customization.company.name}</installation.root>
+        <launcher.version.file>launcher.version</launcher.version.file>
 
         <!-- Build Defaults -->
         <license.environment>production</license.environment>
@@ -110,58 +133,48 @@
         <box>none</box>
         <modification/>
         <beta>true</beta>
-        <final.artifact.name>${project.artifactId}</final.artifact.name>
         <build.suffix>${arch}</build.suffix>
-        <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}-${build.configuration}-beta</finalName>
         <updateFeedUrl>${testUpdateFeedUrl}</updateFeedUrl>
         <mobile>false</mobile>
-        <newmobile></newmobile>
+        <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
-        <client.binary.name>client-bin</client.binary.name>
+
         <template>lib</template>
-        <!-- compile.option2. See profile angle  -->
-        <angle>false</angle>
+        <noQmlInQrc>false</noQmlInQrc>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1></compile.option1>
-        <compile.option2/>
-        <compile.option3/>
-        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
-        <!-- Used for cross-compilation to add -m32 on Linux to compile x86 on x64 -->
-        <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
         <rdep.target>${platform}-${arch}</rdep.target>
         <packages.dir>${environment.dir}/packages</packages.dir>
         <qt.path>packages/${rdep.target}/qt-${qt.version}</qt.path>
         <qt.dir>${environment.dir}/${qt.path}</qt.dir>
-         <!-- Can take values 'pdb', 'src' or both ('pdb, src')  -->
-        <qt.debug></qt.debug>
         <ClientHelpSourceDir>${libdir}/bin/release/help</ClientHelpSourceDir>
         <ClientVoxSourceDir>${libdir}/bin/release/vox</ClientVoxSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
+        <launcher.version.dir>${libdir}/bin/${build.configuration}</launcher.version.dir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.6.0</qt.version>
+        <qt.version>5.6.1</qt.version>
         <gtest.version>1.7.0</gtest.version>
         <gmock.version>1.7.0</gmock.version>
-        <ffmpeg.version>0.11.4</ffmpeg.version>
+        <ffmpeg.version>3.1.1</ffmpeg.version>
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
-        <onvif.version>2.1.2-io</onvif.version>
+        <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
-        <boost.version>1.56.0</boost.version>
+        <boost.version>1.60.0</boost.version>
         <quazip.version>0.7.1</quazip.version>
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
-        <server-external.version>3.0.0</server-external.version>
-        <help.version>${customization}-3.0.0</help.version>
+        <server-external.version>${release.version}</server-external.version>
+        <help.version>${customization}-${release.version}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -172,7 +185,7 @@
         <android.oslibs/>
         <ios.oslibs/>
 
-        <global.defines></global.defines>
+        <global.defines/>
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>
@@ -181,6 +194,9 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
+        <cloud.group>dev</cloud.group>
+        <cloudHostAutoDetect>false</cloudHostAutoDetect>
+        <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
         <toolchain.version>none</toolchain.version>
@@ -209,12 +225,76 @@
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <projectType>generic</projectType>
+
+        <!--
+        Proposed standart (see https://networkoptix.atlassian.net/wiki/display/SD/Installer+Filenames):
+            {product}-{apptype}-{version}-{platform}-{optional:beta_status}-{optional:cloud_instance_group}.{extension}
+        Where:
+            product = { nxwitness | dwspectrum | qulu | <other customizations> }
+            apptype = { client | server | bundle | <etc> }
+            version = { major.minor.release.build }
+            platform = { win64 | win86 | linux64 | linux86 | mac | android | ios | bpi | rpi | bananapi }
+            beta_status = { beta | <empty> }
+            cloud_instance_group = { dev | test | demo | stage | <empty if instance if prod> }
+            extension = { exe | msi | zip | tar.gz | dmg | ipa }
+        -->
+        <artifact.name.product>${installer.name}</artifact.name.product>
+        <artifact.name.version>${release.version}.${buildNumber}</artifact.name.version>
+        <artifact.name.platform>INVALID_PLATFORM</artifact.name.platform> <!-- will be defined in each platform separately -->
+        <artifact.name.beta.suffix></artifact.name.beta.suffix> <!-- will be defined in artifact-name-beta profile -->
+        <artifact.name.cloud.suffix></artifact.name.cloud.suffix> <!-- will be defined in artifact-name-cloud profile -->
+
+        <artifact.name.prefix>${artifact.name.product}</artifact.name.prefix>
+        <artifact.name.suffix>${artifact.name.version}-${artifact.name.platform}${artifact.name.beta.suffix}${artifact.name.cloud.suffix}</artifact.name.suffix>
+
+        <!-- List of public final names which are to be used everywhere -->
+        <artifact.name.client>${artifact.name.prefix}-client-${artifact.name.suffix}</artifact.name.client>
+        <artifact.name.server>${artifact.name.prefix}-server-${artifact.name.suffix}</artifact.name.server>
+        <artifact.name.bundle>${artifact.name.prefix}-bundle-${artifact.name.suffix}</artifact.name.bundle>
+        <artifact.name.servertool>${artifact.name.prefix}-servertool-${artifact.name.suffix}</artifact.name.servertool>
+        <artifact.name.client_update>${artifact.name.prefix}-client_update-${artifact.name.suffix}</artifact.name.client_update>
+        <artifact.name.server_update>${artifact.name.prefix}-server_update-${artifact.name.suffix}</artifact.name.server_update>
+        <artifact.name.paxton>${artifact.name.prefix}-paxton-${artifact.name.suffix}</artifact.name.paxton>
+        <artifact.name.paxton_plugin>${artifact.name.prefix}-paxton_plugin-${artifact.name.suffix}</artifact.name.paxton_plugin>
+        <artifact.name.cdb>${artifact.name.prefix}-cdb-${artifact.name.suffix}</artifact.name.cdb>
+        <artifact.name.hpm>${artifact.name.prefix}-hpm-${artifact.name.suffix}</artifact.name.hpm>
+        <artifact.name.client_debug>${artifact.name.prefix}-client_debug-${artifact.name.suffix}</artifact.name.client_debug>
+        <artifact.name.server_debug>${artifact.name.prefix}-server_debug-${artifact.name.suffix}</artifact.name.server_debug>
+        <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
+        <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
+        <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
+
     </properties>
 
     <build>
         <defaultGoal>package</defaultGoal>
-        <finalName>${finalName}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <exec dir="${root.dir}" executable="${init.python.dir}/${python.executable}" failifexecutionfails="true" failonerror="true">
+                                    <arg value="get_branch.py" />
+                                </exec>
+                            </tasks>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -222,7 +302,7 @@
                 <executions>
                     <execution>
                         <id>read</id>
-                        <phase>validate</phase>
+                        <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
                         </goals>
@@ -231,6 +311,7 @@
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
+                                <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
@@ -299,16 +380,20 @@
                                     <directory>${parent.customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
-                                        <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
                                 </resource>
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
-                                    <excludes>
-                                        <exclude>**/_unused/**</exclude>
-                                    </excludes>
+                                </resource>
+                                <resource>
+                                    <directory>${customization.dir}/icons/${platform}</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${customization.dir}/icons/all</directory>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
@@ -366,13 +451,14 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <module>common_libs/nx_fusion</module>
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
+                <module>common_libs/nx_vms_utils</module>
                 <module>common_libs/udt</module>
                 <module>nx_cloud/cloud_db_client</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
-                <!-- <module>testcamera</module> -->
             </modules>
         </profile>
         <profile>
@@ -384,15 +470,7 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/cloud_connectivity_ut</module>
-                <!--<module>unit_tests/cloud_db_ut</module>-->
-                <module>unit_tests/common_ut</module>
-                <module>unit_tests/connection_mediator_ut</module>
-                <module>unit_tests/mediaserver_core_ut</module>
-                <module>unit_tests/nx_network_ut</module>
-                <module>unit_tests/utils_ut</module>
-                <!--<module>unit_tests/image_library_plugin_ut</module>-->
-                <!--<module>unit_tests/traytool_ut</module>-->
+                <module>unit_tests</module>
             </modules>
         </profile>
         <profile>
@@ -413,6 +491,7 @@
                 <module>nx_sdk</module>
                 <module>nx_storage_sdk</module>
 
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
 
@@ -424,11 +503,7 @@
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
-                <!-- <module>testcamera</module> -->
             </modules>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
-            </properties>
         </profile>
         <profile>
             <id>desktop</id>
@@ -443,16 +518,29 @@
                 <additional.qtlibs>DBus, WebChannel, Webkit, WebkitWidgets</additional.qtlibs>
             </properties>
             <modules>
-                <module>applauncher</module>
-                <module>client.core</module>
-                <module>client</module>
-                <module>client.bin</module>
                 <module>common_libs/nx_audio</module>
-                <module>nx_cloud/cloud_db</module>
-                <module>nx_cloud/connection_mediator</module>
-                <module>nx_cloud/cloud_connect_test_util</module>
-                <module>nx_cloud/libcloud_db</module>
-                <module>nx_cloud/libconnection_mediator</module>
+                <module>client/applauncher</module>
+                <module>client/libclient_core</module>
+                <module>client/libclient</module>
+                <module>client/desktop_client</module>
+                <module>common_libs/nx_media</module>
+                <module>nx_cloud/libvms_gateway</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>desktop-nomac</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>!mac</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>
+                <module>client/mobile_client</module>
             </modules>
         </profile>
         <profile>
@@ -464,14 +552,11 @@
             </activation>
             <properties>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
-                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
-                <python.dir>${libdir}/${arch}/python/scripts</python.dir>
                 <python.executable>python.exe</python.executable>
                 <python.virtualenv>virtualenv.exe</python.virtualenv>
                 <buildenv.script>get_buildenv_2.6.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>none</box>
-                <compiler>msvc2015u1</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
@@ -480,16 +565,20 @@
                 <VCVars>VS140COMNTOOLS</VCVars>
                 <modification>winxp</modification>
                 <client.binary.name>${product.name}.exe</client.binary.name>
-                <ClientHelpSourceDir>${libdir}/${arch}/bin/release/help</ClientHelpSourceDir>
-                <ClientVoxSourceDir>${libdir}/${arch}/bin/release/vox</ClientVoxSourceDir>
-
+                <applauncher.binary.name>applauncher.exe</applauncher.binary.name>
+                <minilauncher.binary.name>${product.name} Launcher.exe</minilauncher.binary.name>
+                <installation.root>C:/Program Files/${company.name}/${display.product.name}/</installation.root>
+                <init.python.dir>${environment.dir}/python/x64</init.python.dir>
                 <profile.classifier>${platform}</profile.classifier>
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
                 <machine.type>X64</machine.type>
+                <qt.version>5.6.1-1</qt.version>
+                <artifact.name.platform>win64</artifact.name.platform>
             </properties>
+
         </profile>
         <profile>
             <id>windows-x86</id>
@@ -505,6 +594,7 @@
             </activation>
             <properties>
                 <machine.type>X86</machine.type>
+                <artifact.name.platform>win86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -519,10 +609,20 @@
                 </property>
             </activation>
             <modules>
+                <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
+                <module>client/minilauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <!--<module>nxtool</module>-->
+                <module>testcamera</module>
                 <module>wixsetup</module>
             </modules>
         </profile>
@@ -542,10 +642,10 @@
                 </file>
             </activation>
             <modules>
-                <module>axclient</module>
+                <module>client/activex_client</module>
                 <module>plugins/nxinterface</module>
                 <module>plugins/nxcontrol</module>
-                <module>plugins/acs/paxton</module>
+                <module>plugins/acs/paxton-plugin</module>
                 <module>plugins/acs/paxton-installer</module>
             </modules>
         </profile>
@@ -579,12 +679,10 @@
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
                 <init.python.dir>/usr/bin</init.python.dir>
-                <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
                 <common.platform>unix</common.platform>
-                <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
                 <unix>true</unix>
                 <windows>false</windows>
@@ -617,7 +715,6 @@
                 </os>
             </activation>
             <properties>
-                <additional.compiler>clang</additional.compiler>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
             </properties>
@@ -637,14 +734,24 @@
             <properties>
                 <platform>macosx</platform>
                 <arch>x64</arch>
+                <modification>macosx</modification>
                 <quazip.version>0.7.2</quazip.version>
                 <qt.spec/>
                 <python.executable>python</python.executable>
                 <python.virtualenv>virtualenv</python.virtualenv>
+                <client.binary.name>${display.product.name}</client.binary.name>
+                <minilauncher.binary.name>applauncher</minilauncher.binary.name>
+                <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
+                <installation.root>/Applications/</installation.root>
+                <artifact.name.platform>mac</artifact.name.platform>
+                <qt.version>5.6.2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
+                <module>common_libs/nx_speech_synthesizer</module>
                 <module>macsetup/client-dmg</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
             </modules>
         </profile>
 
@@ -662,10 +769,18 @@
                 </property>
             </activation>
             <modules>
+                <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <module>testcamera</module>
+                <module>nx_cloud/libvms_gateway</module>
+                <module>nx_cloud/vms_gateway</module>
+                <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/connection_mediator-deb</module>
-                <module>debsetup/cloud_db-deb</module>
             </modules>
             <properties>
                 <modification>ubuntu</modification>
@@ -688,8 +803,8 @@
             <properties>
                 <build.suffix>${box}-${arch}</build.suffix>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <compile.option1/>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
+                <artifact.name.platform>${box}</artifact.name.platform>
             </properties>
             <build>
                 <directory>target-${box}</directory>
@@ -710,9 +825,7 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <compiler>2011.09</compiler>
                 <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
@@ -741,13 +854,11 @@
                 </property>
             </activation>
             <properties>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <qt.spec/>
@@ -773,18 +884,19 @@
             </activation>
             <properties>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
+                <festival.version>2.1x-SNAPSHOT</festival.version>
                 <qt.spec/>
                 <modification>rpi</modification>
                 <rdep.target>rpi</rdep.target>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!--<module>plugins/rpi_cam</module>-->
                 <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_speech_synthesizer</module>
             </modules>
         </profile>
 
@@ -803,21 +915,30 @@
                 </property>
             </activation>
             <properties>
+                <qt.version>5.6.2</qt.version>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
+                <festival.version>2.1x</festival.version>
                 <modification>bpi</modification>
                 <rdep.target>bpi</rdep.target>
                 <liteMode>true</liteMode>
-                <qt.spec/>
-                <!-- TODO get rid of this variable. We already have corresponding package name in common/pom.xml -->
                 <gcc.version>4.8.3</gcc.version>
+                <qt.spec/>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
+                <module>common_libs/nx_bpi_videonode_plugin</module>
                 <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_media</module>
+                <module>common_libs/nx_audio</module>
+                <module>common_libs/nx_speech_synthesizer</module>
+                <module>client/libclient_core</module>
+                <module>client/mobile_client</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -836,16 +957,20 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
+                <gcc.version>4.8.3</gcc.version>
                 <qt.spec/>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
                 <!-- Banana pie uses same distro as rpi -->
                 <module>edge_firmware/rpi</module>
+                <module>common_libs/nx_speech_synthesizer</module>
+                <module>nx_cloud/libconnection_mediator</module>
+                <module>media_db_util</module>
+                <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>
         </profile>
         <profile>
@@ -864,19 +989,23 @@
             <properties>
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
-                <compiler>bpi</compiler>
                 <openssl.version>1.0.0j</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <modification>tx1</modification>
                 <rdep.target>tx1</rdep.target>
+                <gcc.version>4.8.4</gcc.version>
                 <qt.spec/>
-                <linux.defines>DISABLE_FESTIVAL</linux.defines>
+                <target.arch>armhf</target.arch>
             </properties>
             <modules>
-                <module>client.core</module>
-                <module>client</module>
-                <module>client.bin</module>
+                <module>client/libclient_core</module>
+                <module>client/libclient</module>
+                <module>client/desktop_client</module>
+                <module>client/applauncher</module>
+                <module>nx_cloud/libvms_gateway</module>
                 <module>common_libs/nx_audio</module>
+                <module>common_libs/nx_speech_synthesizer</module>
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
             </modules>
         </profile>
         <profile>
@@ -896,7 +1025,7 @@
                 <arch>x64</arch>
                 <arch.dir>x86_64-linux-gnu/</arch.dir>
                 <target.arch>amd64</target.arch>
-                <qt.spec>linux-g++-4.9-64</qt.spec>
+                <artifact.name.platform>linux64</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -916,7 +1045,7 @@
                 <arch>x86</arch>
                 <arch.dir>i386-linux-gnu/</arch.dir>
                 <target.arch>i386</target.arch>
-                <qt.spec>linux-g++-4.9-32</qt.spec>
+                <artifact.name.platform>linux86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -933,10 +1062,10 @@
                 </property>
             </activation>
             <properties>
-                <compiler.arguments>-m32</compiler.arguments>
                 <qt.spec>linux-g++-32</qt.spec>
                 <arch.dir>i386-linux-gnu/</arch.dir>
-        <target.arch>i386</target.arch>
+                <target.arch>i386</target.arch>
+                <artifact.name.platform>linux86</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -948,24 +1077,9 @@
                 </property>
             </activation>
             <properties>
-                <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
+                <beta_status />
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
-            </properties>
-        </profile>
-        <profile>
-            <id>angle</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
-                <property>
-                    <name>angle</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <properties>
-                <compile.option2>-angle</compile.option2>
             </properties>
         </profile>
 
@@ -979,15 +1093,14 @@
                     <value>true</value>
                 </property>
             </activation>
-            <properties>
-                <compile.options/>
-            </properties>
             <modules>
-                <module>client.core</module>
                 <module>common_libs/nx_media</module>
                 <module>common_libs/nx_audio</module>
-                <module>mobile_client</module>
+                <module>client/libclient_core</module>
+                <module>client/mobile_client</module>
             </modules>
+            <properties>
+            </properties>
         </profile>
         <profile>
             <id>mobile-android</id>
@@ -1006,38 +1119,17 @@
             </build>
             <properties>
                 <platform>android</platform>
-                <toolchain.version>android</toolchain.version>
-                <qt.spec>android-g++</qt.spec>
                 <libdir>${root.dir}/build_environment/target</libdir>
-                <compiler>gcc</compiler>
-                <additional.compiler>gcc</additional.compiler>
-                <profile.classifier>${platform}-${arch}</profile.classifier>
-                <android.sdk>${environment.dir}/android/android-sdk</android.sdk>
-                <android.ndk>${environment.dir}/android/android-ndk</android.ndk>
-                <android.ndk.host>linux-x86_64</android.ndk.host>
-                <android.toolchain.version>4.8</android.toolchain.version>
-                <qt.version>5.5.1</qt.version>
+                <android.sdk>${packages.dir}/android/android-sdk</android.sdk>
+                <android.ndk>${packages.dir}/android/android-ndk</android.ndk>
+                <android.toolchain.version>4.9</android.toolchain.version>
+                <android.platform>android-16</android.platform>
+                <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <openal.version>1.17.2</openal.version>
-                <openssl.version>1.0.2d</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
-                <compile.option1/>
+                <openssl.version>1.0.2g</openssl.version>
                 <rdep.target>android-${arch}</rdep.target>
-            </properties>
-        </profile>
-        <profile>
-            <id>mobile-android-desktop</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>android-desktop</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
-                </file>
-            </activation>
-            <properties>
-                <additional.compiler>${compiler}</additional.compiler>
+                <artifact.name.platform>android</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1061,17 +1153,14 @@
             <properties>
                 <platform>ios</platform>
                 <toolchain.version>ios</toolchain.version>
-                <qt.spec>macx-ios-clang</qt.spec>
+                <qt.spec/>
+                <qt.version>5.6.2</qt.version>
                 <libdir>${root.dir}/build_environment/target</libdir>
-                <compiler>clang</compiler>
-                <additional.compiler>clang</additional.compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
-                <qt.version>5.5.1</qt.version>
                 <openssl.version>1.0.1i</openssl.version>
-                <ffmpeg.version>0.11.5</ffmpeg.version>
                 <libjpeg-turbo.version>1.4.1</libjpeg-turbo.version>
-                <compile.option1/>
                 <rdep.target>ios</rdep.target>
+                <artifact.name.platform>ios</artifact.name.platform>
             </properties>
         </profile>
         <profile>
@@ -1099,7 +1188,21 @@
                     <name>linux</name>
                 </os>
                 <property>
-                    <name>test</name>
+                    <name>ut</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>unit_tests</module>
+                <module>unit_tests_run</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>unit-tests-build-only</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>utb</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -1107,5 +1210,83 @@
                 <module>unit_tests</module>
             </modules>
         </profile>
+        <profile>
+            <id>get-cloud-url</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>cloudHostAutoDetect</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>properties-maven-plugin</artifactId>
+                        <version>1.0-alpha-2</version>
+                        <executions>
+                            <execution>
+                                <id>get-cloud-url-property</id>
+                                <phase>initialize</phase>
+                                <goals>
+                                    <goal>read-project-properties</goal>
+                                </goals>
+                                <configuration>
+                                    <files>
+                                        <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
+                                    </files>
+                                    <quiet>true</quiet>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>artifacts_validator-id</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>artifactsValidator</name>
+                </property>
+            </activation>
+            <modules>
+                <module>artifacts_validator</module>
+            </modules>
+        </profile>
+
+        <!-- Artifact naming profiles -->
+
+        <profile>
+            <id>artifact-name-beta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <artifact.name.beta.suffix>-beta</artifact.name.beta.suffix>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>artifact-name-cloud</id>
+            <activation>
+                <property>
+                    <name>cloud.group</name>
+                    <value>!prod</value>
+                </property>
+            </activation>
+            <properties>
+                <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
+            </properties>
+        </profile>
+
+        <!-- End of artifact naming profiles -->
+
     </profiles>
 </project>

@@ -63,6 +63,18 @@ struct OnvifResExtInfo
     QString mac;
 };
 
+struct QnOnvifServiceUrls
+{
+	QString deviceServiceUrl;
+	QString mediaServiceUrl;
+	QString ptzServiceUrl;
+	QString imagingServiceUrl;
+	QString anlyticsServiceUrl;
+	QString eventsServiceUrl;
+	QString thermalServiceUrl;
+
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource
@@ -193,7 +205,7 @@ public:
     void setPtzConfigurationToken(const QString &src);
 
     QString getPtzProfileToken() const;
-    void setPtzProfileToken(const QString& src); 
+    void setPtzProfileToken(const QString& src);
 
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
@@ -201,9 +213,15 @@ public:
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
+    virtual void setOnvifRequestsRecieveTimeout(int timeout);
+    virtual void setOnvifRequestsSendTimeout(int timeout);
+
+    virtual int getOnvifRequestsRecieveTimeout() const;
+    virtual int getOnvifRequestsSendTimeout() const;
+
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
+    void calcTimeDrift() const; // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
@@ -232,22 +250,28 @@ public:
 
     void updateToChannel(int value);
 
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const override;
+
     bool detectVideoSourceCount();
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
 
     QnMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+    double getClosestAvailableFps(double desiredFps);
 
+    QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+
+    static bool isCameraForcedToOnvif(const QString& manufacturer, const QString& model);
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 protected:
-    int strictBitrate(int bitrate) const;
+    int strictBitrate(int bitrate, Qn::ConnectionRole role) const;
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
@@ -271,6 +295,8 @@ protected:
         return CameraDiagnostics::NoErrorResult();
     }
 
+
+
 private:
     void setMaxFps(int f);
 
@@ -281,7 +307,7 @@ private:
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-    
+
     CameraDiagnostics::Result fetchVideoSourceToken();
     CameraDiagnostics::Result fetchAndSetVideoSource();
     CameraDiagnostics::Result fetchAndSetAudioSource();
@@ -465,7 +491,8 @@ private:
     QString m_ptzUrl;
     QString m_ptzProfileToken;
     QString m_ptzConfigurationToken;
-    int m_timeDrift;
+    mutable int m_timeDrift;
+    mutable QElapsedTimer m_timeDriftTimer;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -477,23 +504,25 @@ private:
     quint64 m_renewSubscriptionTimerID;
     int m_maxChannels;
     std::map<quint64, TriggerOutputTask> m_triggerOutputTasks;
-    
+
     QnMutex m_streamConfMutex;
     QnWaitCondition m_streamConfCond;
     int m_streamConfCounter;
-    CameraDiagnostics::Result m_prevOnvifResultCode; 
+    CameraDiagnostics::Result m_prevOnvifResultCode;
     QString m_onvifNotificationSubscriptionReference;
     QElapsedTimer m_monotonicClock;
     qint64 m_prevPullMessageResponseClock;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     QString m_portNamePrefixToIgnore;
+    size_t m_inputPortCount;
+    std::vector<QString> m_portAliases;
 
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
     void onPullMessagesResponseReceived(
-        PullPointSubscriptionWrapper* soapWrapper, 
+        PullPointSubscriptionWrapper* soapWrapper,
         int resultCode,
         const _onvifEvents__PullMessagesResponse& response);
         //!Reads relay output list from resource
@@ -516,13 +545,19 @@ private:
         CapabilitiesResp* const response );
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
+    QString getInputPortNumberFromString(const QString& portName);
+
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
+	mutable QnOnvifServiceUrls m_serviceUrls;
+    mutable QnResourceVideoLayoutPtr m_videoLayout;
 protected:
     QnCameraAdvancedParams m_advancedParameters;
+    int m_onvifRecieveTimeout;
+    int m_onvifSendTimeout;
 };
 
 #endif //ENABLE_ONVIF

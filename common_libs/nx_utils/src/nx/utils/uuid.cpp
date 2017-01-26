@@ -97,6 +97,12 @@ QString QnUuid::toSimpleString() const
     return s.mid( 1, s.length() - 2 );
 }
 
+QByteArray QnUuid::toSimpleByteArray() const
+{
+    auto s = toByteArray();
+    return s.mid(1, s.length() - 2);
+}
+
 std::string QnUuid::toStdString() const
 {
     const auto& byteArray = toByteArray();
@@ -160,6 +166,11 @@ QnUuid QnUuid::fromStringSafe(const QString &uuid)
 QnUuid QnUuid::fromStringSafe(const QByteArray& uuid)
 {
     return QnUuid(QUuid(uuid));
+}
+
+QnUuid QnUuid::fromStringSafe(const std::string& uuid)
+{
+    return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), (int)uuid.size())));
 }
 
 QnUuid QnUuid::createUuidFromPool(const QUuid &baseId, uint offset) {

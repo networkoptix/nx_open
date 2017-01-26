@@ -9,7 +9,7 @@ namespace {
     const int readBufferSize = 1024 * 16;
     const int maxSymlinkLength = readBufferSize;
 
-    bool isSymlink(const QuaZipFileInfo &info) {
+    bool isSymlink(const QuaZipFileInfo64 &info) {
         /* According to zip format specifications the higher 4 bits contain file type. Symlink is 0xA. */
         return (info.externalAttr >> 28) == 0xA;
     }
@@ -77,7 +77,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
 
     QuaZipFile file(m_zip);
     for (bool more = m_zip->goToFirstFile(); more && !m_needStop; more = m_zip->goToNextFile()) {
-        QuaZipFileInfo info;
+        QuaZipFileInfo64 info;
         m_zip->getCurrentFileInfo(&info);
 
         QFileInfo fileInfo(info.name);
@@ -85,6 +85,7 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
 
         if (!path.isEmpty() && !m_dir.exists(path) && !m_dir.mkpath(path))
             return OtherError;
+
 
         if (isSymlink(info)) {
             if (!file.open(QuaZipFile::ReadOnly))
@@ -116,10 +117,11 @@ QnZipExtractor::Error QnZipExtractor::extractZip() {
                     return NoFreeSpace;
                 }
             }
+
+            destFile.setPermissions(info.getPermissions());
             destFile.close();
             file.close();
 
-            destFile.setPermissions(info.getPermissions());
         }
     }
 

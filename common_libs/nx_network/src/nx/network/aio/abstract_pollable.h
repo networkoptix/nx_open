@@ -26,7 +26,7 @@ class AbstractPollable
 public:
     virtual ~AbstractPollable() {}
 
-    virtual aio::AbstractAioThread* getAioThread() = 0;
+    virtual aio::AbstractAioThread* getAioThread() const = 0;
     /** Generally, binding to aio thread can be done just after 
             object creation before any usage.
         Some implementation may allow more (e.g., binding if no async 

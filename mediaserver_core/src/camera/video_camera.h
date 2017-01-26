@@ -32,7 +32,12 @@ public:
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
 
-    int copyLastGop(bool primaryLiveStream, qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq);
+    int copyLastGop(
+        bool primaryLiveStream, 
+        qint64 skipTime, 
+        QnDataPacketQueue& dstQueue, 
+        int cseq,
+        bool iFramesOnly);
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
@@ -50,10 +55,10 @@ public:
     void updateActivity();
 
     /* Mark some camera activity (RTSP client connection for example) */
-    void inUse(void* user);
+    virtual void inUse(void* user) override;
 
     /* Unmark some camera activity (RTSP client connection for example) */
-    void notInUse(void* user);
+    virtual void notInUse(void* user) override;
 
     //!Returns cache holding several last seconds of media stream
     /*!
@@ -104,6 +109,6 @@ private:
     QElapsedTimer m_lastActivityTimer;
 };
 
-typedef std::shared_ptr<QnVideoCamera> QnVideoCameraPtr;
+typedef QnSharedResourcePointer<QnVideoCamera> QnVideoCameraPtr;
 
 #endif // __VIDEO_CAMERA_H__

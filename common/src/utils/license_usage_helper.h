@@ -1,8 +1,6 @@
 #ifndef LICENSE_USAGE_HELPER_H
 #define LICENSE_USAGE_HELPER_H
 
-#ifdef ENABLE_SENDMAIL
-
 #include <array>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
@@ -36,13 +34,13 @@ public:
 
     bool isValid(Qn::LicenseType licenseType) const;
 
-    /** 
+    /**
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
      */
 
     QString getRequiredText(Qn::LicenseType licenseType) const;
 
-    /** 
+    /**
      *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for all types.
      */
     QString getRequiredMsg() const;
@@ -73,8 +71,8 @@ public:
     /** Number of licenses of the selected type currently in use (including proposed). */
     int usedLicenses(Qn::LicenseType licenseType) const;
 
-    /** 
-     *  Number of licenses of the selected type lacking for system to work. 
+    /**
+     *  Number of licenses of the selected type lacking for system to work.
      *  Always equals to 0 of the helper is valid.
      */
     int requiredLicenses(Qn::LicenseType licenseType) const;
@@ -118,7 +116,7 @@ private:
         licensesArray proposed;
         licensesArray overflow;
     };
-    
+
     mutable Cache m_cache;
 };
 
@@ -170,7 +168,7 @@ protected:
 
 private:
     void init(const QnCamLicenseUsageWatcherPtr &watcher);
-    
+
     QnCamLicenseUsageWatcherPtr m_watcher;
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
@@ -181,7 +179,7 @@ class QnSingleCamLicenceStatusHelper : public Connective<QObject>
     Q_OBJECT
 
 public:
-    enum CameraLicenseStatus 
+    enum CameraLicenseStatus
     {
         InvalidSource
         , LicenseNotUsed
@@ -239,7 +237,5 @@ private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
     int m_count;
 };
-
-#endif //ENABLE_SENDMAIL
 
 #endif // LICENSE_USAGE_HELPER_H

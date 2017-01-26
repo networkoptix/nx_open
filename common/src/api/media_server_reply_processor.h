@@ -1,13 +1,14 @@
 #ifndef QN_MEDIA_SERVER_REPLY_PROCESSOR_H
 #define QN_MEDIA_SERVER_REPLY_PROCESSOR_H
 
+#include <QtCore/QElapsedTimer>
+
 #include "abstract_reply_processor.h"
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <business/business_fwd.h>
 
-#include <api/api_fwd.h>
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/storage_status_reply.h>
@@ -20,10 +21,13 @@
 #include <api/model/camera_list_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include "model/getnonce_reply.h"
 
 #include "media_server_connection.h"
 #include "model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
+
+#include <recording/time_period_list.h>
 #include <utils/common/ldap_fwd.h>
 
 class QnTimePeriodList;
@@ -32,7 +36,7 @@ class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
 public:
-    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
+    QnMediaServerReplyProcessor(int object, const QString& serverId);
 
     virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
 
@@ -62,6 +66,7 @@ signals:
     void finished(int status, const QnCameraBookmarkList &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraBookmarkTagList &reply, int handle, const QString &errorString);
     void finished(int status, const QnConfigureReply &reply, int handle, const QString &errorString);
+    void finished(int status, const QnGetNonceReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnUploadUpdateReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnModuleInformation &reply, int handle, const QString &errorString);
     void finished(int status, const QList<QnModuleInformation> &reply, int handle, const QString &errorString);
@@ -73,6 +78,8 @@ signals:
 
 private:
     friend class QnAbstractReplyProcessor;
+    QString m_serverId; // for debug purposes
+    QElapsedTimer timer;
 };
 
 

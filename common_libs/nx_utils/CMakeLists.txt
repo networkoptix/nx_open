@@ -1,6 +1,6 @@
 project(nx_utils)
 set(PROJECT_SHORTNAME "nx_utils")
-set(PROJECT_LONGNAME "${nxtool.company.name} Utilities Library")
+set(PROJECT_LONGNAME "${short.company.name} Utilities Library")
 
 remove_definitions(-D_CONSOLE
                 -DNX_UTILS_API=__declspec\(dllimport\)

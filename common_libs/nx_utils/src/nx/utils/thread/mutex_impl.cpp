@@ -17,16 +17,12 @@ QnMutexImpl::QnMutexImpl( QMutex::RecursionMode mode, QnMutex* const _mutexPtr )
     mutexPtr( _mutexPtr ),
     recursive( mode == QMutex::Recursive )
 {
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     MutexLockAnalyzer::instance()->mutexCreated( mutexPtr );
-#endif
 }
 
 QnMutexImpl::~QnMutexImpl()
 {
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     MutexLockAnalyzer::instance()->beforeMutexDestruction( mutexPtr );
-#endif
 }
 
 void QnMutexImpl::afterMutexLocked(
@@ -37,33 +33,31 @@ void QnMutexImpl::afterMutexLocked(
     threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
 
-#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-    MutexLockKey lockKey(
-        sourceFile,
-        sourceLine,
-        mutexPtr,
-        lockID,
-        threadHoldingMutex );
-    //recursive mutex can be locked multiple times, that's why we need stack
-    currentLockStack.push( std::move(lockKey) );
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
-    MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
-#endif
-#else
-    Q_UNUSED( sourceFile );
-    Q_UNUSED( sourceLine );
-    Q_UNUSED( lockID );
-#endif
+    #if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
+        MutexLockKey lockKey(
+            sourceFile,
+            sourceLine,
+            mutexPtr,
+            lockID,
+            threadHoldingMutex );
+
+        MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
+
+        //recursive mutex can be locked multiple times, that's why we need stack
+        currentLockStack.push(std::move(lockKey));
+    #else
+        Q_UNUSED( sourceFile );
+        Q_UNUSED( sourceLine );
+        Q_UNUSED( lockID );
+    #endif
 }
 
 void QnMutexImpl::beforeMutexUnlocked()
 {
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
-    MutexLockAnalyzer::instance()->beforeMutexUnlocked( currentLockStack.top() );
-#endif
-#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
-    currentLockStack.pop();
-#endif
+    #if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
+        MutexLockAnalyzer::instance()->beforeMutexUnlocked( currentLockStack.top() );
+        currentLockStack.pop();
+    #endif
 
     if( --recursiveLockCount == 0 )
         threadHoldingMutex = 0;

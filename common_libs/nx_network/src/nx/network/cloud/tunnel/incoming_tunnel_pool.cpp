@@ -8,31 +8,20 @@ namespace network {
 namespace cloud {
 
 IncomingTunnelPool::IncomingTunnelPool(
-    aio::AbstractAioThread* ioThread, size_t acceptLimit)
+    aio::AbstractAioThread* aioThread, size_t acceptLimit)
 :
-    m_acceptLimit(acceptLimit),
-    m_terminated(false),
-    m_ioThreadSocket(new TCPSocket)
+    m_acceptLimit(acceptLimit)
 {
-    m_ioThreadSocket->bindToAioThread(ioThread);
-}
-
-IncomingTunnelPool::~IncomingTunnelPool()
-{
+    m_aioTimer.bindToAioThread(aioThread);
 }
 
 void IncomingTunnelPool::addNewTunnel(
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    std::shared_ptr<AbstractIncomingTunnelConnection> sharedConnection(
-        connection.release());
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_pool.emplace(sharedConnection);
-    }
-
-    acceptTunnel(std::move(sharedConnection));
+    NX_CRITICAL(m_aioTimer.isInSelfAioThread());
+    auto insert = m_pool.emplace(std::move(connection));
+    NX_ASSERT(insert.second);
+    acceptTunnel(insert.first);
 }
 
 std::unique_ptr<AbstractStreamSocket> IncomingTunnelPool::getNextSocketIfAny()
@@ -50,22 +39,23 @@ void IncomingTunnelPool::getNextSocketAsync(
     nx::utils::MoveOnlyFunc<void(std::unique_ptr<AbstractStreamSocket>)> handler,
     boost::optional<unsigned int> timeout)
 {
-    QnMutexLocker lock(&m_mutex);
-    NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
-
-    if (!m_acceptedSockets.empty())
     {
-        auto socket = std::move(m_acceptedSockets.front());
-        m_acceptedSockets.pop_front();
-
-        lock.unlock();
-        return handler(std::move(socket));
+        QnMutexLocker lock(&m_mutex);
+        NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Multiple accepts are not supported");
+        m_acceptHandler = std::move(handler);
+        if (!m_acceptedSockets.empty())
+        {
+            lock.unlock();
+            return m_aioTimer.dispatch([this](){ callAcceptHandler(false); });
+        }
     }
 
-    m_acceptHandler = std::move(handler);
     if (timeout && *timeout != 0)
-        m_ioThreadSocket->registerTimer(
-            *timeout, [this](){ callAcceptHandler(true); });
+    {
+        m_aioTimer.start(
+            std::chrono::milliseconds(*timeout),
+            [this](){ callAcceptHandler(true); });
+    }
 }
 
 void IncomingTunnelPool::cancelAccept()
@@ -76,45 +66,36 @@ void IncomingTunnelPool::cancelAccept()
 
 void IncomingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_terminated = true;
-    }
-
-    BarrierHandler barrier(
-        [this, handler = std::move(handler)]() mutable
+    m_aioTimer.cancelAsync(
+        [this, handler = std::move(handler)]()
         {
-            m_ioThreadSocket->pleaseStop(std::move(handler));
+            m_pool.clear();
+            handler();
         });
-
-    for (const auto& tunnel : m_pool)
-        tunnel->pleaseStop(barrier.fork());
 }
 
-void IncomingTunnelPool::acceptTunnel(
-    std::shared_ptr<AbstractIncomingTunnelConnection> connection)
+void IncomingTunnelPool::acceptTunnel(TunnelIterator connection)
 {
-    NX_LOGX(lm("accept tunnel %1").arg(connection), cl_logDEBUG2);
-    connection->accept(
+    NX_LOGX(lm("accept tunnel %1").arg(connection->get()), cl_logDEBUG2);
+    (*connection)->accept(
         [this, connection](
             SystemError::ErrorCode code,
             std::unique_ptr<AbstractStreamSocket> socket)
         {
+            if (code != SystemError::noError)
+            {
+                NX_LOGX(lm("tunnel %1 is broken: %2")
+                    .arg(connection->get()).arg(SystemError::toString(code)),
+                    cl_logDEBUG1);
+
+                m_pool.erase(connection);
+                return;
+            }
+
+            acceptTunnel(connection);
+
             {
                 QnMutexLocker lock(&m_mutex);
-                if (m_terminated)
-                    return;
-
-                if (code != SystemError::noError)
-                {
-                    NX_LOGX(lm("tunnel %1 is broken: %2")
-                        .arg(connection).arg(SystemError::toString(code)),
-                        cl_logDEBUG1);
-
-                    m_pool.erase(connection);
-                    return;
-                }
-
                 if (m_acceptedSockets.size() >= m_acceptLimit)
                 {
                     // TODO: #mux Stop accepting tunnel?
@@ -127,20 +108,17 @@ void IncomingTunnelPool::acceptTunnel(
                 else
                 {
                     m_acceptedSockets.push_back(std::move(socket));
-                    if (m_acceptHandler)
-                        m_ioThreadSocket->post(
-                            [this](){ callAcceptHandler(false); });
+                    lock.unlock();
+                    callAcceptHandler(false);
                 }
             }
-
-            acceptTunnel(std::move(connection));
         });
 }
 
 void IncomingTunnelPool::callAcceptHandler(bool timeout)
 {
     // Cancel all possible posts (we are in corresponding IO thread)
-    m_ioThreadSocket->cancelIOSync(aio::etTimedOut);
+    m_aioTimer.cancelSync();
 
     QnMutexLocker lock(&m_mutex);
     if (!m_acceptHandler)

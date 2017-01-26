@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project,
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -18,17 +12,17 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Common Lib</name>
+    <name>Nx Witness Common Library</name>
 
     <properties>
         <guid>${common.guid}</guid>
-        <!--Global libs-->
+
         <qt.libs>core core-private gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <!--Specific os libs used-->
+        <global.libs>-lnx_fusion -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lSecur32</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lz -framework QtConcurrent</mac.oslibs>
         <android.oslibs>-lz</android.oslibs>
-        <!--Specific os defines-->
+
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <rdep.packages>openssl ffmpeg</rdep.packages>
         <rdep.windows.packages>quazip</rdep.windows.packages>
@@ -44,6 +38,24 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_utils</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
     </dependencies>
 
@@ -86,7 +98,7 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3 quazip openldap</rdep.linux.packages>
+                <rdep.linux.packages>quazip openldap</rdep.linux.packages>
                 <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
@@ -106,7 +118,6 @@
             </activation>
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>gcc-4.9.3 quazip</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -142,25 +153,7 @@
                 </property>
             </activation>
             <properties>
-                <rdep.linux.packages>gcc-4.8.3 quazip opengl-es-mali</rdep.linux.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-tx1</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>tx1</value>
-                </property>
-            </activation>
-            <properties>
-                <rdep.linux.packages>gcc-4.8.4 sysroot quazip</rdep.linux.packages>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
             </properties>
         </profile>
 
@@ -171,19 +164,6 @@
                 <property>
                     <name>box</name>
                     <value>android</value>
-                </property>
-            </activation>
-            <properties>
-                <buildLib>staticlib</buildLib>
-            </properties>
-        </profile>
-        <profile>
-            <id>mobile-ios</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>box</name>
-                    <value>ios</value>
                 </property>
             </activation>
             <properties>

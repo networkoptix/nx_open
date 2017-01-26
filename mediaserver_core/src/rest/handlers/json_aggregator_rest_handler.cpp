@@ -1,34 +1,98 @@
 #include "json_aggregator_rest_handler.h"
 
-#include <network/tcp_connection_priv.h>
+#include <common/common_module.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include "rest/server/rest_connection_processor.h"
+#include <rest/server/rest_connection_processor.h>
 
-bool QnJsonAggregatorRestHandler::executeCommad(const QString &command, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner, QVariantMap& fullData)
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
+#include <nx/network/http/httpclient.h>
+#include <http/custom_headers.h>
+
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+bool QnJsonAggregatorRestHandler::executeCommad(
+    const QString &command,
+    const QnRequestParams & params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner,
+    QVariantMap& fullData)
 {
-    QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(command);
-    if (!handler) {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Rest handler '%1' is not found").arg(command));
+    int port = owner->owner()->getPort();
+    QUrl url(lit("http://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
+    QUrlQuery urlQuery;
+    for (auto itr = params.begin(); itr != params.end(); ++itr)
+        urlQuery.addQueryItem(itr.key(), itr.value());
+    url.setQuery(urlQuery);
+
+    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    if (!server)
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));
         return false;
     }
-    
-    QSharedPointer<QnJsonRestHandler> jsonHandler = handler.dynamicCast<QnJsonRestHandler>();
-    if (!jsonHandler) {
-        result.setError(QnJsonRestResult::InvalidParameter, lit("Rest handler '%1' is not json handler. It is not supported").arg(command));
+
+    nx_http::HttpClient client;
+    client.setUserName(server->getId().toString());
+    client.setUserPassword(server->getAuthKey());
+    auto user = qnResPool->getResourceById<QnUserResource>(owner->accessRights().userId);
+    if (user)
+        client.addAdditionalHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, user->getName().toUtf8());
+    if (!client.doGet(url))
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));
         return false;
     }
-    QnJsonRestResult subResult;
-    jsonHandler->executeGet(command, params, subResult, owner);
-    QVariantMap subResultWithErr;
-    subResultWithErr["error"] = subResult.error;
-    subResultWithErr["errorString"] = subResult.errorString;
-    subResultWithErr["reply"] = subResult.reply;
-    fullData[command] = subResultWithErr;
+
+    if (!client.response())
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't exec request '%1'").arg(command));
+        return false;
+    }
+
+    nx_http::BufferType msgBody;
+    while (!client.eof())
+        msgBody.append(client.fetchMessageBodyBuffer());
+
+    int statusCode = client.response()->statusLine.statusCode;
+    if (statusCode / 2 != 200 && msgBody.isEmpty())
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("Can't exec request '%1'. HTTP error '%2'").
+            arg(command).
+            arg(QString::fromUtf8(client.response()->statusLine.reasonPhrase)));
+        return false;
+    }
+
+    if (!client.contentType().toLower().contains("json"))
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("Request '%1' has no json content type. Only json result is supported").
+            arg(command));
+        return false;
+    }
+
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(msgBody, &error);
+    if (error.error != QJsonParseError::NoError)
+    {
+        result.setError(
+            QnJsonRestResult::CantProcessRequest,
+            lit("Request '%1' parse error: %2").arg(command).arg(error.errorString()));
+        return false;
+    }
+
+    fullData[command] = doc.toVariant();
+
     return true;
 }
 
-int QnJsonAggregatorRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor* owner) 
+int QnJsonAggregatorRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor* owner)
 {
     QnJsonRestResult jsonResult;
     int returnCode = executeGet(path, params, jsonResult, owner);
@@ -37,7 +101,7 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &path, const QnRequest
     return returnCode;
 }
 
-int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestParamList & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestParamList & params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QnRequestParams outParams;
     QString cmdToExecute;
@@ -45,8 +109,10 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
 
     for (auto itr = params.begin(); itr != params.end(); ++itr)
     {
-        if (itr->first == "exec_cmd") {
-            if (!cmdToExecute.isEmpty()) {
+        if (itr->first == "exec_cmd")
+        {
+            if (!cmdToExecute.isEmpty())
+            {
                 if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
                     return CODE_OK;
             }
@@ -54,9 +120,12 @@ int QnJsonAggregatorRestHandler::executeGet(const QString &, const QnRequestPara
             cmdToExecute = itr->second;
         }
         else
+        {
             outParams.insert(itr->first, itr->second);
+        }
     }
-    if (!cmdToExecute.isEmpty()) {
+    if (!cmdToExecute.isEmpty())
+    {
         if (!executeCommad(cmdToExecute, outParams, result, owner, fullData))
             return CODE_OK;
     }

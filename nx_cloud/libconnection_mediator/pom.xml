@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libconnection_mediator</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud Connection Mediator Lib</name>
+    <name>Nx Cloud Connection Mediator Library</name>
 
     <properties>
         <guid>${libconnection_mediator.guid}</guid>
@@ -20,13 +20,14 @@
         <product.title>${company.name} Mediator Lib</product.title>
         <product.display.title>${company.name} Mediator Lib</product.display.title>
         <template>lib</template>
+        <targetName>connection_mediator</targetName>
 
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
-        <rdep.packages>openssl ffmpeg qtsinglecoreapplication qtservice</rdep.packages>
+        <rdep.packages>openssl ffmpeg any/qtsinglecoreapplication any/qtservice</rdep.packages>
     </properties>
 
     <dependencies>
@@ -37,15 +38,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>udt</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/udt/pom.xml</systemPath>
         </dependency>
 
         <dependency>

@@ -4,7 +4,7 @@
 
 #include "resourcecontainer.h"
 
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 
 namespace stree
@@ -187,6 +187,20 @@ namespace stree
         m_readers[0] = &rc1;
         m_readers[1] = &rc2;
         m_readers[2] = &rc3;
+    }
+
+    MultiSourceResourceReader::MultiSourceResourceReader(
+        const AbstractResourceReader& rc1,
+        const AbstractResourceReader& rc2,
+        const AbstractResourceReader& rc3,
+        const AbstractResourceReader& rc4)
+    :
+        m_elementCount(4)
+    {
+        m_readers[0] = &rc1;
+        m_readers[1] = &rc2;
+        m_readers[2] = &rc3;
+        m_readers[3] = &rc4;
     }
 
     bool MultiSourceResourceReader::getAsVariant( int resID, QVariant* const value ) const

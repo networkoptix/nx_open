@@ -8,6 +8,7 @@
 #include <nx/network/socket.h>
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"
+#include <nx/network/http/httptypes.h>
 
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
@@ -16,7 +17,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable {
     Q_OBJECT;
 
 public:
-    static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
+    static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
 
     QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
@@ -50,7 +51,7 @@ public:
     bool readRequest();
     /*!
         Reads single HTTP request. To be used when HTTP interleaving is required
-        \note After return of this method there is already-parsed request in d->request. 
+        \note After return of this method there is already-parsed request in d->request.
             No need to call QnTCPConnectionProcessor::parseRequest
         \note \a d->clientRequest is not filled by this method!
     */
@@ -62,6 +63,7 @@ public:
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     QnAuthSession authSession() const;
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -71,6 +73,7 @@ protected:
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();
 
+    QByteArray createResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, const QByteArray& multipartBoundary, bool displayDebug = false);
     void sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), const QByteArray& multipartBoundary = QByteArray(), bool displayDebug = false);
     QString codeToMessage(int code);
 
@@ -86,7 +89,7 @@ protected:
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
-    void sendUnauthorizedResponse(bool isProxy, const QByteArray& messageBody);
+    void sendUnauthorizedResponse(nx_http::StatusCode::Value httpResult, const QByteArray& messageBody);
 protected:
     Q_DECLARE_PRIVATE(QnTCPConnectionProcessor);
 

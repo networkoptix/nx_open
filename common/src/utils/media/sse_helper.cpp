@@ -1,5 +1,7 @@
 #include "sse_helper.h"
 
+#include <QtCore/private/qsimd_p.h>
+
 #if defined(Q_CC_MSVC)
 #   include <intrin.h> /* For __cpuid. */
 #elif defined(Q_CC_GNU)
@@ -83,3 +85,90 @@ QString getCPUString()
     return QString();
 #endif
 }
+
+//TODO: #ak give up following Q_OS_MAC check
+//TODO/ARM: sse analog
+
+#if defined(__arm__) || defined(Q_OS_IOS)
+
+bool useSSE2()
+{
+    return false;
+}
+
+bool useSSE3()
+{
+    return false;
+}
+
+bool useSSSE3()
+{
+    return false;
+}
+
+bool useSSE41()
+{
+    return false;
+}
+
+bool useSSE42()
+{
+    return false;
+}
+
+#elif defined(Q_OS_MACX)
+
+bool useSSE2()
+{
+    return true;
+}
+
+bool useSSE3()
+{
+    return true;
+}
+
+bool useSSSE3()
+{
+    return true;
+}
+
+bool useSSE41()
+{
+    //TODO: #ak we are compiling mac client with -msse4.1 - why is it forbidden here?
+    return false;
+}
+
+bool useSSE42()
+{
+    return false;
+}
+
+#else
+
+bool useSSE2()
+{
+    return qCpuHasFeature(SSE2);
+}
+
+bool useSSE3()
+{
+    return qCpuHasFeature(SSE3);
+}
+
+bool useSSSE3()
+{
+    return qCpuHasFeature(SSSE3);
+}
+
+bool useSSE41()
+{
+    return qCpuHasFeature(SSE4_1);
+}
+
+bool useSSE42()
+{
+    return qCpuHasFeature(SSE4_2);
+}
+
+#endif // defined(__arm__)

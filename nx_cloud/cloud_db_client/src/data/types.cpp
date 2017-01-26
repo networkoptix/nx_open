@@ -1,23 +1,19 @@
-/**********************************************************
-* Sep 4, 2015
-* akolesnikov
-***********************************************************/
-
 #include "types.h"
 
-#include <utils/common/model_functions.h>
-
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace cdb {
 namespace api {
 
+//TODO #ak too many different conversion functions here
 
 nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
 {
     switch (resultCode)
     {
         case ResultCode::ok:
+        case ResultCode::partialContent:    //< mapping to "200 OK" because request is not Partial Content from Http point of view
             return nx_http::StatusCode::ok;
         case ResultCode::notAuthorized:
         case ResultCode::credentialsRemovedPermanently:
@@ -43,6 +39,10 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::badRequest:
             return nx_http::StatusCode::badRequest;
         case ResultCode::serviceUnavailable:
+            return nx_http::StatusCode::serviceUnavailable;
+        case ResultCode::invalidFormat:
+            return nx_http::StatusCode::badRequest;
+        case ResultCode::retryLater:
             return nx_http::StatusCode::serviceUnavailable;
         case ResultCode::unknownError:
             return nx_http::StatusCode::internalServerError;
@@ -107,8 +107,6 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
             requestResultCode = nx_http::FusionRequestErrorClass::ioError;
             break;
 
-        case ResultCode::notImplemented:
-        case ResultCode::unknownError:
         default:
             requestResultCode = nx_http::FusionRequestErrorClass::internalError;
             break;
@@ -129,32 +127,33 @@ ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result)
     return static_cast<ResultCode>(result.errorDetail);
 }
 
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
-    (ResultCode::ok, "ok")
-    (ResultCode::notAuthorized, "notAuthorized")
-    (ResultCode::forbidden, "forbidden")
-    (ResultCode::accountNotActivated, "accountNotActivated")
-    (ResultCode::accountBlocked, "accountBlocked")
-    (ResultCode::notFound, "notFound")
-    (ResultCode::alreadyExists, "alreadyExists")
-    (ResultCode::dbError, "dbError")
-    (ResultCode::networkError, "networkError")
-    (ResultCode::notImplemented, "notImplemented")
-    (ResultCode::unknownRealm, "unknownRealm")
-    (ResultCode::badUsername, "badUsername")
-    (ResultCode::badRequest, "badRequest")
-    (ResultCode::invalidNonce, "invalidNonce")
-    (ResultCode::serviceUnavailable, "serviceUnavailable")
-    (ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
-    (ResultCode::unknownError, "unknownError")
-);
-
 std::string toString(ResultCode resultCode)
 {
     return QnLexical::serialized(resultCode).toStdString();
 }
 
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, ResultCode,
+(nx::cdb::api::ResultCode::ok, "ok")
+(nx::cdb::api::ResultCode::notAuthorized, "notAuthorized")
+(nx::cdb::api::ResultCode::forbidden, "forbidden")
+(nx::cdb::api::ResultCode::accountNotActivated, "accountNotActivated")
+(nx::cdb::api::ResultCode::accountBlocked, "accountBlocked")
+(nx::cdb::api::ResultCode::notFound, "notFound")
+(nx::cdb::api::ResultCode::alreadyExists, "alreadyExists")
+(nx::cdb::api::ResultCode::dbError, "dbError")
+(nx::cdb::api::ResultCode::networkError, "networkError")
+(nx::cdb::api::ResultCode::notImplemented, "notImplemented")
+(nx::cdb::api::ResultCode::unknownRealm, "unknownRealm")
+(nx::cdb::api::ResultCode::badUsername, "badUsername")
+(nx::cdb::api::ResultCode::badRequest, "badRequest")
+(nx::cdb::api::ResultCode::invalidNonce, "invalidNonce")
+(nx::cdb::api::ResultCode::serviceUnavailable, "serviceUnavailable")
+(nx::cdb::api::ResultCode::credentialsRemovedPermanently, "credentialsRemovedPermanently")
+(nx::cdb::api::ResultCode::invalidFormat, "invalidFormat")
+(nx::cdb::api::ResultCode::retryLater, "retryLater")
+(nx::cdb::api::ResultCode::unknownError, "unknownError")
+)
 
 }   //api
 }   //cdb

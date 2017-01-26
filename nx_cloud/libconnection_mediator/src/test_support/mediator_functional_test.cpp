@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
 #include "mediator_functional_test.h"
 
 #include <chrono>
@@ -13,39 +8,70 @@
 #include <tuple>
 
 #include <common/common_globals.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
-#include <utils/common/cpp14.h>
-#include <utils/common/string.h>
+#include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/serialization/lexical.h>
 
+#include "http/get_listening_peer_list_handler.h"
 #include "local_cloud_data_provider.h"
-#include "socket_globals_holder.h"
+#include "mediator_service.h"
 
 namespace nx {
 namespace hpm {
 
-MediatorFunctionalTest::MediatorFunctionalTest()
-:
-    m_port(0)
+static constexpr size_t kMaxBindRetryCount = 10;
+
+static SocketAddress findFreeTcpAndUdpLocalAddress()
+{
+    for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
+    {
+        const SocketAddress address(
+            HostAddress::localhost,
+            nx::utils::random::number<uint16_t>(5000, 50000));
+
+        network::TCPServerSocket tcpSocket(AF_INET);
+        if (!tcpSocket.bind(address))
+            continue;
+
+        network::UDPSocket udpSocket(AF_INET);
+        if (!udpSocket.bind(address))
+            continue;
+
+        return address;
+    }
+
+    return SocketAddress::anyPrivateAddress;
+}
+
+MediatorFunctionalTest::MediatorFunctionalTest():
+    m_stunPort(0),
+    m_httpPort(0)
 {
     //starting clean test
-    SocketGlobalsHolder::instance()->reinitialize();
+    nx::network::SocketGlobalsHolder::instance()->reinitialize();
 
-    m_port = (std::rand() % 10000) + 50000;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
+    QDir().mkpath(m_tmpDir);
 
-    auto b = std::back_inserter(m_args);
-    *b = strdup("/path/to/bin");
-    *b = strdup("-e");
-    *b = strdup("-stun/addrToListenList"); *b = strdup(lit("127.0.0.1:%1").arg(m_port).toLatin1().constData());
-    *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
-    *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
+    const auto stunAddress = findFreeTcpAndUdpLocalAddress();
+    NX_LOGX(lm("STUN TCP & UDP endpoint: %1").str(stunAddress), cl_logINFO);
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(endpoint());
+    addArg("/path/to/bin");
+    addArg("-e");
+    addArg("-stun/addrToListenList", stunAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", SocketAddress::anyPrivateAddress.toStdString().c_str());
+    addArg("-log/logLevel", "DEBUG2");
+    addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
+
     registerCloudDataProvider(&m_cloudDataProvider);
 }
 
@@ -56,79 +82,44 @@ MediatorFunctionalTest::~MediatorFunctionalTest()
     QDir(m_tmpDir).removeRecursively();
 }
 
-void MediatorFunctionalTest::start()
-{
-    nx::utils::promise<void> mediatorInstantiatedCreatedPromise;
-    auto mediatorInstantiatedCreatedFuture = mediatorInstantiatedCreatedPromise.get_future();
-
-    m_mediatorProcessFuture = std::async(
-        std::launch::async,
-        [this, &mediatorInstantiatedCreatedPromise]()->int {
-            m_mediatorInstance = std::make_unique<nx::hpm::MediatorProcessPublic>(
-                static_cast<int>(m_args.size()), m_args.data());
-            m_mediatorInstance->setOnStartedEventHandler(
-                [this](bool result)
-                {
-                    m_mediatorStartedPromise.set_value(result);
-                });
-            mediatorInstantiatedCreatedPromise.set_value();
-            return m_mediatorInstance->exec();
-        });
-    mediatorInstantiatedCreatedFuture.wait();
-}
-
-bool MediatorFunctionalTest::startAndWaitUntilStarted()
-{
-    start();
-    return waitUntilStarted();
-}
-
 bool MediatorFunctionalTest::waitUntilStarted()
 {
-    static const std::chrono::seconds initializedMaxWaitTime(15);
-
-    auto mediatorStartedFuture = m_mediatorStartedPromise.get_future();
-    if (mediatorStartedFuture.wait_for(initializedMaxWaitTime) !=
-            std::future_status::ready)
-    {
+    if (!utils::test::ModuleLauncher<MediatorProcessPublic>::waitUntilStarted())
         return false;
-    }
 
-    return mediatorStartedFuture.get();
+    const auto& stunEndpoints = moduleInstance()->impl()->stunEndpoints();
+    if (stunEndpoints.empty())
+        return false;
+    m_stunPort = stunEndpoints.front().port;
+
+    const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
+    if (httpEndpoints.empty())
+        return false;
+    m_httpPort = httpEndpoints.front().port;
+
+    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
+    network::SocketGlobals::mediatorConnector().enable(true);
+
+    return true;
 }
 
-void MediatorFunctionalTest::stop()
+SocketAddress MediatorFunctionalTest::stunEndpoint() const
 {
-    m_mediatorInstance->pleaseStop();
-    m_mediatorProcessFuture.wait();
-    m_mediatorInstance.reset();
+    return SocketAddress(HostAddress::localhost, m_stunPort);
 }
 
-void MediatorFunctionalTest::restart()
+SocketAddress MediatorFunctionalTest::httpEndpoint() const
 {
-    stop();
-    start();
-    waitUntilStarted();
+    return SocketAddress(HostAddress::localhost, m_httpPort);
 }
 
-void MediatorFunctionalTest::addArg(const char* arg)
-{
-    auto b = std::back_inserter(m_args);
-    *b = strdup(arg);
-}
-
-SocketAddress MediatorFunctionalTest::endpoint() const
-{
-    return SocketAddress(HostAddress::localhost, m_port);
-}
-
-std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorClientTcpConnection>
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection>
+std::unique_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();
@@ -139,20 +130,20 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 {
     AbstractCloudDataProviderFactory::setFactoryFunc(
         [cloudDataProvider](
-            const std::string& address,
-            const std::string& user,
-            const std::string& password,
-            std::chrono::milliseconds updateInterval)
-    {
-        return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
-    });
+            const boost::optional<QUrl>& /*cdbUrl*/,
+            const std::string& /*user*/,
+            const std::string& /*password*/,
+            std::chrono::milliseconds /*updateInterval*/)
+        {
+            return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+        });
 }
 
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 {
     AbstractCloudDataProvider::System system(
-        generateRandomName(16),
-        generateRandomName(16),
+        QnUuid::createUuid().toSimpleString().toUtf8(),
+        nx::utils::generateRandomName(16),
         true);
     m_cloudDataProvider.addSystem(
         system.id,
@@ -162,102 +153,87 @@ AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
     const AbstractCloudDataProvider::System& system,
-    nx::String name)
+    nx::String name, ServerTweak::Value tweak)
 {
     auto server = std::make_unique<MediaServerEmulator>(
-        endpoint(),
+        stunEndpoint(),
         system,
         std::move(name));
-    if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
+
+    if (!server->start(!(tweak & ServerTweak::noListenToConnect)))
+    {
+        NX_LOGX(lm("Failed to start server: %1").arg(server->fullName()), cl_logERROR);
         return nullptr;
+    }
+
+    if (!(tweak & ServerTweak::noBindEndpoint)
+        && server->bind() != nx::hpm::api::ResultCode::ok)
+    {
+        NX_LOGX(lm("Failed to bind server: %1, endpoint=%2")
+            .arg(server->fullName()).str(server->endpoint()), cl_logERROR);
+        return nullptr;
+    }
+
     return server;
 }
 
 std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
-    const AbstractCloudDataProvider::System& system)
+    const AbstractCloudDataProvider::System& system,
+    boost::optional<QnUuid> serverId,
+    ServerTweak::Value tweak)
 {
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
-    if (!server->start())
-    {
-        std::cerr<<"Failed to start server"<<std::endl;
-        return nullptr;
-    }
-    const auto resultCode = server->registerOnMediator();
-    if (resultCode != api::ResultCode::ok)
-    {
-        std::cerr<<"Failed to register server on mediator. "
-            <<QnLexical::serialized(resultCode).toStdString()<<std::endl;
-        return nullptr;
-    }
-    return server;
-}
+    if (!serverId)
+        serverId = QnUuid::createUuid();
 
-std::unique_ptr<MediaServerEmulator>
-    MediatorFunctionalTest::addRandomServerNotRegisteredOnMediator(
-        const AbstractCloudDataProvider::System& system)
-{
-    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
-    if (!server->start())
-        return nullptr;
-    return server;
+    return addServer(
+        system,
+        serverId.get().toSimpleString().toUtf8(),
+        tweak);
 }
 
 std::vector<std::unique_ptr<MediaServerEmulator>>
     MediatorFunctionalTest::addRandomServers(
         const AbstractCloudDataProvider::System& system,
-        size_t count)
+        size_t count, ServerTweak::Value tweak)
 {
     std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
-    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
-    for (auto& server: systemServers)
-        if (!server->start() || (server->registerOnMediator() != api::ResultCode::ok))
-            return std::vector<std::unique_ptr<MediaServerEmulator>>();
+    for (size_t i = 0; i < count; ++i)
+    {
+        auto server = addRandomServer(system, boost::none, tweak);
+        if (!server)
+            return {};
+
+        systemServers.push_back(std::move(server));
+    }
+
     return systemServers;
 }
 
-//api::ResultCode MediatorFunctionalTest::addAccount(
-//    api::AccountData* const accountData,
-//    std::string* const password,
-//    api::AccountConfirmationCode* const activationCode)
-//{
-//    if (accountData->email.empty())
-//    {
-//        std::ostringstream ss;
-//        ss << "test_" << rand() << "@networkoptix.com";
-//        accountData->email = ss.str();
-//    }
-//
-//    if (password->empty())
-//    {
-//        std::ostringstream ss;
-//        ss << rand();
-//        *password = ss.str();
-//    }
-//
-//    if (accountData->fullName.empty())
-//        accountData->fullName = "Test Test";
-//    if (accountData->passwordHa1.empty())
-//        accountData->passwordHa1 = nx_http::calcHa1(
-//            QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
-//            //accountData->email.c_str(),
-//            moduleInfo().realm.c_str(),
-//            password->c_str()).constData();
-//    if (accountData->customization.empty())
-//        accountData->customization = QnAppInfo::customizationName();
-//
-//    auto connection = connectionFactory()->createConnection("", "");
-//
-//    //adding account
-//    api::ResultCode result = api::ResultCode::ok;
-//    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
-//        std::bind(
-//            &nx::cdb::api::AccountManager::registerNewAccount,
-//            connection->accountManager(),
-//            *accountData,
-//            std::placeholders::_1));
-//    return result;
-//}
+std::tuple<nx_http::StatusCode::Value, data::ListeningPeers>
+    MediatorFunctionalTest::getListeningPeers() const
+{
+    nx_http::HttpClient httpClient;
+    const auto urlStr =
+        lm("http://%1%2").arg(httpEndpoint().toString())
+        .arg(nx::hpm::http::GetListeningPeerListHandler::kHandlerPath);
+    if (!httpClient.doGet(QUrl(urlStr)))
+        return std::make_tuple(
+            nx_http::StatusCode::serviceUnavailable,
+            data::ListeningPeers());
+    if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+        return std::make_tuple(
+            static_cast<nx_http::StatusCode::Value>(
+                httpClient.response()->statusLine.statusCode),
+            data::ListeningPeers());
 
-}   //hpm
-}   //nx
+    QByteArray responseBody;
+    while (!httpClient.eof())
+        responseBody += httpClient.fetchMessageBodyBuffer();
+
+    return std::make_tuple(
+        nx_http::StatusCode::ok,
+        QJson::deserialized<data::ListeningPeers>(responseBody));
+}
+
+}   // namespace hpm
+}   // namespace nx

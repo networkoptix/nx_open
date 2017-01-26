@@ -43,7 +43,7 @@ static const int METADATA_TRACK_NUM = 7;
 static const double TIME_RESYNC_THRESHOLD = 10.0; // at seconds
 static const double LOCAL_TIME_RESYNC_THRESHOLD = 500; // at ms
 static const int DRIFT_STATS_WINDOW_SIZE = 1000;
-static const QString DEFAULT_REALM(lit("NetworkOptix"));
+
 
 
 QByteArray QnRtspClient::m_guid;
@@ -59,25 +59,37 @@ static QString getValueFromString(const QString& line)
 }
 #endif
 
+namespace
+{
+    const quint8 FFMPEG_CODE = 102;
+    QString FFMPEG_STR(lit("FFMPEG"));
+    const quint8 METADATA_CODE = 126;
+    const QString METADATA_STR(lit("ffmpeg-metadata"));
+    const QString DEFAULT_REALM(lit("NetworkOptix"));
+}
+
 // --------------------- QnRtspIoDevice --------------------------
 
-QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP):
+QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
     m_owner(owner),
-    m_tcpMode(false),
+    m_tcpMode(useTCP),
     m_mediaSocket(0),
     m_rtcpSocket(0),
+    m_mediaPort(mediaPort),
+    m_remoteEndpointRtcpPort(rtcpPort),
     ssrc(0),
-    m_rtpTrackNum(0)
+    m_rtpTrackNum(0),
+    m_reportTimerStarted(false),
+    m_forceRtcpReports(false)
 {
-    m_tcpMode = useTCP;
     if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket().release();
-        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_mediaSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_mediaSocket->setRecvTimeout(500);
 
         m_rtcpSocket = SocketFactory::createDatagramSocket().release();
-        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_rtcpSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_rtcpSocket->setRecvTimeout(500);
     }
 }
@@ -90,16 +102,19 @@ QnRtspIoDevice::~QnRtspIoDevice()
 
 qint64 QnRtspIoDevice::read(char *data, qint64 maxSize)
 {
-
-    int readed;
+    int bytesRead;
     if (m_tcpMode)
-        readed = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+    {
+        bytesRead = m_owner->readBinaryResponce((quint8*) data, maxSize); // demux binary data from TCP socket
+    }
     else
-        readed = m_mediaSocket->recv(data, maxSize);
+    {
+        bytesRead = m_mediaSocket->recv(data, maxSize);
+    }
     m_owner->sendKeepAliveIfNeeded();
     if (!m_tcpMode)
         processRtcpData();
-    return readed;
+    return bytesRead;
 }
 
 AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
@@ -108,6 +123,14 @@ AbstractCommunicatingSocket* QnRtspIoDevice::getMediaSocket()
         return m_owner->m_tcpSock.get();
     else
         return m_mediaSocket;
+}
+
+void QnRtspIoDevice::shutdown()
+{
+    if (m_tcpMode)
+        m_owner->shutdown();
+    else
+        m_mediaSocket->shutdown();
 }
 
 void QnRtspIoDevice::setTcpMode(bool value)
@@ -123,11 +146,13 @@ void QnRtspIoDevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
+
+    bool rtcpReportAlreadySent = false;
     while( m_rtcpSocket->hasData() )
     {
         SocketAddress senderEndpoint;
-        int readed = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
-        if (readed > 0)
+        int bytesRead = m_rtcpSocket->recvFrom(rtcpBuffer, sizeof(rtcpBuffer), &senderEndpoint);
+        if (bytesRead > 0)
         {
             if (!m_rtcpSocket->isConnected())
             {
@@ -137,12 +162,42 @@ void QnRtspIoDevice::processRtcpData()
                 }
             }
             bool gotValue = false;
-            QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, readed, &gotValue);
+            QnRtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, bytesRead, &gotValue);
             if (gotValue)
                 m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
+            {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
+                rtcpReportAlreadySent = true;
+            }
+        }
+    }
+
+    if (m_forceRtcpReports && !rtcpReportAlreadySent)
+    {
+        if (!m_reportTimerStarted)
+        {
+            m_reportTimer.start();
+            m_reportTimerStarted = true;
+        }
+
+        if (m_reportTimer.elapsed() > 5000)
+        {
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            if (outBufSize > 0)
+            {
+                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
+                if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
+                {
+                    qWarning()
+                        << "RTPIODevice::processRtcpData(): setDestAddr() failed: "
+                        << SystemError::getLastOSErrorText();
+                }
+                m_rtcpSocket->send(sendBuffer, outBufSize);
+            }
+
+            m_reportTimer.restart();
         }
     }
 }
@@ -259,6 +314,9 @@ bool QnRtspTimeHelper::isLocalTimeChanged()
 
 bool QnRtspTimeHelper::isCameraTimeChanged(const QnRtspStatistic& statistics)
 {
+    if (statistics.isEmpty())
+        return false; //< no camera time provided yet
+
     double diff = statistics.localtime - statistics.nptTime;
     if (m_rtcpReportTimeDiff == INT_MAX)
         m_rtcpReportTimeDiff = diff;
@@ -332,13 +390,13 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const QnRtspStatistic& sta
             if (currentUsecTime - m_lastWarnTime > 2000 * 1000ll)
             {
                 if (camTimeChanged) {
-                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Camera time has been changed or receiving latency > 10 seconds. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else if (localTimeChanged) {
-                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("Local time has been changed. Resync time for camera %1")).arg(m_resId), cl_logDEBUG1);
                 }
                 else {
-                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logWARNING);
+                    NX_LOG(QString(lit("RTSP time drift reached %1 seconds. Resync time for camera %2")).arg(localTimeInSecs - resultInSecs).arg(m_resId), cl_logDEBUG1);
                 }
                 m_lastWarnTime = currentUsecTime;
             }
@@ -373,7 +431,6 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_proxyPort(0),
     m_responseCode(CODE_OK),
     m_isAudioEnabled(true),
     m_numOfPredefinedChannels(0),
@@ -426,11 +483,6 @@ void QnRtspClient::usePredefinedTracks()
     if(!m_sdpTracks.isEmpty())
         return;
 
-    static const quint8 FFMPEG_CODE = 102;
-    static const QString FFMPEG_STR(QLatin1String("FFMPEG"));
-    static const quint8 METADATA_CODE = 126;
-    static const QString METADATA_STR(QLatin1String("ffmpeg-metadata"));
-
     int trackNum = 0;
     for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
     {
@@ -472,7 +524,7 @@ void QnRtspClient::updateTrackNum()
         else if (m_sdpTracks[i]->trackType == TT_AUDIO)
             m_sdpTracks[i]->trackNum = videoNum + curAudio++;
         else if (m_sdpTracks[i]->trackType == TT_METADATA) {
-            if (m_sdpTracks[i]->codecName == QLatin1String("ffmpeg-metadata"))
+            if (m_sdpTracks[i]->codecName == METADATA_STR)
                 m_sdpTracks[i]->trackNum = METADATA_TRACK_NUM; // use fixed track num for our proprietary format
             else
                 m_sdpTracks[i]->trackNum = videoNum + audioNum + curMetadata++;
@@ -535,7 +587,7 @@ void QnRtspClient::parseSDP()
     if (mapNum >= 0) {
         if (codecName.isEmpty())
             codecName = findCodecById(mapNum);
-        //if (codecName == QLatin1String("ffmpeg-metadata"))
+        //if (codecName == METADATA_STR)
         //    trackNumber = METADATA_TRACK_NUM;
         QSharedPointer<SDPTrackInfo> sdpTrack(new SDPTrackInfo(codecName, codecType, setupURL, mapNum, 0, this, m_transport == TRANSPORT_TCP));
         m_sdpTracks << sdpTrack;
@@ -603,9 +655,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_outStreamFile.open( ss.str(), std::ios_base::binary );
 #endif
 
-
-
-    if ((quint64)startTime != AV_NOPTS_VALUE)
+    if (startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
 
     m_SessionId.clear();
@@ -618,31 +668,23 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
 
-
-    //unsigned int port = DEFAULT_RTP_PORT;
-
     if (m_tcpSock->isClosed())
     {
+        QnMutexLocker lock(&m_socketMutex);
         m_tcpSock = SocketFactory::createStreamSocket();
         m_additionalReadBufferSize = 0;
     }
 
     m_tcpSock->setRecvTimeout(TCP_CONNECT_TIMEOUT);
 
-    QString targetAddress;
-    int destinationPort = 0;
-    if( m_proxyPort == 0 )
-    {
-        targetAddress = m_url.host();
-        destinationPort = m_url.port(DEFAULT_RTP_PORT);
-    }
+    SocketAddress targetAddress;
+    if (m_proxyAddress)
+        targetAddress = *m_proxyAddress;
     else
-    {
-        targetAddress = m_proxyAddr;
-        destinationPort = m_proxyPort;
-    }
-    if( !m_tcpSock->connect(targetAddress, destinationPort, TCP_CONNECT_TIMEOUT) )
-        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, destinationPort);
+        targetAddress = SocketAddress(m_url.host(), m_url.port(DEFAULT_RTP_PORT));
+
+    if (!m_tcpSock->connect(targetAddress, TCP_CONNECT_TIMEOUT))
+        return CameraDiagnostics::CannotOpenCameraMediaPortResult(url, targetAddress.port);
 
     m_tcpSock->setNoDelay(true);
 
@@ -658,7 +700,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if( !sendRequestAndReceiveResponse( createDescribeRequest(), response ) )
     {
         stop();
-        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, destinationPort);
+        return CameraDiagnostics::ConnectionClosedUnexpectedlyResult(url, targetAddress.port);
     }
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -706,7 +748,9 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
 
     if( result )
     {
-        NX_LOG( lit("Sucessfully opened RTSP stream %1").arg(m_url.toString()), cl_logALWAYS );
+        NX_LOG(lit("Sucessfully opened RTSP stream %1")
+                .arg(m_url.toString(QUrl::RemovePassword)),
+            cl_logALWAYS);
     }
 
     return result;
@@ -731,17 +775,20 @@ QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionE
 
 bool QnRtspClient::stop()
 {
+    QnMutexLocker lock(&m_socketMutex);
     m_tcpSock->close();
     return true;
 }
 
 void QnRtspClient::shutdown()
 {
+    QnMutexLocker lock(&m_socketMutex);
     m_tcpSock->shutdown();
 }
 
 bool QnRtspClient::isOpened() const
 {
+    QnMutexLocker lock(&m_socketMutex);
     return m_tcpSock->isConnected();
 }
 
@@ -819,7 +866,7 @@ nx_http::Request QnRtspClient::createDescribeRequest()
     request.requestLine.version = nx_rtsp::rtsp_1_0;
     addCommonHeaders(request.headers);
     request.headers.insert( nx_http::HttpHeader( "Accept", "application/sdp" ) );
-    if( (quint64)m_openedTime != AV_NOPTS_VALUE )
+    if( m_openedTime != AV_NOPTS_VALUE )
         addRangeHeader( &request, m_openedTime, AV_NOPTS_VALUE );
     addAdditionAttrs( &request );
     return request;
@@ -940,7 +987,7 @@ bool QnRtspClient::sendSetup()
         {
             ;
         }
-        else if (trackInfo->codecName != QLatin1String("ffmpeg-metadata"))
+        else if (trackInfo->codecName != METADATA_STR)
         {
             continue; // skip unknown metadata e.t.c
         }
@@ -1098,7 +1145,7 @@ bool QnRtspClient::sendSetup()
                     QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
                     if (tmpParams.size() > 1) {
                         bool ok;
-                        m_sdpTracks[i]->setSSRC(tmpParams[1].toInt(&ok, 16));
+                        m_sdpTracks[i]->setSSRC((quint32)tmpParams[1].toLongLong(&ok, 16));
                     }
                 }
                 else if (tmpList[k].startsWith(QLatin1String("interleaved"))) {
@@ -1111,7 +1158,15 @@ bool QnRtspClient::sendSetup()
                         }
                     }
                 }
-
+                else if (tmpList[k].startsWith(QLatin1String("server_port"))) {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
+                        if (tmpParams.size() == 2) {
+                            trackInfo->setRemoteEndpointRtcpPort(tmpParams[1].toInt());
+                        }
+                    }
+                }
             }
         }
 
@@ -1153,9 +1208,11 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
 
 void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
 {
+    nx_http::StringType rangeVal;
     if (startPos != qint64(AV_NOPTS_VALUE))
     {
-        nx_http::StringType rangeVal;
+        //There is no guarantee that every RTSP server understands utc ranges.
+        //RFC requires only npt ranges support.
         if (startPos != DATETIME_NOW)
             rangeVal += "clock=" + nx_http::StringType::number(startPos);
         else
@@ -1168,10 +1225,16 @@ void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 start
             else
                 rangeVal += "clock";
         }
-        nx_http::insertOrReplaceHeader(
-            &request->headers,
-            nx_http::HttpHeader("Range", rangeVal));
+
     }
+    else
+    {
+        rangeVal += "npt=0.000-";
+    }
+
+    nx_http::insertOrReplaceHeader(
+        &request->headers,
+        nx_http::HttpHeader("Range", rangeVal));
 }
 
 QByteArray QnRtspClient::getGuid()
@@ -1402,10 +1465,10 @@ void QnRtspClient::sendBynaryResponse(quint8* buffer, int size)
 bool QnRtspClient::processTextResponseInsideBinData()
 {
     // have text response or part of text response.
-    int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
-    if (readed <= 0)
+    int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+    if (bytesRead <= 0)
         return false;
-    m_responseBufferLen += readed;
+    m_responseBufferLen += bytesRead;
 
     quint8* curPtr = m_responseBuffer;
     quint8* bEnd = m_responseBuffer+m_responseBufferLen;
@@ -1429,10 +1492,10 @@ int QnRtspClient::readBinaryResponce(quint8* data, int maxDataSize)
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
-            if (readed <= 0)
-                return readed;
-            m_responseBufferLen += readed;
+            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+            if (bytesRead <= 0)
+                return bytesRead;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$')
             break;
@@ -1452,11 +1515,11 @@ int QnRtspClient::readBinaryResponce(quint8* data, int maxDataSize)
     m_responseBufferLen -= copyLen;
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = readSocketWithBuffering(data, dataRestLen, true);
-        if (readed <= 0)
-            return readed;
-        dataRestLen -= readed;
-        data += readed;
+        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        if (bytesRead <= 0)
+            return bytesRead;
+        dataRestLen -= bytesRead;
+        data += bytesRead;
     }
     return dataLen;
 }
@@ -1478,10 +1541,10 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
     while (m_tcpSock->isConnected())
     {
         while (m_responseBufferLen < 4) {
-            int readed = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
-            if (readed <= 0)
-                return readed;
-            m_responseBufferLen += readed;
+            int bytesRead = readSocketWithBuffering(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen, true);
+            if (bytesRead <= 0)
+                return bytesRead;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$')
             break;
@@ -1503,11 +1566,11 @@ int QnRtspClient::readBinaryResponce(std::vector<QnByteArray*>& demuxedData, int
 
     for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
     {
-        int readed = readSocketWithBuffering(data, dataRestLen, true);
-        if (readed <= 0)
-            return readed;
-        dataRestLen -= readed;
-        data += readed;
+        int bytesRead = readSocketWithBuffering(data, dataRestLen, true);
+        if (bytesRead <= 0)
+            return bytesRead;
+        dataRestLen -= bytesRead;
+        data += bytesRead;
     }
 
     demuxedData[channelNumber]->finishWriting(dataLen);
@@ -1522,10 +1585,10 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
     for (int i = 0; i < 1000 && ignoreDataSize < 1024*1024*3 && m_tcpSock->isConnected(); ++i)
     {
         if (needMoreData) {
-            int readed = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
-            if (readed <= 0)
+            int bytesRead = readSocketWithBuffering(m_responseBuffer + m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen), true);
+            if (bytesRead <= 0)
             {
-                if( readed == 0 )
+                if( bytesRead == 0 )
                 {
                     NX_LOG( lit("RTSP connection to %1 has been unexpectedly closed").
                         arg(m_tcpSock->getForeignAddress().toString()), cl_logINFO );
@@ -1537,14 +1600,14 @@ bool QnRtspClient::readTextResponce(QByteArray& response)
                 }
                 return false;	//error occured or connection closed
             }
-            m_responseBufferLen += readed;
+            m_responseBufferLen += bytesRead;
         }
         if (m_responseBuffer[0] == '$') {
             // binary data
             quint8 tmpData[1024*64];
-            int readed = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+            int bytesRead = readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
             int oldIgnoreDataSize = ignoreDataSize;
-            ignoreDataSize += readed;
+            ignoreDataSize += bytesRead;
             if (oldIgnoreDataSize / 64000 != ignoreDataSize/64000)
                 QnSleep::msleep(1);
             needMoreData = m_responseBufferLen == 0;
@@ -1732,6 +1795,10 @@ QAuthenticator QnRtspClient::getAuth() const
     return m_auth;
 }
 
+QUrl QnRtspClient::getUrl() const
+{
+    return m_url;
+}
 
 void QnRtspClient::setAudioEnabled(bool value)
 {
@@ -1745,8 +1812,7 @@ bool QnRtspClient::isAudioEnabled() const
 
 void QnRtspClient::setProxyAddr(const QString& addr, int port)
 {
-    m_proxyAddr = addr;
-    m_proxyPort = port;
+    m_proxyAddress = SocketAddress(addr, (uint16_t) port);
 }
 
 QString QnRtspClient::mediaTypeToStr(TrackType trackType)
@@ -1804,7 +1870,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
             //At least, move ioctl call to sockets, since m_tcpSock->handle() is deprecated method
             //(with nat traversal introduced, not every socket will have handle)
         int bytesAv = 0;
-        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) != 0) ||  //socket read buffer size is unknown to us
+        if( (ioctl( m_tcpSock->handle(), FIONREAD, &bytesAv ) == 0) &&  //socket read buffer size is unknown to us
             (bytesAv == 0) )    //socket read buffer is empty
         {
             //This sleep somehow reduces CPU time spent by process in kernel space on arm platform
@@ -1815,7 +1881,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
     }
 #endif
 
-    int bytesRead = m_tcpSock->recv( buf, bufSize, readSome ? 0 : MSG_WAITALL );
+    int bytesRead = m_tcpSock->recv( buf, (unsigned int) bufSize, readSome ? 0 : MSG_WAITALL );
     return bytesRead < 0 ? 0 : bytesRead;
 #else
     const size_t bufSizeBak = bufSize;
@@ -1890,7 +1956,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
         if( !readTextResponce(responseBuf) )
             return false;
 
-        nx_http::Response response;
+        nx_rtsp::RtspResponse response;
         if( !response.parse( responseBuf ) )
             return false;
         m_responseCode = response.statusLine.statusCode;

@@ -52,21 +52,21 @@ void QnVideoCameraPool::updateActivity()
         camera->updateActivity();
 }
 
-QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
+QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) const
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
-
     QnMutexLocker lock(&m_staticMtx);
-    CameraMap::iterator itr = m_cameras.find(res);
-    if (itr == m_cameras.end()) {
-        QnVideoCameraPtr result = std::make_shared<QnVideoCamera>(res);
-        m_cameras.insert(res, result);
-        return result;
-    }
-    else {
-        return itr.value();
-    }
+    CameraMap::const_iterator itr = m_cameras.find(res);
+    return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
+}
+
+QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
+{
+    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
+        return QnVideoCameraPtr();
+    QnMutexLocker lock(&m_staticMtx);
+    return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(res))).value();
 }
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)

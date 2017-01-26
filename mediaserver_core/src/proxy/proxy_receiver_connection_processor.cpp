@@ -3,6 +3,7 @@
 #include "network/universal_request_processor_p.h"
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
+#include <http/custom_headers.h>
 
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -44,7 +45,7 @@ void QnProxyReceiverConnection::run()
 
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
-    auto guid = nx_http::getHeaderValue(d->request.headers, "x-server-uuid");
+    auto guid = nx_http::getHeaderValue(d->request.headers, Qn::SERVER_GUID_HEADER_NAME);
     if (d->owner->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();

@@ -10,6 +10,8 @@ namespace
 
 void QnSendStatisticsRequestData::loadFromParams(const QnRequestParamList& params)
 {
+    QnMultiserverRequestData::loadFromParams(params);
+
     if (params.contains(kStatServerUrlTag) )
         statisticsServerUrl = params.value(kStatServerUrlTag);
 

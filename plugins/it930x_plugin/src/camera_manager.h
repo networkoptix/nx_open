@@ -22,13 +22,14 @@ namespace ite
     class CameraManager;
 
     ///
-    class CameraManager : public nxcip::BaseCameraManager3, public ObjectCounter<CameraManager>
+    class CameraManager : public DefaultRefCounter<nxcip::BaseCameraManager3>
     {
-        DEF_REF_COUNTER
-
     public:
-        CameraManager(const nxcip::CameraInfo& info, DeviceMapper * devMapper, TxDevicePtr txDev);
-        virtual ~CameraManager();
+        CameraManager(const RxDevicePtr &rxDev);
+
+        // nxcip::PluginInterface
+
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxcip::BaseCameraManager
 
@@ -62,14 +63,6 @@ namespace ite
         void openStream(unsigned encNo);
         void closeStream(unsigned encNo);
 
-        // for DiscoveryManager
-
-        void updateTx(TxDevicePtr txDev)
-        {
-            if (! m_txDevice)
-                m_txDevice = txDev;
-        }
-
         void updateCameraInfo(const nxcip::CameraInfo& info);
         bool stopIfNeedIt();
 
@@ -77,44 +70,11 @@ namespace ite
 
         const char * url() const { return m_info.url; }
 
-        unsigned short txID() const
-        {
-            if (m_txDevice)
-                return m_txDevice->txID();
-            return 0;
-        }
-
-        //
+       //
 
         void needUpdate(unsigned group);
         void updateSettings();
         void setChannel(unsigned channel) { m_newChannel = channel; }
-
-    private:
-        mutable std::mutex m_mutex;
-
-        DeviceMapper * m_devMapper;
-        TxDevicePtr m_txDevice;
-        RxDevicePtr m_rxDevice;
-        std::vector<std::shared_ptr<MediaEncoder>> m_encoders;
-
-        std::set<unsigned> m_openedStreams;
-        Timer m_stopTimer;
-
-        std::map<uint8_t, bool> m_update;
-        unsigned m_newChannel;
-
-        mutable const char * m_errorStr;
-        nxcip::CameraInfo m_info;
-
-        bool captureAnyRxDevice();
-        RxDevicePtr captureFreeRxDevice();
-        void freeRx(bool reset = false);
-
-        void initEncoders();
-        void stopEncoders();
-        void reloadMedia();
-        bool stopStreams(bool force = false);
 
         typedef enum
         {
@@ -126,8 +86,37 @@ namespace ite
             STATE_READING           // got readers
         } State;
 
-        State checkState() const;
         State tryLoad();
+
+        //refactor
+        int cameraId() const
+        {
+            return m_cameraId;
+        }
+
+        std::mutex &get_mutex() {return m_mutex;}
+        RxDevicePtr &rxDeviceRef() { return m_rxDevice; }
+
+    private:
+        typedef MediaEncoder *MediaEncoderPtr;
+        mutable std::mutex m_mutex;
+
+        RxDevicePtr m_rxDevice;
+
+        std::set<unsigned> m_openedStreams;
+        Timer m_stopTimer;
+
+        std::map<uint8_t, bool> m_update;
+        unsigned m_newChannel;
+
+        mutable const char * m_errorStr;
+        mutable nxcip::CameraInfo m_info;
+
+        bool stopStreams(bool force = false);
+
+        const int m_cameraId;
+
+        State checkState() const;
     };
 }
 

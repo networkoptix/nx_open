@@ -5,6 +5,8 @@
 #include <thread>
 #include <atomic>
 
+#include "pts_to_clock_mapper.h"
+
 #if 0
 #include <ratio>
 
@@ -34,8 +36,6 @@ namespace ite
     class Timer
     {
     public:
-        //typedef ClockRDTSC Clock;
-        //typedef std::chrono::steady_clock Clock;
         typedef std::chrono::high_resolution_clock Clock;
 
         Timer(bool start = false)
@@ -120,42 +120,45 @@ namespace ite
     class PtsTime
     {
     public:
-        typedef uint32_t PtsT;
-
-        static constexpr unsigned MAX_PTS_DRIFT() { return 63000; } // 700 ms
-
-        PtsTime()
-        :   m_baseUsec(0),
-            m_basePTS(0),
-            m_prevPTS(0)
+        PtsTime() :
+            m_ptsMapper(90000, &m_syncData),
+            m_allowedGap(
+                std::chrono::duration_cast<std::chrono::microseconds>(
+                    std::chrono::milliseconds(150)
+                ).count()
+            )
         {}
 
-        uint64_t pts2usec(PtsT pts)
+        uint64_t pts2usec(PtsToClockMapper::pts_type pts)
         {
-            // - first fime
-            // - drift
-            // - overflow
-            // - fix frozen PTS
-            if (pts <= m_prevPTS || (pts - m_prevPTS) > PtsTime::MAX_PTS_DRIFT())
-            {
-                m_baseUsec = Timer::usecNow();
-                m_basePTS = pts;    
+            auto curTimeStamp = std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::high_resolution_clock::now().time_since_epoch()
+            ).count();
+
+            auto ret = m_ptsMapper.getTimestamp(pts);
 #if 0
-                if (pts <= m_prevPTS)
-                    debug_printf("[stream] timestamp PTS overflow: %ld\n", m_baseUsec / 1000000);
-                else
-                    debug_printf("[stream] timestamp drift: %ld\n", m_baseUsec / 1000000);
+            printf("[Timer gap] real: %lu allowed: %lu\n", qAbs(ret - curTimeStamp), m_allowedGap);
 #endif
+            if (qAbs(ret - curTimeStamp) > m_allowedGap)
+            {
+#if 0
+                printf("[Timer update] cur: %lu  ret: %lu", curTimeStamp, ret);
+#endif
+                m_ptsMapper.updateTimeMapping(
+                    pts,
+                    std::chrono::duration_cast<std::chrono::microseconds>(
+                        std::chrono::high_resolution_clock::now().time_since_epoch()
+                    ).count()
+                );
             }
 
-            m_prevPTS = pts;
-            return m_baseUsec + static_cast<uint64_t>(pts - m_basePTS) * 100 / 9; // 90kHz -> usec
+            return ret;
         }
 
     private:
-        uint64_t m_baseUsec;
-        PtsT m_basePTS;
-        PtsT m_prevPTS;
+        PtsToClockMapper::TimeSynchronizationData   m_syncData;
+        PtsToClockMapper                            m_ptsMapper;
+        const int64_t                               m_allowedGap;
     };
 }
 

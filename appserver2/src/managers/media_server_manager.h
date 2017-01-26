@@ -6,33 +6,33 @@
 
 namespace ec2
 {
-    class QnMediaServerNotificationManager: public AbstractMediaServerManager
+    class QnMediaServerNotificationManager: public AbstractMediaServerNotificationManager
     {
     public:
         QnMediaServerNotificationManager();
 
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiStorageData>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran, NotificationSource source);
     };
 
-
+    typedef std::shared_ptr<QnMediaServerNotificationManager> QnMediaServerNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnMediaServerManager: public QnMediaServerNotificationManager
+    class QnMediaServerManager: public AbstractMediaServerManager
     {
     public:
-        QnMediaServerManager( QueryProcessorType* const queryProcessor);
+        QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         //!Implementation of QnMediaServerManager::getServers
         virtual int getServers(impl::GetServersHandlerPtr handler) override;
@@ -53,5 +53,6 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 }

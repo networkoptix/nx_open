@@ -1,6 +1,7 @@
 #ifndef QN_NETWORK_RESOURCE_H
 #define QN_NETWORK_RESOURCE_H
 
+#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
 #include <nx/network/mac_address.h>
@@ -15,6 +16,7 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
+    using base_type = QnResource;
 public:
     enum NetworkStatusFlag {
         BadHostAddr = 0x01,
@@ -72,7 +74,7 @@ public:
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);

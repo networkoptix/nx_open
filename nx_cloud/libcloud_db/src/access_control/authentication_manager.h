@@ -33,9 +33,8 @@ class AbstractAuthenticationDataProvider;
     Uses account data and some predefined static data to authenticate incoming requests.
     \note Listens to user data change events
  */
-class AuthenticationManager
-:
-    public nx_http::AbstractAuthenticationManager
+class AuthenticationManager:
+    public nx_http::server::AbstractAuthenticationManager
 {
 public:
     AuthenticationManager(
@@ -43,13 +42,10 @@ public:
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
-    virtual bool authenticate(
+    virtual void authenticate(
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
-        boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-        stree::ResourceContainer* authProperties,
-        nx_http::HttpHeaders* const responseHeaders,
-        std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody) override;
+        nx_http::server::AuthenticationCompletionHandler completionHandler) override;
         
     static nx::String realm(); 
 

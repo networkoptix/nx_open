@@ -41,7 +41,7 @@ protected:
 
 private:
     QnTCPConnectionProcessor* const m_tcpOutput;
-    CLThreadQueue<QByteArray> m_packetsToSend;
+    QnSafeQueue<QByteArray> m_packetsToSend;
     bool m_failed;
     mutable QnMutex m_mutex;
     QnWaitCondition m_cond;

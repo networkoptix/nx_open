@@ -10,80 +10,77 @@
 #include <iostream>
 #include <list>
 #include <thread>
+#include <type_traits>
 
 #include <QtCore/QDir>
 #include <QtSql/QSqlQuery>
 
-#include <api/global_settings.h>
-#include <platform/process/current_process.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
-#include <utils/common/cpp14.h>
+#include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/type_utils.h>
+
+#include <api/global_settings.h>
+#include <common/common_module.h>
+#include <platform/process/current_process.h>
+#include <utils/common/app_info.h>
+#include <utils/common/guard.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
-#include <utils/common/guard.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
+
+#include <cloud_db_client/src/cdb_request_path.h>
 
 #include "access_control/authentication_manager.h"
-#include "db/structure_update_statements.h"
-#include "http_handlers/activate_account_handler.h"
-#include "http_handlers/add_account_handler.h"
-#include "http_handlers/bind_system_handler.h"
-#include "http_handlers/get_account_handler.h"
-#include "http_handlers/update_account_handler.h"
-#include "http_handlers/reset_password_handler.h"
-#include "http_handlers/reactivate_account_handler.h"
-#include "http_handlers/get_access_role_list.h"
-#include "http_handlers/get_cloud_users_of_system.h"
-#include "http_handlers/get_systems_handler.h"
-#include "http_handlers/get_cdb_nonce_handler.h"
-#include "http_handlers/get_authentication_response_handler.h"
+#include "dao/rdb/db_instance_controller.h"
+#include "ec2/synchronization_engine.h"
 #include "http_handlers/ping.h"
-#include "http_handlers/unbind_system_handler.h"
-#include "http_handlers/share_system_handler.h"
+#include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
-#include "managers/temporary_account_password_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
+#include "managers/event_manager.h"
+#include "managers/maintenance_manager.h"
+#include "managers/system_health_info_provider.h"
 #include "managers/system_manager.h"
+#include "managers/temporary_account_password_manager.h"
 #include "stree/stree_manager.h"
-
-#include <utils/common/app_info.h>
-#include <libcloud_db_app_info.h>
 
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE( libcloud_db );
+    Q_INIT_RESOURCE(libcloud_db);
     return 0;
 }
 
 namespace nx {
 namespace cdb {
 
-static const int DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC = 5;
-
-CloudDBProcess::CloudDBProcess( int argc, char **argv )
-:
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibCloudDbAppInfo::applicationName()),
-    m_argc( argc ),
-    m_argv( argv ),
-    m_terminated( false ),
-    m_timerID( -1 )
+CloudDBProcess::CloudDBProcess(int argc, char **argv):
+    m_argc(argc),
+    m_argv(argv),
+    m_terminated(false),
+    m_settings(nullptr),
+    m_emailManager(nullptr),
+    m_streeManager(nullptr),
+    m_httpMessageDispatcher(nullptr),
+    m_tempPasswordManager(nullptr),
+    m_accountManager(nullptr),
+    m_eventManager(nullptr),
+    m_systemManager(nullptr),
+    m_authenticationManager(nullptr),
+    m_authorizationManager(nullptr),
+    m_authProvider(nullptr)
 {
-    setServiceDescription(QnLibCloudDbAppInfo::applicationDisplayName());
-
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
 }
 
 void CloudDBProcess::pleaseStop()
 {
-    m_terminated = true;
-    if (application())
-        application()->quit();
+    m_processTerminationEvent.set_value();
 }
 
 void CloudDBProcess::setOnStartedEventHandler(
@@ -92,7 +89,14 @@ void CloudDBProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
-int CloudDBProcess::executeApplication()
+const std::vector<SocketAddress>& CloudDBProcess::httpEndpoints() const
+{
+    return m_httpEndpoints;
+}
+
+static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
+
+int CloudDBProcess::exec()
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -107,24 +111,32 @@ int CloudDBProcess::executeApplication()
         //reading settings
         conf::Settings settings;
         //parsing command line arguments
-        settings.load( m_argc, m_argv );
+        settings.load( m_argc, (const char**) m_argv );
         if( settings.showHelp() )
         {
-            settings.printCmdLineArgsHelp();
+            settings.printCmdLineArgsHelpToCout();
             return 0;
         }
 
-        initializeLogging( settings );
+        nx::utils::log::initialize(
+            settings.logging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "log_file", QnLog::MAIN_LOG_ID);
+
+        nx::utils::log::initialize(
+            settings.vmsSynchronizationLogging(), settings.dataDir(),
+            QnLibCloudDbAppInfo::applicationDisplayName(), "sync_log", QnLog::EC2_TRAN_LOG);
 
         const auto& httpAddrToListenList = settings.endpointsToListen();
+        m_settings = &settings;
         if( httpAddrToListenList.empty() )
         {
             NX_LOG( "No HTTP address to listen", cl_logALWAYS );
             return 1;
         }
 
-        nx::db::AsyncSqlQueryExecutor dbManager(settings.dbConnectionOptions());
-        if( !initializeDB(&dbManager) )
+        dao::rdb::DbInstanceController dbInstanceController(
+            settings.dbConnectionOptions());
+        if (!dbInstanceController.initialize())
         {
             NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
             return 2;
@@ -135,31 +147,61 @@ int CloudDBProcess::executeApplication()
 
         std::unique_ptr<AbstractEmailManager> emailManager(
             EMailManagerFactory::create(settings));
-        StreeManager streeManager(settings.auth());
+        m_emailManager = emailManager.get();
+
+        CdbAttrNameSet cdbAttrNameSet;
+        StreeManager streeManager(
+            cdbAttrNameSet,
+            settings.auth().rulesXmlPath);
+        m_streeManager = &streeManager;
+
+        nx_http::MessageDispatcher httpMessageDispatcher;
+        m_httpMessageDispatcher = &httpMessageDispatcher;
 
         //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
-            &dbManager);
+            dbInstanceController.queryExecutor().get());
+        m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
+            streeManager,
             &tempPasswordManager,
-            &dbManager,
+            dbInstanceController.queryExecutor().get(),
             emailManager.get());
+        m_accountManager = &accountManager;
+
+        EventManager eventManager(settings);
+        m_eventManager = &eventManager;
+
+        ec2::SyncronizationEngine ec2SyncronizationEngine(
+            kCdbGuid,
+            settings.p2pDb(),
+            dbInstanceController.queryExecutor().get());
+
+        SystemHealthInfoProvider systemHealthInfoProvider(
+            ec2SyncronizationEngine.connectionManager());
 
         SystemManager systemManager(
             settings,
             &timerManager,
-            accountManager,
-            &dbManager);
+            &accountManager,
+            systemHealthInfoProvider,
+            dbInstanceController.queryExecutor().get(),
+            emailManager.get(),
+            &ec2SyncronizationEngine);
+        m_systemManager = &systemManager;
+
+        ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
+            systemManager.systemMarkedAsDeletedSubscription());
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
-        authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
+        authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
 
         std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
         authDataProviders.push_back(&accountManager);
@@ -168,118 +210,92 @@ int CloudDBProcess::executeApplication()
             std::move(authDataProviders),
             authRestrictionList,
             streeManager);
+        m_authenticationManager = &authenticationManager;
 
         AuthorizationManager authorizationManager(
             streeManager,
             accountManager,
             systemManager);
+        m_authorizationManager = &authorizationManager;
 
         AuthenticationProvider authProvider(
             settings,
             accountManager,
-            systemManager);
+            systemManager,
+            tempPasswordManager);
+        m_authProvider = &authProvider;
 
-        nx_http::MessageDispatcher httpMessageDispatcher;
+        MaintenanceManager maintenanceManager(
+            kCdbGuid,
+            &ec2SyncronizationEngine);
+
         //registering HTTP handlers
         registerApiHandlers(
             &httpMessageDispatcher,
             authorizationManager,
             &accountManager,
             &systemManager,
-            &authProvider);
+            &authProvider,
+            &eventManager,
+            &ec2SyncronizationEngine.connectionManager(),
+            &maintenanceManager);
+        //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
+        eventManager.registerHttpHandlers(
+            authorizationManager,
+            &httpMessageDispatcher);
 
         MultiAddressServer<nx_http::HttpStreamSocketServer> multiAddressHttpServer(
             &authenticationManager,
             &httpMessageDispatcher,
             false,  //TODO #ak enable ssl when it works properly
-            SocketFactory::NatTraversalType::nttDisabled );
+            nx::network::NatTraversalSupport::disabled );
 
-        if( !multiAddressHttpServer.bind(httpAddrToListenList) )
+        if (m_settings->auth().connectionInactivityPeriod.count())
+        {
+            multiAddressHttpServer.forEachListener(
+                [&](nx_http::HttpStreamSocketServer* server)
+                {
+                    server->setConnectionInactivityTimeout(
+                        m_settings->auth().connectionInactivityPeriod);
+                });
+        }
+
+        if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
         // process privilege reduction
-        CurrentProcess::changeUser( settings.changeUser() );
+        CurrentProcess::changeUser(settings.changeUser());
 
-        if( !multiAddressHttpServer.listen() )
+        if (!multiAddressHttpServer.listen())
             return 5;
+        m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-        application()->installEventFilter(this);
         if (m_terminated)
             return 0;
 
         NX_LOG(lit("%1 has been started")
                 .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
                cl_logALWAYS);
-        std::cout << QnLibCloudDbAppInfo::applicationDisplayName().toStdString()
-            << " has been started" << std::endl;
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
 
-        //starting timer to check for m_terminated again after event loop start
-        m_timerID = application()->startTimer(0);
+        // This is actually the main loop.
+        m_processTerminationEvent.get_future().wait();
 
-        //TODO #ak remove qt event loop
-        //application's main loop
-        const int result = application()->exec();
+        // First of all, cancelling accepting new requests.
+        multiAddressHttpServer.forEachListener(
+            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
 
-        return result;
+        ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
+            systemManager.systemMarkedAsDeletedSubscription());
+
+        return 0;
     }
-    catch( const std::exception& e )
+    catch (const std::exception& e)
     {
-        NX_LOG( lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS );
+        NX_LOG(lit("Failed to start application. %1").arg(e.what()), cl_logALWAYS);
         return 3;
-    }
-}
-
-void CloudDBProcess::start()
-{
-    QtSingleCoreApplication* application = this->application();
-
-    if( application->isRunning() )
-    {
-        NX_LOG( "Server already started", cl_logERROR );
-        application->quit();
-        return;
-    }
-}
-
-void CloudDBProcess::stop()
-{
-    pleaseStop();
-    //TODO #ak wait for executeApplication to return?
-}
-
-bool CloudDBProcess::eventFilter(QObject* /*watched*/, QEvent* /*event*/)
-{
-    if (m_timerID != -1)
-    {
-        application()->killTimer(m_timerID);
-        m_timerID = -1;
-    }
-
-    if (m_terminated)
-        application()->quit();
-    return false;
-}
-
-void CloudDBProcess::initializeLogging( const conf::Settings& settings )
-{
-    //logging
-    if( settings.logging().logLevel != QString::fromLatin1("none") )
-    {
-        const QString& logDir = settings.logging().logDir;
-
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if( cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1) )
-            QnLog::initLog( settings.logging().logLevel );
-        else
-            std::wcerr << L"Failed to create log file " << logFileName.toStdWString() << std::endl;
-        NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationVersion()), cl_logALWAYS);
-        NX_LOG(lit("Software revision: %1").arg(QnAppInfo::applicationRevision()), cl_logALWAYS);
     }
 }
 
@@ -288,186 +304,226 @@ void CloudDBProcess::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
-    AuthenticationProvider* const authProvider)
+    AuthenticationProvider* const authProvider,
+    EventManager* const /*eventManager*/,
+    ec2::ConnectionManager* const ec2ConnectionManager,
+    MaintenanceManager* const maintenanceManager)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
         PingHandler::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<PingHandler> {
-            return std::make_unique<PingHandler>( authorizationManager );
-        } );
-
-    //accounts
-    msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
-        AddAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
-            return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<ActivateAccountHandler>(
-        ActivateAccountHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ActivateAccountHandler> {
-            return std::make_unique<ActivateAccountHandler>( accountManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
-        GetAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
-            return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<UpdateAccountHttpHandler>(
-        UpdateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
-            return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<ResetPasswordHttpHandler>(
-        ResetPasswordHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
-            return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<ReactivateAccountHttpHandler>(
-        ReactivateAccountHttpHandler::kHandlerPath,
-        [accountManager, &authorizationManager]() -> std::unique_ptr<ReactivateAccountHttpHandler> {
-            return std::make_unique<ReactivateAccountHttpHandler>( accountManager, authorizationManager );
-        } );
-
-    //systems
-    msgDispatcher->registerRequestProcessor<BindSystemHandler>(
-        BindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
-            return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
-        GetSystemsHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
-            return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
-        UnbindSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
-            return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
-        } );
-
-    msgDispatcher->registerRequestProcessor<ShareSystemHttpHandler>(
-        ShareSystemHttpHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
-            return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
-        } );
-
-    msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
-        GetCloudUsersOfSystemHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
-            return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
-        } );
-
-    msgDispatcher->registerRequestProcessor<GetAccessRoleListHandler>(
-        GetAccessRoleListHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<GetAccessRoleListHandler> {
-            return std::make_unique<GetAccessRoleListHandler>(systemManager, authorizationManager);
+        [&authorizationManager]() -> std::unique_ptr<PingHandler>
+        {
+            return std::make_unique<PingHandler>(authorizationManager);
         });
 
-    //authentication
-    msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
-        GetCdbNonceHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetCdbNonceHandler> {
-            return std::make_unique<GetCdbNonceHandler>( authProvider, authorizationManager );
-        } );
+    //---------------------------------------------------------------------------------------------
+    // AccountManager
+    registerHttpHandler(
+        kAccountRegisterPath,
+        &AccountManager::registerAccount, accountManager,
+        EntityType::account, DataActionType::insert);
 
-    msgDispatcher->registerRequestProcessor<GetAuthenticationResponseHandler>(
-        GetAuthenticationResponseHandler::kHandlerPath,
-        [authProvider, &authorizationManager]() -> std::unique_ptr<GetAuthenticationResponseHandler> {
-            return std::make_unique<GetAuthenticationResponseHandler>( authProvider, authorizationManager );
-        } );
+    registerHttpHandler(
+        kAccountActivatePath,
+        &AccountManager::activate, accountManager,
+        EntityType::account, DataActionType::update);
+
+    registerHttpHandler(
+        kAccountGetPath,
+        &AccountManager::getAccount, accountManager,
+        EntityType::account, DataActionType::fetch);
+
+    registerHttpHandler(
+        kAccountUpdatePath,
+        &AccountManager::updateAccount, accountManager,
+        EntityType::account, DataActionType::update);
+
+    registerHttpHandler(
+        kAccountPasswordResetPath,
+        &AccountManager::resetPassword, accountManager,
+        EntityType::account, DataActionType::update);
+
+    registerHttpHandler(
+        kAccountReactivatePath,
+        &AccountManager::reactivateAccount, accountManager,
+        EntityType::account, DataActionType::update);
+
+    registerHttpHandler(
+        kAccountCreateTemporaryCredentialsPath,
+        &AccountManager::createTemporaryCredentials, accountManager,
+        EntityType::account, DataActionType::update);
+
+    //---------------------------------------------------------------------------------------------
+    // SystemManager
+    registerHttpHandler(
+        kSystemBindPath,
+        &SystemManager::bindSystemToAccount, systemManager,
+        EntityType::system, DataActionType::insert);
+
+    registerHttpHandler(
+        kSystemGetPath,
+        &SystemManager::getSystems, systemManager,
+        EntityType::system, DataActionType::fetch);
+
+    registerHttpHandler(
+        kSystemUnbindPath,
+        &SystemManager::unbindSystem, systemManager,
+        EntityType::system, DataActionType::_delete);
+
+    registerHttpHandler(
+        kSystemSharePath,
+        &SystemManager::shareSystem, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemGetCloudUsersPath,
+        &SystemManager::getCloudUsersOfSystem, systemManager,
+        EntityType::system, DataActionType::fetch);
+
+    registerHttpHandler(
+        kSystemGetAccessRoleListPath,
+        &SystemManager::getAccessRoleList, systemManager,
+        EntityType::system, DataActionType::fetch);
+
+    registerHttpHandler(
+        kSystemRenamePath,
+        &SystemManager::updateSystem, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemUpdatePath,
+        &SystemManager::updateSystem, systemManager,
+        EntityType::system, DataActionType::update);
+
+    registerHttpHandler(
+        kSystemRecordUserSessionStartPath,
+        &SystemManager::recordUserSessionStart, systemManager,
+        EntityType::account, DataActionType::update);
+    //< TODO: #ak: current entity:action is not suitable for this request
+
+    //---------------------------------------------------------------------------------------------
+    // AuthenticationProvider
+    registerHttpHandler(
+        kAuthGetNoncePath,
+        &AuthenticationProvider::getCdbNonce, authProvider,
+        EntityType::account, DataActionType::fetch);
+
+    registerHttpHandler(
+        kAuthGetAuthenticationPath,
+        &AuthenticationProvider::getAuthenticationResponse, authProvider,
+        EntityType::account, DataActionType::fetch);
+
+    //---------------------------------------------------------------------------------------------
+    // ec2::ConnectionManager
+    // TODO: #ak remove after 3.0 release.
+    registerHttpHandler(
+        kEstablishEc2TransactionConnectionDeprecatedPath,
+        &ec2::ConnectionManager::createTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
+        kEstablishEc2TransactionConnectionPath,
+        &ec2::ConnectionManager::createTransactionConnection,
+        ec2ConnectionManager);
+
+    registerHttpHandler(
+        //kPushEc2TransactionPath,
+        nx_http::kAnyPath.toStdString().c_str(),   //dispatcher does not support max prefix by now
+        &ec2::ConnectionManager::pushTransaction,
+        ec2ConnectionManager);
+
+    //---------------------------------------------------------------------------------------------
+    // MaintenanceManager
+    registerHttpHandler(
+        kMaintenanceGetVmsConnections,
+        &MaintenanceManager::getVmsConnections, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
+    registerHttpHandler(
+        kMaintenanceGetTransactionLog,
+        &MaintenanceManager::getTransactionLog, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
 }
 
-bool CloudDBProcess::initializeDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
+template<typename ManagerType, typename InputData, typename... OutputData>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        InputData inputData,
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
 {
-    for (;;)
-    {
-        if (dbManager->init())
-            break;
-        NX_LOG(lit("Cannot start application due to DB connect error"), cl_logALWAYS);
-        std::this_thread::sleep_for(
-            std::chrono::seconds(DB_REPEATED_CONNECTION_ATTEMPT_DELAY_SEC));
-    }
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
 
-    if (!configureDB(dbManager))
-    {
-        NX_LOG("Failed to tune DB", cl_logALWAYS);
-        return false;
-    }
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        typename std::remove_const<typename std::remove_reference<InputData>::type>::type,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
 
-    if (!updateDB(dbManager))
-    {
-        NX_LOG("Could not update DB to current vesion", cl_logALWAYS);
-        return false;
-    }
-
-    return true;
-}
-
-bool CloudDBProcess::configureDB( nx::db::AsyncSqlQueryExecutor* const dbManager )
-{
-    if( dbManager->connectionOptions().driverName != lit("QSQLITE") )
-        return true;
-
-    std::promise<nx::db::DBResult> cacheFilledPromise;
-    auto future = cacheFilledPromise.get_future();
-
-    //starting async operation
-    using namespace std::placeholders;
-    dbManager->executeUpdateWithoutTran(
-        [](QSqlDatabase* connection) ->nx::db::DBResult {
-            QSqlQuery enableWalQuery(*connection);
-            enableWalQuery.prepare("PRAGMA journal_mode = WAL");
-            if (!enableWalQuery.exec())
-            {
-                NX_LOG(lit("sqlite configure. Failed to enable WAL mode. %1").
-                    arg(connection->lastError().text()), cl_logWARNING);
-                return nx::db::DBResult::ioError;
-            }
-
-            QSqlQuery enableFKQuery(*connection);
-            enableFKQuery.prepare("PRAGMA foreign_keys = ON");
-            if (!enableFKQuery.exec())
-            {
-                NX_LOG(lit("sqlite configure. Failed to enable foreign keys. %1").
-                    arg(connection->lastError().text()), cl_logWARNING);
-                return nx::db::DBResult::ioError;
-            }
-
-            return nx::db::DBResult::ok;
-        },
-        [&](nx::db::DBResult dbResult) {
-            cacheFilledPromise.set_value(dbResult);
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2, _3));
         });
-
-    //waiting for completion
-    future.wait();
-    return future.get() == nx::db::DBResult::ok;
 }
 
-bool CloudDBProcess::updateDB(nx::db::AsyncSqlQueryExecutor* const dbManager)
+template<typename ManagerType, typename... OutputData>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    void (ManagerType::*managerFunc)(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, OutputData...)> completionHandler),
+    ManagerType* manager,
+    EntityType entityType,
+    DataActionType dataActionType)
 {
-    //updating DB structure to actual state
-    nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
-    dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
-    dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
-    dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);
-    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToSystem);
-    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
-    dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
-    dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
-    dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
-    dbStructureUpdater.addUpdateScript(db::kChangeSystemIdTypeToString);
-    dbStructureUpdater.addUpdateScript(db::kAddDeletedSystemState);
-    dbStructureUpdater.addUpdateScript(db::kSystemExpirationTime);
-    return dbStructureUpdater.updateStructSync();
+    typedef typename nx::utils::tuple_first_element<void, std::tuple<OutputData...>>::type
+        ActualOutputDataType;
+    typedef AbstractFiniteMsgBodyHttpHandler<
+        void,
+        typename std::remove_const<typename std::remove_reference<ActualOutputDataType>::type>::type
+    > HttpHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<HttpHandlerType>(
+        handlerPath,
+        [this, managerFunc, manager, entityType, dataActionType]()
+            -> std::unique_ptr<HttpHandlerType>
+        {
+            using namespace std::placeholders;
+            return std::make_unique<HttpHandlerType>(
+                entityType,
+                dataActionType,
+                *m_authorizationManager,
+                std::bind(managerFunc, manager, _1, _2));
+        });
 }
 
-}   //cdb
-}   //nx
+template<typename ManagerType>
+void CloudDBProcess::registerHttpHandler(
+    const char* handlerPath,
+    typename CustomHttpHandler<ManagerType>::ManagerFuncType managerFuncPtr,
+    ManagerType* manager)
+{
+    typedef CustomHttpHandler<ManagerType> RequestHandlerType;
+
+    m_httpMessageDispatcher->registerRequestProcessor<RequestHandlerType>(
+        handlerPath,
+        [managerFuncPtr, manager]() -> std::unique_ptr<RequestHandlerType>
+        {
+            return std::make_unique<RequestHandlerType>(manager, managerFuncPtr);
+        });
+}
+
+} // namespace cdb
+} // namespace nx

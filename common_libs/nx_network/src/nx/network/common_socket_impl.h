@@ -1,18 +1,11 @@
-/**********************************************************
-* 13 oct 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef COMMON_SOCKET_IMPL_H
-#define COMMON_SOCKET_IMPL_H
+#pragma once
 
 #include <array>
 #include <atomic>
 
+#include <nx/network/aio/event_type.h>
+
 #include "detail/socket_sequence.h"
-
-
-static std::atomic<SocketSequenceType> socketSequenceCounter(1);
 
 namespace nx {
 namespace network {
@@ -25,7 +18,7 @@ namespace aio {
 }   //network
 }   //nx
 
-class CommonSocketImpl
+class NX_NETWORK_API CommonSocketImpl
 {
 public:
     std::atomic<nx::network::aio::AIOThread*> aioThread;
@@ -35,17 +28,6 @@ public:
     SocketSequenceType socketSequence;
     bool isUdtSocket;
 
-    CommonSocketImpl()
-    :
-        aioThread( nullptr ),
-        terminated( 0 ),
-        socketSequence( ++socketSequenceCounter ),
-        isUdtSocket(false)
-    {
-        eventTypeToUserData.fill( nullptr );
-    }
-
-    virtual ~CommonSocketImpl() {}
+    CommonSocketImpl();
+    virtual ~CommonSocketImpl() = default;
 };
-
-#endif  //COMMON_SOCKET_IMPL_H

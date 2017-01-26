@@ -12,6 +12,14 @@ namespace
     {
         NX_ASSERT(!(targetThread && parent), Q_FUNC_INFO, "Invalid thread and parent parameters");
 
+        if (parent)
+        {
+            /* NX_ASSERT does not stop debugging here. */
+            NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
+                "Timer cannot be child of QObject, located in an another thread. Use targetThread "
+                "parameter instead and guarded callback.");
+        }
+
         QTimer *timer = new QTimer(parent);
         timer->setInterval(delayMs);
         timer->setSingleShot(true);

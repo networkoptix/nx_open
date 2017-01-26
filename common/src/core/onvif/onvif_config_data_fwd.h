@@ -2,7 +2,7 @@
 #define QN_ONVIF_CONFIG_DATA_FWD_H
 
 #include <QtCore/QSharedPointer>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 struct QnOnvifConfigData;
 typedef QSharedPointer<QnOnvifConfigData> QnOnvifConfigDataPtr;

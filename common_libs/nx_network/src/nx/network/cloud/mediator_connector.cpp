@@ -1,33 +1,54 @@
-
 #include "mediator_connector.h"
 
-#include "common/common_globals.h"
-#include "utils/common/cpp14.h"
-
-#include <nx/utils/log/log.h>
 #include <nx/network/socket_factory.h>
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
+
+#include "common/common_globals.h"
 
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
-static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes( 10 );
+static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-MediatorConnector::MediatorConnector()
-    : m_isTerminating( false )
-    , m_stunClient(std::make_shared<stun::AsyncClient>())
-    , m_endpointFetcher(
-        lit( "hpm" ),
-        std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
-    , m_fetchEndpointRetryTimer(
-        nx::network::RetryPolicy(
-            nx::network::RetryPolicy::kInfiniteRetries,
-            kRetryIntervalInitial,
-            2,
-            kRetryIntervalMax))
+namespace {
+
+static stun::AbstractAsyncClient::Settings s_stunClientSettings
+    = stun::AbstractAsyncClient::kDefaultSettings;
+
+} // namespace
+
+MediatorConnector::MediatorConnector():
+    m_stunClient(std::make_shared<stun::AsyncClient>(s_stunClientSettings)),
+    m_endpointFetcher(std::make_unique<nx::network::cloud::ConnectionMediatorUrlFetcher>(
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>())),
+    m_fetchEndpointRetryTimer(
+        std::make_unique<nx::network::RetryTimer>(
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                kRetryIntervalInitial,
+                2,
+                kRetryIntervalMax)))
 {
+    bindToAioThread(getAioThread());
+}
+
+MediatorConnector::~MediatorConnector()
+{
+    NX_ASSERT((m_stunClient == nullptr) || m_stunClient.unique());
+    pleaseStopSync(false);
+}
+
+void MediatorConnector::bindToAioThread(network::aio::AbstractAioThread* aioThread)
+{
+    network::aio::BasicPollable::bindToAioThread(aioThread);
+
+    m_stunClient->bindToAioThread(aioThread);
+    m_endpointFetcher->bindToAioThread(aioThread);
+    m_fetchEndpointRetryTimer->bindToAioThread(aioThread);
 }
 
 void MediatorConnector::enable( bool waitComplete )
@@ -50,22 +71,23 @@ void MediatorConnector::enable( bool waitComplete )
         m_future->wait();
 }
 
-std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
+std::unique_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
-    return std::shared_ptr<MediatorClientTcpConnection>(
-                new MediatorClientTcpConnection( m_stunClient ) );
+    return std::make_unique<MediatorClientTcpConnection>(m_stunClient);
 }
 
-std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
+std::unique_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorServerTcpConnection>(
-                new MediatorServerTcpConnection( m_stunClient, this ) );
+    return std::make_unique<MediatorServerTcpConnection>(m_stunClient, this);
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarning )
 {
     {
         QnMutexLocker lk( &m_mutex );
+        if (m_promise && (address == m_mediatorAddress))
+            return;
+
         NX_ASSERT( !m_promise, Q_FUNC_INFO,
                     "Address resolving is already in progress!" );
 
@@ -79,8 +101,8 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
                  .arg( address.toString() ), cl_logWARNING );
     }
 
-    m_mediatorAddress = std::move(address);
-    m_stunClient->connect( address );
+    m_mediatorAddress = address;
+    m_stunClient->connect( std::move( address ) );
     m_promise->set_value( true );
 }
 
@@ -112,19 +134,16 @@ boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() con
     return m_credentials;
 }
 
-void MediatorConnector::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
-{
-    {
-        QnMutexLocker lk( &m_mutex );
-        m_isTerminating = true;
-    }
-
-    m_fetchEndpointRetryTimer.pleaseStop(std::move(handler));
-}
-
 boost::optional<SocketAddress> MediatorConnector::mediatorAddress() const
 {
+    QnMutexLocker lk(&m_mutex);
     return m_mediatorAddress;
+}
+
+void MediatorConnector::setStunClientSettings(
+    stun::AbstractAsyncClient::Settings stunClientSettings)
+{
+    s_stunClientSettings = std::move(stunClientSettings);
 }
 
 static bool isReady(nx::utils::future<bool> const& f)
@@ -134,35 +153,43 @@ static bool isReady(nx::utils::future<bool> const& f)
 
 void MediatorConnector::fetchEndpoint()
 {
-    m_endpointFetcher.get(
-        [ this ]( nx_http::StatusCode::Value status, SocketAddress address )
+    m_endpointFetcher->get(
+        [ this ]( nx_http::StatusCode::Value status, QUrl url )
     {
         if( status != nx_http::StatusCode::ok )
         {
             NX_LOGX( lit( "Can not fetch mediator address: HTTP %1" )
-                     .arg( status ), cl_logERROR );
+                     .arg( status ), cl_logDEBUG1 );
 
             if (!isReady(*m_future))
                 m_promise->set_value( false );
 
             // retry after some delay
-            if (!m_isTerminating)
-            {
-                m_fetchEndpointRetryTimer.scheduleNextTry(
-                    [this]() { fetchEndpoint(); });
-            }
+            m_fetchEndpointRetryTimer->scheduleNextTry([this]() { fetchEndpoint(); });
         }
         else
         {
             NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg( address.toString() ), cl_logALWAYS );
+                     .arg(url.toString() ), cl_logDEBUG1 );
 
-            m_mediatorAddress = std::move(address);
-            m_stunClient->connect( address );
+            auto address = SocketAddress(url.host(), url.port());
+
+            {
+                QnMutexLocker lk(&m_mutex);
+                m_mediatorAddress = address;
+            }
+            m_stunClient->connect( std::move( address ) );
             if (!isReady(*m_future))
                 m_promise->set_value( true );
         }
     });
+}
+
+void MediatorConnector::stopWhileInAioThread()
+{
+    m_stunClient.reset();
+    m_endpointFetcher.reset();
+    m_fetchEndpointRetryTimer.reset();
 }
 
 } // namespace api

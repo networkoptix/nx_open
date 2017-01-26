@@ -17,16 +17,13 @@
     <properties>
         <guid>${udt.guid}</guid>
         <template>lib</template>
-        <qt.libs>core</qt.libs>
-        <template>lib</template>
+        <qt.libs></qt.libs>
 
         <windows.oslibs>-lws2_32</windows.oslibs>
         <mac.oslibs>-lstdc++ -lpthread -lm</mac.oslibs>
 
         <windows.defines>_USING_V110_SDK71_</windows.defines>
         <buildLib>sharedLib</buildLib>
-
-        <rdep.global.packages/>
     </properties>
 
     <dependencies>

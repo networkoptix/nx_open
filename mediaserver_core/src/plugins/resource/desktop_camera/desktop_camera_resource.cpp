@@ -27,7 +27,6 @@ QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhy
 
 QnDesktopCameraResource::~QnDesktopCameraResource()
 {
-
 }
 
 bool QnDesktopCameraResource::setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS)

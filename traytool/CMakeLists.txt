@@ -1,6 +1,6 @@
 project(traytool)
 set(PROJECT_SHORTNAME "traytool")
-set(PROJECT_LONGNAME "${nxtool.company.name} Tray Utility")
+set(PROJECT_LONGNAME "${short.company.name} Tray Utility")
 if(WIN32)
     set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
 endif()

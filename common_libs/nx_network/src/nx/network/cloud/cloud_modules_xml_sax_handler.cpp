@@ -5,8 +5,6 @@
 
 #include "cloud_modules_xml_sax_handler.h"
 
-#include <common/common_globals.h>
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -56,9 +54,10 @@ bool CloudModulesXmlHandler::startElement(
                 return false;
             m_state = readingModuleEndpoint;
             return true;
-    }
 
-    return false;
+        default:
+            return false;
+    }
 }
 
 bool CloudModulesXmlHandler::characters(const QString& ch)

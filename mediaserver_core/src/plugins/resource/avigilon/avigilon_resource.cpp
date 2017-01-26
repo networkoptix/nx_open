@@ -9,7 +9,7 @@
 
 #include <functional>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/timer_manager.h>
 
@@ -35,8 +35,11 @@ public:
 };
 #define QnAvigilonCheckInputPortResponse_Fields (inputs)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (QnAvigilonInputPortState)(QnAvigilonCheckInputPortResponse), (json), _Fields )
-
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (QnAvigilonInputPortState)(QnAvigilonCheckInputPortResponse),
+    (json),
+    _Fields,
+    (optional, false))
 
 QnAvigilonResource::QnAvigilonResource()
 :
@@ -63,11 +66,12 @@ bool QnAvigilonResource::startInputPortMonitoringAsync( std::function<void(bool)
         return false;
     }
 
-    const auto& auth = getAuth();
-
     m_checkInputUrl = QUrl(getUrl());
     m_checkInputUrl.setScheme( lit("http") );
     m_checkInputUrl.setPath( lit("/cgi-x/get-digitalio") );
+
+    QAuthenticator auth = getAuth();
+
     m_checkInputUrl.setUserName( auth.user() );
     m_checkInputUrl.setPassword( auth.password() );
 

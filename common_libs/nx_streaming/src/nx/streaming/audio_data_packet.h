@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include <nx/streaming/config.h>
 #include "media_data_packet.h"
 
 class QnCodecAudioFormat
@@ -38,7 +39,7 @@ public:
     quint64 duration;
 
     QnCompressedAudioData(const QnConstMediaContextPtr& ctx);
-
+    quint64 getDurationMs() const;
     void assign(const QnCompressedAudioData* other);
 };
 

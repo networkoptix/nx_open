@@ -18,6 +18,7 @@
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "common/common_module.h"
+#include <api/global_settings.h>
 
 
 using nx::network::UDPSocket;
@@ -75,7 +76,7 @@ class DiscoveryPacket
 
 private:
     QByteArray m_data;
-    QByteArray m_systemName;
+    QnUuid m_systemId;
     QByteArray m_appServerHost;
     QByteArray m_guid;
     QList<QByteArray> m_cameras;
@@ -87,7 +88,9 @@ public:
         QList<QByteArray> lines = m_data.split((char) 0);
         if (lines.size() >= 3) {
             m_guid = lines[0];
-            m_systemName = lines[1];
+            m_systemId = QnUuid::fromStringSafe(lines[1]);
+            if (m_systemId.isNull() && !lines[1].isEmpty())
+                m_systemId = guidFromArbitraryData(lines[1]); //< for compatibility with previous versions
             m_appServerHost = lines[2];
             for (int i = 3; i < lines.size(); ++i)
                 m_cameras << lines[i];
@@ -109,23 +112,26 @@ public:
         return result;
     }
 
-    bool isValidPacket() const {
+    bool isValidPacket() const
+    {
         return m_guid == guidStr;
     }
 
-    QByteArray appServerHost() const {
+    QByteArray appServerHost() const
+    {
         return m_appServerHost;
     }
 
-    QByteArray systemName() const {
-        return m_systemName;
+    QnUuid systemId() const
+    {
+        return m_systemId;
     }
 
-    static QByteArray getRequest(const QByteArray& systemName)
+    static QByteArray getRequest(const QByteArray& systemId)
     {
         QList<QByteArray> result;
         result << guidStr;
-        result << systemName;
+        result << systemId;
         result << localAppServerHost();
         QStringList cameras = getLocalUsingCameras();
         for (const QString &camera: cameras)
@@ -187,7 +193,7 @@ void QnMServerResourceSearcher::updateSocketList()
     deleteSocketList();
     for (const QnInterfaceAndAddr& iface: getAllIPv4Interfaces())
     {
-        UDPSocket* socket = new UDPSocket();
+        UDPSocket* socket = new UDPSocket(AF_INET);
         QString localAddress = iface.address.toString();
         //if (socket->bindToInterface(iface))
         if (socket->bind(SocketAddress(iface.address.toString())))
@@ -201,7 +207,7 @@ void QnMServerResourceSearcher::updateSocketList()
         }
     }
 
-    m_receiveSocket.reset( new UDPSocket() );
+    m_receiveSocket.reset( new UDPSocket(AF_INET) );
     m_receiveSocket->setReuseAddrFlag(true);
     m_receiveSocket->bind(SocketAddress(HostAddress::anyHost, DISCOVERY_PORT));
 
@@ -216,7 +222,7 @@ void QnMServerResourceSearcher::deleteSocketList()
     for (int i = 0; i < m_socketList.size(); ++i)
     {
         delete m_socketList[i];
-        if (m_receiveSocket) 
+        if (m_receiveSocket)
             m_receiveSocket->leaveGroup(groupAddress, m_localAddressList[i]);
     }
     m_socketList.clear();
@@ -235,7 +241,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest(qnCommon->localSystemName().toUtf8());
+        QByteArray datagram = DiscoveryPacket::getRequest(qnGlobalSettings->localSystemId().toByteArray());
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -262,7 +268,8 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && QString::fromUtf8(packet.systemName()) != qnCommon->localSystemName()) {
+            if (packet.isValidPacket() && packet.systemId() != qnGlobalSettings->localSystemId())
+            {
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();

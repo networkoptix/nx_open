@@ -9,5 +9,5 @@
 
 class QnMergeLdapUsersRestHandler : public QnJsonRestHandler {
 public:
-    int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+    int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*owner) override;
 };

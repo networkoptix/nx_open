@@ -479,6 +479,11 @@ CameraRecordsProvider.prototype.addChunk = function(chunk, parent){
 
     parent = parent || this.chunksTree;
 
+    if(chunk.level <= parent.level){
+        console.error("something wrong happened",chunk,parent);
+        return;
+    }
+
     if(parent.end < chunk.end){
         parent.end = chunk.end;
     }

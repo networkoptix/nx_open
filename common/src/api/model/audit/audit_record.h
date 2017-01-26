@@ -3,10 +3,10 @@
 
 #include <nx/utils/uuid.h>
 #include "common/common_globals.h"
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include "auth_session.h"
-#include "utils/common/latin1_array.h"
-#include <nx/network/http/qnbytearrayref.h>
+#include "nx/utils/latin1_array.h"
+#include <nx/utils/qnbytearrayref.h>
 
 struct QnAuditRecord
 {

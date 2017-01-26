@@ -14,6 +14,9 @@
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
 #include "settings.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <nx/fusion/serialization/lexical.h>
 
 
 namespace ec2
@@ -32,7 +35,10 @@ public:
     }
 };
 
-QnTransactionTcpProcessor::QnTransactionTcpProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
+QnTransactionTcpProcessor::QnTransactionTcpProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* _owner)
+    :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
 {
     Q_UNUSED(_owner)
@@ -57,20 +63,30 @@ void QnTransactionTcpProcessor::run()
     parseRequest();
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
-    bool isClient = query.hasQueryItem("isClient");
-    bool isMobileClient = query.hasQueryItem("isMobile");
-    QnUuid remoteGuid  = QnUuid(query.queryItemValue("guid"));
-    QnUuid remoteRuntimeGuid  = QnUuid(query.queryItemValue("runtime-guid"));
-    qint64 remoteSystemIdentityTime  = query.queryItemValue("system-identity-time").toLongLong();
+
+    QnUuid remoteGuid = QnUuid(query.queryItemValue("guid"));
     if (remoteGuid.isNull())
         remoteGuid = QnUuid::createUuid();
-    QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
-    bool isVideowall = (!videowallGuid.isNull());
+    QnUuid remoteRuntimeGuid = QnUuid(query.queryItemValue("runtime-guid"));
+    qint64 remoteSystemIdentityTime = query.queryItemValue("system-identity-time").toLongLong();
 
-    Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
-        : isVideowall   ? Qn::PT_VideowallClient
-        : isClient      ? Qn::PT_DesktopClient
-        : Qn::PT_Server;
+    bool deserialized = false;
+    Qn::PeerType peerType = QnLexical::deserialized<Qn::PeerType>(
+        query.queryItemValue("peerType"),
+        Qn::PT_NotDefined,
+        &deserialized);
+    if (!deserialized || peerType == Qn::PT_NotDefined)
+    {
+        QnUuid videowallGuid = QnUuid(query.queryItemValue("videowallGuid"));
+        const bool isVideowall = !videowallGuid.isNull();
+        const bool isClient = query.hasQueryItem("isClient");
+        const bool isMobileClient = query.hasQueryItem("isMobile");
+
+        peerType = isMobileClient ? Qn::PT_OldMobileClient
+            : isVideowall ? Qn::PT_VideowallClient
+            : isClient ? Qn::PT_DesktopClient
+            : Qn::PT_Server;
+    }
 
     Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
@@ -136,24 +152,33 @@ void QnTransactionTcpProcessor::run()
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     d->response.headers.insert(nx_http::HttpHeader(
-        Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-        QnCommonModule::instance()->localSystemName().toUtf8()));
+        Qn::EC2_CLOUD_HOST_HEADER_NAME,
+        QnAppInfo::defaultCloudHost().toUtf8()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_SYSTEM_ID_HEADER_NAME,
+        qnGlobalSettings->localSystemId().toByteArray()));
 
-    auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
+    auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
-        (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
-            QnCommonModule::instance()->localSystemName()) )
+        (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+            qnGlobalSettings->localSystemId().toByteArray()) )
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
+
+    ConnectionLockGuard connectionLockGuard(
+        QnTransactionMessageBus::instance()->connectionGuardSharedState(),
+        remoteGuid,
+        ConnectionLockGuard::Direction::Incoming);
 
     if (remotePeer.peerType == Qn::PT_Server)
     {
         // use two stage connect for server peers only, go to second stage for client immediately
 
         // 1-st stage
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
+        bool lockOK = connectionLockGuard.tryAcquireConnecting();
+
         d->response.headers.emplace( "Content-Length", "0" );   //only declaring content-type
         sendResponse(
             lockOK ? nx_http::StatusCode::noContent : nx_http::StatusCode::forbidden,
@@ -162,10 +187,9 @@ void QnTransactionTcpProcessor::run()
             return;
 
         // 2-nd stage
-        if (!readRequest()) {
-            QnTransactionTransport::connectingCanceled(remoteGuid, false);
+        if (!readRequest())
             return;
-        }
+
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
@@ -175,13 +199,17 @@ void QnTransactionTcpProcessor::run()
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
         d->response.headers.insert(nx_http::HttpHeader(
-            Qn::EC2_SYSTEM_NAME_HEADER_NAME,
-            QnCommonModule::instance()->localSystemName().toUtf8()));
+            Qn::EC2_CLOUD_HOST_HEADER_NAME,
+            QnAppInfo::defaultCloudHost().toUtf8()));
 
-        auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_NAME_HEADER_NAME);
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_SYSTEM_ID_HEADER_NAME,
+            qnGlobalSettings->localSystemId().toByteArray()));
+
+        auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
-            (QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_NAME_HEADER_NAME)) !=
-                QnCommonModule::instance()->localSystemName()) )
+            (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
+                qnGlobalSettings->localSystemId().toByteArray()) )
         {
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
@@ -222,16 +250,20 @@ void QnTransactionTcpProcessor::run()
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
-    bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
 
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !isClient)
+    bool fail = query.hasQueryItem("canceled");
+    if (!fail)
+    {
+        fail = !connectionLockGuard.tryAcquireConnected();
+    }
+
+    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !remotePeer.isClient())
         fail = true; // accept only allowed peers
 
     d->chunkedMode = false;
     //d->response.headers.emplace( "Connection", "close" );
     if( fail )
     {
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
         sendResponse( nx_http::StatusCode::forbidden, nx_http::StringType() );
     }
     else
@@ -251,19 +283,41 @@ void QnTransactionTcpProcessor::run()
 
         sendResponse( nx_http::StatusCode::ok, QnTransactionTransport::TUNNEL_CONTENT_TYPE, contentEncoding );
 
+        // By default all peers have read permissions on all resources
+        auto access = d->accessRights;
+        if (remotePeer.peerType == Qn::PT_Server)
+        {
+            // Here we substitute admin user with SuperAccess user to pass by all access checks unhurt
+            // since server-to-server order of transactions is unpredictable and access check for resource attribute
+            // may come before resource itself is added to the resource pool and this may be restricted by the access
+            // checking mechanics.
+            if (access != Qn::kSystemAccess)
+            {
+                auto user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
+                bool authAsOwner = (user && user->userRole() == Qn::UserRole::Owner);
+                NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
+                if (authAsOwner)
+                    access = Qn::kSystemAccess;
+            }
+        }
+        else
+        {
+            access.access = Qn::UserAccessData::Access::ReadAllResources;
+        }
+
         QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
             connectionGuid,
+            std::move(connectionLockGuard),
             std::move(d->socket),
             requestedConnectionType,
             remotePeer,
             remoteSystemIdentityTime,
             d->request,
             contentEncoding,
-            ttFinishCallback
-            );
+            ttFinishCallback,
+            access);
 
-        if (!QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming( connectionGuid ))
-            QnTransactionTransport::connectDone(remoteGuid); //< session killed. Cleanup Guid from a connected list manually
+        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming(connectionGuid);
     }
 }
 

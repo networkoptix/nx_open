@@ -8,9 +8,6 @@
 
 namespace ite
 {
-    INIT_OBJECT_COUNTER(StreamReader)
-    DEFAULT_REF_COUNTER(StreamReader)
-
     static DevReader * getDevReader(CameraManager * camera)
     {
         auto rxDevice = camera->rxDevice().lock();
@@ -20,8 +17,7 @@ namespace ite
     }
 
     StreamReader::StreamReader(CameraManager * cameraManager, int encoderNumber)
-    :   m_refManager(this),
-        m_cameraManager(cameraManager),
+    :   m_cameraManager(cameraManager),
         m_encoderNumber(encoderNumber),
         m_interrupted(false)
     {
@@ -54,7 +50,8 @@ namespace ite
         if (!pkt || pkt->empty())
         {
             *lpPacket = nullptr;
-            return nxcip::NX_TRY_AGAIN;
+            printf("[stream] Cam: %d; no data\n", m_cameraManager->cameraId());
+            return nxcip::NX_NO_DATA;
         }
 
 #if 0
@@ -65,8 +62,18 @@ namespace ite
         if (!packet)
         {
             *lpPacket = nullptr;
+            debug_printf("[stream] no VideoPacket\n");
             return nxcip::NX_TRY_AGAIN;
         }
+#if 0
+        debug_printf(
+            "[stream [%d] ] ts:\t %llu diff:\t %llu\n",
+            m_encoderNumber,
+            packet->timestamp(),
+            packet->timestamp() - m_ts
+        );
+        m_ts = packet->timestamp();
+#endif
 
         if (pkt->flags() & ContentPacket::F_StreamReset)
             packet->setFlag(nxcip::MediaDataPacket::fStreamReset);
@@ -77,6 +84,10 @@ namespace ite
 
     void StreamReader::interrupt()
     {
+        std::lock_guard<std::mutex> lock(m_cameraManager->get_mutex());
+        if (!m_cameraManager->rxDeviceRef())
+            return;
+
         DevReader * devReader = getDevReader(m_cameraManager);
         if (devReader)
         {
@@ -95,9 +106,13 @@ namespace ite
         Timer timer(true);
         while (timer.elapsedMS() < TIMEOUT_MS)
         {
+            //std::lock_guard<std::mutex> lock(m_cameraManager->get_mutex());
+            if (!m_cameraManager->rxDeviceRef())
+                return nullptr;
+
             DevReader * devReader = getDevReader(m_cameraManager);
-            if (! devReader)
-                break;
+            if (!devReader || !devReader->hasThread() || !m_cameraManager->rxDeviceRef()->deviceReady())
+                return nullptr;
 
             ContentPacketPtr pkt = devReader->getPacket(RxDevice::stream2pid(m_encoderNumber), timeout);
             if (m_interrupted)

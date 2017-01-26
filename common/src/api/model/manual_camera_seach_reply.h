@@ -5,7 +5,7 @@
 #include <QtCore/QList>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 /**
  * State of the running manual camera search process.

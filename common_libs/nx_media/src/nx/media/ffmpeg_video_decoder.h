@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef DISABLE_FFMPEG
-
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
 
@@ -20,22 +18,26 @@ class FfmpegVideoDecoderPrivate;
 class FfmpegVideoDecoder: public AbstractVideoDecoder
 {
 public:
-    FfmpegVideoDecoder();
+    /** @param maxResolution Limits applicability of the decoder. If empty, there is no limit. */
+    static void setMaxResolution(const QSize& maxResolution);
+
+    FfmpegVideoDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution);
     virtual ~FfmpegVideoDecoder();
 
-    static bool isCompatible(const CodecID codec, const QSize& resolution);
+    static bool isCompatible(const AVCodecID codec, const QSize& resolution);
+
+    static QSize maxResolution(const AVCodecID codec);
+
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 
+    virtual double getSampleAspectRatio() const override;
 private:
-    void ffmpegToQtVideoFrame(QVideoFramePtr* result);
+    static QSize s_maxResolution;
 
-private:
     QScopedPointer<FfmpegVideoDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(FfmpegVideoDecoder);
 };
 
 } // namespace media
 } // namespace nx
-
-#endif // #DISABLE_FFMPEG

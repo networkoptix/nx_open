@@ -1,12 +1,12 @@
-#ifndef QN_RESOURCE_PROPERTY_ADAPTOR_H
-#define QN_RESOURCE_PROPERTY_ADAPTOR_H
+#pragma once
 
 #include <QtCore/QAtomicInt>
+#include <QSettings>
 
 #include <utils/common/connective.h>
 
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -117,9 +117,10 @@ public:
     QString serializedValue() const;
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
     virtual void setValue(const QVariant& value) = 0;
+    virtual void setSerializedValue(const QVariant& value) = 0;
 
     void saveToResource();
-
+    bool takeFromSettings(QSettings* settings);
 signals:
     void valueChanged();
 
@@ -176,7 +177,14 @@ public:
         }
     }
 
-    virtual void setValue(const QVariant& value) override {
+    virtual void setSerializedValue(const QVariant& value) override
+    {
+        QVariant v = qVariantFromValue(QnLexical::deserialized<T>(value.toString()));
+        base_type::setValueInternal(v);
+    }
+
+    virtual void setValue(const QVariant& value) override
+    {
         //converting incoming value to expected type
         base_type::setValueInternal(QVariant::fromValue(value.value<T>()));
     }
@@ -219,6 +227,3 @@ public:
         base_type(key, new QnLexicalResourcePropertyHandler<T>(), defaultValue, parent)
     {}
 };
-
-
-#endif // QN_RESOURCE_PROPERTY_ADAPTOR_H

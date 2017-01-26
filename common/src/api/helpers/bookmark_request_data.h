@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QUrlQuery>
-
 #include <api/helpers/request_helpers_fwd.h>
 #include <api/helpers/multiserver_request_data.h>
 
@@ -9,7 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
-struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
+struct QnGetBookmarksRequestData: public QnMultiserverRequestData
+{
     QnGetBookmarksRequestData();
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
@@ -17,11 +16,12 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData {
     virtual bool isValid() const override;
 
     QnCameraBookmarkSearchFilter filter;
-    QnVirtualCameraResourceList cameras;
+    QnSecurityCamResourceList cameras;
 };
 
-struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData {
-    QnGetBookmarkTagsRequestData(int limit = QnGetBookmarkTagsRequestData::unlimited());
+struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData
+{
+    explicit QnGetBookmarkTagsRequestData(int limit = unlimited());
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
@@ -32,9 +32,10 @@ struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData {
     int limit;
 };
 
-struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {
+struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
+{
     QnUpdateBookmarkRequestData();
-    QnUpdateBookmarkRequestData(const QnCameraBookmark &bookmark);
+    QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark);
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
@@ -43,14 +44,14 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData {
     QnCameraBookmark bookmark;
 };
 
-struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData {
+struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData
+{
     QnDeleteBookmarkRequestData();
-    QnDeleteBookmarkRequestData(const QnUuid &bookmarkId);
+    QnDeleteBookmarkRequestData(const QnUuid& bookmarkId);
 
     virtual void loadFromParams(const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;
 
     QnUuid bookmarkId;
-
 };

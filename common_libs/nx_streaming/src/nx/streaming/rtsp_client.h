@@ -34,7 +34,7 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
-class QnRtspStatistic 
+class QnRtspStatistic
 {
 public:
     QnRtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
@@ -98,19 +98,22 @@ private:
 class QnRtspIoDevice
 {
 public:
-    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP);
+    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort = 0, quint16 rtcpPort = 0);
     virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
-    
-    const QnRtspStatistic& getStatistic() { return m_statistic;}
+    const QnRtspStatistic& getStatistic() { return m_statistic; }
     void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
     AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
+    void shutdown();
     void setTcpMode(bool value);
     void setSSRC(quint32 value) {ssrc = value; }
     quint32 getSSRC() const { return ssrc; }
-    
+
     void setRtpTrackNum(quint8 value) { m_rtpTrackNum = value; }
+    void setRemoteEndpointRtcpPort(quint16 rtcpPort) {m_remoteEndpointRtcpPort = rtcpPort;}
+    void setHostAddress(const HostAddress& hostAddress) {m_hostAddress = hostAddress;};
+    void setForceRtcpReports(bool force) {m_forceRtcpReports = force;};
     quint8 getRtpTrackNum() const { return m_rtpTrackNum; }
     quint8 getRtcpTrackNum() const { return m_rtpTrackNum+1; }
 private:
@@ -121,8 +124,14 @@ private:
     QnRtspStatistic m_statistic;
     AbstractDatagramSocket* m_mediaSocket;
     AbstractDatagramSocket* m_rtcpSocket;
+    quint16 m_mediaPort;
+    quint16 m_remoteEndpointRtcpPort;
+    HostAddress m_hostAddress;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
+    QElapsedTimer m_reportTimer;
+    bool m_reportTimerStarted;
+    bool m_forceRtcpReports;
 };
 
 class QnRtspClient: public QObject
@@ -155,8 +164,11 @@ public:
 
             ioDevice = new QnRtspIoDevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
+            ioDevice->setHostAddress(HostAddress(owner->getUrl().host()));
             interleaved = QPair<int,int>(-1,-1);
         }
+
+        void setRemoteEndpointRtcpPort(quint16 rtcpPort) {ioDevice->setRemoteEndpointRtcpPort(rtcpPort);};
 
         void setSSRC(quint32 value);
         quint32 getSSRC() const;
@@ -240,6 +252,8 @@ public:
     */
     void setAuth(const QAuthenticator& auth, nx_http::header::AuthScheme::Value defaultAuthScheme);
     QAuthenticator getAuth() const;
+
+    QUrl getUrl() const;
 
     void setProxyAddr(const QString& addr, int port);
 
@@ -331,7 +345,6 @@ private:
     qint64 m_endTime;
     float m_scale;
     int m_tcpTimeout;
-    int m_proxyPort;
     int m_responseCode;
     bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
@@ -358,7 +371,7 @@ private:
     friend class QnRtspIoDevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     QAuthenticator m_auth;
-    QString m_proxyAddr;
+    boost::optional<SocketAddress> m_proxyAddress;
     QString m_contentBase;
     TransportType m_prefferedTransport;
 
@@ -379,6 +392,7 @@ private:
     std::ofstream m_outStreamFile;
 #endif
     nx_http::header::AuthScheme::Value m_defaultAuthScheme;
+    mutable QnMutex m_socketMutex;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

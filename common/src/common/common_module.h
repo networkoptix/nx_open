@@ -13,6 +13,30 @@
 #include <nx/utils/thread/mutex.h>
 #include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include <utils/common/value_cache.h>
+
+class QSettings;
+struct BeforeRestoreDbData
+{
+    void saveToSettings(QSettings* settings);
+    void loadFromSettings(const QSettings* settings);
+    bool isEmpty() const;
+
+    bool hasInfoForStorage(const QString& url) const;
+    qint64 getSpaceLimitForStorage(const QString& url) const;
+
+    static void clearSettings(QSettings* settings);
+
+    QByteArray digest;
+    QByteArray hash;
+    QByteArray cryptSha512Hash;
+    QByteArray realm;
+    QByteArray localSystemId;
+    QByteArray localSystemName;
+    QByteArray serverName;
+    QByteArray storageInfo;
+};
+
 
 class QnResourceDataPool;
 
@@ -21,7 +45,8 @@ class QnResourceDataPool;
  *
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
+class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule>
+{
     Q_OBJECT
 public:
     QnCommonModule(QObject *parent = NULL);
@@ -60,12 +85,6 @@ public:
     /** Server we are currently connected to. */
     QnMediaServerResourcePtr currentServer() const;
 
-    QUrl moduleUrl() const { return m_url; }
-    void setModuleUlr(const QUrl& url) { m_url = url; }
-
-    void setLocalSystemName(const QString& value);
-    QString localSystemName() const;
-
     void setReadOnly(bool value);
     bool isReadOnly() const;
 
@@ -78,11 +97,11 @@ public:
     * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
     * we have to insert new transaction with low priority
     */
-    void setUseLowPriorityAdminPasswordHach(bool value);
-    bool useLowPriorityAdminPasswordHach() const;
+    void setUseLowPriorityAdminPasswordHack(bool value);
+    bool useLowPriorityAdminPasswordHack() const;
 
-    void setAdminPasswordData(const QByteArray& hash, const QByteArray& digest);
-    void adminPasswordData(QByteArray* hash, QByteArray* digest) const;
+    void setBeforeRestoreData(const BeforeRestoreDbData& data);
+    BeforeRestoreDbData beforeRestoreDbData() const;
 
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -90,8 +109,8 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation(const QnModuleInformation &moduleInformation);
-    QnModuleInformation moduleInformation() const;
+    void setModuleInformation(const QnModuleInformation& moduleInformation);
+    QnModuleInformation moduleInformation();
 
     bool isTranscodeDisabled() const { return m_transcodingDisabled; }
     void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
@@ -102,27 +121,25 @@ public:
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
 
-    void updateModuleInformation();
-
 signals:
-    void systemNameChanged(const QString &systemName);
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
-
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
-
 private:
+    void resetCachedValue();
+    void updateModuleInformationUnsafe();
+private:
+    bool m_dirtyModuleInformation;
     QnResourceDataPool *m_dataPool;
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
-    QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
@@ -131,8 +148,7 @@ private:
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;
 
-    QByteArray m_adminPaswdHash;
-    QByteArray m_adminPaswdDigest;
+    BeforeRestoreDbData m_beforeRestoreDbData;
     bool m_lowPriorityAdminPassword;
     Qn::PeerType m_localPeerType;
 };

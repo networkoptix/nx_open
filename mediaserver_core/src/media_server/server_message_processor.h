@@ -20,9 +20,10 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 public:
     QnServerMessageProcessor();
 
-    virtual void updateResource(const QnResourcePtr &resource) override;
+    virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
     void registerProxySender(QnUniversalTcpListener* tcpListener);
 
+    void startReceivingLocalNotifications(const ec2::AbstractECConnectionPtr &connection);
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;

@@ -4,7 +4,7 @@
 
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
-#include <utils/serialization/lexical_functions.h>
+#include <nx/fusion/serialization/lexical_functions.h>
 
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
@@ -33,7 +33,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     m_overrideContinuousMove = m_flip != 0 || (m_traits & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
 
-    if(resourceData.value(lit("ptzCapabilities"), &m_capabilities))
+    if(resourceData.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &m_capabilities))
         m_overrideCapabilities = true;
 }
 

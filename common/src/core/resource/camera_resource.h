@@ -7,8 +7,9 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api_fwd.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/camera/camera_diagnostics.h>
+#include <utils/common/aspect_ratio.h>
 
 #include "security_cam_resource.h"
 
@@ -39,9 +40,14 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-    void saveParams();
-    void saveParamsAsync();
-    int saveAsync();
+    virtual void saveParams();
+    virtual void saveParamsAsync();
+    virtual int saveAsync();
+    void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
+
+    //! Camera source URL, commonly - rtsp link.
+    QString sourceUrl(Qn::ConnectionRole role) const;
+    void updateSourceUrl(const QString& url, Qn::ConnectionRole role);
 
     static int issuesTimeoutMs();
 
@@ -49,12 +55,15 @@ public:
     void cleanCameraIssues();
 
     CameraMediaStreams mediaStreams() const;
+    QnAspectRatio aspectRatio() const;
+
 protected:
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
+    std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
 };
 
 
@@ -72,7 +81,7 @@ public:
     int getPrimaryStreamRealFps() const;
 
     float rawSuggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
+    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const;
 
     virtual void setUrl(const QString &url) override;
     virtual int getChannel() const override;
@@ -130,7 +139,7 @@ public:
     CameraMediaStreamInfo(
         int _encoderIndex = -1,
         const QSize& _resolution = QSize(),
-        CodecID _codec = CODEC_ID_NONE)
+        AVCodecID _codec = AV_CODEC_ID_NONE)
     :
         encoderIndex( _encoderIndex ),
         resolution( resolutionToString( _resolution ) ),
@@ -144,7 +153,7 @@ public:
         CameraMediaStreamInfo(
             int _encoderIndex,
             const QSize& _resolution,
-            CodecID _codec,
+            AVCodecID _codec,
             CustomParamDictType&& _customStreamParams )
     :
         encoderIndex( _encoderIndex ),
@@ -176,9 +185,9 @@ public:
     int encoderIndex;
     QString timestamp;
 
-    float rawSuggestedBitrate;
-    float suggestedBitrate;
-    float actualBitrate;
+    float rawSuggestedBitrate;  //< Megabits per second
+    float suggestedBitrate;     //< Megabits per second
+    float actualBitrate;        //< Megabits per second
 
     Qn::BitratePerGopType bitratePerGop;
     float bitrateFactor;

@@ -9,12 +9,14 @@
 #include <QtCore/QJsonDocument>
 
 #include <nx_ec/ec_proto_version.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 
 namespace {
-    const QByteArray revealRequestStr   ("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
-    const QString moduleInfoStr (lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
+
+const QByteArray revealRequestStr("{ magic: \"7B938F06-ACF1-45f0-8303-98AA8057739A\" }");
+const QString moduleInfoStr(lit(", { seed: \"%1\" }, {peerType: \"%2\"}"));
+
 }
 
 QByteArray RevealRequest::serialize()
@@ -27,7 +29,8 @@ QByteArray RevealRequest::serialize()
     return result;
 }
 
-bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd) {
+bool RevealRequest::isValid(const quint8 *bufStart, const quint8 *bufEnd)
+{
     if (bufEnd - bufStart < revealRequestStr.size())
         return false;
 
@@ -43,12 +46,15 @@ RevealResponse::RevealResponse(const QnModuleInformation &other)
 {
 }
 
-QByteArray RevealResponse::serialize() {
+QByteArray RevealResponse::serialize()
+{
     QVariantMap map;
     map[lit("application")] = type;
+    map[lit("seed")] = id.toString();
     map[lit("version")] = version.toString();
     map[lit("customization")] = customization;
-    map[lit("seed")] = id.toString();
+    map[lit("brand")] = brand;
+    map[lit("realm")] = realm;
     map[lit("systemName")] = systemName;
     map[lit("name")] = name;
     map[lit("systemInformation")] = systemInformation.toString();
@@ -59,10 +65,13 @@ QByteArray RevealResponse::serialize() {
     map[lit("flags")] = QnLexical::serialized(serverFlags);
     map[lit("ecDbReadOnly")] = ecDbReadOnly;
     map[lit("cloudSystemId")] = cloudSystemId;
+    map[lit("cloudHost")] = cloudHost;
+    map[lit("localSystemId")] = localSystemId.toByteArray();
     return QJsonDocument::fromVariant(map).toJson(QJsonDocument::Compact);
 }
 
-bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
+bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd)
+{
     while (bufStart < bufEnd && *bufStart != '{')
         bufStart++;
 
@@ -73,6 +82,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     version = QnSoftwareVersion(map.value(lit("version")).toString());
     systemInformation = map.value(lit("systemInformation")).toString();
     customization = map.value(lit("customization")).toString();
+    brand = map.value(lit("brand")).toString();
+    realm = map.value(lit("realm")).toString();
     systemName = map.value(lit("systemName")).toString();
     name = map.value(lit("name")).toString();
     id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
@@ -83,6 +94,8 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);
     ecDbReadOnly = map.value(lit("ecDbReadOnly"), ecDbReadOnly).toBool();
     cloudSystemId =  map.value(lit("cloudSystemId")).toString();
+    cloudHost = map.value(lit("cloudHost")).toString();
+    localSystemId = QnUuid(map.value(lit("localSystemId")).toByteArray());
     fixRuntimeId();
 
     return !type.isEmpty() && !version.isNull();

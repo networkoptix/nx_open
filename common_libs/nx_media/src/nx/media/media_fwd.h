@@ -4,7 +4,7 @@ class QVideoFrame;
 
 namespace nx {
 
-class AudioFrame;
+struct AudioFrame;
 
 typedef std::shared_ptr<QVideoFrame> QVideoFramePtr;
 typedef std::shared_ptr<const QVideoFrame> QnConstVideoFramePtr;
@@ -15,14 +15,13 @@ typedef std::shared_ptr<const AudioFrame> ConstAudioFramePtr;
 namespace media {
 
 class AbstractResourceAllocator;
-struct AudioFrame;
 
 static const int kMediaAlignment = 32;
 
 // Initial duration for media buffer.
 static const int kInitialBufferMs = 256;
 
-// Maximum duration for live media buffer. 
+// Maximum duration for live media buffer.
 // Live buffer can be extended dynamically in range [kInitialBufferMs..kMaxLiveBufferMs]
 static const int kMaxLiveBufferMs = 1200;
 

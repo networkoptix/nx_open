@@ -11,23 +11,20 @@
 
 
 namespace nx {
-
-namespace cc {
-class CloudModuleEndPointFetcher;
-}
-
 namespace cdb {
-namespace cl {
+namespace client {
 
-class AuthProvider
-:
+class AuthProvider:
     public api::AuthProvider,
     public AsyncRequestsExecutor
 {
 public:
-    AuthProvider(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AuthProvider(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
 
     virtual void getCdbNonce(
+        std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
+    virtual void getCdbNonce(
+        const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;
     virtual void getAuthenticationResponse(
         const api::AuthRequest& authRequest,
@@ -35,7 +32,7 @@ public:
 };
 
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

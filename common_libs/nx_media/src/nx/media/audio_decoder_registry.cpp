@@ -10,7 +10,7 @@ AudioDecoderRegistry* AudioDecoderRegistry::instance()
     return &instance;
 }
 
-std::unique_ptr<AbstractAudioDecoder> AudioDecoderRegistry::createCompatibleDecoder(const CodecID codec)
+std::unique_ptr<AbstractAudioDecoder> AudioDecoderRegistry::createCompatibleDecoder(const AVCodecID codec)
 {
     for (const auto& plugin : m_plugins)
     {
@@ -20,7 +20,7 @@ std::unique_ptr<AbstractAudioDecoder> AudioDecoderRegistry::createCompatibleDeco
     return AudioDecoderPtr(); //< no compatible decoder found
 }
 
-bool AudioDecoderRegistry::hasCompatibleDecoder(const CodecID codec)
+bool AudioDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec)
 {
     for (const auto& plugin : m_plugins)
     {

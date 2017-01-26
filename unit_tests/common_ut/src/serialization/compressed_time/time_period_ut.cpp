@@ -10,8 +10,8 @@
 
 #include <QtCore/QUuid>
 #include <QDateTime>
-#include <utils/serialization/compressed_time_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
+#include <nx/fusion/serialization/compressed_time_functions.h>
+#include <nx/fusion/fusion/fusion_adaptor.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>

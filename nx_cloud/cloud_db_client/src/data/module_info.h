@@ -6,8 +6,8 @@
 #ifndef NX_CDB_CL_MODULE_INFO_H
 #define NX_CDB_CL_MODULE_INFO_H
 
-#include <utils/common/model_functions_fwd.h>
-#include <utils/fusion/fusion_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <cdb/module_info.h>
 

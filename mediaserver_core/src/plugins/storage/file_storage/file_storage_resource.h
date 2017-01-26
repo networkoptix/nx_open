@@ -2,10 +2,13 @@
 #define _FILE_STORAGE_PROTOCOL_H__
 
 #include <atomic>
-#include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
 #include <platform/platform_abstraction.h>
+
+#if defined(Q_OS_WIN)
+#include <wtypes.h>
+#endif
 
 /*
 * QnFileStorageResource uses custom implemented IO access
@@ -20,6 +23,7 @@ class QnFileStorageResource: public QnStorageResource
 private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
+
 public:
     QnFileStorageResource();
     ~QnFileStorageResource();
@@ -27,6 +31,7 @@ public:
     static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
+    QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode, int bufferSize);
 
     virtual float getAvarageWritingUsage() const override;
 
@@ -38,33 +43,38 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
-    virtual qint64 getTotalSpace() override;
+    virtual qint64 getTotalSpace() const override;
 
     virtual int getCapabilities() const override;
-    virtual bool initOrUpdate() const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
 
     virtual void setUrl(const QString& url) override;
+    virtual bool isSystem() const override;
 
-    QString getLocalPath() const
-    {
-        return m_localPath.isEmpty() ? getPath() : m_localPath;
-    }
+    virtual QString getPath() const override;
+
+    qint64 calculateAndSetTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
-    // calculate space limit judging by storage URL
-    static qint64 calcSpaceLimit(const QString &url);
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
+    qint64 calcInitialSpaceLimit();
 private:
-    virtual QString getPath() const override;
+
     QString removeProtocolPrefix(const QString& url);
-    bool initOrUpdateInternal() const;
-    bool updatePermissions() const;
+    Qn::StorageInitResult initOrUpdateInternal();
+    Qn::StorageInitResult updatePermissions(const QString& url) const;
     bool checkWriteCap() const;
     bool isStorageDirMounted() const;
     bool checkDBCap() const;
+#if defined(Q_OS_WIN)
+    Qn::StorageInitResult updatePermissionsHelper(
+        LPWSTR userName,
+        LPWSTR password,
+        NETRESOURCE* netRes) const;
+#endif
 
     // It is for smb mount points with linux server .
     // Translates remote url to local temporary mount folder.
@@ -73,11 +83,10 @@ private:
     QString translateUrlToRemote(const QString &url) const;
 
     // mounts network (smb) folder to temporary local path
-    // returns not 0 if something went wrong, 0 otherwise
-    int mountTmpDrive() const;
+    Qn::StorageInitResult mountTmpDrive(const QString& url);
     bool testWriteCapInternal() const;
 
-    void setLocalPathSafe(const QString &path) const;
+    void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
 public:
     // Try to remove old temporary dirs if any.
@@ -92,11 +101,12 @@ private:
 private:
     mutable QnMutex     m_mutexCheckStorage;
     mutable int         m_capabilities;
-    mutable QString     m_localPath;
+    QString     m_localPath;
 
     mutable qint64 m_cachedTotalSpace;
     mutable boost::optional<bool> m_writeCapCached;
     mutable QnMutex      m_writeTestMutex;
+    bool m_isSystem;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

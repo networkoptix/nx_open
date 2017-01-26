@@ -19,7 +19,6 @@
 
 #include "../abstract_outgoing_tunnel_connection.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -29,7 +28,7 @@ class Timeouts
 {
 public:
     std::chrono::seconds keepAlivePeriod;
-    /** Number of missing keep-alives before connection can be treated as closed */
+    /** Number of missing keep-alives before connection can be treated as closed. */
     int keepAliveProbeCount;
 
     Timeouts()
@@ -45,13 +44,13 @@ public:
     }
 };
 
-/** Creates connections (UDT) after UDP hole punching has been successfully done.
-    Also, makes some efforts to keep UDP hole opened
-    \note \a OutgoingTunnelConnection instance 
-        can be safely freed while in aio thread (e.g., in any handler)
-*/
-class NX_NETWORK_API OutgoingTunnelConnection
-:
+/**
+ * Creates connections (UDT) after UDP hole punching has been successfully done.
+ * Also, makes some efforts to keep UDP hole opened.
+ * @note OutgoingTunnelConnection instance 
+ *     can be safely freed while in aio thread (e.g., in any handler).
+ */
+class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
     public StreamConnectionHolder<
 		nx_api::BaseStreamProtocolConnectionEmbeddable<
@@ -61,27 +60,31 @@ class NX_NETWORK_API OutgoingTunnelConnection
 {
 public:
     /** 
-        \param connectionId unique id of connection established
-        \param udtConnection already established connection to the target host
-    */
+     * @param connectionId unique id of connection established.
+     * @param udtConnection already established connection to the target host.
+     */
     OutgoingTunnelConnection(
+        aio::AbstractAioThread* aioThread,
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection,
         Timeouts timeouts);
     OutgoingTunnelConnection(
+        aio::AbstractAioThread* aioThread,
         nx::String connectionId,
         std::unique_ptr<UdtStreamSocket> udtConnection);
     ~OutgoingTunnelConnection();
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
+    virtual void stopWhileInAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+
+    virtual void start() override;
 
     virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
-
-    void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void()> handler);
+    virtual void setControlConnectionClosedHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
     typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
@@ -102,12 +105,12 @@ private:
     const SocketAddress m_remoteHostAddress;
     nx::utils::AtomicUniquePtr<ConnectionType> m_controlConnection;
     const Timeouts m_timeouts;
-    aio::Timer m_aioTimer;
     std::map<UdtStreamSocket*, ConnectionContext> m_ongoingConnections;
     QnMutex m_mutex;
     bool m_pleaseStopHasBeenCalled;
     bool m_pleaseStopCompleted;
-    nx::utils::MoveOnlyFunc<void()> m_controlConnectionClosedHandler;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)>
+        m_controlConnectionClosedHandler;
 
     void proceedWithConnection(
         UdtStreamSocket* connectionPtr,
@@ -123,7 +126,6 @@ private:
         SystemError::ErrorCode closeReason,
         ConnectionType* connection) override;
     void onStunMessageReceived(nx::stun::Message message);
-    void onKeepAliveTimeout();
 };
 
 } // namespace udp

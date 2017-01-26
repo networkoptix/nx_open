@@ -27,57 +27,30 @@ public:
     {
     }
 
-    //////////////////////////////////////////////////////////////////////
-    ///////// Implementation of AbstractSocket methods
-    //////////////////////////////////////////////////////////////////////
-
-    //!Implementation of AbstractSocket::bind
     virtual bool bind(const SocketAddress& localAddress) override { return m_abstractSocketProvider()->bind(localAddress); }
-    //!Implementation of AbstractSocket::getLocalAddress
     virtual SocketAddress getLocalAddress() const override { return m_abstractSocketProvider()->getLocalAddress(); }
-    //!Implementation of AbstractSocket::close
     virtual bool close() override { return m_abstractSocketProvider()->close(); }
-    //!Implementation of AbstractSocket::shutdown
     virtual bool shutdown() override { return m_abstractSocketProvider()->shutdown(); }
-    //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override { return m_abstractSocketProvider()->isClosed(); }
-    //!Implementation of AbstractSocket::setReuseAddrFlag
     virtual bool setReuseAddrFlag(bool reuseAddr) override { return m_abstractSocketProvider()->setReuseAddrFlag(reuseAddr); }
-    //!Implementation of AbstractSocket::reuseAddrFlag
     virtual bool getReuseAddrFlag(bool* val) const override { return m_abstractSocketProvider()->getReuseAddrFlag(val); }
-    //!Implementation of AbstractSocket::setNonBlockingMode
     virtual bool setNonBlockingMode(bool val) override { return m_abstractSocketProvider()->setNonBlockingMode(val); }
-    //!Implementation of AbstractSocket::getNonBlockingMode
     virtual bool getNonBlockingMode(bool* val) const override { return m_abstractSocketProvider()->getNonBlockingMode(val); }
-    //!Implementation of AbstractSocket::getMtu
     virtual bool getMtu(unsigned int* mtuValue) const override { return m_abstractSocketProvider()->getMtu(mtuValue); }
-    //!Implementation of AbstractSocket::setSendBufferSize
     virtual bool setSendBufferSize(unsigned int buffSize) override { return m_abstractSocketProvider()->setSendBufferSize(buffSize); }
-    //!Implementation of AbstractSocket::getSendBufferSize
     virtual bool getSendBufferSize(unsigned int* buffSize) const override { return m_abstractSocketProvider()->getSendBufferSize(buffSize); }
-    //!Implementation of AbstractSocket::setRecvBufferSize
     virtual bool setRecvBufferSize(unsigned int buffSize) override { return m_abstractSocketProvider()->setRecvBufferSize(buffSize); }
-    //!Implementation of AbstractSocket::getRecvBufferSize
     virtual bool getRecvBufferSize(unsigned int* buffSize) const override { return m_abstractSocketProvider()->getRecvBufferSize(buffSize); }
-    //!Implementation of AbstractSocket::setRecvTimeout
     virtual bool setRecvTimeout(unsigned int ms) override { return m_abstractSocketProvider()->setRecvTimeout(ms); }
-    //!Implementation of AbstractSocket::getRecvTimeout
     virtual bool getRecvTimeout(unsigned int* millis) const override { return m_abstractSocketProvider()->getRecvTimeout(millis); }
-    //!Implementation of AbstractSocket::setSendTimeout
     virtual bool setSendTimeout(unsigned int ms) override { return m_abstractSocketProvider()->setSendTimeout(ms); }
-    //!Implementation of AbstractSocket::getSendTimeout
     virtual bool getSendTimeout(unsigned int* millis) const override { return m_abstractSocketProvider()->getSendTimeout(millis); }
-    //!Implementation of AbstractSocket::getLastError
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override { return m_abstractSocketProvider()->getLastError(errorCode); }
-    //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_abstractSocketProvider()->handle(); }
-    //!Implementation of AbstractSocket::post
+    virtual Pollable* pollable() override { return m_abstractSocketProvider()->pollable(); }
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
-    //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
-    //!Implementation of AbstractSocket::getAioThread
-    virtual nx::network::aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
-    //!Implementation of AbstractSocket::bindToAioThread
+    virtual nx::network::aio::AbstractAioThread* getAioThread() const override { return m_abstractSocketProvider()->getAioThread(); }
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
 
 private:

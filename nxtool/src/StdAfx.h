@@ -1,1 +1,0 @@
-//#define QT_NO_CAST_FROM_ASCII // TODO: #GDM

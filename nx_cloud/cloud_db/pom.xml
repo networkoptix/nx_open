@@ -1,12 +1,4 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-        Example pom for delegating maven goals to msbuild so it builds the "solution"
-
-        A solution can be a group of projects, but here we only have one.
-        It should also be possible to have one maven project per solution project,
-        and have a parent pom to deletegate the build.
-    -->
-
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
@@ -19,14 +11,14 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>cloud_db</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Cloud cloud_db</name>
+    <name>Nx Cloud Db</name>
 
     <properties>
         <guid>${cloud_db.guid}</guid>
         <product.title>${company.name} cloud_db</product.title>
 
         <qt.libs>core gui network concurrent sql xml</qt.libs>
-        <global.libs>-lcloud_db -lnx_utils -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client</global.libs>
+        <global.libs>-lcloud_db -lcommon -lnx_streaming -ludt -lnx_network -lcloud_db_client -lnx_fusion -lnx_utils -lappserver2</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

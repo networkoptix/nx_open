@@ -183,13 +183,13 @@ Ellenőrizze le a GStreamer-t és győzödjön meg róla, hogy telepłtette-e a 
         <location line="+129"/>
         <source>Missing codec helper script assistant.</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Hiányzó kodek-súgó script.</translation>
+        <translation>Hiányzó kodek-súgó script segéd.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Plugin codec installation failed for codec: %0</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Plugin kodek telepítése sikertelen ehhez a kodekhez: %0</translation>
+        <translation>Plugin kodek telepítése sikertelen ehhez a kodekhez: %0</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -305,7 +305,7 @@ Ellenőrizze le a GStreamer-t és győzödjön meg róla, hogy telepłtette-e a 
         <location line="+2"/>
         <source>Disconnected</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Szétkapcsolva</translation>
+        <translation>Szétkapcsolva</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1752,7 +1752,7 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativeanimation.cpp" line="+2553"/>
         <source>Cannot set a duration of &lt; 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem állítható be időtartam &lt; 0</translation>
     </message>
 </context>
 <context>
@@ -1828,7 +1828,7 @@ erre:
     <message>
         <location filename="../src/declarative/graphicsitems/qdeclarativeitemsmodule.cpp" line="+86"/>
         <source>Qt was built without support for QMovie</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt QMovie támogatás nélkül lett felépítve</translation>
     </message>
 </context>
 <context>
@@ -1852,7 +1852,7 @@ erre:
     <message>
         <location filename="../src/declarative/qml/qdeclarativecompiledbindings.cpp" line="+372"/>
         <source>Binding loop detected for property &quot;%1&quot;</source>
-        <translation type="unfinished">Kötési hurok észlelhető a(z) &quot;%1&quot; tulajdonságon</translation>
+        <translation>Kötési hurok észlelhető a(z) &quot;%1&quot; tulajdonságon</translation>
     </message>
 </context>
 <context>
@@ -1955,7 +1955,7 @@ erre:
     <message>
         <location line="+277"/>
         <source>Element is not creatable.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem létrehozható elem.</translation>
     </message>
     <message>
         <location line="+618"/>
@@ -1985,17 +1985,17 @@ erre:
     <message>
         <location line="+3"/>
         <source>Component objects cannot declare new properties.</source>
-        <translation type="unfinished"></translation>
+        <translation>A tartalmazó objektum nem rendelkezik új tulajdonsággal.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Component objects cannot declare new signals.</source>
-        <translation type="unfinished"></translation>
+        <translation>A tartalmazó objektum nem rendelkezik új jellel.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Component objects cannot declare new functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>A tartalmazó objektum nem rendelkezik új funkciókkal.</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -2094,18 +2094,18 @@ erre:
     <message>
         <location line="-357"/>
         <source>Incorrectly specified signal assignment</source>
-        <translation type="unfinished"></translation>
+        <translation>Inkorrekt jelhozzárendelés</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Cannot assign a value to a signal (expecting a script to be run)</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem rendelhető érték a jelhez (script futtatás várható)</translation>
     </message>
     <message>
         <location line="+434"/>
         <location line="+2"/>
         <source>Property has already been assigned a value</source>
-        <translation type="unfinished"></translation>
+        <translation>A tulájdonság már értékhez van rendelve</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2116,7 +2116,7 @@ erre:
     <message>
         <location line="+3"/>
         <source>Cannot assign a value directly to a grouped property</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem rendelhető érték közvetlenül csoportos tulajdonsághoz</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -2146,7 +2146,7 @@ erre:
     <message>
         <location line="+6"/>
         <source>Can only assign one binding to lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak egy kötés rendelhető listákhoz</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -2167,56 +2167,56 @@ erre:
         <location line="+105"/>
         <source>Cannot assign object to property</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Nem lehet objektumot rendelni tulajdonsághoz</translation>
+        <translation>Nem lehet objektumot rendelni tulajdonsághoz</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>&quot;%1&quot; cannot operate on &quot;%2&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; nem használható &quot;%2&quot;-n</translation>
     </message>
     <message>
         <location line="+117"/>
         <source>Duplicate default property</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Dupla alapértelmezett tulajdonság</translation>
+        <translation>Dupla alapértelmezett tulajdonság</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Duplicate property name</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Dupla tulajdonságnév</translation>
+        <translation>Dupla tulajdonságnév</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Property names cannot begin with an upper case letter</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulajdonságnév nem kezdődhet nagybetűvel</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Duplicate signal name</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Dupla jelzés név</translation>
+        <translation>Dupla jelzés név</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Signal names cannot begin with an upper case letter</source>
-        <translation type="unfinished"></translation>
+        <translation>Jelnevek nem kezdődhetnek nagybetűvel</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Duplicate method name</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Dupla metódus név</translation>
+        <translation>Dupla metódus név</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Method names cannot begin with an upper case letter</source>
-        <translation type="unfinished"></translation>
+        <translation>Metódus nevek nem kezdődhetnek nagybetűvel</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Property value set multiple times</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulajdonságérték többször beállítva</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2236,39 +2236,39 @@ erre:
     <message>
         <location line="+159"/>
         <source>Invalid empty ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen üres ID</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>IDs cannot start with an uppercase letter</source>
-        <translation type="unfinished"></translation>
+        <translation>ID nem kezdődhet nagybetűvel</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>IDs must start with a letter or underscore</source>
-        <translation type="unfinished"></translation>
+        <translation>ID betűvel vagy alulvonással kezdődhet</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>IDs must contain only letters, numbers, and underscores</source>
-        <translation type="unfinished"></translation>
+        <translation>ID csak betűből, számból és alulvonásból állhat</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>ID illegally masks global JavaScript property</source>
-        <translation type="unfinished"></translation>
+        <translation>ID érvénytelenül maszkol JavaScript tulajdonságot</translation>
     </message>
     <message>
         <location line="+31"/>
         <location line="+9"/>
         <source>No property alias location</source>
-        <translation type="unfinished"></translation>
+        <translation>Nincs tulajdonság alias hely</translation>
     </message>
     <message>
         <location line="-4"/>
         <location line="+25"/>
         <source>Invalid alias location</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen alias hely</translation>
     </message>
     <message>
         <location line="-16"/>
@@ -2286,7 +2286,7 @@ erre:
     <message>
         <location filename="../src/declarative/qml/qdeclarativecomponent.cpp" line="+459"/>
         <source>Invalid empty URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen üres URL</translation>
     </message>
 </context>
 <context>
@@ -2300,7 +2300,7 @@ erre:
     <message>
         <location line="-120"/>
         <source>%1 %2</source>
-        <translation type="unfinished">%1% {1 %2?}</translation>
+        <translation>%1% %2</translation>
     </message>
     <message>
         <source>Import %1 unavailable</source>
@@ -2397,75 +2397,75 @@ erre:
     <message>
         <location filename="../src/declarative/qml/qdeclarativeimport.cpp" line="+294"/>
         <source>module &quot;%1&quot; definition &quot;%2&quot; not readable</source>
-        <translation type="unfinished"></translation>
+        <translation>modul &quot;%1&quot; deffiníció &quot;%2&quot; nem olvasható</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>plugin cannot be loaded for module &quot;%1&quot;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>plugin &quot;%1&quot;: %2 modulhoz nem töltheő be</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>module &quot;%1&quot; plugin &quot;%2&quot; not found</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; modul &quot;%2&quot; plugin nem található</translation>
     </message>
     <message>
         <location line="+79"/>
         <location line="+55"/>
         <source>module &quot;%1&quot; version %2.%3 is not installed</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; modul %2.%3 verzió nincs telepítve</translation>
     </message>
     <message>
         <location line="-53"/>
         <source>module &quot;%1&quot; is not installed</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; modul nincs telepítve</translation>
     </message>
     <message>
         <location line="+14"/>
         <location line="+19"/>
         <source>&quot;%1&quot;: no such directory</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1: nincs ilyen könyvtár</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>import &quot;%1&quot; has no qmldir and no namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;%1&quot; importnak nincs qmlkönyvtára se névhelye</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>- %1 is not a namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>- %1 nem egy névhely</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>- nested namespaces not allowed</source>
-        <translation type="unfinished"></translation>
+        <translation>- beágyazott névhely nem megengedett</translation>
     </message>
     <message>
         <location line="+47"/>
         <location line="+4"/>
         <source>local directory</source>
-        <translation type="unfinished"></translation>
+        <translation>helyi könyvtár</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>is ambiguous. Found in %1 and in %2</source>
-        <translation type="unfinished"></translation>
+        <translation>kétértelmű. %1 és %2 nek is része</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>is ambiguous. Found in %1 in version %2.%3 and %4.%5</source>
-        <translation type="unfinished"></translation>
+        <translation>kétértelmű. Megtalálható %1 verzióban %2.%3 és %4.%5</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>is instantiated recursively</source>
-        <translation type="unfinished"></translation>
+        <translation>rekurzív bemutatás</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>is not a type</source>
-        <translation type="unfinished"></translation>
+        <translation>nem egy típus</translation>
     </message>
 </context>
 <context>
@@ -2480,7 +2480,7 @@ erre:
     <message>
         <location filename="../src/declarative/graphicsitems/qdeclarativeitemsmodule.cpp" line="+70"/>
         <source>KeyNavigation is only available via attached properties</source>
-        <translation type="unfinished"></translation>
+        <translation>KeyNavigation a csatolt tulajdonságokon keresztül érhető el</translation>
     </message>
 </context>
 <context>
@@ -2488,7 +2488,7 @@ erre:
     <message>
         <location line="+1"/>
         <source>Keys is only available via attached properties</source>
-        <translation type="unfinished"></translation>
+        <translation>Keys a csatolt tulajdonságokon keresztül érhető el</translation>
     </message>
 </context>
 <context>
@@ -2522,7 +2522,7 @@ erre:
         <location line="+132"/>
         <location line="+15"/>
         <source>ListElement: cannot contain nested elements</source>
-        <translation type="unfinished"></translation>
+        <translation>ListElement: nem tartalmazhat beágyazott elemeket</translation>
     </message>
     <message>
         <source>get: index %1 out of range</source>
@@ -2564,7 +2564,7 @@ erre:
     <message>
         <location filename="../src/declarative/graphicsitems/qdeclarativeloader.cpp" line="+313"/>
         <source>Loader does not support loading non-visual elements.</source>
-        <translation type="unfinished"></translation>
+        <translation>A loader nem támogatja nem látható elemek betöltését.</translation>
     </message>
 </context>
 <context>
@@ -2583,7 +2583,7 @@ erre:
     <message>
         <location line="+7"/>
         <source>Unable to preserve appearance under scale of 0</source>
-        <translation type="unfinished"></translation>
+        <translation>0 alatti megjelenések nem őrizhetők  meg</translation>
     </message>
 </context>
 <context>
@@ -2591,18 +2591,18 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativestateoperations.cpp" line="+95"/>
         <source>Unable to preserve appearance under complex transform</source>
-        <translation type="unfinished">Nem lehet a kinézetet megőrizni a komplex transzformáció alatt</translation>
+        <translation>Nem lehet a kinézetet megőrizni a komplex transzformáció alatt</translation>
     </message>
     <message>
         <location line="+10"/>
         <location line="+7"/>
         <source>Unable to preserve appearance under non-uniform scale</source>
-        <translation type="unfinished">Nem lehet a kinézetet megőrizni a nem-uniform skálázás alatt</translation>
+        <translation>Nem lehet a kinézetet megőrizni a nem-uniform skálázás alatt</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Unable to preserve appearance under scale of 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet a kinézetet megőrizni a 0 skálázás alatt</translation>
     </message>
 </context>
 <context>
@@ -2610,144 +2610,144 @@ erre:
     <message>
         <location filename="../src/declarative/qml/parser/qdeclarativejslexer.cpp" line="+579"/>
         <source>Illegal character</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen karakter</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Unclosed string at end of line</source>
-        <translation type="unfinished"></translation>
+        <translation>Lezáratlan string a sor elején</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Illegal escape sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen kilépési szekvencia</translation>
     </message>
     <message>
         <location line="-77"/>
         <location line="+123"/>
         <location line="+54"/>
         <source>Illegal unicode escape sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen unicode kilépési szekvencia</translation>
     </message>
     <message>
         <location line="-28"/>
         <source>Unclosed comment at end of file</source>
-        <translation type="unfinished"></translation>
+        <translation>Lezáratlan comment a fájl végén</translation>
     </message>
     <message>
         <location line="+102"/>
         <source>Illegal syntax for exponential number</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen szintaxis az exponenciális számhoz</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Identifier cannot start with numeric literal</source>
-        <translation type="unfinished"></translation>
+        <translation>Azonosító nek kezdődhet számmal</translation>
     </message>
     <message>
         <location line="+338"/>
         <source>Unterminated regular expression literal</source>
-        <translation type="unfinished"></translation>
+        <translation>Befejezetlen pontos kifejezés szó</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Invalid regular expression flag &apos;%0&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen pontos kifejezés zászló &apos;%0&apos;</translation>
     </message>
     <message>
         <location line="+16"/>
         <location line="+22"/>
         <source>Unterminated regular expression backslash sequence</source>
-        <translation type="unfinished"></translation>
+        <translation>Befejezetlen pontos kifejezés backslash szekvencia</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Unterminated regular expression class</source>
-        <translation type="unfinished"></translation>
+        <translation>Befejezetlen pontos kifejezés osztály</translation>
     </message>
     <message>
         <location filename="../src/declarative/qml/parser/qdeclarativejsparser.cpp" line="+1828"/>
         <location line="+67"/>
         <source>Syntax error</source>
-        <translation type="unfinished"></translation>
+        <translation>Szintaxis hiba</translation>
     </message>
     <message>
         <location line="-65"/>
         <source>Unexpected token `%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Váratlan token &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+28"/>
         <location line="+24"/>
         <source>Expected token `%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Várt token &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../src/declarative/qml/qdeclarativescriptparser.cpp" line="+271"/>
         <source>Expected type name</source>
-        <translation type="unfinished"></translation>
+        <translation>Várt típus név</translation>
     </message>
     <message>
         <location line="-11"/>
         <location line="+431"/>
         <location line="+59"/>
         <source>Property value set multiple times</source>
-        <translation type="unfinished"></translation>
+        <translation>Tulajdonságérték többszörösen beállítva</translation>
     </message>
     <message>
         <location line="-343"/>
         <source>Invalid import qualifier ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen import minősítő ID</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Reserved name &quot;Qt&quot; cannot be used as an qualifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Foglalt név &quot;Qt&quot; nem használható minősítőként</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Script import qualifiers must be unique.</source>
-        <translation type="unfinished"></translation>
+        <translation>Script import minősítő egyedi kell legyen.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Script import requires a qualifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Scrip importhoz kell minősítő</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Library import requires a version</source>
-        <translation type="unfinished"></translation>
+        <translation>Könyvtár importhoz kell verzió</translation>
     </message>
     <message>
         <location line="+59"/>
         <source>Expected parameter type</source>
-        <translation type="unfinished"></translation>
+        <translation>Várt paraméter típus</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Invalid property type modifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Érvénytelen tulajdonság típus módosító</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Unexpected property type modifier</source>
-        <translation type="unfinished"></translation>
+        <translation>Nemvárt tulajdonság típus módosító</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Expected property type</source>
-        <translation type="unfinished"></translation>
+        <translation>Várt tulajdonság típus</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Readonly not yet supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Csak-olvasás még nem támogatott</translation>
     </message>
     <message>
         <location line="+215"/>
         <source>JavaScript declaration outside Script element</source>
-        <translation type="unfinished"></translation>
+        <translation>JavaScript deklaráció Script elemen kívül esik</translation>
     </message>
 </context>
 <context>
@@ -2755,7 +2755,7 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativeanimation.cpp" line="-1977"/>
         <source>Cannot set a duration of &lt; 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem állítható be időtartam &lt; 0</translation>
     </message>
 </context>
 <context>
@@ -2763,23 +2763,24 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativepixmapcache.cpp" line="+190"/>
         <source>Error decoding: %1: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Hibakódolás: %1: %2</translation>
     </message>
     <message>
         <location line="+70"/>
         <source>Failed to get image from provider: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>A kép begyűjtése sikertelen a szolgáltatótól: %1</translation>
     </message>
     <message>
         <location line="+19"/>
         <location line="+345"/>
         <source>Cannot open: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem nyitható meg:
+%1</translation>
     </message>
     <message>
         <location line="+37"/>
         <source>Unknown Error loading %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Ismeretlen hiba beolvasás %1</translation>
     </message>
 </context>
 <context>
@@ -2787,7 +2788,7 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativeanimation.cpp" line="+1102"/>
         <source>Cannot set a duration of &lt; 0</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem állítható be időtartam &lt; 0</translation>
     </message>
 </context>
 <context>
@@ -2795,17 +2796,17 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativepropertychanges.cpp" line="+267"/>
         <source>PropertyChanges does not support creating state-specific objects.</source>
-        <translation type="unfinished"></translation>
+        <translation>ProperyChange nem támogat állapotspecifikus objektumokat.</translation>
     </message>
     <message>
         <location line="+157"/>
         <source>Cannot assign to non-existent property &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hozzárendelni a nem létező &quot;%1&quot; tulajdonságot</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Cannot assign to read-only property &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hozzárendelni a csak olvasható &quot;%1&quot; tulajdonsággal</translation>
     </message>
 </context>
 <context>
@@ -2814,12 +2815,12 @@ erre:
         <location filename="../src/declarative/graphicsitems/qdeclarativetextinput.cpp" line="+793"/>
         <location line="+8"/>
         <source>Could not load cursor delegate</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem olvasható kurzoz megbízott</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Could not instantiate cursor delegate</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurzor megbízott nem bemutatható</translation>
     </message>
 </context>
 <context>
@@ -2827,47 +2828,47 @@ erre:
     <message>
         <location filename="../src/declarative/qml/qdeclarativevme.cpp" line="+194"/>
         <source>Unable to create object of type %1</source>
-        <translation type="unfinished"></translation>
+        <translation>A %1 típusó objektum nem hozható létre</translation>
     </message>
     <message>
         <location line="+390"/>
         <source>Cannot assign value %1 to property %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hozzárendelni &quot;%1&quot; értéket %2 tulajdonsághoz</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Cannot assign object type %1 with no default method</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet hozzárendelni %1 objektum típust metódusok nélkül</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Cannot connect mismatched signal/slot %1 %vs. %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet eltérő jel/rés %1 %vs. %2</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Cannot assign an object to signal property %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet objektumot rendelni%1 jel tulajdonsághoz</translation>
     </message>
     <message>
         <location line="+146"/>
         <source>Cannot assign object to list</source>
-        <translation type="unfinished">Nem lehet objektumot listához rendelni</translation>
+        <translation>Nem lehet objektumot listához rendelni</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Cannot assign object to interface property</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem lehet objektumot rendelni interfész tulajdonsághoz</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Unable to create attached object</source>
-        <translation type="unfinished"></translation>
+        <translation>A csatolt objektum nem hozható létre</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Cannot set properties on %1 as it is null</source>
-        <translation type="unfinished"></translation>
+        <translation>Nem állítható be tulajdonság %1-re mivel az nulla</translation>
     </message>
 </context>
 <context>
@@ -2875,7 +2876,7 @@ erre:
     <message>
         <location filename="../src/declarative/graphicsitems/qdeclarativevisualitemmodel.cpp" line="+1088"/>
         <source>Delegate component must be Item type.</source>
-        <translation type="unfinished"></translation>
+        <translation>Megbízott komonens Item típusú kell legyen.</translation>
     </message>
 </context>
 <context>
@@ -2884,7 +2885,7 @@ erre:
         <location filename="../src/declarative/util/qdeclarativeutilmodule.cpp" line="-12"/>
         <location line="+2"/>
         <source>Qt was built without support for xmlpatterns</source>
-        <translation type="unfinished"></translation>
+        <translation>Qt xmlpattern támogatás nélkül lett felépítve</translation>
     </message>
 </context>
 <context>
@@ -2892,7 +2893,7 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativexmllistmodel_p.h" line="+174"/>
         <source>An XmlRole query must not start with &apos;/&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>XmlRole kérés nem kezdődhet  &apos;/&apos; karakterrel</translation>
     </message>
 </context>
 <context>
@@ -2900,7 +2901,7 @@ erre:
     <message>
         <location filename="../src/declarative/util/qdeclarativexmllistmodel.cpp" line="+712"/>
         <source>An XmlListModel query must start with &apos;/&apos; or &quot;//&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>XmlListModel Role kérésnek &apos;/&apos; vagy  &quot;//&quot; karakterrel kell kezdődnie</translation>
     </message>
 </context>
 <context>
@@ -5262,7 +5263,7 @@ Biztosan törölni akarja?</translation>
         <location line="+192"/>
         <source>Network session error.</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">Hálozati munkamenet hiba.</translation>
+        <translation>Hálozati munkamenet hiba.</translation>
     </message>
     <message>
         <location line="+352"/>
@@ -7781,7 +7782,7 @@ Válasszon másik fájlnevet.</translation>
     <message>
         <location line="+16"/>
         <source>Run to New Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Futtatás új scriptben</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -8744,7 +8745,7 @@ Válasszon másik fájlnevet.</translation>
         <location line="+1"/>
         <source>Menu PB</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">PB menü</translation>
+        <translation>PB menü</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8795,13 +8796,13 @@ Válasszon másik fájlnevet.</translation>
         <location line="+1"/>
         <source>Rotation PB</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">PB forgatás</translation>
+        <translation>PB forgatás</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rotation KB</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">KB forgatás</translation>
+        <translation>KB forgatás</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9164,17 +9165,17 @@ Válasszon másik fájlnevet.</translation>
     <message>
         <location line="+1"/>
         <source>Code input</source>
-        <translation type="unfinished"></translation>
+        <translation>Kód megadás</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Multiple Candidate</source>
-        <translation type="unfinished"></translation>
+        <translation>Többes jelölt</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Previous Candidate</source>
-        <translation type="unfinished"></translation>
+        <translation>Előző jelölt</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -9620,7 +9621,7 @@ Válasszon másik fájlnevet.</translation>
         <location line="+3"/>
         <source>The basicConstraints path length parameter has been exceeded</source>
         <translatorcomment>CHECKIT</translatorcomment>
-        <translation type="unfinished">A basicConstraints hosszának értéke túl nagy</translation>
+        <translation>A basicConstraints hosszának értéke túl nagy</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -9640,12 +9641,12 @@ Válasszon másik fájlnevet.</translation>
     <message>
         <location line="+3"/>
         <source>The current candidate issuer certificate was rejected because its subject name did not match the issuer name of the current certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>A jelenlegi jelölt kiabocsátó certifikációja visszautasítva, mert a kibocsátó tárgyneve nem egyezik meg a jelenlegi certifikáció használójának nevével</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The current candidate issuer certificate was rejected because its issuer name and serial number was present and did not match the authority key identifier of the current certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>A jelenlegi jelölt kiabocsátó certifikációja visszautasítva, mert a kibocsátó neve és sorozatszáma nem egyezik meg a jelenlegi certifikáció kulcsazonosító nevével és sorozatszámával</translation>
     </message>
     <message>
         <location line="+5"/>

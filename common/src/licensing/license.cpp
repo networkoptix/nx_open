@@ -15,7 +15,6 @@
 #include <utils/common/app_info.h>
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
-#include <utils/common/product_features.h>
 #include "common/common_module.h"
 
 #include "api/runtime_info_manager.h"
@@ -99,7 +98,8 @@ static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1),
     LicenseTypeInfo(Qn::LC_IO,              "iomodule",      1),
     LicenseTypeInfo(Qn::LC_Start,           "starter",       0),
-    LicenseTypeInfo(Qn::LC_Invalid,         "",              1),
+    LicenseTypeInfo(Qn::LC_Free,            "free",          1),
+    LicenseTypeInfo(Qn::LC_Invalid,         "",              1)
 };
 } // anonymous namespace
 
@@ -187,6 +187,7 @@ QString QnLicense::displayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall");
     case Qn::LC_IO:             return tr("I/O Module");
     case Qn::LC_Start:          return tr("Start");
+    case Qn::LC_Free:           return tr("Free");
     case Qn::LC_Invalid:        return tr("Invalid");
     default:
         break;
@@ -209,6 +210,7 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     case Qn::LC_VideoWall:      return tr("Video Wall Licenses");
     case Qn::LC_IO:             return tr("I/O Module Licenses");
     case Qn::LC_Start:          return tr("Start Licenses");
+    case Qn::LC_Free:           return tr("Free license");
     case Qn::LC_Invalid:        return tr("Invalid Licenses");
     default:
         break;
@@ -222,7 +224,7 @@ QnUuid QnLicense::serverId() const {
         if (info.data.peer.peerType != Qn::PT_Server)
             continue;
 
-        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool hwKeyOK = info.data.hardwareIds.contains(m_hardwareId);
         bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
             return info.uuid;
@@ -289,6 +291,11 @@ QString QnLicense::brand() const
 QString QnLicense::expiration() const
 {
     return m_expiration;
+}
+
+bool QnLicense::neverExpire() const
+{
+    return m_expiration.isEmpty();
 }
 
 QByteArray QnLicense::rawLicense() const
@@ -404,12 +411,9 @@ QByteArray QnLicense::toString() const
     return m_rawLicense;
 }
 
-qint64 QnLicense::expirationTime() const {
-
-    //return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
-
-
-    if(m_expiration.isEmpty())
+qint64 QnLicense::expirationTime() const
+{
+    if (neverExpire())
         return -1;
 
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
@@ -424,15 +428,15 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case NoError:
         return QString();
     case InvalidSignature:
-        return tr("Invalid Signature");
+        return tr("Invalid signature");
     case InvalidHardwareID:
         return tr("Server with matching hardware ID not found");
     case InvalidBrand:
-        return tr("Invalid Customization");
+        return tr("Invalid customization");
     case Expired:
-        return tr("Expired"); // license is out of date
+        return tr("License is expired"); // license is out of date
     case InvalidType:
-        return tr("Invalid Type");
+        return tr("Invalid type");
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
     case FutureLicense:
@@ -446,7 +450,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
 
 Qn::LicenseType QnLicense::type() const
 {
-    if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
+    if (key() == QnAppInfo::freeLicenseKey().toLatin1())
         return Qn::LC_Trial;
 
     if (xclass().toLower().toUtf8() == ::licenseTypeInfo[Qn::LC_VideoWall].className)
@@ -563,6 +567,9 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
 
 int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
 {
+    if (licenseType == Qn::LC_Free)
+        return std::numeric_limits<int>::max();
+
     int result = 0;
 
     for (const QnLicensePtr& license: m_licenseDict.values())
@@ -648,8 +655,8 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicense_i(license))
-        emit licensesChanged();
+    addLicense_i(license);
+    emit licensesChanged();
 }
 
 void QnLicensePool::removeLicense(const QnLicensePtr &license)
@@ -675,8 +682,8 @@ void QnLicensePool::addLicenses(const QnLicenseList &licenses)
 {
     QnMutexLocker locker( &m_mutex );
 
-    if (addLicenses_i(licenses))
-        emit licensesChanged();
+    addLicenses_i(licenses);
+    emit licensesChanged();
 }
 
 void QnLicensePool::replaceLicenses(const ec2::ApiLicenseDataList& licenses)
@@ -709,19 +716,29 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QVector<QString> QnLicensePool::mainHardwareIds() const {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
-}
-
-QVector<QString> QnLicensePool::compatibleHardwareIds() const {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
+QVector<QString> QnLicensePool::hardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.hardwareIds;
 }
 
 QString QnLicensePool::currentHardwareId() const {
-    QVector<QString> hwIds = mainHardwareIds();
-    return hwIds.isEmpty()
-        ? QString()
-        : hwIds.last();
+    QString hardwareId;
+
+    // hardwareIds is a ordered list
+    // first come hwid1s, than hwid2s, etc..
+    // We need to find first hardware id of last version
+    QVector<QString> hwIds = hardwareIds();
+    QString lastPrefix;
+    for (QString hwid : hwIds) {
+        NX_ASSERT(hwid.length() >= 2);
+
+        QString prefix = hwid.mid(0, 2);
+        if (prefix != lastPrefix) {
+            lastPrefix = prefix;
+            hardwareId = hwid;
+        }
+    }
+
+    return hardwareId;
 }
 
 int QnLicensePool::camerasPerAnalogEncoder() {

@@ -16,7 +16,7 @@ class FrameTypeExtractor;
 class QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
     Q_OBJECT;
-
+    typedef QnAbstractArchiveStreamReader base_type;
 public:
     QnArchiveStreamReader(const QnResourcePtr& dev);
     virtual ~QnArchiveStreamReader();
@@ -29,7 +29,7 @@ public:
     virtual bool isReverseMode() const { return m_reverseMode;}
 
     /** Is not used and not implemented. */
-    virtual bool isNegativeSpeedSupported() const; 
+    virtual bool isNegativeSpeedSupported() const;
 
     virtual bool isSingleShotMode() const;
 
@@ -55,6 +55,7 @@ public:
     virtual bool isMediaPaused() const;
     virtual void resumeMedia();
     virtual QnAbstractMediaDataPtr getNextData();
+    virtual bool needKeyData(int channel) const override;
 
     bool setSendMotion(bool value);
 
@@ -63,6 +64,7 @@ public:
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution = QSize()) override;
     virtual MediaQuality getQuality() const override;
+    virtual AVCodecID getTranscodingCodec() const override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
@@ -80,7 +82,7 @@ public:
 
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
-    
+
     /* Return true if archive range is accessible immediately without opening an archive */
     bool offlineRangeSupported() const;
 
@@ -92,6 +94,7 @@ public:
     virtual bool isPaused() const override;
 
     virtual bool isRealTimeSource() const override;
+    virtual void pleaseStop();
 protected:
     virtual bool init();
 
@@ -99,7 +102,6 @@ protected:
     bool initCodecs();
     bool openFormatContext();
     void setCurrentTime(qint64 value);
-    virtual void pleaseStop();
     QnAbstractMediaDataPtr createEmptyPacket(bool isReverseMode);
     void beforeJumpInternal(qint64 mksec);
 
@@ -113,8 +115,8 @@ protected:
     int m_primaryVideoIdx;
     int m_audioStreamIndex;
 
-    CodecID m_videoCodecId;
-    CodecID m_audioCodecId;
+    AVCodecID m_videoCodecId;
+    AVCodecID m_audioCodecId;
 
     int m_freq;
     int m_channels;
@@ -180,7 +182,7 @@ private:
     bool m_prevSendMotion;
     bool m_outOfPlaybackMask;
     qint64 m_latPacketTime;
-    
+
     bool m_stopCond;
     mutable QnMutex m_stopMutex;
     QnWaitCondition m_stopWaitCond;

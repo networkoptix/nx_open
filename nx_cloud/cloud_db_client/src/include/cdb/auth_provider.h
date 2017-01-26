@@ -51,18 +51,20 @@ public:
     std::string nonce;
     //!H(ha1:nonce). H is calculated like MD5 but without appending 1 bit, zero bits and message length
     std::string intermediateResponse;
-    //!Authorized access role
-    SystemAccessRole accessRole;
     //!period, \a intermediateResponse usage should be limited to
     /*!
         This period is introduced to force vms server to verify periodically password at cloud_db
     */
     std::chrono::seconds validPeriod;
+    //!Contains user info and access rights
+    SystemSharingEx authenticatedAccountData;
+    //!Duplicates authenticatedAccountData.accessRole
+    api::SystemAccessRole accessRole;
 
     AuthResponse()
     :
-        accessRole(SystemAccessRole::none),
-        validPeriod(0)
+        validPeriod(0),
+        accessRole(api::SystemAccessRole::none)
     {
     }
 };
@@ -78,6 +80,9 @@ public:
 
     //!Returns nonce to be used by mediaserver
     virtual void getCdbNonce(
+        std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
+    virtual void getCdbNonce(
+        const std::string& systemId,
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) = 0;
     //!Returns light_MD5(ha1:nonce). Real digest response can be calculated using this hash
     /*!

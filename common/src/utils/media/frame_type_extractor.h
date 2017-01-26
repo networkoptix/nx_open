@@ -5,7 +5,7 @@ class VC1SequenceHeader;
 
 extern "C"
 {
-// For enum CodecID, struct AVCodecContext.
+// For enum AVCodecID, struct AVCodecContext.
 #include <libavcodec/avcodec.h>
 }
 
@@ -15,14 +15,14 @@ class FrameTypeExtractor
 {
 public:
     FrameTypeExtractor(const QnConstMediaContextPtr& context);
-    FrameTypeExtractor(CodecID id, bool nalPrefixes = true);
+    FrameTypeExtractor(AVCodecID id, bool nalPrefixes = true);
     ~FrameTypeExtractor();
 
     enum FrameType { UnknownFrameType, I_Frame, P_Frame, B_Frame };
     FrameType getFrameType(const quint8* data, int dataLen);
 
     QnConstMediaContextPtr getContext() const { return m_context; }
-    CodecID getCodec() const { return m_codecId; }
+    AVCodecID getCodec() const { return m_codecId; }
 
 private:
     FrameType getH264FrameType(const quint8* data, int size);
@@ -36,7 +36,7 @@ private:
 private:
     QnConstMediaContextPtr m_context;
 
-    CodecID m_codecId;
+    AVCodecID m_codecId;
     VC1SequenceHeader* m_vcSequence;
     bool m_dataWithNalPrefixes;
 };

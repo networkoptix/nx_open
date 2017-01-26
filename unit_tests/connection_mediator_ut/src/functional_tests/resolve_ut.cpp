@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 #include <test_support/mediaserver_emulator.h>
@@ -24,10 +24,9 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
@@ -67,11 +66,12 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
                 api::ResolvePeerRequest(
                     system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
+
         ASSERT_EQ(api::ResultCode::ok, resultCode);
-        ASSERT_TRUE(std::find(
-            resolveResponse.endpoints.begin(),
-            resolveResponse.endpoints.end(),
-            system1Servers[i]->endpoint()) != resolveResponse.endpoints.end());
+        ASSERT_EQ(1, resolveResponse.endpoints.size());
+        ASSERT_EQ(
+            system1Servers[i]->endpoint().toString(),
+            resolveResponse.endpoints.front().toString());
     }
 
     client->pleaseStopSync();
@@ -81,13 +81,12 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, generateRandomName(16));
+    auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
     auto server2 = addServer(system1, server1->serverId());
 
     //resolving, last added server is chosen
@@ -99,15 +98,12 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
             client.get(),
             api::ResolvePeerRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        server2->endpoint()) != resolveResponse.endpoints.end());
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        server1->endpoint()) == resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        server2->endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     client->pleaseStopSync();
 }
@@ -116,10 +112,9 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
+    const auto client = clientConnection();
 
     //resolving unknown system
     api::ResolveDomainResponse resolveResponse;
@@ -128,7 +123,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
         makeSyncCall<api::ResultCode, api::ResolveDomainResponse>(std::bind(
             &nx::hpm::api::MediatorClientTcpConnection::resolveDomain,
             client.get(),
-            api::ResolveDomainRequest(generateRandomName(16)),
+            api::ResolveDomainRequest(nx::utils::generateRandomName(16)),
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
@@ -140,11 +135,9 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
-
+    const auto client = clientConnection();
     const auto system1 = addRandomSystem();
 
     //resolving unknown system
@@ -166,17 +159,15 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
 {
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
-    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
-        client = clientConnection();
-
+    const auto client = clientConnection();
     const auto system1 = addRandomSystem();
 
     //emulating local mediaserver
-    MediaServerEmulator mserverEmulator(endpoint(), system1);
+    MediaServerEmulator mserverEmulator(stunEndpoint(), system1);
     ASSERT_TRUE(mserverEmulator.start());
-    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.registerOnMediator());
+    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.bind());
 
     //resolving 
     api::ResolvePeerResponse resolveResponse;
@@ -187,11 +178,12 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             client.get(),
             api::ResolvePeerRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        mserverEmulator.endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     //resolve by system name is supported!
     std::tie(resultCode, resolveResponse) =
@@ -200,11 +192,12 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             client.get(),
             api::ResolvePeerRequest(system1.id),
             std::placeholders::_1));
+
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_TRUE(std::find(
-        resolveResponse.endpoints.begin(),
-        resolveResponse.endpoints.end(),
-        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
+    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(
+        mserverEmulator.endpoint().toString(),
+        resolveResponse.endpoints.front().toString());
 
     client->pleaseStopSync();
 }

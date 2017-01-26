@@ -14,34 +14,35 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/network/stun/stream_socket_server.h>
-#include <nx/network/stun/udp_server.h>
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/guard.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/app_info.h>
 
-#include "listening_peer_pool.h"
-#include "peer_registrator.h"
-#include "mediaserver_api.h"
-#include "server/hole_punching_processor.h"
+#include "business_logic_composite.h"
+#include "http/get_listening_peer_list_handler.h"
+#include "libconnection_mediator_app_info.h"
 #include "settings.h"
-
-#include <libconnection_mediator_app_info.h>
+#include "statistics/stats_manager.h"
+#include "stun_server.h"
 
 namespace nx {
 namespace hpm {
 
-MediatorProcess::MediatorProcess( int argc, char **argv )
-:
-    QtService<QtSingleCoreApplication>(argc, argv, QnLibConnectionMediatorAppInfo::applicationName()),
-    m_argc( argc ),
-    m_argv( argv )
+MediatorProcess::MediatorProcess(int argc, char **argv):
+    m_argc(argc),
+    m_argv(argv),
+    m_businessLogicComposite(nullptr),
+    m_stunServerComposite(nullptr)
 {
-    setServiceDescription(QnLibConnectionMediatorAppInfo::applicationDisplayName());
+}
+
+void MediatorProcess::pleaseStop()
+{
+    m_processTerminationEvent.set_value();
 }
 
 void MediatorProcess::setOnStartedEventHandler(
@@ -50,12 +51,17 @@ void MediatorProcess::setOnStartedEventHandler(
     m_startedEventHandler = std::move(handler);
 }
 
-void MediatorProcess::pleaseStop()
+const std::vector<SocketAddress>& MediatorProcess::httpEndpoints() const
 {
-    application()->quit();
+    return m_httpEndpoints;
 }
 
-int MediatorProcess::executeApplication()
+const std::vector<SocketAddress>& MediatorProcess::stunEndpoints() const
+{
+    return m_stunServerComposite->endpoints();
+}
+
+int MediatorProcess::exec()
 {
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
@@ -67,146 +73,124 @@ int MediatorProcess::executeApplication()
 
     conf::Settings settings;
     //parsing command line arguments
-    settings.load(m_argc, m_argv);
+    settings.load(m_argc, (const char**) m_argv);
     if (settings.showHelp())
     {
         settings.printCmdLineArgsHelp();
         return 0;
     }
 
-    initializeLogging(settings);
+    nx::utils::log::initialize(
+        settings.logging(), settings.general().dataDir,
+        QnLibConnectionMediatorAppInfo::applicationDisplayName());
 
     if (settings.stun().addrToListenList.empty())
     {
-        NX_LOG( "No STUN address to listen", cl_logALWAYS );
+        NX_LOGX( "No STUN address to listen", cl_logALWAYS );
         return 1;
-    }
-    if (settings.http().addrToListenList.empty())
-    {
-        NX_LOG( "No HTTP address to listen", cl_logERROR );
-        return 2;
     }
 
     nx::utils::TimerManager timerManager;
-    std::unique_ptr<AbstractCloudDataProvider> cloudDataProvider;
-    if (settings.cloudDB().runWithCloud)
-    {
-        cloudDataProvider = AbstractCloudDataProviderFactory::create(
-            settings.cloudDB().address.toStdString(),
-            settings.cloudDB().user.toStdString(),
-            settings.cloudDB().password.toStdString(),
-            settings.cloudDB().updateInterval);
-    }
-    else
-    {
-        NX_LOG( lit( "STUN Server is running without cloud (debug mode)" ), cl_logALWAYS );
-    }
 
-    //STUN handlers
-    nx::stun::MessageDispatcher stunMessageDispatcher;
-    MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
-    ListeningPeerPool listeningPeerPool;
-    PeerRegistrator listeningPeerRegistrator(
-        cloudDataProvider.get(),
-        &stunMessageDispatcher,
-        &listeningPeerPool);
-    HolePunchingProcessor cloudConnectProcessor(
-        settings,
-        cloudDataProvider.get(),
-        &stunMessageDispatcher,
-        &listeningPeerPool);
-
-    //accepting STUN requests by both tcp and udt
-    MultiAddressServer<stun::SocketServer> tcpStunServer(
-        &stunMessageDispatcher,
-        false,
-        SocketFactory::NatTraversalType::nttDisabled);
-    if (!tcpStunServer.bind(settings.stun().addrToListenList))
-    {
-        NX_LOG(lit("Can not bind to TCP addresses: %1")
-            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+    auto stunServerComposite = std::make_unique<StunServer>(settings);
+    if (!stunServerComposite->bind())
         return 3;
-    }
+    m_stunServerComposite = stunServerComposite.get();
 
-    MultiAddressServer<stun::UDPServer> udpStunServer(&stunMessageDispatcher);
-    if (!udpStunServer.bind(settings.stun().addrToListenList))
-    {
-        NX_LOG(lit("Can not bind to UDP addresses: %1")
-            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-        return 4;
-    }
+    // TODO: #ak BusinessLogicComposite should be instanciated before stunServerComposite.
+    // That requires decoupling businessLogicComposite and STUN request handling.
+    BusinessLogicComposite businessLogicComposite(
+        settings,
+        &stunServerComposite->dispatcher());
+    m_businessLogicComposite = &businessLogicComposite;
+
+    // TODO: #ak create http server composite class.
+    std::unique_ptr<nx_http::MessageDispatcher> httpMessageDispatcher;
+    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>
+        multiAddressHttpServer;
+
+    launchHttpServerIfNeeded(
+        settings,
+        businessLogicComposite.listeningPeerRegistrator(),
+        &httpMessageDispatcher,
+        &multiAddressHttpServer);
 
     // process privilege reduction
     CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
 
-    if (!tcpStunServer.listen())
-    {
-        NX_LOG(lit("Can not listen on TCP addresses %1")
-            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+    if (!stunServerComposite->listen())
         return 5;
-    }
 
-    if (!udpStunServer.listen())
+    if (multiAddressHttpServer && !multiAddressHttpServer->listen())
     {
-        NX_LOG(lit("Can not listen on UDP addresses %1")
-            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-        return 6;
+        NX_LOGX(lit("Can not listen on HTTP addresses %1. Running without HTTP server")
+            .arg(containerString(settings.http().addrToListenList)), cl_logWARNING);
     }
 
-    NX_LOG(lit("STUN Server is listening on %1")
-        .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-    std::cout << QnLibConnectionMediatorAppInfo::applicationDisplayName().toStdString()
-        << " has been started" << std::endl;
+    NX_LOGX(lit("STUN Server is listening on %1")
+        .arg(containerString(settings.stun().addrToListenList)), cl_logALWAYS);
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
 
-    //TODO #ak remove qt event loop
-    //application's main loop
-    const int result = application()->exec();
+    // This is actually the main loop.
+    m_processTerminationEvent.get_future().wait();
 
-    //stopping accepting incoming connections
+    stunServerComposite->stopAcceptingNewRequests();
+    businessLogicComposite.stop();
+    stunServerComposite.reset();
 
-    return result;
+    return 0;
 }
 
-void MediatorProcess::start()
+ListeningPeerPool* MediatorProcess::listeningPeerPool() const
 {
-    QtSingleCoreApplication* application = this->application();
+    return &m_businessLogicComposite->listeningPeerPool();
+}
 
-    if( application->isRunning() )
+bool MediatorProcess::launchHttpServerIfNeeded(
+    const conf::Settings& settings,
+    const PeerRegistrator& peerRegistrator,
+    std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
+    std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
+        multiAddressHttpServer)
+{
+    if (settings.http().addrToListenList.empty())
+        return true;
+
+    NX_LOGX("Bringing up HTTP server", cl_logINFO);
+
+    *httpMessageDispatcher = std::make_unique<nx_http::MessageDispatcher>();
+
+    //registering HTTP handlers
+    (*httpMessageDispatcher)->registerRequestProcessor<http::GetListeningPeerListHandler>(
+        http::GetListeningPeerListHandler::kHandlerPath,
+        [&]() { return std::make_unique<http::GetListeningPeerListHandler>(peerRegistrator); });
+    
+    *multiAddressHttpServer =
+        std::make_unique<MultiAddressServer<nx_http::HttpStreamSocketServer>>(
+            nullptr,    //TODO #ak add authentication 
+            httpMessageDispatcher->get(),
+            false,
+            nx::network::NatTraversalSupport::disabled);
+
+    auto& httpServer = *multiAddressHttpServer;
+    if (!httpServer->bind(settings.http().addrToListenList))
     {
-        NX_LOG( "Server already started", cl_logERROR );
-        application->quit();
-        return;
+        const auto osErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOGX(lm("Failed to bind HTTP server to address ... . %1")
+            .arg(SystemError::toString(osErrorCode)), cl_logERROR);
+        return false;
     }
-}
 
-void MediatorProcess::stop()
-{
-    application()->quit();
-}
-
-void MediatorProcess::initializeLogging(const conf::Settings& settings)
-{
-    //logging
-    if (settings.logging().logLevel != QString::fromLatin1("none"))
-    {
-        const QString& logDir = settings.logging().logDir;
-
-        QDir().mkpath(logDir);
-        const QString& logFileName = logDir + lit("/log_file");
-        if (!cl_log.create(logFileName, 1024 * 1024 * 10, 5, cl_logDEBUG1))
+    m_httpEndpoints = httpServer->endpoints();
+    httpServer->forEachListener(
+        [&settings](nx_http::HttpStreamSocketServer* server)
         {
-            std::wcerr << L"Failed to create log file "
-                       << logFileName.toStdWString() << std::endl;
-        }
+            server->setConnectionKeepAliveOptions(settings.http().keepAliveOptions);
+        });
 
-        QnLog::initLog(settings.logging().logLevel);
-        NX_LOG(lit("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("%1 started").arg(QnLibConnectionMediatorAppInfo::applicationDisplayName()), cl_logALWAYS);
-        NX_LOG(lit("Software version: %1").arg(QnAppInfo::applicationFullVersion()), cl_logALWAYS);
-    }
+    return true;
 }
 
 } // namespace hpm

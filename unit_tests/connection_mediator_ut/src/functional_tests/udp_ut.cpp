@@ -9,7 +9,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/common/sync_call.h>
 
 #include <test_support/mediaserver_emulator.h>
@@ -27,14 +27,14 @@ TEST_F(MediatorFunctionalTest, udp_transport)
 
     using namespace nx::hpm;
 
-    startAndWaitUntilStarted();
+    ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
 
     nx::stun::MessageParser messageParser;
     nx::stun::MessageSerializer messageSerializer;
-    auto udpSocket = SocketFactory::createDatagramSocket();
+    const auto udpSocket = std::make_unique<network::UDPSocket>();
     udpSocket->setRecvTimeout(3000);
 
     //for (int j = 0; j < 1000; ++j)
@@ -45,7 +45,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         nx::stun::Message requestMessage(
             stun::Header(
                 nx::stun::MessageClass::request,
-                nx::stun::cc::methods::resolvePeer));
+                nx::stun::extension::methods::resolvePeer));
         request.serialize(&requestMessage);
         messageSerializer.setMessage(&requestMessage);
         nx::Buffer sendBuffer;
@@ -53,7 +53,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         size_t bytesWritten = 0;
         ASSERT_EQ(nx_api::SerializerState::done, messageSerializer.serialize(&sendBuffer, &bytesWritten));
         ASSERT_EQ(bytesWritten, sendBuffer.size());
-        ASSERT_TRUE(udpSocket->sendTo(sendBuffer, endpoint()));
+        ASSERT_TRUE(udpSocket->sendTo(sendBuffer.data(), sendBuffer.size(), stunEndpoint()));
 
         //reading response
         nx::Buffer recvBuffer;
@@ -70,10 +70,10 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         ASSERT_TRUE(responseData.parse(responseMessage));
 
         //checking response
-        ASSERT_TRUE(std::find(
-            responseData.endpoints.begin(),
-            responseData.endpoints.end(),
-            system1Servers[i]->endpoint()) != responseData.endpoints.end());
+        ASSERT_EQ(1, responseData.endpoints.size());
+        ASSERT_EQ(
+            system1Servers[i]->endpoint().toString(),
+            responseData.endpoints.front().toString());
     }
 }
 

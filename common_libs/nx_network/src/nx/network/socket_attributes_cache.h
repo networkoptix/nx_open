@@ -139,7 +139,7 @@ public:
     {
         return setAttributeValue(
             &m_socketAttributes.recvTimeout,
-            &AbstractSocket::setRecvTimeout,
+            static_cast<bool (AbstractSocket::*)(unsigned int)>(&AbstractSocket::setRecvTimeout),
             millis);
     }
     virtual bool getRecvTimeout(unsigned int* millis) const override
@@ -154,7 +154,7 @@ public:
     {
         return setAttributeValue(
             &m_socketAttributes.sendTimeout,
-            &AbstractSocket::setSendTimeout,
+            static_cast<bool (AbstractSocket::*)(unsigned int)>(&AbstractSocket::setSendTimeout),
             millis);
     }
     virtual bool getSendTimeout(unsigned int* millis) const override
@@ -176,26 +176,37 @@ public:
     }
     virtual AbstractSocket::SOCKET_HANDLE handle() const override
     {
-        if (!m_delegate)
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "Not supported");
-            return -1;
-        }
-
+        NX_CRITICAL(m_delegate, "Not supported");
         return m_delegate->handle();
     }
-    virtual aio::AbstractAioThread* getAioThread() override
+    virtual nx::network::Pollable* pollable() override
+    {
+        if (!m_delegate)
+            return nullptr;
+
+        return m_delegate->pollable();
+    }
+    virtual aio::AbstractAioThread* getAioThread() const override
     {
         if (!m_delegate)
         {
-            if (m_socketAttributes.aioThread)
-                return *m_socketAttributes.aioThread;
+            NX_CRITICAL(m_socketAttributes.aioThread,
+                "Notfully supported while delegate is not set");
 
-            NX_ASSERT(false, Q_FUNC_INFO,
-                       "Notfully supported while delegate is not set");
+            return *m_socketAttributes.aioThread;
         }
 
         return m_delegate->getAioThread();
+    }
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(m_delegate, "Not supported");
+        return m_delegate->post(std::move(handler));
+    }
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(m_delegate, "Not supported");
+        return m_delegate->dispatch(std::move(handler));
     }
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
@@ -338,6 +349,13 @@ public:
             &AbstractStreamSocket::getKeepAlive,
             decltype(this->m_socketAttributes.keepAlive)(),
             val);
+    }
+    virtual void registerTimer(
+        std::chrono::milliseconds timeoutMs,
+        nx::utils::MoveOnlyFunc<void()> handler) override
+    {
+        NX_CRITICAL(this->m_delegate, "Not supported");
+        return this->m_delegate->registerTimer(timeoutMs, std::move(handler));
     }
 };
 

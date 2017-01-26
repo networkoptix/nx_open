@@ -14,6 +14,7 @@ public:
 
     void setRequest(const QString& request);
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
+    virtual void pleaseStop() override;
 protected:
     
 
@@ -21,7 +22,7 @@ protected:
     virtual CameraDiagnostics::Result openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params) override;
     virtual void closeStream() override;
     virtual bool isStreamOpened() const override;
-    virtual void pleaseReopenStream() override {}
+    //virtual void pleaseReopenStream() override {}
 
 private:
     QnMulticodecRtpReader m_rtpReader;

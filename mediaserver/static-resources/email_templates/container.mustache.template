@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta name="viewport" content="width=device-width" />
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>{{productName}} notification</title>
+</head>
+
+<body bgcolor="#F5F7F8" topmargin="0" leftmargin="0" marginheight="0" marginwidth="0">
+<style>
+{{>style_css}}
+</style>
+
+<table class="container" border="0" cellspacing="0" cellpadding="0" bgcolor="#F5F7F8"><!-- background-color -->
+    <tbody>
+    <tr>
+        <td class="side-spacer"></td>
+        <td class="header">
+            {{#systemName}}
+            <div class="system-info">
+                <table border="0" cellspacing="0" cellpadding="0" >
+                    <tbody>
+                    <tr title="System name">
+                        <td><img class="icon" src="cid:systemIcon"></td>
+                        <td><div class="name">{{systemName}}</div>
+                            {{#systemSignature}}<div class="hint">{{systemSignature}}</div>{{/systemSignature}}</td>
+                    </tr>
+                    {{#cloudOwnerEmail}}
+                    <tr class="cloud-info" title="System owner">
+                        <td><img class="icon" src="cid:ownerIcon"></td>
+                        <td>{{#cloudOwner}}<div class="name">{{cloudOwner}}</div>{{/cloudOwner}}
+                            {{#cloudOwnerEmail}}<div class="hint"><a rel="nofollow" class="nolink">{{cloudOwnerEmail}}</a></div>{{/cloudOwnerEmail}}</td>
+                    </tr>
+                    {{/cloudOwnerEmail}}
+                    </tbody>
+                </table>
+            </div>
+            {{/systemName}}
+            {{^systemName}}
+            <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
+            {{/systemName}}
+        </td>
+        <td class="side-spacer"></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td class="content" bgcolor="white">
+            {{>body}}
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td class="footer">
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tbody>
+                <tr>
+                    {{#systemName}}
+                    <td class="right-border">
+                        <a href="{{config.portal_url}}"><img class="logo" src="cid:logo"></a>
+                    </td>
+                    <td class="left-border right-border">
+                        <b>Website</b><br>
+                        <a href="{{companyUrl}}">{{companyUrl}}</a>
+                    </td>
+                    {{/systemName}}
+                    {{^systemName}}
+                    <td class="right-border">
+                        <b>Website</b><br>
+                        <a href="{{companyUrl}}">{{companyUrl}}</a>
+                    </td>
+                    {{/systemName}}
+                    <td class="left-border">
+                        <b>Support</b><br>
+                        <a href="{{supportLink}}">{{supportLinkText}}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

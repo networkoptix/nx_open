@@ -2,7 +2,6 @@ LIBRARY "CustomActions"
 
 EXPORTS
 
-FindConfiguredStorages
 GenerateGuidsForServers
 CheckPorts
 FindFreePorts
@@ -11,6 +10,7 @@ CopyAppServerProfile
 CopyAppServerNotificationFiles
 DeleteDatabaseFile
 DeleteRegistryKeys
+DeleteAllRegistryKeys
 BackupDatabaseFile
 RestoreDatabaseFile
 CopyDatabaseFile

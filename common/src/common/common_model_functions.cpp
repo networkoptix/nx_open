@@ -1,6 +1,6 @@
 #include "common_globals.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
@@ -27,48 +27,63 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuditRecordType)
 //QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, IODefaultState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, AuthResult)
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::IOPortType,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IOPortType,
 (Qn::PT_Unknown,  "Unknown")
 (Qn::PT_Disabled, "Disabled")
 (Qn::PT_Input,    "Input")
 (Qn::PT_Output,   "Output")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::IODefaultState,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, IODefaultState,
 (Qn::IO_OpenCircuit,  "Open Circuit")
 (Qn::IO_GroundedCircuit, "Grounded circuit")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::FailoverPriority,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FailoverPriority,
 (Qn::FP_Never,      "Never")
 (Qn::FP_Low,        "Low")
 (Qn::FP_Medium,     "Medium")
 (Qn::FP_High,       "High")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTraits,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTraits,
     (Qn::FourWayPtzTrait,          "FourWayPtz")
     (Qn::EightWayPtzTrait,         "EightWayPtz")
     (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupType,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupType,
     (Qn::Backup_Manual,            "BackupManual")
     (Qn::Backup_RealTime,          "BackupRealTime")
     (Qn::Backup_Schedule,          "BackupSchedule")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::CameraBackupQuality,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageInitResult,
+    (Qn::StorageInit_Ok,            "Ok")
+    (Qn::StorageInit_CreateFailed,  "CreateFailed")
+    (Qn::StorageInit_WrongPath,     "InitFailed_WrongPath")
+    (Qn::StorageInit_WrongAuth,     "InitFailed_WrongAuth")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQualities,
     (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
     (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
     (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
     (Qn::CameraBackup_Both,              "CameraBackupBoth")
+    (Qn::CameraBackup_Default,           "CameraBackupDefault")
 )
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQualities)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQuality,
+    (Qn::CameraBackup_Disabled,          "CameraBackupDisabled")
+    (Qn::CameraBackup_HighQuality,       "CameraBackupHighQuality")
+    (Qn::CameraBackup_LowQuality,        "CameraBackupLowQuality")
+    (Qn::CameraBackup_Both,              "CameraBackupBoth")
+    (Qn::CameraBackup_Default,           "CameraBackupDefault")
+)
 
 
 // TODO: #Elric #2.3 code duplication ^v
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTrait,
     (Qn::FourWayPtzTrait,          "FourWayPtz")
     (Qn::EightWayPtzTrait,         "EightWayPtz")
     (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
@@ -77,7 +92,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PropertyDataType)
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StreamQuality,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityLowest,     "lowest")
     (Qn::QualityLow,        "low")
     (Qn::QualityNormal,     "normal")
@@ -86,7 +101,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StreamQuality,
     (Qn::QualityPreSet,     "preset")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, SerializationFormat,
     (Qn::JsonFormat,        "json")
     (Qn::UbjsonFormat,      "ubjson")
     (Qn::BnsFormat,         "bns")
@@ -95,7 +110,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::CompressedPeriodsFormat, "periods")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortField,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,
     (Qn::BookmarkName,          "name")
     (Qn::BookmarkStartTime,     "startTime")
     (Qn::BookmarkDuration,      "duration")
@@ -103,18 +118,18 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortField,
     (Qn::BookmarkCameraName,    "cameraName")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qt::SortOrder,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qt, SortOrder,
     (Qt::AscendingOrder,     "asc")
     (Qt::DescendingOrder,    "desc")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::RebuildAction,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, RebuildAction,
 (Qn::RebuildAction_Start,   "start")
 (Qn::RebuildAction_Cancel,  "stop")
 (Qn::RebuildAction_ShowProgress, QString())
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BackupAction,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
 (Qn::BackupAction_Start,   "start")
 (Qn::BackupAction_Cancel,  "stop")
 (Qn::BackupAction_ShowProgress, QString())

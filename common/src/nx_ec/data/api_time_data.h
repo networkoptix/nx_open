@@ -3,8 +3,8 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "utils/common/latin1_array.h"
-#include "utils/common/model_functions_fwd.h"
+#include "nx/utils/latin1_array.h"
+#include "nx/fusion/model_functions_fwd.h"
 #include <nx/utils/uuid.h>
 
 

@@ -9,22 +9,23 @@
 #include "request_handler.h"
 #include "utils/gzip/gzip_compressor.h"
 #include "core/resource_management/resource_pool.h"
-#include <core/resource_management/resource_access_manager.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/user_access_data.h>
 
-static const QByteArray NOT_ADMIN_UNAUTHORIZED_HTML("\
+static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
     <HTML>\
     <HEAD>\
     <TITLE>Error</TITLE>\
     <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=utf-8\">\
     </HEAD>\
-    <BODY><H1>401 Unauthorized. <br> Administrator permissions are required.</H1></BODY>\
+    <BODY><H1>401 Unauthorized. <br> You don't have required permissions.</H1></BODY>\
     </HTML>"
 );
 
 
-void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHandler* handler, RestPermissions permissions )
+void QnRestProcessorPool::registerHandler(const QString& path, QnRestRequestHandler* handler, Qn::GlobalPermission permissions )
 {
     m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
     handler->setPath(path);
@@ -34,10 +35,8 @@ void QnRestProcessorPool::registerHandler( const QString& path, QnRestRequestHan
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler( QString path ) const
 {
-    while (path.startsWith(L'/'))
-        path = path.mid(1);
-    if (path.endsWith(L'/'))
-        path = path.left(path.length()-1);
+    path = QnTcpListener::normalizedPath(path);
+
 
     Handlers::const_iterator i = m_handlers.upperBound(path);
     if (i == m_handlers.begin())
@@ -65,7 +64,8 @@ public:
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket),
+    m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
     d->owner = _owner;
@@ -105,19 +105,17 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler)
     {
-        if (handler->permissions() == RestPermissions::adminOnly)
+        if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
-            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
+            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
-                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
-
-            bool isAdmin = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
-            if (!isAdmin)
+            if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
             {
-                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
         }
@@ -156,16 +154,21 @@ void QnRestConnectionProcessor::run()
         handler->afterExecute(url.path(), params, uncompressedResponse, this);
 }
 
-QnUuid QnRestConnectionProcessor::authUserId() const
+Qn::UserAccessData QnRestConnectionProcessor::accessRights() const
 {
     Q_D(const QnRestConnectionProcessor);
-    return d->authUserId;
+    return d->accessRights;
 }
 
-void QnRestConnectionProcessor::setAuthUserId(const QnUuid& authUserId)
+void QnRestConnectionProcessor::setAccessRights(const Qn::UserAccessData& accessRights)
 {
     Q_D(QnRestConnectionProcessor);
-    d->authUserId = authUserId;
+    d->accessRights = accessRights;
+}
+
+void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
+{
+    m_noAuth = noAuth;
 }
 
 const nx_http::Request& QnRestConnectionProcessor::request() const

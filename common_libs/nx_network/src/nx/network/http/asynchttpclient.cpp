@@ -10,103 +10,162 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
-#include <nx/utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
-#include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
 #include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
+
+#include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/systemerror.h>
+#include <utils/common/util.h>
 
 #include "auth_tools.h"
 
-//TODO: #ak persistent connection support
-//TODO: #ak MUST call cancelAsyncIO with 1st parameter set to false
-//TODO: #ak reconnect support
-
 static const int DEFAULT_SEND_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-//static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 
+namespace {
+
+static bool logTraffic()
+{
+    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+}
+
+} // namespace
+
 namespace nx_http
 {
-    static const size_t RESPONSE_BUFFER_SIZE = 16*1024;
+    static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
+    
+    constexpr int kMaxNumberOfRedirects = 5;
 
-    AsyncHttpClient::Timeouts::Timeouts()
+    AsyncHttpClient::Timeouts::Timeouts(
+        std::chrono::milliseconds send,
+        std::chrono::milliseconds recv,
+        std::chrono::milliseconds msgBody)
     :
-        sendTimeout(kDefaultSendTimeout),
-        responseReadTimeout(kDefaultResponseReadTimeout),
-        messageBodyReadTimeout(kDefaultMessageBodyReadTimeout)
+        sendTimeout(send),
+        responseReadTimeout(recv),
+        messageBodyReadTimeout(msgBody)
     {
     }
 
-    AsyncHttpClient::AsyncHttpClient()
-    :
-        m_state( sInit ),
-        m_connectionClosed( false ),
-        m_requestBytesSent( 0 ),
-        m_authorizationTried( false ),
-        m_ha1RecalcTried( false ),
-        m_terminated( false ),
-        m_totalBytesRead( 0 ),
-        m_contentEncodingUsed( true ),
-        m_sendTimeoutMs( DEFAULT_SEND_TIMEOUT ),
-        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT ),
-        m_msgBodyReadTimeoutMs( 0 ),
+
+    bool AsyncHttpClient::Timeouts::operator==(const Timeouts& rhs) const
+    {
+        return sendTimeout == rhs.sendTimeout
+            && responseReadTimeout == rhs.responseReadTimeout
+            && messageBodyReadTimeout == rhs.messageBodyReadTimeout;
+    }
+
+    AsyncHttpClient::AsyncHttpClient():
+        m_state(sInit),
+        m_connectionClosed(false),
+        m_requestBytesSent(0),
+        m_authorizationTried(false),
+        m_proxyAuthorizationTried(false),
+        m_ha1RecalcTried(false),
+        m_terminated(false),
+        m_bytesRead(0),
+        m_totalRequests(0),
+        m_contentEncodingUsed(true),
+        m_sendTimeoutMs(DEFAULT_SEND_TIMEOUT),
+        m_responseReadTimeoutMs(DEFAULT_RESPONSE_READ_TIMEOUT),
+        m_msgBodyReadTimeoutMs(0),
         m_authType(authBasicAndDigest),
-        m_awaitedMessageNumber( 0 ),
+        m_awaitedMessageNumber(0),
         m_lastSysErrorCode(SystemError::noError),
-        m_requestSequence( 0 )
+        m_requestSequence(0),
+        m_forcedEof(false),
+        m_precalculatedAuthorizationDisabled(false),
+        m_numberOfRedirectsTried(0)
     {
         m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
     }
 
     AsyncHttpClient::~AsyncHttpClient()
     {
-        terminate();
+        pleaseStopSync(false);
     }
 
-    AbstractStreamSocket* AsyncHttpClient::socket()
+    const std::unique_ptr<AbstractStreamSocket>& AsyncHttpClient::socket()
     {
-        return m_socket.data();
+        return m_socket;
     }
 
-    QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
+    std::unique_ptr<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
-        QSharedPointer<AbstractStreamSocket> result = m_socket;
+        NX_ASSERT(m_aioThreadBinder.isInSelfAioThread());
 
-        {
-            QnMutexLocker lk( &m_mutex );
-            m_terminated = true;
-        }
-        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
-        if( result )
-            result->pleaseStopSync();
-        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+        m_terminated = true;
 
-        m_socket.clear();
+        std::unique_ptr<AbstractStreamSocket> result;
+        result.swap(m_socket);
+        if (result)
+            result->cancelIOSync(nx::network::aio::etNone);
         return result;
     }
 
-    void AsyncHttpClient::terminate()
+    //TODO #ak move pleaseStop and pleaseStopSync to some common base class
+
+    void AsyncHttpClient::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
     {
+        m_aioThreadBinder.post(
+            [this, completionHandler = std::move(completionHandler)]() mutable
         {
-            QnMutexLocker lk( &m_mutex );
-            if( m_terminated )
-                return;
-            m_terminated = true;
+            stopWhileInAioThread();
+            completionHandler();
+        });
+    }
+
+    void AsyncHttpClient::pleaseStopSync(bool checkForLocks)
+    {
+        if (m_aioThreadBinder.isInSelfAioThread())
+        {
+            stopWhileInAioThread();
         }
-        //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
-        if( m_socket )
-            m_socket->pleaseStopSync();
-        //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
+        else
+        {
+            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+            QnStoppableAsync::pleaseStopSync(checkForLocks);
+        }
+    }
+
+    void AsyncHttpClient::stopWhileInAioThread()
+    {
+        m_terminated = true;
+        if (m_socket)
+            m_socket->pleaseStopSync(false);
+    }
+
+    nx::network::aio::AbstractAioThread* AsyncHttpClient::getAioThread() const
+    {
+        return m_aioThreadBinder.getAioThread();
+    }
+
+    void AsyncHttpClient::bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
+    {
+        m_aioThreadBinder.bindToAioThread(aioThread);
+        if (m_socket)
+            m_socket->bindToAioThread(aioThread);
+    }
+
+    void AsyncHttpClient::post(nx::utils::MoveOnlyFunc<void()> func)
+    {
+        m_aioThreadBinder.post(std::move(func));
+    }
+
+    void AsyncHttpClient::dispatch(nx::utils::MoveOnlyFunc<void()> func)
+    {
+        m_aioThreadBinder.dispatch(std::move(func));
     }
 
     AsyncHttpClient::State AsyncHttpClient::state() const
@@ -116,30 +175,89 @@ namespace nx_http
 
     bool AsyncHttpClient::failed() const
     {
-        return m_state == sFailed;
+        return m_state == sFailed || response() == nullptr;
     }
 
     SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
     {
-        return m_lastSysErrorCode;
+        if (m_lastSysErrorCode != SystemError::noError)
+            return m_lastSysErrorCode;
+        // Ensuring system error code is always non-zero in case of failure 
+        //  to simplify AsyncHttpClient user's life.
+        return failed() ? SystemError::connectionReset : SystemError::noError;
     }
 
     //!Start request to \a url
     /*!
-        \return true, if socket is created and async connect is started. false otherwise
-        To get error description use SystemError::getLastOSErrorCode()
+    \return true, if socket is created and async connect is started. false otherwise
+    To get error description use SystemError::getLastOSErrorCode()
     */
-    void AsyncHttpClient::doGet( const QUrl& url )
+    void AsyncHttpClient::doGet(const QUrl& url)
     {
-        NX_ASSERT( url.isValid() );
+        NX_ASSERT(!url.host().isEmpty());
+        NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::GET );
-        initiateHttpMessageDelivery( url );
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
+        composeRequest(nx_http::Method::GET);
+        initiateHttpMessageDelivery();
+    }
+
+    void AsyncHttpClient::doGet(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<void(AsyncHttpClient::*)(const QUrl&)>(&AsyncHttpClient::doGet),
+            url);
     }
 
     void AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        bool includeContentLength)
+    {
+        NX_ASSERT(url.isValid());
+
+        resetDataBeforeNewRequest();
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
+        composeRequest(nx_http::Method::POST);
+        m_request.headers.insert(make_pair("Content-Type", contentType));
+        if (includeContentLength)
+            m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
+        //TODO #ak support chunked encoding & compression
+        m_request.headers.insert(make_pair("Content-Encoding", "identity"));
+        m_request.messageBody = std::move(messageBody);
+        initiateHttpMessageDelivery();
+    }
+
+    void AsyncHttpClient::doPost(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody,
+        bool includeContentLength,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/,
+            bool /*includeContentLength*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType, bool>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPost),
+            url,
+            contentType,
+            std::move(messageBody),
+            includeContentLength);
+    }
+
+    void AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody)
@@ -147,31 +265,57 @@ namespace nx_http
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::POST );
-        m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
+        composeRequest(nx_http::Method::PUT);
+        m_request.headers.insert(make_pair("Content-Type", contentType));
+        m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
         //TODO #ak support chunked encoding & compression
-        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = std::move(messageBody);
-        initiateHttpMessageDelivery( url );
+        initiateHttpMessageDelivery();
     }
 
     void AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        nx_http::StringType messageBody )
+        nx_http::StringType messageBody,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(
+            const QUrl& /*url*/,
+            const nx_http::StringType& /*contentType*/,
+            nx_http::StringType /*messageBody*/);
+
+        doHttpOperation<const QUrl&, const nx_http::StringType&, nx_http::StringType>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doPut),
+            url,
+            contentType,
+            std::move(messageBody));
+    }
+
+    void AsyncHttpClient::doOptions(const QUrl& url)
     {
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
-        composeRequest( nx_http::Method::PUT );
-        m_request.headers.insert( make_pair("Content-Type", contentType) );
-        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
-        //TODO #ak support chunked encoding & compression
-        m_request.messageBody = std::move(messageBody);
-        initiateHttpMessageDelivery( url );
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
+        m_contentLocationUrl.setPath(QLatin1String("*"));
+        composeRequest(nx_http::Method::OPTIONS);
+        initiateHttpMessageDelivery();
+    }
+
+    void AsyncHttpClient::doOptions(
+        const QUrl& url,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler)
+    {
+        typedef void(AsyncHttpClient::*FuncToCallType)(const QUrl& /*url*/);
+
+        doHttpOperation<const QUrl&>(
+            std::move(completionHandler),
+            static_cast<FuncToCallType>(&AsyncHttpClient::doOptions),
+            url);
     }
 
     const nx_http::Request& AsyncHttpClient::request() const
@@ -180,7 +324,7 @@ namespace nx_http
     }
 
     /*!
-        Response is valid only after signal \a responseReceived() has been emitted
+    Response is valid only after signal \a responseReceived() has been emitted
     */
     const Response* AsyncHttpClient::response() const
     {
@@ -191,10 +335,10 @@ namespace nx_http
     StringType AsyncHttpClient::contentType() const
     {
         const Message& httpMsg = m_httpStreamReader.message();
-        if( httpMsg.type == MessageType::none )
+        if (httpMsg.type == MessageType::none)
             return StringType();
-        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
-        if( contentTypeIter == httpMsg.headers().end() )
+        HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find("Content-Type");
+        if (contentTypeIter == httpMsg.headers().end())
             return StringType();
         return contentTypeIter->second;
     }
@@ -215,135 +359,170 @@ namespace nx_http
     //!Returns current message body buffer, clearing it
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
-        return m_httpStreamReader.fetchMessageBody();
+        const auto buffer = m_httpStreamReader.fetchMessageBody();
+        if (logTraffic())
+            NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+
+        return buffer;
     }
 
     const QUrl& AsyncHttpClient::url() const
     {
-        return m_url;
+        return m_requestUrl;
     }
 
-    quint64 AsyncHttpClient::totalBytesRead() const
+    const QUrl& AsyncHttpClient::contentLocationUrl() const
     {
-        QnMutexLocker lk( &m_mutex );
-        return m_totalBytesRead;
+        return m_contentLocationUrl;
     }
 
-    void AsyncHttpClient::setUseCompression( bool toggleUseEntityEncoding )
+    quint64 AsyncHttpClient::bytesRead() const
+    {
+        return m_bytesRead;
+    }
+
+    void AsyncHttpClient::setUseCompression(bool toggleUseEntityEncoding)
     {
         m_contentEncodingUsed = toggleUseEntityEncoding;
     }
 
-    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
+    void AsyncHttpClient::setSubsequentReconnectTries(int /*reconnectTries*/)
     {
         //TODO #ak
     }
 
-    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
+    void AsyncHttpClient::setTotalReconnectTries(int /*reconnectTries*/)
     {
         //TODO #ak
     }
 
-    void AsyncHttpClient::setUserAgent( const QString& userAgent )
+    void AsyncHttpClient::setUserAgent(const QString& userAgent)
     {
         m_userAgent = userAgent;
     }
 
-    void AsyncHttpClient::setUserName( const QString& userName )
+    void AsyncHttpClient::setUserName(const QString& userName)
     {
         m_userName = userName;
     }
 
-    void AsyncHttpClient::setUserPassword( const QString& userPassword )
+    void AsyncHttpClient::setUserPassword(const QString& userPassword)
     {
         m_userPassword = userPassword;
     }
 
-    void AsyncHttpClient::setSendTimeoutMs( unsigned int sendTimeoutMs )
+    void AsyncHttpClient::setProxyUserName(const QString& userName)
+    {
+        m_proxyUserName = userName;
+    }
+
+    void AsyncHttpClient::setProxyUserPassword(const QString& userPassword)
+    {
+        m_proxyUserPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setAuth(const AuthInfo& auth)
+    {
+        setUserName(auth.username);
+        setUserPassword(auth.password);
+        setProxyUserName(auth.proxyUsername);
+        setProxyUserPassword(auth.proxyPassword);
+        setProxyVia(auth.proxyEndpoint);
+    }
+
+    void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
+    {
+        if (proxyEndpoint.isNull())
+            m_proxyEndpoint.reset();
+        else
+            m_proxyEndpoint = proxyEndpoint;
+    }
+
+    void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
+    {
+        m_precalculatedAuthorizationDisabled = val;
+    }
+
+    void AsyncHttpClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
     {
         m_sendTimeoutMs = sendTimeoutMs;
     }
 
-    void AsyncHttpClient::setResponseReadTimeoutMs( unsigned int _responseReadTimeoutMs )
+    void AsyncHttpClient::setResponseReadTimeoutMs(unsigned int _responseReadTimeoutMs)
     {
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
     }
 
-    void AsyncHttpClient::setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs )
+    void AsyncHttpClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs)
     {
         m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
     }
 
-    void AsyncHttpClient::asyncConnectDone( AbstractSocket* sock, SystemError::ErrorCode errorCode )
+    void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        NX_LOGX(lm("Opened connection to url %1. Result code %2")
+            .str(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
 
-        QnMutexLocker lk( &m_mutex );
-        if( m_terminated )
+        std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
+
+        if (m_terminated)
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
-
-        if( m_state != sWaitingConnectToHost )
+        if (m_state != sWaitingConnectToHost)
         {
-            NX_ASSERT( false );
+            NX_ASSERT(false);
             return;
         }
 
-        if( errorCode == SystemError::noError )
+        if (errorCode == SystemError::noError)
         {
             //connect successful
-            m_remoteEndpoint = SocketAddress( m_url.host(), m_url.port(nx_http::DEFAULT_HTTP_PORT) );
+            m_remoteEndpointWithProtocol = endpointWithProtocol(m_contentLocationUrl);
             serializeRequest();
             m_state = sSendingRequest;
-            lk.unlock();
-            emit tcpConnectionEstablished( sharedThis );
-            lk.relock();
+            emit tcpConnectionEstablished(sharedThis);
             using namespace std::placeholders;
-            m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) );
+            NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
+
+            m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
-        else
-        {
-            NX_LOGX( lit( "Failed to establish tcp connection to %1. %2" ).
-                arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_lastSysErrorCode = errorCode;
-            if( reconnectIfAppropriate() )
-                return;
-        }
+
+        NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
+            arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        m_lastSysErrorCode = errorCode;
 
         m_state = sFailed;
-        lk.unlock();
-        emit done( sharedThis );
-        lk.relock();
+        const auto requestSequenceBak = m_requestSequence;
+        emit done(sharedThis);
+        if (m_requestSequence == requestSequenceBak)
+            m_socket.reset();   //< Closing failed socket so that it is not reused.
     }
 
-    void AsyncHttpClient::asyncSendDone( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesWritten )
+    void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWritten)
     {
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
-        QnMutexLocker lk( &m_mutex );
-        if( m_terminated )
+        if (m_terminated)
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
-
-        if( m_state != sSendingRequest )
+        if (m_state != sSendingRequest)
         {
-            NX_ASSERT( false );
+            NX_ASSERT(false);
             return;
         }
 
-        if( errorCode != SystemError::noError )
+        if (errorCode != SystemError::noError)
         {
-            if( reconnectIfAppropriate() )
+            if (reconnectIfAppropriate())
                 return;
-            NX_LOGX( lit( "Error sending (1) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
+            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
-            lk.unlock();
-            emit done( sharedThis );
-            lk.relock();
+            const auto requestSequenceBak = m_requestSequence;
+            emit done(sharedThis);
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();
             return;
         }
 
@@ -352,238 +531,82 @@ namespace nx_http
         using namespace std::placeholders;
 
         m_requestBytesSent += bytesWritten;
-        if( (int)m_requestBytesSent < m_requestBuffer.size() )
+        if ((int)m_requestBytesSent < m_requestBuffer.size())
         {
-            m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) );
+            m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
 
-        NX_LOGX( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
+        NX_LOGX(lm("Request has been successfully sent to %1: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
+
+        const auto requestSequenceBak = m_requestSequence;
+        emit requestHasBeenSent(sharedThis, m_authorizationTried);
+        if (m_terminated || //user cancelled futher action
+            (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
+        {
+            return;
+        }
+
         m_state = sReceivingResponse;
-        m_responseBuffer.resize( 0 );
+        m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            NX_LOGX( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
-            lk.unlock();
-            emit done( sharedThis );
-            lk.relock();
+            const auto requestSequenceBak = m_requestSequence;
+            emit done(sharedThis);
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
 
         m_socket->readSomeAsync(
             &m_responseBuffer,
-            std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
+            std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, _1, _2));
     }
 
-    void AsyncHttpClient::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
+    void AsyncHttpClient::onSomeBytesReadAsync(
+        SystemError::ErrorCode errorCode,
+        size_t bytesRead)
     {
         using namespace std::placeholders;
 
-        std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
+        std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
-        QnMutexLocker lk( &m_mutex );
-        if( m_terminated )
+        if (m_terminated)
             return;
 
-        NX_ASSERT( sock == m_socket.data() );
-
-        if( errorCode != SystemError::noError )
+        if (errorCode != SystemError::noError)
         {
-            if( reconnectIfAppropriate() )
-                return;
-            NX_LOGX(lit("Error reading (state %1) http response from %2. %3").arg( m_state ).arg( m_url.toString() ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG1 );
-            m_state =
-                ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
+            const auto stateBak = m_state;
+            if ((m_httpStreamReader.state() == HttpStreamReader::messageDone) &&
                     m_httpStreamReader.currentMessageNumber() == m_awaitedMessageNumber)
-                ? sDone
-                : sFailed;
+            {
+                m_state = sDone;
+            }
+            else
+            {
+                // Reconnecting only in case of failure.
+                if (reconnectIfAppropriate())
+                    return;
+                m_state = sFailed;
+            }
+
+            NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
+                .arg(stateBak).arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
+                .arg(SystemError::toString(errorCode)),
+                cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
-            lk.unlock();
-            emit done( sharedThis );
-            lk.relock();
+            const auto requestSequenceBak = m_requestSequence;
+            emit done(sharedThis);
+            if (m_requestSequence == requestSequenceBak)
+                m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
 
-        switch( m_state )
-        {
-            case sReceivingResponse:
-            {
-                readAndParseHttp( bytesRead );
-                //TODO/IMPL reconnect in case of error
-
-                if( m_state == sFailed )
-                {
-                    lk.unlock();
-                    emit done( sharedThis );
-                    lk.relock();
-                    break;
-                }
-
-                //connection could be closed by remote peer already
-
-                if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
-                    m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders )     //still reading message headers
-                {
-                    //response has not been read yet, reading futher
-                    m_responseBuffer.resize( 0 );
-                    if (m_connectionClosed)
-                    {
-                        NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).
-                            arg( m_url.toString() ).arg(SystemError::connectionReset), cl_logDEBUG1 );
-                        m_state = sFailed;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        return;
-                    }
-                    m_socket->readSomeAsync(
-                        &m_responseBuffer,
-                        std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
-                    return;
-                }
-
-                //read http message headers
-                if( m_httpStreamReader.message().type != nx_http::MessageType::response )
-                {
-                    NX_LOGX( lit( "Unexpectedly received request from %1:%2 while expecting response! Ignoring..." ).
-                        arg( m_url.host() ).arg( m_url.port() ), cl_logDEBUG1 );
-                    m_state = sFailed;
-                    lk.unlock();
-                    emit done( sharedThis );
-                    lk.relock();
-                    return;
-                }
-
-                //response read
-                NX_LOGX( lit( "Http response from %1 has been successfully read. Status line: %2(%3)" ).
-                    arg( m_url.toString() ).arg( m_httpStreamReader.message().response->statusLine.statusCode ).
-                    arg( QLatin1String( m_httpStreamReader.message().response->statusLine.reasonPhrase ) ), cl_logDEBUG2 );
-
-                const Response* response = m_httpStreamReader.message().response;
-                if( response->statusLine.statusCode == StatusCode::unauthorized )
-                {
-                    //TODO #ak following block should be moved somewhere
-                    if( !m_ha1RecalcTried &&
-                        response->headers.find( Qn::REALM_HEADER_NAME ) != response->headers.cend() )
-                    {
-                        m_authorizationTried = false;
-                        m_ha1RecalcTried = true;
-                    }
-
-                    if( !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
-                    {
-                        //trying authorization
-                        if( resendRequestWithAuthorization( *response ) )
-                            return;
-                    }
-                }
-
-                const bool messageHasMessageBody =
-                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
-                    (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
-                    (m_httpStreamReader.messageBodyBufferSize() > 0);
-
-                m_state = sResponseReceived;
-                const auto requestSequenceBak = m_requestSequence;
-                lk.unlock();
-                emit responseReceived( sharedThis );
-                lk.relock();
-                if( m_terminated ||
-                    (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
-                {
-                    return;
-                }
-
-                //does message body follow?
-                if( !messageHasMessageBody )
-                {
-                    //no message body: done
-                    m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
-                    lk.unlock();
-                    emit done( sharedThis );
-                    lk.relock();
-                    return;
-                }
-
-                //starting reading message body
-                m_state = sReadingMessageBody;
-
-                if( m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
-                    m_state == sReadingMessageBody )                    //client wants to read message body
-                {
-                    lk.unlock();
-                    emit someMessageBodyAvailable( sharedThis );
-                    lk.relock();
-                    if( m_terminated )
-                        return;
-                }
-
-                if( ((m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
-                     (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody)) &&
-                    (!m_connectionClosed) )
-                {
-                    //reading more data
-                    m_responseBuffer.resize( 0 );
-                    if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
-                    {
-                        NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
-                        m_state = sFailed;
-                        lk.unlock();
-                        emit done( sharedThis );
-                        lk.relock();
-                        return;
-                    }
-                    m_socket->readSomeAsync(
-                        &m_responseBuffer,
-                        std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
-                    return;
-                }
-
-                //message body has been received with request
-                NX_ASSERT( m_httpStreamReader.state() == HttpStreamReader::messageDone || m_httpStreamReader.state() == HttpStreamReader::parseError );
-
-                m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
-                lk.unlock();
-                emit done( sharedThis );
-                lk.relock();
-                break;
-            }
-
-            case sReadingMessageBody:
-            {
-                const size_t bytesParsed = readAndParseHttp( bytesRead );
-                //TODO #ak reconnect in case of error
-                if( bytesParsed > 0 )
-                {
-                    lk.unlock();
-                    emit someMessageBodyAvailable( sharedThis );
-                    lk.relock();
-                    if( m_terminated )
-                        break;
-                }
-
-                if( m_state != sFailed && m_state != sDone )
-                {
-                    m_responseBuffer.resize( 0 );
-                    m_socket->readSomeAsync(
-                        &m_responseBuffer,
-                        std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) );
-                    return;
-                }
-
-                lk.unlock();
-                emit done( sharedThis );
-                lk.relock();
-                break;
-            }
-
-            default:
-            {
-                NX_ASSERT( false );
-                break;
-            }
-        }
+        processReceivedBytes(std::move(sharedThis), bytesRead);
     }
 
     void AsyncHttpClient::resetDataBeforeNewRequest()
@@ -591,72 +614,90 @@ namespace nx_http
         ++m_requestSequence;
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
+        m_numberOfRedirectsTried = 0;
         m_request = nx_http::Request();
     }
 
-    void AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
+    void AsyncHttpClient::initiateHttpMessageDelivery()
     {
         using namespace std::placeholders;
-
         bool canUseExistingConnection = false;
-        if( m_httpStreamReader.message().type == nx_http::MessageType::response )
+        if (m_httpStreamReader.message().type == nx_http::MessageType::response)
         {
             canUseExistingConnection =
                 (m_httpStreamReader.message().response->statusLine.version == nx_http::http_1_1) &&
-                (nx_http::getHeaderValue( m_httpStreamReader.message().response->headers, "Connection" ) != "close");
+                (nx_http::getHeaderValue(m_httpStreamReader.message().response->headers, "Connection") != "close");
         }
 
-        m_url = url;
-        const SocketAddress remoteEndpoint( url.host(), url.port(nx_http::DEFAULT_HTTP_PORT) );
+        canUseExistingConnection =
+            m_socket &&
+            !m_connectionClosed &&
+            canUseExistingConnection &&
+            (m_remoteEndpointWithProtocol == endpointWithProtocol(m_contentLocationUrl)) &&
+            m_lastSysErrorCode == SystemError::noError;
 
-        if( m_socket )
+        if (!canUseExistingConnection)
         {
-            if( !m_connectionClosed &&
-                canUseExistingConnection &&
-                (m_remoteEndpoint == remoteEndpoint) )  //m_socket->getForeignAddress() returns ip address only, not host name
-            {
-                ++m_awaitedMessageNumber;   //current message will be skipped
-
-                serializeRequest();
-                m_state = sSendingRequest;
-
-                m_socket->sendAsync(
-                    m_requestBuffer,
-                    std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ));
-                return;
-            }
-            else
-            {
-                m_socket.clear();
-            }
+            m_httpStreamReader.resetState();
+            m_awaitedMessageNumber = 0;
+            m_lastSysErrorCode = SystemError::noError;
+            m_totalRequests = 0;
         }
+        ++m_totalRequests;
+        m_bytesRead = 0;
 
-        //resetting parser state only if establishing new tcp connection
-        m_httpStreamReader.resetState();
-        m_awaitedMessageNumber = 0;
+        m_state = sInit;
 
-        initiateTcpConnection();
+        dispatch(
+            [this, canUseExistingConnection]()
+            {
+                if (canUseExistingConnection)
+                {
+                    NX_ASSERT(m_socket);
+                    m_socket->cancelIOSync(nx::network::aio::etNone);
+                    ++m_awaitedMessageNumber;   //current message will be skipped
+
+                    serializeRequest();
+                    m_state = sSendingRequest;
+                    NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
+                    m_socket->sendAsync(
+                        m_requestBuffer,
+                        std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
+                    return;
+                }
+
+                m_socket.reset();
+
+                initiateTcpConnection();
+            });
     }
 
     void AsyncHttpClient::initiateTcpConnection()
     {
-        const SocketAddress remoteAddress( m_url.host(), m_url.port( nx_http::DEFAULT_HTTP_PORT ) );
+        const SocketAddress remoteAddress =
+            m_proxyEndpoint
+            ? m_proxyEndpoint.get()
+            : SocketAddress(
+                m_contentLocationUrl.host(),
+                m_contentLocationUrl.port(nx_http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
 
         m_state = sInit;
 
-        m_socket = QSharedPointer<AbstractStreamSocket>(
-            SocketFactory::createStreamSocket(m_url.scheme() == lit("https"))
-            .release());
+        m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lit("https"));
+
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+
+        m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
-        if( !m_socket->setNonBlockingMode( true ) ||
-            !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
-            !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
+        if (!m_socket->setNonBlockingMode(true) ||
+            !m_socket->setSendTimeout(m_sendTimeoutMs) ||
+            !m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            m_socket->post(std::bind(
-                &AsyncHttpClient::asyncConnectDone,
-                this,
-                m_socket.data(),
-                SystemError::getLastOSErrorCode()));
+            m_socket->post(
+                std::bind(
+                    &AsyncHttpClient::asyncConnectDone,
+                    this,
+                    SystemError::getLastOSErrorCode()));
             return;
         }
 
@@ -665,278 +706,654 @@ namespace nx_http
         //starting async connect
         m_socket->connectAsync(
             remoteAddress,
-            std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) );
+            std::bind(&AsyncHttpClient::asyncConnectDone, this, std::placeholders::_1));
     }
 
-    size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )
+    size_t AsyncHttpClient::parseReceivedBytes(size_t bytesRead)
     {
-        if( bytesRead == 0 )   //connection closed
+        if (bytesRead == 0)   //connection closed
         {
             //closing connection is a valid HTTP way to signal message end
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
             //TODO #ak check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
-            m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
-                      (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
-                      (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
-                ? sDone
-                : sFailed;
+            if (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody &&
+                m_httpStreamReader.contentLength() &&
+                m_httpStreamReader.contentLength().get() > m_httpStreamReader.messageBodyBytesRead())
+            {
+                m_state = sFailed;
+                m_lastSysErrorCode = SystemError::connectionReset;
+            }
+            else
+            {
+                m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+                    (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
+                    ? sDone
+                    : sFailed;
+            }
+
             m_connectionClosed = true;
             return 0;
         }
 
-        m_totalBytesRead += bytesRead;
-
-        //TODO #ak m_httpStreamReader is allowed to process not all bytes in m_responseBuffer. MUST support this!
-
-        if( !m_httpStreamReader.parseBytes( m_responseBuffer, bytesRead ) )
+        // m_httpStreamReader is allowed to process not all bytes from m_responseBuffer.
+        std::size_t bytesProcessed = 0;
+        if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
         {
-            NX_LOGX( lit("Error parsing http response from %1. %2").
-                arg(m_url.toString()).arg(m_httpStreamReader.errorText()), cl_logDEBUG1 );
+            NX_LOGX(lit("Error parsing http response from %1. %2").
+                arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
             m_state = sFailed;
             return -1;
         }
 
-        if( m_httpStreamReader.state() == HttpStreamReader::parseError )
+        m_bytesRead += bytesProcessed;
+
+        if (m_httpStreamReader.state() == HttpStreamReader::parseError)
         {
             m_state = sFailed;
-            return bytesRead;
+            return bytesProcessed;
         }
 
-        NX_ASSERT( m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber );
-        if( m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber )
-            return bytesRead;   //reading some old message, not changing state in this case
+        NX_ASSERT(m_httpStreamReader.currentMessageNumber() <= m_awaitedMessageNumber);
+        if (m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber)
+            return bytesProcessed;   //reading some old message, not changing state in this case
 
-        if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
+        if (m_httpStreamReader.state() == HttpStreamReader::messageDone)
             m_state = sDone;
-        return bytesRead;
+        return bytesProcessed;
     }
 
-    void AsyncHttpClient::composeRequest( const nx_http::StringType& httpMethod )
+    void AsyncHttpClient::processReceivedBytes(
+        std::shared_ptr<AsyncHttpClient> sharedThis,
+        std::size_t bytesRead)
+    {
+        using namespace std::placeholders;
+
+        for (;;)
+        {
+            const auto stateBak = m_state;
+            const size_t bytesParsed = parseReceivedBytes(bytesRead);
+            QByteArray receivedBytesLeft;
+            if (bytesParsed != (std::size_t)-1)
+                receivedBytesLeft = m_responseBuffer.mid(bytesParsed);
+            m_responseBuffer.resize(0);
+
+            bool continueReceiving = false;
+            switch (stateBak)
+            {
+                case sReceivingResponse:
+                {
+                    processResponseHeadersBytes(
+                        sharedThis,
+                        &continueReceiving);
+                    break;
+                }
+
+                case sReadingMessageBody:
+                {
+                    processResponseMessageBodyBytes(
+                        sharedThis,
+                        bytesParsed,
+                        &continueReceiving);
+                    break;
+                }
+
+                default:
+                {
+                    NX_ASSERT(false);
+                    break;
+                }
+            }
+
+            if (!continueReceiving)
+                break;
+
+            if (receivedBytesLeft.isEmpty())
+            {
+                NX_ASSERT(m_responseBuffer.size() == 0);
+                m_socket->readSomeAsync(
+                    &m_responseBuffer,
+                    std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, _1, _2));
+                return;
+            }
+
+            NX_CRITICAL(bytesParsed != 0 && bytesParsed != (std::size_t)-1);
+            m_responseBuffer = std::move(receivedBytesLeft);
+            m_responseBuffer.reserve(RESPONSE_BUFFER_SIZE);
+            bytesRead = m_responseBuffer.size();
+        }
+    }
+
+    void AsyncHttpClient::processResponseHeadersBytes(
+        std::shared_ptr<AsyncHttpClient> sharedThis,
+        bool* const continueReceiving)
+    {
+        using namespace std::placeholders;
+
+        //TODO/IMPL reconnect in case of error
+
+        if (m_state == sFailed)
+        {
+            emit done(sharedThis);
+            return;
+        }
+
+        // Connection could have already been closed by remote peer.
+
+        if (m_httpStreamReader.currentMessageNumber() < m_awaitedMessageNumber ||       //still reading previous message
+            m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders)     //still reading message headers
+        {
+            //response has not been read yet, reading futher
+            m_responseBuffer.resize(0);
+            if (m_connectionClosed)
+            {
+                if (reconnectIfAppropriate())
+                    return;
+
+                NX_LOGX(lit("Failed to read (1) response from %1. %2").
+                    arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
+                m_state = sFailed;
+                emit done(sharedThis);
+                return;
+            }
+            *continueReceiving = true;
+            return;
+        }
+
+        //read http message headers
+        if (m_httpStreamReader.message().type != nx_http::MessageType::response)
+        {
+            NX_LOGX(lit("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
+                arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()), cl_logDEBUG1);
+            m_state = sFailed;
+            emit done(sharedThis);
+            return;
+        }
+
+        NX_LOGX(lm("Response from %1 has been successfully read: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? response()->toString() : response()->statusLine.toString()),
+            cl_logDEBUG2);
+
+        if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
+            return;
+
+        const bool messageHasMessageBody =
+            (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
+            (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody) ||
+            (m_httpStreamReader.messageBodyBufferSize() > 0);
+
+        m_state = sResponseReceived;
+        const auto requestSequenceBak = m_requestSequence;
+        emit responseReceived(sharedThis);
+        if (m_terminated ||
+            (m_requestSequence != requestSequenceBak))  //user started new request within responseReceived handler
+        {
+            return;
+        }
+
+        //does message body follow?
+        if (!messageHasMessageBody)
+        {
+            //no message body: done
+            m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
+            emit done(sharedThis);
+            return;
+        }
+
+        //starting reading message body
+        m_state = sReadingMessageBody;
+
+        if (m_httpStreamReader.messageBodyBufferSize() > 0 &&   //some message body has been read
+            m_state == sReadingMessageBody)                    //client wants to read message body
+        {
+            emit someMessageBodyAvailable(sharedThis);
+            if (m_terminated)
+                return;
+            if (m_forcedEof)
+            {
+                m_forcedEof = false;
+                return;
+            }
+        }
+
+        if (((m_httpStreamReader.state() == HttpStreamReader::readingMessageBody) ||
+            (m_httpStreamReader.state() == HttpStreamReader::pullingLineEndingBeforeMessageBody)) &&
+            (!m_connectionClosed))
+        {
+            //reading more data
+            m_responseBuffer.resize(0);
+            if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
+            {
+                NX_LOGX(lit("Failed to read (1) response from %1. %2")
+                    .arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
+                    .arg(SystemError::getLastOSErrorText()),
+                    cl_logDEBUG1);
+
+                m_state = sFailed;
+                emit done(sharedThis);
+                return;
+            }
+            *continueReceiving = true;
+            return;
+        }
+
+        //message body has been received with request
+        NX_ASSERT(
+            m_httpStreamReader.state() == HttpStreamReader::messageDone ||
+            m_httpStreamReader.state() == HttpStreamReader::parseError);
+
+        m_state = m_httpStreamReader.state() == HttpStreamReader::parseError ? sFailed : sDone;
+        emit done(sharedThis);
+    }
+
+    bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
+    {
+        switch (response.statusLine.statusCode)
+        {
+            case StatusCode::unauthorized:
+            {
+                if (!m_ha1RecalcTried &&
+                    response.headers.find(Qn::REALM_HEADER_NAME) != response.headers.cend())
+                {
+                    m_authorizationTried = false;
+                    m_ha1RecalcTried = true;
+                }
+
+                if (!m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()))
+                {
+                    //trying authorization
+                    if (resendRequestWithAuthorization(response))
+                        return true;
+                }
+
+                break;
+            }
+            
+            case StatusCode::proxyAuthenticationRequired:
+            {
+                if (!m_proxyAuthorizationTried &&
+                    (!m_proxyUserName.isEmpty() || !m_proxyUserPassword.isEmpty()))
+                {
+                    if (resendRequestWithAuthorization(response, true))
+                        return true;
+                }
+                break;
+            }
+            
+            case StatusCode::found:
+            case StatusCode::movedPermanently:
+                return sendRequestToNewLocation(response);
+
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    bool AsyncHttpClient::sendRequestToNewLocation(const Response& response)
+    {
+        if (m_numberOfRedirectsTried >= kMaxNumberOfRedirects)
+            return false;
+        ++m_numberOfRedirectsTried;
+
+        // For now, using first Location if many have been provided in response.
+        const auto locationIter = response.headers.find("Location");
+        if (locationIter == response.headers.end())
+            return false;
+
+        m_authorizationTried = false;
+        m_ha1RecalcTried = false;
+
+        m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
+
+        initiateHttpMessageDelivery();
+        return true;
+    }
+
+    void AsyncHttpClient::processResponseMessageBodyBytes(
+        std::shared_ptr<AsyncHttpClient> sharedThis,
+        std::size_t bytesRead,
+        bool* const continueReceiving)
+    {
+        using namespace std::placeholders;
+
+        //TODO #ak reconnect in case of error
+        if (bytesRead != (std::size_t)-1)
+        {
+            emit someMessageBodyAvailable(sharedThis);
+            if (m_terminated)
+                return;
+            if (m_forcedEof)
+            {
+                m_forcedEof = false;
+                return;
+            }
+        }
+
+        if (m_state != sFailed && m_state != sDone)
+        {
+            m_responseBuffer.resize(0);
+            *continueReceiving = true;
+            return;
+        }
+
+        emit done(sharedThis);
+    }
+
+    void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     {
         const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
         m_request.requestLine.method = httpMethod;
-        m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
+        if (m_proxyEndpoint)
+            m_request.requestLine.url = m_contentLocationUrl;
+        else    //if no proxy specified then erasing http://host:port from request url
+            m_request.requestLine.url = m_contentLocationUrl.path() + (m_contentLocationUrl.hasQuery() ? (QLatin1String("?") + m_contentLocationUrl.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
         nx_http::insertOrReplaceHeader(
             &m_request.headers,
-            HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+            HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
         m_request.headers.emplace(
             "User-Agent",
-            m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1() );
-        if( useHttp11 )
+            m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
+        if (useHttp11)
         {
-            if( httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD )
+            if (httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD)
             {
                 //m_request.headers.insert( std::make_pair("Accept", "*/*") );
-                if( m_contentEncodingUsed )
-                    m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip") );
+                if (m_contentEncodingUsed)
+                    m_request.headers.insert(std::make_pair("Accept-Encoding", "gzip"));
                 //else
                 //    m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
             }
             //m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
-            m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
-            m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
+
+            if (m_additionalHeaders.count("Connection") == 0)
+                m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
+
+            if (m_additionalHeaders.count("Host") == 0)
+                m_request.headers.insert(std::make_pair("Host", m_contentLocationUrl.host().toLatin1()));
         }
 
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
         //adding user credentials
-        if( !m_url.userName().isEmpty() )
-            m_userName = m_url.userName();
-        if( !m_url.password().isEmpty() )
-            m_userPassword = m_url.password();
+        if (!m_contentLocationUrl.userName().isEmpty())
+            m_userName = m_contentLocationUrl.userName();
+        if (!m_contentLocationUrl.password().isEmpty())
+            m_userPassword = m_contentLocationUrl.password();
+        m_contentLocationUrl.setUserName(m_userName);
+        m_contentLocationUrl.setPassword(m_userPassword);
 
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
-        if( !m_userName.isEmpty() )
+        if (!m_userName.isEmpty() &&
+            m_request.headers.find(Qn::CUSTOM_USERNAME_HEADER_NAME) == m_request.headers.end())
+        {
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
-                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()) );
+                HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_userName.toUtf8()));
+        }
+
+        if (m_precalculatedAuthorizationDisabled)
+            return;
 
         //if that url has already been authenticated, adding same authentication info to the request
         //first request per tcp-connection always uses authentication
         //    This is done due to limited AuthInfoCache implementation
-        if( m_authCacheItem.url.isEmpty() ||
+        if (m_authCacheItem.url.isEmpty() ||
             !AuthInfoCache::instance()->addAuthorizationHeader(
-                m_url,
+                m_contentLocationUrl,
                 &m_request,
-                &m_authCacheItem ) )
+                &m_authCacheItem))
         {
-            //not using Basic authentication by default, since it is not secure
-            nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            if (m_authType == AuthType::authBasic)
+            {
+                header::BasicAuthorization basicAuthorization(m_userName.toLatin1(), m_userPassword.toLatin1());
+                nx_http::insertOrReplaceHeader(
+                    &m_request.headers,
+                    nx_http::HttpHeader(
+                        header::Authorization::NAME,
+                        basicAuthorization.serialized()));
+            }
+            else
+            {
+                //not using Basic authentication by default, since it is not secure
+                nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
+            }
         }
     }
 
     void AsyncHttpClient::addAdditionalHeader(const StringType& key, const StringType& value)
     {
-        m_additionalHeaders.emplace( key, value );
+        m_additionalHeaders.emplace(key, value);
     }
 
-    void AsyncHttpClient::removeAdditionalHeader( const StringType& key )
+    void AsyncHttpClient::removeAdditionalHeader(const StringType& key)
     {
-        m_additionalHeaders.erase( key );
+        m_additionalHeaders.erase(key);
     }
 
     void AsyncHttpClient::addRequestHeaders(const HttpHeaders& headers)
     {
         for (HttpHeaders::const_iterator itr = headers.begin(); itr != headers.end(); ++itr)
-            m_additionalHeaders.emplace( itr->first, itr->second);
+            m_additionalHeaders.emplace(itr->first, itr->second);
     }
 
     void AsyncHttpClient::serializeRequest()
     {
         m_requestBuffer.clear();
-        m_request.serialize( &m_requestBuffer );
+        m_request.serialize(&m_requestBuffer);
         m_requestBytesSent = 0;
     }
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
+        if ((m_connectionClosed || m_state == sSendingRequest || m_state == sReceivingResponse) &&
+            m_bytesRead == 0 &&
+            m_totalRequests > 1)
+        {
+            //< Reconnect if TCP timeout for keep-alive connections
+            m_connectionClosed = true;
+            initiateHttpMessageDelivery();
+            return true;
+        }
+
         //TODO #ak we need reconnect and request entity from the point we stopped at
         return false;
     }
 
     AsyncHttpClientPtr AsyncHttpClient::create()
     {
-        return AsyncHttpClientPtr( std::shared_ptr<AsyncHttpClient>( new AsyncHttpClient() ) );
+        return AsyncHttpClientPtr(std::shared_ptr<AsyncHttpClient>(new AsyncHttpClient()));
     }
 
-    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
+    QString AsyncHttpClient::endpointWithProtocol(const QUrl& url)
     {
-        //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
-        NX_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
+        return lit("%1://%2:%3")
+            .arg(url.scheme())
+            .arg(url.host())
+            .arg(url.port(nx_http::defaultPortForScheme(url.scheme().toLatin1())));
+    }
 
-        HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find( "WWW-Authenticate" );
-        if( wwwAuthenticateIter == response.headers.end() )
+    bool AsyncHttpClient::resendRequestWithAuthorization(
+        const nx_http::Response& response,
+        bool isProxy)
+    {
+        const StringType authenticateHeaderName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+        const StringType authorizationHeaderName = isProxy ? StringType("Proxy-Authorization") : header::Authorization::NAME;
+        const QString userName = isProxy ? m_proxyUserName : m_userName;
+        const QString userPassword = isProxy ? m_proxyUserPassword : m_userPassword;
+
+        //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
+        NX_ASSERT(response.statusLine.statusCode == StatusCode::unauthorized ||
+                  response.statusLine.statusCode == StatusCode::proxyAuthenticationRequired);
+
+        HttpHeaders::const_iterator wwwAuthenticateIter = response.headers.find(authenticateHeaderName);
+        if (wwwAuthenticateIter == response.headers.end())
             return false;
 
         header::WWWAuthenticate wwwAuthenticateHeader;
-        wwwAuthenticateHeader.parse( wwwAuthenticateIter->second );
-        if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
+        wwwAuthenticateHeader.parse(wwwAuthenticateIter->second);
+        if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic)
         {
-            header::BasicAuthorization basicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() );
+            header::BasicAuthorization basicAuthorization(userName.toLatin1(), userPassword.toLatin1());
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
                 nx_http::HttpHeader(
-                    header::Authorization::NAME,
-                    basicAuthorization.serialized() ) );
+                    authorizationHeaderName,
+                    basicAuthorization.serialized()));
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-                m_url,
+                m_contentLocationUrl,
                 m_request.requestLine.method,
-                m_userName.toLatin1(),
-                m_userPassword.toLatin1(),
+                userName.toLatin1(),
+                userPassword.toLatin1(),
                 boost::optional<BufferType>(),
                 std::move(wwwAuthenticateHeader),
-                std::move(basicAuthorization) );
-            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
+                std::move(basicAuthorization));
+            AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
         }
-        else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
+        else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
         {
             header::DigestAuthorization digestAuthorizationHeader;
-            if( !calcDigestResponse(
+            if (!calcDigestResponse(
                     m_request.requestLine.method,
-                    m_userName.toUtf8(),
+                    userName.toUtf8(),
                     m_authType != authDigestWithPasswordHash
-                        ? m_userPassword.toUtf8()
+                        ? userPassword.toUtf8()
                         : boost::optional<nx_http::BufferType>(),
                     m_authType == authDigestWithPasswordHash
-                        ? m_userPassword.toLatin1()
+                        ? userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
-                    m_url.path().toUtf8(),
+                    m_contentLocationUrl.path().toUtf8(),
                     wwwAuthenticateHeader,
-                    &digestAuthorizationHeader ) )
+                    &digestAuthorizationHeader))
             {
                 return false;
             }
             BufferType authorizationStr;
-            digestAuthorizationHeader.serialize( &authorizationStr );
+            digestAuthorizationHeader.serialize(&authorizationStr);
 
             nx_http::insertOrReplaceHeader(
                 &m_request.headers,
-                nx_http::HttpHeader( header::Authorization::NAME, authorizationStr ) );
+                nx_http::HttpHeader(authorizationHeaderName, authorizationStr));
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-                m_url,
+                m_contentLocationUrl,
                 m_request.requestLine.method,
-                m_userName.toLatin1(),
+                userName.toLatin1(),
                 m_authType == authDigestWithPasswordHash
                     ? boost::optional<BufferType>()
-                    : boost::optional<BufferType>(m_userPassword.toLatin1()),
+                    : boost::optional<BufferType>(userPassword.toLatin1()),
                 m_authType == authDigestWithPasswordHash
-                    ? boost::optional<BufferType>(m_userPassword.toLatin1())
+                    ? boost::optional<BufferType>(userPassword.toLatin1())
                     : boost::optional<BufferType>(),
                 std::move(wwwAuthenticateHeader),
-                std::move(digestAuthorizationHeader) );
-            AuthInfoCache::instance()->cacheAuthorization( m_authCacheItem );
+                std::move(digestAuthorizationHeader));
+            AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
         }
         else
         {
             return false;
         }
 
-        doSomeCustomLogic( response, &m_request );
+        doSomeCustomLogic(response, &m_request);
 
-        m_authorizationTried = true;
-        initiateHttpMessageDelivery( m_url );
+        if (isProxy)
+            m_proxyAuthorizationTried = true;
+        else
+            m_authorizationTried = true;
+        initiateHttpMessageDelivery();
         return true;
     }
 
     void AsyncHttpClient::doSomeCustomLogic(
         const nx_http::Response& response,
-        Request* const request )
+        Request* const request)
     {
         //TODO #ak this method is not part of http, so it should not be in this class
 
-        if( m_authType == authDigestWithPasswordHash )
+        if (m_authType == authDigestWithPasswordHash)
             return;
 
-        auto realmIter = response.headers.find( Qn::REALM_HEADER_NAME );
-        if( realmIter == response.headers.end() )
+        auto realmIter = response.headers.find(Qn::REALM_HEADER_NAME);
+        if (realmIter == response.headers.end())
             return;
 
         //calculating user's digest with new realm
-        const auto newRealmDigest = calcHa1( m_userName.toUtf8(), realmIter->second, m_userPassword.toUtf8() );
+        const auto newRealmDigest = calcHa1(m_userName.toUtf8(), realmIter->second, m_userPassword.toUtf8());
         const auto cryptSha512Hash = linuxCryptSha512(
             m_userPassword.toUtf8(),
-            generateSalt( LINUX_CRYPT_SALT_LENGTH ) );
+            generateSalt(LINUX_CRYPT_SALT_LENGTH));
 
         nx_http::insertOrReplaceHeader(
             &request->headers,
-            HttpHeader( Qn::HA1_DIGEST_HEADER_NAME, newRealmDigest ) );
+            HttpHeader(Qn::HA1_DIGEST_HEADER_NAME, newRealmDigest));
         nx_http::insertOrReplaceHeader(
             &request->headers,
-            HttpHeader( Qn::CRYPT_SHA512_HASH_HEADER_NAME, cryptSha512Hash ) );
+            HttpHeader(Qn::CRYPT_SHA512_HASH_HEADER_NAME, cryptSha512Hash));
         nx_http::insertOrReplaceHeader(
             &request->headers,
-            HttpHeader( Qn::REALM_HEADER_NAME, realmIter->second ) );
+            HttpHeader(Qn::REALM_HEADER_NAME, realmIter->second));
     }
 
-    const char* AsyncHttpClient::toString( State state )
+    namespace {
+
+    struct SharedState
     {
-        switch( state )
+        QMetaObject::Connection qtConnection;
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
+    };
+
+    } // namespace 
+
+    template<typename ... Args>
+    void AsyncHttpClient::doHttpOperation(
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler,
+        void(AsyncHttpClient::*func)(Args...),
+        Args... args)
+    {
+        auto sharedState = std::make_shared<SharedState>();
+        sharedState->completionHandler = std::move(completionHandler);
+        auto* qtConnectionPtr = &sharedState->qtConnection;
+        *qtConnectionPtr = QObject::connect(
+            this, &AsyncHttpClient::done,
+            [this, sharedState = std::move(sharedState)](
+                AsyncHttpClientPtr httpClient)
+            {
+                sharedState->completionHandler(httpClient);
+                disconnect(sharedState->qtConnection);
+            });
+        (this->*func)(args...);
+    }
+
+    const char* AsyncHttpClient::toString(State state)
+    {
+        switch (state)
         {
-            case sInit:
-                return "init";
-            case sWaitingConnectToHost:
-                return "waitingConnectToHost";
-            case sSendingRequest:
-                return "sendingRequest";
-            case sReceivingResponse:
-                return "receivingResponse";
-            case sResponseReceived:
-                return "responseReceived";
-            case sReadingMessageBody:
-                return "readingMessageBody";
-            case sFailed:
-                return "failed";
-            case sDone:
-                return "done";
-            default:
-                return "unknown";
+        case sInit:
+            return "init";
+        case sWaitingConnectToHost:
+            return "waitingConnectToHost";
+        case sSendingRequest:
+            return "sendingRequest";
+        case sReceivingResponse:
+            return "receivingResponse";
+        case sResponseReceived:
+            return "responseReceived";
+        case sReadingMessageBody:
+            return "readingMessageBody";
+        case sFailed:
+            return "failed";
+        case sDone:
+            return "done";
+        default:
+            return "unknown";
         }
     }
 
@@ -950,6 +1367,11 @@ namespace nx_http
         return m_authCacheItem;
     }
 
+    void AsyncHttpClient::forceEndOfMsgBody()
+    {
+        m_forcedEof = true;
+        m_httpStreamReader.forceEndOfMsgBody();
+    }
 
     /**********************************************************
     * utils
@@ -1012,7 +1434,7 @@ namespace nx_http
             SystemError::ErrorCode osErrorCode,
             int statusCode,
             nx_http::StringType,
-            nx_http::BufferType msgBody )
+            nx_http::BufferType msgBody)
         {
             completionHandler(osErrorCode, statusCode, msgBody);
         };
@@ -1038,7 +1460,7 @@ namespace nx_http
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,
         int* const statusCode,
-        nx_http::BufferType* const msgBody )
+        nx_http::BufferType* const msgBody)
     {
         bool done = false;
         SystemError::ErrorCode resultingErrorCode = SystemError::noError;
@@ -1047,18 +1469,18 @@ namespace nx_http
         downloadFileAsync(
             url,
             [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done]
-            ( SystemError::ErrorCode errorCode, int _statusCode, const nx_http::BufferType& _msgBody ) {
-                resultingErrorCode = errorCode;
-                *statusCode = _statusCode;
-                *msgBody = _msgBody;
-                std::unique_lock<std::mutex> lk( mtx );
-                done = true;
-                condVar.notify_all();
-            } );
+        (SystemError::ErrorCode errorCode, int _statusCode, const nx_http::BufferType& _msgBody) {
+            resultingErrorCode = errorCode;
+            *statusCode = _statusCode;
+            *msgBody = _msgBody;
+            std::unique_lock<std::mutex> lk(mtx);
+            done = true;
+            condVar.notify_all();
+        });
 
-        std::unique_lock<std::mutex> lk( mtx );
-        while( !done )
-            condVar.wait( lk );
+        std::unique_lock<std::mutex> lk(mtx);
+        while (!done)
+            condVar.wait(lk);
 
         return resultingErrorCode;
     }
@@ -1087,12 +1509,12 @@ namespace nx_http
             httpClientHolder->disconnect(nullptr, static_cast<const char *>(nullptr));
             httpClientHolder.reset();
 
-            if( httpClient->failed() )
+            if (httpClient->failed())
                 return callback(SystemError::connectionReset, nx_http::StatusCode::ok);
 
             const auto response = httpClient->response();
             const auto statusLine = response->statusLine;
-            if((statusLine.statusCode != nx_http::StatusCode::ok)
+            if ((statusLine.statusCode != nx_http::StatusCode::ok)
                 && (statusLine.statusCode != nx_http::StatusCode::partialContent))
             {
                 return callback(SystemError::noError, statusLine.statusCode);
@@ -1141,7 +1563,7 @@ namespace nx_http
             , nx_http::HttpHeaders(), callback, authType, user, password);
 
         std::unique_lock<std::mutex> guard(mutex);
-        while(!done)
+        while (!done)
             waiter.wait(guard);
 
         return result;

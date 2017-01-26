@@ -1,7 +1,5 @@
 #include "light_motion_archive_connection.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "utils/common/util.h"
 
 QnLightMotionArchiveConnection::QnLightMotionArchiveConnection(const QnMetaDataLightVector& data, int channel):
@@ -45,5 +43,3 @@ QnMetaDataV1Ptr QnLightMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
     return m_lastResult;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

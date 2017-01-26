@@ -1,8 +1,6 @@
 #ifndef __THUMBNAILS_ARCHIVE_DELEGATE_H
 #define __THUMBNAILS_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include "avi_archive_delegate.h"
 
 class QnThumbnailsArchiveDelegate: public QnAbstractArchiveDelegate
@@ -32,10 +30,10 @@ private:
     qint64 m_frameStep;
     qint64 m_lastMediaTime;
     QnAbstractArchiveDelegatePtr m_baseDelegate;
+    int m_nextChannelNum;
+    int m_channelCount;
 };
 
 typedef QSharedPointer<QnThumbnailsArchiveDelegate> QnThumbnailsArchiveDelegatePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif

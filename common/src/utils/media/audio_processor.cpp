@@ -1,7 +1,5 @@
 #include "audio_processor.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 static inline short clip_short(int v)
 {
     if (v < -32768)
@@ -34,8 +32,8 @@ static void down_mix_to_stereo(T *data, int channels, int len)
             rl = input[4];
             rr = input[5];
 
-            /* Postings on Doom9 say that Dolby specifically says the LFE (.1) 
-             * channel should usually be ignored during downmixing to Dolby ProLogic II, 
+            /* Postings on Doom9 say that Dolby specifically says the LFE (.1)
+             * channel should usually be ignored during downmixing to Dolby ProLogic II,
              * with quotes from official Dolby documentation. */
             Q_UNUSED(lfe);
 
@@ -51,25 +49,6 @@ static void down_mix_to_stereo(T *data, int channels, int len)
         input += channels;
     }
 }
-
-// =======================================================================
-int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
-{
-    if (ctx->channels <= 2)
-        return size;
-
-    if (ctx->sample_fmt == AV_SAMPLE_FMT_U8)
-        down_mix_to_stereo<qint8>((qint8*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S16)
-        down_mix_to_stereo<qint16>((qint16*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
-        down_mix_to_stereo<qint32>((qint32*)data, ctx->channels, size);
-    else
-        NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
-
-    return size / ctx->channels * 2;
-}
-
 
 QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
@@ -147,5 +126,3 @@ QnCodecAudioFormat QnAudioProcessor::float2int32(QnByteArray& audio, QnCodecAudi
     format.setSampleType(QnAudioFormat::SignedInt);
     return format;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

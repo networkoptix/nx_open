@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
     Q_OBJECT
@@ -33,7 +33,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
         return static_cast<StoragePool>
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
+    static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
+
+    static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 
 } // namespace QnServer
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
-

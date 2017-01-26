@@ -10,7 +10,6 @@
 #include <mutex>
 #include <vector>
 
-#define QN_NO_KEYWORD_UNUSED
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
@@ -18,8 +17,8 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/thread.h>
-
 
 namespace nx_http {
 
@@ -129,7 +128,7 @@ TEST_F(HttpClientServerTest, FileDownload)
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         //emulating error response from server
-        if (rand() % 3 == 0)
+        if (nx::utils::random::number(0, 2) == 0)
             continue;
         nx_http::BufferType msgBody;
         while (!client.eof())
@@ -249,7 +248,7 @@ TEST(HttpClientTest, DISABLED_mjpgRetrieval)
         ASSERT_TRUE(client.response());
         ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         nx::Buffer newMsgBody;
-        const int readsCount = (rand() % 10) + 10;
+        const int readsCount = nx::utils::random::number(10, 20);
         for (int i = 0; i < readsCount; ++i)
             newMsgBody += client.fetchMessageBodyBuffer();
         continue;
@@ -274,7 +273,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
             nx::Buffer msgBody;
 
             std::unique_lock<std::mutex> lk(mtx);
-            int pos = rand() % clients.size();
+            int pos = nx::utils::random::number<int>(0, (int)clients.size() - 1);
             while (clients[pos].first)
                 pos = (pos+1) % clients.size();
             auto client = clients[pos].second;
@@ -282,7 +281,7 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
             lk.unlock();
 
             ASSERT_TRUE(client->doGet(url));
-            if ((rand() % 3 != 0) && !client->eof() && (client->response() != nullptr))
+            if ((nx::utils::random::number(0, 2) != 0) && !client->eof() && (client->response() != nullptr))
             {
                 const auto statusCode = client->response()->statusLine.statusCode;
                 ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
@@ -307,18 +306,18 @@ TEST(HttpClientTest, DISABLED_fileDownload2)
     while (beginTime + TEST_DURATION > std::chrono::steady_clock::now())
     {
         std::unique_lock<std::mutex> lk(mtx);
-        const int pos = rand() % clients.size();
+        const int pos = nx::utils::random::number<int>(0, (int)clients.size() - 1);
         auto client = clients[pos].second;
         lk.unlock();
-        
+
         client->pleaseStop();
         client.reset();
-        
+
         lk.lock();
         clients[pos].second = std::make_shared<nx_http::HttpClient>();
         clients[pos].first = false;
         lk.unlock();
-        
+
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 

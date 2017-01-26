@@ -1,0 +1,234 @@
+#include <gtest/gtest.h>
+
+#include <thread>
+
+#include <nx/utils/random.h>
+#include <nx/utils/std/thread.h>
+#include <nx/utils/thread/sync_queue.h>
+
+namespace nx {
+namespace utils {
+namespace test {
+
+class SyncQueue:
+    public ::testing::Test
+{
+protected:
+    std::thread push(
+        std::vector<int> values,
+        std::chrono::milliseconds delay = std::chrono::milliseconds(0))
+    {
+        return std::thread(
+            [this, values = std::move(values), delay]()
+            {
+                for (const auto& value: values)
+                {
+                    if (delay.count())
+                        std::this_thread::sleep_for(delay);
+
+                    queue.push(value);
+                }
+            });
+    }
+
+    int popSum(
+        std::chrono::milliseconds timeout = std::chrono::milliseconds(100))
+    {
+        int total(0);
+        while (auto value = queue.pop(timeout))
+            total += *value;
+
+        return total;
+    }
+
+    virtual void TearDown() override
+    {
+        ASSERT_TRUE(queue.isEmpty());
+    }
+
+    nx::utils::SyncQueue<int> queue;
+};
+
+TEST_F(SyncQueue, SinglePushPop)
+{
+    auto pusher = push({1, 2, 3, 4, 5});
+    ASSERT_EQ(popSum(), 15);
+    pusher.join();
+}
+
+TEST_F(SyncQueue, MultiPushPop)
+{
+    auto pusher1 = push({1, 2, 3, 4, 5});
+    auto pusher2 = push({5, 5, 5});
+    auto pusher3 = push({3, 3, 3, 3});
+
+    ASSERT_EQ(popSum(), 42);
+
+    pusher1.join();
+    pusher2.join();
+    pusher3.join();
+}
+
+TEST_F(SyncQueue, TimedPop)
+{
+    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100)));
+    auto pusher = push({1, 2}, std::chrono::milliseconds(500));
+
+    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early
+    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 1); // just in time
+
+    ASSERT_FALSE(queue.pop(std::chrono::milliseconds(100))); // too early again
+    ASSERT_EQ(*queue.pop(std::chrono::milliseconds(500)), 2); // just in time
+
+    pusher.join();
+}
+
+class SyncQueueTermination:
+    public ::testing::Test
+{
+public:
+    SyncQueueTermination()
+    {
+    }
+
+    ~SyncQueueTermination()
+    {
+        deinit();
+    }
+
+protected:
+    void givenReaderThreadBlockedOnPopFromQueue()
+    {
+        initializeReaders(1U);
+    }
+
+    void givenMultipleReadersThreadBlockedOnPopFromQueue()
+    {
+        initializeReaders(nx::utils::random::number<std::size_t>(2, 10));
+    }
+
+    void havingAskedRandomReaderToTerminate()
+    {
+        terminateReader(m_readers.begin()->first);
+    }
+
+    void havingAskedReaderToTerminate()
+    {
+        ASSERT_EQ(1U, m_readers.size());
+        terminateAllReaders();
+    }
+
+    void verifyThatReaderHasStopped()
+    {
+        // If reader did not stop we will hang in destructor, so doing nothing here.
+    }
+    
+    void verifyThatOtherReadersAreWorking()
+    {
+        QnMutex mutex;
+        QnWaitCondition condition;
+        boost::optional<QueueReaderId> disturbedReader;
+
+        setOnElementPoppedHandler(
+            [&mutex, &condition, &disturbedReader](QueueReaderId readerId, int /*value*/)
+            {
+                QnMutexLocker lock(&mutex);
+                disturbedReader = readerId;
+                condition.wakeAll();
+            });
+
+        while (!m_readers.empty())
+        {
+            m_syncQueue.push(1);
+            QnMutexLocker lock(&mutex);
+            while (!disturbedReader)
+                condition.wait(lock.mutex());
+            terminateReader(*disturbedReader);
+            disturbedReader.reset();
+        }
+    }
+
+private:
+    struct ReaderContext
+    {
+        nx::utils::thread thread;
+    };
+
+    using Readers = std::map<QueueReaderId, ReaderContext>;
+    using OnElementReadHandler = 
+        nx::utils::MoveOnlyFunc<void(QueueReaderId /*readerId*/, int /*value*/)>;
+
+    Readers m_readers;
+    nx::utils::SyncQueue<int> m_syncQueue;
+    OnElementReadHandler m_onElementReadHandler;
+
+    void initializeReaders(std::size_t readerCount)
+    {
+        for (std::size_t i = 0; i < readerCount; ++i)
+        {
+            m_readers.emplace(
+                i,
+                ReaderContext{nx::utils::thread(
+                    std::bind(&SyncQueueTermination::readThreadMain, this, i))});
+        }
+    }
+
+    void readThreadMain(std::size_t readerId)
+    {
+        for (;;)
+        {
+            boost::optional<int> x = m_syncQueue.pop(readerId);
+            if (!x)
+                break;
+            if (m_onElementReadHandler)
+                m_onElementReadHandler(readerId, *x);
+        }
+    }
+
+    void terminateAllReaders()
+    {
+        for (Readers::iterator it = m_readers.begin(); it != m_readers.end();)
+        {
+            m_syncQueue.addReaderToTerminatedList(it->first);
+            it->second.thread.join();
+            it = m_readers.erase(it);
+        }
+    }
+
+    void terminateReader(QueueReaderId readerId)
+    {
+        auto it = m_readers.find(readerId);
+        ASSERT_NE(m_readers.end(), it);
+        m_syncQueue.addReaderToTerminatedList(it->first);
+        it->second.thread.join();
+        m_readers.erase(it);
+    }
+
+    void setOnElementPoppedHandler(OnElementReadHandler onElementReadHandler)
+    {
+        m_onElementReadHandler = std::move(onElementReadHandler);
+    }
+
+    void deinit()
+    {
+        ASSERT_TRUE(m_readers.empty());
+    }
+};
+
+TEST_F(SyncQueueTermination, SingleReaderTermination)
+{
+    givenReaderThreadBlockedOnPopFromQueue();
+    havingAskedReaderToTerminate();
+    verifyThatReaderHasStopped();
+}
+
+TEST_F(SyncQueueTermination, OtherReadersKeepWorkingAfterOneHasBeenTerminated)
+{
+    givenMultipleReadersThreadBlockedOnPopFromQueue();
+    havingAskedRandomReaderToTerminate();
+    verifyThatOtherReadersAreWorking();
+}
+
+} // namespace test
+} // namespace utils
+} // namespace nx

@@ -20,7 +20,7 @@ typedef std::shared_ptr<const QnMediaContext> QnConstMediaContextPtr;
 class QnMediaContext
 {
 public:
-    virtual ~QnMediaContext() {};
+    virtual ~QnMediaContext() = default;
 
     /// Clone all fields except extradata, which is set empty (null).
     virtual QnMediaContext* cloneWithoutExtradata() const = 0;
@@ -41,7 +41,7 @@ public:
     /// Fields defined in ffmpeg's AVCodecContext.
     //@{
 
-    virtual CodecID getCodecId() const = 0;
+    virtual AVCodecID getCodecId() const = 0;
     virtual AVMediaType getCodecType() const = 0;
 
     /// Nul-terminated ASCII string; can be null.
@@ -50,9 +50,9 @@ public:
     /// Can be null (empty) or contain getExtradataSize() bytes.
     virtual const quint8* getExtradata() const = 0;
     virtual int getExtradataSize() const = 0;
-    
+
     /// Can be null (empty) or contain QnAvCodecHelper::kMatrixLength items.
-    virtual const quint16* getIntraMatrix() const = 0; 
+    virtual const quint16* getIntraMatrix() const = 0;
 
     /// Can be null (empty) or contain QnAvCodecHelper::kMatrixLength items.
     virtual const quint16* getInterMatrix() const = 0;
@@ -72,6 +72,7 @@ public:
     virtual int getBitRate() const = 0;
     virtual quint64 getChannelLayout() const = 0;
     virtual int getBlockAlign() const = 0;
+    virtual int getFrameSize() const = 0;
 
     //@}
 };

@@ -11,16 +11,18 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "https://itunes.apple.com/eg/app/hd-witness/id648369716?mt=8",
+    url: "https://itunes.apple.com/eg/app/id1090087835",
     title: "iOS Client",
     target: "new" // new|frame
 });
 
 Config.helpLinks.push({
-    url: "https://play.google.com/store/apps/details?id=com.networkoptix.hdwitness",
+    url: "https://play.google.com/store/apps/details?id=ru.ipera.flyviewmobile",
     title: "Android Client",
     target: "new" // new|frame
 });
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
+Config.productName = 'FlyView';
+Config.cloud.productName = 'FlyView Cloud';

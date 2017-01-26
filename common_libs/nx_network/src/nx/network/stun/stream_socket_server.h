@@ -25,17 +25,17 @@ public:
     SocketServer(
         const MessageDispatcher* dispatcher,
         bool sslRequired,
-        SocketFactory::NatTraversalType natTraversalRequired
-            = SocketFactory::NatTraversalType::nttAuto )
+        network::NatTraversalSupport natTraversalSupport
+            = network::NatTraversalSupport::enabled)
     :
-        base_type(sslRequired, natTraversalRequired),
+        base_type(sslRequired, natTraversalSupport),
         m_dispatcher(dispatcher)
     {
     }
 
     ~SocketServer()
     {
-        pleaseStop();
+        pleaseStopSync();
     }
 
 protected:

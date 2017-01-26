@@ -6,6 +6,7 @@
 
 #include <utils/common/util.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/random.h>
 
 #include "../resource/av_resource.h"
 
@@ -36,7 +37,7 @@ public:
         this->m_streamParam.insert("image_top", 0);
         this->m_streamParam.insert("image_bottom", maxResolution.height());
 
-        this->m_streamParam.insert("streamID", random(1, 32000));
+        this->m_streamParam.insert("streamID", nx::utils::random::number(1, 32000));
 
         this->m_streamParam.insert("resolution", lit("full"));
         this->m_streamParam.insert("Quality", lit("11"));

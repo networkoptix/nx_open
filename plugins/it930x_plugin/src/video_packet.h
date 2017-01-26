@@ -11,13 +11,15 @@
 namespace ite
 {
     //!
-    class VideoPacket : public nxcip::MediaDataPacket, public ObjectCounter<VideoPacket>
+    class VideoPacket : public DefaultRefCounter<nxcip::MediaDataPacket>
     {
-        DEF_REF_COUNTER
-
     public:
         VideoPacket(const uint8_t * data, unsigned size, uint64_t ts);
         virtual ~VideoPacket();
+
+        // nxcip::PluginInterface
+
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
 
         // nxpl::VideoDataPacket
 

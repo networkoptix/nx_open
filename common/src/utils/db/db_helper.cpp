@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QtSql/QSqlError>
 #include "qcoreapplication.h"
+#include <nx/utils/log/log.h>
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
     //and no concurrent transactions supported. Maybe QnDbConnection?
@@ -33,6 +34,28 @@ bool QnDbHelper::QnDbTransaction::beginTran()
     return true;
 }
 
+bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
+{
+    QSqlQuery enableWalQuery(*sqlDb);
+    enableWalQuery.prepare(lit("PRAGMA journal_mode = WAL"));
+    if( !enableWalQuery.exec() )
+    {
+        qWarning() << "Failed to enable WAL mode on sqlLite database!" << enableWalQuery.lastError().text();
+        return false;
+    }
+
+    QSqlQuery enableFKQuery(*sqlDb);
+    enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
+    if( !enableFKQuery.exec() )
+    {
+        qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
+
 void QnDbHelper::QnDbTransaction::rollback()
 {
     m_database.rollback();
@@ -44,9 +67,17 @@ bool QnDbHelper::QnDbTransaction::commit()
 {
     bool rez = m_database.commit();
     if (rez)
+    {
         m_mutex.unlock();
+    }
     else
-        qWarning() << m_database.databaseName()<< ". Commit failed:" << m_database.lastError().text(); // do not unlock mutex. Rollback is expected
+    {
+        // do not unlock mutex. Rollback is expected
+        NX_LOG(lit("%1. Commit failed: %2").
+            arg(m_database.databaseName()).
+            arg(m_database.lastError().text()), cl_logERROR);
+    }
+
     return rez;
 }
 
@@ -67,7 +98,11 @@ bool QnDbHelper::QnDbTransactionLocker::commit()
 {
     m_committed = m_tran->commit();
     if (!m_committed)
-        qWarning() << m_tran->m_database.databaseName()<< ". Commit failed:" << m_tran->m_database.lastError().text();
+    {
+        NX_LOG(lit("%1. Commit failed: %2").
+            arg(m_tran->m_database.databaseName()).
+            arg(m_tran->m_database.lastError().text()), cl_logERROR);
+    }
     return m_committed;
 }
 
@@ -110,11 +145,15 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, c
     return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
 }
 
-bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details) {
+bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
+{
     if (!query->exec())
     {
-        qWarning() << details << query->lastError().text();
-        NX_ASSERT(false, details, "Unable to execute SQL query");
+        auto error = query->lastError();
+        NX_ASSERT(error.type() != QSqlError::StatementError,
+            error.text() + lit(":\n") + query->lastQuery());
+        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(error.text()), cl_logERROR);
+
         return false;
     }
     return true;
@@ -124,7 +163,7 @@ bool QnDbHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, cons
 {
     if (!query->prepare(queryStr))
     {
-        qWarning() << details << query->lastError().text();
+        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(query->lastError().text()), cl_logERROR);
         NX_ASSERT(false, details, "Unable to prepare SQL query");
         return false;
     }
@@ -162,9 +201,12 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     if (!file.open(QFile::ReadOnly))
         return false;
     QByteArray data = file.readAll();
+    if (data.isEmpty())
+        return true;
+
     if( !execSQLScript( data, database ) )
     {
-        qWarning() << "Error while executing SQL file" << fileName;
+        NX_LOG(lit("Error while executing SQL file %1").arg(fileName), cl_logERROR);
         return false;
     }
     return true;
@@ -189,7 +231,7 @@ void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
 {
     QFileInfo dirInfo(fileName);
     if (!QDir().mkpath(dirInfo.absoluteDir().path()))
-        qWarning() << "can't create folder for sqlLite database!\n" << fileName;
+        NX_LOG(lit("can't create folder for sqlLite database!\n %1").arg(fileName), cl_logERROR);
     m_connectionName = dbname;
     m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
     m_sdb.setDatabaseName(fileName);
@@ -232,6 +274,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
+            NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
             if (!execSQLFile(fileName, m_sdb))
@@ -244,8 +287,10 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
             insQuery.addBindValue(qApp->applicationName());
             insQuery.addBindValue(fileName);
             insQuery.addBindValue(QDateTime::currentDateTime());
-            if (!insQuery.exec()) {
-                qWarning() << Q_FUNC_INFO << __LINE__ << insQuery.lastError();
+            if (!insQuery.exec())
+            {
+                NX_LOG(lit("Can not register SQL update. SQL error: %1").
+                    arg(insQuery.lastError().text()), cl_logERROR);
                 return false;
             }
         }

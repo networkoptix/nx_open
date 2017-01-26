@@ -37,7 +37,7 @@ public:
         const QnAbstractVideoDecoderPlugin& decoderFactory );
 
     //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
-    virtual PixelFormat GetPixelFormat() const override;
+    virtual AVPixelFormat GetPixelFormat() const override;
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const override;
     //!Implementation of QnAbstractVideoDecoder::decode

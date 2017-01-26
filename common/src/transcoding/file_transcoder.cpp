@@ -16,6 +16,7 @@
 
 #include <core/resource/resource.h>
 #include <utils/fs/file.h>
+#include <nx/utils/random.h>
 
 
 class DummyResource
@@ -29,9 +30,12 @@ public:
         return Qn::Online;
     }
 
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode) override {
+    virtual void setStatus(
+        Qn::ResourceStatus newStatus,
+        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override
+    {
         Q_UNUSED(newStatus);
-        Q_UNUSED(silenceMode);
+        Q_UNUSED(reason);
         //do nothing
     }
 };
@@ -76,7 +80,7 @@ bool FileTranscoder::addTag( const QString& name, const QString& value )
 }
 
 bool FileTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -87,7 +91,7 @@ bool FileTranscoder::setVideoCodec(
 }
 
 bool FileTranscoder::setAudioCodec(
-    CodecID codec,
+    AVCodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod )
 {
     return m_transcoder.setAudioCodec( codec, transcodeMethod ) == QnTranscoder::OperationResult::Success;
@@ -115,7 +119,8 @@ bool FileTranscoder::setTagValue(
         return false;
 
     QDir srcFileDir = QFileInfo(srcFilePath).dir();
-    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch()).arg(rand()).arg(QLatin1String(formatCtx->iformat->name));
+    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch())
+            .arg(nx::utils::random::number()).arg(QLatin1String(formatCtx->iformat->name));
     const QString& tempFilePath = lit("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
 
     //setting audio/video codecID

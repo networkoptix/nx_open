@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
-#include <utils/common/cpp14.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "functional_tests/test_setup.h"
 #include "functional_tests/system_ut.h"
@@ -23,6 +23,7 @@ class CdbLoadTest
 {
 };
 
+// Disabled since not ready yet.
 TEST_F(CdbLoadTest, DISABLED_manyConnections)
 {
     constexpr const int connectionCount = 10000;
@@ -47,7 +48,7 @@ TEST_F(CdbLoadTest, DISABLED_manyConnections)
     {
         auto& connection = connections[i];
 
-        connection = std::make_unique<nx::network::TCPSocket>();
+        connection = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(connection->setNonBlockingMode(true));
         ASSERT_TRUE(connection->setSendTimeout(sendTimeoutMs));
         connection->connectAsync(endpoint(), onConnectDone);

@@ -46,7 +46,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
     qint64 timeMs = timeUsec/1000;
 
-    if (m_index.isEmpty() || timeMs < m_index.front().start + m_indexHeader.startTime || 
+    if (m_index.isEmpty() || timeMs < m_index.front().start + m_indexHeader.startTime ||
         timeMs > m_index.last().start + +m_index.last().duration + m_indexHeader.startTime)
     {
         qint64 prevMaxDate = m_maxDate;
@@ -66,7 +66,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
     if (m_lastTimeMs != (qint64)AV_NOPTS_VALUE && timeMs > m_lastTimeMs)
         m_indexItr = std::upper_bound(m_indexItr, m_index.end(), timeMs - m_indexHeader.startTime);
-    else 
+    else
         m_indexItr = std::upper_bound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
 
     if (m_indexItr > m_index.begin())
@@ -82,7 +82,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
     if (!isMotionLoaded)
     {
         m_owner->fillFileNames(timeMs, &m_motionFile, 0);
-        if (m_motionFile.open(QFile::ReadOnly)) 
+        if (m_motionFile.open(QFile::ReadOnly))
         {
             m_motionLoadedStart = qMax(0, indexOffset - 512);
             m_motionFile.seek(m_motionLoadedStart * MOTION_DATA_RECORD_SIZE);
@@ -112,7 +112,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
 // ----------------------- QnMotionArchive ------------------
 
-QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel): 
+QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel):
 m_resource(resource),
 m_channel(channel),
 m_lastDetailedData(new QnMetaDataV1()),
@@ -181,7 +181,7 @@ QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msSt
     QnTimePeriodList rez;
     QFile motionFile, indexFile;
     quint8* buffer = (quint8*) qMallocAligned(MOTION_DATA_RECORD_SIZE * 1024, 32);
-    simd128i mask[MD_WIDTH * MD_HEIGHT / 128];
+    simd128i mask[Qn::kMotionGridWidth * Qn::kMotionGridHeight / 128];
     int maskStart, maskEnd;
 
     NX_ASSERT(((unsigned long)mask)%16 == 0);
@@ -273,7 +273,7 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
 {
     QFile indexFile;
     fillFileNames(msTime, 0, &indexFile);
-    if (!indexFile.open(QFile::ReadOnly)) 
+    if (!indexFile.open(QFile::ReadOnly))
         return false;
     return loadIndexFile(index, indexHeader, indexFile);
 }
@@ -381,7 +381,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         m_detailedMotionFile.seek(m_middleRecordNum*MOTION_DATA_RECORD_SIZE);
         m_minMotionTime = qMin(m_minMotionTime, timestamp);
     }
-    else if (m_middleRecordNum >= 0 && m_middleRecordNum < m_index.size()) 
+    else if (m_middleRecordNum >= 0 && m_middleRecordNum < m_index.size())
     {
         qint64 timeInIndex = m_index[m_middleRecordNum].start + m_indexHeader.startTime;
         if (timestamp > timeInIndex) {

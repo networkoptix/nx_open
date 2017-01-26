@@ -1,6 +1,6 @@
 project(nx_email)
 set(PROJECT_SHORTNAME "nx_email")
-set(PROJECT_LONGNAME "${nxtool.company.name} E-Mail Library")
+set(PROJECT_LONGNAME "${short.company.name} E-Mail Library")
 
 find_sources(src)
 ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)

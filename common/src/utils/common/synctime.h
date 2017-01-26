@@ -11,6 +11,7 @@
 
 #include <plugins/plugin_container_api.h>
 #include <nx/utils/singleton.h>
+#include <QtCore/QElapsedTimer>
 
 /** 
  * Time provider that is synchronized with Server.
@@ -49,7 +50,7 @@ signals:
     void timeChanged();
 
 private:
-    QTime m_timer;
+    QElapsedTimer m_timer;
     qint64 m_lastReceivedTime;
     QnMutex m_mutex;
     qint64 m_lastWarnTime;

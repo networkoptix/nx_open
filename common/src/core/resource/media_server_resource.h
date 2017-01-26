@@ -3,12 +3,12 @@
 #include <QtCore/QElapsedTimer>
 
 #include <api/media_server_connection.h>
-
 #include <utils/common/value_cache.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-
+#include <utils/common/safe_direct_connection.h>
 #include <core/resource/resource.h>
+#include <nx/network/socket_common.h>
 
 #include "api/server_rest_connection_fwd.h"
 
@@ -17,11 +17,13 @@ namespace nx_http {
 }
 class SocketAddress;
 
-class QnMediaServerResource : public QnResource
+class QnMediaServerResource:
+    public QnResource,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
-    Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
 
+    typedef QnResource base_type;
 public:
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
@@ -34,10 +36,7 @@ public:
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
 
-    void setApiUrl(const QString& apiUrl);
-    QString getApiUrl() const;
-
-    void setNetAddrList(const QList<SocketAddress>&);
+    void setNetAddrList(const QList<SocketAddress>& value);
     QList<SocketAddress> getNetAddrList() const;
 
     // TODO: #dklychkov Use QSet instead of QList
@@ -47,7 +46,22 @@ public:
     void setIgnoredUrls(const QList<QUrl> &urls);
     QList<QUrl> getIgnoredUrls() const;
 
+    boost::optional<SocketAddress> getCloudAddress() const;
+
+    virtual QString getUrl() const override;
+    virtual void setUrl(const QString& url) override;
+    // TODO: #dklychkov remove this, use getPrimaryAddress() instead.
     quint16 getPort() const;
+    virtual QUrl getApiUrl() const;
+
+    SocketAddress getPrimaryAddress() const;
+    void setPrimaryAddress(const SocketAddress &getPrimaryAddress);
+
+    bool isSslAllowed() const;
+    void setSslAllowed(bool sslAllowed);
+
+    /** Get list of all available server addresses. */
+    QList<SocketAddress> getAllAvailableAddresses() const;
 
     /*
     * Deprecated server rest connection
@@ -62,9 +76,7 @@ public:
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
 
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
-
-    void setPrimaryAddress(const SocketAddress &primaryAddress);
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     Qn::PanicMode getPanicMode() const;
     void setPanicMode(Qn::PanicMode panicMode);
@@ -86,12 +98,7 @@ public:
 
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
-
-    QString getSystemName() const;
-    void setSystemName(const QString &systemName);
-
-    QnModuleInformation getModuleInformation() const;
-    void setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
+    virtual QnModuleInformation getModuleInformation() const;
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
@@ -102,51 +109,49 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
-    /** Original GUID is set for incompatible servers when their getGuid() getter returns a fake GUID.
-     * This allows us to hold temporary fake server duplicates in the resource pool.
-     */
-    QnUuid getOriginalGuid() const;
-    /** Set original GUID. No signals emmited after this method because the original GUID should not be changed after resource creation. */
-    void setOriginalGuid(const QnUuid &guid);
-    static bool isFakeServer(const QnResourcePtr &resource);
-
-    virtual void setStatus(Qn::ResourceStatus newStatus, bool silenceMode = false) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();
 
+    /**
+     * This function need for client. Client may insert fakeServer with overriden ID and
+     * reference to a original ID. So, its overrid this call for fakeMediaServer
+     */
+    virtual QnUuid getOriginalGuid() const { return getId();  }
+protected:
+    static QString apiUrlScheme(bool sslAllowed);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);
     void atResourceChanged();
     void at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key);
+    void at_cloudSettingsChanged();
 
 signals:
     void portChanged(const QnResourcePtr &resource);
-    void apiUrlChanged(const QnResourcePtr &resource);
     void serverFlagsChanged(const QnResourcePtr &resource);
     //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
     void auxUrlsChanged(const QnResourcePtr &resource);
     void versionChanged(const QnResourcePtr &resource);
-    void systemNameChanged(const QnResourcePtr &resource);
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
+    void apiUrlChanged(const QnResourcePtr& resource);
+    void primaryAddressChanged(const QnResourcePtr& resource);
 private:
+    SocketAddress m_primaryAddress;
     QnMediaServerConnectionPtr m_apiConnection; // deprecated
     rest::QnConnectionPtr m_restConnection; // new one
-    QString m_apiUrl;
     QList<SocketAddress> m_netAddrList;
     QList<QUrl> m_additionalUrls;
     QList<QUrl> m_ignoredUrls;
+    bool m_sslAllowed = false;
     Qn::ServerFlags m_serverFlags;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
-    QString m_systemName;
     QVector<nx_http::AsyncHttpClientPtr> m_runningIfRequests;
     QElapsedTimer m_statusTimer;
     QString m_authKey;
-
-    QnUuid m_originalGuid;
 
     CachedValue<Qn::PanicMode> m_panicModeCache;
 
@@ -155,5 +160,5 @@ private:
     Qn::PanicMode calculatePanicMode() const;
 };
 
-Q_DECLARE_METATYPE(QnMediaServerResourcePtr);
-Q_DECLARE_METATYPE(QnMediaServerResourceList);
+Q_DECLARE_METATYPE(QnMediaServerResourcePtr)
+Q_DECLARE_METATYPE(QnMediaServerResourceList)

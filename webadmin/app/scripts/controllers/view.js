@@ -1,7 +1,12 @@
 'use strict';
 
 angular.module('webadminApp').controller('ViewCtrl',
-    function ($scope,$rootScope,$location,$routeParams,mediaserver,cameraRecords,$timeout,$q,$sessionStorage,$localStorage) {
+    function ($scope, $rootScope, $location, $routeParams, mediaserver, cameraRecords, $poll, $q,
+              $sessionStorage, $localStorage, currentUser) {
+
+        if(currentUser === null ){
+            return; // Do nothing, user wasn't authorised
+        }
 
         var channels = {
             Auto: 'lo',
@@ -30,9 +35,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         var isAdmin = false;
-        var canViewLive = false;
         var canViewArchive = false;
-        var availableCameras = null;
 
         var timeCorrection = 0;
         var minTimeLag = 2000;// Two seconds
@@ -468,14 +471,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                         return false;
                     }
 
-                    if(isAdmin){
-                        return true;
-                    }
-
-                    if(availableCameras){
-                        return availableCameras.indexOf(camera.id)>=0;
-                    }
-                    return false;
+                    return true;
                 }
 
                 function cameraSorter(camera) {
@@ -671,19 +667,24 @@ angular.module('webadminApp').controller('ViewCtrl',
         }
 
         var firstTime = true;
-        var timer = false;
         function reloader(){
-            reloadTree().then(function(){
+            return reloadTree().then(function(){
                 $scope.selectCameraById($scope.storage.cameraId  , firstTime && $location.search().time || false, !firstTime);
                 firstTime = false;
-                timer = $timeout(reloader, reloadInterval);
             },function(error){
                 if(typeof(error.status) === 'undefined' || !error.status) {
                     console.error(error);
                 }
-                timer = $timeout(reloader, reloadInterval); // Some error happened. Maybe, request was aborted. Wait and try again
             });
         }
+
+        var poll = $poll(reloader,reloadInterval);
+        $scope.$on( '$destroy', function( ) {
+            killSubscription();
+            $poll.cancel(poll);
+        });
+
+
         var desktopCameraTypeId = null;
         function requestResourses() {
             mediaserver.getResourceTypes().then(function (result) {
@@ -722,51 +723,16 @@ angular.module('webadminApp').controller('ViewCtrl',
             }
         });
 
-        mediaserver.getCurrentUser().then(function(result){
-            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-            canViewLive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewLivePermission);
-            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalViewArchivePermission);
-
-            if(!canViewLive){
-                return;
-            }
+        mediaserver.getCurrentUser().then(function(result) {
+            isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalEditServersPermissions)>=0);
+            canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
 
             var userId = result.data.reply.id;
 
-            if(isAdmin){
-                requestResourses(); //Show  whole tree
-                return;
-            }
-            mediaserver.getLayouts().then(function(data){
-
-                availableCameras = _.chain(data.data).
-                    filter(function(layout){
-                        return layout.parentId === userId;
-                    }).
-                    map(function(layout){
-                        return layout.items;
-                    }).
-                    flatten().
-                    map(function(item){
-                        return item.resourceId;
-                    }).uniq().value();
-
-                requestResourses();
-            });
-
-
-
+            requestResourses(); //Show  whole tree
         });
 
-        $scope.$on(
-            '$destroy',
-            function( ) {
-                $timeout.cancel(timer);
-            }
-        );
-
-
-        $rootScope.$on('$routeChangeStart', function (event, next/*, current*/) {
+        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
             $scope.selectCameraById(next.params.cameraId, $location.search().time || false);
         });
 

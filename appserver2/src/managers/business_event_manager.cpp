@@ -17,10 +17,10 @@ namespace ec2
 {
 
 template<class QueryProcessorType>
-QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcessorType* const queryProcessor )
+QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(QueryProcessorType* const queryProcessor , const Qn::UserAccessData &userAccessData)
 :
-    QnBusinessEventNotificationManager( ),
-    m_queryProcessor( queryProcessor )
+  m_queryProcessor( queryProcessor ),
+  m_userAccessData(userAccessData)
 {
 }
 
@@ -30,13 +30,17 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
 {
     const int reqID = generateRequestID();
 
-    auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules) {
+    auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiBusinessRuleDataList& rules)
+    {
         QnBusinessEventRuleList outData;
         if( errorCode == ErrorCode::ok )
             fromApiToResourceList(rules, outData);
         handler->done( reqID, errorCode, outData);
     };
-    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRules, nullptr, queryDoneHandler);
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+        QnUuid,
+        ApiBusinessRuleDataList,
+        decltype(queryDoneHandler)> ( ApiCommand::getEventRules, QnUuid(), queryDoneHandler);
     return reqID;
 }
 
@@ -44,14 +48,16 @@ template<class T>
 int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-
     if (rule->id().isNull())
         rule->setId(QnUuid::createUuid());
 
-    auto tran = prepareTransaction( ApiCommand::saveBusinessRule, rule );
+    ApiBusinessRuleData params;
+    fromResourceToApi(rule, params);
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SaveBusinessRuleHandler::done, handler, reqID, _1, rule ) );
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::saveEventRule, params,
+        std::bind( &impl::SaveBusinessRuleHandler::done, handler, reqID, _1, rule ) );
 
     return reqID;
 }
@@ -60,9 +66,10 @@ template<class T>
 int QnBusinessEventManager<T>::deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction( ApiCommand::removeBusinessRule, ruleId );
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::removeEventRule, ApiIdData(ruleId),
+        std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
     return reqID;
 }
 
@@ -70,9 +77,11 @@ template<class T>
 int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
+    auto tran = prepareTransaction( ApiCommand::broadcastAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran);
-    QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    QnConcurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }
 
@@ -80,9 +89,11 @@ template<class T>
 int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
+    auto tran = prepareTransaction( ApiCommand::execAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
-    QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    QnConcurrent::run(
+        Ec2ThreadPool::instance(),
+        std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }
 
@@ -90,11 +101,13 @@ template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules);
-    fromResourceListToApi(QnBusinessEventRule::getDefaultRules(), tran.params.defaultRules);
+    ApiResetBusinessRuleData params;
+    fromResourceListToApi(QnBusinessEventRule::getDefaultRules(), params.defaultRules);
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::resetEventRules, params,
+        std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
 
     return reqID;
 }
@@ -107,24 +120,7 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
     return tran;
 }
 
-
-template<class T>
-QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
-{
-    QnTransaction<ApiBusinessRuleData> tran(command);
-    fromResourceToApi(resource, tran.params);
-    return tran;
-}
-
-template<class T>
-QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnUuid& id )
-{
-    QnTransaction<ApiIdData> tran(command);
-    tran.params.id = id;
-    return tran;
-}
-
-template class QnBusinessEventManager<ServerQueryProcessor>;
+template class QnBusinessEventManager<ServerQueryProcessorAccess>;
 template class QnBusinessEventManager<FixedUrlClientQueryProcessor>;
 
 }

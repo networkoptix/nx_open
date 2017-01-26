@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <?include BuildVars.wxi ?>
+
+    <Bundle
+            Name="$(var.productName) Server"
+            Manufacturer="$(var.companyName)"
+            Version="$(var.releaseVersionFull)"
+            IconSourceFile="favicon.ico"
+            UpgradeCode="$(var.serverBundleUpgradeCode)"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+
+        <Variable Name="InstallServerOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" /> 
+            <Payload SourceFile="installer_bg.png" /> 
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
+
+            <bal:WixExtendedBootstrapperApplication
+                SuppressOptionsUI="yes"
+                SuppressRepair="yes"
+                ShowFilesInUse="yes"
+                LicenseUrl="License.html" />
+        </BootstrapperApplicationRef>
+
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeServer.wxl" />
+
+        <Chain DisableSystemRestore="yes">
+            <PackageGroupRef Id="ServerPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

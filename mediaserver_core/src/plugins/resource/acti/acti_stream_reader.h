@@ -23,7 +23,6 @@ protected:
     virtual void pleaseStop() override;
 private:
     int getActiChannelNum() const;
-    QString formatBitrateStr(int bitrateKbps) const;
     QString formatResolutionStr(const QSize& resolution) const;
 private:
     QnMulticodecRtpReader m_multiCodec;

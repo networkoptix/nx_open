@@ -28,7 +28,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     ec2::ApiResourceParamWithRefDataList outData;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     //TODO: #GDM SafeMode
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(params, &outData);
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params, &outData);
 
     if (rez != ec2::ErrorCode::ok)
     {
@@ -60,7 +60,7 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
     //TODO #ak m_requestInProgress is redundant here, data can be saved to
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone
     //TODO: #GDM SafeMode
-    int requestId = conn->getResourceManager()->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
+    int requestId = conn->getResourceManager(Qn::kSystemAccess)->save(data, this, &QnResourcePropertyDictionary::onRequestDone);
     m_requestInProgress.insert(requestId, std::move(data));
     return requestId;
 }
@@ -147,6 +147,21 @@ void QnResourcePropertyDictionary::clear(const QVector<QnUuid>& idList)
         [&idList]( const ec2::ApiResourceParamWithRefData& param ) -> bool {
             return idList.contains( param.resourceId );
         } );
+}
+
+void QnResourcePropertyDictionary::markAllParamsDirty(const QnUuid& resourceId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_items.find(resourceId);
+    if (itr == m_items.end())
+        return;
+    const QnResourcePropertyList& properties = itr.value();
+    QnResourcePropertyList& modifiedProperties = m_modifiedItems[resourceId];
+    for (auto itrProperty = properties.begin(); itrProperty != properties.end(); ++itrProperty)
+    {
+        if (!modifiedProperties.contains(itrProperty.key()))
+            modifiedProperties[itrProperty.key()] = itrProperty.value();
+    }
 }
 
 bool QnResourcePropertyDictionary::setValue(const QnUuid& resourceId, const QString& key, const QString& value, bool markDirty, bool replaceIfExists)

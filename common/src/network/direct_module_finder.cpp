@@ -7,14 +7,16 @@
 
 #include <network/module_information.h>
 #include <network/networkoptixmodulerevealcommon.h>
+#include <network/connection_validator.h>
 
 #include <nx_ec/ec_proto_version.h>
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
+
 #include <nx/utils/log/log.h>
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 
@@ -54,7 +56,6 @@ namespace {
 QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
 :
     QObject(parent),
-    m_compatibilityMode(false),
     m_maxConnections(kDefaultMaxConnections),
     m_checkTimer(new QTimer(this))
 {
@@ -62,16 +63,10 @@ QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
     connect(m_checkTimer, &QTimer::timeout, this, &QnDirectModuleFinder::at_checkTimer_timeout);
 }
 
-void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
-    m_compatibilityMode = compatibilityMode;
-}
-
-bool QnDirectModuleFinder::isCompatibilityMode() const {
-    return m_compatibilityMode;
-}
-
 void QnDirectModuleFinder::addUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::addUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::addUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     QUrl locUrl = trimmedUrl(url);
     if (!m_urls.contains(locUrl)) {
@@ -81,7 +76,9 @@ void QnDirectModuleFinder::addUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::removeUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::removeUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::removeUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     QUrl locUrl = trimmedUrl(url);
     m_urls.remove(locUrl);
@@ -90,7 +87,9 @@ void QnDirectModuleFinder::removeUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
-    NX_LOG(lit("QnDirectModuleFinder::checkUrl %1").arg(url.toString()), cl_logDEBUG2);
+    NX_LOG(lit("QnDirectModuleFinder::checkUrl %1")
+            .arg(url.toString(QUrl::RemovePassword)),
+        cl_logDEBUG2);
 
     if (QThread::currentThread() != thread()) {
         QMetaObject::invokeMethod(this, "checkUrl", Q_ARG(QUrl, url));
@@ -120,7 +119,7 @@ void QnDirectModuleFinder::pleaseStop() {
     m_checkTimer->stop();
     m_requestQueue.clear();
     for (QnAsyncHttpClientReply *reply: m_activeRequests) {
-        reply->asyncHttpClient()->terminate();
+        reply->asyncHttpClient()->pleaseStopSync();
         reply->deleteLater();
     }
     m_activeRequests.clear();
@@ -169,13 +168,14 @@ void QnDirectModuleFinder::activateRequests() {
     }
 }
 
-void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
+void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
+{
     reply->deleteLater();
 
     QUrl url = reply->url();
 
     NX_LOG(lit("QnDirectModuleFinder. Received %1 reply from %2")
-        .arg(!reply->isFailed()).arg(url.toString()), cl_logDEBUG1);
+        .arg(!reply->isFailed()).arg(url.toString()), cl_logDEBUG2);
 
     const auto replyIter = m_activeRequests.find(url);
     NX_ASSERT(replyIter != m_activeRequests.end(), "Reply that is not in the set of active requests has finished! (1)", Q_FUNC_INFO);
@@ -202,21 +202,25 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     if (moduleInformation.id.isNull())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received empty module id from %1. Ignoring reply...")
-            .arg(url.toString()), cl_logDEBUG1);
+            .arg(url.toString()), cl_logDEBUG2);
         return;
     }
 
     if (moduleInformation.type != QnModuleInformation::nxMediaServerId())
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply with improper module type (%1) id from %2. Ignoring reply...")
-            .arg(moduleInformation.type).arg(url.toString()), cl_logDEBUG1);
+            .arg(moduleInformation.type).arg(url.toString()), cl_logDEBUG2);
         return;
     }
 
-    if (!m_compatibilityMode && moduleInformation.customization != QnAppInfo::customizationName())
+    auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
+    if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
-        NX_LOG(lit("QnDirectModuleFinder. Received reply from imcompatible server: url %1, customization %2. Ignoring reply...")
-            .arg(url.toString()).arg(moduleInformation.customization), cl_logDEBUG1);
+        NX_LOG(lit("QnDirectModuleFinder. Received reply from incompatible server: url %1, "
+            "customization %2. Ignoring reply...")
+            .arg(url.toString())
+            .arg(moduleInformation.customization),
+             cl_logDEBUG2);
         return;
     }
 
@@ -224,7 +228,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply) {
     m_lastPingByUrl[url] = m_elapsedTimer.elapsed();
 
     NX_LOG(lit("QnDirectModuleFinder. Received success reply from url %1")
-        .arg(url.toString()), cl_logDEBUG1);
+        .arg(url.toString()), cl_logDEBUG2);
 
     emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
 }
@@ -235,7 +239,9 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (const QUrl &url: m_urls) {
-        NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1").arg(url.toString()), cl_logDEBUG2);
+        NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1")
+                .arg(url.toString(QUrl::RemovePassword)),
+            cl_logDEBUG2);
 
         const bool alive = currentTime - m_lastPingByUrl.value(url) < maxPingTimeout().count();
         const qint64 lastCheck = m_lastCheckByUrl.value(url);
@@ -243,14 +249,20 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
             if (currentTime - lastCheck < aliveCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (1) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(aliveCheckInterval().count()), cl_logDEBUG2);
+                        .arg(url.toString(QUrl::RemovePassword))
+                        .arg(currentTime - lastCheck)
+                        .arg(aliveCheckInterval().count()),
+                    cl_logDEBUG2);
                 continue;
             }
         } else {
             if (currentTime - lastCheck < discoveryCheckInterval().count())
             {
                 NX_LOG(lit("QnDirectModuleFinder::at_checkTimer_timeout. url %1. Not adding (2) since %2 < %3")
-                    .arg(url.toString()).arg(currentTime - lastCheck).arg(discoveryCheckInterval().count()), cl_logDEBUG2);
+                        .arg(url.toString(QUrl::RemovePassword))
+                        .arg(currentTime - lastCheck)
+                        .arg(discoveryCheckInterval().count()),
+                    cl_logDEBUG2);
                 continue;
             }
         }

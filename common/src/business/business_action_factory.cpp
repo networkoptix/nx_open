@@ -22,15 +22,13 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
-
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
     runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 
     result->setParams(rule->actionParams());
-    result->setResources(toIdList(resList));
+    result->setResources(rule->actionResources());
 
     if (QnBusiness::hasToggleState(event->getEventType()) && QnBusiness::hasToggleState(rule->actionType())) {
         QnBusiness::EventState value = state != QnBusiness::UndefinedState ? state : event->getToggleState();
@@ -67,8 +65,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::SayTextAction:
             break;
 
-        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
-        case QnBusiness::CameraOutputOnceAction:    return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
+        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(runtimeParams));
         case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
@@ -77,6 +74,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::ExecutePtzPresetAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
+        case QnBusiness::ExecHttpRequestAction:
             break;
 
         default:

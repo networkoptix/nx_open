@@ -72,6 +72,7 @@ private:
     QnMutex m_mutex;
 
 private:
+    QnSecurityCamResourcePtr cameraFromConnection(const ClientConnectionInfo& info);
     void log(const QByteArray &message, const ClientConnectionInfo &info) const;
 };
 

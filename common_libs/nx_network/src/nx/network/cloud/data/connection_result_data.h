@@ -1,53 +1,46 @@
-/**********************************************************
-* Dec 23, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H
-#define NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H
+#pragma once
 
 #include "stun_message_data.h"
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/systemerror.h>
-
 
 namespace nx {
 namespace hpm {
 namespace api {
 
-enum class UdpHolePunchingResultCode
+enum class NatTraversalResultCode
 {
-    ok,
+    ok = 0,
     noResponseFromMediator,
     mediatorReportedError,
     targetPeerHasNoUdpAddress,
     noSynFromTargetPeer,
-    udtConnectFailed
+    udtConnectFailed,
+    tcpConnectFailed,
+    endpointVerificationFailure
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UdpHolePunchingResultCode)
-//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorDetail), (lexical))
-//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
-void NX_NETWORK_API serialize(const UdpHolePunchingResultCode&, QString*);
-
-class NX_NETWORK_API ConnectionResultRequest
-:
-    public StunMessageData
+class NX_NETWORK_API ConnectionResultRequest:
+    public StunRequestData
 {
 public:
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::connectionResult;
+
     nx::String connectSessionId;
-    UdpHolePunchingResultCode resultCode;
+    NatTraversalResultCode resultCode;
     SystemError::ErrorCode sysErrorCode;
 
     ConnectionResultRequest();
-
-    void serialize(nx::stun::Message* const message);
-    bool parse(const nx::stun::Message& message);
+    virtual void serializeAttributes(nx::stun::Message* const message) override;
+    virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-}   //api
-}   //hpm
-}   //nx
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
 
-#endif  //NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H
+} // namespace api
+} // namespace hpm
+} // namespace nx
+
+void NX_NETWORK_API serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);

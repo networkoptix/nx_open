@@ -88,31 +88,33 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 {
     QnMutexLocker lk(&m_mutex);
 
-    auto tcpServerSocket = std::make_unique<nx::network::TCPServerSocket>();
+    auto tcpServerSocket =  SocketFactory::createStreamServerSocket();
     if (!tcpServerSocket->setReuseAddrFlag(true) ||
         !tcpServerSocket->bind(localAddress) ||
         !tcpServerSocket->listen())
     {
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
-
-    //auto sslServerSocket = std::make_unique<nx::network::SslServerSocket>(
-    //    tcpServerSocket.release(), true );
 
     auto multipleServerSocket = std::make_unique<nx::network::MultipleServerSocket>();
     if (!multipleServerSocket->addSocket(std::move(tcpServerSocket)))
-        return nullptr;
-
-#ifdef LISTEN_ON_UDT_SOCKET
-    auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
-    if (!udtServerSocket->setReuseAddrFlag(true) ||
-        !udtServerSocket->bind(localAddress) ||
-        !udtServerSocket->listen())
     {
+        setLastError(SystemError::getLastOSErrorCode());
         return nullptr;
     }
-    multipleServerSocket->addSocket(std::move(udtServerSocket));
-#endif
+
+    #ifdef LISTEN_ON_UDT_SOCKET
+        auto udtServerSocket = std::make_unique<nx::network::UdtStreamServerSocket>();
+        if (!udtServerSocket->setReuseAddrFlag(true) ||
+            !udtServerSocket->bind(localAddress) ||
+            !udtServerSocket->listen() ||
+            !multipleServerSocket->addSocket(std::move(udtServerSocket)))
+        {
+            setLastError(SystemError::getLastOSErrorCode());
+            return nullptr;
+        }
+    #endif
 
     m_multipleServerSocket = multipleServerSocket.get();
     m_serverSocket = std::move(multipleServerSocket);
@@ -120,11 +122,10 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
     if (m_boundToCloud)
         updateCloudConnectState(&lk);
 
-
     #ifdef ENABLE_SSL
-        m_serverSocket.reset( new nx::network::SslServerSocket( m_serverSocket.release(), true ) );
+        if (sslNeeded)
+            m_serverSocket.reset(new nx::network::SslServerSocket(m_serverSocket.release(), true));
     #endif
-
 
    return m_serverSocket.get();
 }
@@ -132,11 +133,16 @@ AbstractStreamServerSocket* QnUniversalTcpListener::createAndPrepareSocket(
 void QnUniversalTcpListener::destroyServerSocket(
     AbstractStreamServerSocket* serverSocket)
 {
-    QnMutexLocker lk(&m_mutex);
+    decltype(m_serverSocket) serverSocketToDestroy;
+    {
+        QnMutexLocker lk(&m_mutex);
 
-    NX_ASSERT(m_serverSocket.get() == serverSocket);
-    m_serverSocket->pleaseStopSync();
-    m_serverSocket.reset();
+        NX_ASSERT(m_serverSocket.get() == serverSocket);
+        std::swap(m_serverSocket, serverSocketToDestroy);
+    }
+
+    serverSocketToDestroy->pleaseStopSync();
+    serverSocketToDestroy.reset();
 }
 
 void QnUniversalTcpListener::onCloudBindingStatusChanged(
@@ -145,7 +151,7 @@ void QnUniversalTcpListener::onCloudBindingStatusChanged(
     QnMutexLocker lk(&m_mutex);
 
     const bool isBound = static_cast<bool>(cloudCredentials);
-    const bool newCredentialsAreTheSame = 
+    const bool newCredentialsAreTheSame =
         cloudCredentials
         ? (m_cloudCredentials == *cloudCredentials)
         : false;
@@ -176,6 +182,7 @@ void QnUniversalTcpListener::updateCloudConnectState(
     if (!m_multipleServerSocket)
         return;
 
+    NX_LOGX(lm("Update cloud connect state (boundToCloud=%1)").arg(m_boundToCloud), cl_logINFO);
     if (m_boundToCloud)
     {
         NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);

@@ -3,6 +3,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/config.h>
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
@@ -29,8 +30,19 @@ QnAbstractMediaStreamDataProvider::~QnAbstractMediaStreamDataProvider()
     stop();
 }
 
+void QnAbstractMediaStreamDataProvider::setNeedKeyData(int channel)
+{
+    QnMutexLocker mtx( &m_mutex );
 
+    if (m_numberOfchannels == 0)
+    {
+        m_numberOfchannels = dynamic_cast<QnMediaResource*>(
+            m_mediaResource.data())->getVideoLayout(this)->channelCount();
+    }
 
+    if (m_numberOfchannels < CL_MAX_CHANNEL_NUMBER && channel < m_numberOfchannels)
+        m_gotKeyFrame[channel] = 0;
+}
 
 void QnAbstractMediaStreamDataProvider::setNeedKeyData()
 {
@@ -39,7 +51,7 @@ void QnAbstractMediaStreamDataProvider::setNeedKeyData()
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-    
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         m_gotKeyFrame[i] = 0;
 }
@@ -57,7 +69,7 @@ bool QnAbstractMediaStreamDataProvider::needKeyData() const
     if (m_numberOfchannels==0)
         m_numberOfchannels = dynamic_cast<QnMediaResource*>(m_mediaResource.data())->getVideoLayout(this)->channelCount();
 
-   
+
     for (int i = 0; i < m_numberOfchannels; ++i)
         if (m_gotKeyFrame[i]==0)
             return true;
@@ -201,7 +213,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
         {
             resetTimeCheck();
         }
-        else if ((quint64)m_lastMediaTime[channel] != AV_NOPTS_VALUE)
+        else if (m_lastMediaTime[channel] != AV_NOPTS_VALUE)
         {
             qint64 timeDiff = media->timestamp - m_lastMediaTime[channel];
             // if timeDiff < -N it may be time correction or dayling time change
@@ -212,7 +224,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
                     arg(timeDiff).
                     arg(m_mediaResource ? m_mediaResource->getName() : QString()).
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
-                    cl_logDEBUG1);
+                    cl_logDEBUG2);
 
                 media->timestamp = m_lastMediaTime[channel] + MIN_FRAME_DURATION;
             }

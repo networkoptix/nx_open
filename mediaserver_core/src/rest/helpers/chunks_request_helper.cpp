@@ -4,31 +4,36 @@
 
 #include "recorder/storage_manager.h"
 #include "core/resource/camera_bookmark.h"
-#include <core/resource/camera_resource.h>
-#include <core/resource/camera_bookmark.h>
+#include <core/resource/security_cam_resource.h>
 #include "motion/motion_helper.h"
-#include <utils/serialization/json.h>
-#include <utils/serialization/json_functions.h>
-#include "core/resource_management/resource_pool.h"
-
-#include <vector>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/json_functions.h>
 
 QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 {
     // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
     QnTimePeriodList periods;
-    switch (request.periodsType) {
-    case Qn::MotionContent:
+    switch (request.periodsType)
+    {
+        case Qn::MotionContent:
         {
-            QList<QRegion> motionRegions = QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
-            periods = QnMotionHelper::instance()->matchImage(motionRegions, request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel);
+            QList<QRegion> motionRegions =
+                QJson::deserialized<QList<QRegion>>(request.filter.toUtf8());
+            periods = QnMotionHelper::instance()->matchImage(
+                motionRegions, request.resList, request.startTimeMs, request.endTimeMs,
+                request.detailLevel);
+            break;
         }
-        break;
-    case Qn::RecordingContent:
-    default:
-        periods = QnStorageManager::getRecordedPeriods(request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel, request.keepSmallChunks,
-            QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog, request.limit);
-        break;
+
+        case Qn::RecordingContent:
+        default:
+            periods = QnStorageManager::getRecordedPeriods(
+                request.resList, request.startTimeMs, request.endTimeMs, request.detailLevel,
+                request.keepSmallChunks,
+                QList<QnServer::ChunksCatalog>()
+                    << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
+                request.limit);
+            break;
     }
 
     return periods;

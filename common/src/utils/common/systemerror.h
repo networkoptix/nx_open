@@ -50,6 +50,7 @@ namespace SystemError
     static const ErrorCode notSupported = WSAEOPNOTSUPP;
     static const ErrorCode msgTooLarge = WSAEMSGSIZE;
     static const ErrorCode dnsServerFailure = DNS_ERROR_RCODE_SERVER_FAILURE;
+    static const ErrorCode already = WSAEALREADY;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -75,6 +76,7 @@ namespace SystemError
     static const ErrorCode notSupported = EOPNOTSUPP;
     static const ErrorCode msgTooLarge = EMSGSIZE;
     static const ErrorCode dnsServerFailure = 0x0F000001;
+    static const ErrorCode already = EALREADY;
 #endif
 
     //!Returns error code of previous system call

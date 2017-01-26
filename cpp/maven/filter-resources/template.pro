@@ -4,16 +4,22 @@ NAME=${project.artifactId}
 BUILDLIB = ${buildLib}
 LIBTYPE = ${libtype}
 TEMPLATE = ${template}
-TARGET = ${project.artifactId}
+TARGET = ${targetName}
+GUID = ${guid}
 VERSION = ${release.version}
-unix {
-    VERSION = ${linux.release.version}
-}
 QT = ${qt.libs}
-ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
+BOX = ${box}
+ROOT_DIR = $$clean_path("${root.dir}")
+
+CONFIG += unversioned_soname unversioned_libname
 
 ## GLOBAL CONFIGURATIONS
-CONFIG += precompile_header $$BUILDLIB $$LIBTYPE
+!ios|equals(TEMPLATE, app) {
+    CONFIG += precompile_header
+} else {
+    QMAKE_CXXFLAGS += -include ${project.build.sourceDirectory}/StdAfx.h
+}
+CONFIG += $$BUILDLIB $$LIBTYPE
 CONFIG -= flat
 CONFIG += no_private_qt_headers_warning
 CONFIG += c++14
@@ -28,7 +34,6 @@ if (android | ios) {
     DISABLE_THIRD_PARTY \
     DISABLE_COLDSTORE \
     DISABLE_MDNS \
-    DISABLE_ARCHIVE \
     DISABLE_DATA_PROVIDERS \
     DISABLE_SOFTWARE_MOTION_DETECTION \
     DISABLE_SENDMAIL \
@@ -52,6 +57,7 @@ CONFIG(debug, debug|release) {
     #Warning: enabling ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK can significantly reduce performance
     #DEFINES += ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
   }
+  CONFIG += qml_debug
 }
 else {
   CONFIGURATION=release
@@ -70,11 +76,7 @@ else {
   }
 }
 
-win* {
-  OUTPUT_PATH = ${libdir}/${arch}
-} else {
-  OUTPUT_PATH = ${libdir}
-}
+OUTPUT_PATH = $$clean_path("${libdir}")
 
 isEmpty(BUILDLIB) {
   DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
@@ -102,42 +104,39 @@ MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 
-#temporary hardcode
-CONFIG(debug, debug|release) {
-    LIBS += -L${qt.dir}-debug/lib
-}
-else {
-    LIBS += -L${qt.dir}/lib
-}
-
 LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
-    LIBS += -Wl,-rpath-link,${qt.dir}/lib
+    LIBS += -Wl,-rpath-link,$$clean_path("${qt.dir}")/lib
     LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
-                ${root.dir}/common/src \
-                ${root.dir}/common_libs/nx_network/src \
-                ${root.dir}/common_libs/nx_utils/src \
-                ${root.dir}/common_libs/nx_streaming/src \
-                ${root.dir}/common_libs/nx_media/src \
-                ${root.dir}/common_libs/nx_audio/src \
-                ${libdir}/include \
+                $$ROOT_DIR/common/src \
+                $$ROOT_DIR/common_libs/nx_network/src \
+                $$ROOT_DIR/common_libs/nx_fusion/src \
+                $$ROOT_DIR/common_libs/nx_utils/src \
+                $$ROOT_DIR/common_libs/nx_streaming/src \
+                $$ROOT_DIR/common_libs/nx_media/src \
+                $$ROOT_DIR/common_libs/nx_audio/src \
+                $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
 win* {
     DEFINES += \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
+        NX_FUSION_API=__declspec(dllimport) \
+        NX_VMS_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
         NX_NETWORK_API= \
         NX_UTILS_API= \
+        NX_FUSION_API= \
+        NX_VMS_UTILS_API= \
         UDT_API= \
 
 }
@@ -193,7 +192,7 @@ CONFIG += ${arch}
 
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
-  ICON = ${customization.dir}/icons/hdw_logo.ico
+  ICON = ${customization.dir}/icons/favicon.ico
   LIBS += ${windows.oslibs}
   DEFINES += NOMINMAX= ${windows.defines}
   DEFINES += ${global.windows.defines}
@@ -220,20 +219,27 @@ win* {
 unix: {
   DEFINES += QN_EXPORT=
   clang {
-    QMAKE_CXXFLAGS += -std=c++14 -Wno-c++14-extensions
+    QMAKE_CXXFLAGS += -Wno-c++14-extensions -Wno-inconsistent-missing-override
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
+!win32 {
+  ext_debug2.target  = $(DESTDIR)$(TARGET).debug
+  ext_debug2.depends = $(DESTDIR)$(TARGET)
+  ext_debug2.commands = $$QMAKE_OBJCOPY --only-keep-debug $(DESTDIR)/$(TARGET) $(DESTDIR)/$(TARGET).debug; $(STRIP) -g $(DESTDIR)/$(TARGET); $$QMAKE_OBJCOPY --add-gnu-debuglink=$(DESTDIR)/$(TARGET).debug $(DESTDIR)/$(TARGET); touch $(DESTDIR)/$(TARGET).debug
+
+  ext_debug.depends = $(DESTDIR)$(TARGET).debug
+
+  QMAKE_EXTRA_TARGETS += ext_debug ext_debug2
+}
+
 ## LINUX
-unix:!android:!mac {
+linux*:!android {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += ${compiler.arguments}
-    QMAKE_CFLAGS += ${compiler.arguments}
-    QMAKE_LFLAGS += ${compiler.arguments}
     !clang: {
         QMAKE_CXXFLAGS += -msse2
     } else {
@@ -243,18 +249,22 @@ unix:!android:!mac {
   } else {
     LIBS -= -lssl
     LIBS += ${linux.arm.oslibs}
-    QMAKE_CXXFLAGS += -ggdb1 -fno-omit-frame-pointer
+    QMAKE_CXXFLAGS += -fno-omit-frame-pointer
+    CONFIG(release, debug|release)|!equals(BOX, tx1): QMAKE_CXXFLAGS += -ggdb1
   }
   QMAKE_LFLAGS += -rdynamic
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+
+  equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
 }
 
 ## MAC OS
 macx {
   QMAKE_INFO_PLIST = Info.plist
-  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.7 -stdlib=libc++
+  QMAKE_CXXFLAGS += -msse4.1 -mmacosx-version-min=10.8 -stdlib=libc++
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
   QMAKE_CFLAGS += -msse4.1
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
   LIBS += ${mac.oslibs}
@@ -272,6 +282,10 @@ android {
   LIBS += ${android.oslibs}
 
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
+  # Android mkspec ignores CONFIG+=c++14 and forces -std=c++11.
+  # Replacing the parameter manually.
+  QMAKE_CXXFLAGS -= -std=c++11
+  QMAKE_CXXFLAGS += -std=c++1y
   DEFINES += ${android.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
   CONFIG += no_smart_library_merge
@@ -284,6 +298,7 @@ ios {
     QMAKE_MOC_OPTIONS += -DQ_OS_IOS
     QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
     XCODEBUILD_FLAGS += -jobs 4
+    QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedef
 }
 
 
@@ -293,9 +308,4 @@ CONFIG(debug, debug|release) {
 } else {
   include(dependencies.pri)
 }
-
-
-
-
-
 

@@ -1,9 +1,6 @@
 #define QT_NO_CAST_FROM_ASCII
 
-#include <common/config.h>
-#ifdef __cplusplus
-#   include <common/common_globals.h>
-#endif
+#include <nx/utils/compiler_options.h>
 
 /* Windows headers. */
 #ifdef _WIN32
@@ -27,3 +24,6 @@
 #include <QtWidgets/QAction>
 
 #endif
+
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

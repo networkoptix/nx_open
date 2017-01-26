@@ -5,17 +5,9 @@
 
 #include "crash_server_handler.h"
 
-#ifdef _WIN32
-#include <common/systemexcept_win32.h>
-#endif
-
-#ifdef __linux__
-#include <common/systemexcept_linux.h>
-#endif
-
+#include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/http/httptypes.h>
-
 
 int QnCrashServerHandler::executeGet(
     const QString& /*path*/,

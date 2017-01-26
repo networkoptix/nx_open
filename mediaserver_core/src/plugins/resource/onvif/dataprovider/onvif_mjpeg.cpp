@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "nx/streaming/video_data_packet.h"
+#include <core/resource/camera_resource.h>
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include <nx/network/http/httptypes.h>
@@ -133,7 +134,7 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
         videoData->m_data.finishWriting(-1);
 
-    videoData->compressionType = CODEC_ID_MJPEG;
+    videoData->compressionType = AV_CODEC_ID_MJPEG;
 
     nx_jpg::ImageInfo imgInfo;
     if( nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
@@ -157,23 +158,27 @@ CameraDiagnostics::Result MJPEGStreamReader::openStreamInternal(bool isCameraCon
         return CameraDiagnostics::NoErrorResult();
 
     //QString request = QLatin1String("now.jpg?snap=spush?dummy=1305868336917");
-    QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
+    auto nres = getResource().dynamicCast<QnNetworkResource>();
+	auto virtRes = getResource().dynamicCast<QnVirtualCameraResource>();
 
     mHttpClient.reset( new CLSimpleHTTPClient(nres->getHostAddress(), nres->httpPort() , 2000, nres->getAuth()) );
     CLHttpStatus httpStatus = mHttpClient->doGET(m_request);
+
+	QUrl requestedUrl;
+	requestedUrl.setHost(nres->getHostAddress());
+	requestedUrl.setPort(nres->httpPort());
+	requestedUrl.setScheme(QLatin1String("http"));
+	requestedUrl.setPath(m_request);
+
+	if (virtRes)
+		virtRes->updateSourceUrl(requestedUrl.toString(), getRole());
+	
     switch( httpStatus )
     {
         case CL_HTTP_SUCCESS:
             return CameraDiagnostics::NoErrorResult();
         case CL_HTTP_AUTH_REQUIRED:
-        {
-            QUrl requestedUrl;
-            requestedUrl.setHost( nres->getHostAddress() );
-            requestedUrl.setPort( nres->httpPort() );
-            requestedUrl.setScheme( QLatin1String("http") );
-            requestedUrl.setPath( m_request );
             return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
-        }
         default:
             return CameraDiagnostics::RequestFailedResult(m_request, QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatus)));
     }

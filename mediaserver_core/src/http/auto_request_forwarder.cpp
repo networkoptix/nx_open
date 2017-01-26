@@ -14,12 +14,13 @@
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <nx/utils/log/log.h>
-#include <utils/common/string.h>
+#include <nx/utils/string.h>
 #include <utils/fs/file.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtsp_client.h>
 
 #include "streaming/streaming_params.h"
+#include <network/universal_request_processor.h>
 
 
 static const qint64 USEC_PER_MS = 1000;
@@ -46,6 +47,26 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
         request->headers.find( Qn::CAMERA_GUID_HEADER_NAME ) != request->headers.end() )
     {
         //CAMERA_GUID_HEADER_NAME already present
+        return;
+    }
+
+    if (QnUniversalRequestProcessor::isCloudRequest(*request))
+    {
+        auto servers = qnResPool->getResources<QnMediaServerResource>().filtered(
+            [](const QnMediaServerResourcePtr server)
+            {
+                return server->getServerFlags().testFlag(Qn::SF_HasPublicIP) &&
+                       server->getStatus() == Qn::Online;
+            });
+        if (!servers.isEmpty())
+        {
+            if (addProxyToRequest(request, servers.front()))
+            {
+                NX_LOG(lit("auto_forward. Forwarding request %1 to server %2").
+                    arg(request->requestLine.url.path()).
+                    arg(servers.front()->getId().toString()), cl_logDEBUG2);
+            }
+        }
         return;
     }
 
@@ -79,18 +100,28 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 }
             }
         }
-        if( !serverRes )
-            return; //no current server?
-        if( serverRes->getId() == qnCommon->moduleGUID() )
-            return; //target server is this one
-        NX_LOG(lit("auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4").
-            arg(request->requestLine.url.path()).arg(cameraRes->getId().toString()).
-            arg(timestampMs == -1 ? QString::fromLatin1("live") : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate)).
-            arg(serverRes->getId().toString()), cl_logDEBUG2);
-        request->headers.emplace(
-            Qn::SERVER_GUID_HEADER_NAME,
-            serverRes->getId().toByteArray() );
+        if (addProxyToRequest(request, serverRes))
+        {
+            NX_LOG(lit("auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4").
+                arg(request->requestLine.url.path()).arg(cameraRes->getId().toString()).
+                arg(timestampMs == -1 ? QString::fromLatin1("live") : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate)).
+                arg(serverRes->getId().toString()), cl_logDEBUG2);
+        }
     }
+}
+
+bool QnAutoRequestForwarder::addProxyToRequest(
+    nx_http::Request* const request,
+    const QnMediaServerResourcePtr& serverRes)
+{
+    if (!serverRes)
+        return false;
+    if (serverRes->getId() == qnCommon->moduleGUID())
+        return false; //target server is this one
+    request->headers.emplace(
+        Qn::SERVER_GUID_HEADER_NAME,
+        serverRes->getId().toByteArray());
+    return true;
 }
 
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
@@ -180,14 +211,14 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         if( timeStr.toLower().trimmed() == "latest" )
             return -1;
         else
-            return parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
+            return nx::utils::parseDateTime( timeStr.toLatin1() ) / USEC_PER_MS;
     }
 
     if( urlQuery.hasQueryItem( StreamingParams::START_POS_PARAM_NAME ) )
     {
         //in rtsp "pos" is usec only, no date! In http "pos" is in millis or iso date
         const auto posStr = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME );
-        const auto ts = parseDateTime( posStr );
+        const auto ts = nx::utils::parseDateTime( posStr );
         if( ts == DATETIME_NOW )
             return -1;
         return ts / USEC_PER_MS;

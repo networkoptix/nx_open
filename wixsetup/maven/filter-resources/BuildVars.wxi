@@ -1,8 +1,19 @@
 <Include>
+
+    <?define companyName="${company.name}"?>
+    <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+
+    <?define serverUpgradeCode = "${customization.upgradeCode}"?>
+    <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>
+    <?define clientBundleUpgradeCode = "${customization.clientBundleUpgradeCode}"?>
+    <?define serverBundleUpgradeCode = "${customization.serverBundleUpgradeCode}"?>
+    <?define fullBundleUpgradeCode = "${customization.fullBundleUpgradeCode}"?>
+    <?define nxtoolBundleUpgradeCode = "${customization.nxtoolBundleUpgradeCode}"?>
+
+    <?define cloudHost = "${cloudHost}"?>
+
     <?define arch = "${arch}"?>
     <?define vmax = "${vmax}"?>
-    <?define angle = "${angle}"?>
-    <?define webkit = "${webkit}"?>
 
     <?define customization = "${customization}"?>
     <?define uriProtocol = "${uri.protocol}"?>
@@ -15,12 +26,15 @@
     
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
+    <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>
     <?define clientName = "${product.name}"?>
-    <?define nxtoolName = "${nxtool.company.name} Server Tool"?>
+    <?define clientDisplayName = "${client.display.name}"?>
+    <?define nxtoolName = "${short.company.name} Server Tool"?>
+    <?define launcherVersionFile = "${launcher.version.file}"?>
 
-    <?define productExeName = "${product_name}"?>
+    <?define productExeName = "${product.name}"?>
     <?define clientExeName = "${display.product.name}"?>
-    <?define nxtoolExeName = "${nxtool.company.name} Server Tool"?>
+    <?define nxtoolExeName = "${short.company.name} Server Tool"?>
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
@@ -34,6 +48,9 @@
         <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
         <?define SystemFolderActual = "System64Folder"?>
     <?endif?>
+
+    <?define clientInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Client" ?>
+    <?define nxtoolInstallFullPath="[$(var.ProgramFilesFolder)]${company.name}\${display.product.name}\Nxtool" ?>
 
     <!-- Wix Variables -->
 
@@ -57,9 +74,13 @@
     <?define archSuffix = "x86_x64" ?>
     <?endif?>
 
-    <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-    <?define NxtoolSourceDir="${libdir}/${arch}/bin/${build.configuration}"?>    
-    <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+    <?define SourceDir="${libdir}/bin/${build.configuration}"?>
+    <?define NxtoolSourceDir="${libdir}/bin/${build.configuration}"?>
+    <?define PluginsDir="${libdir}/bin/${build.configuration}/plugins"?>
+    <?define QtDir="${qt.dir}/bin"?>
+    <?define QtPluginsDir="${qt.dir}/plugins"?>
+
+    <?define VC14RedistPath="${VC14RedistPath}"?>
 
     <?define clientDirId = "$(var.customization)_$(var.releaseVersionFull)_Dir"?>
 </Include>

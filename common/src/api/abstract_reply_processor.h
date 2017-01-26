@@ -10,8 +10,8 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/warnings.h>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/compressed_time.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/fusion/serialization/compressed_time.h>
 
 #include "abstract_connection.h"
 
@@ -154,11 +154,10 @@ protected:
 
         T reply;
         if(status == 0) {
-            Qn::SerializationFormat format = 
-                Qn::serializationFormatFromHttpContentType(
-                    nx_http::getHeaderValue(response.response.headers, "Content-Type"));
+            Qn::SerializationFormat format =
+                Qn::serializationFormatFromHttpContentType(response.contentType);
             NX_ASSERT(format != Qn::UnsupportedFormat, Q_FUNC_INFO, "Invalid content-type header");
-            
+
             switch (format) {
             case Qn::JsonFormat:
                 {
@@ -203,7 +202,7 @@ protected:
             reply = QnCompressedTime::deserialized(response.msgBody, T(), &success);
             if (!success)
                 status = 1;
-        } 
+        }
         emitFinished(derived, status, reply, handle, response.errorString);
     }
 

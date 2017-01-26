@@ -11,8 +11,19 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>traytool</artifactId>
     <packaging>pom</packaging>
-    <name>NX Witness Tray Assistant</name>  
+    <name>Nx Witness Tray Assistant</name>  
 
+    <properties>
+        <guid>${traytool.guid}</guid>
+        <product.title>${traytool.name}</product.title>
+        <template>app</template>
+        <qt.libs>core gui widgets</qt.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_utils</global.libs>
+        <windows.oslibs>DbgHelp.lib</windows.oslibs>
+
+        <rdep.packages>any/qtsingleapplication</rdep.packages>
+    </properties>    
+    
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -32,15 +43,5 @@
         </dependency>
     </dependencies>     
 
-    <properties>
-        <guid>${traytool.guid}</guid>
-        <product.title>${traytool.name}</product.title>
-        <product.display.title>${traytool.display.name}</product.display.title>
-        <template>app</template>
-        <qt.libs>core gui widgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils</global.libs>
-        <windows.oslibs>DbgHelp.lib</windows.oslibs>
 
-        <rdep.packages>qtsingleapplication</rdep.packages>
-    </properties>
 </project>

@@ -23,15 +23,15 @@ angular.module('webadminApp')
             request.then(function(result){
                 if(serverWasDown || result.data.reply.uptimeMs < oldUptime )
                 {
-                    $scope.state = 'server is starting';
+                    $scope.state = L.restartDialog.serverStarting;
                     return reload();
                 }
 
-                $scope.state = 'server is restarting';
+                $scope.state = L.restartDialog.serverRestarting;
                 oldUptime = result.data.reply.uptimeMs;
                 setTimeout(pingServer,1000);
             },function(){
-                $scope.state = 'server is offline';
+                $scope.state =  L.restartDialog.serverOffline;
                 serverWasDown = true; // server was down once - next success should restart server
                 setTimeout(pingServer,1000);
                 return false;
@@ -52,7 +52,7 @@ angular.module('webadminApp')
                 }
             );
         },function(){
-            $scope.state = 'server is offline';
+            $scope.state = L.restartDialog.serverOffline;
             setTimeout(pingServer,1000);
             return false;
         });

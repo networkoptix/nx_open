@@ -19,8 +19,6 @@
 #ifndef EMAILADDRESS_H
 #define EMAILADDRESS_H
 
-#include <common/common_globals.h>
-
 class EmailAddress
 {
 public:

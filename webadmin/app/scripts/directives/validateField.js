@@ -19,14 +19,28 @@ angular.module('webadminApp')
 
                 input.on('focus',function(){
                     setTimeout(function(){
-                        scope[formName][fieldName].$setUntouched();
+                        resolveForm(scope,formName)[fieldName].$setUntouched();
                         scope.$apply();
                     },0);
                 });
 
+                function resolveForm(scope,formName){
+                    if(!scope){
+                        return; // undefined
+                    }
+
+                    if(formName.indexOf('.')<0){
+                        return scope[formName];
+                    }
+
+                    var pointIndex = formName.indexOf('.');
+                    return resolveForm(scope[formName.substr(0,pointIndex)], formName.substr(pointIndex + 1));
+                }
+
                 function updateValidity(){
-                    var touched = scope[formName][fieldName].$touched;
-                    var valid = scope[formName][fieldName].$valid;
+                    var form = resolveForm(scope,formName);
+                    var touched = form[fieldName].$touched;
+                    var valid = form[fieldName].$valid;
                     if(!touched){
                         element.removeClass('has-error');
                         return;

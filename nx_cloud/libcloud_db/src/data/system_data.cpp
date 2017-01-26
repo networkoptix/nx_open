@@ -5,15 +5,24 @@
 
 #include "system_data.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 #include "stree/cdb_ns.h"
 
 
 namespace nx {
 namespace cdb {
-namespace data {
 
+namespace api {
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharingEx),
+    (sql_record),
+    _Fields);
+
+} // namespace api
+
+namespace data {
 
 ////////////////////////////////////////////////////////////
 //// class SystemRegistrationData
@@ -38,7 +47,7 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )
     {
-        case attr::systemID:
+        case attr::systemId:
             *value = QString::fromStdString(id);
             return true;
         case attr::systemStatus:
@@ -54,15 +63,15 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 //// class SystemSharing
 ////////////////////////////////////////////////////////////
 
-bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
+bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
         case attr::accountEmail:
             *value = QString::fromStdString(accountEmail);
             return true;
-        case attr::systemID:
-            *value = QString::fromStdString(systemID);
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
             return true;
         case attr::systemAccessRole:
             *value = QVariant(QnLexical::serialized(accessRole));
@@ -72,17 +81,29 @@ bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
     }
 }
 
+bool SystemSharingList::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+{
+    return false;
+}
+
+bool loadFromUrlQuery(
+    const QUrlQuery& /*urlQuery*/,
+    SystemSharingList* const /*systemSharing*/)
+{
+    return false;
+}
+
 
 ////////////////////////////////////////////////////////////
-//// class SystemID
+//// class SystemId
 ////////////////////////////////////////////////////////////
 
-bool SystemID::getAsVariant(int resID, QVariant* const value) const
+bool SystemId::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
     {
-        case attr::systemID:
-            *value = QString::fromStdString(systemID);
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
             return true;
         default:
             return false;
@@ -90,14 +111,63 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
 }
 
 
+////////////////////////////////////////////////////////////
+//// class SystemAttributesUpdate
+////////////////////////////////////////////////////////////
+
+bool SystemAttributesUpdate::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::systemId:
+            *value = QString::fromStdString(systemId);
+            return true;
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// class UserSessionDescriptor
+
+bool UserSessionDescriptor::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::systemId:
+            if (!systemId)
+                return false;
+            *value = QString::fromStdString(*systemId);
+            return true;
+
+        case attr::accountEmail:
+            if (!accountEmail)
+                return false;
+            *value = QString::fromStdString(*accountEmail);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemId),
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemData),
     (sql_record),
     _FieldsEx);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharing),
+    (sql_record),
+    _FieldsEx);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (SystemSharingList),
+    (json),
+    _Fields);
 
 }   //data
 }   //cdb

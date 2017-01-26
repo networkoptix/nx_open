@@ -4,10 +4,12 @@
  * If once health chart will dissapear - try going to tc-angular-chartjs and find there "chartObj.resize();" and comment to hell!
  */
 angular.module('webadminApp')
-    .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver,$timeout) {
+    .controller('HealthCtrl', function ($scope, $modal, $log, mediaserver, $poll) {
         $scope.healthLength = 100;//сколько точек сохраняем
         $scope.interval = 1000;// 1 секунда
         $scope.serverIsOnline = true;
+
+        $scope.chartData = {};
 
         var colors =  {
             'StatisticsCPU':        ['#3776ca'],
@@ -173,35 +175,28 @@ angular.module('webadminApp')
         }
 
 
-        var statisticTimer = null;
         function updateStatistics() {
-            mediaserver.statistics().then(function (r) {
-                if(statisticTimer === null){
+            return mediaserver.statistics().then(function (r) {
+                if(!$scope.datasets){
                     // Подготовить легенды
                     prepareDataSets(r.data.reply.statistics);
                 }
                 $scope.serverIsOnline = true;
 
-                updateStatisticsDataSets((r.status===200 && r.data.error === '0') ? r.data.reply.statistics:[]);
-
-                statisticTimer = $timeout(updateStatistics,$scope.interval);
-                return false;
+                return updateStatisticsDataSets((r.status===200 && r.data.error === '0') ? r.data.reply.statistics:[]);
             },function(){
                 //some connection error
-                updateStatisticsDataSets([]);
                 $scope.serverIsOnline = false;
-
-                //show message 'server is offline'
-                statisticTimer = $timeout(updateStatistics,$scope.interval);
+                return updateStatisticsDataSets([]);
             });
         }
 
-        var timeout = setTimeout(updateStatistics,$scope.interval);
+
+        var poll = $poll(updateStatistics,$scope.interval);
         $scope.$on(
             '$destroy',
             function(  ) {
-                $timeout.cancel(statisticTimer);
-                clearTimeout(timeout);
+                $poll.cancel(poll);
             }
         );
 

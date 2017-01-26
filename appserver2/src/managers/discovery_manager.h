@@ -7,22 +7,24 @@
 namespace ec2
 {
 
-    class QnDiscoveryNotificationManager : public AbstractDiscoveryManager
+    class QnDiscoveryNotificationManager : public AbstractDiscoveryNotificationManager
     {
     public:
-        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
-        void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction);
+        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource source);
         void triggerNotification(const ApiDiscoveryData &discoveryData, bool addInformation = true);
-        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran);
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran);
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran);
+        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran, NotificationSource source);
     };
 
+    typedef std::shared_ptr<QnDiscoveryNotificationManager> QnDiscoveryNotificationManagerPtr;
+
     template<class QueryProcessorType>
-    class QnDiscoveryManager : public QnDiscoveryNotificationManager
+    class QnDiscoveryManager : public AbstractDiscoveryManager
     {
     public:
-        QnDiscoveryManager(QueryProcessorType * const queryProcessor);
+        QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
     protected:
@@ -35,11 +37,7 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiDiscoveryData> prepareTransaction(ApiCommand::Value command, const QnUuid &id, const QUrl &url, bool ignore) const;
-        QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
-        QnTransaction<ApiDiscoveredServerData> prepareTransaction(const ApiDiscoveredServerData &discoveredServer) const;
-        QnTransaction<ApiDiscoveredServerDataList> prepareTransaction(const ApiDiscoveredServerDataList &discoveredServersList) const;
+        Qn::UserAccessData m_userAccessData;
     };
 
 } // namespace ec2

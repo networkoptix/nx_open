@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <platform/win32_syscall_resolver.h>
+#include <nx/utils/platform/win32_syscall_resolver.h>
 
 #include "abstract_socket.h"
 

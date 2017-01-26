@@ -1,5 +1,3 @@
-#ifndef DISABLE_FFMPEG
-
 #include "ffmpeg_audio_decoder.h"
 
 extern "C" {
@@ -24,7 +22,7 @@ class FfmpegAudioDecoderPrivate: public QObject
 public:
     FfmpegAudioDecoderPrivate()
     :
-        frame(avcodec_alloc_frame()),
+        frame(av_frame_alloc()),
         codecContext(nullptr),
         lastPts(AV_NOPTS_VALUE)
     {
@@ -84,7 +82,7 @@ FfmpegAudioDecoder::~FfmpegAudioDecoder()
 {
 }
 
-bool FfmpegAudioDecoder::isCompatible(const CodecID codec)
+bool FfmpegAudioDecoder::isCompatible(const AVCodecID codec)
 {
     Q_UNUSED(codec);
     return true;
@@ -154,5 +152,3 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Audi
 
 } // namespace media
 } // namespace nx
-
-#endif // DISABLE_FFMPEG

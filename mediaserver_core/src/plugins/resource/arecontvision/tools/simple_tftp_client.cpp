@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "simple_tftp_client.h"
 
 #ifdef ENABLE_ARECONT
@@ -7,8 +9,6 @@
 #include <utils/common/byte_array.h>
 #include <utils/common/systemerror.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
-
-static const int SERVER_TFTP_PORT = 69;
 
 using namespace std;
 
@@ -23,7 +23,7 @@ CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
     m_sock->setRecvTimeout(max(m_timeout,1000)); // minimum timeout is 1000 ms
-    if (!m_sock->setDestAddr(m_resolvedAddress, SERVER_TFTP_PORT))
+    if (!m_sock->setDestAddr(m_resolvedAddress, kDefaultTFTPPort))
     {
         qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << SystemError::getLastOSErrorText();
     }
@@ -39,7 +39,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
         int len_recv;
         int i, len = 0;
 
-        m_sock->setDestAddr( m_resolvedAddress, SERVER_TFTP_PORT );
+        m_sock->setDestAddr( m_resolvedAddress, kDefaultTFTPPort );
 
         len_send = form_read_request(fn, buff_send);
 
@@ -74,18 +74,22 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                 if (buff_recv[0]==0 && buff_recv[1]==0x06)// this option ack
                 {
-                    // some times ( do not know why) cam responds with wrong blk size - very very rarely
-                    if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
+                    auto blockSize = parseBlockSize((char*)buff_recv, len_recv);
+                    if (!blockSize)
+                        continue;
+
+                    if (m_wish_blk_size < blockSize)
                     {
-                        //NX_LOG("unexpected packet size", cl_logWARNING);
-                        m_curr_blk_size = blk_size;
-                    }
-                    else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
-                    {
-                        //NX_LOG("unexpected packet size", cl_logWARNING);
-                        m_curr_blk_size = double_blk_size;
+                        m_prevResult = CameraDiagnostics::IOErrorResult(
+                            lit("Bad TFTP block size. Got %1, expected %2")
+                                .arg(blockSize)
+                                .arg(m_wish_blk_size));
+
+                        m_status = protocol_error;
+                        break;
                     }
 
+                    m_curr_blk_size = blockSize;
                     m_status = all_ok;
                     break;
                 }
@@ -179,18 +183,22 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                             if (len_recv<13) // unexpected answer
                                 continue;
 
-                            // some times ( do not know why) cam responds with wrong blk size - very very rarely
-                            if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
+                            auto blockSize = parseBlockSize((char*)buff_recv, len_recv);
+                            if (!blockSize)
+                                continue;
+
+                            if (m_wish_blk_size < blockSize)
                             {
-                                //NX_LOG("unexpected packet size", cl_logWARNING);
-                                m_curr_blk_size = blk_size;
-                            }
-                            else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
-                            {
-                                //NX_LOG("unexpected packet size", cl_logWARNING);
-                                m_curr_blk_size = double_blk_size;
+                                m_prevResult = CameraDiagnostics::IOErrorResult(
+                                    lit("Bad TFTP block size. Got %1, expected %2")
+                                        .arg(blockSize)
+                                        .arg(m_wish_blk_size));
+
+                                m_status = protocol_error;
+                                break;
                             }
 
+                            m_curr_blk_size = blockSize;
                             len_send = form_ack(0, buff_send); // need to send akc0 again
                             break;
                         }
@@ -202,10 +210,8 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
             }
 
-            if (m_status == time_out)
-                return 0;
-
-                                                                                                 }
+            if (m_status != all_ok)
+                return 0;                                                                                                 }
 
 LAST_PACKET:
 
@@ -261,6 +267,51 @@ int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
     buff[2] = blk>>8; buff[3] = blk&0xff;
 
     return 4;
+}
+
+int CLSimpleTFTPClient::parseBlockSize(const char* const responseBuffer, std::size_t responseLength)
+{
+    if (!responseLength)
+        return 0;
+
+    // Response should end with zero.
+    if (*(responseBuffer + responseLength - 1) != 0)
+        return 0;
+
+    const char* kBlockSizeOption = "blksize";
+    const auto kOptionAckCodeLen = 1;
+    const auto kTerminatingBytes = 3; 
+    const auto optionNameLength = std::strlen(kBlockSizeOption);
+    const auto minimalLength = kTerminatingBytes 
+        + kOptionAckCodeLen 
+        + optionNameLength
+        + 1;
+
+    if (responseLength < minimalLength)
+        return 0;
+
+    // Check that it is actually blcksize option acknowledgment.
+    if (strncmp(responseBuffer + 2, kBlockSizeOption, optionNameLength) != 0)
+        return 0;
+
+    const int blockSizeValueLength = responseLength 
+        - optionNameLength
+        - kOptionAckCodeLen
+        - kTerminatingBytes;
+    
+    const auto blockSizeValuePtr = responseBuffer 
+        + responseLength 
+        - (blockSizeValueLength + 1);
+
+    const auto str = QString::fromLatin1(blockSizeValuePtr);
+    bool success = false;
+
+    auto blockSize = str.toInt(&success);
+
+    if (success)
+        return blockSize;
+
+    return 0;
 }
 
 #endif // ENABLE_ARECONT

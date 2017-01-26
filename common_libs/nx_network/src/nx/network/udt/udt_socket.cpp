@@ -1,4 +1,3 @@
-
 #include "udt_socket.h"
 
 #ifdef _WIN32
@@ -37,33 +36,22 @@ namespace detail {
 // Udt library initialization and tear down routine.
 // =========================================================
 
-class UdtLibrary {
-public:
-    static void Initialize() {
-        std::call_once(kOnceFlag,&UdtLibrary::InitializeUdt);
-    }
-
-private:
-    static void InitializeUdt() {
-        UDT::startup();
-    }
-private:
-    static std::once_flag kOnceFlag;
-};
-
-std::once_flag UdtLibrary::kOnceFlag;
-
 void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
     memset(out, 0, sizeof(*out));    // Zero out address structure
     out->sin_family = AF_INET;       // Internet address
-    out->sin_addr = local_addr.address.inAddr();
+
+    // TODO: add support for IPv6
+    if (auto ip = local_addr.address.ipV4())
+        out->sin_addr = *ip;
+    else
+        out->sin_addr.s_addr = 0;
+
     out->sin_port = htons(local_addr.port);
 }
 
 //TODO #ak we have UdtSocketImpl and UDTSocketImpl! refactor!
 // Implementator to keep the layout of class clean and achieve binary compatible
-class UdtSocketImpl
-:
+class UdtSocketImpl:
     public UDTSocketImpl
 {
 public:
@@ -76,7 +64,7 @@ public:
         UDTSocketImpl(socket)
     {
     }
-    
+
     ~UdtSocketImpl()
     {
     }
@@ -86,14 +74,17 @@ private:
     UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
-struct UdtEpollHandlerHelper {
+struct UdtEpollHandlerHelper
+{
     UdtEpollHandlerHelper(int fd,UDTSOCKET udt_handler):
-        epoll_fd(fd){
+        epoll_fd(fd)
+    {
 #ifndef TRACE_UDT_SOCKET
             Q_UNUSED(udt_handler);
 #endif
     }
-    ~UdtEpollHandlerHelper() {
+    ~UdtEpollHandlerHelper()
+    {
         if(epoll_fd >=0) {
             int ret = UDT::epoll_release(epoll_fd);
 #ifndef TRACE_UDT_SOCKET
@@ -101,6 +92,7 @@ struct UdtEpollHandlerHelper {
 #endif
         }
     }
+    
     int epoll_fd;
     UDTSOCKET udt_handler;
 };
@@ -113,11 +105,12 @@ struct UdtEpollHandlerHelper {
 // =====================================================================
 
 template<typename InterfaceToImplement>
-UdtSocket<InterfaceToImplement>::UdtSocket()
-:
+UdtSocket<InterfaceToImplement>::UdtSocket():
     UdtSocket(new detail::UdtSocketImpl(), detail::SocketState::closed)
 {
-    detail::UdtLibrary::Initialize();
+    SocketGlobals::customInit(
+        reinterpret_cast<SocketGlobals::CustomInit>(&UDT::startup),
+        reinterpret_cast<SocketGlobals::CustomDeinit>(&UDT::cleanup));
 }
 
 template<typename InterfaceToImplement>
@@ -126,6 +119,7 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
     NX_CRITICAL(
+        !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
             .isSocketBeingWatched(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
@@ -143,6 +137,8 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
     Pollable(-1, std::unique_ptr<detail::UdtSocketImpl>(impl)),
     m_state(state)
 {
+    NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
+
     this->m_impl = static_cast<detail::UdtSocketImpl*>(this->Pollable::m_impl.get());
 }
 
@@ -202,10 +198,13 @@ bool UdtSocket<InterfaceToImplement>::close()
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
         return true;    //already closed
 
-                        //TODO #ak linger MUST be optional
-                        //set UDT_LINGER to 1 if socket is in blocking mode?
-    int val = 0;
-    UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &val, sizeof(val));
+    //TODO #ak linger MUST be optional
+    //  set UDT_LINGER to 1 if socket is in blocking mode?
+    struct linger lingerVal;
+    memset(&lingerVal, 0, sizeof(lingerVal));
+    lingerVal.l_onoff = 1;
+    lingerVal.l_linger = 7; //TODO #ak why 7?
+    UDT::setsockopt(m_impl->udtHandle, 0, UDT_LINGER, &lingerVal, sizeof(lingerVal));
 
 #ifdef TRACE_UDT_SOCKET
     NX_LOG(lit("closing UDT socket %1").arg(udtHandle), cl_logDEBUG2);
@@ -287,7 +286,11 @@ bool UdtSocket<InterfaceToImplement>::getNonBlockingMode(bool* val) const
     int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_SNDSYN, val, &len);
 
     if (ret != 0)
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    {
+        const auto error = UDT::getlasterror();
+        SystemError::setLastErrorCode(detail::convertToSystemError(error.getErrorCode()));
+    }
+
     *val = !*val;
     return ret == 0;
 }
@@ -429,7 +432,7 @@ AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 }
 
 template<typename InterfaceToImplement>
-aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread()
+aio::AbstractAioThread* UdtSocket<InterfaceToImplement>::getAioThread() const
 {
     return Pollable::getAioThread();
 }
@@ -438,6 +441,12 @@ template<typename InterfaceToImplement>
 void UdtSocket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     Pollable::bindToAioThread(aioThread);
+}
+
+template<typename InterfaceToImplement>
+Pollable* UdtSocket<InterfaceToImplement>::pollable()
+{
+    return this;
 }
 
 template<typename InterfaceToImplement>
@@ -518,19 +527,21 @@ template class UdtSocket<AbstractStreamServerSocket>;
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
-UdtStreamSocket::UdtStreamSocket()
+UdtStreamSocket::UdtStreamSocket(int ipVersion)
 :
-    m_aioHelper(
-        new aio::AsyncSocketImplHelper<Pollable>(this, this, false /*natTraversal*/)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
     m_noDelay(false)
 {
     open();
+
+    // TODO: Add support for IPv6
+    static_cast<void>(ipVersion);
 }
 
 UdtStreamSocket::UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state)
 :
     UdtSocket(impl, state),
-    m_aioHelper(new aio::AsyncSocketImplHelper<Pollable>(this, this, false)),
+    m_aioHelper(new aio::AsyncSocketImplHelper<UdtStreamSocket>(this, AF_INET)),
     m_noDelay(false)
 {
 }
@@ -548,36 +559,30 @@ bool UdtStreamSocket::setRendezvous(bool val)
 
 bool UdtStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis )
+    unsigned int timeoutMs )
 {
-    //TODO #ak use timeoutMillis
+    if (remoteAddress.address.isIpAddress())
+        return connectToIp(remoteAddress, timeoutMs);
 
-    NX_ASSERT(m_state == detail::SocketState::open);
-    sockaddr_in addr;
-    detail::AddressFrom(remoteAddress, &addr);
-    // The official documentation doesn't advice using select but here we just need
-    // to wait on a single socket fd, select is way more faster than epoll on linux
-    // since epoll needs to create the internal structure inside of kernel.
-    bool nbk_sock = false;
-    if (!getNonBlockingMode(&nbk_sock))
-        return false;
-    if (!nbk_sock)
+    std::deque<HostAddress> ips;
+    const SystemError::ErrorCode resultCode =
+        SocketGlobals::addressResolver().dnsResolver().resolveSync(
+            remoteAddress.address.toString(), AF_INET, &ips);
+    if (resultCode != SystemError::noError)
     {
-        if (!setNonBlockingMode(nbk_sock))
-            return false;
-    }
-    int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
-    // The UDT connect will always return zero even if such operation is async which is 
-    // different with the existed Posix/Win32 socket design. So if we meet an non-zero
-    // value, the only explanation is an error happened which cannot be solved.
-    if (ret != 0)
-    {
-        // Error happened
-        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        SystemError::setLastErrorCode(resultCode);
         return false;
     }
-    m_state = detail::SocketState::connected;
-    return true;
+
+    while (!ips.empty())
+    {
+        auto ip = std::move(ips.front());
+        ips.pop_front();
+        if (connectToIp(SocketAddress(std::move(ip), remoteAddress.port), timeoutMs))
+            return true;
+    }
+
+    return false; //< Could not connect by any of addresses.
 }
 
 int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
@@ -588,7 +593,29 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    int sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    int sz;
+    if (flags & MSG_DONTWAIT)
+    {
+        bool value;
+        if (!getNonBlockingMode(&value))
+            return -1;
+
+        if (!setNonBlockingMode(true))
+            return -1;
+
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
+
+        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+        if (!setNonBlockingMode(value))
+            return -1;
+        // Restoring system error code.
+        SystemError::setLastErrorCode(sysErrorCodeBak);
+    }
+    else
+    {
+        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+    }
+
     if (sz == UDT::ERROR)
     {
         const int udtErrorCode = UDT::getlasterror().getErrorCode();
@@ -718,12 +745,10 @@ bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
 
 bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 {
-    //udt has keep-alives but provides no way to modify it...
-    KeepAliveOptions options;
-    options.probeCount = 10;    //TODO #ak find real value in udt
-    options.timeSec = 5;
-    options.intervalSec = 5;
-    *result = options;
+    // UDT has keep-alives but provides no way to modify it...
+    (*result)->probeCount = 10; // TODO: #ak find real value in udt.
+    (*result)->time = std::chrono::seconds(5);
+    (*result)->interval = std::chrono::seconds(5);
     return true;
 }
 
@@ -762,14 +787,51 @@ void UdtStreamSocket::registerTimer(
     return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
 
+bool UdtStreamSocket::connectToIp(
+    const SocketAddress& remoteAddress,
+    unsigned int /*timeoutMs*/ )
+{
+    //TODO #ak use timeoutMs
+
+    NX_ASSERT(m_state == detail::SocketState::open);
+    sockaddr_in addr;
+    detail::AddressFrom(remoteAddress, &addr);
+    // The official documentation doesn't advice using select but here we just need
+    // to wait on a single socket fd, select is way more faster than epoll on linux
+    // since epoll needs to create the internal structure inside of kernel.
+    bool nbk_sock = false;
+    if (!getNonBlockingMode(&nbk_sock))
+        return false;
+    if (!nbk_sock)
+    {
+        if (!setNonBlockingMode(nbk_sock))
+            return false;
+    }
+    int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
+    // The UDT connect will always return zero even if such operation is async which is
+    // different with the existed Posix/Win32 socket design. So if we meet an non-zero
+    // value, the only explanation is an error happened which cannot be solved.
+    if (ret != 0)
+    {
+        // Error happened
+        SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+    m_state = detail::SocketState::connected;
+    return true;
+}
+
 // =====================================================================
 // UdtStreamServerSocket implementation
 // =====================================================================
-UdtStreamServerSocket::UdtStreamServerSocket()
+UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion)
 :
     m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
 {
     open();
+
+    // TODO: Add support for IPv6
+    static_cast<void>(ipVersion);
 }
 
 UdtStreamServerSocket::~UdtStreamServerSocket()
@@ -864,10 +926,15 @@ void UdtStreamServerSocket::cancelIOSync()
     m_aioHelper->cancelIOSync();
 }
 
-void UdtStreamServerSocket::pleaseStop( 
+void UdtStreamServerSocket::pleaseStop(
     nx::utils::MoveOnlyFunc< void() > handler )
 {
     m_aioHelper->cancelIOAsync( std::move( handler ) );
+}
+
+void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+{
+    m_aioHelper->cancelIOSync();
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()

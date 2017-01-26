@@ -11,7 +11,7 @@
 #include "rest/server/request_handler.h"
 
 
-class QnGetSystemNameRestHandler
+class QnGetSystemIdRestHandler
 :
     public QnRestRequestHandler
 {

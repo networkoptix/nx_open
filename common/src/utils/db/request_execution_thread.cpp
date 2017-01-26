@@ -1,76 +1,179 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "request_execution_thread.h"
 
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace db {
 
-
 DbRequestExecutionThread::DbRequestExecutionThread(
     const ConnectionOptions& connectionOptions,
-    CLThreadQueue<std::unique_ptr<AbstractExecutor>>* const requestQueue )
+    QueryExecutorQueue* const queryExecutorQueue)
 :
-    m_connectionOptions( connectionOptions ),
-    m_requestQueue( requestQueue )
+    BaseRequestExecutor(connectionOptions, queryExecutorQueue),
+    m_state(ConnectionState::initializing),
+    m_terminated(false),
+    m_numberOfFailedRequestsInARow(0),
+    m_dbConnectionHolder(connectionOptions),
+    m_queueReaderId(queryExecutorQueue->generateReaderId())
 {
 }
 
 DbRequestExecutionThread::~DbRequestExecutionThread()
 {
-    stop();
-    m_dbConnection.close();
-}
-
-bool DbRequestExecutionThread::open()
-{
-    //using guid as a unique connection name
-    m_dbConnection = QSqlDatabase::addDatabase(
-        m_connectionOptions.driverName,
-        QUuid::createUuid().toString() );
-    m_dbConnection.setConnectOptions( m_connectionOptions.connectOptions );
-    m_dbConnection.setDatabaseName( m_connectionOptions.dbName );
-    m_dbConnection.setHostName( m_connectionOptions.hostName );
-    m_dbConnection.setUserName( m_connectionOptions.userName );
-    m_dbConnection.setPassword( m_connectionOptions.password );
-    m_dbConnection.setPort( m_connectionOptions.port );
-    if( !m_dbConnection.open() )
+    if (m_queryExecutionThread.joinable())
     {
-        NX_LOG( lit( "Failed to establish connection to DB %1 at %2:%3. %4" ).
-            arg( m_connectionOptions.dbName ).arg( m_connectionOptions.hostName ).
-            arg( m_connectionOptions.port ).arg( m_dbConnection.lastError().text() ),
-            cl_logWARNING );
-        return false;
+        pleaseStop();
+        m_queryExecutionThread.join();
     }
-    return true;
+    m_dbConnectionHolder.close();
+
+    queryExecutorQueue()->removeReaderFromTerminatedList(m_queueReaderId);
 }
 
-void DbRequestExecutionThread::run()
+void DbRequestExecutionThread::pleaseStop()
 {
-    static const int TASK_WAIT_TIMEOUT_MS = 1000;
+    m_terminated = true;
+    queryExecutorQueue()->addReaderToTerminatedList(m_queueReaderId);
+}
 
-    while( !needToStop() )
-    {
-        std::unique_ptr<AbstractExecutor> task;
-        if( !m_requestQueue->pop( task, TASK_WAIT_TIMEOUT_MS ) )
-            continue;
+void DbRequestExecutionThread::join()
+{
+    m_queryExecutionThread.join();
+}
 
-        if( task->execute( &m_dbConnection ) != DBResult::ok )
+ConnectionState DbRequestExecutionThread::state() const
+{
+    return m_state;
+}
+
+void DbRequestExecutionThread::setOnClosedHandler(nx::utils::MoveOnlyFunc<void()> handler)
+{
+    m_onClosedHandler = std::move(handler);
+}
+
+void DbRequestExecutionThread::start()
+{
+    m_queryExecutionThread = 
+        nx::utils::thread(std::bind(&DbRequestExecutionThread::queryExecutionThreadMain, this));
+}
+
+void DbRequestExecutionThread::queryExecutionThreadMain()
+{
+    constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
+
+    auto invokeOnClosedHandlerGuard = makeScopedGuard(
+        [onClosedHandler = std::move(m_onClosedHandler)]()
         {
-            NX_LOG( lit( "Request failed with error %1" ).arg( m_dbConnection.lastError().text() ), cl_logWARNING );
-            //TODO #ak reopen connection?
+            if (onClosedHandler)
+                onClosedHandler();
+        });
+
+    if (!m_dbConnectionHolder.open())
+    {
+        m_state = ConnectionState::closed;
+        return;
+    }
+
+    m_state = ConnectionState::opened;
+
+    auto previousActivityTime = std::chrono::steady_clock::now();
+
+    while (!m_terminated && m_state == ConnectionState::opened)
+    {
+        boost::optional<std::unique_ptr<AbstractExecutor>> task = 
+            queryExecutorQueue()->pop(kTaskWaitTimeout, m_queueReaderId);
+        if (!task)
+        {
+            if (std::chrono::steady_clock::now() - previousActivityTime >= 
+                connectionOptions().inactivityTimeout)
+            {
+                // Dropping connection by timeout.
+                NX_LOGX(lm("Closing DB connection by timeout (%1)")
+                    .arg(connectionOptions().inactivityTimeout), cl_logDEBUG2);
+                closeConnection();
+                break;
+            }
+            continue;
+        }
+
+        processTask(std::move(*task));
+        if (m_state == ConnectionState::closed)
+            break;
+
+        previousActivityTime = std::chrono::steady_clock::now();
+    }
+}
+
+void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> task)
+{
+    const auto result = task->execute(m_dbConnectionHolder.dbConnection());
+    switch (result)
+    {
+        case DBResult::ok:
+        case DBResult::cancelled:
+            m_numberOfFailedRequestsInARow = 0;
+            break;
+
+        default:
+        {
+            NX_LOGX(lit("DB query failed with error %1. Db text %2")
+                .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                cl_logWARNING);
+            ++m_numberOfFailedRequestsInARow;
+            if (!isDbErrorRecoverable(result))
+            {
+                NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
+                    .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                    cl_logWARNING);
+                closeConnection();
+                break;
+            }
+            if (m_numberOfFailedRequestsInARow >= 
+                connectionOptions().maxErrorsInARowBeforeClosingConnection)
+            {
+                NX_LOGX(lit("Dropping DB connection due to %1 errors in a row. Db text %2")
+                    .arg(QnLexical::serialized(result)), cl_logWARNING);
+                closeConnection();
+                break;
+            }
         }
     }
 }
 
+void DbRequestExecutionThread::closeConnection()
+{
+    m_dbConnectionHolder.close();
+    m_state = ConnectionState::closed;
+}
 
-}   //db
-}   //nx
+bool DbRequestExecutionThread::isDbErrorRecoverable(DBResult dbResult)
+{
+    switch (dbResult)
+    {
+        case DBResult::notFound:
+        case DBResult::statementError:
+        case DBResult::cancelled:
+        case DBResult::retryLater:
+        case DBResult::uniqueConstraintViolation:
+            return true;
+
+        case DBResult::ioError:
+        case DBResult::connectionError:
+            return false;
+
+        default:
+            NX_ASSERT(false);
+            return false;
+    }
+}
+
+} // namespace db
+} // namespace nx

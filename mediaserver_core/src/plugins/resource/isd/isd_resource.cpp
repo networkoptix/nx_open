@@ -35,7 +35,6 @@ static bool sizeCompare(const QSize &s1, const QSize &s2)
 QnPlIsdResource::QnPlIsdResource()
 {
     setVendor(lit("ISD"));
-    setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
 void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -44,8 +43,12 @@ void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHa
     apiUrl.setScheme( lit("http") );
     apiUrl.setHost( getHostAddress() );
     apiUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
-    apiUrl.setUserName( getAuth().user() );
-    apiUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiUrl.setUserName( auth.user());
+    apiUrl.setPassword( auth.password() );
+
     apiUrl.setPath( lit("/api/param.cgi") );
     apiUrl.setQuery( lit("req=Network.1.MacAddress") );
 
@@ -84,10 +87,16 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
+    updateDefaultAuthIfEmpty(QLatin1String("root"), QLatin1String("admin"));
+
+
     QUrl apiRequestUrl;
     apiRequestUrl.setScheme( lit("http") );
-    apiRequestUrl.setUserName( getAuth().user() );
-    apiRequestUrl.setPassword( getAuth().password() );
+
+    QAuthenticator auth = getAuth();
+
+    apiRequestUrl.setUserName( auth.user() );
+    apiRequestUrl.setPassword( auth.password() );
     apiRequestUrl.setHost( getHostAddress() );
     apiRequestUrl.setPort( QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 
