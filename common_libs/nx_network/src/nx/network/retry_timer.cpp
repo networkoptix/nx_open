@@ -127,10 +127,26 @@ void RetryTimer::reset()
     m_triesMade = 0;
 }
 
+void RetryTimer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_timer->cancelAsync(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            reset();
+            completionHandler();
+        });
+}
+
+void RetryTimer::cancelSync()
+{
+    m_timer->cancelSync();
+    reset();
+}
+
 void RetryTimer::stopWhileInAioThread()
 {
     m_timer.reset();
 }
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx

@@ -84,6 +84,9 @@ public:
      */
     void reset();
 
+    void cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    void cancelSync();
+
 protected:
     virtual void stopWhileInAioThread() override;
 
