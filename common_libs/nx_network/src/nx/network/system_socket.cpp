@@ -946,11 +946,14 @@ bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
             break;
         }
 
-        if (sockPollfd.revents & POLLOUT)
-            break;  //< Success.
+        if (sockPollfd.revents & POLLERR)
+        {
+            if (!this->getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
+                connectErrorCode = SystemError::connectionRefused;
+            break;
+        }
 
-        if (!this->getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
-            connectErrorCode = SystemError::connectionRefused;
+        // Success.
         break;
     }
 #endif
