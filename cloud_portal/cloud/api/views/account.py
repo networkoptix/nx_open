@@ -103,10 +103,15 @@ def change_password(request):
     try:
         CreateAccountSerializer.validate_password(new_password)
     except ValidationError as error:
-        raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
+        raise APIRequestException('Incorrect new password', ErrorCodes.wrong_parameters,
                                   error_data={'new_password': error.detail})
 
-    Account.change_password(request.user.email, old_password, new_password)
+    try:
+        Account.change_password(request.user.email, old_password, new_password)
+    except APINotAuthorisedException as error:
+        raise APIRequestException('Wrong old password', ErrorCodes.wrong_parameters,
+                                  error_data={'old_password': error.error_data})
+
     request.session['password'] = new_password
     return api_success()
 
