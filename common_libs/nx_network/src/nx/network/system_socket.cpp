@@ -192,7 +192,22 @@ bool Socket<InterfaceToImplement>::bind( const SocketAddress& localAddress )
     if (!addr.ptr)
         return false;
 
-    return ::bind(m_fd, addr.ptr.get(), addr.size) == 0;
+    if (::bind(m_fd, addr.ptr.get(), addr.size) == 0)
+        return true;
+
+    std::cerr<<"Failed to bind fd "<< m_fd <<" to address "<<localAddress.toStdString()<<". ";
+    if (m_ipVersion == AF_INET)
+    {
+        const sockaddr_in* saddr = (const sockaddr_in*)addr.ptr.get();
+        std::cerr<<"Addr(4): "<< saddr->sin_family<<", "<< saddr->sin_addr.s_addr <<", "<< saddr->sin_port<<std::endl;
+    }
+    else if (m_ipVersion == AF_INET6)
+    {
+        const sockaddr_in6* saddr = (const sockaddr_in6*)addr.ptr.get();
+        std::cerr << "Addr(6): " << saddr->sin6_family << ", " << saddr->sin6_port << std::endl;
+    }
+
+    return false;
 }
 
 template<typename InterfaceToImplement>
