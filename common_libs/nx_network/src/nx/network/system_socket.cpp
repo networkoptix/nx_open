@@ -195,17 +195,21 @@ bool Socket<InterfaceToImplement>::bind( const SocketAddress& localAddress )
     if (::bind(m_fd, addr.ptr.get(), addr.size) == 0)
         return true;
 
+    const auto systemErrorCode = SystemError::getLastOSErrorCode();
+
     std::cerr<<"Failed to bind fd "<< m_fd <<" to address "<<localAddress.toStdString()<<". ";
     if (m_ipVersion == AF_INET)
     {
         const sockaddr_in* saddr = (const sockaddr_in*)addr.ptr.get();
-        std::cerr<<"Addr(4): "<< saddr->sin_family<<", "<< saddr->sin_addr.s_addr <<", "<< saddr->sin_port<<std::endl;
+        std::cerr<<"Addr(4): "<< saddr->sin_family<<", "<< saddr->sin_addr.s_addr <<", "<< saddr->sin_port<<". ";
     }
     else if (m_ipVersion == AF_INET6)
     {
         const sockaddr_in6* saddr = (const sockaddr_in6*)addr.ptr.get();
-        std::cerr << "Addr(6): " << saddr->sin6_family << ", " << saddr->sin6_port << std::endl;
+        std::cerr << "Addr(6): " << saddr->sin6_family << ", " << saddr->sin6_port << ". ";
     }
+
+    std::cerr<<SystemError::toString(systemErrorCode).toStdString()<<std::endl;
 
     return false;
 }
