@@ -6,6 +6,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <utils/common/connective.h>
 #include <nx/utils/string.h>
 #include <common/common_module.h>
@@ -95,7 +96,7 @@ private:
     void at_serverFlagsChanged(const QnResourcePtr& resource);
 
     QList<ModelItem> m_itemsList;
-    QnUuid m_userId;
+    QnUserResourcePtr m_user;
     int m_allCamerasCount;
 };
 
@@ -222,16 +223,19 @@ void QnLayoutsModelUnsorted::resetModel()
         m_itemsList.append(layout);
     }
 
-    const auto servers = qnResPool->getResources<QnMediaServerResource>();
-    for (const auto& server : servers)
+    if (qnResourceAccessManager->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
     {
-        connect(server, &QnMediaServerResource::serverFlagsChanged,
-            this, &QnLayoutsModelUnsorted::at_serverFlagsChanged);
+        const auto servers = qnResPool->getResources<QnMediaServerResource>();
+        for (const auto& server : servers)
+        {
+            connect(server, &QnMediaServerResource::serverFlagsChanged,
+                    this, &QnLayoutsModelUnsorted::at_serverFlagsChanged);
 
-        if (!isServerSuitable(server))
-            continue;
+            if (!isServerSuitable(server))
+                continue;
 
-        m_itemsList.append(server);
+            m_itemsList.append(server);
+        }
     }
 
     endResetModel();
@@ -239,8 +243,11 @@ void QnLayoutsModelUnsorted::resetModel()
 
 bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout) const
 {
+    if (!m_user)
+        return false;
+
     const auto parentId = layout->getParentId();
-    return parentId.isNull() || parentId == m_userId;
+    return parentId.isNull() || parentId == m_user->getId();
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
@@ -250,11 +257,10 @@ bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& se
 
 void QnLayoutsModelUnsorted::at_userChanged(const QnUserResourcePtr& user)
 {
-    const auto id = user ? user->getId() : QnUuid();
-    if (m_userId == id)
+    if (m_user == user)
         return;
 
-    m_userId = id;
+    m_user = user;
     resetModel();
 }
 
