@@ -328,7 +328,7 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
     NX_LOGX(lm("Connect to %1 completed with result %2")
-        .str(*m_endpoint).arg(SystemError::toString(code)), cl_logDEBUG2);
+        .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectCompletionHandler connectCompletionHandler;
     const auto executeOnConnectedHandlerGuard = makeScopedGuard(
