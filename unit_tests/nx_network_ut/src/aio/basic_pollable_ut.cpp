@@ -219,7 +219,7 @@ protected:
         else
             aioObject = std::make_unique<aio::BasicPollable>();
 
-        int prevCallCounter = -1;
+        std::size_t prevCallCounter = (std::size_t)-1;
         const auto endTime = std::chrono::steady_clock::now() + testDuration;
         while (std::chrono::steady_clock::now() < endTime)
         {
