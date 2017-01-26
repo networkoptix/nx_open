@@ -68,8 +68,10 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
         return tr("LDAP Server connection timed out.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
-        return tr("Connection to the %1 is not ready yet. Check media server internet connection or try again later.").
-            arg(QnAppInfo::cloudName()) + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
+        return tr("Connection to the %1 is not ready yet. "
+            "Check media server internet connection or try again later.",
+            "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
+            + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ForbiddenConnectionResult:
         return tr("Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.")
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
@@ -380,4 +382,11 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
             break;
     }
     return QString();
+}
+
+void QnConnectionDiagnosticsHelper::failedRestartClientMessage(QWidget* parent)
+{
+    QnMessageBox::critical(parent,
+        tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
+        tr("Please close the application and start it again using the shortcut in the start menu."));
 }

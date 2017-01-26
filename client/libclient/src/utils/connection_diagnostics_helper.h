@@ -33,6 +33,9 @@ public:
         const QnConnectionInfo &connectionInfo,
         ec2::ErrorCode errorCode);
 
+
+    static void failedRestartClientMessage(QWidget* parent);
+
 private:
     static bool getInstalledVersions(QList<QnSoftwareVersion>* versions);
     static Qn::ConnectionResult handleApplauncherError(QWidget* parentWidget);

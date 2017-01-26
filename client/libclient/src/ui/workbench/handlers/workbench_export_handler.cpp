@@ -32,7 +32,7 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/standard_message_box.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/dialogs/export_timelapse_dialog.h>
@@ -159,7 +159,7 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename)
     if (QFile::exists(filename) && !QFile::remove(filename))
     {
 
-        QnStandardMessageBox::failedToOverwriteMessage(mainWindow(),
+        QnFileMessages::overwriteFailed(mainWindow(),
             QFileInfo(filename).completeBaseName());
         return false;
     }
@@ -498,7 +498,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             // method called under condition because in other case this message is popped out by the dialog itself
             if (QFile::exists(fileName))
             {
-                if (!QnStandardMessageBox::overwriteFileQuestion(
+                if (!QnFileMessages::confirmOverwrite(
                     mainWindow(), QFileInfo(fileName).completeBaseName()))
                 {
                     return;
@@ -795,7 +795,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
             // method called under condition because in other case this message is popped out by the dialog itself
             if (QFile::exists(fileName) &&
-                !QnStandardMessageBox::overwriteFileQuestion(
+                !QnFileMessages::confirmOverwrite(
                     mainWindow(), QFileInfo(fileName).completeBaseName()))
             {
                 return false;

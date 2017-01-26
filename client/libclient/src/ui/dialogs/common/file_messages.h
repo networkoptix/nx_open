@@ -5,15 +5,15 @@
 class QString;
 class QWidget;
 
-class QnStandardMessageBox : public QObject
+class QnFileMessages : public QObject
 {
     Q_OBJECT
 public:
-    static bool overwriteFileQuestion(
+    static bool confirmOverwrite(
         QWidget* parent,
         const QString& fileName);
 
-    static void failedToOverwriteMessage(
+    static void overwriteFailed(
         QWidget* parent,
         const QString& fileName);
 };

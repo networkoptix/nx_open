@@ -16,7 +16,7 @@
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
-#include <ui/dialogs/common/standard_message_box.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
@@ -71,7 +71,7 @@ void QnDatabaseManagementWidget::backupDb()
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly))
     {
-        QnStandardMessageBox::failedToOverwriteMessage(this, fileName);
+        QnFileMessages::overwriteFailed(this, fileName);
         return;
     }
 

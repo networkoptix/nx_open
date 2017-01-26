@@ -1,8 +1,8 @@
-#include "standard_message_box.h"
+#include "file_messages.h"
 
 #include <ui/dialogs/common/message_box.h>
 
-bool QnStandardMessageBox::overwriteFileQuestion(
+bool QnFileMessages::confirmOverwrite(
     QWidget* parent,
     const QString& fileName)
 {
@@ -14,7 +14,7 @@ bool QnStandardMessageBox::overwriteFileQuestion(
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
-void QnStandardMessageBox::failedToOverwriteMessage(
+void QnFileMessages::overwriteFailed(
     QWidget* parent,
     const QString& fileName)
 {

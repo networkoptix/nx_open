@@ -8,7 +8,7 @@
 #include <client/client_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
-#include <ui/dialogs/common/standard_message_box.h>
+#include <ui/dialogs/common/file_messages.h>
 
 #include <utils/common/html.h>
 
@@ -39,7 +39,7 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
             fileName += selectedExtension;
 
             if (QFile::exists(fileName)
-                && !QnStandardMessageBox::overwriteFileQuestion(
+                && !QnFileMessages::confirmOverwrite(
                     parent, QFileInfo(fileName).completeBaseName()))
             {
                 return;

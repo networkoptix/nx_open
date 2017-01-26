@@ -216,7 +216,8 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnDisconnectFromCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to disconnect the System from %1").arg(QnAppInfo::cloudName()),
+        tr("Failed to disconnect the System from %1", "%1 is name of cloud (like 'Nx Cloud')")
+            .arg(QnAppInfo::cloudName()),
         message);
 
     lockUi(false);
@@ -306,8 +307,7 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All cloud features will be disabled, cloud users will be deleted from the System.")
-        .arg(QnAppInfo::cloudName());
+    return tr("All cloud features will be disabled, cloud users will be deleted from the System.");
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const

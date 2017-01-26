@@ -59,8 +59,6 @@
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
 #include <ui/dialogs/messages/layouts_handler_messages.h>  //TODO: #GDM #VW refactor
-#include <ui/dialogs/common/standard_message_box.h>
-#include <ui/dialogs/common/custom_message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -1442,7 +1440,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            QnCustomMessageBox::showAnotherVideoWallExist(mainWindow());
+            anotherVideoWallExistMessage(mainWindow());
             continue;
         }
 
@@ -3041,4 +3039,9 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
     { // e.g. workbench layout is empty
         qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
     }
+}
+
+void QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(QWidget* parent)
+{
+    QnMessageBox::warning(parent, tr("There is another Video Wall with the same name"));
 }

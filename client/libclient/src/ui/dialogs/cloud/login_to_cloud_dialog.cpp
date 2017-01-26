@@ -52,7 +52,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    setWindowTitle(tr("Log in to %1").arg(QnAppInfo::cloudName()));
+    setWindowTitle(tr("Log in to %1", "%1 is name of cloud (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -76,7 +77,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
-    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
+    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is name of cloud (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName()));
     ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png",
         QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
@@ -231,7 +233,8 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         {
             Q_Q(QnLoginToCloudDialog);
 
-            QnMessageBox::critical(q, tr("Failed to login to %1").arg(QnAppInfo::cloudName()));
+            QnMessageBox::critical(q, tr("Failed to login to %1",
+                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
             break;
         }
     }

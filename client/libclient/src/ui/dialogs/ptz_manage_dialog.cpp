@@ -26,7 +26,7 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/dialogs/common/custom_message_box.h>
+#include <ui/dialogs/ptz_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -432,7 +432,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnCustomMessageBox::showFailedToGetPosition(this, m_resource->getName());
+        QnPtzMessages::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -451,7 +451,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnCustomMessageBox::showFailedToSetPosition(this, m_resource->getName());
+        QnPtzMessages::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -492,7 +492,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnCustomMessageBox::showFailedToSetPosition(this, m_resource->getName());
+        QnPtzMessages::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -547,31 +547,8 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse)
-            {
-                Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-                if (!messagesFilter.testFlag(Qn::ShowOnceMessage::PtzPresetInUse))
-                {
-                    QnMessageBox dialog(QnMessageBoxIcon::Warning,
-                        tr("Preset used by some tours. Delete it anyway?"),
-                        tr("These tours will become invalid."),
-                        QDialogButtonBox::Cancel, QDialogButtonBox::Yes, this);
-
-                    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
-                    dialog.setCheckBoxText(tr("Don't show this message again"));
-
-                    const auto cancelled = (dialog.exec() == QDialogButtonBox::Cancel);
-                    if (dialog.isChecked())
-                    {
-                        messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
-                        qnSettings->setShowOnceMessages(messagesFilter);
-                        qnSettings->save();
-                    }
-
-                    if (cancelled)
-                        break;
-                }
-            }
+            if (presetIsInUse && !QnPtzMessages::confirmDeleteUsedPresed(this))
+                break;
 
             m_model->removePreset(data.presetModel.preset.id);
             break;

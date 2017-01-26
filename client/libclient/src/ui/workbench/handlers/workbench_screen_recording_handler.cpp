@@ -8,7 +8,7 @@
 #include <client/client_settings.h>
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
-#include <ui/dialogs/common/standard_message_box.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/screen_recording/video_recorder_settings.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench_display.h>
@@ -306,7 +306,7 @@ void QnWorkbenchScreenRecordingHandler::onRecordingFinished(const QString& fileN
             QFile::remove(filePath);
             if (!QFile::rename(fileName, filePath))
             {
-                QnStandardMessageBox::failedToOverwriteMessage(mainWindow(), filePath);
+                QnFileMessages::overwriteFailed(mainWindow(), filePath);
                 continue;
             }
 

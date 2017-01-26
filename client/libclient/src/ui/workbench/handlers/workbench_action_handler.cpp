@@ -83,7 +83,6 @@
 #include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
-#include <ui/dialogs/common/custom_message_box.h>
 #include <ui/dialogs/camera_diagnostics_dialog.h>
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/media_file_settings_dialog.h>
@@ -120,7 +119,8 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_welcome_screen.h>
 
-#include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -148,6 +148,7 @@
 #include <utils/screen_manager.h>
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
+#include <utils/connection_diagnostics_helper.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -1574,7 +1575,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         if (checkedFlags == Qn::user)
             QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
         else
-            QnCustomMessageBox::showAnotherVideoWallExist(mainWindow());
+            QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(mainWindow());
 
         return false;
     }
@@ -2175,7 +2176,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
 
     if (!tryToRestartClient())
     {
-        QnCustomMessageBox::showFailedRestartClient(mainWindow());
+        QnConnectionDiagnosticsHelper::failedRestartClientMessage(mainWindow());
         return;
     }
     menu()->trigger(QnActions::DelayedForcedExitAction);

@@ -327,7 +327,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 
     QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
 
-    // TODO FOR REVIEW: Is it right check??
+    // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
