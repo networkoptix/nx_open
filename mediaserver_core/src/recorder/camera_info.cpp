@@ -1,6 +1,5 @@
 #include <utils/common/util.h>
 #include <utils/common/id.h>
-#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
@@ -244,16 +243,22 @@ bool Reader::initArchiveCamData()
     coreData.parentId = m_handler->moduleGuid();
     if (coreData.parentId.isNull())
     {
-        m_lastError = lit("Unable to get parent id for the archive camera %1")
-                            .arg(m_archiveCamData.coreData.physicalId);
+        m_lastError = { 
+            lit("Unable to get parent id for the archive camera %1")
+                .arg(m_archiveCamData.coreData.physicalId),
+            cl_logERROR
+        };
         return false;
     }
 
     coreData.typeId = m_handler->archiveCamTypeId();
     if (coreData.typeId.isNull())
     {
-        m_lastError = lit("Unable to get type id for the archive camera %1")
-                            .arg(m_archiveCamData.coreData.physicalId);
+        m_lastError = {
+            lit("Unable to get type id for the archive camera %1")
+                .arg(m_archiveCamData.coreData.physicalId), 
+            cl_logERROR
+        };
         return false;
     }
 
@@ -264,8 +269,11 @@ bool Reader::cameraAlreadyExists() const
 {
     if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
     {
-        m_lastError = lit("Camera %1 is already in resource pool")
-                            .arg(m_archiveCamData.coreData.physicalId);
+        m_lastError = {
+            lit("Archive camera %1 found but we already have camera with this id in the resource pool. Skipping.") 
+                .arg(m_archiveCamData.coreData.physicalId),
+            cl_logDEBUG2
+        };
         return true;
     }
 
@@ -277,8 +285,11 @@ bool Reader::cameraAlreadyExists() const
                     return cam.coreData.id == m_archiveCamData.coreData.id;
                 }) != m_archiveCamList->cend())
     {
-        m_lastError = lit("Camera %1 is already in the archive camera list")
-                            .arg(m_archiveCamData.coreData.physicalId);
+        m_lastError = {
+            lit("Camera %1 is already in the archive camera list")
+                .arg(m_archiveCamData.coreData.physicalId), 
+            cl_logDEBUG2
+        };
         return true;
     }
 
@@ -296,8 +307,11 @@ bool Reader::readFileData()
 
     if (m_fileData.isNull())
     {
-        m_lastError = lit("File data is NULL for camera %1")
-                            .arg(m_archiveCamData.coreData.physicalId);
+        m_lastError =  { 
+            lit("File data is NULL for archive camera %1")
+                .arg(m_archiveCamData.coreData.physicalId), 
+            cl_logERROR
+        };
         return false;
     }
 
@@ -314,8 +328,11 @@ bool Reader::parseData()
         {
         case ParseResult::ParseCode::NoData: break;
         case ParseResult::ParseCode::RegexpFailed:
-            m_lastError = lit("Camera info file %1 parse failed")
-                                .arg(infoFilePath());
+            m_lastError = {
+                lit("Camera info file %1 parse failed")
+                    .arg(infoFilePath()), 
+                cl_logERROR
+            };
             return false;
         case ParseResult::ParseCode::Ok:
             addProperty(result);
@@ -376,9 +393,9 @@ bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
     return static_cast<bool>(qnResPool->getResourceById(cameraId));
 }
 
-void ServerReaderHandler::handleError(const QString& message) const
+void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const
 {
-    NX_LOG(message, cl_logERROR);
+    NX_LOG(errorInfo.message, errorInfo.severity);
 }
 
 

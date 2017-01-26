@@ -1,3 +1,5 @@
+#if defined (Q_OS_WIN)
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -124,3 +126,5 @@ TEST(MigrateWinData, MoveDataFailed)
     ASSERT_EQ(nx::misc::migrateFilesFromWindowsOldDir(&handler), 
               nx::misc::MigrateDataResult::MoveDataFailed);
 }
+
+#endif // Q_OS_WIN
