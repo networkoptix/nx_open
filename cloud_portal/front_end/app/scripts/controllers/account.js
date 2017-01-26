@@ -30,8 +30,5 @@ angular.module('cloudApp')
             },
             successMessage:'Your password was successfully changed.',
             errorPrefix:'Couldn\'t change your password:'
-        }).then(function(){
-            account.setPassword($scope.newPassword);
         });
-
     }]);
