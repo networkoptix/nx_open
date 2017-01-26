@@ -1,6 +1,6 @@
 #include "available_cameras_watcher.h"
 
-#include <utils/common/counter_hash.h>
+#include <core/resource_access/helpers/layout_item_aggregator.h>
 
 namespace detail {
 
@@ -35,15 +35,12 @@ public:
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
-
-    void addLayout(const QnLayoutResourcePtr& layout);
-    void removeLayout(const QnLayoutResourcePtr& layout);
-    void at_layoutItemAdded(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
-    void at_layoutItemRemoved(const QnLayoutResourcePtr& resource, const QnLayoutItemData& item);
+    void at_layoutItemAdded(const QnUuid& id);
+    void at_layoutItemRemoved(const QnUuid& id);
 
 private:
+    QnLayoutItemAggregator* m_itemAggregator;
     QHash<QnUuid, QnVirtualCameraResourcePtr> m_cameras;
-    QnCounterHash<QnUuid> m_camerasCounter;
 };
 
 class PermissionsBasedWatcher: public Watcher
@@ -54,8 +51,8 @@ public:
     virtual QHash<QnUuid, QnVirtualCameraResourcePtr> cameras() const override;
 
 private:
-    void at_resourceAdded(const QnResourcePtr& resource);
-    void at_resourceRemoved(const QnResourcePtr& resource);
+    void addCamera(const QnResourcePtr& resource);
+    void removeCamera(const QnResourcePtr& resource);
 
 private:
     QHash<QnUuid, QnVirtualCameraResourcePtr> m_cameras;

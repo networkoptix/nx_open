@@ -23,7 +23,8 @@ QnUserResourcePtr Watcher::user() const
 // LayoutBasedWatcher
 
 LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user):
-    Watcher(user)
+    Watcher(user),
+    m_itemAggregator(new QnLayoutItemAggregator(this))
 {
     NX_ASSERT(user);
     if (!user)
@@ -34,11 +35,16 @@ LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user):
     connect(qnResPool, &QnResourcePool::resourceRemoved,
         this, &LayoutBasedWatcher::at_resourceRemoved);
 
+    connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded,
+        this, &LayoutBasedWatcher::at_layoutItemAdded);
+    connect(m_itemAggregator, &QnLayoutItemAggregator::itemRemoved,
+        this, &LayoutBasedWatcher::at_layoutItemRemoved);
+
     const auto layouts = qnResPool->getResourcesByParentId(
         user->getId()).filtered<QnLayoutResource>();
 
     for (const auto& layout: layouts)
-        addLayout(layout);
+        m_itemAggregator->addWatchedLayout(layout);
 }
 
 QHash<QnUuid, QnVirtualCameraResourcePtr> LayoutBasedWatcher::cameras() const
@@ -60,70 +66,39 @@ void LayoutBasedWatcher::at_resourceAdded(const QnResourcePtr& resource)
                 return;
 
             if (layout->getParentId() == user()->getId())
-                addLayout(layout);
+                m_itemAggregator->addWatchedLayout(layout);
             else
-                removeLayout(layout);
+                m_itemAggregator->removeWatchedLayout(layout);
         });
 
     if (layout->getParentId() != user()->getId())
         return;
 
-    addLayout(layout);
+    m_itemAggregator->addWatchedLayout(layout);
 }
 
 void LayoutBasedWatcher::at_resourceRemoved(const QnResourcePtr& resource)
 {
     if (const auto layout = resource.dynamicCast<QnLayoutResource>())
-        removeLayout(layout);
+        m_itemAggregator->removeWatchedLayout(layout);
 }
 
-void LayoutBasedWatcher::addLayout(const QnLayoutResourcePtr& layout)
+void LayoutBasedWatcher::at_layoutItemAdded(const QnUuid& id)
 {
-    connect(layout, &QnLayoutResource::itemAdded,
-        this, &LayoutBasedWatcher::at_layoutItemAdded);
-    connect(layout, &QnLayoutResource::itemRemoved,
-        this, &LayoutBasedWatcher::at_layoutItemRemoved);
-
-    for (const auto& item: layout->getItems())
-        at_layoutItemAdded(layout, item);
-}
-
-void LayoutBasedWatcher::removeLayout(const QnLayoutResourcePtr& layout)
-{
-    layout->disconnect(this);
-
-    for (const auto& item: layout->getItems())
-        at_layoutItemRemoved(layout, item);
-}
-
-void LayoutBasedWatcher::at_layoutItemAdded(
-    const QnLayoutResourcePtr& /*resource*/, const QnLayoutItemData& item)
-{
-    const auto id = item.resource.id;
-    if (id.isNull())
-        return;
-
     const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return;
 
     m_cameras[id] = camera;
-    if (m_camerasCounter.insert(id))
-        emit cameraAdded(camera);
+    emit cameraAdded(camera);
 }
 
-void LayoutBasedWatcher::at_layoutItemRemoved(
-    const QnLayoutResourcePtr& /*resource*/, const QnLayoutItemData& item)
+void LayoutBasedWatcher::at_layoutItemRemoved(const QnUuid& id)
 {
-    const auto id = item.resource.id;
-    if (id.isNull())
-        return;
-
     const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
 
     m_cameras.remove(id);
-    if (m_camerasCounter.remove(id))
-        emit cameraRemoved(camera);
+    emit cameraRemoved(camera);
 }
 
 // PermissionsBasedWatcher
@@ -131,28 +106,28 @@ void LayoutBasedWatcher::at_layoutItemRemoved(
 PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user):
     Watcher(user)
 {
+    const auto accessProvider = qnResourceAccessProvider;
+
     if (user)
     {
-        connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+        connect(accessProvider, &QnResourceAccessProvider::accessChanged, this,
             [this, user](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
             {
                 if (!subject.isUser() || subject.user() != user)
                     return;
 
                 if (qnResourceAccessProvider->hasAccess(user, resource))
-                    at_resourceAdded(resource);
+                    addCamera(resource);
                 else
-                    at_resourceRemoved(resource);
+                    removeCamera(resource);
             });
     }
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
-        this, &PermissionsBasedWatcher::at_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
-        this, &PermissionsBasedWatcher::at_resourceRemoved);
-
     for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
-        at_resourceAdded(camera);
+    {
+        if (accessProvider->hasAccess(user, camera))
+            addCamera(camera);
+    }
 }
 
 QHash<QnUuid, QnVirtualCameraResourcePtr> PermissionsBasedWatcher::cameras() const
@@ -160,20 +135,17 @@ QHash<QnUuid, QnVirtualCameraResourcePtr> PermissionsBasedWatcher::cameras() con
     return m_cameras;
 }
 
-void PermissionsBasedWatcher::at_resourceAdded(const QnResourcePtr& resource)
+void PermissionsBasedWatcher::addCamera(const QnResourcePtr& resource)
 {
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
-        return;
-
-    if (user() && !qnResourceAccessProvider->hasAccess(user(), resource))
         return;
 
     m_cameras[camera->getId()] = camera;
     emit cameraAdded(resource);
 }
 
-void PermissionsBasedWatcher::at_resourceRemoved(const QnResourcePtr& resource)
+void PermissionsBasedWatcher::removeCamera(const QnResourcePtr& resource)
 {
     const auto camera = m_cameras.take(resource->getId());
     if (!camera)
