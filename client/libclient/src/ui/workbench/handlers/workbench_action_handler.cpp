@@ -1496,12 +1496,12 @@ void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered() {
-    QnMediaServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
-    if (resources.size() != 1)
+void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered()
+{
+    const auto params = menu()->currentParameters(sender());
+    const auto server = params.resource().dynamicCast<QnMediaServerResource>();
+    if (!server)
         return;
-
-    QnMediaServerResourcePtr server = resources[0];
 
     QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindow());
 
