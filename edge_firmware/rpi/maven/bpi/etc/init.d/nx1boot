@@ -102,11 +102,11 @@ get_reset_button_presense() {
     mount -t vfat $BOOTPART $MNTBOOTPART
     ln -s $MNTBOOTPART/backup/bootloader /tmp/fw_printenv
     # Serial Number was used only for checking the reset button status. Removing old file.
-    rm -rf /tmp/serial;
+    rm -rf /tmp/serial
 	RESET=$(/tmp/fw_printenv reset | sed 's/reset=//')
 	RESET=${RESET:-false}
-    echo "++++++++++++++ RESET: "$RESET" ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ RESET: "$RESET" ++++++++++++++" >> $NX1LOG
+    echo "++++++++++++++ RESET BUTTON PRESENT: "$RESET" ++++++++++++++" >&2 >/dev/kmsg
+    echo `date` "++++++++++++++ RESET BUTTON PRESENT: "$RESET" ++++++++++++++" >> $NX1LOG
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
