@@ -56,10 +56,10 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     ASSERT_EQ(restoreData.getSpaceLimitForStorage(path2), spaceLimit2);
 }
 
-class UnmountedStoragesFilterTest : public ::testing::Test
+class UnmountedLocalStoragesFilterTest : public ::testing::Test
 {
 protected:
-    UnmountedStoragesFilterTest() :
+    UnmountedLocalStoragesFilterTest() :
         mediaFolderName(lit("HD Witness Media")),
         unmountedFilter(mediaFolderName),
         spaceLimit(10 * 1024 * 1024 * 1024ll)
@@ -105,12 +105,12 @@ protected:
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
     QString basePath = "/some/path";
     QString mediaFolderName;
-    nx::mserver_aux::UnmountedStoragesFilter unmountedFilter;
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedFilter;
     qint64 spaceLimit;
     QnStorageResourceList unmountedStorages;
 };
 
-TEST_F(UnmountedStoragesFilterTest , main)
+TEST_F(UnmountedLocalStoragesFilterTest , main)
 {
     when(PathFound::yes, MediaFolderSuffix::yes);
     then(StorageUnmounted::no);
