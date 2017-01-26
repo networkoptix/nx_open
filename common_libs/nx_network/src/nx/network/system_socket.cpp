@@ -13,7 +13,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <common/common_globals.h>
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #  include <iphlpapi.h>
 #  include <Mstcpip.h>
 #  include "win32_socket_tools.h"
@@ -26,10 +26,11 @@
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
 
-
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 /* Check that the typedef in AbstractSocket is correct. */
-static_assert(boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value, "Invalid socket type is used in AbstractSocket.");
+static_assert(
+    boost::is_same<AbstractSocket::SOCKET_HANDLE, SOCKET>::value,
+    "Invalid socket type is used in AbstractSocket.");
 typedef char raw_type;       // Type used for raw data on this platform
 #else
 #include <sys/types.h>       // For data types
@@ -43,25 +44,6 @@ typedef char raw_type;       // Type used for raw data on this platform
 #include "ssl_socket.h"
 typedef void raw_type;       // Type used for raw data on this platform
 #endif
-
-#ifdef WIN32
-static bool initialized = false;
-static const int ERR_TIMEOUT = WSAETIMEDOUT;
-static const int ERR_WOULDBLOCK = WSAEWOULDBLOCK;
-#else
-static const int ERR_TIMEOUT = ETIMEDOUT;
-//static const int ERR_WOULDBLOCK = EWOULDBLOCK;
-#endif
-
-int getSystemErrCode()
-{
-#ifdef WIN32
-    return WSAGetLastError();
-#else
-    return errno;
-#endif
-}
-
 
 #ifndef SOCKET_ERROR
 #define SOCKET_ERROR (-1)
@@ -138,9 +120,9 @@ SystemSocketAddress::operator SocketAddress() const
     return SocketAddress();
 }
 
-//////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
 // Socket implementation
-//////////////////////////////////////////////////////////
+
 template<typename InterfaceToImplement>
 Socket<InterfaceToImplement>::~Socket()
 {
@@ -226,13 +208,12 @@ bool Socket<InterfaceToImplement>::shutdown()
     if( m_fd == -1 )
         return true;
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
     return ::shutdown(m_fd, SD_BOTH) == 0;
 #else
     return ::shutdown(m_fd, SHUT_RDWR) == 0;
 #endif
 }
-
 
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::close()
@@ -249,7 +230,7 @@ bool Socket<InterfaceToImplement>::close()
     auto fd = m_fd;
     m_fd = -1;
 
-#ifdef WIN32
+#ifdef _WIN32
     return ::closesocket(fd) == 0;
 #else
     return ::close(fd) == 0;
@@ -481,18 +462,23 @@ Socket<InterfaceToImplement>::Socket(
 {
 }
 
+#ifdef _WIN32
+static bool win32SocketsInitialized = false;
+#endif
+
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
 {
-#ifdef WIN32
-    if (!initialized) {
+#ifdef _WIN32
+    if (!win32SocketsInitialized)
+    {
         WORD wVersionRequested;
         WSADATA wsaData;
 
         wVersionRequested = MAKEWORD(2, 0);              // Request WinSock v2.0
         if (WSAStartup(wVersionRequested, &wsaData) != 0)  // Load WinSock DLL
             return false;
-        initialized = true;
+        win32SocketsInitialized = true;
     }
 #endif
 
@@ -533,12 +519,8 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     return true;
 }
 
-//////////////////////////////////////////////////////////
-///////// class CommunicatingSocket
-//////////////////////////////////////////////////////////
-
-
-// CommunicatingSocket Code
+//-------------------------------------------------------------------------------------------------
+// class CommunicatingSocket
 
 #ifndef _WIN32
 namespace
@@ -578,7 +560,7 @@ namespace
                 //if( (unsigned int)millisAlreadySlept < timeout )
                 if( et.elapsed() < timeout )
                     continue;
-                errno = ERR_TIMEOUT;    //operation timedout
+                errno = ETIMEDOUT;
             }
             return result;
         }
@@ -654,7 +636,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connect(
 }
 
 template<typename InterfaceToImplement>
-int CommunicatingSocket<InterfaceToImplement>::recv( void* buffer, unsigned int bufferLen, int flags )
+int CommunicatingSocket<InterfaceToImplement>::recv(void* buffer, unsigned int bufferLen, int flags)
 {
 #ifdef _WIN32
     int bytesRead;
@@ -834,7 +816,7 @@ template<typename InterfaceToImplement>
 bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
     const SocketAddress& remoteAddress, unsigned int timeoutMs)
 {
-    // Get the address of the requested host
+    // Get the address of the requested host.
     m_connected = false;
 
     const SystemSocketAddress addr(remoteAddress, this->m_ipVersion);
@@ -968,15 +950,11 @@ bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
     return m_connected;
 }
 
-//////////////////////////////////////////////////////////
-///////// class TCPSocket
-//////////////////////////////////////////////////////////
-
-// TCPSocket Code
+//-------------------------------------------------------------------------------------------------
+// class TCPSocket
 
 #ifdef _WIN32
-class Win32TcpSocketImpl
-:
+class Win32TcpSocketImpl:
     public PollableSystemSocketImpl
 {
 public:
@@ -984,13 +962,12 @@ public:
 
     Win32TcpSocketImpl()
     {
-        memset( &win32TcpTableRow, 0, sizeof(win32TcpTableRow) );
+        memset(&win32TcpTableRow, 0, sizeof(win32TcpTableRow));
     }
 };
 #endif
 
-TCPSocket::TCPSocket(int ipVersion)
-:
+TCPSocket::TCPSocket(int ipVersion):
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
@@ -1002,8 +979,7 @@ TCPSocket::TCPSocket(int ipVersion)
 {
 }
 
-TCPSocket::TCPSocket(int newConnSD, int ipVersion)
-:
+TCPSocket::TCPSocket(int newConnSD, int ipVersion):
     base_type(
         newConnSD,
         ipVersion
@@ -1034,7 +1010,6 @@ bool TCPSocket::setNoDelay( bool value )
                       sizeof(int)) == 0;    // length of option value
 }
 
-//!Implementation of AbstractStreamSocket::getNoDelay
 bool TCPSocket::getNoDelay( bool* value ) const
 {
     int flag = 0;
@@ -1136,7 +1111,7 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 
 bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
-    #if defined( Q_OS_WIN )
+    #if defined( _WIN32 )
         struct tcp_keepalive ka = { FALSE, 0, 0 };
         if( info )
         {
@@ -1199,7 +1174,7 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) cons
         return true;
     }
 
-    #if defined(Q_OS_WIN)
+    #if defined(_WIN32)
         *result = m_keepAlive;
     #else
         *result = KeepAliveOptions();
@@ -1231,19 +1206,17 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) cons
     return true;
 }
 
-//////////////////////////////////////////////////////////
-///////// class TCPServerSocket
-//////////////////////////////////////////////////////////
-
-// TCPServerSocket Code
+//-------------------------------------------------------------------------------------------------
+// class TCPServerSocket
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
-/*!
-    \return fd (>=0) on success, <0 on error (-2 if timed out)
-*/
-static int acceptWithTimeout( int m_fd,
-                              int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
-                              bool nonBlockingMode = false )
+/**
+ * @return fd (>=0) on success, <0 on error (-2 if timed out)
+ */
+static int acceptWithTimeout(
+    int m_fd,
+    int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
+    bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
         return ::accept( m_fd, NULL, NULL );
@@ -1318,8 +1291,7 @@ static int acceptWithTimeout( int m_fd,
 #endif
 }
 
-class TCPServerSocketPrivate
-:
+class TCPServerSocketPrivate:
     public PollableSystemSocketImpl
 {
 public:
@@ -1327,29 +1299,28 @@ public:
     const int ipVersion;
     aio::AsyncServerSocketHelper<TCPServerSocket> asyncServerSocketHelper;
 
-    TCPServerSocketPrivate( TCPServerSocket* _sock, int _ipVersion )
-    :
-        socketHandle( -1 ),
-        ipVersion( _ipVersion ),
-        asyncServerSocketHelper( _sock )
+    TCPServerSocketPrivate(TCPServerSocket* _sock, int _ipVersion):
+        socketHandle(-1),
+        ipVersion(_ipVersion),
+        asyncServerSocketHelper(_sock)
     {
     }
 
-    AbstractStreamSocket* accept( unsigned int recvTimeoutMs, bool nonBlockingMode )
+    AbstractStreamSocket* accept(unsigned int recvTimeoutMs, bool nonBlockingMode)
     {
-        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs, nonBlockingMode );
-        if( newConnSD >= 0 )
+        int newConnSD = acceptWithTimeout(socketHandle, recvTimeoutMs, nonBlockingMode);
+        if (newConnSD >= 0)
         {
             return new TCPSocket(newConnSD, ipVersion);
         }
-        else if( newConnSD == -2 )
+        else if (newConnSD == -2)
         {
             //setting system error code
-    #ifdef _WIN32
-            ::SetLastError( SystemError::timedOut );
-    #else
+#ifdef _WIN32
+            ::SetLastError(SystemError::timedOut);
+#else
             errno = SystemError::timedOut;
-    #endif
+#endif
             return nullptr;    //timeout
         }
         else
@@ -1360,13 +1331,12 @@ public:
     }
 };
 
-TCPServerSocket::TCPServerSocket(int ipVersion)
-:
+TCPServerSocket::TCPServerSocket(int ipVersion):
     base_type(
         SOCK_STREAM,
         IPPROTO_TCP,
         ipVersion,
-        new TCPServerSocketPrivate( this, ipVersion ) )
+        new TCPServerSocketPrivate(this, ipVersion))
 {
     static_cast<TCPServerSocketPrivate*>(impl())->socketHandle = handle();
 }
@@ -1414,7 +1384,6 @@ void TCPServerSocket::cancelIOSync()
     return d->asyncServerSocketHelper.cancelIOSync();
 }
 
-//!Implementation of AbstractStreamServerSocket::listen
 bool TCPServerSocket::listen(int queueLen)
 {
     return ::listen( handle(), queueLen ) == 0;
@@ -1422,7 +1391,7 @@ bool TCPServerSocket::listen(int queueLen)
 
 void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
 {
-    //TODO #ak add general implementation to Socket class and remove this method
+    // TODO #ak: Add general implementation to Socket class and remove this method.
     dispatch(
         [this, completionHandler = std::move(completionHandler)]()
         {
@@ -1439,7 +1408,6 @@ void TCPServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
     d->asyncServerSocketHelper.cancelIOSync();
 }
 
-//!Implementation of AbstractStreamServerSocket::accept
 AbstractStreamSocket* TCPServerSocket::accept()
 {
     return systemAccept();
@@ -1461,7 +1429,7 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!acceptedSocket)
         return nullptr;
 
-    #if defined(Q_OS_WIN) || defined(Q_OS_MACX)
+    #if defined(_WIN32) || defined(Q_OS_MACX)
         if (!nonBlockingMode)
             return acceptedSocket;
 
@@ -1483,20 +1451,16 @@ bool TCPServerSocket::setListen(int queueLen)
 }
 
 
-//////////////////////////////////////////////////////////
-///////// class UDPSocket
-//////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class UDPSocket
 
-// UDPSocket Code
-
-UDPSocket::UDPSocket(int ipVersion)
-:
+UDPSocket::UDPSocket(int ipVersion):
     base_type(SOCK_DGRAM, IPPROTO_UDP, ipVersion),
     m_destAddr()
 {
     setBroadcast();
     int buff_size = 1024*512;
-    if( ::setsockopt( handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof( buff_size ) )<0 )
+    if (::setsockopt(handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof(buff_size)) < 0)
     {
         //error
     }
@@ -1507,12 +1471,14 @@ SocketAddress UDPSocket::getForeignAddress() const
     return m_destAddr;
 }
 
-void UDPSocket::setBroadcast() {
+void UDPSocket::setBroadcast()
+{
     // If this fails, we'll hear about it when we try to send.  This will allow
     // system that cannot broadcast to continue if they don't plan to broadcast
     int broadcastPermission = 1;
-    setsockopt( handle(), SOL_SOCKET, SO_BROADCAST,
-               (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
+    setsockopt(
+        handle(), SOL_SOCKET, SO_BROADCAST,
+        (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
 }
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
@@ -1542,9 +1508,12 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 
 }
 
-bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
-    if( setsockopt( handle(), IPPROTO_IP, IP_MULTICAST_TTL,
-                   (raw_type *) &multicastTTL, sizeof(multicastTTL)) < 0) {
+bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)
+{
+    if (setsockopt(
+            handle(), IPPROTO_IP, IP_MULTICAST_TTL,
+            (raw_type *)&multicastTTL, sizeof(multicastTTL)) < 0)
+    {
         qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
     }
@@ -1563,63 +1532,76 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
     return true;
 }
 
-bool UDPSocket::joinGroup(const QString &multicastGroup)  {
+bool UDPSocket::joinGroup(const QString &multicastGroup)
+{
     struct ip_mreq multicastRequest;
+    memset(&multicastRequest, 0, sizeof(multicastRequest));
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-    if( setsockopt( handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-        (raw_type *) &multicastRequest,
-        sizeof(multicastRequest)) < 0) {
-            qWarning() << "failed to join multicast group" << multicastGroup;
-            return false;
+    if (setsockopt(handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (raw_type *)&multicastRequest,
+            sizeof(multicastRequest)) < 0)
+    {
+        qWarning() << "failed to join multicast group" << multicastGroup;
+        return false;
     }
     return true;
 }
 
-bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)  {
+bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicastIF)
+{
     struct ip_mreq multicastRequest;
+    memset(&multicastRequest, 0, sizeof(multicastRequest));
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
-    if( setsockopt( handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-        (raw_type *) &multicastRequest,
-        sizeof(multicastRequest)) < 0) {
-            qWarning() << "failed to join multicast group" << multicastGroup << "from IF" << multicastIF<<". "<<SystemError::getLastOSErrorText();
-            return false;
+    if (setsockopt(handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (raw_type *)&multicastRequest,
+            sizeof(multicastRequest)) < 0)
+    {
+        qWarning() << "failed to join multicast group" << multicastGroup
+            << "from IF" << multicastIF << ". " << SystemError::getLastOSErrorText();
+        return false;
     }
     return true;
 }
 
-bool UDPSocket::leaveGroup(const QString &multicastGroup)  {
+bool UDPSocket::leaveGroup(const QString &multicastGroup)
+{
     struct ip_mreq multicastRequest;
+    memset(&multicastRequest, 0, sizeof(multicastRequest));
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-    if( setsockopt( handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
-        (raw_type *) &multicastRequest,
-        sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group leave failed (setsockopt()).");
-            return false;
+    if (setsockopt(handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
+            (raw_type *)&multicastRequest,
+            sizeof(multicastRequest)) < 0)
+    {
+        qnWarning("Multicast group leave failed (setsockopt()).");
+        return false;
     }
     return true;
 }
 
-bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multicastIF)  {
+bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multicastIF)
+{
     struct ip_mreq multicastRequest;
+    memset(&multicastRequest, 0, sizeof(multicastRequest));
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
-    if( setsockopt( handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
-        (raw_type *) &multicastRequest,
-        sizeof(multicastRequest)) < 0) {
-            qnWarning("Multicast group leave failed (setsockopt()).");
-            return false;
+    if (setsockopt(handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
+            (raw_type *)&multicastRequest,
+            sizeof(multicastRequest)) < 0)
+    {
+        qnWarning("Multicast group leave failed (setsockopt()).");
+        return false;
     }
     return true;
 }
 
-int UDPSocket::send( const void* buffer, unsigned int bufferLen )
+int UDPSocket::send(const void* buffer, unsigned int bufferLen)
 {
     #ifdef _WIN32
         return sendto(
@@ -1640,8 +1622,7 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
 
 }
 
-//!Implementation of AbstractDatagramSocket::setDestAddr
-bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
+bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
 {
     if (endpoint.address.isIpAddress())
     {
@@ -1668,7 +1649,6 @@ bool UDPSocket::setDestAddr( const SocketAddress& endpoint )
     return (bool) m_destAddr.ptr;
 }
 
-//!Implementation of AbstractDatagramSocket::sendTo
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
@@ -1711,7 +1691,7 @@ void UDPSocket::sendToAsync(
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 {
     //TODO #ak use flags
-    return recvFrom( buffer, bufferLen, &m_prevDatagramAddress.address, &m_prevDatagramAddress.port );
+    return recvFrom(buffer, bufferLen, &m_prevDatagramAddress.address, &m_prevDatagramAddress.port);
 }
 
 int UDPSocket::recvFrom(
@@ -1734,10 +1714,11 @@ void UDPSocket::recvFromAsync(
     nx::Buffer* const buf,
     std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
 {
-    //TODO #ak #msvc2015 move handler
     readSomeAsync(
         buf,
-        [/*std::move*/ handler, this](SystemError::ErrorCode errCode, size_t bytesRead){
+        [handler = std::move(handler), this](
+            SystemError::ErrorCode errCode, size_t bytesRead)
+        {
             handler(errCode, std::move(m_prevDatagramAddress), bytesRead);
         });
 }
@@ -1783,11 +1764,12 @@ int UDPSocket::recvFrom(
     quint16* const sourcePort )
 {
     sockaddr_in clntAddr;
-    socklen_t addrLen = sizeof( clntAddr );
+    memset(&clntAddr, 0, sizeof(clntAddr));
+    socklen_t addrLen = sizeof(clntAddr);
 
 #ifdef _WIN32
     const auto h = handle();
-    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen );
+    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen);
     if ((rtn == SOCKET_ERROR) &&
         (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
     {
@@ -1806,9 +1788,9 @@ int UDPSocket::recvFrom(
         recvTimeout );
 #endif
 
-    if( rtn >= 0 )
+    if (rtn >= 0)
     {
-        *sourceAddress = HostAddress( clntAddr.sin_addr );
+        *sourceAddress = HostAddress(clntAddr.sin_addr);
         *sourcePort = ntohs(clntAddr.sin_port);
     }
     return rtn;
@@ -1819,5 +1801,5 @@ template class Socket<AbstractStreamSocket>;
 template class CommunicatingSocket<AbstractStreamSocket>;
 template class CommunicatingSocket<AbstractDatagramSocket>;
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx
