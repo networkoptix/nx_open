@@ -100,7 +100,7 @@ SocketAddress AsyncClient::remoteAddress() const
 
 void AsyncClient::closeConnection(SystemError::ErrorCode errorCode)
 {
-    post([this, errorCode](){ closeConnection(errorCode, nullptr); });
+    dispatch([this, errorCode](){ closeConnection(errorCode, nullptr); });
 }
 
 template<typename Container>
