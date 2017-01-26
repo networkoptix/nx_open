@@ -141,28 +141,37 @@ protected:
     {
         using namespace std::chrono;
 
-        const seconds testDuration(5);
+        const auto millisInSecond = duration_cast<milliseconds>(seconds(1)).count();
+
+        const seconds testDurationLimit(5);
+        // Limiting number of connections to limit number of allocated ports.
+        const int maxConnectionsToEstablish = 1000;
 
         TestResult testResult;
 
         bool terminated = false;
+        bool connectorDone = false;
         nx::utils::thread establishConnectionThread(
-            [this, &terminated, testDuration]()
+            [this, &terminated, testDurationLimit, maxConnectionsToEstablish, &connectorDone]()
             {
-                while (!terminated)
+                for (int i = 0; !terminated; ++i)
                 {
                     TCPSocket socket;
-                    socket.connect(m_localServerAddress, 50);
+                    ASSERT_TRUE(socket.setReuseAddrFlag(true));
+                    socket.connect(m_localServerAddress, 500);
+                    if (i >= maxConnectionsToEstablish && !connectorDone)
+                        connectorDone = true;
                 }
             });
 
         int socketsAccepted = 0;
         const auto startTime = system_clock::now();
-        while (system_clock::now() < (startTime + testDuration))
+        while ((system_clock::now() < (startTime + testDurationLimit)) && !connectorDone)
         {
             auto clientSocket = m_serverSocket->accept();
+            if (clientSocket)
+                ++socketsAccepted;
             delete clientSocket;
-            ++socketsAccepted;
         }
         const auto endTime = system_clock::now();
 
@@ -172,7 +181,8 @@ protected:
         testResult.duration = duration_cast<milliseconds>(endTime - startTime);
         testResult.totalConnectionsAccepted = socketsAccepted;
         testResult.connectionsAcceptedPerSecond =
-            socketsAccepted / (duration_cast<seconds>(endTime - startTime).count());
+            (socketsAccepted * millisInSecond) /
+            (duration_cast<milliseconds>(endTime - startTime).count());
 
         return testResult;
     }
