@@ -43,6 +43,11 @@ QUrl QnCloudUrlHelper::restorePasswordUrl() const
     return makeUrl(lit("/restore_password"), false);
 }
 
+QUrl QnCloudUrlHelper::faqUrl() const
+{
+    return makeUrl(lit("/content/faq"), false);
+}
+
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
     SystemUri uri(QnAppInfo::defaultCloudPortalUrl());
