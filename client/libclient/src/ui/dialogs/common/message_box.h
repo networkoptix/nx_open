@@ -148,9 +148,6 @@ public:
     Qt::TextFormat textFormat() const;
     void setTextFormat(Qt::TextFormat format);
 
-    bool informativeOpenLinks() const;
-    void setInformativeOpenLinks(bool value);
-
     QString informativeText() const;
 
     /** Informative text, that will be split by \n to several paragraphs */

@@ -66,7 +66,7 @@ void QnMessageBoxPrivate::init()
     font.setPixelSize(font.pixelSize() + 2);
     q->ui->mainLabel->setFont(font);
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
-
+    q->ui->mainLabel->setOpenExternalLinks(true);
     q->setResizeToContentsMode(Qt::Vertical);
 
     detectEscapeButton();
@@ -572,24 +572,6 @@ void QnMessageBox::setTextFormat(Qt::TextFormat format)
     ui->mainLabel->setTextFormat(format);
 }
 
-bool QnMessageBox::informativeOpenLinks() const
-{
-    Q_D(const QnMessageBox);
-    if (d->informativeLabels.isEmpty())
-        return false;
-
-    return d->informativeLabels.first()->openExternalLinks();
-}
-
-void QnMessageBox::setInformativeOpenLinks(bool value)
-{
-    Q_D(const QnMessageBox);
-
-    QStringList lines;
-    for (auto label : d->informativeLabels)
-        label->setOpenExternalLinks(value);
-}
-
 QString QnMessageBox::informativeText() const
 {
     Q_D(const QnMessageBox);
@@ -615,6 +597,7 @@ void QnMessageBox::setInformativeText(const QString &text, bool split)
     for (const QString& line: lines)
     {
         QLabel* label = new QLabel(this);
+        label->setOpenExternalLinks(true);
         label->setWordWrap(true);
         label->setText(line);
         ui->verticalLayout->insertWidget(index, label);
