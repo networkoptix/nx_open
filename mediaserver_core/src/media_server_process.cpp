@@ -1267,7 +1267,7 @@ void MediaServerProcess::updateAddressesList()
 
     QList<SocketAddress> serverAddresses;
 
-    const auto port = m_mediaServer->getPort();
+    const auto port = m_universalTcpListener->getPort();
     for (const auto& host: allLocalAddresses())
         serverAddresses << SocketAddress(host.toString(), port);
 
@@ -1275,7 +1275,7 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << SocketAddress(host.first, host.second);
 
     if (!m_ipDiscovery->publicIP().isNull())
-        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), m_mediaServer->getPort());
+        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
@@ -2758,8 +2758,8 @@ void MediaServerProcess::run()
         &MediaServerProcess::updateAddressesList);
 
     connect(
-        m_mediaServer.data(),
-        &QnMediaServerResource::primaryAddressChanged,
+        m_universalTcpListener,
+        &QnTcpListener::portChanged,
         this,
         &MediaServerProcess::updateAddressesList);
 
