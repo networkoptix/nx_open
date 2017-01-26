@@ -596,6 +596,8 @@ TEST_F(CloudServerSocketTest, reconnect)
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 
+        cloudServerSocket.pleaseStopSync();
+
         // Breaking connection to mediator.
         nx::utils::promise<void> cloudCredentialsModified;
         nx::network::SocketGlobals::mediatorConnector().post(
@@ -607,8 +609,6 @@ TEST_F(CloudServerSocketTest, reconnect)
             });
         cloudCredentialsModified.get_future().wait();
         std::swap(currentCredentials, otherCredentials);
-
-        cloudServerSocket.pleaseStopSync();
     }
 }
 
