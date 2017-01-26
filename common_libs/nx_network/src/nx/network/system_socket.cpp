@@ -862,103 +862,125 @@ bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
 
     //switching to non-blocking mode to connect with timeout
     bool isNonBlockingModeBak = false;
-    if( !this->getNonBlockingMode( &isNonBlockingModeBak ) )
+    if (!this->getNonBlockingMode(&isNonBlockingModeBak))
         return false;
-    if( !isNonBlockingModeBak && !this->setNonBlockingMode( true ) )
+    if (!isNonBlockingModeBak && !this->setNonBlockingMode(true))
         return false;
 
     int connectResult = ::connect(this->m_fd, addr.ptr.get(), addr.size);
-
-    if( connectResult != 0 )
+    if (connectResult != 0)
     {
-        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
+        if (SystemError::getLastOSErrorCode() != SystemError::inProgress)
             return false;
-        if( isNonBlockingModeBak )
+        if (isNonBlockingModeBak)
             return true;        //async connect started
     }
 
-    int iSelRet = 0;
+    SystemError::ErrorCode connectErrorCode = SystemError::noError;
 
 #ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
-
-    /* monitor for incomming connections */
     FD_ZERO(&wrtFDS);
     FD_SET(m_fd, &wrtFDS);
 
+    fd_set exceptFDS;
+    FD_ZERO(&exceptFDS);
+    FD_SET(m_fd, &exceptFDS);
+
     /* set timeout values */
-    timeVal.tv_sec  = timeoutMs/1000;
-    timeVal.tv_usec = timeoutMs%1000;
-    iSelRet = ::select(
+    timeVal.tv_sec = timeoutMs / 1000;
+    timeVal.tv_usec = (timeoutMs % 1000) * 1000;
+    const int selectResult = ::select(
         m_fd + 1,
         NULL,
         &wrtFDS,
-        NULL,
-        timeoutMs >= 0 ? &timeVal : NULL );
+        &exceptFDS,
+        timeoutMs >= 0 ? &timeVal : NULL);
+
+    if (selectResult < 0)
+    {
+        connectErrorCode = SystemError::getLastOSErrorCode();
+    }
+    else if (selectResult == 0)
+    {
+        connectErrorCode = SystemError::timedOut;
+    }
+    else
+    {
+        if (FD_ISSET(m_fd, &wrtFDS))
+        {
+            m_connected = true;
+        }
+        else if (FD_ISSET(m_fd, &exceptFDS))
+        {
+            if (!getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
+                connectErrorCode = SystemError::connectionRefused;
+        }
+    }
 #else
-    //handling interruption by a signal
-    //struct timespec waitStartTime;
-    //memset( &waitStartTime, 0, sizeof(waitStartTime) );
     QElapsedTimer et;
     et.start();
     bool waitStartTimeActual = false;
-    if( timeoutMs > 0 )
-        waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
-    for( ;; )
+    if (timeoutMs > 0)
+        waitStartTimeActual = true;
+    for (;;)
     {
         struct pollfd sockPollfd;
-        memset( &sockPollfd, 0, sizeof(sockPollfd) );
+        memset(&sockPollfd, 0, sizeof(sockPollfd));
         sockPollfd.fd = this->m_fd;
         sockPollfd.events = POLLOUT;
 #ifdef _GNU_SOURCE
         sockPollfd.events |= POLLRDHUP;
 #endif
-        iSelRet = ::poll( &sockPollfd, 1, timeoutMs );
-
-
-        //timeVal.tv_sec  = timeoutMs/1000;
-        //timeVal.tv_usec = timeoutMs%1000;
-
-        //iSelRet = ::select( m_fd + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
-        if( iSelRet == -1 && errno == EINTR )
+        const int pollResult = ::poll(&sockPollfd, 1, timeoutMs);
+        if (pollResult < 0)
         {
-            //modifying timeout for time we've already spent in select
-            if( timeoutMs == 0 ||  //no timeout
-                !waitStartTimeActual )
+            if (errno == EINTR)
             {
-                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
+                //modifying timeout for time we've already spent in select
+                if (timeoutMs == 0 ||  //no timeout
+                    !waitStartTimeActual)
+                {
+                    //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
+                    continue;
+                }
+                const int millisAlreadySlept = et.elapsed();
+                if (millisAlreadySlept >= (int)timeoutMs)
+                {
+                    connectErrorCode = SystemError::timedOut;
+                    break;
+                }
+                timeoutMs -= millisAlreadySlept;
                 continue;
             }
-            //struct timespec waitStopTime;
-            //memset( &waitStopTime, 0, sizeof(waitStopTime) );
-            //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-            //    continue;   //not updating timeout value
-            const int millisAlreadySlept = et.elapsed();
-            //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
-            //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-            if( millisAlreadySlept >= (int)timeoutMs )
-                break;
-            timeoutMs -= millisAlreadySlept;
-            continue;
+
+            connectErrorCode = SystemError::getLastOSErrorCode();
+            break;
         }
 
-        if ((sockPollfd.revents & POLLERR) || !(sockPollfd.revents & POLLOUT))
-            iSelRet = 0;
+        if (pollResult == 0)
+        {
+            connectErrorCode = SystemError::timedOut;
+            break;
+        }
 
-        int result;
-        socklen_t result_len = sizeof(result);
-        if ((getsockopt(this->m_fd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0) || (result != 0))
-            iSelRet = 0;
+        if (sockPollfd.revents & POLLOUT)
+            break;  //< Success.
 
+        if (!getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
+            connectErrorCode = SystemError::connectionRefused;
         break;
     }
 #endif
 
-    m_connected = iSelRet > 0;
+    m_connected = connectErrorCode == SystemError::noError;
 
     //restoring original mode
-    this->setNonBlockingMode( isNonBlockingModeBak );
+    this->setNonBlockingMode(isNonBlockingModeBak);
+
+    SystemError::setLastErrorCode(connectErrorCode);
+
     return m_connected;
 }
 
