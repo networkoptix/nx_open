@@ -39,6 +39,14 @@
       <translation>L6FE34GJWM.com.networkoptix.NxMobile</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>disabled</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>disabled</translation>
+    </message>      
+    <message>
       <source>COMPANY_NAME</source>
       <translation>Network Optix</translation>
     </message>

@@ -39,6 +39,14 @@
       <translation>32NH529F85.ru.ipera.FlyView</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>https://itunes.apple.com/eg/app/id1090087835</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=ru.ipera.flyviewmobile</translation>
+    </message>      
+    <message>
       <source>COMPANY_NAME</source>
       <translation>iPera</translation>
     </message>

@@ -37,7 +37,15 @@
     <message>
       <source>{{iOSappID}}</source>
       <translation>N3KX2CKR5P.com.vista.quluMobile</translation>
-    </message>    
+    </message>  
+    <message>
+      <source>IOS_APP_LINK</source>
+      <translation>https://itunes.apple.com/us/app/qulu/id1090487857?mt=8</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=com.vista.qulumobile</translation>
+    </message>        
     <message>
       <source>COMPANY_NAME</source>
       <translation>Vista CCTV</translation>
