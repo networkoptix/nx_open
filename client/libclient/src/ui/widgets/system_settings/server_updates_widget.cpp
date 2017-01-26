@@ -460,18 +460,13 @@ bool QnServerUpdatesWidget::hasChanges() const
 bool QnServerUpdatesWidget::canApplyChanges() const
 {
     //TODO: #GDM now this prevents other tabs from saving their changes
-    if (isUpdating())
-        return false;
-    return true;
+    return !isUpdating();
 }
 
 bool QnServerUpdatesWidget::canDiscardChanges() const
 {
     //TODO: #GDM now this prevents other tabs from discarding their changes
-    if (!canCancelUpdate())
-        return false;
-
-    return true;
+    return canCancelUpdate();
 }
 
 void QnServerUpdatesWidget::autoCheckForUpdates()
