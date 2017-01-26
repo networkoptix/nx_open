@@ -1744,7 +1744,33 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=3;height=1;sensors=0,1,2"
-        }
+        },
+        {
+            "keys": [
+                "Cellinx|STH795"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  -1,    1],
+                        "logical": [  0,  -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 31.55],
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        }		
     ]
 }
 
