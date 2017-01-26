@@ -22,7 +22,7 @@ const char* const kArchiveCameraGroupNameKey = "groupName";
 QByteArray Composer::make(ComposerHandler* composerHandler)
 {
     QByteArray result;
-    if (!composerHandler->hasCamera())
+    if (!composerHandler)
         return result;
 
     m_stream.reset(new QTextStream(&result));
@@ -93,7 +93,7 @@ void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& in
     if (!m_infoPathToCameraInfo.contains(infoFilePath) ||
         m_infoPathToCameraInfo[infoFilePath] != infoFileData)
     {
-        if (m_handler->replaceFile(infoFilePath, infoFileData))
+        if (m_handler->handleFileData(infoFilePath, infoFileData))
             m_infoPathToCameraInfo[infoFilePath] = infoFileData;
     }
 }
@@ -136,7 +136,7 @@ bool ServerWriterHandler::needStop() const
     return QnResource::isStopping();
 }
 
-bool ServerWriterHandler::replaceFile(const QString& path, const QByteArray& data)
+bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& data)
 {
     auto storage = m_storageManager->getStorageByUrlInternal(path);
     NX_ASSERT(storage);
@@ -164,44 +164,32 @@ bool ServerWriterHandler::replaceFile(const QString& path, const QByteArray& dat
 
 QString ServerWriterHandler::name() const
 {
-    if (!hasCamera())
-        return QString();
     return m_camera->getUserDefinedName();
 }
 
 QString ServerWriterHandler::model() const
 {
-    if (!hasCamera())
-        return QString();
     return m_camera->getModel();
 }
 
 QString ServerWriterHandler::groupId() const
 {
-    if (!hasCamera())
-        return QString();
     return m_camera->getGroupId();
 }
 
 QString ServerWriterHandler::groupName() const
 {
-    if (!hasCamera())
-        return QString();
     return m_camera->getGroupName();
 }
 
 QString ServerWriterHandler::url() const
 {
-    if (!hasCamera())
-        return QString();
     return m_camera->getUrl();
 }
 
 QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 {
     QList<QPair<QString, QString>> result;
-    if (!hasCamera())
-        return result;
 
     for (const auto& prop: m_camera->getAllProperties())
         result.append(QPair<QString, QString>(prop.name, prop.value));
@@ -212,11 +200,9 @@ QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 {
     m_camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
+    if (!static_cast<bool>(m_camera))
+        return nullptr;
     return this;
-}
-bool ServerWriterHandler::hasCamera() const
-{
-    return static_cast<bool>(m_camera);
 }
 
 
