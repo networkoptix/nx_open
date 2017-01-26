@@ -474,6 +474,147 @@ void socketSimpleAsync(
     }
 }
 
+static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+
+    Buffer buffer;
+    buffer.reserve(kTestMessage.size());
+    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
+
+    std::promise<void> promise;
+    receiver->readAsyncAtLeast(
+        &buffer, kTestMessage.size(),
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(size, kTestMessage.size());
+            EXPECT_EQ(buffer, kTestMessage);
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
+}
+
+static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    std::promise<void> promise;
+    sender->sendAsync(
+        kTestMessage,
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(kTestMessage.size(), size);
+            promise.set_value();
+        });
+
+    Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size())) << lastError();
+    EXPECT_EQ(buffer, kTestMessage);
+    promise.get_future().wait();
+}
+
+static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
+
+    Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size())) << lastError();
+}
+
+static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    std::promise<void> sendPromise;
+    sender->sendAsync(
+        kTestMessage,
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            ASSERT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            ASSERT_EQ(kTestMessage.size(), size);
+            sendPromise.set_value();
+        });
+
+    Buffer buffer;
+    buffer.reserve(kTestMessage.size());
+    EXPECT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
+
+    std::promise<void> readPromise;
+    receiver->readAsyncAtLeast(
+        &buffer, kTestMessage.size(),
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(kTestMessage.size(), size);
+            readPromise.set_value();
+        });
+
+    sendPromise.get_future().wait();
+    readPromise.get_future().wait();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSyncAsyncSwitch(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    bool bothNonBlocking,
+    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
+{
+    static const std::chrono::milliseconds kTimeout(1500);
+
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(100));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    ASSERT_FALSE((bool) server->accept()) << lastError();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->setRecvTimeout(kTimeout.count()));
+
+    std::promise<void> connectPromise;
+    client->connectAsync(
+        *endpointToConnectTo,
+        [&](SystemError::ErrorCode code)
+        {
+            EXPECT_EQ(code, SystemError::noError);
+            connectPromise.set_value();
+        });
+
+    connectPromise.get_future().wait();
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool) accepted);
+
+    ASSERT_TRUE(accepted->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(accepted->setRecvTimeout(kTimeout.count()));
+    transferAsyncSync(client.get(), accepted.get());
+    transferSyncAsync(accepted.get(), client.get());
+
+    if (bothNonBlocking)
+    {
+        ASSERT_TRUE(accepted->setNonBlockingMode(true));
+        transferAsync(client.get(), accepted.get());
+        transferAsync(accepted.get(), client.get());
+        ASSERT_TRUE(client->setNonBlockingMode(false));
+    }
+    else
+    {
+        ASSERT_TRUE(client->setNonBlockingMode(false));
+        transferSync(client.get(), accepted.get());
+        transferSync(accepted.get(), client.get());
+        ASSERT_TRUE(accepted->setNonBlockingMode(true));
+    }
+
+    transferSyncAsync(client.get(), accepted.get());
+    transferAsyncSync(accepted.get(), client.get());
+}
+
 template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketMultiConnect(
     const ServerSocketMaker& serverMaker,
@@ -1035,6 +1176,10 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, SimpleAsync) \
         { nx::network::test::socketSimpleAsync(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, SimpleSyncAsyncSwitch) \
+        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, false, endpointToConnectTo); } \
+    Type(Name, SimpleAsyncSyncSwitch) \
+        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, true, endpointToConnectTo); } \
     Type(Name, SimpleMultiConnect) \
         { nx::network::test::socketMultiConnect(mkServer, mkClient, endpointToConnectTo); } \
 
