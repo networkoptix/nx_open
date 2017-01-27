@@ -46,8 +46,17 @@ Pane
             var player = videoScreenController.mediaPlayer
             var statistics = player.currentStatistics()
 
-            framerate = statistics.framerate
-            bitrate = statistics.bitrate
+            if (player.playing)
+            {
+                framerate = statistics.framerate
+                bitrate = statistics.bitrate
+            }
+            else
+            {
+                framerate = 0.0
+                bitrate = 0.0
+            }
+
             codec = statistics.codec
 
             var quality = player.actualVideoQuality()
@@ -98,9 +107,9 @@ Pane
     {
         id: updateTimer
         running: videoScreenController && videoScreenController.mediaPlayer.playing
-        triggeredOnStart: true
         repeat: true
         interval: 1000
         onTriggered: d.updateStatistics()
+        onRunningChanged: d.updateStatistics()
     }
 }
