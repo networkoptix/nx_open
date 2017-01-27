@@ -61,6 +61,24 @@ QnContext::QnContext(QObject* parent) :
         auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
         camerasWatcher->setUseLayouts(useLayouts);
     });
+
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
+        [this](int id)
+        {
+            switch (id)
+            {
+                case QnMobileClientSettings::AutoLogin:
+                    emit autoLoginEnabledChanged();
+                    break;
+
+                case QnMobileClientSettings::ShowCameraInfo:
+                    emit showCameraInfoChanged();
+                    break;
+
+                default:
+                    break;
+            }
+        });
 }
 
 QnContext::~QnContext() {}
@@ -140,7 +158,19 @@ void QnContext::setAutoLoginEnabled(bool enabled)
         return;
 
     qnSettings->setAutoLoginMode(intMode);
-    emit autoLoginEnabledChanged();
+}
+
+bool QnContext::showCameraInfo() const
+{
+    return qnSettings->showCameraInfo();
+}
+
+void QnContext::setShowCameraInfo(bool showCameraInfo)
+{
+    if (showCameraInfo == qnSettings->showCameraInfo())
+        return;
+
+    qnSettings->setShowCameraInfo(showCameraInfo);
 }
 
 bool QnContext::testMode() const

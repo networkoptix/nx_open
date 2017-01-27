@@ -28,8 +28,8 @@ class TranslatableProject():
             self.name, self.path, self.extensions, self.locations, self.sources)
 
 translatableProjects = [
-    TranslatableProject("qt", "common"),
-    TranslatableProject("qtbase", "common"),
+#    TranslatableProject("qt", "common"),
+#    TranslatableProject("qtbase", "common"),
     TranslatableProject("common"),
     TranslatableProject("traytool"),
     TranslatableProject("client_base", "client/libclient"),

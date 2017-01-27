@@ -3,6 +3,7 @@
 #include <QtCore/QUrl>
 
 #include <core/resource/resource_type.h>
+#include <core/resource/webpage_resource.h>
 
 #include <database/api/db_webpage_api.h>
 
@@ -21,7 +22,7 @@ bool addDefaultWebpages(const QSqlDatabase& database)
     auto addWebPage = [&database](const QString& target)
         {
             QUrl url(target);
-            if (target.isEmpty() || !url.isValid())
+            if (!url.isValid() || url.host().isEmpty())
                 return true;
 
             // keeping consistency with QnWebPageResource
@@ -29,19 +30,24 @@ bool addDefaultWebpages(const QSqlDatabase& database)
             webPage.id = guidFromArbitraryData(url.toString().toUtf8());
             webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
             webPage.url = target;
-            webPage.name = url.host();
+            webPage.name = QnWebPageResource::nameForUrl(url);
             return api::saveWebPage(database, webPage);
         };
 
-    bool success = addWebPage(QnAppInfo::companyUrl());
-    NX_ASSERT(success);
-    if (!success)
-        NX_LOG(lit("Invalid company url %1").arg(QnAppInfo::companyUrl()), cl_logERROR);
+    QSet<QString> urls;
+    urls.insert(QnAppInfo::companyUrl().trimmed());
+    urls.insert(QnAppInfo::supportLink().trimmed());
 
-    success = addWebPage(QnAppInfo::supportLink());
-    NX_ASSERT(success);
-    if (!success)
-        NX_LOG(lit("Invalid support link %1").arg(QnAppInfo::supportLink()), cl_logERROR);
+    for (const auto& url: urls)
+    {
+        if (url.isEmpty())
+            continue;
+
+        bool success = addWebPage(url);
+        NX_ASSERT(success);
+        if (!success)
+            NX_LOG(lit("Invalid predefined url %1").arg(url), cl_logERROR);
+    }
 
     return true; // We don't want to crash if partner did not fill any of these
 }

@@ -322,6 +322,17 @@ void QnNotificationWidget::addActionButton(
     m_actions << ActionData(actionId, parameters); //still required for thumbnails click and base notification click
 }
 
+void QnNotificationWidget::triggerDefaultAction()
+{
+    if (m_defaultActionIdx < 0)
+        return;
+
+    NX_ASSERT(m_defaultActionIdx < m_actions.size());
+    const auto actionData = m_actions[m_defaultActionIdx];
+
+    emit actionTriggered(actionData.action, actionData.params);
+}
+
 void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     if (m_hoverProcessor->isHovered())
@@ -388,24 +399,13 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
     }
     else if (button == Qt::LeftButton)
     {
-        if (!m_actions.isEmpty())
-        {
-            ActionData data = m_actions[0]; // TODO: #Elric
-            emit actionTriggered(data.action, data.params);
-        }
+        triggerDefaultAction();
     }
 }
 
 void QnNotificationWidget::at_thumbnail_clicked()
 {
-    if (m_defaultActionIdx < 0)
-        return;
-
-    if (m_actions.size() <= m_defaultActionIdx)
-        return;
-
-    ActionData data = m_actions[m_defaultActionIdx];
-    emit actionTriggered(data.action, data.params);
+    triggerDefaultAction();
 }
 
 void QnNotificationWidget::at_loop_sound()
