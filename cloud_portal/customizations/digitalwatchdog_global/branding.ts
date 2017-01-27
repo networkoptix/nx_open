@@ -39,6 +39,14 @@
       <translation>HW58JB7FUF.tv.dwcc.DwMobile</translation>
     </message>    
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>https://itunes.apple.com/us/app/dw-spectrum/id1090087818?mt=8</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=com.digitalwatchdog.dwmobile</translation>
+    </message>    
+    <message>
       <source>COMPANY_NAME</source>
       <translation>Digital Watchdog</translation>
     </message>

@@ -39,6 +39,14 @@
       <translation>C6ZWGSKK3B.com.cox.cb.hdsec</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>https://itunes.apple.com/us/app/cox-business-security/id904940952?mt=8</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=com.cox.hdsec</translation>
+    </message>    
+    <message>
       <source>COMPANY_NAME</source>
       <translation>Cox Communications</translation>
     </message>

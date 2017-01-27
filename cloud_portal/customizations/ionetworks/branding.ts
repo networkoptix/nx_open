@@ -39,6 +39,14 @@
       <translation>MXZQG6QD9L.com.ioezio.ezpromobile</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>disabled</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>https://play.google.com/store/apps/details?id=com.ioezio.ezpromobile</translation>
+    </message>     
+    <message>
       <source>COMPANY_NAME</source>
       <translation>EZ Pro</translation>
     </message>
