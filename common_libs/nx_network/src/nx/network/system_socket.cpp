@@ -928,7 +928,7 @@ bool CommunicatingSocket<InterfaceToImplement>::connectToIp(
             break;
         }
 
-        if (sockPollfd.revents & POLLERR)
+        if (sockPollfd.revents & (POLLERR| POLLHUP))
         {
             if (!this->getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
                 connectErrorCode = SystemError::connectionRefused;
