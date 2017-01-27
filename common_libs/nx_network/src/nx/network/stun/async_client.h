@@ -60,7 +60,6 @@ private:
         disconnected,
         connecting,
         connected,
-        terminated,
     };
 
     virtual void closeConnection(

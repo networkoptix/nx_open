@@ -239,9 +239,8 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
 
         case State::connected:
         case State::connecting:
-        case State::terminated:
             NX_LOGX(lm("Cannot open connection while in state %1")
-                .arg(toString(m_state)), cl_logDEBUG2);
+                .arg(toString(m_state)), cl_logDEBUG1);
             return;
 
         default:
@@ -254,12 +253,11 @@ void AsyncClient::closeConnectionImpl(
     QnMutexLockerBase* lock, SystemError::ErrorCode code)
 {
     NX_LOGX(lm("Connection is closed: %1").arg(SystemError::toString(code)), cl_logINFO);
+    m_state = State::disconnected;
+
     auto connectingSocket = std::move(m_connectingSocket);
     auto requestQueue = std::move(m_requestQueue);
     auto requestsInProgress = std::move(m_requestsInProgress);
-
-    if (m_state != State::terminated)
-        m_state = State::disconnected;
 
     lock->unlock();
     {
@@ -271,18 +269,16 @@ void AsyncClient::closeConnectionImpl(
     }
     lock->relock();
 
-    if (m_state != State::terminated)
-    {
-        NX_LOGX(lm("Scheduling reconnect attempt"), cl_logDEBUG2);
-        m_timer->scheduleNextTry(
-            [this]
-            {
-                NX_LOGX(lm("Trying to restore connection to STUN server %1 ...")
-                    .str(m_endpoint ? *m_endpoint : SocketAddress()), cl_logDEBUG1);
-                QnMutexLocker lock(&m_mutex);
-                openConnectionImpl(&lock);
-            });
-    }
+    NX_LOGX(lm("Scheduling reconnect attempt"), cl_logDEBUG1);
+    m_timer->scheduleNextTry(
+        [this]
+        {
+            NX_LOGX(lm("Trying to restore connection to STUN server %1 ...")
+                .str(m_endpoint ? *m_endpoint : SocketAddress()), cl_logDEBUG1);
+
+            QnMutexLocker lock(&m_mutex);
+            openConnectionImpl(&lock);
+        });
 }
 
 void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
@@ -327,7 +323,7 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
 
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
-    NX_LOGX(lm("Connect to %1 completed with result %2")
+    NX_LOGX(lm("Connect to %1 completed with result: %2")
         .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectCompletionHandler connectCompletionHandler;
@@ -340,9 +336,6 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     QnMutexLocker lock( &m_mutex );
     connectCompletionHandler.swap(m_connectCompletionHandler);
-
-    if( m_state == State::terminated )
-        return;
 
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
@@ -370,9 +363,6 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 void AsyncClient::processMessage(Message message)
 {
     QnMutexLocker lock( &m_mutex );
-    if( m_state == State::terminated )
-        return;
-
     message.transportHeader.requestedEndpoint = m_baseConnection->socket()->getForeignAddress();
     message.transportHeader.locationEndpoint = message.transportHeader.requestedEndpoint;
 
@@ -428,6 +418,7 @@ void AsyncClient::processMessage(Message message)
 
 void AsyncClient::stopWhileInAioThread()
 {
+    NX_LOGX(lm("Stopped"), cl_logINFO);
     m_timer.reset();
     m_baseConnection.reset();
     m_connectingSocket.reset();
@@ -443,8 +434,6 @@ const char* AsyncClient::toString(State state) const
             return "connecting";
         case State::connected:
             return "connected";
-        case State::terminated:
-            return "terminated";
     }
 
     return "unknown";
