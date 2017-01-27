@@ -85,7 +85,13 @@ bool MediaServerLauncher::start()
     const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
-    return result == std::future_status::ready;
+    if (result != std::future_status::ready)
+        return false;
+
+    while (m_mediaServerProcess->getTcpPort() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    return true;
 }
 
 bool MediaServerLauncher::startAsync()
