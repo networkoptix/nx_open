@@ -97,6 +97,14 @@
         <source>Connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enter server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All fields must be filled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DeveloperSettingsScreen</name>
@@ -192,6 +200,37 @@
     </message>
 </context>
 <context>
+    <name>InformationLabel</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Inconnue</translation>
+    </message>
+    <message>
+        <source>Hi-res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-res key-frames</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LaunchButton</name>
     <message>
         <source>Turn On</source>
@@ -205,15 +244,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure that display is connected to Nx1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot stop client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nx1 is offline</source>
+        <source>Please make sure that display is connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -316,7 +355,7 @@
 <context>
     <name>ServerOfflineDummy</name>
     <message>
-        <source>Nx1 is offline</source>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -387,6 +426,14 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">Paramètres</translation>
+    </message>
+    <message>
+        <source>Live previews in the cameras list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save passwords for servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
