@@ -239,7 +239,7 @@ QJsonObject::const_iterator QJsonDetail::findField(
     const QJsonObject& jsonObject,
     const QString& fieldName,
     DeprecatedFieldNames* deprecatedFieldNames,
-    const type_info& structTypeInfo)
+    const std::type_info& structTypeInfo)
 {
     QJsonObject::const_iterator pos = jsonObject.find(fieldName);
 
