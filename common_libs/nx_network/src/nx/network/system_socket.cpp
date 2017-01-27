@@ -1082,8 +1082,6 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
 #endif
 }
 
-static const size_t USEC_PER_MSEC = 1000;
-
 bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 {
 #ifdef _WIN32
@@ -1096,6 +1094,8 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
     }
     return readTcpStat( &d->win32TcpTableRow, info ) == ERROR_SUCCESS;
 #elif defined(__linux__)
+    static const size_t USEC_PER_MSEC = 1000;
+
     struct tcp_info tcpinfo;
     memset( &tcpinfo, 0, sizeof(tcpinfo) );
     socklen_t tcp_info_length = sizeof(tcpinfo);
