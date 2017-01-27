@@ -703,7 +703,7 @@ TEST(MediaDbTest, ReadWrite_MT)
     initDbFile(&dbFile, fileName);
 
     const size_t threadsNum = 4;
-    const size_t recordsCount = 1000;
+    const size_t recordsCount = 100000;
 
     nx::media_db::Error error;
     TestDataManager tdm(threadsNum * recordsCount);

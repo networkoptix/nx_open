@@ -73,7 +73,7 @@ private:
             testPath,
             m_modulesXmlBody,
             "plain/text");
-        ASSERT_TRUE(m_server.bindAndListen());
+        ASSERT_TRUE(m_server.bindAndListen()) << SystemError::getLastOSErrorText().toStdString();
 
         m_modulesUrl =
             QUrl(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath));

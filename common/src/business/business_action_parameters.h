@@ -63,6 +63,9 @@ struct QnBusinessActionParameters
     //Say text
     bool playToClient;
 
+    //HTTP action
+    QString contentType;
+
     /**
      * \returns                        Whether all parameters have default values.
      */
@@ -70,7 +73,7 @@ struct QnBusinessActionParameters
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)
+    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

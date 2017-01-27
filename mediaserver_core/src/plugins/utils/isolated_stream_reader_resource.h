@@ -6,9 +6,14 @@
 
 namespace nx {
 namespace plugins {
-namespace pelco {
+namespace utils {
 
-class OpteraStreamReaderResource: public QnPlOnvifResource
+/**
+ * Isolated resource does not put its properties to the database. 
+ * It can be safely used in places where creation of temporary/proxy resources is needed. 
+ */
+
+class IsolatedStreamReaderResource: public QnPlOnvifResource
 {
 
 public:
@@ -20,6 +25,9 @@ public:
         const QString &value,
         PropertyOptions options = DEFAULT_OPTIONS) override;
 
+    virtual void saveParams() override;
+    virtual void saveParamsAsync() override;
+    virtual int saveAsync() override;
     virtual bool removeProperty(const QString& key) override;
 
 private:
@@ -27,7 +35,7 @@ private:
     std::map<QString, QString> m_properties;
 };
 
-} // namespace pelco
+} // namespace utils
 } // namespace plugins
 } // namespace nx
 

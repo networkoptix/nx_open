@@ -16,7 +16,6 @@ from functest_util import generateKey
 TEST_SYSTEM_NAME_1="MergeTestSystem1"
 TEST_SYSTEM_NAME_2="MergeTestSystem2"
 CLOUD_SERVER='cloud-test.hdw.mx'
-FAKE_CLOUD_SERVER='cloud-fake.hdw.mx'
 CLOUD_USER_NAME='anikitin@networkoptix.com'
 CLOUD_USER_PWD='qweasd123'
 DEFAULT_CUSTOMIZATION='default'
@@ -51,8 +50,8 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
               'testMergeTakeRemoteSettings',
               'testRestartOneServer',
               'testMergeCloudWithLocal',
-              # 'testMergeCloudSystems',
-              # 'testCloudMergeAfterDisconnect'
+              'testMergeCloudSystems',
+              'testCloudMergeAfterDisconnect'
           ]),
       )
 
@@ -395,7 +394,7 @@ class MergeSystemTest(FuncTestCase, ClientMixin):
             headers={'Content-Type': 'application/json'},
             data=json.dumps({'id': adminGuid,
                              'isEnabled': True}))
-        self.checkResponseError(response, "ec2/saveUser")
+        self.checkResponseError(response, "ec2/saveUser", status = 403)
        
         
     def testCloudMergeAfterDisconnect(self):

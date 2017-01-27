@@ -1,4 +1,4 @@
-
+#include <memory>
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -114,6 +114,20 @@ TEST(TcpServerSocketIpv6, BindsToLocalAddress)
     TCPServerSocket socket(AF_INET6);
     ASSERT_TRUE(socket.bind(SocketAddress::anyPrivateAddress));
     ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
+}
+
+TEST(TcpSocket, ConnectErrorReporting)
+{
+    // Connecting to port 1 which is reserved for now deprecated TCPMUX service.
+    // So, in most cases can expect port 1 to be unused.
+    const SocketAddress localAddress(HostAddress::localhost, 1);
+
+    TCPSocket tcpSocket(AF_INET);
+    const bool connectResult = tcpSocket.connect(localAddress, 1500);
+    const auto connectErrorCode = SystemError::getLastOSErrorCode();
+    ASSERT_FALSE(connectResult);
+    ASSERT_NE(SystemError::noError, connectErrorCode);
+    ASSERT_FALSE(tcpSocket.isConnected());
 }
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(

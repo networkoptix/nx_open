@@ -60,7 +60,6 @@ private:
         disconnected,
         connecting,
         connected,
-        terminated,
     };
 
     virtual void closeConnection(
@@ -94,6 +93,8 @@ private:
 
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     ConnectCompletionHandler m_connectCompletionHandler;
+
+    const char* toString(State state) const;
 };
 
 } // namespase stun

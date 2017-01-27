@@ -27,7 +27,7 @@ class FakeTcpTunnelConnection
 {
 public:
     FakeTcpTunnelConnection(
-        aio::AbstractAioThread* thread,
+        aio::AbstractAioThread* aioThread,
         network::test::AddressBinder::Manager addressManager,
         size_t clientsLimit)
     :
@@ -35,16 +35,7 @@ public:
         m_server(new TCPServerSocket(AF_INET)),
         m_addressManager(std::move(addressManager))
     {
-        m_server->bindToAioThread(thread);
-        NX_CRITICAL(m_server->setNonBlockingMode(true));
-        NX_CRITICAL(m_server->setReuseAddrFlag(true));
-        NX_CRITICAL(m_server->bind(SocketAddress::anyPrivateAddress));
-        NX_CRITICAL(m_server->listen());
-
-        auto address = m_server->getLocalAddress();
-        NX_LOGX(lm("listening %1 for %2 sockets")
-            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
-        m_addressManager.add(std::move(address));
+        init(aioThread);
     }
 
     ~FakeTcpTunnelConnection()
@@ -81,6 +72,24 @@ private:
     size_t m_clientsLimit;
     std::unique_ptr<AbstractStreamServerSocket> m_server;
     network::test::AddressBinder::Manager m_addressManager;
+
+    void init(aio::AbstractAioThread* aioThread)
+    {
+        m_server->bindToAioThread(aioThread);
+        ASSERT_TRUE(m_server->setNonBlockingMode(true))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->setReuseAddrFlag(true))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->bind(SocketAddress::anyPrivateAddress))
+            << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(m_server->listen())
+            << SystemError::getLastOSErrorText().toStdString();
+
+        auto address = m_server->getLocalAddress();
+        NX_LOGX(lm("listening %1 for %2 sockets")
+            .str(address.toString()).arg(m_clientsLimit), cl_logDEBUG1);
+        m_addressManager.add(std::move(address));
+    }
 };
 
 /**
@@ -579,7 +588,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     otherCredentials.key = system.authKey;
     otherCredentials.serverId = server->serverId();
 
-    for (int i = 0; i < 200; ++i)
+    for (int i = 0; i < 17; ++i)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
@@ -587,11 +596,19 @@ TEST_F(CloudServerSocketTest, reconnect)
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 
-        //breaking connection to mediator
-        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(otherCredentials);
-        std::swap(currentCredentials, otherCredentials);
-
         cloudServerSocket.pleaseStopSync();
+
+        // Breaking connection to mediator.
+        nx::utils::promise<void> cloudCredentialsModified;
+        nx::network::SocketGlobals::mediatorConnector().post(
+            [&cloudCredentialsModified, &otherCredentials]()
+            {
+                nx::network::SocketGlobals::mediatorConnector()
+                    .setSystemCredentials(otherCredentials);
+                cloudCredentialsModified.set_value();
+            });
+        cloudCredentialsModified.get_future().wait();
+        std::swap(currentCredentials, otherCredentials);
     }
 }
 

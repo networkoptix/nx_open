@@ -584,7 +584,13 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
                 continue;
 
-            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
+                auto url = QUrl(itr.key());
+                if (url.path() == lit("/"))
+                    url.setPath(lit(""));
+
+                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
+                    url.toString(QUrl::StripTrailingSlash), itr.value());
+
             inserted.value().searcher = searcher;
 			resourceHasBeenAdded = true;
         }
@@ -640,7 +646,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
     QnMutexLocker lock( &m_searchersListMutex );
-    return m_manualCameraMap.contains(url);
+    return m_manualCameraMap.contains(QUrl(url).toString(QUrl::StripTrailingSlash));
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {

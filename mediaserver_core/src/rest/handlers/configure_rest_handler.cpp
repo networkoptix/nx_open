@@ -179,10 +179,6 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
             return ResultFail;
     }
 
-    auto primaryAddress = server->getPrimaryAddress();
-    primaryAddress.port = port;
-    server->setPrimaryAddress(primaryAddress);
-
     QUrl url = server->getUrl();
     url.setPort(port);
     server->setUrl(url.toString());

@@ -13,6 +13,7 @@
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
 
 namespace nx {
@@ -185,6 +186,8 @@ TEST_F(UdpClient, client_test_async)
         addServer();
 
     stun::UdpClient client;
+    auto clientGuard = makeScopedGuard([&client](){ client.pleaseStopSync(); });
+
     std::mutex mutex;
     std::condition_variable cond;
     std::set<nx::String> expectedTransactionIDs;
@@ -223,8 +226,6 @@ TEST_F(UdpClient, client_test_async)
             [&expectedTransactionIDs]()->bool {return expectedTransactionIDs.empty();}));
         ASSERT_TRUE(expectedTransactionIDs.empty());
     }
-
-    client.pleaseStopSync();
 }
 
 /**

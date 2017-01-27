@@ -289,7 +289,7 @@ APPLY(301, saveCamera, ApiCameraData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyCameraDataAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
