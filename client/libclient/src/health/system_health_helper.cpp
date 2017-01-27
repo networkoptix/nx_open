@@ -51,10 +51,13 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         {
             const QString kTryText = tr("Try it free");
             const QString kLearnMoreText = tr("Learn more");
-            const QString kMessage = tr("Check out %1 Beta", "%1 is name of cloud (like 'Nx Cloud')")
-                .arg(QnAppInfo::cloudName());
+            const QString kMessage = tr("Check out <b>%1</b> Beta "
+                                        "&mdash; connect to your servers from anywhere",
+                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
 
-            const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a> <a href=\"%3\">%4</a></p>");
+            const QString kTemplate = lit("<p>%1</p>"
+                                          "<p><a href=\"settings\">%2</a>&nbsp;&nbsp; "
+                                             "<a href=\"%3\">%4</a></p>");
             return kTemplate.arg(
                 kMessage,
                 kTryText,

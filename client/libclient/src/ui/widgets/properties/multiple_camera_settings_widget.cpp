@@ -225,25 +225,25 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QnMessageBox::warning(
-        this,
-        tr("Invalid Schedule"),
-        tr("Second stream is disabled on these cameras. Motion + LQ option has no effect. "\
-            "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+        tr("Secondary stream disabled for these cameras"),
+        tr("\"Motion + Low - Res\" recording option can't be set."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
+    const auto recordAlways = dialog.addButton(
+        tr("Set Recording to \"Always\""), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+    dialog.addButton(
+        tr("Enable Secondary Stream"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
 
-    switch (button)
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return  false;
+
+    if (dialog.clickedButton() == recordAlways)
     {
-        case QDialogButtonBox::Yes:
-            ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
-            return true;
-        case QDialogButtonBox::No:
-            ui->expertSettingsWidget->setSecondStreamEnabled();
-            return true;
-        default:
-            return false;
+        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        return true;
     }
+    ui->expertSettingsWidget->setSecondStreamEnabled();
+    return true;
 }
 
 bool QnMultipleCameraSettingsWidget::hasDbChanges() const

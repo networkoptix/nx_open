@@ -9,8 +9,6 @@ TARGET=/opt/$COMPANY_NAME/client/$FULLVERSION
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 
-ln -s $TARGET/lib $TARGET/bin/lib
-
 pkill applauncher-bin || true
 
 #Installing shortcut to current users' desktop

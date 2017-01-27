@@ -23,11 +23,11 @@
 #include <client/client_instance_manager.h>
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
-#include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <client/forgotten_systems_manager.h>
 #include <client/startup_tile_manager.h>
 #include <client/client_settings_watcher.h>
+#include <client/client_show_once_settings.h>
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -263,12 +263,14 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     // TODO: #dklychkov Move to client core module
     common->store(new QnFfmpegInitializer());
 
-    auto clientInstanceManager =
-        qnCommon->store(new QnClientInstanceManager()); //< Depends on QnClientSettings
+    /* Depends on QnClientSettings. */
+    auto clientInstanceManager = common->store(new QnClientInstanceManager());
 
-    /* Depends on QnClientSettings and QnClientInstanceManager, never used by anyone else. */
-    auto clientSettingsWatcher = new QnClientSettingsWatcher(clientInstanceManager);
-    static_cast<void>(clientSettingsWatcher); //< Debug?
+    /* Depends on nothing. */
+    common->store(new QnClientShowOnceSettings());
+
+    /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
+    common->store(new QnClientSettingsWatcher());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
@@ -290,7 +292,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store(new QnResourcesChangesManager());
     common->store(new QnCameraBookmarksManager());
     common->store(new QnServerStorageManager());
-    common->store(new QnClientRecentConnectionsManager());
 
     common->store(new QnVoiceSpectrumAnalyzer());
 
@@ -526,7 +527,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     if (ui)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
-        
+
         // Window icon is taken from 'icons' customization project. Suppress check.
         QApplication::setWindowIcon(qnSkin->icon(":/logo.png")); // _IGNORE_VALIDATION_
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));

@@ -68,7 +68,7 @@ void MediatorAddressPublisher::publishAddressesIfNeeded()
 {
     if (m_publishedAddresses == m_serverAddresses)
     {
-        NX_LOGX(lm("No need to publish addresses: they match already published. Reporting success..."),
+        NX_LOGX(lm("No need to publish addresses: they are already published. Reporting success..."),
             cl_logDEBUG2);
         reportResultToTheCaller(hpm::api::ResultCode::ok);
         return;

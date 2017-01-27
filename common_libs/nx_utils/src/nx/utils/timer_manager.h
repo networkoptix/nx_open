@@ -190,6 +190,10 @@ std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 
+boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration(
+    const QString& duration,
+    std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
+
 }   //namespace utils
 }   //namespace nx
 

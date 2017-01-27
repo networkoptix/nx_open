@@ -1,11 +1,13 @@
 #include "server_interface_watcher.h"
 
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/log/log.h>
+
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <network/module_finder.h>
-#include <nx/utils/log/log.h>
 
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)
@@ -32,7 +34,8 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (resource != currentServer)
         return;
 
-    const SocketAddress address(QnAppServerConnectionFactory::url());
+    const SocketAddress address = 
+        nx::network::url::getEndpoint(QnAppServerConnectionFactory::url());
     currentServer->setPrimaryAddress(address);
     NX_LOG(
         lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")

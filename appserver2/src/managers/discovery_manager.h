@@ -10,12 +10,12 @@ namespace ec2
     class QnDiscoveryNotificationManager : public AbstractDiscoveryNotificationManager
     {
     public:
-        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
-        void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction);
+        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource source);
         void triggerNotification(const ApiDiscoveryData &discoveryData, bool addInformation = true);
-        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran);
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran);
-        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran);
+        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnDiscoveryNotificationManager> QnDiscoveryNotificationManagerPtr;

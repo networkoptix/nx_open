@@ -73,7 +73,6 @@ public:
     QString text() const;
 
     void addActionButton(const QIcon& icon,
-                         const QString& tooltip = QString(),
                          QnActions::IDType actionId = QnActions::NoAction,
                          const QnActionParameters& parameters = QnActionParameters(),
                          bool defaultAction = false);
@@ -101,6 +100,7 @@ signals:
     void closeTriggered();
     void actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters);
     void buttonClicked(const QString& alias);
+    void linkActivated(const QString& link);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;

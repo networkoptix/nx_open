@@ -49,7 +49,7 @@ namespace ec2
             QnDiscoveryNotificationManager* discoveryManager);
 
         template<typename T>
-        void triggerNotification(const QnTransaction<T> &tran)
+        void triggerNotification(const QnTransaction<T> &tran, NotificationSource source)
         {
             ec2::detail::NotificationParams notificationParams = {
                 m_ecConnection,
@@ -65,7 +65,8 @@ namespace ec2
                 m_storedFileManager,
                 m_updatesManager,
                 m_miscManager,
-                m_discoveryManager
+                m_discoveryManager,
+                source
             };
 
             auto tdBase = getTransactionDescriptorByValue(tran.command);

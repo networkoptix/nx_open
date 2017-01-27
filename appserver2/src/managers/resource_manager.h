@@ -17,7 +17,7 @@ namespace ec2
     public:
         QnResourceNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran ) 
+        void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran, NotificationSource source)
         {
             NX_LOG(lit("%1 Emit statusChanged signal for id %2")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
@@ -25,22 +25,22 @@ namespace ec2
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
         }
 
-        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& /*tran*/ ) {
+        void triggerNotification( const QnTransaction<ApiLicenseOverflowData>& /*tran*/, NotificationSource /*source*/) {
             // nothing to do
         }
 
-        void triggerNotification(const QnTransaction<ApiCleanupDatabaseData>& /*tran*/) {
+        void triggerNotification(const QnTransaction<ApiCleanupDatabaseData>& /*tran*/, NotificationSource /*source*/) {
             // nothing to do
         }
 
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceParamWithRefData>& tran, NotificationSource /*source*/) {
             if (tran.command == ApiCommand::setResourceParam)
                 emit resourceParamChanged(tran.params);
             else if (tran.command == ApiCommand::removeResourceParam)
                 emit resourceParamRemoved(tran.params);
         }
 
-        void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceParamWithRefDataList>& tran, NotificationSource /*source*/) {
             for (const ec2::ApiResourceParamWithRefData& param : tran.params)
             {
                 if (tran.command == ApiCommand::setResourceParams)
@@ -50,11 +50,11 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/) {
             emit resourceRemoved( tran.params.id );
         }
 
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource /*source*/) {
             for(const ApiIdData& id: tran.params)
                 emit resourceRemoved( id.id );
         }

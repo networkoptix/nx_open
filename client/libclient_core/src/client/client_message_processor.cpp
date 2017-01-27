@@ -131,7 +131,7 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
 {
     NX_ASSERT(resource);
     /*
@@ -159,7 +159,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, con
     resource->addFlags(Qn::remote);
     resource->removeFlags(Qn::local);
 
-    QnCommonMessageProcessor::updateResource(resource, peerId);
+    QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
         qnResPool->addResource(resource);

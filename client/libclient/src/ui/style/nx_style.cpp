@@ -163,6 +163,11 @@ namespace
         return widget && widget->property(Properties::kAccentStyleProperty).toBool();
     }
 
+    bool isWarningStyle(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kWarningStyleProperty).toBool();
+    }
+
     bool isSwitchButtonCheckbox(const QWidget* widget)
     {
         return widget && widget->property(Properties::kCheckBoxAsButton).toBool();
@@ -594,8 +599,8 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = isAccented(widget)
-                ? option->palette.color(QPalette::HighlightedText)
+            QColor color = isAccented(widget) || isWarningStyle(widget)
+                ? option->palette.color(QPalette::BrightText)
                 : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
@@ -615,11 +620,17 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
-                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -688,7 +699,13 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
@@ -2355,7 +2372,9 @@ void QnNxStyle::drawControl(
                     return;
                 }
 
-                if (isDefaultForegroundRole && isAccented(widget))
+                if (isDefaultForegroundRole && isWarningStyle(widget))
+                    foregroundRole = QPalette::BrightText;
+                else if (isDefaultForegroundRole && isAccented(widget))
                     foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);

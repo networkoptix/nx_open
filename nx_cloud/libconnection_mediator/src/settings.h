@@ -46,12 +46,14 @@ struct Stun
 {
     std::list<SocketAddress> addrToListenList;
     boost::optional<KeepAliveOptions> keepAliveOptions;
+    boost::optional<std::chrono::milliseconds> inactivityTimeout;
 };
 
 struct Http
 {
     std::list<SocketAddress> addrToListenList;
     boost::optional<KeepAliveOptions> keepAliveOptions;
+    boost::optional<std::chrono::milliseconds> inactivityTimeout;
 };
 
 struct Statistics

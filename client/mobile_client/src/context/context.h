@@ -61,7 +61,7 @@ public:
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
 
-    Q_INVOKABLE void removeSavedConnection(const QString& systemName);
+    Q_INVOKABLE void removeSavedConnection(const QString& localSystemId);
 
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;

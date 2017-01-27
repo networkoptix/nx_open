@@ -1,13 +1,16 @@
 #include "migration_helper.h"
 
-#include <boost/range/algorithm/find_if.hpp>
-#include <boost/range/algorithm/remove_if.hpp>
+#include <functional>
+
+#include <nx/network/url/url_parse_helper.h>
 
 #include <network/module_finder.h>
+#include <network/direct_module_finder.h>
 #include <network/direct_module_finder_helper.h>
 #include <network/system_helpers.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
+#include <helpers/system_helpers.h>
 
 #include "login_session.h"
 
@@ -26,59 +29,82 @@ public:
     void at_moduleFinder_moduleAddressFound(
         const QnModuleInformation &moduleInformation, const SocketAddress &address)
     {
+        using namespace nx::client::core::helpers;
+        using nx::client::core::LocalConnectionData;
+
         const auto systemId = helpers::getLocalSystemId(moduleInformation);
         auto recentConnections = qnClientCoreSettings->recentLocalConnections();
+        auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
         auto savedSessions = qnSettings->savedSessions();
         bool recentConnectionsChanged = false;
+
+        auto findConnection =
+            [&recentConnections](
+                std::function<bool(const QnUuid&, const LocalConnectionData&)> check)
+            {
+                auto it = recentConnections.begin();
+                for (; it != recentConnections.end(); ++it)
+                {
+                    if (check(it.key(), it.value()))
+                        break;
+                }
+                return it;
+            };
 
         while (!migratedSessionIds.empty())
         {
             // There could be multiple sessions with the same URL and even same credentials.
-            auto migratedIt = boost::find_if(recentConnections,
-                [this, &moduleInformation, &address](const QnLocalConnectionData& connectionData)
+
+            auto migratedIt = findConnection(
+                [this, &moduleInformation, &address](
+                    const QnUuid& localId, const LocalConnectionData& data)
                 {
-                    return address == SocketAddress(connectionData.url)
-                        && moduleInformation.systemName == connectionData.systemName
-                        && migratedSessionIds.contains(connectionData.localId);
+                    if (!migratedSessionIds.contains(localId))
+                        return false;
+
+                    for (const auto& url: data.urls)
+                    {
+                        if (address == nx::network::url::getEndpoint(url))
+                            return true;
+                    }
+
+                    return false;
                 });
 
             if (migratedIt == recentConnections.end())
                 break;
 
+            const auto fakeId = migratedIt.key();
+            const auto connectionData = migratedIt.value();
+            const auto credentialsList = authenticationData.take(fakeId);
+
+            recentConnections.erase(migratedIt);
+            removeConnection(fakeId);
+
             savedSessions.erase(
-                boost::remove_if(
-                    savedSessions,
-                    [migratedIt](const QVariant& sessionVariant)
+                std::find_if(savedSessions.begin(), savedSessions.end(),
+                    [&fakeId](const QVariant& sessionVariant)
                     {
-                        return migratedIt->localId == savedSessionId(sessionVariant);
-                    }),
-                savedSessions.end());
+                        return fakeId == savedSessionId(sessionVariant);
+                    }));
 
-            auto existingIt = boost::find_if(recentConnections,
-                 [this, &moduleInformation, &address, migratedIt]
-                    (const QnLocalConnectionData& connectionData)
-                 {
-                     return address == SocketAddress(connectionData.url)
-                         && moduleInformation.systemName == connectionData.systemName
-                         && migratedIt->url.userName() == connectionData.url.userName()
-                         && !migratedSessionIds.contains(connectionData.localId);
-                 });
-            migratedSessionIds.remove(migratedIt->localId);
-            qnModuleFinder->directModuleFinderHelper()->removeForcedUrl(this, address.toUrl());
+            for (const auto& url: connectionData.urls)
+                storeConnection(systemId, connectionData.systemName, url);
 
-            if (existingIt == recentConnections.end())
-                migratedIt->localId = systemId;
-            else
-                recentConnections.erase(migratedIt);
+            for (const auto& credentials: credentialsList)
+            {
+                if (getCredentials(systemId, credentials.user).isEmpty())
+                    storeCredentials(systemId, credentials);
+            }
+
+            for (const auto& url: connectionData.urls)
+                qnModuleFinder->directModuleFinderHelper()->removeForcedUrl(this, url);
 
             recentConnectionsChanged = true;
         }
 
         if (recentConnectionsChanged)
-        {
-            qnClientCoreSettings->setRecentLocalConnections(recentConnections);
             qnSettings->setSavedSessions(savedSessions);
-        }
     }
 
 public:
@@ -98,6 +124,7 @@ SessionsMigrationHelper::SessionsMigrationHelper(QObject* parent):
         const auto& session = QnLoginSession::fromVariant(sessionVariant.toMap());
         d->migratedSessionIds.insert(session.id);
         qnModuleFinder->directModuleFinderHelper()->addForcedUrl(d, session.url);
+        qnModuleFinder->directModuleFinder()->checkUrl(session.url);
     }
 
     for (const auto& moduleInformation: qnModuleFinder->foundModules())
@@ -107,7 +134,7 @@ SessionsMigrationHelper::SessionsMigrationHelper(QObject* parent):
     }
 
     connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound,
-            d, &SessionsMigrationHelperPrivate::at_moduleFinder_moduleAddressFound);
+        d, &SessionsMigrationHelperPrivate::at_moduleFinder_moduleAddressFound);
 }
 
 SessionsMigrationHelper::~SessionsMigrationHelper()

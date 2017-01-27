@@ -16,7 +16,7 @@ QnSystemDescription::PointerType QnLocalSystemDescription::create(
 }
 
 QnLocalSystemDescription::QnLocalSystemDescription(const QString& systemId):
-    base_type(systemId, QnUuid::fromStringSafe(systemId), tr("New System")),
+    base_type(systemId, QnUuid::fromStringSafe(systemId), tr("New Server")),
     m_isNewSystem(true)
 {
     init();

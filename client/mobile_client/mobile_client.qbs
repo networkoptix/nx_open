@@ -20,7 +20,7 @@ GenericProduct
         "liteMode": vms.box == "bpi",
         "android.oldPackageName": customization.androidOldPackageName,
         "ios.old_app_appstore_id" : customization.iosOldAppstoreId,
-        "mobile.nx1_customized_name": customization.liteDeviceName
+        "liteDeviceName": customization.liteDeviceName
     })
 
     Group

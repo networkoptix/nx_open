@@ -992,6 +992,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Account Settings..."));
 
+    factory(QnActions::HideCloudPromoAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
         text(tr("Create Account..."));
@@ -1606,7 +1609,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
+        text(tr("Add Device...")).   //intentionally hardcode devices here
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),

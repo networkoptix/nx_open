@@ -12,6 +12,8 @@
 
 #include <ui/workaround/cancel_drag.h>
 
+#include <utils/common/app_info.h>
+
 class QnMessageBoxPrivate : public QObject
 {
     QnMessageBox *q_ptr;
@@ -21,10 +23,11 @@ public:
     QAbstractButton *clickedButton;
     QList<QAbstractButton *> customButtons;
     QAbstractButton *defaultButton;
+    QnButtonAccent buttonAccent;
     QAbstractButton *escapeButton;
     QList<QLabel*> informativeLabels;
     QList<QWidget*> customWidgets;
-    QnMessageBox::Icon icon;
+    QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
 
     QnMessageBoxPrivate(QnMessageBox *parent);
@@ -42,8 +45,9 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     q_ptr(parent),
     clickedButton(nullptr),
     defaultButton(nullptr),
+    buttonAccent(QnButtonAccent::Standard),
     escapeButton(nullptr),
-    icon(QnMessageBox::NoIcon)
+    icon(QnMessageBoxIcon::NoIcon)
 {
 }
 
@@ -62,7 +66,7 @@ void QnMessageBoxPrivate::init()
     font.setPixelSize(font.pixelSize() + 2);
     q->ui->mainLabel->setFont(font);
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
-
+    q->ui->mainLabel->setOpenExternalLinks(true);
     q->setResizeToContentsMode(Qt::Vertical);
 
     detectEscapeButton();
@@ -149,8 +153,19 @@ void QnMessageBoxPrivate::stylizeButtons()
 {
     Q_Q(QnMessageBox);
 
-    for (QAbstractButton *button: q->buttons())
-        setAccentStyle(button, button == defaultButton);
+    for (QAbstractButton *button : q->buttons())
+    {
+        if (button != defaultButton)
+        {
+            resetButtonStyle(button);
+            continue;
+        }
+
+        if (buttonAccent == QnButtonAccent::Warning)
+            setWarningButtonStyle(button);
+        else
+            setAccentStyle(button);
+    }
 }
 
 int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
@@ -166,69 +181,115 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
     return ret;
 }
 
-
-static QDialogButtonBox::StandardButton execMessageBox(
-        QWidget *parent,
-        QnMessageBox::Icon icon,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    QnMessageBox msgBox(
-                icon,
-                helpTopicId,
-                title,
-                title,
-                buttons,
-                parent);
-
-    msgBox.setInformativeText(text);
-    msgBox.setDefaultButton(defaultButton);
-
-    return static_cast<QDialogButtonBox::StandardButton>(msgBox.exec());
-}
-
-
-QnMessageBox::QnMessageBox(QWidget *parent, Qt::WindowFlags flags):
+QnMessageBox::QnMessageBox(
+    QWidget* parent
+    , Qt::WindowFlags flags)
+    :
     base_type(parent, flags),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
-    Q_D(QnMessageBox);
-
-    ui->setupUi(this);
-    d->init();
+    initialize();
+    setStandardButtons(QDialogButtonBox::NoButton);
 }
 
 QnMessageBox::QnMessageBox(
-    Icon icon,
-    int helpTopicId,
-    const QString &title,
-    const QString &text,
+    QnMessageBoxIcon icon,
+    const QString& text,
+    const QString& extras,
     QDialogButtonBox::StandardButtons buttons,
-    QWidget *parent,
-    Qt::WindowFlags flags)
+    QDialogButtonBox::StandardButton defaultButton,
+    QWidget* parent)
     :
-    base_type(parent, helpTopicId == Qn::Empty_Help ? flags : flags | Qt::WindowContextHelpButtonHint),
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
-    Q_D(QnMessageBox);
+    initialize();
 
-    ui->setupUi(this);
-    d->init();
-
-    setHelpTopic(this, helpTopicId);
-    setWindowTitle(title);
-    setText(text);
+    if (!text.isEmpty())
+        setText(text);
     setStandardButtons(buttons);
     setIcon(icon);
+    if (!extras.isEmpty())
+        setInformativeText(extras);
+
+    setDefaultButton(defaultButton);
 }
 
 QnMessageBox::~QnMessageBox()
 {
+}
+
+void QnMessageBox::initialize()
+{
+    Q_D(QnMessageBox);
+
+    ui->setupUi(this);
+    d->init();
+    setWindowTitle(QnAppInfo::productNameLong());
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::execute(
+    QWidget* parent,
+    QnMessageBoxIcon icon,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    QnMessageBox msgBox(icon, text, extras, buttons, defaultButton, parent);
+    return static_cast<QDialogButtonBox::StandardButton>(msgBox.exec());
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::information(
+    QWidget* parent,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execute(parent, QnMessageBoxIcon::Information, text, extras, buttons, defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::warning(
+    QWidget* parent,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execute(parent, QnMessageBoxIcon::Warning, text, extras, buttons, defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::question(
+    QWidget* parent,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execute(parent, QnMessageBoxIcon::Question, text, extras, buttons, defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::critical(
+    QWidget* parent,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execute(parent, QnMessageBoxIcon::Critical, text, extras, buttons, defaultButton);
+}
+
+QDialogButtonBox::StandardButton QnMessageBox::success(
+    QWidget* parent,
+    const QString& text,
+    const QString& extras,
+    QDialogButtonBox::StandardButtons buttons,
+    QDialogButtonBox::StandardButton defaultButton)
+{
+    return execute(parent, QnMessageBoxIcon::Success, text, extras, buttons, defaultButton);
 }
 
 void QnMessageBox::addButton(
@@ -247,22 +308,65 @@ void QnMessageBox::addButton(
     d->stylizeButtons();
 }
 
-QPushButton *QnMessageBox::addButton(
-        const QString &text,
-        QDialogButtonBox::ButtonRole role)
+QPushButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
+{
+    switch (button)
+    {
+        case QnMessageBoxCustomButton::Overwrite:
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Delete:
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Reset:
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        case QnMessageBoxCustomButton::Skip:
+            return addCustomButton(button, QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+        default:
+            return nullptr;
+    }
+}
+
+QPushButton* QnMessageBox::addCustomButton(
+    QnMessageBoxCustomButton button,
+    QDialogButtonBox::ButtonRole role,
+    QnButtonAccent accent)
+{
+    QPushButton* result = nullptr;
+    switch (button)
+    {
+        case QnMessageBoxCustomButton::Overwrite:
+            return addButton(tr("Overwrite"), role, accent);
+        case QnMessageBoxCustomButton::Delete:
+            return addButton(tr("Delete"), role, accent);
+        case QnMessageBoxCustomButton::Reset:
+            return addButton(tr("Reset"), role, accent);
+        case QnMessageBoxCustomButton::Skip:
+            return addButton(tr("Skip"), role, accent);
+        default:
+            return nullptr;
+    }
+}
+
+QPushButton* QnMessageBox::addButton(
+    const QString &text,
+    QDialogButtonBox::ButtonRole role,
+    QnButtonAccent accent)
 {
     Q_D(QnMessageBox);
 
-    QPushButton *addedButton = ui->buttonBox->addButton(text, role);
-    d->customButtons.append(addedButton);
+    QPushButton* result = ui->buttonBox->addButton(text, role);
+    d->customButtons.append(result);
 
     if (!d->escapeButton)
         d->detectEscapeButton();
-    if (!d->defaultButton)
-        d->detectDefaultButton();
+    if (accent != QnButtonAccent::NoAccent)
+    {
+        d->buttonAccent = accent;
+        d->defaultButton = result;
+    }
+
     d->stylizeButtons();
 
-    return addedButton;
+    return result;
 }
 
 QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
@@ -274,6 +378,7 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
 
     if (!d->escapeButton)
         d->detectEscapeButton();
+
     if (!d->defaultButton)
         d->detectDefaultButton();
     d->stylizeButtons();
@@ -341,7 +446,9 @@ QAbstractButton *QnMessageBox::defaultButton() const
     return d->defaultButton;
 }
 
-void QnMessageBox::setDefaultButton(QAbstractButton* button)
+void QnMessageBox::setDefaultButton(
+    QAbstractButton* button
+    , QnButtonAccent accent)
 {
     NX_ASSERT(ui->buttonBox->buttons().contains(button));
     if (!ui->buttonBox->buttons().contains(button))
@@ -354,18 +461,22 @@ void QnMessageBox::setDefaultButton(QAbstractButton* button)
     if (QPushButton* pushButton = qobject_cast<QPushButton*>(button))
         pushButton->setDefault(true);
 
-    button->setFocus();
+    if (button)
+        button->setFocus();
 
+    d->buttonAccent = accent;
     d->defaultButton = button;
     d->stylizeButtons();
 }
 
-void QnMessageBox::setDefaultButton(QDialogButtonBox::StandardButton button)
+void QnMessageBox::setDefaultButton(
+    QDialogButtonBox::StandardButton button,
+    QnButtonAccent accent)
 {
     QPushButton *buttonWidget = ui->buttonBox->button(button);
 
     if (buttonWidget)
-        setDefaultButton(buttonWidget);
+        setDefaultButton(buttonWidget, accent);
 }
 
 QAbstractButton *QnMessageBox::escapeButton() const
@@ -405,13 +516,39 @@ void QnMessageBox::setText(const QString &text)
     ui->mainLabel->setText(text);
 }
 
-QnMessageBox::Icon QnMessageBox::icon() const
+QnMessageBoxIcon QnMessageBox::icon() const
 {
     Q_D(const QnMessageBox);
     return d->icon;
 }
 
-void QnMessageBox::setIcon(QnMessageBox::Icon icon)
+QPixmap QnMessageBox::getPixmapByIconId(QnMessageBoxIcon icon)
+{
+    const auto standardPixmap =
+        [this](QStyle::StandardPixmap pixmapId) -> QPixmap
+        {
+            return QnSkin::maximumSizePixmap(style()->standardIcon(pixmapId));
+        };
+
+    switch (icon)
+    {
+        case QnMessageBoxIcon::Information:
+            return standardPixmap(QStyle::SP_MessageBoxInformation);
+        case QnMessageBoxIcon::Warning:
+            return standardPixmap(QStyle::SP_MessageBoxWarning);
+        case QnMessageBoxIcon::Critical:
+            return standardPixmap(QStyle::SP_MessageBoxCritical);
+        case QnMessageBoxIcon::Question:
+            return standardPixmap(QStyle::SP_MessageBoxQuestion);
+        case QnMessageBoxIcon::Success:
+            return qnSkin->pixmap("standard_icons/message_box_success.png",
+                QSize(), Qt::IgnoreAspectRatio, Qt::FastTransformation, true);
+        default:
+            return QPixmap();
+    }
+}
+
+void QnMessageBox::setIcon(QnMessageBoxIcon icon)
 {
     Q_D(QnMessageBox);
     if (d->icon == icon)
@@ -419,35 +556,7 @@ void QnMessageBox::setIcon(QnMessageBox::Icon icon)
 
     d->icon = icon;
 
-    auto standardPixmap =
-        [this](QStyle::StandardPixmap pixmapId) -> QPixmap
-        {
-            return QnSkin::maximumSizePixmap(style()->standardIcon(pixmapId));
-        };
-
-    QPixmap pixmap;
-    switch (icon)
-    {
-        case Information:
-            pixmap = standardPixmap(QStyle::SP_MessageBoxInformation);
-            break;
-        case Warning:
-            pixmap = standardPixmap(QStyle::SP_MessageBoxWarning);
-            break;
-        case Critical:
-            pixmap = standardPixmap(QStyle::SP_MessageBoxCritical);
-            break;
-        case Question:
-            pixmap = standardPixmap(QStyle::SP_MessageBoxQuestion);
-            break;
-        case Success:
-            pixmap = qnSkin->pixmap("standard_icons/message_box_success.png",
-                QSize(), Qt::IgnoreAspectRatio, Qt::FastTransformation, true);
-            break;
-        default:
-            break;
-    }
-
+    const auto pixmap = getPixmapByIconId(icon);
     ui->iconLabel->setVisible(!pixmap.isNull());
     ui->iconLabel->setPixmap(pixmap);
     ui->iconLabel->resize(pixmap.size());
@@ -488,6 +597,7 @@ void QnMessageBox::setInformativeText(const QString &text, bool split)
     for (const QString& line: lines)
     {
         QLabel* label = new QLabel(this);
+        label->setOpenExternalLinks(true);
         label->setWordWrap(true);
         label->setText(line);
         ui->verticalLayout->insertWidget(index, label);
@@ -574,171 +684,6 @@ bool QnMessageBox::isChecked() const
 void QnMessageBox::setChecked(bool checked)
 {
     ui->checkBox->setChecked(checked);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::information(
-        QWidget *parent,
-        int helpTopicId,
-        const QString &title,
-        const QString& text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Information,
-                          helpTopicId,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::information(
-        QWidget *parent,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Information,
-                          Qn::Empty_Help,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::success(
-    QWidget *parent,
-    int helpTopicId,
-    const QString &title,
-    const QString& text,
-    QDialogButtonBox::StandardButtons buttons,
-    QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-        Success,
-        helpTopicId,
-        title,
-        text,
-        buttons,
-        defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::success(
-    QWidget *parent,
-    const QString &title,
-    const QString &text,
-    QDialogButtonBox::StandardButtons buttons,
-    QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-        Success,
-        Qn::Empty_Help,
-        title,
-        text,
-        buttons,
-        defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::question(
-        QWidget *parent,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Question,
-                          helpTopicId,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::question(
-        QWidget *parent,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Question,
-                          Qn::Empty_Help,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::warning(
-        QWidget *parent,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Warning,
-                          helpTopicId,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::warning(
-        QWidget *parent,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Warning,
-                          Qn::Empty_Help,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::critical(
-        QWidget *parent,
-        int helpTopicId,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Critical,
-                          helpTopicId,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
-}
-
-QDialogButtonBox::StandardButton QnMessageBox::critical(
-        QWidget *parent,
-        const QString &title,
-        const QString &text,
-        QDialogButtonBox::StandardButtons buttons,
-        QDialogButtonBox::StandardButton defaultButton)
-{
-    return execMessageBox(parent,
-                          Critical,
-                          Qn::Empty_Help,
-                          title,
-                          text,
-                          buttons,
-                          defaultButton);
 }
 
 int QnMessageBox::exec()

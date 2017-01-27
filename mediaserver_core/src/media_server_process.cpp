@@ -739,7 +739,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                    .arg(Q_FUNC_INFO)
                    .arg(storage.url)
                    .arg(storage.spaceLimit), cl_logDEBUG2);
-            messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
@@ -772,7 +772,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
         modifiedStorages.append(updateStorages(m_mediaServer));
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
-            messageProcessor->updateResource(storage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
 
         qnNormalStorageMan->initDone();
         qnBackupStorageMan->initDone();
@@ -1352,7 +1352,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             }
             qnServerAdditionalAddressesDictionary->setAdditionalUrls(mediaServer.id, additionalAddresses);
             qnServerAdditionalAddressesDictionary->setIgnoredUrls(mediaServer.id, ignoredAddressesById.values(mediaServer.id));
-            messageProcessor->updateResource(mediaServer, qnCommon->moduleGUID());
+            messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
         }
         do {
             if (needToStop())
@@ -1422,7 +1422,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         QnManualCameraInfoMap manualCameras;
         for (const auto &camera : cameras)
         {
-            messageProcessor->updateResource(camera, qnCommon->moduleGUID());
+            messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
             if (camera.manuallyAdded)
             {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(camera.typeId);
@@ -1458,7 +1458,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &user: users)
-            messageProcessor->updateResource(user, qnCommon->moduleGUID());
+            messageProcessor->updateResource(user, ec2::NotificationSource::Local);
     }
 
     {
@@ -1473,7 +1473,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for (const ec2::ApiVideowallData& videowall: videowalls)
-            messageProcessor->updateResource(videowall, qnCommon->moduleGUID());
+            messageProcessor->updateResource(videowall, ec2::NotificationSource::Local);
     }
 
     {
@@ -1488,7 +1488,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for(const auto &layout: layouts)
-            messageProcessor->updateResource(layout, qnCommon->moduleGUID());
+            messageProcessor->updateResource(layout, ec2::NotificationSource::Local);
     }
 
     {
@@ -1503,7 +1503,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         }
 
         for (const auto &webpage : webpages)
-            messageProcessor->updateResource(webpage, qnCommon->moduleGUID());
+            messageProcessor->updateResource(webpage, ec2::NotificationSource::Local);
     }
 
     {

@@ -24,6 +24,7 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
+#include <ui/dialogs/ptz_messages.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -154,14 +155,8 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Unable to get position from camera."),
-            tr("An error has occurred while trying to get the current position from camera %1.")
-            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-            + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        QnPtzMessages::failedToGetPosition(mainWindow(),
+        QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
 
@@ -366,14 +361,8 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Unable to set position on camera."),
-            tr("An error has occurred while trying to set the current position for camera %1.")
-            .arg(QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()))
-            + L'\n'
-            + tr("Please wait for the camera to go online.")
-        );
+        QnPtzMessages::failedToSetPosition(mainWindow(),
+            QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases
 }

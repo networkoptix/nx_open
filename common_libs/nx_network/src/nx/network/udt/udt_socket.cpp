@@ -745,12 +745,10 @@ bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
 
 bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 {
-    //udt has keep-alives but provides no way to modify it...
-    KeepAliveOptions options;
-    options.probeCount = 10;    //TODO #ak find real value in udt
-    options.timeSec = 5;
-    options.intervalSec = 5;
-    *result = options;
+    // UDT has keep-alives but provides no way to modify it...
+    (*result)->probeCount = 10; // TODO: #ak find real value in udt.
+    (*result)->time = std::chrono::seconds(5);
+    (*result)->interval = std::chrono::seconds(5);
     return true;
 }
 
