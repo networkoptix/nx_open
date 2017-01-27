@@ -79,7 +79,7 @@ customizableProjects = [
         "client", 
         ["client/libclient/src", "client/libclient/static-resources/src"], 
         ["client/libclient/static-resources/skin"],
-        ["client/resources/skin"],
+        ["libclient/resources/skin"],
         "skin"
         ),
     CustomizableProject(

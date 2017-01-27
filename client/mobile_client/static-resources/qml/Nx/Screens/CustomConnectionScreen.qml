@@ -100,9 +100,31 @@ Page
         }
     }
 
-    function connect()
+    function checkConnectionFields()
     {
         hideWarning()
+
+        if (credentialsEditor.address.trim().length == 0)
+        {
+            credentialsEditor.addressErrorText = qsTr("Enter server address")
+            credentialsEditor.displayAddressError = true
+            return false
+        }
+        else if ((credentialsEditor.login.trim().length == 0)
+            || (credentialsEditor.password.trim().length == 0))
+        {
+            credentialsEditor.credentialsErrorText = qsTr("All fields must be filled")
+            credentialsEditor.displayUserCredentialsError = true
+            return false
+        }
+        return true
+    }
+
+    function connect()
+    {
+        if (!checkConnectionFields())
+            return
+
         connectButton.forceActiveFocus()
         d.connecting = true
         connectionManager.connectByUserInput(address, login, password)
@@ -112,6 +134,8 @@ Page
     {
         if (status == QnConnectionManager.UnauthorizedConnectionResult)
         {
+            credentialsEditor.credentialsErrorText =
+                LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
             credentialsEditor.displayUserCredentialsError = true
         }
         else
