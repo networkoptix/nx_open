@@ -124,7 +124,6 @@ void DbHelper::run()
                 m_handler->handleRecordWrite(error);
         }
 
-        lk.unlock();
         m_writerDoneCond.wakeAll();
     }
 }
