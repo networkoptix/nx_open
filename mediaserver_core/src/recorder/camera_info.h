@@ -4,6 +4,7 @@
 #include <chrono>
 #include <memory>
 #include <QtCore>
+#include <nx/utils/log/log.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/abstract_storage_resource.h>
 #include <server/server_globals.h>
@@ -111,6 +112,12 @@ struct ArchiveCameraData
 
 typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
 
+struct ReaderErrorInfo
+{
+    QString message;
+    QnLogLevel severity;
+};
+
 class ReaderHandler
 {
 public:
@@ -118,7 +125,7 @@ public:
     virtual QnUuid moduleGuid() const = 0;
     virtual QnUuid archiveCamTypeId() const = 0;
     virtual bool isCameraInResPool(const QnUuid& cameraId) const = 0;
-    virtual void handleError(const QString& message) const = 0;
+    virtual void handleError(const ReaderErrorInfo& errorInfo) const = 0;
 };
 
 class Reader
@@ -180,7 +187,7 @@ private:
 
 private:
     ReaderHandler* m_handler;
-    mutable QString m_lastError;
+    mutable ReaderErrorInfo m_lastError;
     ArchiveCameraData m_archiveCamData;
     ArchiveCameraDataList* m_archiveCamList;
     QByteArray m_fileData;
@@ -194,7 +201,7 @@ public:
     virtual QnUuid moduleGuid() const override;
     virtual QnUuid archiveCamTypeId() const override;
     virtual bool isCameraInResPool(const QnUuid& cameraId) const override;
-    virtual void handleError(const QString& message) const override;
+    virtual void handleError(const ReaderErrorInfo& errorInfo) const override;
 
 private:
     mutable QnUuid m_archiveCamTypeId;

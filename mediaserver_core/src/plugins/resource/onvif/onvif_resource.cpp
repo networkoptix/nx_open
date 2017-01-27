@@ -49,6 +49,9 @@
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <core/resource/resource_data_structures.h>
 
+#include <plugins/utils/multisensor_data_provider.h>
+#include <core/resource_management/resource_properties.h>
+
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
 
@@ -257,6 +260,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_streamConfCounter(0),
     m_prevPullMessageResponseClock(0),
     m_inputPortCount(0),
+    m_videoLayout(nullptr),
     m_onvifRecieveTimeout(DEFAULT_SOAP_TIMEOUT),
     m_onvifSendTimeout(DEFAULT_SOAP_TIMEOUT)
 {
@@ -478,6 +482,14 @@ void QnPlOnvifResource::setAudioCodec(QnPlOnvifResource::AUDIO_CODECS c)
 
 QnAbstractStreamDataProvider* QnPlOnvifResource::createLiveDataProvider()
 {
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool shouldAppearAsSingleChannel = resData.value<bool>(
+        Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
+
+
+    if (shouldAppearAsSingleChannel)
+        return new nx::plugins::utils::MultisensorDataProvider(toSharedPointer(this));
+
     return new QnOnvifStreamReader(toSharedPointer());
 }
 
@@ -3676,6 +3688,34 @@ void QnPlOnvifResource::updateToChannel(int value)
     setUrl(getUrl() + suffix);
     setPhysicalId(getPhysicalId() + suffix.replace(QLatin1String("?"), QLatin1String("_")));
     setName(getName() + QString(QLatin1String("-channel %1")).arg(value+1));
+}
+
+QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const
+{
+    if (m_videoLayout)
+        return m_videoLayout;
+
+    auto resData = qnCommon->dataPool()->data(getVendor(), getModel());
+    auto layoutStr = resData.value<QString>(Qn::VIDEO_LAYOUT_PARAM_NAME2);
+
+    if (!layoutStr.isEmpty())
+    {
+        m_videoLayout = QnResourceVideoLayoutPtr(
+            QnCustomResourceVideoLayout::fromString(layoutStr));
+    }
+    else
+    {
+        m_videoLayout = QnMediaResource::getVideoLayout(dataProvider)
+            .constCast<QnResourceVideoLayout>();
+    }
+
+    auto resourceId = getId();
+
+    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    propertyDictionary->saveParams(resourceId);
+
+    return m_videoLayout;
 }
 
 bool QnPlOnvifResource::secondaryResolutionIsLarge() const

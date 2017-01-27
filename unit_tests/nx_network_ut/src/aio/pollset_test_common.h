@@ -43,6 +43,10 @@ public:
         runTest<ActualTestClassImplementation>(
             &CommonPollSetTest::removeSocketThatHasUnprocessedEvents,
             "remove_socket_that_has_unprocessed_events");
+
+        runTest<ActualTestClassImplementation>(
+            &CommonPollSetTest::pollIsActuallyLevelTriggered,
+            "poll_is_actually_level_triggered");
     }
 
     template<typename ActualTestClassImplementation>
@@ -56,10 +60,11 @@ public:
     }
 
 protected:
-    virtual void simulateSocketEvents(int events) = 0;
+    virtual bool simulateSocketEvent(Pollable* socket, int eventMask) = 0;
 
     virtual std::unique_ptr<Pollable> createRegularSocket();
     virtual std::unique_ptr<Pollable> createSocketOfRandomType();
+    virtual std::vector<std::unique_ptr<Pollable>> createSocketOfAllSupportedTypes();
 
     void initializeSocketOfRandomType();
     void initializeUdtSocket();
@@ -75,15 +80,22 @@ protected:
     // Tests
 
     void initializeRegularSocket();
-    void givenRegularSocketAvailableForReadWrite();
     void initializeBunchOfSocketsOfRandomType();
+
+    void givenRegularSocketSubscribedToReadWriteEventPolling();
+    void givenRegularSocketAvailableForReadWrite();
+    void givenSocketsOfAllSupportedTypes();
+
     void runRemoveSocketWithMultipleEventsTest();
 
+    void whenMadeSocketAvailableForReadWrite();
     void whenRemovedSocketFromPollSetOnFirstEvent();
     void whenReceivedSocketEvents();
+    void whenChangedEverySocketState();
 
     void thenPollsetDidNotReportEventsForRemovedSockets();
-    void thenReadWriteEventsHaveBeenReported();
+    void thenReadWriteEventsShouldBeReportedEventually();
+    void thenPollsetReportsSocketsAsSignalledMultipleTimes();
 
 private:
     AbstractPollSet* m_pollset;
@@ -98,12 +110,15 @@ private:
     void removingSocketWithMultipleEvents();
     void multiplePollsetIterators();
     void removeSocketThatHasUnprocessedEvents();
+    void pollIsActuallyLevelTriggered();
 
     // End of tests
     //---------------------------------------------------------------------------------------------
 
+    void simulateSocketEvents(int events);
     void assertIfEventIsNotExpected(Pollable* const socket, aio::EventType eventType);
     void removeSocket(Pollable* const socket);
+    bool isEveryExpectedEventHasBeenReported(std::vector<aio::EventType> expectedEvents) const;
 };
 
 } // namespace test

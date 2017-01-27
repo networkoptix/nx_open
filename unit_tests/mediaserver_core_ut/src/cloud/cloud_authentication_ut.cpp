@@ -29,6 +29,108 @@ public:
     {
         connectSystemToCloud();
     }
+
+protected:
+    void givenCloudNonce()
+    {
+        getCloudNonce(&m_cloudNonceData);
+    }
+
+    void whenIssuedHttpRequestSignedWithThatNonce()
+    {
+        nx_http::Message requestMsg = prepareRequest(lit("/ec2/getUsers"), m_cloudNonceData);
+
+        //issuing request to mediaserver using that nonce
+        auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
+        ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
+        ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
+        auto httpMsgPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+            nullptr,
+            std::move(tcpSocket));
+        httpMsgPipeline->startReadingConnection();
+
+        auto httpMsgPipelineGuard = makeScopedGuard(
+            [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
+
+        nx::utils::promise<nx_http::Message> responseReceivedPromise;
+        httpMsgPipeline->setMessageHandler(
+            [&responseReceivedPromise](nx_http::Message msg)
+            {
+                responseReceivedPromise.set_value(std::move(msg));
+            });
+        httpMsgPipeline->sendMessage(std::move(requestMsg), [](SystemError::ErrorCode) {});
+
+        auto responseReceivedFuture = responseReceivedPromise.get_future();
+        m_responseMessage = std::move(responseReceivedFuture.get());
+    }
+
+    void thenRequestShouldBeFulfilled()
+    {
+        ASSERT_EQ(nx_http::MessageType::response, m_responseMessage.type);
+        ASSERT_EQ(nx_http::StatusCode::ok, m_responseMessage.response->statusLine.statusCode);
+    }
+
+private:
+    api::NonceData m_cloudNonceData;
+    nx_http::Message m_responseMessage;
+
+    void getCloudNonce(api::NonceData* nonceData)
+    {
+        typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
+            (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
+
+        auto cdbConnection =
+            cdb()->connectionFactory()->createConnection(
+                accountEmail(),
+                accountPassword());
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::tie(resultCode, *nonceData) =
+            makeSyncCall<api::ResultCode, api::NonceData>(
+                std::bind(
+                    static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
+                    cdbConnection->authProvider(),
+                    cloudSystem().id,
+                    std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+    }
+
+    nx_http::Message prepareRequest(
+        const QString& requestPath,
+        const api::NonceData& nonceData)
+    {
+        nx_http::Message requestMsg(nx_http::MessageType::request);
+        requestMsg.request->requestLine.url = requestPath;
+        requestMsg.request->requestLine.method = nx_http::Method::GET;
+        requestMsg.request->requestLine.version = nx_http::http_1_1;
+
+        addAuthorizationHeader(nonceData, requestMsg.request);
+        return requestMsg;
+    }
+
+    void addAuthorizationHeader(
+        const api::NonceData& nonceData,
+        nx_http::Request* const request)
+    {
+        nx_http::header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = nx_http::header::AuthScheme::digest;
+        wwwAuthenticate.params.insert("nonce", nonceData.nonce.c_str());
+        wwwAuthenticate.params.insert("realm", "VMS");
+
+        nx_http::header::DigestAuthorization digestAuthorization;
+
+        nx_http::calcDigestResponse(
+            request->requestLine.method,
+            accountEmail().c_str(),
+            nx_http::StringType(accountPassword().c_str()),
+            boost::none,
+            request->requestLine.url.toString().toUtf8(),
+            wwwAuthenticate,
+            &digestAuthorization);
+
+        request->headers.emplace(
+            nx_http::header::Authorization::NAME,
+            digestAuthorization.serialized());
+    }
 };
 
 TEST_F(FtCloudAuthentication, authorize_api_request_with_cloud_credentials)
@@ -44,76 +146,7 @@ TEST_F(FtCloudAuthentication, authorize_api_request_with_cloud_credentials)
 
 TEST_F(FtCloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
 {
-    typedef void(nx::cdb::api::AuthProvider::*GetCdbNonceType)
-        (const std::string&, std::function<void(api::ResultCode, api::NonceData)>);
-
-    //fetching nonce from cloud_db
-    auto cdbConnection =
-        cdb()->connectionFactory()->createConnection(
-            accountEmail(),
-            accountPassword());
-    api::ResultCode resultCode = api::ResultCode::ok;
-    api::NonceData nonceData;
-    std::tie(resultCode, nonceData) =
-        makeSyncCall<api::ResultCode, api::NonceData>(
-            std::bind(
-                static_cast<GetCdbNonceType>(&api::AuthProvider::getCdbNonce),
-                cdbConnection->authProvider(),
-                cloudSystemId(),
-                std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::ok, resultCode);
-
-    //preparing request
-    nx_http::Message requestMsg(nx_http::MessageType::request);
-    requestMsg.request->requestLine.url = lit("/ec2/getUsers");
-    requestMsg.request->requestLine.method = nx_http::Method::GET;
-    requestMsg.request->requestLine.version = nx_http::http_1_1;
-
-    nx_http::header::WWWAuthenticate wwwAuthenticate;
-    wwwAuthenticate.authScheme = nx_http::header::AuthScheme::digest;
-    wwwAuthenticate.params.insert("nonce", nonceData.nonce.c_str());
-    wwwAuthenticate.params.insert("realm", "VMS");
-
-    nx_http::header::DigestAuthorization digestAuthorization;
-
-    nx_http::calcDigestResponse(
-        requestMsg.request->requestLine.method,
-        accountEmail().c_str(),
-        nx_http::StringType(accountPassword().c_str()),
-        boost::none,
-        requestMsg.request->requestLine.url.toString().toUtf8(),
-        wwwAuthenticate,
-        &digestAuthorization);
-
-    requestMsg.request->headers.emplace(
-        nx_http::header::Authorization::NAME,
-        digestAuthorization.serialized());
-
-    //issuing request to mediaserver using that nonce
-    auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
-    ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
-    ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
-    auto httpMsgPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
-        nullptr,
-        std::move(tcpSocket));
-    httpMsgPipeline->startReadingConnection();
-
-    auto httpMsgPipelineGuard = makeScopedGuard(
-        [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
-
-    nx::utils::promise<nx_http::Message> responseReceivedPromise;
-    httpMsgPipeline->setMessageHandler(
-        [&responseReceivedPromise](nx_http::Message msg)
-        {
-            responseReceivedPromise.set_value(std::move(msg));
-        });
-    httpMsgPipeline->sendMessage(std::move(requestMsg), [](SystemError::ErrorCode) {});
-
-    auto responseReceivedFuture = responseReceivedPromise.get_future();
-    ASSERT_EQ(
-        std::future_status::ready,
-        responseReceivedFuture.wait_for(std::chrono::seconds(10)));
-    const auto responseMsg = std::move(responseReceivedFuture.get());
-    ASSERT_EQ(nx_http::MessageType::response, responseMsg.type);
-    ASSERT_EQ(nx_http::StatusCode::ok, responseMsg.response->statusLine.statusCode);
+    givenCloudNonce();
+    whenIssuedHttpRequestSignedWithThatNonce();
+    thenRequestShouldBeFulfilled();
 }

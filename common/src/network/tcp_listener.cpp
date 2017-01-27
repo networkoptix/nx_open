@@ -314,6 +314,7 @@ void QnTcpListener::run()
 
                 // Reset newPort if no more changes.
                 d->newPort.compare_exchange_strong(currentValue, 0);
+                emit portChanged();
             }
 
             if (d->localPort == 0 && d->serverSocket)

@@ -101,7 +101,7 @@ public:
     */
     virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
-    static QnUuid uniqueIdToId(const QString& uniqId);
+    static QnUuid physicalIdToId(const QString& uniqId);
     virtual void initializationDone() override;
 
 private:

@@ -487,7 +487,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
     if (cachedUrlExists && cachedUrl->second == url)
         return;
 
-    auto urlUpdater = 
+    auto urlUpdater =
         [url, role](QString oldValue)
         {
             const auto roleStr = QString::number(role);

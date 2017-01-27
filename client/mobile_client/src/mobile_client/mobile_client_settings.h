@@ -24,6 +24,7 @@ public:
         LastUsedQuality,
         LiteMode,
         MaxFfmpegResolution,
+        ShowCameraInfo,
 
         BasePath,
         TestMode,
@@ -72,6 +73,10 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
         QN_DECLARE_RW_PROPERTY(int,                         liteMode,                   setLiteMode,                LiteMode,                   (int)LiteModeType::LiteModeAuto)
         QN_DECLARE_RW_PROPERTY(QSize,                       maxFfmpegResolution,        setMaxFfmpegResolution,     MaxFfmpegResolution,        QSize())
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            showCameraInfo, setShowCameraInfo,
+            ShowCameraInfo, false)
 
         QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
         QN_DECLARE_RW_PROPERTY(bool,                        testMode,                   setTestMode,                TestMode,                   false)

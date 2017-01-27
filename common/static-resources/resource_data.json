@@ -230,6 +230,30 @@
         },
         {
             "keys": [
+                "Network Optix|Nx-Cube",
+                "Network Optix|E12A"
+            ],
+            "nxDeviceModel": "Nx-Cube-0512A",
+            "nxDeviceName": "Nx-Cube"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome",
+                "Network Optix|E924"
+            ],
+            "nxDeviceModel": "Nx-Dome-05924",
+            "nxDeviceName": "Nx-Dome"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Fisheye",
+                "Network Optix|E925"
+            ],
+            "nxDeviceModel": "Nx-Fisheye-05925",
+            "nxDeviceName": "Nx-Fisheye"
+        },
+        {
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
@@ -357,10 +381,10 @@
                 "*|VS8801",
                 "VS8401|*",
                 "*|VS8401",
-                "Digital Watchdog|DW-CPUHDE04",
-                "Digital Watchdog|DW-CPUHDE08",
-                "Digital Watchdog|DW-CPUHDE16",
-                "Digital Watchdog|VMAX A1",
+                "DW|DW-CPUHDE04",
+                "DW|DW-CPUHDE08",
+                "DW|DW-CPUHDE16",
+                "DW|VMAX A1",
                 "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
@@ -459,7 +483,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -1680,6 +1705,51 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            },
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
         }
     ]
 }

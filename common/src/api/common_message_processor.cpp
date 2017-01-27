@@ -695,7 +695,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     if (qnCamera)
     {
         fromApiToResource(camera, qnCamera);
-        NX_ASSERT(camera.id == QnVirtualCameraResource::uniqueIdToId(qnCamera->getUniqueId()),
+        NX_ASSERT(camera.id == QnVirtualCameraResource::physicalIdToId(qnCamera->getUniqueId()),
             Q_FUNC_INFO,
             "You must fill camera ID as md5 hash of unique id");
 

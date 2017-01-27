@@ -12,8 +12,6 @@
 
 #include <ui/workaround/cancel_drag.h>
 
-#include <utils/common/app_info.h>
-
 class QnMessageBoxPrivate : public QObject
 {
     QnMessageBox *q_ptr;
@@ -227,7 +225,6 @@ void QnMessageBox::initialize()
 
     ui->setupUi(this);
     d->init();
-    setWindowTitle(QnAppInfo::productNameLong());
 }
 
 QDialogButtonBox::StandardButton QnMessageBox::execute(

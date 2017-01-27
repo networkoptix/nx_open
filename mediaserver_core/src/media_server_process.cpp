@@ -744,9 +744,17 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         QnStorageResourceList storagesToRemove = getSmallStorages(m_mediaServer->getStorages());
 
-        nx::mserver_aux::UnmountedStoragesFilter unmountedStoragesFilter(QnAppInfo::mediaFolderName());
-        auto unMountedStorages = unmountedStoragesFilter.getUnmountedStorages(
-                m_mediaServer->getStorages(),
+        nx::mserver_aux::UnmountedLocalStoragesFilter unmountedLocalStoragesFilter(QnAppInfo::mediaFolderName());
+        auto unMountedStorages = unmountedLocalStoragesFilter.getUnmountedStorages(
+                [this]()
+                {
+                    QnStorageResourceList result;
+                    for (const auto& storage: m_mediaServer->getStorages())
+                        if (!storage->isExternal())
+                            result.push_back(storage);
+
+                    return result;
+                }(),
                 listRecordFolders());
 
         storagesToRemove.append(unMountedStorages);
@@ -1267,7 +1275,7 @@ void MediaServerProcess::updateAddressesList()
 
     QList<SocketAddress> serverAddresses;
 
-    const auto port = m_mediaServer->getPort();
+    const auto port = m_universalTcpListener->getPort();
     for (const auto& host: allLocalAddresses())
         serverAddresses << SocketAddress(host.toString(), port);
 
@@ -1275,7 +1283,7 @@ void MediaServerProcess::updateAddressesList()
         serverAddresses << SocketAddress(host.first, host.second);
 
     if (!m_ipDiscovery->publicIP().isNull())
-        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), m_mediaServer->getPort());
+        serverAddresses << SocketAddress(m_ipDiscovery->publicIP().toString(), port);
 
     m_mediaServer->setNetAddrList(serverAddresses);
     NX_LOGX(lit("Update mediaserver addresses: %1")
@@ -2114,7 +2122,22 @@ void MediaServerProcess::run()
 
     QnCallCountStart(std::chrono::milliseconds(5000));
 #ifdef Q_OS_WIN32
-    misc::migrateFilesFromWindowsOldDir(QDir::toNativeSeparators(getDataDirectory()));
+    nx::misc::ServerDataMigrateHandler migrateHandler;
+    switch (nx::misc::migrateFilesFromWindowsOldDir(&migrateHandler))
+    {
+        case nx::misc::MigrateDataResult::WinDirNotFound:
+            NX_LOG(lit("Moving data from the old windows dir. Windows dir not found."), cl_logWARNING);
+            break;
+        case nx::misc::MigrateDataResult::NoNeedToMigrate:
+            NX_LOG(lit("Moving data from the old windows dir. Nothing to move"), cl_logDEBUG2);
+            break;
+        case nx::misc::MigrateDataResult::MoveDataFailed:
+            NX_LOG(lit("Moving data from the old windows dir. Old data found but move failed."), cl_logWARNING);
+            break;
+        case nx::misc::MigrateDataResult::Ok:
+            NX_LOG(lit("Moving data from the old windows dir. Old data found and successfully moved."), cl_logINFO);
+            break;
+    }
 #endif
     ffmpegInit();
 
@@ -2743,8 +2766,8 @@ void MediaServerProcess::run()
         &MediaServerProcess::updateAddressesList);
 
     connect(
-        m_mediaServer.data(),
-        &QnMediaServerResource::primaryAddressChanged,
+        m_universalTcpListener,
+        &QnTcpListener::portChanged,
         this,
         &MediaServerProcess::updateAddressesList);
 
