@@ -31,6 +31,14 @@
       <translation>http://www.ubiquitysmart.com/</translation>
     </message>
     <message>
+      <source>IOS_APP_LINK</source>
+      <translation>disabled</translation>
+    </message>
+    <message>
+      <source>ANDROID_APP_LINK</source>
+      <translation>disabled</translation>
+    </message>      
+    <message>
       <source>COMPANY_NAME</source>
       <translation>VMS DTV</translation>
     </message>
