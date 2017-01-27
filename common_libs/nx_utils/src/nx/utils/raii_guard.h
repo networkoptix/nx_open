@@ -33,8 +33,8 @@ public:
     static QnRaiiGuardPtr createEmpty();
 
 private:
-    bool m_destructionHandlerEnabled = true;
     Handler m_destructionHandler;
+    bool m_destructionHandlerEnabled = true;
 };
 
 Q_DECLARE_METATYPE(QnRaiiGuardPtr)
