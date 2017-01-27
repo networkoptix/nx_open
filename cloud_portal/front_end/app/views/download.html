@@ -68,6 +68,7 @@
 </uib-tabset>
 
 <a ng-repeat="platform in downloads.mobile"
+   ng-if="$root.L.downloads.mobile[platform.name].link != 'disabled'"
    class="mobile-link"
    ng-class="platform.os"
    ng-href="{{$root.L.downloads.mobile[platform.name].link}}">

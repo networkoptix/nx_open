@@ -48,7 +48,7 @@ angular.module('cloudApp')
 
         for(var mobile in Config.downloads.mobile){
             if(Config.downloads.mobile[mobile].os === activeOs){
-                window.location.href = L.downloads.mobile[Config.downloads.mobile[mobile].name];
+                window.location.href = L.downloads.mobile[Config.downloads.mobile[mobile].name].link;
                 break;
             }
         }
