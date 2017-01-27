@@ -137,11 +137,15 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            static const auto kNDash = QString::fromWCharArray(L"\x2013");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Total %n devices",      "", cameras.size()),
-                    tr("Total %n cameras",      "", cameras.size()),
-                    tr("Total %n I/O modules",  "", cameras.size())
+                    tr("Total %1 %n devices", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n cameras", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n I/O modules", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash)
                 ), cameras
             );
         }
@@ -289,7 +293,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
             case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
-            case BitrateColumn:    return tr("Bitrate for");
+            case BitrateColumn:    return tr("Bitrate");
             default:               break;
         }
     }
