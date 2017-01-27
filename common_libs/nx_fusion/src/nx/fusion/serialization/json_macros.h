@@ -4,7 +4,7 @@
 #include <typeinfo>
 
 #include <nx/fusion/fusion/fusion_serialization.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 #include "json.h"
 #include "lexical.h"
