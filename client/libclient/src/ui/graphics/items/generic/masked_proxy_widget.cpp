@@ -245,7 +245,7 @@ bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
                 if (cacheMode() != NoCache)
                     break;
                 /* In not cached mode we obtain dirty rects from embedded widget updates: */
-                updateDirtyRect();
+                syncDirtyRect();
                 break;
 
             case QEvent::CursorChange:
@@ -260,7 +260,7 @@ bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
     return base_type::eventFilter(watched, event);
 }
 
-void QnMaskedProxyWidget::updateDirtyRect()
+void QnMaskedProxyWidget::syncDirtyRect()
 {
     if (m_fullRepaintPending || !widget())
         return;
