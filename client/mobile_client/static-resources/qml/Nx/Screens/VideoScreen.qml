@@ -186,6 +186,7 @@ PageBase
         id: informationLabelLoader
         anchors.right: parent.right
         anchors.rightMargin: 8
+        y: header.y
         active: showCameraInfo
         sourceComponent: InformationLabel
         {
