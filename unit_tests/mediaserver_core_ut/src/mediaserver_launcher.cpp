@@ -8,7 +8,7 @@
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
     m_workDirResource(tmpDir),
-    m_serverEndpoint(HostAddress::localhost, nx::utils::random::number<int>(45000, 50000)),
+    m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
 }
@@ -20,7 +20,7 @@ MediaServerLauncher::~MediaServerLauncher()
 
 SocketAddress MediaServerLauncher::endpoint() const
 {
-    return m_serverEndpoint;
+    return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
 void MediaServerLauncher::addSetting(const QString& name, const QString& value)
@@ -77,10 +77,8 @@ bool MediaServerLauncher::start()
         m_mediaServerProcess.get(),
         &MediaServerProcess::started,
         this,
-        [&processStartedPromise]()
-        {
-            processStartedPromise.set_value(true);
-        }, Qt::DirectConnection);
+        [&processStartedPromise]() { processStartedPromise.set_value(true); },
+        Qt::DirectConnection);
     m_mediaServerProcess->start();
 
     //waiting for server to come up
@@ -111,5 +109,5 @@ bool MediaServerLauncher::stopAsync()
 
 QUrl MediaServerLauncher::apiUrl() const
 {
-    return QUrl(lit("http://") + m_serverEndpoint.toString());
+    return QUrl(lit("http://") + endpoint().toString());
 }
