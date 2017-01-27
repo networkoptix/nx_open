@@ -168,7 +168,7 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
 
     if (mediaFolders().contains(dirName))
     {
-        QnMessageBox::information(this, tr("Folder has already been added."), tr("This folder has already been added."), QDialogButtonBox::Ok);
+        QnMessageBox::information(this, tr("Folder already added"));
         return;
     }
 

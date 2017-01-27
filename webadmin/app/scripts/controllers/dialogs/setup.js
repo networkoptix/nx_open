@@ -618,6 +618,7 @@ angular.module('webadminApp')
                 0: {},
                 start: {
                     cancel: $scope.settings.thickClient,
+                    noFooter: true, // Here we disable next button
                     skip: 'merge',
                     next: 'systemName'
                 },

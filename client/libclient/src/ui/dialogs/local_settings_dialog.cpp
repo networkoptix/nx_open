@@ -19,6 +19,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
 
+#include <utils/common/app_info.h>
+
 QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -97,22 +99,22 @@ void QnLocalSettingsDialog::accept()
 
     if (isRestartRequired())
     {
-        QDialogButtonBox::StandardButton result = QnMessageBox::information(
-            this,
-            tr("Information"),
-            tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
-        switch (result)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::Yes:
-                restartQueued = true;
-                break;
-            default:
-                break;
-        }
+        QnMessageBox dialog(this);
+        dialog.setText(tr("Some changes will take effect only after %1 Client restart")
+            .arg(QnAppInfo::productNameLong()));
+
+        dialog.setStandardButtons(QDialogButtonBox::Cancel);
+        const auto restartNowButton = dialog.addButton(
+            tr("Restart Now"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+
+        dialog.addButton(
+            tr("Restart Later"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        if (dialog.clickedButton() == restartNowButton)
+            restartQueued = true;
     }
 
     base_type::accept();

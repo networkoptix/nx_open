@@ -573,7 +573,7 @@ struct ModifyCameraDataAccess
             }
         }
 
-        return ModifyResourceAccess(false)(accessData, param);
+        return ModifyResourceAccess(/*isRemove*/ false)(accessData, param);
     }
 };
 

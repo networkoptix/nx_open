@@ -135,7 +135,7 @@ Item
 
             property bool resumeWhenDragFinished: false
 
-            enabled: startBound > 0
+            enabled: d.hasArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
@@ -243,7 +243,7 @@ Item
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
             color: ColorTheme.windowText
-            visible: timeline.startBound <= 0
+            visible: !d.hasArchive
             opacity: 0.5
         }
 
@@ -410,7 +410,7 @@ Item
             anchors.bottom: playbackController.bottom
             width: 2
             height: 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
         }
 
         Rectangle
@@ -420,7 +420,7 @@ Item
             anchors.bottom: parent.bottom
             width: 2
             height: timeline.chunkBarHeight + 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
         }
     }
 

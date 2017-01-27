@@ -439,13 +439,17 @@ namespace Qn
      */
     enum class ShowOnceMessage
     {
+        Empty                       = 0x000,
         PtzPresetInUse              = 0x001,    /**< Delete ptz preset which is used in the tour. */
         SharedLayoutEdit            = 0x002,    /**< Edit shared layout. */
         ChangeUserLocalLayout       = 0x004,    /**< Items are removed from user's layout, but access still persist. */
         AddToRoleLocalLayout        = 0x008,    /**< Items are added to roled user's layout. */
         RemoveFromRoleLocalLayout   = 0x010,    /**< Items are removed from roled user's layout, but access still persist. */
         DeleteResources             = 0x020,    /**< Batch delete resources (but layouts). */
-        DeleteLocalLayouts          = 0x040     /**< Batch delete user's or group's local layouts. */
+        DeleteLocalLayouts          = 0x040,    /**< Batch delete user's or group's local layouts. */
+        RemoveItemsFromLayout       = 0x080,    /**< When removing multiple items from layout */
+        BetaVersion                 = 0x100,    /**< Represents Beta version message */
+        VersionMismatchDialog       = 0x200     /**< Asking for update all outdated servers to the last version*/
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
     Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)

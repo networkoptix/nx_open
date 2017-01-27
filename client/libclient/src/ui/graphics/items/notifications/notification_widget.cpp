@@ -189,10 +189,6 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
-    connect(m_textLabel, &QnProxyLabel::linkActivated, this, [this](const QString& link)
-        {
-            qDebug() << "link " << link << "was activated";
-        });
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
     m_layout->addItem(m_textLabel);
@@ -297,7 +293,7 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 }
 
 void QnNotificationWidget::addActionButton(
-    const QIcon& icon, const QString& /*tooltip*/, QnActions::IDType actionId,
+    const QIcon& icon, QnActions::IDType actionId,
     const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
@@ -324,6 +320,17 @@ void QnNotificationWidget::addActionButton(
         emit actionTriggered(actionId, parameters);
     });
     m_actions << ActionData(actionId, parameters); //still required for thumbnails click and base notification click
+}
+
+void QnNotificationWidget::triggerDefaultAction()
+{
+    if (m_defaultActionIdx < 0)
+        return;
+
+    NX_ASSERT(m_defaultActionIdx < m_actions.size());
+    const auto actionData = m_actions[m_defaultActionIdx];
+
+    emit actionTriggered(actionData.action, actionData.params);
 }
 
 void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -392,24 +399,13 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
     }
     else if (button == Qt::LeftButton)
     {
-        if (!m_actions.isEmpty())
-        {
-            ActionData data = m_actions[0]; // TODO: #Elric
-            emit actionTriggered(data.action, data.params);
-        }
+        triggerDefaultAction();
     }
 }
 
 void QnNotificationWidget::at_thumbnail_clicked()
 {
-    if (m_defaultActionIdx < 0)
-        return;
-
-    if (m_actions.size() <= m_defaultActionIdx)
-        return;
-
-    ActionData data = m_actions[m_defaultActionIdx];
-    emit actionTriggered(data.action, data.params);
+    triggerDefaultAction();
 }
 
 void QnNotificationWidget::at_loop_sound()
