@@ -1041,10 +1041,7 @@ PlayerStatistics Player::currentStatistics() const
 
     int channelCount = 1;
     if (const auto layout = d->archiveReader->getDPVideoLayout())
-    {
-        const auto& size = layout->size();
-        channelCount = size.width() * size.height();
-    }
+        channelCount = layout->channelCount();
 
     for (int i = 0; i < channelCount; i++)
     {
