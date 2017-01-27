@@ -61,9 +61,6 @@ protected:
         httpMsgPipeline->sendMessage(std::move(requestMsg), [](SystemError::ErrorCode) {});
 
         auto responseReceivedFuture = responseReceivedPromise.get_future();
-        ASSERT_EQ(
-            std::future_status::ready,
-            responseReceivedFuture.wait_for(std::chrono::seconds(10)));
         m_responseMessage = std::move(responseReceivedFuture.get());
     }
 
