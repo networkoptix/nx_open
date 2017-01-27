@@ -158,6 +158,7 @@ private:
     mutable QnResourcePtr m_firstCamera;
 
     Qn::PanicMode calculatePanicMode() const;
+    QUrl buildApiUrl() const;
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr)

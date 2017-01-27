@@ -8,7 +8,7 @@
 #include <network/direct_module_finder_helper.h>
 #include <client/client_message_processor.h>
 #include <client_core/client_core_settings.h>
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 namespace {
 
@@ -52,7 +52,7 @@ QnServerAddressWatcher::QnServerAddressWatcher(
             if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
                 return;
 
-            url = UrlBuilder()
+            url = nx::network::url::Builder()
                 .setScheme(lit("http"))
                 .setHost(url.host())
                 .setPort(url.port());
