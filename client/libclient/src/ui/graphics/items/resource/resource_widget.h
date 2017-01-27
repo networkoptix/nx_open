@@ -9,7 +9,6 @@
 
 #include <utils/common/connective.h>
 #include <ui/utils/viewport_scale_watcher.h>
-#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -349,12 +348,7 @@ protected:
     OverlayWidgets* overlayWidgets() const;
 
 private:
-    void updateFrameWidth();
-
-    void updateFrameGeometry();
-
     QColor calculateFrameColor() const;
-
     qreal calculateFrameWidth() const;
 
     void createButtons();
@@ -448,7 +442,6 @@ private:
     SelectionState m_selectionState;
 
     QnViewportScaleWatcher m_scaleWatcher;
-    QnCosmeticFramePainter m_framePainter;
 };
 
 typedef QList<QnResourceWidget *> QnResourceWidgetList;

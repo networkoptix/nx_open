@@ -4161,3 +4161,35 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
 
     return base_type::eventFilter(object, event);
 }
+
+void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
+    const QColor& color, int width, int shift)
+{
+    if (width == 0)
+        return;
+
+    const QRect deviceRect = painter->transform().mapRect(rect).toAlignedRect();
+
+    QRect outerRect = deviceRect.adjusted(shift, shift, -shift, -shift);
+    QRect innerRect = outerRect.adjusted(width, width, -width, -width);
+
+    if (width < 0) //< if outer frame
+    {
+        qSwap(outerRect, innerRect);
+        width = -width;
+    }
+
+    const QRect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
+    const QRect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
+    const QRect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
+    const QRect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+
+    const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+
+    const QBrush brush(color);
+    painter->fillRect(topRect, brush);
+    painter->fillRect(leftRect, brush);
+    painter->fillRect(rightRect, brush);
+    painter->fillRect(bottomRect, brush);
+}
