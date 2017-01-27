@@ -631,26 +631,22 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 qnSkin->icon("events/cloud_promo.png"),
                 QnActions::PreferencesCloudTabAction);
 
-            connect(item, &QnNotificationWidget::actionTriggered,
-                item, &QnNotificationWidget::closeTriggered);
+            const auto hideCloudPromoNextRun =
+                [this]
+                {
+                    menu()->trigger(QnActions::HideCloudPromoAction);
+                };
+
+            connect(item, &QnNotificationWidget::actionTriggered, this, hideCloudPromoNextRun);
+            connect(item, &QnNotificationWidget::closeTriggered, this, hideCloudPromoNextRun);
 
             connect(item, &QnNotificationWidget::linkActivated, this,
                 [item](const QString& link)
                 {
                     if (link.contains(lit("://"))) //< currently unused
-                    {
                         QDesktopServices::openUrl(link);
-                        return;
-                    }
-
-                    emit item->actionTriggered(QnActions::PreferencesCloudTabAction,
-                        QnActionParameters());
-                });
-
-            connect(item, &QnNotificationWidget::closeTriggered, this,
-                [this]
-                {
-                    menu()->trigger(QnActions::HideCloudPromoAction);
+                    else
+                        item->triggerDefaultAction();
                 });
 
             break;

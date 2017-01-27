@@ -95,6 +95,8 @@ public:
 
     virtual void setGeometry(const QRectF& geometry) override;
 
+    void triggerDefaultAction(); //< emits actionTriggered with default action
+
 signals:
     void notificationLevelChanged();
     void closeTriggered();
