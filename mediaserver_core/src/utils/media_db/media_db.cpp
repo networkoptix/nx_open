@@ -111,14 +111,14 @@ void DbHelper::run()
             if (error == Error::WriteError)
             {
                 m_handler->handleRecordWrite(error);
-                break;
+                continue;
             }
 
             error = getError();
             if (error == Error::WriteError)
             {
                 m_handler->handleRecordWrite(error);
-                break;
+                continue;
             } 
             else
                 m_handler->handleRecordWrite(error);
