@@ -506,10 +506,14 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
+                window.location.href = window.location.origin;
+
+                /*
                 $location.path('/');
                 setTimeout(function(){
-                    window.location.reload();
+                    window.location.reload(true);
                 });
+                */
             });
         };
 
