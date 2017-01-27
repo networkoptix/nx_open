@@ -49,7 +49,8 @@ private:
     {
         IsCloudConnection = 0x1,
         StorePassword = 0x2,
-        AutoLogin = 0x4
+        AutoLogin = 0x4,
+        FactorySystem = 0x8,
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 
@@ -92,7 +93,7 @@ private:
         ec2::AbstractECConnectionPtr connection);
 
     void storeConnectionRecord(
-        QUrl url,
+        const QUrl& url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 
