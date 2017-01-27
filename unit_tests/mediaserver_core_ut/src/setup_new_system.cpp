@@ -6,10 +6,15 @@ class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest,
     public ::testing::Test
 {
+public:
+    FtConfiguringNewSystem()
+    {
+        init();
+    }
+
 protected:
     void givenSystemCredentialsRegisteredInCloud()
     {
-        ASSERT_TRUE(registerRandomCloudAccount());
         ASSERT_TRUE(registerCloudSystem());
     }
 
@@ -35,6 +40,59 @@ protected:
         ec2::ApiResourceParamDataList vmsSettings;
         ASSERT_EQ(ec2::ErrorCode::ok, client.ec2GetSettings(&vmsSettings));
     }
+
+    void configureCloudSystem()
+    {
+        givenSystemCredentialsRegisteredInCloud();
+        whenConfiguredMediaServerAsCloudSystem();
+        thenSystemMustBeAccessibleWithCloudOwnerCredentials();
+    }
+
+    void detachSystemFromCloud()
+    {
+        MediaServerClient client(mediaServerEndpoint());
+        client.setUserName(QString::fromStdString(accountEmail()));
+        client.setPassword(QString::fromStdString(accountPassword()));
+
+        ASSERT_EQ(
+            QnJsonRestResult::NoError,
+            client.detachFromCloud(DetachFromCloudData()).error);
+    }
+
+    void assertIfSystemDoesNotAcceptDefaultCredentials()
+    {
+        MediaServerClient client(mediaServerEndpoint());
+        client.setUserName("admin");
+        client.setPassword("admin");
+
+        ec2::ApiResourceParamDataList vmsSettings;
+        ASSERT_EQ(
+            ec2::ErrorCode::ok,
+            client.ec2GetSettings(&vmsSettings));
+    }
+
+    void assertIfSystemHasNotBecameNew()
+    {
+        MediaServerClient client(mediaServerEndpoint());
+        client.setUserName("admin");
+        client.setPassword("admin");
+        
+        for (;;)
+        {
+            QnModuleInformation moduleInformation;
+            ASSERT_EQ(
+                QnJsonRestResult::NoError,
+                client.getModuleInformation(&moduleInformation).error);
+            if (moduleInformation.serverFlags.testFlag(Qn::ServerFlag::SF_NewSystem))
+                break;
+        }
+    }
+
+private:
+    void init()
+    {
+        ASSERT_TRUE(registerRandomCloudAccount());
+    }
 };
 
 TEST_F(FtConfiguringNewSystem, cloud_system)
@@ -42,4 +100,12 @@ TEST_F(FtConfiguringNewSystem, cloud_system)
     givenSystemCredentialsRegisteredInCloud();
     whenConfiguredMediaServerAsCloudSystem();
     thenSystemMustBeAccessibleWithCloudOwnerCredentials();
+}
+
+TEST_F(FtConfiguringNewSystem, reconfiguring_cloud_system)
+{
+    configureCloudSystem();
+    detachSystemFromCloud();
+    assertIfSystemDoesNotAcceptDefaultCredentials();
+    configureCloudSystem();
 }
