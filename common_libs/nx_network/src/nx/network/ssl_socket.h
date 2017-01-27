@@ -88,9 +88,7 @@ public:
     virtual bool enableClientEncryption() override;
     virtual bool isEncryptionEnabled() const override;
 
-    virtual void cancelIOAsync(
-        nx::network::aio::EventType eventType,
-        nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
+    virtual void cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
 
     virtual bool setNonBlockingMode(bool val) override;

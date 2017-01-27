@@ -125,10 +125,7 @@ public:
 
     void decreasePendingIOCount()
     {
-        if (m_pendingIoCount == 0)
-            return;
-
-        NX_ASSERT(m_pendingIoCount > 0);
+        NX_ASSERT(m_pendingIoCount != 0);
         --m_pendingIoCount;
         if (m_pendingIoCount == 0) {
             // Check if we can invoke the IO operations, if the IO
@@ -213,10 +210,7 @@ protected:
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
 
-        if (handler == nullptr)
-            return;
         NX_ASSERT(handler != nullptr);
-
         DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
         switch(m_exitStatus)
         {
@@ -363,6 +357,7 @@ public:
 
     void clear()
     {
+        DEBUG_LOG(lm("Clear read/write queues"));
         m_readQueue.clear();
         m_writeQueue.clear();
     }
@@ -592,10 +587,12 @@ void SslAsyncBioHelper::checkShutdown(int sslReturn, int sslError)
         sslError == SSL_ERROR_ZERO_RETURN) {
             // This should be the normal shutdown which means the
             // peer at least call SSL_shutdown once
+            DEBUG_LOG("normal shutdown");
             m_eof = true;
     } else if (sslError == SSL_ERROR_SYSCALL) {
         // Brute shutdown for SSL connection
         if (ERR_get_error() == 0) {
+            DEBUG_LOG("brute shutdown");
             m_eof = true;
         }
     }
@@ -628,6 +625,7 @@ void SslAsyncBioHelper::handleSslError(int sslReturn, int sslError)
 void SslAsyncBioHelper::onRecv(
     SystemError::ErrorCode errorCode, std::size_t transferred)
 {
+    DEBUG_LOG(lm("transport read %1: %2").strs(transferred, SystemError::toString(errorCode)));
     if (m_readQueue.empty()) return;
     if (errorCode != SystemError::noError) {
         DeletionFlag deleted(this);
@@ -661,7 +659,8 @@ void SslAsyncBioHelper::onRecv(
 void SslAsyncBioHelper::enqueueRead(SslAsyncOperation* operation)
 {
     m_readQueue.push_back(operation);
-    if (m_readQueue.size() ==1) {
+    DEBUG_LOG(lm("there are %1 reads in queue").arg(m_readQueue.size()));
+    if (m_readQueue.size() == 1) {
         m_outstandingRead = m_readQueue.front();
         doRead();
     }
@@ -687,12 +686,13 @@ void SslAsyncBioHelper::doRead()
     // user's callback function.
     if (static_cast<int>(m_recvBufferReadPos) < m_recvBuffer.size()) {
         m_outstandingRead->increasePendingIOCount();
-        onRecv(SystemError::noError,
-            m_recvBuffer.size() - m_recvBufferReadPos);
+        onRecv(SystemError::noError, m_recvBuffer.size() - m_recvBufferReadPos);
     } else {
         // We have to issue our operations right just here since we have no
         // left data inside of the buffer and our user needs to read all the
         // data out in the buffer here.
+        DEBUG_LOG(lm("transport try read some"));
+        m_outstandingRead->increasePendingIOCount();
         m_underlySocket->readSomeAsync(
             &m_recvBuffer,
             std::bind(
@@ -700,7 +700,6 @@ void SslAsyncBioHelper::doRead()
             this,
             std::placeholders::_1,
             std::placeholders::_2));
-        m_outstandingRead->increasePendingIOCount();
     }
 }
 
@@ -708,6 +707,7 @@ void SslAsyncBioHelper::onSend(
         SystemError::ErrorCode errorCode,
         std::size_t transferred)
 {
+    DEBUG_LOG(lm("transport sent %1: %2").strs(transferred, SystemError::toString(errorCode)));
     Q_UNUSED(transferred);
     if (m_writeQueue.empty()) return;
     if (errorCode != SystemError::noError) {
@@ -734,6 +734,8 @@ void SslAsyncBioHelper::onSend(
 
 void SslAsyncBioHelper::doWrite()
 {
+    DEBUG_LOG(lm("transport try send %1").arg(m_outstandingWrite->writeBuffer.size()));
+    m_outstandingWrite->operation->increasePendingIOCount();
     m_underlySocket->sendAsync(
         m_outstandingWrite->writeBuffer,
         std::bind(
@@ -741,7 +743,6 @@ void SslAsyncBioHelper::doWrite()
         this,
         std::placeholders::_1,
         std::placeholders::_2));
-    m_outstandingWrite->operation->increasePendingIOCount();
 }
 
 void SslAsyncBioHelper::enqueueWrite()
@@ -962,6 +963,7 @@ private:
         std::size_t transferred,
         SnifferData data)
     {
+        DEBUG_LOG(lm("Transport read %1: %2").strs(transferred, SystemError::toString(ec)));
         // We have the data in our buffer right now
         if (ec) {
             data.completionHandler(ec,0);
@@ -1747,23 +1749,31 @@ bool SslSocket::isEncryptionEnabled() const
     return d->ecnryptionEnabled || d->asyncSslHelper->isSsl();
 }
 
-void SslSocket::cancelIOAsync(
-    nx::network::aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
+void SslSocket::cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler)
 {
     Q_D(const SslSocket);
     d->wrappedSocket->cancelIOAsync(
         eventType,
-        [cancellationDoneHandler = move(cancellationDoneHandler), d](){
+        [d, handler = move(handler)]()
+        {
             d->asyncSslHelper->clear();
-            cancellationDoneHandler();
+            handler();
         });
 }
 
 void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
     Q_D(const SslSocket);
-    d->wrappedSocket->cancelIOSync(eventType);
+    if (pollable()->isInSelfAioThread())
+    {
+        d->asyncSslHelper->clear();
+        d->wrappedSocket->cancelIOSync(eventType);
+    }
+    else
+    {
+        utils::BarrierWaiter waiter;
+        cancelIOAsync(eventType, waiter.fork());
+    }
 }
 
 bool SslSocket::setNonBlockingMode(bool value)

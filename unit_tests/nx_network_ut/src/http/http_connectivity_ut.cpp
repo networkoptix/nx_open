@@ -272,7 +272,7 @@ private:
     mutable QnMutex m_mutex;
 };
 
-TEST_F(TakingHttpSocketTest, DISABLED_TakingSocketSSl)
+TEST_F(TakingHttpSocketTest, TakingSocketSSl)
 {
     launchTest(true);
 }

@@ -991,7 +991,7 @@ void socketConnectCancelAsync(
 }
 
 template<typename ClientSocketMaker>
-void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
+void socketIsValidAfterPleaseStop(const ClientSocketMaker& clientMaker)
 {
     auto socket = clientMaker();
     ASSERT_TRUE(socket->setNonBlockingMode(true));
@@ -1001,6 +1001,66 @@ void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
 
     socket->pleaseStopSync();
     socket->setRecvBufferSize(128 * 1024);
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketIsUsefulAfterCancelIo(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
+{
+    static const std::chrono::milliseconds kTimeout(1500);
+
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(100));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    ASSERT_FALSE((bool) server->accept()) << lastError();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->setRecvTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->connect(*endpointToConnectTo, kTimeout.count()));
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool) accepted);
+    transferAsyncSync(client.get(), accepted.get());
+    transferSyncAsync(accepted.get(), client.get());
+
+    nx::Buffer buffer;
+    buffer.reserve(100);
+    for (size_t delayMs = 1; delayMs <= 1000; delayMs = delayMs * 10)
+    {
+        NX_LOG(lm("Cancel read: %1 ms").arg(delayMs), cl_logINFO);
+        client->readSomeAsync(&buffer, [](SystemError::ErrorCode, size_t) { FAIL(); });
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        client->cancelIOSync(aio::EventType::etRead);
+
+        transferSyncAsync(accepted.get(), client.get());
+        transferAsyncSync(client.get(), accepted.get());
+    }
+
+    for (size_t delayMs = 1; delayMs <= 1000; delayMs = delayMs * 10)
+    {
+        NX_LOG(lm("Cancel write: %1 ms").arg(delayMs), cl_logINFO);
+        client->sendAsync(kTestMessage, [](SystemError::ErrorCode, size_t) { /*pass*/ });
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        client->cancelIOSync(aio::EventType::etWrite);
+    }
+
+    buffer.resize(100);
+    ASSERT_GT(accepted->recv(buffer.data(), buffer.size()), 0);
 }
 
 template<typename ServerSocketMaker>
@@ -1147,8 +1207,10 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::cancelIo); } \
     Type(Name, ConnectPleaseStopAsync) \
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::pleaseStop); } \
-    Type(Name, SocketIsInValidStateAfterCancellation) \
-        { nx::network::test::socketIsInValidStateAfterCancellation(mkClient); } \
+    Type(Name, ValidAfterPleaseStop) \
+        { nx::network::test::socketIsValidAfterPleaseStop(mkClient); } \
+    Type(Name, UsefulAfterCancelIo) \
+        { nx::network::test::socketIsUsefulAfterCancelIo(mkServer, mkClient, endpointToConnectTo); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleAcceptMixed) \
