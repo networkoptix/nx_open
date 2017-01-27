@@ -1009,7 +1009,8 @@ void socketIsUsefulAfterCancelIo(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    static const std::chrono::milliseconds kTimeout(1500);
+    static const std::chrono::milliseconds kTimeout(3000);
+    static const std::chrono::milliseconds kMinDelay(1), kMaxDelay(1000);
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
@@ -1038,24 +1039,24 @@ void socketIsUsefulAfterCancelIo(
 
     nx::Buffer buffer;
     buffer.reserve(100);
-    for (size_t delayMs = 1; delayMs <= 1000; delayMs = delayMs * 10)
+    for (std::chrono::milliseconds delay = kMinDelay; delay <= kMaxDelay; delay *= 10)
     {
-        NX_LOG(lm("Cancel read: %1 ms").arg(delayMs), cl_logINFO);
+        NX_LOG(lm("Cancel read: %1").arg(delay), cl_logINFO);
         client->readSomeAsync(&buffer, [](SystemError::ErrorCode, size_t) { FAIL(); });
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        std::this_thread::sleep_for(delay);
         client->cancelIOSync(aio::EventType::etRead);
 
         transferSyncAsync(accepted.get(), client.get());
         transferAsyncSync(client.get(), accepted.get());
     }
 
-    for (size_t delayMs = 1; delayMs <= 1000; delayMs = delayMs * 10)
+    for (std::chrono::milliseconds delay = kMinDelay; delay <= kMaxDelay; delay *= 10)
     {
-        NX_LOG(lm("Cancel write: %1 ms").arg(delayMs), cl_logINFO);
+        NX_LOG(lm("Cancel write: %1").arg(delay), cl_logINFO);
         client->sendAsync(kTestMessage, [](SystemError::ErrorCode, size_t) { /*pass*/ });
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
+        std::this_thread::sleep_for(delay);
         client->cancelIOSync(aio::EventType::etWrite);
     }
 
