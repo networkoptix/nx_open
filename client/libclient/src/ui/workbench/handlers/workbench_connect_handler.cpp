@@ -177,6 +177,12 @@ void storeCustomConnection(const QnUuid& localId, const QString& systemName, con
     qnSettings->save();
 }
 
+void clearPassword(bool autoLogin, bool storePassword, QUrl& url)
+{
+    if (!autoLogin && !storePassword)
+        url.setPassword(QString());
+}
+
 void storeLocalSystemConnection(
     const QString& systemName,
     const QnUuid& localSystemId,
@@ -186,13 +192,12 @@ void storeLocalSystemConnection(
 {
     if (autoLogin)
         storePassword = true;
-    if (!storePassword)
-        url.setPassword(QString());
+
+    clearPassword(autoLogin, storePassword, url);
 
     using namespace nx::client::core::helpers;
 
     storeConnection(localSystemId, systemName, url);
-    storeCredentials(localSystemId, QnCredentials(url));
 
     qnClientCoreSettings->save();
 
@@ -548,7 +553,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 }
 
 void QnWorkbenchConnectHandler::storeConnectionRecord(
-    const QUrl& url,
+    QUrl url,
     const QnConnectionInfo& info,
     ConnectionOptions options)
 {
@@ -564,6 +569,16 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const auto localId = helpers::getLocalSystemId(info);
     nx::client::core::helpers::updateWeightData(localId);
 
+    const bool autoLogin = options.testFlag(AutoLogin);
+    const bool storePassword = options.testFlag(StorePassword);
+
+    // Stores local credentials for successful connection
+    if (helpers::isLocalUser(url.userName()))
+    {
+        clearPassword(autoLogin, storePassword, url);
+        nx::client::core::helpers::storeCredentials(localId, QnCredentials(url));
+    }
+
     if (options.testFlag(IsCloudConnection))
     {
         using namespace nx::network;
@@ -571,12 +586,13 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         return;
     }
 
+    // Stores connection if it is local
     storeLocalSystemConnection(
         info.systemName,
         localId,
         url,
-        options.testFlag(StorePassword),
-        options.testFlag(AutoLogin)
+        storePassword,
+        autoLogin
     );
 }
 

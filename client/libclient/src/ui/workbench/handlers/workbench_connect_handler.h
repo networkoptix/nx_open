@@ -92,7 +92,7 @@ private:
         ec2::AbstractECConnectionPtr connection);
 
     void storeConnectionRecord(
-        const QUrl& url,
+        QUrl url,
         const QnConnectionInfo& info,
         ConnectionOptions options);
 
