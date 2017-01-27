@@ -13,6 +13,7 @@ public:
 
 public:
     explicit QnRaiiGuard(const Handler& creationHandler, const Handler& destructionHandler);
+    explicit QnRaiiGuard(const Handler& destructionHandler);
 
     QnRaiiGuard(QnRaiiGuard&& other);
 
@@ -20,6 +21,8 @@ public:
     QnRaiiGuard& operator=(const QnRaiiGuard&) = delete;
 
     ~QnRaiiGuard();
+
+    void finalize(); //< early destruction
 
     void enableDestructionHandler();
     void disableDestructionHandler();
