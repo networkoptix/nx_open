@@ -378,7 +378,10 @@ int IOSVideoDecoder::decode(
     }
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
     {
-        av_frame_unref(d->frame);
+        // Recreate frame just in case.
+        // I am not sure hardware decoder can reuse it.
+        av_frame_free(&d->frame);
+        d->frame = av_frame_alloc();
         return -1; //< report error
     }
 
