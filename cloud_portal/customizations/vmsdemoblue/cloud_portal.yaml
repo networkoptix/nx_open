@@ -1,4 +1,4 @@
-customization: vmsdemoblue
+customization: '$CUSTOMIZATION'
 
 cloud_database:
     host: '$DB_HOST'

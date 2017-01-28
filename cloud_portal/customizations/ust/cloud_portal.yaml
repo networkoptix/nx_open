@@ -1,4 +1,4 @@
-customization: ust
+customization: '$CUSTOMIZATION'
 
 cloud_database:
     host: '$DB_HOST'
