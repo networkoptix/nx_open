@@ -7,8 +7,6 @@
 namespace nx {
 namespace stun {
 
-const AbstractAsyncClient::Settings AbstractAsyncClient::kDefaultSettings;
-
 AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_useSsl(false),
