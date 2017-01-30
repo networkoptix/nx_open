@@ -834,13 +834,13 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             mainWindow());
 
         messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
-        if (result != QDialogButtonBox::Cancel)
+        if ((result != QDialogButtonBox::Cancel) && (skipButton != messageBox.clickedButton()))
             modifiedResources << errorResources;
     }
 
