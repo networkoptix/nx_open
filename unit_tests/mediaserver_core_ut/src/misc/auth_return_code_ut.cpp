@@ -95,7 +95,6 @@ void testCookieAuth(
         nx_http::Method::GET,
         QnAuthHelper::instance()->generateNonce());
 
-
     auto msgBody = QJson::serialized(cookieLogin);
     QUrl url = mediaServerLauncher->apiUrl();
     url.setPath("/api/cookieLogin");
