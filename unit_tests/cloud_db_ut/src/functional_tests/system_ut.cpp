@@ -11,6 +11,7 @@
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
 #include <nx/utils/system_utils.h>
+#include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <nx/utils/test_support/utils.h>
 
@@ -317,6 +318,85 @@ void cdbFunctionalTestSystemGet(CdbFunctionalTest* testSetup)
 TEST_F(FtSystem, get)
 {
     cdbFunctionalTestSystemGet(this);
+}
+
+//-------------------------------------------------------------------------------------------------
+// FtSystemGetFilter
+
+class FtSystemGetFilter:
+    public FtSystem
+{
+protected:
+    void givenAccountWithSystemsOfDifferentCustomizations()
+    {
+        m_account = addActivatedAccount2();
+
+        constexpr int numberOfCustomizations = 3;
+        for (int i = 0; i < numberOfCustomizations; ++i)
+            m_customizations.push_back(nx::utils::generateRandomName(7).toStdString());
+
+        constexpr int numberOfSystemsToAdd = 7;
+        for (int i = 0; i < numberOfSystemsToAdd; ++i)
+        {
+            api::SystemData system;
+            system.customization = m_customizations[
+                nx::utils::random::number<std::size_t>(0, m_customizations.size() - 1)];
+            m_systemByCustomization.emplace(
+                system.customization,
+                addRandomSystemToAccount(m_account, system));
+        }
+    }
+
+    void whenRequestedSystemListWithCustomizationSpecified()
+    {
+        m_requestedCustomization = m_customizations[
+            nx::utils::random::number<std::size_t>(0, m_customizations.size() - 1)];
+
+        api::Filter filter;
+        filter.nameToValue.emplace(api::FilterField::customization, m_requestedCustomization);
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemsFiltered(m_account.email, m_account.password, filter, &m_systemsReturned));
+    }
+
+    void thenSystemsOfRequestedCustomizationHaveBeenReturned()
+    {
+        const auto expectedSystemsRange = 
+            m_systemByCustomization.equal_range(m_requestedCustomization);
+        for (auto expectedSystemIter = expectedSystemsRange.first;
+            expectedSystemIter != expectedSystemsRange.second;
+            ++expectedSystemIter)
+        {
+            const auto receivedSystemIter =
+                std::find_if(m_systemsReturned.begin(), m_systemsReturned.end(),
+                    [&expectedSystemIter](const api::SystemDataEx& val)
+                    {
+                        return val.id == expectedSystemIter->second.id;
+                    });
+            ASSERT_TRUE(receivedSystemIter != m_systemsReturned.end());
+
+            ASSERT_EQ(m_requestedCustomization, receivedSystemIter->customization);
+
+            m_systemsReturned.erase(receivedSystemIter);
+        }
+
+        ASSERT_TRUE(m_systemsReturned.empty());
+    }
+
+private:
+    AccountWithPassword m_account;
+    std::multimap<std::string, api::SystemData> m_systemByCustomization;
+    std::vector<std::string> m_customizations;
+    std::string m_requestedCustomization;
+    std::vector<api::SystemDataEx> m_systemsReturned;
+};
+
+TEST_F(FtSystemGetFilter, filter_by_customization)
+{
+    givenAccountWithSystemsOfDifferentCustomizations();
+    whenRequestedSystemListWithCustomizationSpecified();
+    thenSystemsOfRequestedCustomizationHaveBeenReturned();
 }
 
 TEST_F(FtSystem, activation)
