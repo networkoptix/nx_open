@@ -146,12 +146,8 @@ void PermissionsBasedWatcher::addCamera(const QnResourcePtr& resource)
         return;
 
     const auto key = camera->getId();
-    const auto existing = m_cameras.find(key);
-    if (existing != m_cameras.cend())
-    {
-        NX_ASSERT(*existing == camera);
+    if (m_cameras.contains(key))
         return;
-    }
 
     m_cameras.insert(key, camera);
     emit cameraAdded(resource);
@@ -160,7 +156,6 @@ void PermissionsBasedWatcher::addCamera(const QnResourcePtr& resource)
 void PermissionsBasedWatcher::removeCamera(const QnResourcePtr& resource)
 {
     const auto camera = m_cameras.take(resource->getId());
-    NX_ASSERT(camera);
     if (!camera)
         return;
 
