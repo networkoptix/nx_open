@@ -18,8 +18,7 @@ public:
         std::chrono::milliseconds recvTimeout;
         nx::network::RetryPolicy reconnectPolicy;
 
-        Settings() /* Defaults */
-        :
+        Settings():
             sendTimeout(3000),
             recvTimeout(3000),
             reconnectPolicy(
@@ -29,8 +28,6 @@ public:
                 std::chrono::minutes(1))
         {}
     };
-
-    static const Settings kDefaultSettings;
 
     virtual ~AbstractAsyncClient() = default;
 

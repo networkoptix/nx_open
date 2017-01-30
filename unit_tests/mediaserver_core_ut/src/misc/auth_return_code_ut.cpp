@@ -1,7 +1,3 @@
-/**********************************************************
-* Dec 27, 2016
-* rvasilenko
-***********************************************************/
 #include <QFile>
 #include <vector>
 
@@ -43,7 +39,7 @@ public:
         {
             auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
             ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
-            ASSERT_EQ(userManager->saveSync(userData), ec2::ErrorCode::ok);
+            ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
         }
     }
 
@@ -59,7 +55,7 @@ void testServerReturnCode(
     int expectedStatusCode,
     Qn::AuthResult expectedAuthResult)
 {
-    //waiting for server to come up
+    // Waiting for server to come up
 
     nx_http::HttpClient httpClient;
     httpClient.setUserName(userData.name);
@@ -72,17 +68,17 @@ void testServerReturnCode(
         QUrl url = mediaServerLauncher->apiUrl();
         url.setPath("/ec2/getUsers");
         if (httpClient.doGet(url))
-            break;  //server is alive
+            break;  //< Server is alive
     }
     ASSERT_TRUE(httpClient.response());
     auto statusCode = httpClient.response()->statusLine.statusCode;
-    ASSERT_EQ(statusCode, expectedStatusCode);
+    ASSERT_EQ(expectedStatusCode, statusCode);
 
     QString authResultStr = nx_http::getHeaderValue(httpClient.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
     ASSERT_FALSE(authResultStr.isEmpty());
 
     Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-    ASSERT_EQ(authResult, expectedAuthResult);
+    ASSERT_EQ(expectedAuthResult, authResult);
 }
 
 void testCookieAuth(
@@ -99,7 +95,6 @@ void testCookieAuth(
         nx_http::Method::GET,
         QnAuthHelper::instance()->generateNonce());
 
-
     auto msgBody = QJson::serialized(cookieLogin);
     QUrl url = mediaServerLauncher->apiUrl();
     url.setPath("/api/cookieLogin");
@@ -112,12 +107,13 @@ void testCookieAuth(
     while (!httpClient.eof())
         response += httpClient.fetchMessageBodyBuffer();
     QnJsonRestResult jsonResult = QJson::deserialized<QnJsonRestResult>(response);
-    ASSERT_EQ(jsonResult.error, expectedError);
+    ASSERT_EQ(expectedError, jsonResult.error);
 }
 
 TEST_F(AuthReturnCodeTest, authWhileRestart)
 {
-    // cloud users is forbidden for basic auth. We had bug: server return invalid code if request occurred when server is just started.
+    // Cloud users is forbidden for basic auth.
+    // We had bug: server return invalid code if request occurred when server is just started.
     mediaServerLauncher->stop();
     mediaServerLauncher->startAsync();
     testServerReturnCode(

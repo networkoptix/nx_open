@@ -241,40 +241,37 @@ QJsonObject::const_iterator QJsonDetail::findField(
     DeprecatedFieldNames* deprecatedFieldNames,
     const std::type_info& structTypeInfo)
 {
-    QJsonObject::const_iterator pos = jsonObject.find(fieldName);
+    const QJsonObject::const_iterator pos = jsonObject.find(fieldName);
+    if (pos != jsonObject.end())
+        return pos;
 
-    if (pos == jsonObject.end())
+    if (!deprecatedFieldNames)
     {
-        if (deprecatedFieldNames)
-        {
-            const QString deprecatedFieldName = deprecatedFieldNames->value(fieldName.toLatin1());
-            if (!deprecatedFieldName.isEmpty())
-            {
-                pos = jsonObject.find(deprecatedFieldName);
-                if (pos == jsonObject.end())
-                {
-                    NX_LOG(lit(
-                        "JSON field %2 of %1 not found even as deprecated %3 in { %4 }")
-                        .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName).arg(deprecatedFieldName)
-                        .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
-                }
-            }
-            else
-            {
-                NX_LOG(lit(
-                    "JSON field %2 of %1 not found (no deprecated name for this field) in { %3 }")
-                    .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
-                    .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
-            }
-        }
-        else
-        {
-            NX_LOG(lit(
-                "JSON field %2 of %1 not found (no deprecated names for this struct) in { %3 }")
-                .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
-                .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
-        }
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found (no deprecated names for this struct) in { %3 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
     }
 
-    return pos;
+    const QString deprecatedFieldName = deprecatedFieldNames->value(fieldName);
+    if (deprecatedFieldName.isEmpty())
+    {
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found (no deprecated name for this field) in { %3 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
+    }
+
+    const QJsonObject::const_iterator deprecatedFieldPos = jsonObject.find(deprecatedFieldName);
+    if (deprecatedFieldPos == jsonObject.end())
+    {
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found even as deprecated %3 in { %4 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName).arg(deprecatedFieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
+    }
+    return deprecatedFieldPos;
 }

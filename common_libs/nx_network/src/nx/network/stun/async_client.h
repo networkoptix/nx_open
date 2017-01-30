@@ -30,7 +30,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectCompletionHandler;
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
-    AsyncClient(Settings timeouts = kDefaultSettings);
+    AsyncClient(Settings timeouts = Settings());
     virtual ~AsyncClient() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;

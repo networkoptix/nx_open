@@ -24,6 +24,9 @@ public:
     AccountWithPassword addActivatedAccount2();
     api::SystemData addRandomSystemToAccount(
         const AccountWithPassword& account);
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account,
+        const api::SystemData& systemPrototype);
     void shareSystemEx(
         const AccountWithPassword& from,
         const api::SystemData& what,
