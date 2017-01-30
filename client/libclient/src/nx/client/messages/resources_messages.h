@@ -14,11 +14,7 @@ class Resources
 public:
     static void layoutAlreadyExists(QWidget* parent);
 
-    /**
-    * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
-    * @return                      Yes button if confirmed, otherwise Cancel
-    */
-    static QDialogButtonBox::StandardButton askOverrideLayout(QWidget* parent);
+    static bool overrideLayout(QWidget* parent);
 
     static bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
     static bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);

@@ -83,7 +83,7 @@ void Resources::layoutAlreadyExists(QWidget* parent)
         tr("You don't have permission to overwrite it."));
 }
 
-QDialogButtonBox::StandardButton Resources::askOverrideLayout(QWidget* parent)
+bool Resources::overrideLayout(QWidget* parent)
 {
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
@@ -91,10 +91,7 @@ QDialogButtonBox::StandardButton Resources::askOverrideLayout(QWidget* parent)
     messageBox.setInformativeText(tr("There is another layout with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite);
-
-    return (messageBox.exec() == QDialogButtonBox::Cancel
-        ? QDialogButtonBox::Cancel
-        : QDialogButtonBox::Yes);
+    return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
 bool Resources::changeUserLocalLayout(QWidget* parent,

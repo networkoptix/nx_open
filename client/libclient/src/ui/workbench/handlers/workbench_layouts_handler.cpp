@@ -168,7 +168,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
 
     if (!existing.isEmpty())
     {
-        if (nx::client::messages::Resources::askOverrideLayout(mainWindow()) != QDialogButtonBox::Yes)
+        if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
             return;
         removeLayouts(existing);
     }
@@ -268,14 +268,9 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
-        QDialogButtonBox::StandardButton button = QDialogButtonBox::Cancel;
         do
         {
             if (!dialog->exec())
-                return;
-
-            /* Check if we were disconnected (server shut down) while the dialog was open. */
-            if (!context()->user())
                 return;
 
             if (dialog->clickedButton() != QDialogButtonBox::Save)
@@ -292,17 +287,10 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
+                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+                    return;
 
-                switch (nx::client::messages::Resources::askOverrideLayout(mainWindow()))
-                {
-                    case QDialogButtonBox::Cancel:
-                        return;
-                    case QDialogButtonBox::Yes:
-                        saveLayout(layout);
-                        return;
-                    default:
-                        continue;
-                }
+                saveLayout(layout);
             }
 
             /* Check if we have rights to overwrite the layout */
@@ -315,18 +303,16 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 continue;
             }
 
-            button = QDialogButtonBox::Yes;
             if (!existing.isEmpty())
             {
-                button = nx::client::messages::Resources::askOverrideLayout(mainWindow());
-                if (button == QDialogButtonBox::Cancel)
+                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
                     return;
-                if (button == QDialogButtonBox::Yes)
-                {
-                    removeLayouts(existing);
-                }
+
+                removeLayouts(existing);
             }
-        } while (button != QDialogButtonBox::Yes);
+            break;
+
+        } while (true);
     }
     else
     {
@@ -339,8 +325,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
         if (!existing.isEmpty())
         {
-            const auto result = nx::client::messages::Resources::askOverrideLayout(mainWindow());
-            if (result == QDialogButtonBox::Cancel)
+            if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
                 return;
             removeLayouts(existing);
         }
@@ -881,41 +866,30 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     dialog->setName(generateUniqueLayoutName(user, tr("New Layout"), tr("New Layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    QDialogButtonBox::StandardButton button;
-    do
+    if (!dialog->exec())
+        return;
+
+    QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
+    if (!canRemoveLayouts(existing))
     {
-        if (!dialog->exec())
+        nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+        return;
+    }
+
+    if (!existing.isEmpty())
+    {
+        bool allAreLocal = boost::algorithm::all_of(existing,
+            [](const QnLayoutResourcePtr& layout)
+            {
+                return layout->hasFlags(Qn::local);
+            });
+
+        if (!allAreLocal && !nx::client::messages::Resources::overrideLayout(mainWindow()))
             return;
 
-        button = QDialogButtonBox::Yes;
-        QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
+        removeLayouts(existing);
+    }
 
-        if (!canRemoveLayouts(existing))
-        {
-            nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
-            return;
-        }
-
-        if (!existing.isEmpty())
-        {
-            bool allAreLocal = true;
-            for (const QnLayoutResourcePtr &layout : existing)
-                allAreLocal &= layout->hasFlags(Qn::local);
-            if (allAreLocal)
-            {
-                removeLayouts(existing);
-                break;
-            }
-
-            button = nx::client::messages::Resources::askOverrideLayout(mainWindow());
-            if (button == QDialogButtonBox::Cancel)
-                return;
-            if (button == QDialogButtonBox::Yes)
-            {
-                removeLayouts(existing);
-            }
-        }
-    } while (button != QDialogButtonBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setId(QnUuid::createUuid());
