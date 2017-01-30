@@ -1,10 +1,16 @@
 #pragma once
 
 /**@file
- * Utils for testing Rest API.
+ * Utils for testing Rest API from the client side.
  */
 
+#include <QJsonDocument>
+
 #include <nx/utils/move_only_func.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/fusion/model_functions.h>
+
+#include "mediaserver_launcher.h"
 
 namespace nx {
 namespace test {

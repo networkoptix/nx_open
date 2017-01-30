@@ -1,14 +1,4 @@
-#include <QJsonDocument>
-#include <QFile>
-#include <QRegExp>
-#include <vector>
-
 #include <gtest/gtest.h>
-#include "mediaserver_launcher.h"
-#include <api/app_server_connection.h>
-#include <nx/network/http/httpclient.h>
-#include <nx/fusion/model_functions.h>
-#include <rest/server/json_rest_result.h>
 
 #include "test_api_request.h"
 
@@ -28,9 +18,6 @@ TEST(SaveCamera, invalidData)
     cameraData.vendor = "test vendor";
     cameraData.physicalId = "matching physicalId";
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
-
-    auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    auto userManager = ec2Connection->getCameraManager(Qn::kSystemAccess);
 
     // Both id and physicalId fields correctly defined.
     testApiPost(launcher, "/ec2/saveCamera", cameraData);
