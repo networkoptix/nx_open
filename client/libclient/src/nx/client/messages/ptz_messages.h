@@ -6,7 +6,7 @@ namespace messages {
 
 class Ptz
 {
-    Q_DECLARE_TR_FUNCTIONS(nx::client::messages::Ptz)
+    Q_DECLARE_TR_FUNCTIONS(Ptz)
 public:
     static bool deletePresetInUse(QWidget* parent);
 

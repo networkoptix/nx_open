@@ -10,7 +10,7 @@ namespace messages {
 
 class Resources
 {
-    Q_DECLARE_TR_FUNCTIONS(nx::client::messages::Resources)
+    Q_DECLARE_TR_FUNCTIONS(Resources)
 public:
     static void layoutAlreadyExists(QWidget* parent);
 
