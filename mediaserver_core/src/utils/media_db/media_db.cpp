@@ -95,11 +95,12 @@ void DbHelper::run()
         auto record = m_writeQueue.front();
 
         Error error = Error::NoError;
-        lk.unlock();
         RecordVisitor vis(&m_stream, &error);
+
+        lk.unlock();
+        boost::apply_visitor(vis, record);
         lk.relock();
 
-        boost::apply_visitor(vis, record);
         m_writeQueue.pop_front();
         m_writerDoneCond.wakeAll();
 
