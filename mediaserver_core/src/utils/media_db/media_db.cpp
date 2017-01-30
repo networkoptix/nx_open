@@ -102,7 +102,6 @@ void DbHelper::run()
         lk.relock();
 
         m_writeQueue.pop_front();
-        m_writerDoneCond.wakeAll();
 
         if (error == Error::WriteError)
         {
@@ -118,6 +117,8 @@ void DbHelper::run()
         } 
         else
             m_handler->handleRecordWrite(error);
+
+        m_writerDoneCond.wakeAll();
     }
 }
 
