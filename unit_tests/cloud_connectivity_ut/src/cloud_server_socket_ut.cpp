@@ -588,7 +588,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     otherCredentials.key = system.authKey;
     otherCredentials.serverId = server->serverId();
 
-    for (int i = 0; i < 200; ++i)
+    for (int i = 0; i < 17; ++i)
     {
         CloudServerSocket cloudServerSocket(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
@@ -596,11 +596,19 @@ TEST_F(CloudServerSocketTest, reconnect)
         ASSERT_TRUE(cloudServerSocket.listen(128));
         cloudServerSocket.moveToListeningState();
 
-        //breaking connection to mediator
-        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(otherCredentials);
-        std::swap(currentCredentials, otherCredentials);
-
         cloudServerSocket.pleaseStopSync();
+
+        // Breaking connection to mediator.
+        nx::utils::promise<void> cloudCredentialsModified;
+        nx::network::SocketGlobals::mediatorConnector().post(
+            [&cloudCredentialsModified, &otherCredentials]()
+            {
+                nx::network::SocketGlobals::mediatorConnector()
+                    .setSystemCredentials(otherCredentials);
+                cloudCredentialsModified.set_value();
+            });
+        cloudCredentialsModified.get_future().wait();
+        std::swap(currentCredentials, otherCredentials);
     }
 }
 

@@ -1317,8 +1317,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     if (emptyData && !flushCurrentBuffer)
     {
-        //if (speed == 0)
-        //    return true;
+        bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer) &&
+            isVideoCamera)
+        {
+            // Local EOF packet could be created on TCP stream reconnect.
+            // Ignore such packets for video cameras.
+            return true;
+        }
 
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
@@ -1327,7 +1333,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (m_emptyPacketCounter >= 3 || isFillerPacket)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
             if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !isFillerPacket) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;

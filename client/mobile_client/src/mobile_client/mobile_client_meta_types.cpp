@@ -31,14 +31,17 @@
 
 using namespace nx::client::mobile;
 
-void QnMobileClientMetaTypes::initialize() {
+void QnMobileClientMetaTypes::initialize()
+{
     QnClientCoreMetaTypes::initialize();
 
     registerMetaTypes();
     registerQmlTypes();
 }
 
-void QnMobileClientMetaTypes::registerMetaTypes() {
+void QnMobileClientMetaTypes::registerMetaTypes()
+{
+    qRegisterMetaType<nx::media::PlayerStatistics>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {

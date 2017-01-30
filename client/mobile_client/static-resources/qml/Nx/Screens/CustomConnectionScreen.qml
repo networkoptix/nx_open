@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Dialogs 1.0
 import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
@@ -77,10 +78,57 @@ Page
 
             onClicked:
             {
-                removeSavedConnection(localSystemId)
-                Workflow.popCurrentScreen()
+                var title
+                var message
+
+                var lastCredentials = authenticationDataAccessor.count <= 1
+
+                if (!lastCredentials)
+                {
+                    title = qsTr("Delete login \"%1\"?").arg(credentialsEditor.login)
+                    message = qsTr(
+                        "Server addresses and other logins will remain saved. "
+                            + "To delete all connection information "
+                            + "you should delete all saved logins.")
+                }
+                else
+                {
+                    title = qsTr("Delete connection?")
+                }
+
+                var dialog = Workflow.openStandardDialog(
+                    title, message,
+                    [
+                        { "id": "DELETE", "text": qsTr("Delete") },
+                        "CANCEL"
+                    ])
+
+                dialog.buttonClicked.connect(
+                    function(buttonId)
+                    {
+                        if (buttonId !== "DELETE")
+                            return
+
+                        removeSavedConnection(localSystemId, credentialsEditor.login)
+
+                        if (lastCredentials)
+                        {
+                            Workflow.popCurrentScreen()
+                            return
+                        }
+
+                        var credentials = authenticationDataModel.defaultCredentials
+                        credentialsEditor.login = credentials.user
+                        credentialsEditor.password = credentials.password
+                    })
             }
         }
+    }
+
+    ModelDataAccessor
+    {
+        id: authenticationDataAccessor
+        model: authenticationDataModel
     }
 
     Connections
@@ -100,9 +148,31 @@ Page
         }
     }
 
-    function connect()
+    function checkConnectionFields()
     {
         hideWarning()
+
+        if (credentialsEditor.address.trim().length == 0)
+        {
+            credentialsEditor.addressErrorText = qsTr("Enter server address")
+            credentialsEditor.displayAddressError = true
+            return false
+        }
+        else if ((credentialsEditor.login.trim().length == 0)
+            || (credentialsEditor.password.trim().length == 0))
+        {
+            credentialsEditor.credentialsErrorText = qsTr("All fields must be filled")
+            credentialsEditor.displayUserCredentialsError = true
+            return false
+        }
+        return true
+    }
+
+    function connect()
+    {
+        if (!checkConnectionFields())
+            return
+
         connectButton.forceActiveFocus()
         d.connecting = true
         connectionManager.connectByUserInput(address, login, password)
@@ -112,6 +182,8 @@ Page
     {
         if (status == QnConnectionManager.UnauthorizedConnectionResult)
         {
+            credentialsEditor.credentialsErrorText =
+                LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
             credentialsEditor.displayUserCredentialsError = true
         }
         else

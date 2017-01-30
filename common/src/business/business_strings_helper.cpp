@@ -62,7 +62,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     }
 
     NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
-    return tr("Unknown (%1)").arg(static_cast<int>(value));
+    return lit("Unknown (%1)").arg(static_cast<int>(value));
 }
 
 QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int count)
@@ -73,24 +73,24 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
     {
         QString result = tr("Generic Event");
         if (value > UserDefinedEvent)
-            result += tr(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
+            result += lit(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
         return result;
     }
 
     switch( value )
     {
-    case CameraMotionEvent:     return tr("Motion on Camera(s)", "", count);
+    case CameraMotionEvent:     return tr("Motion on Cameras", "", count);
     case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Input Signal on Device(s)", "", count),
-                                    tr("Input Signal on Camera(s)", "", count)
+                                    tr("Input Signal on Devices", "", count),
+                                    tr("Input Signal on Cameras", "", count)
                                 );
     case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Device(s) Disconnected", "", count),
-                                    tr("Camera(s) Disconnected", "", count)
+                                    tr("Devices Disconnected", "", count),
+                                    tr("Cameras Disconnected", "", count)
                                 );
     case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Device(s) IP Conflict", "", count),
-                                    tr("Camera(s) IP Conflict", "", count)
+                                    tr("Devices IP Conflict", "", count),
+                                    tr("Cameras IP Conflict", "", count)
                                 );
     case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
                                     tr("Any Device Issue"),

@@ -186,13 +186,13 @@ void storeLocalSystemConnection(
 {
     if (autoLogin)
         storePassword = true;
+
     if (!storePassword)
         url.setPassword(QString());
 
     using namespace nx::client::core::helpers;
 
     storeConnection(localSystemId, systemName, url);
-    storeCredentials(localSystemId, QnCredentials(url));
 
     qnClientCoreSettings->save();
 
@@ -555,14 +555,29 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     /**
      * Note! We don't save connection to cloud or new systems. But we have to update
      * weights for any connection using its local id
+     *
+     * Also, we always store connection if StorePassword flag is set because it means
+     * it is not initial connection to factory system.
      */
 
-    const auto serverModuleInfo = qnModuleFinder->moduleInformation(info.serverId());
-    if (helpers::isNewSystem(serverModuleInfo))
+    const bool storePassword = options.testFlag(StorePassword);
+    if (!storePassword && helpers::isNewSystem(info))
         return;
 
     const auto localId = helpers::getLocalSystemId(info);
     nx::client::core::helpers::updateWeightData(localId);
+
+    // Stores local credentials for successful connection
+    const bool autoLogin = options.testFlag(AutoLogin);
+    if (helpers::isLocalUser(url.userName()))
+    {
+        const auto credentials = (storePassword || autoLogin
+            ? QnCredentials(url)
+            : QnCredentials(url.userName(), QString()));
+
+        nx::client::core::helpers::storeCredentials(localId, credentials);
+        qnClientCoreSettings->save();
+    }
 
     if (options.testFlag(IsCloudConnection))
     {
@@ -571,12 +586,13 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         return;
     }
 
+    // Stores connection if it is local
     storeLocalSystemConnection(
         info.systemName,
         localId,
         url,
-        options.testFlag(StorePassword),
-        options.testFlag(AutoLogin)
+        storePassword,
+        autoLogin
     );
 }
 

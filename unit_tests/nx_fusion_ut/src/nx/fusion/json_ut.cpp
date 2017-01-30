@@ -12,7 +12,8 @@ QByteArray str(const QByteArray& source)
 }
 
 static const QByteArray kHelloWorld(str("hello world"));
-}
+
+} // namespace
 
 TEST_F(QnFusionTestFixture, integralTypes)
 {
@@ -64,4 +65,73 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     nx::TestFlags flags = nx::Flag0;
     ASSERT_TRUE(QJson::deserialize(value, &flags));
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
+}
+
+namespace {
+
+struct MockData
+{
+    int a = 661;
+    int b = 662;
+    int c = 663;
+
+    MockData() = default;
+
+    MockData(int a, int b, int c): a(a), b(b), c(c) {}
+
+    bool operator==(const MockData& other) const
+    {
+        return a == other.a && b == other.b && c == other.c;
+    }
+
+    bool operator!=(const MockData& other) const { return !(*this == other); }
+
+    std::string toJsonString() const { return QJson::serialized(*this).toStdString(); }
+
+    static DeprecatedFieldNames* getDeprecatedFieldNames()
+    {
+        static DeprecatedFieldNames kDeprecatedFieldNames{
+            {lit("b"), lit("deprecatedB")},
+            {lit("c"), lit("deprecatedC")},
+        };
+        return &kDeprecatedFieldNames;
+    }
+};
+#define MockData_Fields (a)(b)(c)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((MockData), (ubjson)(json), _Fields)
+
+} // namespace
+
+TEST_F(QnFusionTestFixture, deserializeStruct)
+{
+    const MockData data(113, 115, 117);
+
+    const QByteArray jsonStr = R"json(
+        {
+            "a": 113,
+            "b": 115,
+            "c": 117
+        }
+    )json";
+
+    MockData deserializedData;
+    ASSERT_TRUE(QJson::deserialize(jsonStr, &deserializedData));
+    ASSERT_EQ(data, deserializedData);
+}
+
+TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
+{
+    const MockData data(113, 115, 117);
+
+    const QByteArray jsonStr = R"json(
+        {
+            "a": 113,
+            "deprecatedB": 115,
+            "deprecatedC": 117
+        }
+    )json";
+
+    MockData deserializedData;
+    ASSERT_TRUE(QJson::deserialize(jsonStr, &deserializedData));
+    ASSERT_EQ(data, deserializedData);
 }

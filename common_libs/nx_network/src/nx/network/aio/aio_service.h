@@ -46,6 +46,8 @@ public:
     AIOService(unsigned int threadCount = 0);
     virtual ~AIOService();
 
+    void pleaseStopSync();
+
     /**
      * @return true, if object has been successfully initialized.
      */

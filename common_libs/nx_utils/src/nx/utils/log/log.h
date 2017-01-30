@@ -155,7 +155,8 @@ private:
         }                                           \
     } while (0)
 
-#define NX_CLASS_NAME QString::fromStdString(boost::core::demangle(typeid(*this).name()))
+#define NX_TYPE_NAME(TYPE_INFO) QString::fromStdString(boost::core::demangle(TYPE_INFO.name()))
+#define NX_CLASS_NAME NX_TYPE_NAME(typeid(*this))
 #define NX_OBJECT_MESSAGE lm("%1(%2) %3").arg(NX_CLASS_NAME).arg(this)
 #define NX_LOGX(...) NX_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOGX_3, NX_LOGX_2)(__VA_ARGS__))
 

@@ -855,6 +855,8 @@ void QnResourceBrowserWidget::keyReleaseEvent(QKeyEvent* event)
 
 void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
 {
+    QWidget::timerEvent(event);
+
     if (event->timerId() == m_filterTimerId)
     {
         killTimer(m_filterTimerId);
@@ -867,27 +869,16 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
 
             QString filter = ui->filterLineEdit->text();
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
+            QnResourceSearchQuery query(filter, flags);
 
-            model->clearCriteria();
-            model->setFilterWildcard(L'*' + filter + L'*');
-            if (filter.isEmpty())
-            {
-                model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
-            }
-            else
-            {
-                model->addCriterion(QnResourceCriterionGroup(filter));
-                model->addCriterion(QnResourceCriterion(Qn::user));
-                model->addCriterion(QnResourceCriterion(Qn::layout));
-            }
-            if (flags != 0)
-                model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+            /* Checking manually until initial model criteria is here */
+            if (model->query() == query)
+                return;
 
+            model->setQuery(query);
             setupInitialModelCriteria(model);
         }
     }
-
-    QWidget::timerEvent(event);
 }
 
 void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
@@ -897,7 +888,6 @@ void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
     {
         QPainter painter(this);
         QRect rectToFill(rect());
-        rectToFill.adjust(1, 1, -1, -1);
         // rectToFill.setBottom(ui->horizontalLine->mapTo(this, QPoint(0, 0)).y()); //TODO #vkutin this line might be needed later. Remove it if not.
         painter.fillRect(rectToFill, palette().alternateBase());
     }

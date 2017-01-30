@@ -139,4 +139,9 @@ bool currentSystemIsNew()
     return qnGlobalSettings->localSystemId().isNull();
 }
 
+bool isLocalUser(const QString& login)
+{
+    return !login.contains(L'@');
+}
+
 } // namespace helpers

@@ -118,7 +118,9 @@ void QnLinkHoverProcessor::updateColors(UpdateTime when)
 
     /* Apply altered label text: */
     if (when == UpdateTime::Now)
+    {
         changeLabelState(alteredText, hovered);
+    }
     else
     {
         auto changer = [this, alteredText, hovered]() { changeLabelState(alteredText, hovered); };

@@ -27,6 +27,11 @@ AIOService::AIOService(unsigned int threadCount)
 
 AIOService::~AIOService()
 {
+    pleaseStopSync();
+}
+
+void AIOService::pleaseStopSync()
+{
     m_systemSocketAIO.sockets.clear();
     m_systemSocketAIO.aioThreadPool.clear();
 }

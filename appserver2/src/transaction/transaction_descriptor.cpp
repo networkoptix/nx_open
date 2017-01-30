@@ -559,6 +559,25 @@ struct ModifyResourceAccess
     bool isRemove;
 };
 
+struct ModifyCameraDataAccess
+{
+    bool operator()(const Qn::UserAccessData& accessData, const ApiCameraData& param)
+    {
+        if (!hasSystemAccess(accessData))
+        {
+            if (!param.physicalId.isEmpty() && !param.id.isNull())
+            {
+                auto expectedId = ApiCameraData::physicalIdToId(param.physicalId);
+                if (expectedId != param.id)
+                    return false;
+            }
+        }
+
+        return ModifyResourceAccess(/*isRemove*/ false)(accessData, param);
+    }
+};
+
+
 template<typename Param>
 void applyColumnFilter(const Qn::UserAccessData& /*accessData*/, Param& /*data*/) {}
 

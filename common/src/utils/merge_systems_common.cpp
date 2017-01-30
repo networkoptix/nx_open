@@ -54,13 +54,10 @@ public:
             case backupFailed:
                 return tr("Cannot create database backup.");
             case starterLicense:
-                return tr("Warning: You are about to merge Systems with START licenses.")
-                    + L'\n'
-                    + tr("As only 1 START license is allowed per System after your merge "
-                        "you will only have 1 START license remaining.")
-                    + L'\n'
-                    + tr("If you understand this and would like to proceed please click "
-                        "Merge to continue.");
+                return tr("You are about to merge Systems with Starter licenses.")
+                    + L'\n' + tr("Only one Starter license is allowed per System,"
+                        " so the second license will be deactivated.")
+                    + L'\n' + tr("Merge anyway?");
             case safeMode:
                 return tr("The discovered system %1 is in safe mode.",
                     "%1 is name of the system")

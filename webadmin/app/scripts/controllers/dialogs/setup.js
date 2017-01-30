@@ -506,10 +506,14 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
+                window.location.href = window.location.origin;
+
+                /*
                 $location.path('/');
                 setTimeout(function(){
-                    window.location.reload();
+                    window.location.reload(true);
                 });
+                */
             });
         };
 
@@ -618,6 +622,7 @@ angular.module('webadminApp')
                 0: {},
                 start: {
                     cancel: $scope.settings.thickClient,
+                    noFooter: true, // Here we disable next button
                     skip: 'merge',
                     next: 'systemName'
                 },

@@ -265,7 +265,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         bool somethingDeleted = false;
         for (quint32 ch = 0; ch < m_videoChannels; ++ch)
         {
-            for (quint32 i = (quint32) unsafeQueue.size() - 1; i >=0; --i)
+            for (int i = unsafeQueue.size() - 1; i >=0; --i)
             {
                 const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(unsafeQueue.at(i).get() );
                 if (video && (video->flags & AV_PKT_FLAG_KEY) && video->channelNumber == ch)

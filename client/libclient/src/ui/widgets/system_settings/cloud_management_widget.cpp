@@ -11,16 +11,19 @@
 #include <ui/dialogs/cloud/disconnect_from_cloud_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/common/palette.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/html.h>
 
-namespace
-{
+namespace {
+
+const bool kShowPromoBar = true;
 const int kAccountFontPixelSize = 24;
-}
+
+} // namespace
 
 QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
     base_type(parent),
@@ -69,17 +72,31 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
     ui->promo3TextLabel->setText(tr("Connect to your Systems\nfrom anywhere with any\ndevices"));
 
-    const QString kIssuesLink = makeHref(tr("known issues"), QnAppInfo::defaultCloudPortalUrl());
-    const QString kPromoText = tr("%1 is in Beta yet. See %2", 
-        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
-        .arg(QnAppInfo::cloudName()).arg(kIssuesLink);
-
-    ui->promoBar->setText(kPromoText);
-
     using nx::vms::utils::SystemUri;
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
+
+    const QString kLimitationsLink = makeHref(tr("Known limitations"), urlHelper.faqUrl());
+    const QString kPromoText = tr("%1 is in Beta. %2",
+        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
+        .arg(QnAppInfo::cloudName()).arg(kLimitationsLink);
+
+    /* Realign content in intro panel if promo bar is shown: */
+    if (kShowPromoBar)
+    {
+        ui->promoBar->setText(kPromoText);
+
+        QMargins margins = ui->introLayout->contentsMargins();
+        margins.setTop(margins.top() - style::Metrics::kHeaderSize / 2);
+        ui->introLayout->setContentsMargins(margins);
+
+        ui->introSpacer->changeSize(
+            ui->introSpacer->sizeHint().width(),
+            ui->introSpacer->sizeHint().height() - style::Metrics::kHeaderSize / 2,
+            ui->introSpacer->sizePolicy().horizontalPolicy(),
+            ui->introSpacer->sizePolicy().verticalPolicy());
+    }
 
     ui->learnMoreLabel->setText(
         makeHref(tr("Learn more about %1", "%1 is name of cloud (like 'Nx Cloud')").arg(

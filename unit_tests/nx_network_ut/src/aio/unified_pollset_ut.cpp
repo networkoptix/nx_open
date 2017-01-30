@@ -38,10 +38,8 @@ public:
     }
 
 protected:
-    virtual bool simulateSocketEvent(Pollable* socket, int eventMask) override
+    virtual bool simulateSocketEvent(Pollable* socket, int /*eventMask*/) override
     {
-        eventMask = eventMask;
-
         const auto udtSocket = dynamic_cast<UdtStreamSocket*>(socket);
         if (udtSocket)
         {

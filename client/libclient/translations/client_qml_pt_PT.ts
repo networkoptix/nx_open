@@ -68,11 +68,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New System</source>
+        <source>UNREACHABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UNREACHABLE</source>
+        <source>New Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

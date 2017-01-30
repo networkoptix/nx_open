@@ -5,7 +5,6 @@
 #include <nx/network/http/httptypes.h>
 #include "media_server/serverutil.h"
 #include "save_cloud_system_credentials.h"
-#include <api/model/cloud_credentials_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -19,32 +18,6 @@
 #include "system_settings_handler.h"
 
 
-namespace
-{
-    static const QString kSystemNameParamName(QLatin1String("systemName"));
-}
-
-struct SetupRemoveSystemData: public CloudCredentialsData
-{
-    SetupRemoveSystemData(): CloudCredentialsData() {}
-
-    SetupRemoveSystemData(const QnRequestParams& params) :
-        CloudCredentialsData(params),
-        systemName(params.value(kSystemNameParamName))
-    {
-    }
-
-    QString systemName;
-    QHash<QString, QString> systemSettings;
-};
-
-#define SetupRemoveSystemData_Fields CloudCredentialsData_Fields (systemName)(systemSettings)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SetupRemoveSystemData),
-    (json),
-    _Fields)
-
 QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
     CloudManagerGroup* cloudManagerGroup)
     :
@@ -55,18 +28,18 @@ QnSetupCloudSystemRestHandler::QnSetupCloudSystemRestHandler(
 int QnSetupCloudSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(SetupRemoveSystemData(params)), owner, result);
+    return execute(std::move(SetupCloudSystemData(params)), owner, result);
 }
 
 int QnSetupCloudSystemRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params);
-    const SetupRemoveSystemData data = QJson::deserialized<SetupRemoveSystemData>(body);
+    const SetupCloudSystemData data = QJson::deserialized<SetupCloudSystemData>(body);
     return execute(std::move(data), owner, result);
 }
 
 int QnSetupCloudSystemRestHandler::execute(
-    SetupRemoveSystemData data,
+    SetupCloudSystemData data,
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {

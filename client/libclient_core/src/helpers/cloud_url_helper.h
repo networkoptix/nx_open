@@ -20,6 +20,7 @@ public:
     Q_INVOKABLE QUrl accountManagementUrl() const;
     Q_INVOKABLE QUrl createAccountUrl() const;
     Q_INVOKABLE QUrl restorePasswordUrl() const;
+    Q_INVOKABLE QUrl faqUrl() const;
 
     Q_INVOKABLE QUrl makeUrl(const QString& path = QString(), bool auth = true) const;
 

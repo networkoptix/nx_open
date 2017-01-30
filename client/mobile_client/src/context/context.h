@@ -26,6 +26,8 @@ class QnContext: public QObject
     Q_PROPERTY(bool liteMode READ liteMode CONSTANT)
     Q_PROPERTY(bool autoLoginEnabled READ autoLoginEnabled WRITE setAutoLoginEnabled
         NOTIFY autoLoginEnabledChanged)
+    Q_PROPERTY(bool showCameraInfo READ showCameraInfo WRITE setShowCameraInfo
+        NOTIFY showCameraInfoChanged)
     Q_PROPERTY(bool testMode READ testMode CONSTANT)
     Q_PROPERTY(QString initialTest READ initialTest CONSTANT)
 
@@ -55,13 +57,19 @@ public:
 
     Q_INVOKABLE bool liteMode() const;
 
+    // TODO: #dklychkov Move settings properties to a dedicated object.
+
     Q_INVOKABLE bool autoLoginEnabled() const;
     Q_INVOKABLE void setAutoLoginEnabled(bool enabled);
+
+    Q_INVOKABLE bool showCameraInfo() const;
+    Q_INVOKABLE void setShowCameraInfo(bool showCameraInfo);
 
     Q_INVOKABLE bool testMode() const;
     Q_INVOKABLE QString initialTest() const;
 
-    Q_INVOKABLE void removeSavedConnection(const QString& localSystemId);
+    Q_INVOKABLE void removeSavedConnection(
+        const QString& localSystemId, const QString& userName = QString());
 
     Q_INVOKABLE void clearLastUsedConnection();
     Q_INVOKABLE QString getLastUsedSystemName() const;
@@ -77,6 +85,7 @@ public:
 
 signals:
     bool autoLoginEnabledChanged();
+    bool showCameraInfoChanged();
 
 private:
     NxGlobalsObject* m_nxGlobals;

@@ -76,7 +76,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
 
     std::unique_ptr<AbstractStreamSocket> client(server->accept());
-    ASSERT_TRUE(client);
+    ASSERT_TRUE(client != nullptr);
     waitForKeepAliveDisconnect(client.get());
 }
 

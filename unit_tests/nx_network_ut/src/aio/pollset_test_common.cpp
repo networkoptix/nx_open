@@ -92,10 +92,23 @@ void CommonPollSetTest::initializeRegularSocket()
     m_sockets.push_back(createRegularSocket());
 }
 
-void CommonPollSetTest::givenRegularSocketAvailableForReadWrite()
+void CommonPollSetTest::initializeBunchOfSocketsOfRandomType()
+{
+    constexpr int socketCount = 100;
+
+    for (int i = 0; i < socketCount; ++i)
+        initializeSocketOfRandomType();
+}
+
+void CommonPollSetTest::givenRegularSocketSubscribedToReadWriteEventPolling()
 {
     initializeRegularSocket();
     subscribeSocketsToEvents(aio::etRead | aio::etWrite);
+}
+
+void CommonPollSetTest::givenRegularSocketAvailableForReadWrite()
+{
+    givenRegularSocketSubscribedToReadWriteEventPolling();
     simulateSocketEvents(aio::etRead | aio::etWrite);
 }
 
@@ -103,14 +116,6 @@ void CommonPollSetTest::givenSocketsOfAllSupportedTypes()
 {
     m_sockets = createSocketOfAllSupportedTypes();
     subscribeSocketsToEvents(aio::etRead | aio::etWrite);
-}
-
-void CommonPollSetTest::initializeBunchOfSocketsOfRandomType()
-{
-    constexpr int socketCount = 100;
-
-    for (int i = 0; i < socketCount; ++i)
-        initializeSocketOfRandomType();
 }
 
 void CommonPollSetTest::runRemoveSocketWithMultipleEventsTest()
@@ -134,6 +139,11 @@ void CommonPollSetTest::runRemoveSocketWithMultipleEventsTest()
                 m_sockets[nx::utils::random::number<size_t>(0, m_sockets.size() - 1)].get(),
                 eventsToRemove);
         });
+}
+
+void CommonPollSetTest::whenMadeSocketAvailableForReadWrite()
+{
+    simulateSocketEvents(aio::etRead | aio::etWrite);
 }
 
 void CommonPollSetTest::whenRemovedSocketFromPollSetOnFirstEvent()
@@ -164,21 +174,17 @@ void CommonPollSetTest::whenChangedEverySocketState()
 
 void CommonPollSetTest::thenPollsetDidNotReportEventsForRemovedSockets()
 {
-    // If we did not crash to this point, then everything is ok.
+    // If we did not crash up to this point, then everything is ok.
 }
 
-void CommonPollSetTest::thenReadWriteEventsHaveBeenReported()
+void CommonPollSetTest::thenReadWriteEventsShouldBeReportedEventually()
 {
-    for (const auto& socketAndEventMask: m_socketToActiveEventMask)
+    for (;;)
     {
-        for (auto eventTypeToCheck: { aio::etRead, aio::etWrite })
-        {
-            if ((socketAndEventMask.second & eventTypeToCheck) == 0)
-                continue;
-            ASSERT_TRUE(
-                m_eventsReported.find(std::make_pair(socketAndEventMask.first, eventTypeToCheck)) !=
-                m_eventsReported.end());
-        }
+        whenReceivedSocketEvents();
+        if (isEveryExpectedEventHasBeenReported({ aio::etRead, aio::etWrite }))
+            break;
+        m_eventsReported.clear();
     }
 }
 
@@ -188,8 +194,7 @@ void CommonPollSetTest::thenPollsetReportsSocketsAsSignalledMultipleTimes()
 
     for (int i = 0; i < numberOfChecks; ++i)
     {
-        whenReceivedSocketEvents();
-        thenReadWriteEventsHaveBeenReported();
+        thenReadWriteEventsShouldBeReportedEventually();
         m_eventsReported.clear();
     }
 }
@@ -199,9 +204,9 @@ void CommonPollSetTest::thenPollsetReportsSocketsAsSignalledMultipleTimes()
 
 void CommonPollSetTest::allEventsAreActuallyReported()
 {
-    givenRegularSocketAvailableForReadWrite();
-    whenReceivedSocketEvents();
-    thenReadWriteEventsHaveBeenReported();
+    givenRegularSocketSubscribedToReadWriteEventPolling();
+    whenMadeSocketAvailableForReadWrite();
+    thenReadWriteEventsShouldBeReportedEventually();
 }
 
 void CommonPollSetTest::removingSocketWithMultipleEvents()
@@ -283,6 +288,25 @@ void CommonPollSetTest::removeSocket(Pollable* const socket)
     m_sockets.erase(socketIter);
 
     m_socketToActiveEventMask.erase(socket);
+}
+
+bool CommonPollSetTest::isEveryExpectedEventHasBeenReported(
+    std::vector<aio::EventType> expectedEvents) const
+{
+    for (const auto& socketAndEventMask: m_socketToActiveEventMask)
+    {
+        for (auto eventTypeToCheck: expectedEvents)
+        {
+            if ((socketAndEventMask.second & eventTypeToCheck) == 0)
+                continue;
+            auto reportedEventIter = 
+                m_eventsReported.find(std::make_pair(socketAndEventMask.first, eventTypeToCheck));
+            if (reportedEventIter == m_eventsReported.end())
+                return false;
+        }
+    }
+
+    return true;
 }
 
 } // namespace test

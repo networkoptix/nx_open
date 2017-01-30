@@ -366,15 +366,15 @@ TEST_F(SocketUdt, acceptingFirstConnection)
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
-                AbstractStreamSocket* /*socket*/)
+                AbstractStreamSocket* socket)
             {
+                delete socket;
                 socketAcceptedPromise.set_value(errorCode);
             });
 
-        //std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
         UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()));
+        ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()))
+            << SystemError::getLastOSErrorText().toStdString();
 
         auto future = socketAcceptedPromise.get_future();
         ASSERT_EQ(
@@ -386,7 +386,7 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     }
 }
 
-TEST_F(SocketUdt, /*DISABLED_*/allDataReadAfterFin)
+TEST_F(SocketUdt, allDataReadAfterFin)
 {
     const int testMessageLength = 16;
     const std::chrono::milliseconds connectTimeout(3000);
@@ -485,16 +485,14 @@ protected:
         return 0;
     }
 
-    UdtSocketPerformance()
-        : kTransferSize(selectTransferSize())
+    UdtSocketPerformance():
+        kTransferSize(selectTransferSize())
     {
     }
 
     void SetUp() override
     {
         server = std::make_unique<UdtStreamServerSocket>(AF_INET);
-        //auto udp = udpSocket();
-        //ASSERT_TRUE(server->bindToUdpSocket(std::move(*udp)));
         ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
         ASSERT_TRUE(server->listen(10));
 
@@ -510,8 +508,6 @@ protected:
     std::unique_ptr<UdtStreamSocket> connect() const
     {
         auto socket = std::make_unique<UdtStreamSocket>(AF_INET);
-        //auto udp = udpSocket();
-        //EXPECT_TRUE(socket->bindToUdpSocket(std::move(*udp)));
         socketConfig(socket.get());
         EXPECT_TRUE((bool) socket->connect(address));
         return std::move(socket);

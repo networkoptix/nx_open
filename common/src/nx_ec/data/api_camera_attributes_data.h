@@ -72,6 +72,15 @@ struct ApiCameraAttributesData: ApiData
 
     QnUuid getIdForMerging() const { return cameraId; } //< See ApiIdData::getIdForMerging().
 
+    static DeprecatedFieldNames* getDeprecatedFieldNames()
+    {
+        static DeprecatedFieldNames kDeprecatedFieldNames{
+            {lit("cameraId"), lit("cameraID")}, //< up to v2.6
+            {lit("preferredServerId"), lit("preferedServerId")}, //< up to v2.6
+        };
+        return &kDeprecatedFieldNames;
+    }
+
     QnUuid cameraId;
     QString cameraName;
     QString userDefinedGroupName;

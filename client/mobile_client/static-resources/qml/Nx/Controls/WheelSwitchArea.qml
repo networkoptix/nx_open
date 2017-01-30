@@ -56,7 +56,7 @@ MouseArea
     Timer
     {
         id: timer
-        interval: 300
+        interval: 500
         onTriggered: __currentRequests = 0
     }
 }

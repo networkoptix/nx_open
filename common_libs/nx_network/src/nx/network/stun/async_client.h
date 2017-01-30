@@ -30,7 +30,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectCompletionHandler;
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
-    AsyncClient(Settings timeouts = kDefaultSettings);
+    AsyncClient(Settings timeouts = Settings());
     virtual ~AsyncClient() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -60,7 +60,6 @@ private:
         disconnected,
         connecting,
         connected,
-        terminated,
     };
 
     virtual void closeConnection(
@@ -94,6 +93,8 @@ private:
 
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     ConnectCompletionHandler m_connectCompletionHandler;
+
+    const char* toString(State state) const;
 };
 
 } // namespase stun

@@ -668,7 +668,6 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
 
-    if (m_tcpSock->isClosed())
     {
         QnMutexLocker lock(&m_socketMutex);
         m_tcpSock = SocketFactory::createStreamSocket();

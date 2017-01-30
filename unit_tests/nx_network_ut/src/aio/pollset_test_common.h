@@ -80,18 +80,21 @@ protected:
     // Tests
 
     void initializeRegularSocket();
+    void initializeBunchOfSocketsOfRandomType();
+
+    void givenRegularSocketSubscribedToReadWriteEventPolling();
     void givenRegularSocketAvailableForReadWrite();
     void givenSocketsOfAllSupportedTypes();
-    void initializeBunchOfSocketsOfRandomType();
 
     void runRemoveSocketWithMultipleEventsTest();
 
+    void whenMadeSocketAvailableForReadWrite();
     void whenRemovedSocketFromPollSetOnFirstEvent();
     void whenReceivedSocketEvents();
     void whenChangedEverySocketState();
 
     void thenPollsetDidNotReportEventsForRemovedSockets();
-    void thenReadWriteEventsHaveBeenReported();
+    void thenReadWriteEventsShouldBeReportedEventually();
     void thenPollsetReportsSocketsAsSignalledMultipleTimes();
 
 private:
@@ -115,6 +118,7 @@ private:
     void simulateSocketEvents(int events);
     void assertIfEventIsNotExpected(Pollable* const socket, aio::EventType eventType);
     void removeSocket(Pollable* const socket);
+    bool isEveryExpectedEventHasBeenReported(std::vector<aio::EventType> expectedEvents) const;
 };
 
 } // namespace test

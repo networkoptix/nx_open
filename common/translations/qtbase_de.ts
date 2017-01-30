@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_DE">
+<TS version="2.1" language="de_DE">
 <context>
     <name>CloseButton</name>
     <message>
@@ -116,6 +116,30 @@
         <translation>Umschalten</translation>
     </message>
     <message>
+        <source>Scroll Left</source>
+        <translation>Nach links scrollen</translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation>Nach rechts scrollen</translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation>Nach oben scrollen</translation>
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation>Nach unten scrollen</translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation>Vorige Seite</translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation>Nächste Seite</translation>
+    </message>
+    <message>
         <source>Triggers the action</source>
         <translation>Aktion auslösen</translation>
     </message>
@@ -138,6 +162,49 @@
     <message>
         <source>Toggles the state</source>
         <translation>Schaltet den Zustand um</translation>
+    </message>
+    <message>
+        <source>Scrolls to the left</source>
+        <translation>Scrollt nach links</translation>
+    </message>
+    <message>
+        <source>Scrolls to the right</source>
+        <translation>Scrollt nach rechts</translation>
+    </message>
+    <message>
+        <source>Scrolls up</source>
+        <translation>Scrollt nach oben</translation>
+    </message>
+    <message>
+        <source>Scrolls down</source>
+        <translation>Scrollt nach unten</translation>
+    </message>
+    <message>
+        <source>Goes back a page</source>
+        <translation>Geht zur vorigen Seite</translation>
+    </message>
+    <message>
+        <source>Goes to the next page</source>
+        <translation>Geht zur nächsten Seite</translation>
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>Yes to All</source>
+        <translation>Ja, alle</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nein</translation>
+    </message>
+    <message>
+        <source>No to All</source>
+        <translation>Nein, keine</translation>
     </message>
 </context>
 <context>
@@ -189,6 +256,29 @@
         <source>Exit</source>
         <translation>Verlassen</translation>
     </message>
+    <message>
+        <source>Cut</source>
+        <translation>Ausschneiden</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Kopieren</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation>Einfügen</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Alles auswählen</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <source>Don&apos;t Save</source>
+        <translation>Nicht speichern</translation>
+    </message>
 </context>
 <context>
     <name>QColorDialog</name>
@@ -225,18 +315,18 @@
         <translation>&amp;HTML:</translation>
     </message>
     <message>
-        <source>Cursor at %1, %2, color: %3
+        <source>Cursor at %1, %2
 Press ESC to cancel</source>
-        <translation>Cursor bei %1, %2, Farbe: %3
+        <translation>Cursor bei %1, %2
 Drücken Sie ESC, um abzubrechen</translation>
+    </message>
+    <message>
+        <source>&amp;Pick Screen Color</source>
+        <translation>&amp;Farbe vom Bildschirm wählen</translation>
     </message>
     <message>
         <source>Select Color</source>
         <translation>Farbauswahl</translation>
-    </message>
-    <message>
-        <source>Pick Screen Color</source>
-        <translation>Farbe vom Bildschirm wählen</translation>
     </message>
     <message>
         <source>&amp;Basic colors</source>
@@ -325,11 +415,6 @@ Drücken Sie ESC, um abzubrechen</translation>
         <source>%1: ftok failed</source>
         <comment>QSystemSemaphore</comment>
         <translation>%1: ftok-Aufruf ist fehlgeschlagen</translation>
-    </message>
-    <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>LTR</translation>
     </message>
 </context>
 <context>
@@ -483,7 +568,14 @@ Drücken Sie ESC, um abzubrechen</translation>
     </message>
 </context>
 <context>
-    <name>QDateTimeEdit</name>
+    <name>QDBusTrayIcon</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+</context>
+<context>
+    <name>QDateTimeParser</name>
     <message>
         <source>AM</source>
         <translation>AM</translation>
@@ -513,98 +605,6 @@ Drücken Sie ESC, um abzubrechen</translation>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>S&amp;peichern</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Speichern</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>Öffnen</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Abbrechen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation>Schl&amp;ießen</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Schließen</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>Anwenden</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>Hilfe</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Save</source>
-        <translation>Nicht speichern</translation>
-    </message>
-    <message>
-        <source>Close without Saving</source>
-        <translation>Schließen ohne Speichern</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>Verwerfen</translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;Ja</translation>
-    </message>
-    <message>
-        <source>Yes to &amp;All</source>
-        <translation>Ja, &amp;alle</translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation>&amp;Nein</translation>
-    </message>
-    <message>
-        <source>N&amp;o to All</source>
-        <translation>N&amp;ein, keine</translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation>Alles speichern</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation>Wiederholen</translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation>Ignorieren</translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation>Voreinstellungen</translation>
     </message>
 </context>
 <context>
@@ -717,24 +717,46 @@ Drücken Sie ESC, um abzubrechen</translation>
         <source>Resolver library can&apos;t be loaded: No runtime library loading support</source>
         <translation>Die Resolver-Bibliothek konnte nicht geladen werden. Das Laden zur Laufzeit wird nicht unterstützt</translation>
     </message>
+    <message>
+        <source>No hostname given</source>
+        <translation>Es wurde kein Hostname angegeben</translation>
+    </message>
+    <message>
+        <source>Invalid hostname</source>
+        <translation>Ungültiger Hostname</translation>
+    </message>
+    <message>
+        <source>Host %1 could not be found.</source>
+        <translation>Host %1 konnte nicht gefunden werden.</translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>Unbekannter Fehler</translation>
+    </message>
+    <message>
+        <source>IPv6 addresses for nameservers are currently not supported</source>
+        <translation>IPv6-Adressen für Nameserver sind gegenwärtig nicht unterstützt</translation>
+    </message>
 </context>
 <context>
     <name>QDockWidget</name>
     <message>
         <source>Float</source>
+        <extracomment>Accessible name for button undocking a dock widget (floating state)</extracomment>
         <translation>Lösen</translation>
     </message>
     <message>
         <source>Undocks and re-attaches the dock widget</source>
-        <translation>Löst das Dockwidget und verankert es wieder</translation>
+        <translation>Löst das Dock-Widget und verankert es wieder</translation>
     </message>
     <message>
         <source>Close</source>
+        <extracomment>Accessible name for button closing a dock widget</extracomment>
         <translation>Schließen</translation>
     </message>
     <message>
         <source>Closes the dock widget</source>
-        <translation>Schließt das Dockwidget</translation>
+        <translation>Schließt das Dock-Widget</translation>
     </message>
 </context>
 <context>
@@ -971,18 +993,18 @@ Die Datei konnte nicht gefunden werden.
 Stellen Sie sicher, dass der Dateiname richtig ist.</translation>
     </message>
     <message>
+        <source>&apos;%1&apos; is write protected.
+Do you want to delete it anyway?</source>
+        <translation>&apos;%1&apos; ist schreibgeschützt.
+Möchten Sie die Datei trotzdem löschen?</translation>
+    </message>
+    <message>
         <source>New Folder</source>
         <translation>Neues Verzeichnis</translation>
     </message>
     <message>
         <source>Delete</source>
         <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is write protected.
-Do you want to delete it anyway?</source>
-        <translation>&apos;%1&apos; ist schreibgeschützt.
-Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
     <message>
         <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -1009,6 +1031,11 @@ Möchten Sie die Datei trotzdem löschen?</translation>
         <translation>Laufwerk</translation>
     </message>
     <message>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation>%1-Datei</translation>
+    </message>
+    <message>
         <source>File</source>
         <translation>Datei</translation>
     </message>
@@ -1024,7 +1051,7 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
     <message>
         <source>Alias</source>
-        <comment>Mac OS X Finder</comment>
+        <comment>OS X Finder</comment>
         <translation>Alias</translation>
     </message>
     <message>
@@ -1117,10 +1144,6 @@ Möchten Sie die Datei trotzdem löschen?</translation>
 <context>
     <name>QFontDatabase</name>
     <message>
-        <source>Normal</source>
-        <translation>Normal</translation>
-    </message>
-    <message>
         <source>Bold</source>
         <translation>Fett</translation>
     </message>
@@ -1134,11 +1157,39 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
     <message>
         <source>Demi</source>
-        <translation>Semi</translation>
+        <extracomment>The word for &quot;Demi&quot; as in &quot;Demi Bold&quot; used as a pattern for string searches</extracomment>
+        <translation>Halb</translation>
     </message>
     <message>
         <source>Light</source>
         <translation>Leicht</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <comment>The Normal or Regular font weight</comment>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <comment>The Medium font weight</comment>
+        <translation>Mittel</translation>
+    </message>
+    <message>
+        <source>Thin</source>
+        <translation>Dünn</translation>
+    </message>
+    <message>
+        <source>Extra Light</source>
+        <translation>Sehr dünn</translation>
+    </message>
+    <message>
+        <source>Extra Bold</source>
+        <translation>Sehr fett</translation>
+    </message>
+    <message>
+        <source>Extra</source>
+        <extracomment>The word for &quot;Extra&quot; as in &quot;Extra Bold, Extra Thin&quot; used as a pattern for string searches</extracomment>
+        <translation>Sehr</translation>
     </message>
     <message>
         <source>Italic</source>
@@ -1332,7 +1383,7 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
     <message>
         <source>Host %1 not found</source>
-        <translation>Rechner %1 konnte nicht gefunden werden</translation>
+        <translation>Host %1 konnte nicht gefunden werden</translation>
     </message>
     <message>
         <source>Connection refused to host %1</source>
@@ -1414,6 +1465,37 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
 </context>
 <context>
+    <name>QGnomeTheme</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>S&amp;peichern</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;Abbrechen</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>Schl&amp;ießen</translation>
+    </message>
+    <message>
+        <source>Close without Saving</source>
+        <translation>Schließen ohne zu Speichern</translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation>LTR</translation>
+    </message>
+</context>
+<context>
     <name>QHostInfo</name>
     <message>
         <source>No host name given</source>
@@ -1483,7 +1565,15 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
     <message>
         <source>SSL handshake failed</source>
-        <translation>Im Ablauf des SSL-Protokolls ist ein Fehler aufgetreten</translation>
+        <translation>Im Ablauf des SSL-Protokolls ist ein Fehler aufgetreten.</translation>
+    </message>
+    <message>
+        <source>Too many redirects</source>
+        <translation>Zu viele Weiterleitungen</translation>
+    </message>
+    <message>
+        <source>Insecure redirect</source>
+        <translation>Unsichere Weiterleitung</translation>
     </message>
 </context>
 <context>
@@ -1637,6 +1727,52 @@ Möchten Sie die Datei trotzdem löschen?</translation>
         <source>Unknown error</source>
         <translation>Unbekannter Fehler</translation>
     </message>
+    <message>
+        <source>file to open is a directory</source>
+        <translation>die zu öffnende Datei ist ein Verzeichnis</translation>
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <source>Invalid device</source>
+        <translation>Ungültiges Gerät</translation>
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation>Datei nicht gefunden</translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation>Dieser Typ von Bilddaten wird nicht unterstützt</translation>
+    </message>
+    <message>
+        <source>Unable to read image data</source>
+        <translation>Die Bilddaten konnten nicht gelesen werden</translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>Unbekannter Fehler</translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <source>Unknown error</source>
+        <translation>Unbekannter Fehler</translation>
+    </message>
+    <message>
+        <source>Device is not set</source>
+        <translation>Kein Ausgabegerät</translation>
+    </message>
+    <message>
+        <source>Device not writable</source>
+        <translation>Kann nicht auf Ausgabegerät schreiben</translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation>Dieser Typ von Bilddaten wird nicht unterstützt</translation>
+    </message>
 </context>
 <context>
     <name>QInputDialog</name>
@@ -1703,6 +1839,10 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     <message>
         <source>too large document</source>
         <translation>zu großes Dokument</translation>
+    </message>
+    <message>
+        <source>garbage at the end of the document</source>
+        <translation>Überzähliger Inhalt nach Ende des Dokuments</translation>
     </message>
 </context>
 <context>
@@ -1912,6 +2052,10 @@ Möchten Sie die Datei trotzdem löschen?</translation>
 <context>
     <name>QMYSQLDriver</name>
     <message>
+        <source>Unable to allocate a MYSQL object</source>
+        <translation>Es konnte kein  MYSQL-Objekt erstellt werden</translation>
+    </message>
+    <message>
         <source>Unable to open database &apos;%1&apos;</source>
         <translation>Die Datenbank &apos;%1&apos; kann nicht geöffnet werden</translation>
     </message>
@@ -2084,8 +2228,8 @@ Möchten Sie die Datei trotzdem löschen?</translation>
         <translation>&lt;h3&gt;Über Qt&lt;/h3&gt;&lt;p&gt;Dieses Programm verwendet Qt Version %1.&lt;/p&gt;</translation>
     </message>
     <message>
-        <source>&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across all major desktop operating systems. It is also available for embedded Linux and other embedded and mobile operating systems.&lt;/p&gt;&lt;p&gt;Qt is available under three different licensing options designed to accommodate the needs of our various users.&lt;/p&gt;&lt;p&gt;Qt licensed under our commercial license agreement is appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU LGPL version 2.1 or GNU GPL version 3.0.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 2.1 is appropriate for the development of Qt applications provided you can comply with the terms and conditions of the GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU General Public License version 3.0 is appropriate for the development of Qt applications where you wish to use such applications in combination with software subject to the terms of the GNU GPL version 3.0 or where you are otherwise willing to comply with the terms of the GNU GPL version 3.0.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://qt.digia.com/Product/Licensing/&quot;&gt;qt.digia.com/Product/Licensing&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;&lt;p&gt;Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies) and other contributors.&lt;/p&gt;&lt;p&gt;Qt and the Qt logo are trademarks of Digia Plc and/or its subsidiary(-ies).&lt;/p&gt;&lt;p&gt;Qt is developed as an open source project on &lt;a href=&quot;http://qt-project.org/&quot;&gt;qt-project.org&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;Qt is a Digia product. See &lt;a href=&quot;http://qt.digia.com/&quot;&gt;qt.digia.com&lt;/a&gt; for more information.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across all major desktop operating systems. It is also available for embedded Linux and other embedded and mobile operating systems.&lt;/p&gt;&lt;p&gt;Qt is available under three different licensing options designed to accommodate the needs of our various users.&lt;/p&gt;&lt;p&gt;Qt licensed under our commercial license agreement is appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU LGPL version 2.1 or GNU GPL version 3.0.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 2.1 is appropriate for the development of Qt applications provided you can comply with the terms and conditions of the GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU General Public License version 3.0 is appropriate for the development of Qt applications where you wish to use such applications in combination with software subject to the terms of the GNU GPL version 3.0 or where you are otherwise willing to comply with the terms of the GNU GPL version 3.0.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://qt.digia.com/Product/Licensing/&quot;&gt;qt.digia.com/Product/Licensing&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;&lt;p&gt;Copyright (C) 2013 Digia Plc and/or its subsidiary(-ies) and other contributors.&lt;/p&gt;&lt;p&gt;Qt and the Qt logo are trademarks of Digia Plc and/or its subsidiary(-ies).&lt;/p&gt;&lt;p&gt;Qt is developed as an open source project on &lt;a href=&quot;http://qt-project.org/&quot;&gt;qt-project.org&lt;/a&gt;.&lt;/p&gt;&lt;p&gt;Qt is a Digia product. See &lt;a href=&quot;http://qt.digia.com/&quot;&gt;qt.digia.com&lt;/a&gt; for more information.&lt;/p&gt;</translation>
+        <source>&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across all major desktop operating systems. It is also available for embedded Linux and other embedded and mobile operating systems.&lt;/p&gt;&lt;p&gt;Qt is available under three different licensing options designed to accommodate the needs of our various users.&lt;/p&gt;&lt;p&gt;Qt licensed under our commercial license agreement is appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU LGPL version 3 or GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 3 is appropriate for the development of Qt&amp;nbsp;applications provided you can comply with the terms and conditions of the GNU LGPL version 3.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 2.1 is appropriate for the development of Qt&amp;nbsp;applications provided you can comply with the terms and conditions of the GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://%2/&quot;&gt;%2&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;&lt;p&gt;Copyright (C) %1 The Qt Company Ltd and other contributors.&lt;/p&gt;&lt;p&gt;Qt and the Qt logo are trademarks of The Qt Company Ltd.&lt;/p&gt;&lt;p&gt;Qt is The Qt Company Ltd product developed as an open source project. See &lt;a href=&quot;http://%3/&quot;&gt;%3&lt;/a&gt; for more information.&lt;/p&gt;</source>
+        <translation>&lt;p&gt;Qt is a C++ toolkit for cross-platform application development.&lt;/p&gt;&lt;p&gt;Qt provides single-source portability across all major desktop operating systems. It is also available for embedded Linux and other embedded and mobile operating systems.&lt;/p&gt;&lt;p&gt;Qt is available under three different licensing options designed to accommodate the needs of our various users.&lt;/p&gt;&lt;p&gt;Qt licensed under our commercial license agreement is appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU LGPL version 3 or GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 3 is appropriate for the development of Qt&amp;nbsp;applications provided you can comply with the terms and conditions of the GNU LGPL version 3.&lt;/p&gt;&lt;p&gt;Qt licensed under the GNU LGPL version 2.1 is appropriate for the development of Qt&amp;nbsp;applications provided you can comply with the terms and conditions of the GNU LGPL version 2.1.&lt;/p&gt;&lt;p&gt;Please see &lt;a href=&quot;http://%2/&quot;&gt;%2&lt;/a&gt; for an overview of Qt licensing.&lt;/p&gt;&lt;p&gt;Copyright (C) %1 The Qt Company Ltd and other contributors.&lt;/p&gt;&lt;p&gt;Qt and the Qt logo are trademarks of The Qt Company Ltd.&lt;/p&gt;&lt;p&gt;Qt is The Qt Company Ltd product developed as an open source project. See &lt;a href=&quot;http://%3/&quot;&gt;%3&lt;/a&gt; for more information.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>About Qt</source>
@@ -2288,10 +2432,6 @@ Möchten Sie die Datei trotzdem löschen?</translation>
 <context>
     <name>QNetworkReply</name>
     <message>
-        <source>Error downloading %1 - server replied: %2</source>
-        <translation>Beim Herunterladen von %1 trat ein Fehler auf - Die Antwort des Servers ist: %2</translation>
-    </message>
-    <message>
         <source>Background request not allowed.</source>
         <translation>Hintergrundabfrage nicht zulässig.</translation>
     </message>
@@ -2310,6 +2450,10 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     <message>
         <source>Protocol &quot;%1&quot; is unknown</source>
         <translation>Das Protokoll &quot;%1&quot; ist unbekannt</translation>
+    </message>
+    <message>
+        <source>Error transferring %1 - server replied: %2</source>
+        <translation>Bei der Übertragung von %1 trat ein Fehler auf - Die Antwort des Servers ist: %2</translation>
     </message>
 </context>
 <context>
@@ -2590,10 +2734,6 @@ Möchten Sie die Datei trotzdem löschen?</translation>
         <translation>Unterer Rand</translation>
     </message>
     <message>
-        <source>Centimeters (cm)</source>
-        <translation>Zentimeter (cm)</translation>
-    </message>
-    <message>
         <source>Millimeters (mm)</source>
         <translation>Millimeter (mm)</translation>
     </message>
@@ -2604,6 +2744,52 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     <message>
         <source>Points (pt)</source>
         <translation>Punkte (pt)</translation>
+    </message>
+    <message>
+        <source>Pica (P̸)</source>
+        <translation>Pica (P̸)</translation>
+    </message>
+    <message>
+        <source>Didot (DD)</source>
+        <translation>Didot (DD)</translation>
+    </message>
+    <message>
+        <source>Cicero (CC)</source>
+        <translation>Cicero (CC)</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation>Benutzerdefiniert</translation>
+    </message>
+    <message>
+        <source>mm</source>
+        <extracomment>Unit &apos;Millimeter&apos;</extracomment>
+        <translation>mm</translation>
+    </message>
+    <message>
+        <source>pt</source>
+        <extracomment>Unit &apos;Points&apos;</extracomment>
+        <translation>pt</translation>
+    </message>
+    <message>
+        <source>in</source>
+        <extracomment>Unit &apos;Inch&apos;</extracomment>
+        <translation>Zoll</translation>
+    </message>
+    <message>
+        <source>P̸</source>
+        <extracomment>Unit &apos;Pica&apos;</extracomment>
+        <translation>P̸</translation>
+    </message>
+    <message>
+        <source>DD</source>
+        <extracomment>Unit &apos;Didot&apos;</extracomment>
+        <translation>DD</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <extracomment>Unit &apos;Cicero&apos;</extracomment>
+        <translation>CC</translation>
     </message>
     <message>
         <source>Page Layout</source>
@@ -2619,21 +2805,41 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     </message>
 </context>
 <context>
-    <name>QPluginLoader</name>
+    <name>QPageSize</name>
     <message>
-        <source>The plugin was not loaded.</source>
-        <translation>Das Plugin wurde nicht geladen.</translation>
+        <source>Custom (%1mm x %2mm)</source>
+        <extracomment>Custom size name in millimeters</extracomment>
+        <translation>Benutzerdefiniert (%1mm x %2mm)</translation>
     </message>
     <message>
-        <source>Unknown error</source>
-        <translation>Unbekannter Fehler</translation>
+        <source>Custom (%1pt x %2pt)</source>
+        <extracomment>Custom size name in points</extracomment>
+        <translation>Benutzerdefiniert (%1pt x %2pt)</translation>
     </message>
-</context>
-<context>
-    <name>QPrintDialog</name>
     <message>
-        <source>Print</source>
-        <translation>Drucken</translation>
+        <source>Custom (%1in x %2in)</source>
+        <extracomment>Custom size name in inches</extracomment>
+        <translation>Benutzerdefiniert (%1 Zoll x %2 Zoll)</translation>
+    </message>
+    <message>
+        <source>Custom (%1pc x %2pc)</source>
+        <extracomment>Custom size name in picas</extracomment>
+        <translation>Benutzerdefiniert (%1pc x %2pc)</translation>
+    </message>
+    <message>
+        <source>Custom (%1DD x %2DD)</source>
+        <extracomment>Custom size name in didots</extracomment>
+        <translation>Benutzerdefiniert (%1DD x %2DD)</translation>
+    </message>
+    <message>
+        <source>Custom (%1CC x %2CC)</source>
+        <extracomment>Custom size name in ciceros</extracomment>
+        <translation>Benutzerdefiniert (%1CC x %2CC)</translation>
+    </message>
+    <message>
+        <source>%1 x %2 in</source>
+        <extracomment>Page size in &apos;Inch&apos;.</extracomment>
+        <translation>%1 x %2 Zoll</translation>
     </message>
     <message>
         <source>A0</source>
@@ -2674,6 +2880,10 @@ Möchten Sie die Datei trotzdem löschen?</translation>
     <message>
         <source>A9</source>
         <translation>A9</translation>
+    </message>
+    <message>
+        <source>A10</source>
+        <translation>A10</translation>
     </message>
     <message>
         <source>B0</source>
@@ -2720,44 +2930,449 @@ Möchten Sie die Datei trotzdem löschen?</translation>
         <translation>B10</translation>
     </message>
     <message>
-        <source>C5E</source>
-        <translation>C5E</translation>
+        <source>Executive (7.5 x 10 in)</source>
+        <translation>Executive (7,5 x 10 Zoll)</translation>
     </message>
     <message>
-        <source>DLE</source>
-        <translation>DLE</translation>
+        <source>Executive (7.25 x 10.5 in)</source>
+        <translation>Executive (7,25 x 10,5 Zoll)</translation>
     </message>
     <message>
-        <source>Executive</source>
-        <translation>Executive</translation>
-    </message>
-    <message>
-        <source>Folio</source>
-        <translation>Folio</translation>
-    </message>
-    <message>
-        <source>Ledger</source>
-        <translation>Ledger</translation>
+        <source>Folio (8.27 x 13 in)</source>
+        <translation>Folio (8,27 x 13 Zoll)</translation>
     </message>
     <message>
         <source>Legal</source>
         <translation>Legal</translation>
     </message>
     <message>
-        <source>Letter</source>
-        <translation>Letter</translation>
+        <source>Letter / ANSI A</source>
+        <translation>Letter / ANSI A</translation>
     </message>
     <message>
-        <source>Tabloid</source>
-        <translation>Tabloid</translation>
+        <source>Tabloid / ANSI B</source>
+        <translation>Tabloid / ANSI B</translation>
     </message>
     <message>
-        <source>US Common #10 Envelope</source>
-        <translation>US Common #10 Envelope</translation>
+        <source>Ledger / ANSI B</source>
+        <translation>Ledger / ANSI B</translation>
     </message>
     <message>
         <source>Custom</source>
         <translation>Benutzerdefiniert</translation>
+    </message>
+    <message>
+        <source>A3 Extra</source>
+        <translation>A3 Extra</translation>
+    </message>
+    <message>
+        <source>A4 Extra</source>
+        <translation>A4 Extra</translation>
+    </message>
+    <message>
+        <source>A4 Plus</source>
+        <translation>A4 Plus</translation>
+    </message>
+    <message>
+        <source>A4 Small</source>
+        <translation>A4 Klein</translation>
+    </message>
+    <message>
+        <source>A5 Extra</source>
+        <translation>A5 Extra</translation>
+    </message>
+    <message>
+        <source>B5 Extra</source>
+        <translation>B5 Extra</translation>
+    </message>
+    <message>
+        <source>JIS B0</source>
+        <translation>JIS B0</translation>
+    </message>
+    <message>
+        <source>JIS B1</source>
+        <translation>JIS B1</translation>
+    </message>
+    <message>
+        <source>JIS B2</source>
+        <translation>JIS B2</translation>
+    </message>
+    <message>
+        <source>JIS B3</source>
+        <translation>JIS B3</translation>
+    </message>
+    <message>
+        <source>JIS B4</source>
+        <translation>JIS B4</translation>
+    </message>
+    <message>
+        <source>JIS B5</source>
+        <translation>JIS B5</translation>
+    </message>
+    <message>
+        <source>JIS B6</source>
+        <translation>JIS B6</translation>
+    </message>
+    <message>
+        <source>JIS B7</source>
+        <translation>JIS B7</translation>
+    </message>
+    <message>
+        <source>JIS B8</source>
+        <translation>JIS B8</translation>
+    </message>
+    <message>
+        <source>JIS B9</source>
+        <translation>JIS B9</translation>
+    </message>
+    <message>
+        <source>JIS B10</source>
+        <translation>JIS B10</translation>
+    </message>
+    <message>
+        <source>ANSI C</source>
+        <translation>ANSI C</translation>
+    </message>
+    <message>
+        <source>ANSI D</source>
+        <translation>ANSI D</translation>
+    </message>
+    <message>
+        <source>ANSI E</source>
+        <translation>ANSI E</translation>
+    </message>
+    <message>
+        <source>Legal Extra</source>
+        <translation>Legal Extra</translation>
+    </message>
+    <message>
+        <source>Letter Extra</source>
+        <translation>Letter Extra</translation>
+    </message>
+    <message>
+        <source>Letter Plus</source>
+        <translation>Letter Plus</translation>
+    </message>
+    <message>
+        <source>Letter Small</source>
+        <translation>Letter Klein</translation>
+    </message>
+    <message>
+        <source>Tabloid Extra</source>
+        <translation>Tabloid Extra</translation>
+    </message>
+    <message>
+        <source>Architect A</source>
+        <translation>Architect A</translation>
+    </message>
+    <message>
+        <source>Architect B</source>
+        <translation>Architect B</translation>
+    </message>
+    <message>
+        <source>Architect C</source>
+        <translation>Architect C</translation>
+    </message>
+    <message>
+        <source>Architect D</source>
+        <translation>Architect D</translation>
+    </message>
+    <message>
+        <source>Architect E</source>
+        <translation>Architect E</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Note</translation>
+    </message>
+    <message>
+        <source>Quarto</source>
+        <translation>Quarto</translation>
+    </message>
+    <message>
+        <source>Statement</source>
+        <translation>Statement</translation>
+    </message>
+    <message>
+        <source>Super A</source>
+        <translation>Super A</translation>
+    </message>
+    <message>
+        <source>Super B</source>
+        <translation>Super B</translation>
+    </message>
+    <message>
+        <source>Postcard</source>
+        <translation>Postkarte</translation>
+    </message>
+    <message>
+        <source>Double Postcard</source>
+        <translation>Doppelpostkarte</translation>
+    </message>
+    <message>
+        <source>PRC 16K</source>
+        <translation>PRC 16K</translation>
+    </message>
+    <message>
+        <source>PRC 32K</source>
+        <translation>PRC 32K</translation>
+    </message>
+    <message>
+        <source>PRC 32K Big</source>
+        <translation>PRC 32K Groß</translation>
+    </message>
+    <message>
+        <source>Fan-fold US (14.875 x 11 in)</source>
+        <translation>Endlosdruckpapier US (14,875 x 11 Zoll)</translation>
+    </message>
+    <message>
+        <source>Fan-fold German (8.5 x 12 in)</source>
+        <translation>Endlosdruckpapier Deutsch (8,5 x 12 Zoll)</translation>
+    </message>
+    <message>
+        <source>Fan-fold German Legal (8.5 x 13 in)</source>
+        <translation>Endlosdruckpapier Deutsch Legal (8,5 x 13 Zoll)</translation>
+    </message>
+    <message>
+        <source>Envelope B4</source>
+        <translation>Umschlag B4</translation>
+    </message>
+    <message>
+        <source>Envelope B5</source>
+        <translation>Umschlag B5</translation>
+    </message>
+    <message>
+        <source>Envelope B6</source>
+        <translation>Umschlag B6</translation>
+    </message>
+    <message>
+        <source>Envelope C0</source>
+        <translation>Umschlag C0</translation>
+    </message>
+    <message>
+        <source>Envelope C1</source>
+        <translation>Umschlag C1</translation>
+    </message>
+    <message>
+        <source>Envelope C2</source>
+        <translation>Umschlag C2</translation>
+    </message>
+    <message>
+        <source>Envelope C3</source>
+        <translation>Umschlag C3</translation>
+    </message>
+    <message>
+        <source>Envelope C4</source>
+        <translation>Umschlag C4</translation>
+    </message>
+    <message>
+        <source>Envelope C5</source>
+        <translation>Umschlag C5</translation>
+    </message>
+    <message>
+        <source>Envelope C6</source>
+        <translation>Umschlag C6</translation>
+    </message>
+    <message>
+        <source>Envelope C65</source>
+        <translation>Umschlag C65</translation>
+    </message>
+    <message>
+        <source>Envelope C7</source>
+        <translation>Umschlag C7</translation>
+    </message>
+    <message>
+        <source>Envelope DL</source>
+        <translation>Umschlag DL</translation>
+    </message>
+    <message>
+        <source>Envelope US 9</source>
+        <translation>Umschlag US 9</translation>
+    </message>
+    <message>
+        <source>Envelope US 10</source>
+        <translation>Umschlag US 10</translation>
+    </message>
+    <message>
+        <source>Envelope US 11</source>
+        <translation>Umschlag US 11</translation>
+    </message>
+    <message>
+        <source>Envelope US 12</source>
+        <translation>Umschlag US 12</translation>
+    </message>
+    <message>
+        <source>Envelope US 14</source>
+        <translation>Umschlag US 14</translation>
+    </message>
+    <message>
+        <source>Envelope Monarch</source>
+        <translation>Umschlag Monarch</translation>
+    </message>
+    <message>
+        <source>Envelope Personal</source>
+        <translation>Umschlag Personal</translation>
+    </message>
+    <message>
+        <source>Envelope Chou 3</source>
+        <translation>Umschlag Chou 3</translation>
+    </message>
+    <message>
+        <source>Envelope Chou 4</source>
+        <translation>Umschlag Chou 4</translation>
+    </message>
+    <message>
+        <source>Envelope Invite</source>
+        <translation>Umschlag Einladung</translation>
+    </message>
+    <message>
+        <source>Envelope Italian</source>
+        <translation>Umschlag Italienisch</translation>
+    </message>
+    <message>
+        <source>Envelope Kaku 2</source>
+        <translation>Umschlag Kaku 2</translation>
+    </message>
+    <message>
+        <source>Envelope Kaku 3</source>
+        <translation>Umschlag Kaku 3</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 1</source>
+        <translation>Umschlag PRC 1</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 2</source>
+        <translation>Umschlag PRC 2</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 3</source>
+        <translation>Umschlag PRC 3</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 4</source>
+        <translation>Umschlag PRC 4</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 5</source>
+        <translation>Umschlag PRC 5</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 6</source>
+        <translation>Umschlag PRC 6</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 7</source>
+        <translation>Umschlag PRC 7</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 8</source>
+        <translation>Umschlag PRC 8</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 9</source>
+        <translation>Umschlag PRC 9</translation>
+    </message>
+    <message>
+        <source>Envelope PRC 10</source>
+        <translation>Umschlag PRC 10</translation>
+    </message>
+    <message>
+        <source>Envelope You 4</source>
+        <translation>Umschlag You 4</translation>
+    </message>
+</context>
+<context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation>Alles speichern</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Öffnen</translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation>&amp;Ja</translation>
+    </message>
+    <message>
+        <source>Yes to &amp;All</source>
+        <translation>Ja, &amp;alle</translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation>&amp;Nein</translation>
+    </message>
+    <message>
+        <source>N&amp;o to All</source>
+        <translation>N&amp;ein, keine</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>Wiederholen</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>Ignorieren</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Schließen</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>Verwerfen</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>Hilfe</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>Anwenden</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation>Voreinstellungen</translation>
+    </message>
+</context>
+<context>
+    <name>QPluginLoader</name>
+    <message>
+        <source>The plugin was not loaded.</source>
+        <translation>Das Plugin wurde nicht geladen.</translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>Unbekannter Fehler</translation>
+    </message>
+</context>
+<context>
+    <name>QPrintDialog</name>
+    <message>
+        <source>Print</source>
+        <translation>Drucken</translation>
     </message>
     <message>
         <source>Left to Right, Top to Bottom</source>
@@ -2887,6 +3502,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <source>OK</source>
         <translation>OK</translation>
     </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automatisch</translation>
+    </message>
 </context>
 <context>
     <name>QPrintPreviewDialog</name>
@@ -2969,6 +3588,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
 </context>
 <context>
     <name>QPrintPropertiesDialog</name>
+    <message>
+        <source>Printer Properties</source>
+        <translation>Druckereigenschaften</translation>
+    </message>
     <message>
         <source>Job Options</source>
         <translation>Einstellungen zum Druckauftrag</translation>
@@ -3126,6 +3749,14 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Der Prozess ist abgestürzt</translation>
     </message>
     <message>
+        <source>Process failed to start</source>
+        <translation>Das Starten des Prozesses ist fehlgeschlagen</translation>
+    </message>
+    <message>
+        <source>Process failed to start (spawned process exited with code 127)</source>
+        <translation>Das Starten des Prozesses ist fehlgeschlagen (der Unterprozess wurde mit Rückgabewert 127 beendet)</translation>
+    </message>
+    <message>
         <source>No program defined</source>
         <translation>Es wurde kein Programm angegeben</translation>
     </message>
@@ -3159,14 +3790,6 @@ Bitte deaktivieren Sie eine der beiden.</translation>
 </context>
 <context>
     <name>QQnxFileDialogHelper</name>
-    <message>
-        <source>CANCEL</source>
-        <translation>ABBRECHEN</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
     <message>
         <source>All files (*.*)</source>
         <translation>Alle Dateien (*.*)</translation>
@@ -3514,7 +4137,7 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     </message>
     <message>
         <source>invalid UTF-16 string</source>
-        <translation>Ungültige UTF16-Zeichenkette</translation>
+        <translation>Ungültige UTF-16-Zeichenkette</translation>
     </message>
     <message>
         <source>name is too long in (*MARK), (*PRUNE), (*SKIP), or (*THEN)</source>
@@ -3523,6 +4146,46 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>character value in \u.... sequence is too large</source>
         <translation>Zeichenwert in \u....-Sequenz ist zu groß</translation>
+    </message>
+    <message>
+        <source>invalid UTF-32 string</source>
+        <translation>Ungültige UTF-32-Zeichenkette</translation>
+    </message>
+    <message>
+        <source>setting UTF is disabled by the application</source>
+        <translation>UTF-Einstellung durch Anwendung deaktiviert</translation>
+    </message>
+    <message>
+        <source>non-hex character in \x{} (closing brace missing?)</source>
+        <translation>\x{} enthält ein Zeichen, das keine Hexadezimalziffer ist (fehlt eventuell eine schließende Klammer?)</translation>
+    </message>
+    <message>
+        <source>non-octal character in \o{} (closing brace missing?)</source>
+        <translation>\o{} enthält ein Zeichen, das keine Oktalziffer ist (fehlt eventuell eine schließende Klammer?)</translation>
+    </message>
+    <message>
+        <source>missing opening brace after \o</source>
+        <translation>öffnende Klammer fehlt nach \o</translation>
+    </message>
+    <message>
+        <source>parentheses are too deeply nested</source>
+        <translation>Klammern zu tief geschachtelt</translation>
+    </message>
+    <message>
+        <source>invalid range in character class</source>
+        <translation>Ungültiger Bereich in Zeichenklasse</translation>
+    </message>
+    <message>
+        <source>group name must start with a non-digit</source>
+        <translation>Gruppenname darf nicht mit einer Ziffer beginnen</translation>
+    </message>
+    <message>
+        <source>parentheses are too deeply nested (stack check)</source>
+        <translation>Klammern zu tief geschachtelt (Stack-Prüfung)</translation>
+    </message>
+    <message>
+        <source>digits missing in \x{} or \o{}</source>
+        <translation>Fehlende Ziffern in \x{} oder \o{}</translation>
     </message>
 </context>
 <context>
@@ -3614,6 +4277,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Existing file %1 is not writable</source>
         <translation>Die existierende Datei %1 ist nicht schreibbar</translation>
+    </message>
+    <message>
+        <source>Filename refers to a directory</source>
+        <translation>Dateiname bezeichnet ein Verzeichnis</translation>
     </message>
     <message>
         <source>Writing canceled by application</source>
@@ -3716,6 +4383,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>%1: key is empty</source>
         <translation>%1: Ungültige Schlüsselangabe (leer)</translation>
+    </message>
+    <message>
+        <source>%1: bad name</source>
+        <translation>%1: Ungültiger Name</translation>
     </message>
     <message>
         <source>%1: UNIX key file doesn&apos;t exist</source>
@@ -4100,10 +4771,6 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Community</translation>
     </message>
     <message>
-        <source>Audio Rewind</source>
-        <translation>Audio rückspulen</translation>
-    </message>
-    <message>
         <source>Back Forward</source>
         <translation>Hinterstes nach vorn</translation>
     </message>
@@ -4340,10 +5007,6 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Ultra Wide Band</translation>
     </message>
     <message>
-        <source>Audio Forward</source>
-        <translation>Audio vorspulen</translation>
-    </message>
-    <message>
         <source>Audio Repeat</source>
         <translation>Audio wiederholen</translation>
     </message>
@@ -4382,6 +5045,86 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Hibernate</source>
         <translation>Hibernate</translation>
+    </message>
+    <message>
+        <source>Media Rewind</source>
+        <translation>Medium zurückspulen</translation>
+    </message>
+    <message>
+        <source>Media Fast Forward</source>
+        <translation>Medium vorspulen</translation>
+    </message>
+    <message>
+        <source>Power Down</source>
+        <translation>Ausschalten</translation>
+    </message>
+    <message>
+        <source>Microphone Mute</source>
+        <translation>Mikrofon stummschalten</translation>
+    </message>
+    <message>
+        <source>Red</source>
+        <translation>Rot</translation>
+    </message>
+    <message>
+        <source>Green</source>
+        <translation>Grün</translation>
+    </message>
+    <message>
+        <source>Yellow</source>
+        <translation>Gelb</translation>
+    </message>
+    <message>
+        <source>Blue</source>
+        <translation>Blau</translation>
+    </message>
+    <message>
+        <source>Channel Up</source>
+        <translation>nächster Kanal</translation>
+    </message>
+    <message>
+        <source>Channel Down</source>
+        <translation>vorangehender Kanal</translation>
+    </message>
+    <message>
+        <source>Guide</source>
+        <translation>Anleitung</translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation>Information</translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation>Einstellungen</translation>
+    </message>
+    <message>
+        <source>Microphone Volume Up</source>
+        <translation>Mikrofon lauter</translation>
+    </message>
+    <message>
+        <source>Microphone Volume Down</source>
+        <translation>Mikrofon leiser</translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation>Neu</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Öffnen</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Suchen</translation>
+    </message>
+    <message>
+        <source>Undo</source>
+        <translation>Rückgängig</translation>
+    </message>
+    <message>
+        <source>Redo</source>
+        <translation>Wiederherstellen</translation>
     </message>
     <message>
         <source>Print Screen</source>
@@ -4631,6 +5374,22 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Vergrößern</translation>
     </message>
     <message>
+        <source>Exit</source>
+        <translation>Verlassen</translation>
+    </message>
+    <message>
+        <source>Touchpad Toggle</source>
+        <translation>Touchpad-Umschalter</translation>
+    </message>
+    <message>
+        <source>Touchpad On</source>
+        <translation>Touchpad an</translation>
+    </message>
+    <message>
+        <source>Touchpad Off</source>
+        <translation>Touchpad aus</translation>
+    </message>
+    <message>
         <source>Ctrl</source>
         <translation>Strg</translation>
     </message>
@@ -4766,11 +5525,6 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Benachrichtigung</translation>
     </message>
     <message>
-        <source>window</source>
-        <extracomment>Role of an accessible object</extracomment>
-        <translation>Fenster</translation>
-    </message>
-    <message>
         <source>filler</source>
         <extracomment>Role of an accessible object</extracomment>
         <translation>Füller</translation>
@@ -4817,7 +5571,9 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     </message>
     <message>
         <source>frame</source>
-        <extracomment>Role of an accessible object</extracomment>
+        <extracomment>Role of an accessible object: a window with frame and title
+----------
+Role of an accessible object</extracomment>
         <translation>Rahmen</translation>
     </message>
     <message>
@@ -5031,6 +5787,51 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Panel mit mehreren Schichten</translation>
     </message>
     <message>
+        <source>web document</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Web-Dokument</translation>
+    </message>
+    <message>
+        <source>paragraph</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Absatz</translation>
+    </message>
+    <message>
+        <source>section</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Abschnitt</translation>
+    </message>
+    <message>
+        <source>color chooser</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Farbauswahl</translation>
+    </message>
+    <message>
+        <source>footer</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Fußzeile</translation>
+    </message>
+    <message>
+        <source>form</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Formular</translation>
+    </message>
+    <message>
+        <source>heading</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Kopfzeile</translation>
+    </message>
+    <message>
+        <source>note</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Hinweis</translation>
+    </message>
+    <message>
+        <source>complementary content</source>
+        <extracomment>Role of an accessible object</extracomment>
+        <translation>Ergänzender Inhalt</translation>
+    </message>
+    <message>
         <source>unknown</source>
         <extracomment>Role of an accessible object</extracomment>
         <translation>unbekannt</translation>
@@ -5139,6 +5940,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Es konnte keine SSL-Kontextstruktur erzeugt werden (%1)</translation>
     </message>
     <message>
+        <source>unsupported protocol</source>
+        <translation>Nicht unterstütztes Protokoll</translation>
+    </message>
+    <message>
         <source>Invalid or empty cipher list (%1)</source>
         <translation>Ungültige oder leere Schlüsselliste (%1)</translation>
     </message>
@@ -5157,6 +5962,14 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Private key does not certify public key, %1</source>
         <translation>Der private Schlüssel passt nicht zum öffentlichen Schlüssel, %1</translation>
+    </message>
+    <message>
+        <source>OpenSSL version too old, need at least v1.0.2</source>
+        <translation>Die verwendete Version von OpenSSL ist zu alt, es muss v1.0.2 oder neuer sein</translation>
+    </message>
+    <message>
+        <source>Error when setting the elliptic curves (%1)</source>
+        <translation>Fehler beim Setzen der elliptischen Kurven (%1)</translation>
     </message>
     <message>
         <source>Error creating SSL session, %1</source>
@@ -5232,6 +6045,10 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Application Data</source>
         <translation>Anwendungsdaten</translation>
+    </message>
+    <message>
+        <source>Application Configuration</source>
+        <translation>Anwendungskonfiguration</translation>
     </message>
     <message>
         <source>Cache</source>
@@ -5468,6 +6285,22 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>PDF Pop directional formatting</translation>
     </message>
     <message>
+        <source>LRI Left-to-right isolate</source>
+        <translation>LRI Left-to-right isolate</translation>
+    </message>
+    <message>
+        <source>RLI Right-to-left isolate</source>
+        <translation>RLI Right-to-left isolate</translation>
+    </message>
+    <message>
+        <source>FSI First strong isolate</source>
+        <translation>FSI First strong isolate</translation>
+    </message>
+    <message>
+        <source>PDI Pop directional isolate</source>
+        <translation>PDI Pop directional isolate</translation>
+    </message>
+    <message>
         <source>Insert Unicode control character</source>
         <translation>Unicode-Kontrollzeichen einfügen</translation>
     </message>
@@ -5519,6 +6352,21 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Select All</source>
         <translation>Alles auswählen</translation>
+    </message>
+</context>
+<context>
+    <name>QWindowsDirect2DIntegration</name>
+    <message>
+        <source>Qt cannot load the direct2d platform plugin because the Direct2D version on this system is too old. The minimum system requirement for this platform plugin is Windows 7 SP1 with Platform Update.
+
+The minimum Direct2D version required is %1.%2.%3.%4. The Direct2D version on this system is %5.%6.%7.%8.</source>
+        <translation>Qt kann das Direct2D-Plattform-Plugin nicht laden, weil die auf dem System installierte Version von Direct2D veraltet ist. Dieses Plattform-Plugin erfordert mindestens Windows 7 SP1 mit Plattform Update.
+
+Die minimal erforderliche Version von Direct2D ist %1.%2.%3.%4. Die auf diesem System installierte Version von Direct2D ist %5.%6.%7.%8.</translation>
+    </message>
+    <message>
+        <source>Cannot load direct2d platform plugin</source>
+        <translation>Direct2D-Plattform-Plugin kann nicht geladen werden</translation>
     </message>
 </context>
 <context>
@@ -5694,8 +6542,8 @@ Bitte deaktivieren Sie eine der beiden.</translation>
         <translation>Ungültige Namensraum-Deklaration.</translation>
     </message>
     <message>
-        <source>Attribute redefined.</source>
-        <translation>Redefinition eines Attributes.</translation>
+        <source>Attribute &apos;%1&apos; redefined.</source>
+        <translation>Attribut &apos;%1&apos; mehrfach definiert.</translation>
     </message>
     <message>
         <source>Unexpected character &apos;%1&apos; in public id literal.</source>
@@ -5804,81 +6652,6 @@ Bitte deaktivieren Sie eine der beiden.</translation>
     <message>
         <source>Invalid character reference.</source>
         <translation>Ungültige Zeichenreferenz.</translation>
-    </message>
-</context>
-<context>
-    <name>QtAndroidDialogHelpers::QAndroidPlatformMessageDialogHelper</name>
-    <message>
-        <source>OK</source>
-        <translation>OK</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Speichern</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>Öffnen</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Schließen</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>Anwenden</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>Hilfe</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>Verwerfen</translation>
-    </message>
-    <message>
-        <source>Yes</source>
-        <translation>Ja</translation>
-    </message>
-    <message>
-        <source>Yes to All</source>
-        <translation>Ja, alle</translation>
-    </message>
-    <message>
-        <source>No</source>
-        <translation>Nein</translation>
-    </message>
-    <message>
-        <source>No to All</source>
-        <translation>Nein, keine</translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation>Alles speichern</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation>Abbrechen</translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation>Wiederholen</translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation>Ignorieren</translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation>Voreinstellungen</translation>
     </message>
 </context>
 </TS>

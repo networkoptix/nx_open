@@ -44,16 +44,16 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
 
     message->addAttribute(
         stun::extension::attrs::tcpReverseRetryMaxCount,
-        (int)tcpReverseRetryPolicy.maxRetryCount());
+        (int)tcpReverseRetryPolicy.maxRetryCount);
     message->addAttribute(
         stun::extension::attrs::tcpReverseRetryInitialDelay,
-        tcpReverseRetryPolicy.initialDelay());
+        tcpReverseRetryPolicy.initialDelay);
     message->addAttribute(
         stun::extension::attrs::tcpReverseRetryDelayMultiplier,
-        (int)tcpReverseRetryPolicy.delayMultiplier());
+        (int)tcpReverseRetryPolicy.delayMultiplier);
     message->addAttribute(
         stun::extension::attrs::tcpReverseRetryMaxDelay,
-        tcpReverseRetryPolicy.maxDelay());
+        tcpReverseRetryPolicy.maxDelay);
 
     message->addAttribute(
         stun::extension::attrs::tcpReverseHttpSendTimeout,
@@ -91,19 +91,19 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
     //  curently unsigned int(s) are represented like simple ints
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseRetryMaxCount,
-        (int*)&tcpReverseRetryPolicy.m_maxRetryCount,
+        (int*)&tcpReverseRetryPolicy.maxRetryCount,
         (int)network::RetryPolicy::kDefaultMaxRetryCount);
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseRetryInitialDelay,
-        &tcpReverseRetryPolicy.m_initialDelay,
+        &tcpReverseRetryPolicy.initialDelay,
         (std::chrono::milliseconds)network::RetryPolicy::kDefaultInitialDelay);
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseRetryDelayMultiplier,
-        (int*)&tcpReverseRetryPolicy.m_delayMultiplier,
+        (int*)&tcpReverseRetryPolicy.delayMultiplier,
         (int)network::RetryPolicy::kDefaultDelayMultiplier);
     readAttributeValue(
         message, stun::extension::attrs::tcpReverseRetryMaxDelay,
-        &tcpReverseRetryPolicy.m_maxDelay,
+        &tcpReverseRetryPolicy.maxDelay,
         (std::chrono::milliseconds)network::RetryPolicy::kDefaultMaxDelay);
 
     readAttributeValue(

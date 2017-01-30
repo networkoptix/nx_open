@@ -188,8 +188,8 @@ void QnUniversalTcpListener::updateCloudConnectState(
         NX_ASSERT(m_multipleServerSocket->count() == kCloudSocketIndex);
 
         nx::network::RetryPolicy registrationOnMediatorRetryPolicy;
-        registrationOnMediatorRetryPolicy.setMaxRetryCount(
-            nx::network::RetryPolicy::kInfiniteRetries);
+        registrationOnMediatorRetryPolicy.maxRetryCount =
+            nx::network::RetryPolicy::kInfiniteRetries;
 
         auto cloudServerSocket =
             std::make_unique<nx::network::cloud::CloudServerSocket>(

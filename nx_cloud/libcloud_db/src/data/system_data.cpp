@@ -37,8 +37,7 @@ bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*valu
 ////////////////////////////////////////////////////////////
 //// class SystemData
 ////////////////////////////////////////////////////////////
-SystemData::SystemData()
-:
+SystemData::SystemData():
     expirationTimeUtc(0)
 {
 }
@@ -52,6 +51,9 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
             return true;
         case attr::systemStatus:
             *value = static_cast<int>(status);
+            return true;
+        case attr::customization:
+            *value = QString::fromStdString(customization);
             return true;
         default:
             return false;

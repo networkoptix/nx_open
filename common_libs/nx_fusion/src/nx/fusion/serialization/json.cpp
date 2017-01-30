@@ -5,6 +5,8 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QtNumeric> //< for qIsFinite
 
+#include <nx/utils/log/log.h>
+
 #include "json_functions.h"
 
 void QJsonDetail::serialize_json(
@@ -231,4 +233,45 @@ Q_GLOBAL_STATIC(QnJsonSerializerStorage, qn_jsonSerializerStorage_instance)
 QnSerializerStorage<QnJsonSerializer>* QJsonDetail::StorageInstance::operator()() const
 {
     return qn_jsonSerializerStorage_instance();
+}
+
+QJsonObject::const_iterator QJsonDetail::findField(
+    const QJsonObject& jsonObject,
+    const QString& fieldName,
+    DeprecatedFieldNames* deprecatedFieldNames,
+    const std::type_info& structTypeInfo)
+{
+    const QJsonObject::const_iterator pos = jsonObject.find(fieldName);
+    if (pos != jsonObject.end())
+        return pos;
+
+    if (!deprecatedFieldNames)
+    {
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found (no deprecated names for this struct) in { %3 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
+    }
+
+    const QString deprecatedFieldName = deprecatedFieldNames->value(fieldName);
+    if (deprecatedFieldName.isEmpty())
+    {
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found (no deprecated name for this field) in { %3 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
+    }
+
+    const QJsonObject::const_iterator deprecatedFieldPos = jsonObject.find(deprecatedFieldName);
+    if (deprecatedFieldPos == jsonObject.end())
+    {
+        NX_LOG(lit(
+            "JSON field %2 of %1 not found even as deprecated %3 in { %4 }")
+            .arg(NX_TYPE_NAME(structTypeInfo)).arg(fieldName).arg(deprecatedFieldName)
+            .arg(jsonObject.keys().join(", ")), cl_logDEBUG2);
+        return jsonObject.end();
+    }
+    return deprecatedFieldPos;
 }

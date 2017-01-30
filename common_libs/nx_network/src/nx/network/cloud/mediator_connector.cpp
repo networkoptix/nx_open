@@ -16,8 +16,7 @@ namespace api {
 
 namespace {
 
-static stun::AbstractAsyncClient::Settings s_stunClientSettings
-    = stun::AbstractAsyncClient::kDefaultSettings;
+static stun::AbstractAsyncClient::Settings s_stunClientSettings;
 
 } // namespace
 
@@ -34,6 +33,10 @@ MediatorConnector::MediatorConnector():
                 kRetryIntervalMax)))
 {
     bindToAioThread(getAioThread());
+
+    NX_ASSERT(
+        s_stunClientSettings.reconnectPolicy.maxRetryCount ==
+        network::RetryPolicy::kInfiniteRetries);
 }
 
 MediatorConnector::~MediatorConnector()
