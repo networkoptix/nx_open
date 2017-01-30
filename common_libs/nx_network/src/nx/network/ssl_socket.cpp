@@ -1825,12 +1825,12 @@ void SslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->nonBlockingMode || d->recvPromisePtr);
+    NX_ASSERT(d->nonBlockingMode.load() || d->recvPromisePtr.load());
     d->wrappedSocket->post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             Q_D(SslSocket);
-            if (!d->nonBlockingMode && !d->recvPromisePtr)
+            if (!d->nonBlockingMode.load() && !d->recvPromisePtr.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             d->asyncSslHelper->asyncRecv(buffer, std::move(handler));
@@ -1842,12 +1842,12 @@ void SslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->nonBlockingMode || d->sendPromisePtr);
+    NX_ASSERT(d->nonBlockingMode.load() || d->sendPromisePtr.load());
     d->wrappedSocket->post(
         [this,&buffer,handler]() mutable
         {
             Q_D(SslSocket);
-            if (!d->nonBlockingMode && !d->sendPromisePtr)
+            if (!d->nonBlockingMode.load() && !d->sendPromisePtr.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             d->asyncSslHelper->asyncSend(buffer, std::move(handler));
@@ -1939,7 +1939,7 @@ void MixedSslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->nonBlockingMode || d->recvPromisePtr);
+    NX_ASSERT(d->nonBlockingMode.load() || d->recvPromisePtr.load());
     if (!d->initState && !d->useSSL)
         return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
 
@@ -1950,7 +1950,7 @@ void MixedSslSocket::readSomeAsync(
     d->wrappedSocket->dispatch(
         [d, helper, buffer, handler = std::move(handler)]() mutable
         {
-            if (!d->nonBlockingMode && !d->recvPromisePtr)
+            if (!d->nonBlockingMode.load() && !d->recvPromisePtr.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             if (!d->initState)
@@ -1972,7 +1972,7 @@ void MixedSslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->nonBlockingMode || d->sendPromisePtr);
+    NX_ASSERT(d->nonBlockingMode.load() || d->sendPromisePtr.load());
     if (!d->initState && !d->useSSL)
         return d->wrappedSocket->sendAsync(buffer, std::move(handler));
 
@@ -1983,7 +1983,7 @@ void MixedSslSocket::sendAsync(
     d->wrappedSocket->dispatch(
         [d, helper, &buffer, handler = std::move(handler)]() mutable
         {
-            if (!d->nonBlockingMode && !d->sendPromisePtr)
+            if (!d->nonBlockingMode.load() && !d->sendPromisePtr.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             if (!d->initState)
