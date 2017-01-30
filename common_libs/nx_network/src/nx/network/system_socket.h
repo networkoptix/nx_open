@@ -1,12 +1,10 @@
-#ifndef __PRACTICALSOCKET_INCLUDED__
-#define __PRACTICALSOCKET_INCLUDED__
+#pragma once
 
 #include <string>
-#include <exception>
 
 #include <QtCore/QString>
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 #   include <winsock2.h>
 #   include <WS2tcpip.h>
 #else
@@ -23,7 +21,6 @@
 #include "utils/common/byte_array.h"
 #include "utils/common/systemerror.h"
 
-
 namespace nx {
 namespace network {
 
@@ -34,7 +31,7 @@ template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
 } // namespace aio
 
-#ifdef Q_OS_WIN
+#ifdef _WIN32
 typedef int socklen_t;
 #endif
 
@@ -49,7 +46,7 @@ struct NX_NETWORK_API SystemSocketAddress
 };
 
 /**
- *   Base class representing basic communication endpoint
+ * Base class representing basic communication endpoint
  */
 template<typename InterfaceToImplement>
 class Socket
@@ -106,24 +103,24 @@ public:
 
 
     /**
-     *   If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
-     *   this in our sample client code but include it in the library for
-     *   completeness.  If you are running on Windows and you are concerned
-     *   about DLL resource consumption, call this after you are done with all
-     *   Socket instances.  If you execute this on Windows while some instance of
-     *   Socket exists, you are toast.  For portability of client code, this is
-     *   an empty function on non-Windows platforms so you can always include it.
-     *   @param buffer buffer to receive the data
-     *   @param bufferLen maximum number of bytes to read into buffer
-     *   @return number of bytes read, 0 for EOF, and -1 for error
+     * If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
+     * this in our sample client code but include it in the library for
+     * completeness.  If you are running on Windows and you are concerned
+     * about DLL resource consumption, call this after you are done with all
+     * Socket instances.  If you execute this on Windows while some instance of
+     * Socket exists, you are toast.  For portability of client code, this is
+     * an empty function on non-Windows platforms so you can always include it.
+     * @param buffer buffer to receive the data
+     * @param bufferLen maximum number of bytes to read into buffer
+     * @return number of bytes read, 0 for EOF, and -1 for error
      */
     static void cleanUp() ;
 
     /**
-     *   Resolve the specified service for the specified protocol to the
-     *   corresponding port number in host byte order
-     *   @param service service to resolve (e.g., "http")
-     *   @param protocol protocol of service to resolve.  Default is "tcp".
+     * Resolve the specified service for the specified protocol to the
+     * corresponding port number in host byte order
+     * @param service service to resolve (e.g., "http")
+     * @param protocol protocol of service to resolve.  Default is "tcp".
      */
     static unsigned short resolveService(
         const QString &service,
@@ -139,11 +136,10 @@ private:
 };
 
 /**
- *   Socket which is able to connect, send, and receive
+ * Socket which is able to connect, send, and receive.
  */
 template<class InterfaceToImplement>
-class CommunicatingSocket
-:
+class CommunicatingSocket:
     public Socket<InterfaceToImplement>
 {
     typedef CommunicatingSocket<InterfaceToImplement> SelfType;
@@ -162,36 +158,26 @@ public:
 
     virtual ~CommunicatingSocket();
 
-    //!Implementation of AbstractCommunicatingSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
 
-    //!Implementation of AbstractCommunicatingSocket::recv
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
-    //!Implementation of AbstractCommunicatingSocket::send
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
-    //!Implementation of AbstractCommunicatingSocket::getForeignAddress
     virtual SocketAddress getForeignAddress() const override;
-    //!Implementation of AbstractCommunicatingSocket::isConnected
     virtual bool isConnected() const override;
-    //!Implementation of AbstractCommunicatingSocket::connectAsync
     virtual void connectAsync(
         const SocketAddress& addr,
         nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
     virtual void readSomeAsync(
         nx::Buffer* const buf,
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::sendAsync
     virtual void sendAsync(
         const nx::Buffer& buf,
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::registerTimer
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
         nx::utils::MoveOnlyFunc<void()> handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
@@ -208,18 +194,14 @@ protected:
 };
 
 /**
- *   TCP socket for communication with other TCP sockets
+ * Client tcp socket.
  */
-class NX_NETWORK_API TCPSocket
-:
+class NX_NETWORK_API TCPSocket:
     public CommunicatingSocket<AbstractStreamSocket>
 {
     typedef CommunicatingSocket<AbstractStreamSocket> base_type;
 
 public:
-    /**
-     * Construct a TCP socket with no connection.
-     */
     explicit TCPSocket(int ipVersion = AF_INET);
     virtual ~TCPSocket();
 
@@ -228,31 +210,18 @@ public:
     TCPSocket(TCPSocket&&) = delete;
     TCPSocket& operator=(TCPSocket&&) = delete;
 
-
-    //////////////////////////////////////////////////////////////////////
-    ///////// Implementation of AbstractStreamSocket methods
-    //////////////////////////////////////////////////////////////////////
-
-    //!Implementation of AbstractStreamSocket::reopen
     virtual bool reopen() override;
-    //!Implementation of AbstractStreamSocket::setNoDelay
     virtual bool setNoDelay( bool value ) override;
-    //!Implementation of AbstractStreamSocket::getNoDelay
     virtual bool getNoDelay( bool* value ) const override;
-    //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
     virtual bool toggleStatisticsCollection( bool val ) override;
-    //!Implementation of AbstractStreamSocket::getConnectionStatistics
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
-    //!Implementation of AbstractStreamSocket::setKeepAlive
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
-    //!Implementation of AbstractStreamSocket::getKeepAlive
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
 private:
-    // Access for TCPServerSocket::accept() connection creation
     friend class TCPServerSocketPrivate;
 
-    #if defined(Q_OS_WIN)
+    #if defined(_WIN32)
         KeepAliveOptions m_keepAlive;
     #endif
 
@@ -260,11 +229,7 @@ private:
     TCPSocket(int newConnSD, int ipVersion);
 };
 
-/**
- *   TCP socket class for servers
- */
-class NX_NETWORK_API TCPServerSocket
-:
+class NX_NETWORK_API TCPServerSocket:
     public Socket<AbstractStreamServerSocket>
 {
     typedef Socket<AbstractStreamServerSocket> base_type;
@@ -279,20 +244,16 @@ public:
     TCPServerSocket& operator=(TCPServerSocket&&) = delete;
 
     /**
-     *   Blocks until a new connection is established on this socket or error
-     *   @return new connection socket
+     * Blocks until a new connection is established on this socket or error.
+     * @return new connection socket.
      */
     static int accept(int sockDesc);
 
-    //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen(int queueLen = 128) override;
-    //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
-    //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(nx::utils::MoveOnlyFunc< void() > handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
@@ -306,11 +267,7 @@ private:
     bool setListen(int queueLen);
 };
 
-/**
-  *   UDP socket class
-  */
-class NX_NETWORK_API UDPSocket
-:
+class NX_NETWORK_API UDPSocket:
     public CommunicatingSocket<AbstractDatagramSocket>
 {
     typedef CommunicatingSocket<AbstractDatagramSocket> base_type;
@@ -318,9 +275,6 @@ class NX_NETWORK_API UDPSocket
 public:
     static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
 
-    /**
-     *   Construct a UDP socket
-     */
     explicit UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
@@ -330,76 +284,58 @@ public:
     virtual SocketAddress getForeignAddress() const override;
 
     /**
-     *   Unset foreign address and port
-     *   @return true if disassociation is successful
-     */
-    //void disconnect() ;
-
-    /**
-     *   Send the given buffer as a UDP datagram to the
-     *   specified address/port
-     *   @param buffer buffer to be written
-     *   @param bufferLen number of bytes to write
-     *   @param foreignAddress address (IP address or name) to send to
-     *   @param foreignPort port number to send to
-     *   @return true if send is successful
-     *
+     * Send the given buffer as a UDP datagram to the specified address/port.
+     * @param buffer buffer to be written.
+     * @param bufferLen number of bytes to write.
+     * @param foreignAddress address (IP address or name) to send to.
+     * @param foreignPort port number to send to.
+     * @return true if send is successful.
      */
     bool sendTo(const void *buffer, int bufferLen);
 
     /**
-     *   Set the multicast TTL
-     *   @param multicastTTL multicast TTL
+     * Set the multicast TTL.
+     * @param multicastTTL multicast TTL.
      */
     bool setMulticastTTL(unsigned char multicastTTL) ;
 
-    //!Implementation of AbstractDatagramSocket::joinGroup
     virtual bool joinGroup( const QString &multicastGroup ) override;
     virtual bool joinGroup( const QString &multicastGroup, const QString& multicastIF ) override;
 
-    //!Implementation of AbstractDatagramSocket::leaveGroup
     virtual bool leaveGroup( const QString &multicastGroup ) override;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) override;
 
-    //!Implementation of AbstractCommunicatingSocket::send
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
-    //!Implementation of AbstractDatagramSocket::setDestAddr
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) override;
 
-    //!Implementation of AbstractDatagramSocket::sendTo
     virtual bool sendTo(
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignEndpoint ) override;
-    //!Implementation of AbstractCommunicatingSocket::sendToAsync
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress,
         std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
-    //!Implementation of AbstractCommunicatingSocket::recv
-    /*!
-        Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
-    */
+    /**
+     * Implementation of AbstractCommunicatingSocket::recv.
+     * Actually calls UDPSocket::recvFrom and saves datagram source address/port
+     */
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
-    //!Implementation of AbstractDatagramSocket::recvFrom
     virtual int recvFrom(
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress ) override;
-    //!Implementation of AbstractDatagramSocket::recvFromAsync
     virtual void recvFromAsync(
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
-    //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
-    //!Implementation of AbstractDatagramSocket::hasData
     virtual bool hasData() const override;
-    //!Implementation of AbstractDatagramSocket::setMulticastIF
     /**
-    *   Set the multicast send interface
-    *   @param multicastIF multicast interface for sending packets
-    */
+     * Implementation of AbstractDatagramSocket::setMulticastIF.
+     * Set the multicast send interface
+     * @param multicastIF multicast interface for sending packets
+     */
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 
 private:
@@ -407,9 +343,9 @@ private:
     SocketAddress m_prevDatagramAddress;
 
     void setBroadcast();
-    /*!
-        \param sourcePort Port is returned in host byte order
-    */
+    /**
+     * @param sourcePort Port is returned in host byte order.
+     */
     int recvFrom(
         void* buffer,
         unsigned int bufferLen,
@@ -417,7 +353,5 @@ private:
         quint16* const sourcePort );
 };
 
-}   //network
-}   //nx
-
-#endif
+} // namespace network
+} // namespace nx

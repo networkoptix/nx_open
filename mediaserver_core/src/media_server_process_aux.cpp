@@ -11,11 +11,11 @@
 namespace nx {
 namespace mserver_aux {
 
-UnmountedStoragesFilter::UnmountedStoragesFilter(const QString& mediaFolderName):
+UnmountedLocalStoragesFilter::UnmountedLocalStoragesFilter(const QString& mediaFolderName):
     m_mediaFolderName(mediaFolderName)
 {}
 
-QString UnmountedStoragesFilter::stripMediaFolderFromPath(const QString& path)
+QString UnmountedLocalStoragesFilter::stripMediaFolderFromPath(const QString& path)
 {
     if (!path.endsWith(m_mediaFolderName))
         return path;
@@ -28,7 +28,7 @@ QString UnmountedStoragesFilter::stripMediaFolderFromPath(const QString& path)
     return path.mid(0, indexBeforeMediaFolderName);
 }
 
-QStringList UnmountedStoragesFilter::stripMediaFolderFromPaths(const QStringList& paths)
+QStringList UnmountedLocalStoragesFilter::stripMediaFolderFromPaths(const QStringList& paths)
 {
     QStringList result;
     std::transform(
@@ -43,7 +43,7 @@ QStringList UnmountedStoragesFilter::stripMediaFolderFromPaths(const QStringList
     return result;
 }
 
-QnStorageResourceList UnmountedStoragesFilter::getUnmountedStorages(
+QnStorageResourceList UnmountedLocalStoragesFilter::getUnmountedStorages(
         const QnStorageResourceList& allStorages,
         const QStringList& paths)
 {

@@ -283,6 +283,7 @@ class BackupStorageTest(StorageBasedTest):
         self._add_test_camera(_WORK_HOST)
 
     def _create_backup_storage(self, boxnum):
+        self._call_box(self.hosts[boxnum], "rm", '-rf', TMP_STORAGE)
         self._call_box(self.hosts[boxnum], "mkdir", '-p', TMP_STORAGE)
         data = self._server_request(boxnum, 'ec2/getStorages?id=' + self.guids[boxnum])
         self.assertIsNotNone(data, 'ec2/getStorages returned empty data')
@@ -319,11 +320,8 @@ class BackupStorageTest(StorageBasedTest):
         while time.time() < end:
             data = self._server_request(_WORK_HOST, 'api/backupControl/')
             log(LOGLEVEL.DEBUG + 9, "DEBUG0: backupControl reply: %s" % (data,))
-            try:
-                if data['reply']['state'] != "BackupState_None":
-                    return
-            except Exception:
-                pass
+            if data['reply']['state'] != "BackupState_None":
+                return
             time.sleep(1)
         self.fail("Backup didn't started for %s seconds (or was ended before the first check)" % BACKUP_START_TIMEOUT)
 

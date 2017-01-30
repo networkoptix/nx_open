@@ -1104,6 +1104,11 @@ int CUDTUnited::epoll_wait(
    return m_EPoll.wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
 }
 
+int CUDTUnited::epoll_interrupt_wait(const int eid)
+{
+    return m_EPoll.interruptWait(eid);
+}
+
 int CUDTUnited::epoll_release(const int eid)
 {
    return m_EPoll.release(eid);
@@ -2080,6 +2085,24 @@ int CUDT::epoll_wait(
    }
 }
 
+int CUDT::epoll_interrupt_wait(const int eid)
+{
+    try
+    {
+        return s_UDTUnited.epoll_interrupt_wait(eid);
+    }
+    catch (CUDTException e)
+    {
+        s_UDTUnited.setError(new CUDTException(e));
+        return ERROR;
+    }
+    catch (...)
+    {
+        s_UDTUnited.setError(new CUDTException(-1, 0, 0));
+        return ERROR;
+    }
+}
+
 int CUDT::epoll_release(const int eid)
 {
    try
@@ -2306,6 +2329,11 @@ int epoll_wait(
     std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds)
 {
    return CUDT::epoll_wait(eid, readfds, writefds, msTimeOut, lrfds, lwfds);
+}
+
+int epoll_interrupt_wait(int eid)
+{
+    return CUDT::epoll_interrupt_wait(eid);
 }
 
 #define SET_RESULT(val, num, fds, it) \

@@ -431,9 +431,9 @@ public:
         return camInRpFlag == CameraPresence::InTheResourcePool;
     }
 
-    void handleError(const QString& message) const override
+    void handleError(const nx::caminfo::ReaderErrorInfo& errorInfo) const override
     {
-        errMsg = message;
+        errMsg = errorInfo.message;
     }
 
     CameraPresence camInRpFlag;

@@ -294,20 +294,22 @@ void Settings::loadConfiguration()
                 m_settings.value(kTunnelInactivityTimeout).toString(),
                 kDefaultTunnelInactivityTimeout));
 
-    m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
-        tcp_reverse_retry_policy::kMaxCount,
-        network::RetryPolicy::kDefaultMaxRetryCount).toInt());
-    m_connectionParameters.tcpReverseRetryPolicy.setInitialDelay(
+    m_connectionParameters.tcpReverseRetryPolicy.maxRetryCount =
+        m_settings.value(
+            tcp_reverse_retry_policy::kMaxCount,
+            network::RetryPolicy::kDefaultMaxRetryCount).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.initialDelay = 
         nx::utils::parseTimerDuration(m_settings.value(
             tcp_reverse_retry_policy::kInitialDelay).toString(),
-        network::RetryPolicy::kDefaultInitialDelay));
-    m_connectionParameters.tcpReverseRetryPolicy.setDelayMultiplier(m_settings.value(
-        tcp_reverse_retry_policy::kDelayMultiplier,
-        network::RetryPolicy::kDefaultDelayMultiplier).toInt());
-    m_connectionParameters.tcpReverseRetryPolicy.setMaxDelay(
+        network::RetryPolicy::kDefaultInitialDelay);
+    m_connectionParameters.tcpReverseRetryPolicy.delayMultiplier =
+        m_settings.value(
+            tcp_reverse_retry_policy::kDelayMultiplier,
+            network::RetryPolicy::kDefaultDelayMultiplier).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.maxDelay =
         nx::utils::parseTimerDuration(m_settings.value(
             tcp_reverse_retry_policy::kMaxDelay).toString(),
-        network::RetryPolicy::kDefaultMaxDelay));
+        network::RetryPolicy::kDefaultMaxDelay);
 
     m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
         nx::utils::parseTimerDuration(m_settings.value(

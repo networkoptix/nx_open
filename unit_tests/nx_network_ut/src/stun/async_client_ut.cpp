@@ -194,10 +194,20 @@ protected:
 private:
     void randomlyCloseConnection(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message /*message*/)
+        nx::stun::Message request)
     {
         if (nx::utils::random::number<int>(0, 1) > 0)
+        {
             connection->close();
+            return;
+        }
+
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
     }
 };
 

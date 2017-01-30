@@ -304,7 +304,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
 
     // fill id before setting properties to avoid conflict with flags properties
     // 	setCameraCapability() call merge existing flags with new one
-    resource->setId(resource->uniqueIdToId(resource->getPhysicalId()));
+    resource->setId(resource->physicalIdToId(resource->getPhysicalId()));
 
     if( strlen(cameraInfo.auxiliaryData) > 0 )
         resource->setProperty( QnThirdPartyResource::AUX_DATA_PARAM_NAME, QString::fromLatin1(cameraInfo.auxiliaryData) );

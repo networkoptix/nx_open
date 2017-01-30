@@ -8,7 +8,7 @@ namespace nx
 namespace media_db
 {
 
-const size_t kMaxWriteQueueSize = 1000;
+const size_t kMaxWriteQueueSize = 100000;
 
 namespace
 {
@@ -111,20 +111,19 @@ void DbHelper::run()
             if (error == Error::WriteError)
             {
                 m_handler->handleRecordWrite(error);
-                break;
+                continue;
             }
 
             error = getError();
             if (error == Error::WriteError)
             {
                 m_handler->handleRecordWrite(error);
-                break;
+                continue;
             } 
             else
                 m_handler->handleRecordWrite(error);
         }
 
-        lk.unlock();
         m_writerDoneCond.wakeAll();
     }
 }
@@ -256,7 +255,10 @@ void DbHelper::writeRecord(const WriteRecordType &record)
         if (m_writeQueue.size() > kMaxWriteQueueSize)
             NX_LOG(lit("%1 DB write queue overflowed. Waiting while it becomes empty...").arg(Q_FUNC_INFO), cl_logWARNING);
         while (m_writeQueue.size() > kMaxWriteQueueSize)
+        {
+            m_cond.wakeAll();
             m_writerDoneCond.wait(lk.mutex());
+        }
         m_writeQueue.push_back(record);
     }
     m_cond.wakeAll();

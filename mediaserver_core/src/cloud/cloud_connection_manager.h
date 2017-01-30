@@ -63,6 +63,9 @@ private:
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> m_cdbConnectionFactory;
 
+    bool hasCloudBindingStatusChanged(
+        const QString& cloudSystemId,
+        const QString& cloudAuthKey) const;
     bool makeSystemLocal();
     bool boundToCloud(QnMutexLockerBase* const lk) const;
     void startEventConnection();

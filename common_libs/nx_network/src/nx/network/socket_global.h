@@ -8,7 +8,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/flag_config.h>
 
-#include "aio/aioservice.h"
+#include "aio/aio_service.h"
 #include "aio/pollset_factory.h"
 
 #include "cloud/address_resolver.h"
@@ -54,7 +54,7 @@ public:
 
     static Config& config() { return s_instance->m_config; }
     static DebugConfig& debugConfig() { return s_instance->m_debugConfig; }
-    static aio::AIOService& aioService() { return *s_instance->m_aioService; }
+    static aio::AIOService& aioService() { return s_instance->m_aioServiceGuard.aioService(); }
     static cloud::AddressResolver& addressResolver() { return *s_instance->m_addressResolver; }
     static AddressPublisher& addressPublisher() { return *s_instance->m_addressPublisher; }
     static MediatorConnector& mediatorConnector() { return *s_instance->m_mediatorConnector; }
@@ -104,6 +104,20 @@ private:
     static SocketGlobals* s_instance;
 
 private:
+    class AioServiceGuard
+    {
+    public:
+        AioServiceGuard();
+        ~AioServiceGuard();
+
+        void initialize();
+
+        aio::AIOService& aioService();
+
+    private:
+        std::unique_ptr<aio::AIOService> m_aioService;
+    };
+
     // TODO: Initialization and deinitialization of this class is brocken by design (because of
     //     wrong dependencies). Should be fixed to separate singltones with strict dependencies:
     // 1. CommonSocketGlobals (AIO Service, DNS Resolver) - required for all system sockets.
@@ -118,7 +132,7 @@ private:
     std::unique_ptr<cloud::AddressResolver> m_addressResolver;
 
     aio::PollSetFactory m_pollSetFactory;
-    std::unique_ptr<aio::AIOService> m_aioService;
+    AioServiceGuard m_aioServiceGuard;
     std::unique_ptr<aio::Timer> m_debugConfigTimer;
 
     // Is unique_ptr becaule it should be initiated before cloud classes but removed before.
