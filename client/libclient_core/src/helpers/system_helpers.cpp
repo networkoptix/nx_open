@@ -106,7 +106,7 @@ QnCredentials getCredentials(const QnUuid& localSystemId, const QString& userNam
 bool hasCredentials(const QnUuid& localSystemId)
 {
     const auto& credentialsHash = qnClientCoreSettings->systemAuthenticationData();
-    return !credentialsHash[localSystemId].isEmpty();
+    return !credentialsHash.value(localSystemId).isEmpty();
 }
 
 } // namespace helpers
