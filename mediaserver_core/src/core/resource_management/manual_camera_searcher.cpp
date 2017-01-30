@@ -28,15 +28,15 @@ static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROG
 
 namespace {
 
-    bool strictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
+    bool restrictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
     {
         QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
         existResList = existResList.filtered(
             [&netRes](const QnNetworkResourcePtr& existRes)
-        {
-            bool sameParent = netRes->getParentId() == existRes->getParentId();
-            return sameParent && existRes->getStatus() != Qn::Offline;
-        });
+            {
+                bool sameParent = netRes->getParentId() == existRes->getParentId();
+                return sameParent && existRes->getStatus() != Qn::Offline;
+            });
 
         for (const QnNetworkResourcePtr& existRes: existResList)
         {
@@ -45,9 +45,8 @@ namespace {
                 continue;
 
             bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-            bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-            if (newIsRtsp && !existIsRtsp)
-                return false; //< allow to stack RTSP and non RTSP cameras with same IP:port
+            if (newIsRtsp)
+                return false; //< allow to stack RTSP cameras with any resource with same IP:port
 
             if (!existCam->isManuallyAdded())
                 return true; //< block manual and auto camera at same IP
@@ -73,7 +72,7 @@ namespace {
             , camera->getVendor()
             , camera->getUniqueId()
             , QnResourceDiscoveryManager::findSameResource(camera)
-              || strictNewManualCameraByIP(camera)
+              || restrictNewManualCameraByIP(camera)
             );
     }
 

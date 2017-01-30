@@ -21,6 +21,7 @@ public:
     void setFlag(const QString& key, bool value = true);
 
     void sync();
+    void reset();
 
 signals:
     void changed(const QString& key, bool value);

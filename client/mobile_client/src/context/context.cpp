@@ -18,6 +18,7 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
 #include <nx/utils/url_builder.h>
 
@@ -183,23 +184,21 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& localSystemId)
+void QnContext::removeSavedConnection(const QString& localSystemId, const QString& userName)
 {
+    using namespace nx::client::core::helpers;
+
     const auto localId = QnUuid::fromStringSafe(localSystemId);
 
     NX_ASSERT(!localId.isNull());
     if (localId.isNull())
         return;
 
-    auto recentConnections = qnClientCoreSettings->recentLocalConnections();
-    recentConnections.remove(localId);
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
+    removeCredentials(localId, userName);
 
-    auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
-    authenticationData.remove(localId);
-    qnClientCoreSettings->setSystemAuthenticationData(authenticationData);
+    if (userName.isEmpty() || !hasCredentials(localId))
+        removeConnection(localId);
 
-    qnClientCoreSettings->setRecentLocalConnections(recentConnections);
     qnClientCoreSettings->save();
 }
 

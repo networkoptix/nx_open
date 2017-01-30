@@ -75,8 +75,8 @@ struct ApiCameraAttributesData: ApiData
     static DeprecatedFieldNames* getDeprecatedFieldNames()
     {
         static DeprecatedFieldNames kDeprecatedFieldNames{
-            {"cameraId", "cameraID"}, //< up to v2.6
-            {"preferredServerId", "preferedServerId"}, //< up to v2.6
+            {lit("cameraId"), lit("cameraID")}, //< up to v2.6
+            {lit("preferredServerId"), lit("preferedServerId")}, //< up to v2.6
         };
         return &kDeprecatedFieldNames;
     }

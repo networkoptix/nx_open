@@ -103,6 +103,12 @@ QnCredentials getCredentials(const QnUuid& localSystemId, const QString& userNam
     return QnCredentials();
 }
 
+bool hasCredentials(const QnUuid& localSystemId)
+{
+    const auto& credentialsHash = qnClientCoreSettings->systemAuthenticationData();
+    return !credentialsHash.value(localSystemId).isEmpty();
+}
+
 } // namespace helpers
 } // namespace core
 } // namespace client

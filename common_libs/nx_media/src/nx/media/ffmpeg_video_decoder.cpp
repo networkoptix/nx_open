@@ -55,8 +55,7 @@ public:
 
     virtual ~AvFrameMemoryBufferPrivate()
     {
-        av_buffer_unref(&frame->buf[0]);
-        av_frame_free(&frame);
+        av_frame_free(&frame); //< It includes av_frame_unref
     }
 
     virtual int map(
@@ -172,7 +171,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         return;
     }
 
-    // keep frame unless we call 'av_buffer_unref'
+    // keep frame unless we call 'av_frame_unref'
     codecContext->refcounted_frames = 1;
 }
 

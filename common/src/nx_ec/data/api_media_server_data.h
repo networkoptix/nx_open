@@ -94,7 +94,7 @@ namespace ec2
         static DeprecatedFieldNames* getDeprecatedFieldNames()
         {
             static DeprecatedFieldNames kDeprecatedFieldNames{
-                {"serverId", "serverID"}, //< up to v2.6
+                {lit("serverId"), lit("serverID")}, //< up to v2.6
             };
             return &kDeprecatedFieldNames;
         }

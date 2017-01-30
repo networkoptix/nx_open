@@ -229,8 +229,6 @@ private:
 
     qint64 getFirstBookmarkTimeMs();
 
-    bool confirmResourcesDelete(const QnResourceList& resources);
-
     void openInBrowserDirectly(const QnMediaServerResourcePtr& server,
         const QString& path, const QString& fragment = QString());
     void openInBrowser(const QnMediaServerResourcePtr& server,

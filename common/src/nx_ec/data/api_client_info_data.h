@@ -21,7 +21,7 @@ struct ApiClientInfoData: ApiIdData
     static DeprecatedFieldNames* getDeprecatedFieldNames()
     {
         static DeprecatedFieldNames kDeprecatedFieldNames{
-            {"physicalMemory", "phisicalMemory"}, //< up to v2.6
+            {lit("physicalMemory"), lit("phisicalMemory")}, //< up to v2.6
         };
         return &kDeprecatedFieldNames;
     }
