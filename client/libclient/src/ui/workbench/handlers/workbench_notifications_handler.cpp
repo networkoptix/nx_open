@@ -31,7 +31,6 @@ namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
 
-
 }
 
 

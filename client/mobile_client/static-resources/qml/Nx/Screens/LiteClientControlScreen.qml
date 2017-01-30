@@ -67,7 +67,7 @@ Page
 
         onClientStartError:
         {
-            Workflow.openInformationDialog(
+            Workflow.openStandardDialog(
                 qsTr("Cannot start client"),
                 qsTr("Please make sure that display is connected to %1.")
                     .arg(applicationInfo.liteDeviceName()))
@@ -75,7 +75,7 @@ Page
 
         onClientStopError:
         {
-            Workflow.openInformationDialog(qsTr("Cannot stop client"))
+            Workflow.openStandardDialog(qsTr("Cannot stop client"))
         }
 
     }

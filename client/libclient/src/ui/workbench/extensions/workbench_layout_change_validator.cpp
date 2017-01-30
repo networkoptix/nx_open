@@ -8,7 +8,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
-#include <ui/dialogs/messages/layouts_handler_messages.h>
+#include <nx/client/messages/resources_messages.h>
 
 QnWorkbenchLayoutsChangeValidator::QnWorkbenchLayoutsChangeValidator(QnWorkbenchContext* context):
     QnWorkbenchContextAware(context)
@@ -53,6 +53,6 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
     if (inaccessible.isEmpty())
         return true;
 
-    return QnLayoutsHandlerMessages::changeVideoWallLayout(mainWindow(), inaccessible);
+    return nx::client::messages::Resources::changeVideoWallLayout(mainWindow(), inaccessible);
 }
 

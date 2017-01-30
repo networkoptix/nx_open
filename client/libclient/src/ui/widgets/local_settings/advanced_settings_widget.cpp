@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_show_once_settings.h>
 
 #include <common/common_module.h>
 
@@ -141,7 +142,7 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 
 void QnAdvancedSettingsWidget::at_resetAllWarningsButton_clicked()
 {
-    qnSettings->setShowOnceMessages(0);
+    qnClientShowOnce->reset();
 }
 
 bool QnAdvancedSettingsWidget::isAudioDownmixed() const

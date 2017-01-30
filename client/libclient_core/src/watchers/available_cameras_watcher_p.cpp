@@ -111,12 +111,13 @@ PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user):
     if (user)
     {
         connect(accessProvider, &QnResourceAccessProvider::accessChanged, this,
-            [this, user](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+            [this, accessProvider, user]
+            (const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
             {
                 if (!subject.isUser() || subject.user() != user)
                     return;
 
-                if (qnResourceAccessProvider->hasAccess(user, resource))
+                if (accessProvider->hasAccess(user, resource))
                     addCamera(resource);
                 else
                     removeCamera(resource);
@@ -141,13 +142,25 @@ void PermissionsBasedWatcher::addCamera(const QnResourcePtr& resource)
     if (!camera)
         return;
 
-    m_cameras[camera->getId()] = camera;
+    if (camera->hasFlags(Qn::desktop_camera))
+        return;
+
+    const auto key = camera->getId();
+    const auto existing = m_cameras.find(key);
+    if (existing != m_cameras.cend())
+    {
+        NX_ASSERT(*existing == camera);
+        return;
+    }
+
+    m_cameras.insert(key, camera);
     emit cameraAdded(resource);
 }
 
 void PermissionsBasedWatcher::removeCamera(const QnResourcePtr& resource)
 {
     const auto camera = m_cameras.take(resource->getId());
+    NX_ASSERT(camera);
     if (!camera)
         return;
 

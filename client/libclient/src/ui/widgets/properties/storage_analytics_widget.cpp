@@ -83,6 +83,17 @@ namespace {
             base_type(Qt::Horizontal, parent)
         {
             m_comboBox = new QComboBox(this);
+
+            // Added to further using. See specification.
+            static const auto kForTranslations =
+            {
+                tr("For the last 5 minutes"),
+                tr("For the last Hour"),
+                tr("For the last Day"),
+                tr("For the last Week"),
+                tr("For the last Month")
+            };
+
             m_comboBox->addItem(tr("5 minutes"), 5 * 60);
             m_comboBox->addItem(tr("Hour"),  60 * 60);
             m_comboBox->addItem(tr("Day"),   3600 * 24);

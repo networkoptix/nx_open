@@ -16,8 +16,11 @@
 
 #include <client/client_settings.h>
 
-#include <utils/common/event_processors.h>
+#include <nx/client/messages/ptz_messages.h>
+
 #include <nx/utils/string.h>
+
+#include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/resource_property_adaptors.h>
 #include <utils/local_file_cache.h>
@@ -26,7 +29,6 @@
 #include <ui/delegates/ptz_preset_hotkey_item_delegate.h>
 #include <ui/widgets/ptz_tour_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/dialogs/ptz_messages.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
@@ -432,7 +434,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnPtzMessages::failedToGetPosition(this, m_resource->getName());
+        nx::client::messages::Ptz::failedToGetPosition(this, m_resource->getName());
         return;
     }
 
@@ -451,7 +453,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnPtzMessages::failedToSetPosition(this, m_resource->getName());
+        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -492,7 +494,7 @@ void QnPtzManageDialog::at_startTourButton_clicked()
 
     if (m_resource->getStatus() == Qn::Offline || m_resource->getStatus() == Qn::Unauthorized)
     {
-        QnPtzMessages::failedToSetPosition(this, m_resource->getName());
+        nx::client::messages::Ptz::failedToSetPosition(this, m_resource->getName());
         return;
     }
 
@@ -547,7 +549,7 @@ void QnPtzManageDialog::at_deleteButton_clicked()
                     break;
             }
 
-            if (presetIsInUse && !QnPtzMessages::confirmDeleteUsedPresed(this))
+            if (presetIsInUse && !nx::client::messages::Ptz::deletePresetInUse(this))
                 break;
 
             m_model->removePreset(data.presetModel.preset.id);

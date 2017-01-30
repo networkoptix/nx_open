@@ -163,8 +163,10 @@ public:
      */
     void removeCustomWidget(QWidget* widget);
 
-    QString checkBoxText() const;
-    void setCheckBoxText(const QString &text);
+    void setCustomCheckBoxText(const QString &text);
+    bool isCheckBoxEnabled() const;
+    void setCheckBoxEnabled(bool value = true);
+
     bool isChecked() const;
     void setChecked(bool checked);
 

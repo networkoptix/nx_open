@@ -153,7 +153,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
         mainWindow());
 
     messageBox.addButton(tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    messageBox.setCheckBoxText(tr("Don't notify again about this update"));
+    messageBox.setCustomCheckBoxText(tr("Don't notify again about this update"));
 
     const auto result = messageBox.exec();
 

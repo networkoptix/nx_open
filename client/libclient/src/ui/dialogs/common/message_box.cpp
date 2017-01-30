@@ -662,15 +662,20 @@ void QnMessageBox::removeCustomWidget(QWidget* widget)
         d->focusWidget = nullptr;
 }
 
-QString QnMessageBox::checkBoxText() const
-{
-    return ui->checkBox->text();
-}
-
-void QnMessageBox::setCheckBoxText(const QString &text)
+void QnMessageBox::setCustomCheckBoxText(const QString &text)
 {
     ui->checkBox->setText(text);
-    ui->checkBox->setVisible(!text.isEmpty());
+    setCheckBoxEnabled(!text.isEmpty());
+}
+
+bool QnMessageBox::isCheckBoxEnabled() const
+{
+    return !ui->checkBox->isHidden();
+}
+
+void QnMessageBox::setCheckBoxEnabled(bool value)
+{
+    ui->checkBox->setVisible(value);
 }
 
 bool QnMessageBox::isChecked() const
