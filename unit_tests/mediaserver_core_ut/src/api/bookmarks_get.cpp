@@ -1,0 +1,49 @@
+#include <QJsonDocument>
+#include <QFile>
+#include <QRegExp>
+#include <vector>
+
+#include <gtest/gtest.h>
+#include "mediaserver_launcher.h"
+#include <api/app_server_connection.h>
+#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/camera_bookmark.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/fusion/model_functions.h>
+#include <rest/server/json_rest_result.h>
+
+#include "test_api_request.h"
+
+namespace nx {
+namespace test {
+
+TEST(BookmarksGet, invalidData)
+{
+    MediaServerLauncher launcher;
+    ASSERT_TRUE(launcher.start());
+
+    ec2::ApiCameraData cameraData;
+    cameraData.id = QnUuid::createUuid();
+    cameraData.parentId = QnUuid::createUuid();
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
+    ASSERT_FALSE(resTypePtr.isNull());
+    cameraData.typeId = resTypePtr->getId();
+    cameraData.vendor = "test vendor";
+    cameraData.physicalId = "test physicalId";
+    cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+
+    auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    auto userManager = ec2Connection->getCameraManager(Qn::kSystemAccess);
+
+    // Create a camera.
+    testApiPost(launcher, "/ec2/saveCamera", cameraData);
+
+    // Check that there are no bookmarks for the camera.
+    QnCameraBookmarkList bookmarks;
+    testApiGet(launcher,
+        lit("/ec2/bookmarks?cameraId=%1").arg(cameraData.id.toString()), &bookmarks);
+    ASSERT_TRUE(bookmarks.isEmpty());
+}
+
+} // namespace test
+} // namespace nx
