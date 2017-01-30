@@ -25,7 +25,6 @@ ShowOnce::ShowOnce(const QString& id, QObject* parent):
 
 ShowOnce::~ShowOnce()
 {
-    m_storage->sync();
 }
 
 bool ShowOnce::testFlag(const QString& key) const
@@ -50,6 +49,16 @@ void ShowOnce::setFlag(const QString& key, bool value)
 void ShowOnce::sync()
 {
     m_storage->sync();
+}
+
+void ShowOnce::reset()
+{
+    const auto keys = m_storage->allKeys();
+    m_storage->clear();
+    m_storage->sync();
+
+    for (const QString& key: keys)
+        emit changed(key, false);
 }
 
 } // namespace settings

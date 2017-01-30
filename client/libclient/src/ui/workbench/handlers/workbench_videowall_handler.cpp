@@ -58,7 +58,6 @@
 #include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_properties/videowall_settings_dialog.h>
-#include <ui/dialogs/messages/layouts_handler_messages.h>  //TODO: #GDM #VW refactor
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -84,10 +83,15 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
-#include <nx/utils/collection.h>
+
+#include <nx/client/messages/resources_messages.h>
+
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
+
+#include <nx/utils/collection.h>
 #include <nx/utils/string.h>
+
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>

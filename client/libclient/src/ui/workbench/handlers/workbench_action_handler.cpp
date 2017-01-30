@@ -27,6 +27,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
+#include <client/client_show_once_settings.h>
 
 #include <common/common_module.h>
 
@@ -53,10 +54,14 @@
 
 #include <nx_ec/dummy_handler.h>
 
+#include <nx/client/messages/resources_messages.h>
+
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/address_resolver.h>
+
 #include <nx/streaming/archive_stream_reader.h>
+
 #include <network/cloud_url_validator.h>
 
 #include <plugins/resource/avi/avi_resource.h>
@@ -167,8 +172,16 @@
 #include <core/resource/fake_media_server.h>
 
 namespace {
-    const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
-}
+
+/* Beta version message. */
+static const QString kBetaVersionShowOnceKey(lit("BetaVersion"));
+
+/* Asking for update all outdated servers to the last version. */
+static const QString kVersionMismatchShowOnceKey(lit("VersionMismatch"));
+
+const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
+
+} // namespace
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
@@ -1082,62 +1095,6 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
 }
 
-bool QnWorkbenchActionHandler::confirmResourcesDelete(const QnResourceList& resources)
-{
-    /* Check if user have already silenced this warning. */
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
-        return true;
-
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-
-    /* Check that we are deleting online auto-found cameras */
-    const auto onlineAutoDiscoveredCameras = cameras.filtered(
-        [](const QnVirtualCameraResourcePtr& camera)
-        {
-            return camera->getStatus() != Qn::Offline && !camera->isManuallyAdded();
-        });
-
-    const auto text = (cameras.size() == resources.size()
-        ? QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("Delete %n devices?", "", cameras.size()),
-                tr("Delete %n cameras?", "", cameras.size()),
-                tr("Delete %n I/O Modules?", "", cameras.size())),
-            cameras)
-        : tr("Delete %n items?", "", resources.size()));
-
-    const auto extras = (onlineAutoDiscoveredCameras.isEmpty()
-        ? QString()
-        : QnDeviceDependentStrings::getNameFromSet(
-            QnCameraDeviceStringSet(
-                tr("%n of them are auto-discovered.",
-                    "", onlineAutoDiscoveredCameras.size()),
-                tr("%n cameras are auto-discovered.",
-                    "", onlineAutoDiscoveredCameras.size()),
-                tr("%n I/O modules are auto-discovered.",
-                    "", onlineAutoDiscoveredCameras.size())),
-            cameras) + L' ' + tr("They may be auto-discovered again after removing."));
-
-    QnMessageBox messageBox(QnMessageBoxIcon::Warning,
-        text, extras, QDialogButtonBox::Cancel, QDialogButtonBox::No,
-        mainWindow());
-
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
-    messageBox.setCheckBoxText(tr("Don't show this message again"));
-    messageBox.addCustomWidget(new QnResourceListView(resources));
-
-    auto result = messageBox.exec();
-    if (messageBox.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
-        qnSettings->setShowOnceMessages(messagesFilter);
-        qnSettings->save();
-    }
-
-    return result != QDialogButtonBox::Cancel;
-}
-
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
@@ -1691,13 +1648,8 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (resources.isEmpty())
-        return;
-
-    if (!confirmResourcesDelete(resources))
-        return;
-
-    qnResourcesChangesManager->deleteResources(resources);
+    if (nx::client::messages::Resources::deleteResources(mainWindow(), resources))
+        qnResourcesChangesManager->deleteResources(resources);
 }
 
 void QnWorkbenchActionHandler::closeApplication(bool force) {
@@ -2012,7 +1964,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     if (qnRuntime->ignoreVersionMismatch())
         return;
 
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::VersionMismatchDialog))
+    if (qnClientShowOnce->testFlag(kVersionMismatchShowOnceKey))
         return;
 
     QnWorkbenchVersionMismatchWatcher *watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
@@ -2078,11 +2030,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
         && (messageBox->clickedButton() == updateButton));
 
     if (messageBox->isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::VersionMismatchDialog;
-        qnSettings->setShowOnceMessages(messagesFilter);
-    }
+        qnClientShowOnce->setFlag(kVersionMismatchShowOnceKey);
 
     if (confirmed)
         menu()->trigger(QnActions::SystemUpdateAction);
@@ -2093,7 +2041,7 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
     if (context()->closingDown())
         return;
 
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::BetaVersion))
+    if (qnClientShowOnce->testFlag(kBetaVersionShowOnceKey))
         return;
 
     QnMessageBox dialog(QnMessageBoxIcon::Information,
@@ -2101,16 +2049,11 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
         tr("Some functionality may be unavailable or not working properly."),
         QDialogButtonBox::Ok, QDialogButtonBox::Ok, mainWindow());
 
-    dialog.setCheckBoxText(tr("Don't show this message again"));
+    dialog.setCheckBoxEnabled();
     dialog.exec();
 
     if (dialog.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::BetaVersion;
-        qnSettings->setShowOnceMessages(messagesFilter);
-        qnSettings->save();
-    }
+        qnClientShowOnce->setFlag(kBetaVersionShowOnceKey);
 }
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {

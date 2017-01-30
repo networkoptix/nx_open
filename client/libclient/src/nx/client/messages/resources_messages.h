@@ -4,18 +4,17 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <client/client_globals.h>
 
-//TODO: #GDM standartize naming
-class QnLayoutsHandlerMessages
+namespace nx {
+namespace client {
+namespace messages {
+
+class Resources
 {
-    Q_DECLARE_TR_FUNCTIONS(QnLayoutsHandlerMessages)
+    Q_DECLARE_TR_FUNCTIONS(Resources)
 public:
     static void layoutAlreadyExists(QWidget* parent);
 
-    /**
-    * @brief askOverrideLayout     Show message box asking user if he really wants to override existing layout.
-    * @return                      Yes button if confirmed, overwise Cancel
-    */
-    static QDialogButtonBox::StandardButton askOverrideLayout(QWidget* parent);
+    static bool overrideLayout(QWidget* parent);
 
     static bool changeUserLocalLayout(QWidget* parent, const QnResourceList& stillAccessible);
     static bool addToRoleLocalLayout(QWidget* parent, const QnResourceList& toShare);
@@ -26,15 +25,14 @@ public:
     static bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts);
     static bool deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible);
 
+    static bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
+
     static bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 
-private:
-
-    static bool showCompositeDialog(
-        QWidget* parent,
-        Qn::ShowOnceMessage showOnceFlag,
-        const QString& text,
-        const QString& extras = QString(),
-        const QnResourceList& resources = QnResourceList(),
-        bool useResources = true);
+    static bool deleteResources(QWidget* parent, const QnResourceList& resources);
 };
+
+
+} // namespace messages
+} // namespace client
+} // namespace nx

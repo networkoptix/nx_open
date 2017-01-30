@@ -15,6 +15,7 @@ void removeConnection(const QnUuid& localSystemId, const QUrl& url = QUrl());
 void storeCredentials(const QnUuid& localSystemId, const QnCredentials& credentials);
 void removeCredentials(const QnUuid& localSystemId, const QString& userName = QString());
 QnCredentials getCredentials(const QnUuid& localSystemId, const QString& userName);
+bool hasCredentials(const QnUuid& localSystemId);
 
 } // namespace helpers
 } // namespace core
