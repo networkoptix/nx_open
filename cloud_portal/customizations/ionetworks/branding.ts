@@ -31,10 +31,6 @@
       <translation>http://www.ioezio.com/</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>cloud-demo.hdw.mx</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>MXZQG6QD9L.com.ioezio.ezpromobile</translation>
     </message>

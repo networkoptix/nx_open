@@ -31,10 +31,6 @@
       <translation>http://www.ipera.ru</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>cloud-demo.hdw.mx</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>32NH529F85.ru.ipera.FlyView</translation>
     </message>
