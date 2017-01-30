@@ -99,7 +99,7 @@
        <item>
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
-          <string notr="true"/>
+          <string>Don't show this message again</string>
          </property>
         </widget>
        </item>

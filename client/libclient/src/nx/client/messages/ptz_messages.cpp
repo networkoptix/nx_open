@@ -1,11 +1,20 @@
 #include "ptz_messages.h"
 
 #include <ui/dialogs/common/message_box.h>
-#include <client/client_settings.h>
+#include <client/client_show_once_settings.h>
 
-void QnPtzMessages::failedToGetPosition(
-    QWidget* parent,
-    const QString& cameraName)
+namespace {
+
+/* Delete ptz preset which is used in the tour. */
+static const QString kPtzPresetShowOnceKey(lit("PtzPresetInUse"));
+
+} //namespace
+
+namespace nx {
+namespace client {
+namespace messages {
+
+void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
         tr("Can't get the current position from camera \"%1\"").arg(cameraName)
@@ -13,9 +22,7 @@ void QnPtzMessages::failedToGetPosition(
     QnMessageBox::critical(parent, tr("Failed to get current position"), extras);
 }
 
-void QnPtzMessages::failedToSetPosition(
-    QWidget* parent,
-    const QString& cameraName)
+void Ptz::failedToSetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
         tr("Can't set the current position for camera \"%1\"").arg(cameraName)
@@ -23,10 +30,9 @@ void QnPtzMessages::failedToSetPosition(
     QnMessageBox::critical(parent, tr("Failed to set current position"), extras);
 }
 
-bool QnPtzMessages::confirmDeleteUsedPresed(QWidget* parent)
+bool Ptz::deletePresetInUse(QWidget* parent)
 {
-    Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-    if (messagesFilter.testFlag(Qn::ShowOnceMessage::PtzPresetInUse))
+    if (qnClientShowOnce->testFlag(kPtzPresetShowOnceKey))
         return true;
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
@@ -35,14 +41,15 @@ bool QnPtzMessages::confirmDeleteUsedPresed(QWidget* parent)
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parent);
 
     dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
-    dialog.setCheckBoxText(tr("Don't show this message again"));
+    dialog.setCheckBoxEnabled();
 
     const auto result = (dialog.exec() != QDialogButtonBox::Cancel);
     if (dialog.isChecked())
-    {
-        messagesFilter |= Qn::ShowOnceMessage::PtzPresetInUse;
-        qnSettings->setShowOnceMessages(messagesFilter);
-        qnSettings->save();
-    }
+        qnClientShowOnce->setFlag(kPtzPresetShowOnceKey);
+
     return result;
 }
+
+} // namespace messages
+} // namespace client
+} // namespace nx

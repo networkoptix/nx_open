@@ -18,13 +18,14 @@
 
 #include <client/client_settings.h>
 
+#include <nx/client/messages/ptz_messages.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/ptz_preset_dialog.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
-#include <ui/dialogs/ptz_messages.h>
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
@@ -155,7 +156,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnPtzMessages::failedToGetPosition(mainWindow(),
+        nx::client::messages::Ptz::failedToGetPosition(mainWindow(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
@@ -361,7 +362,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        QnPtzMessages::failedToSetPosition(mainWindow(),
+        nx::client::messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases
