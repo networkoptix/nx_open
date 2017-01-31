@@ -57,7 +57,7 @@ signals:
 private:
     QString m_cloudSystemId;
     QString m_cloudAuthKey;
-    SocketAddress m_proxyAddress;
+    boost::optional<SocketAddress> m_proxyAddress;
     mutable QnMutex m_mutex;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,

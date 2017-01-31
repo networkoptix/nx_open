@@ -48,6 +48,7 @@ CloudConnectionManager::~CloudConnectionManager()
 
 void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
 {
+    NX_ASSERT(proxyEndpoint.port > 0);
     m_proxyAddress = proxyEndpoint;
 }
 
@@ -138,8 +139,11 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
 
     auto result = m_cdbConnectionFactory->createConnection();
     result->setCredentials(cloudSystemId.toStdString(), cloudAuthKey.toStdString());
-    result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
-    result->setProxyVia(m_proxyAddress.address.toString().toStdString(), m_proxyAddress.port);
+    if (m_proxyAddress)
+    {
+        result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+        result->setProxyVia(m_proxyAddress->address.toString().toStdString(), m_proxyAddress->port);
+    }
     return result;
 }
 
