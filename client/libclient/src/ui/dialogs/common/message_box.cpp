@@ -27,7 +27,7 @@ public:
     QList<QWidget*> customWidgets;
     QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
-
+    QnButtonDetections buttonDetection;
     QnMessageBoxPrivate(QnMessageBox *parent);
 
     void init();
@@ -35,6 +35,12 @@ public:
     void detectEscapeButton();
     void stylizeButtons();
     int execReturnCode(QAbstractButton *button) const;
+
+private:
+    void detectSpecificButton(
+        QAbstractButton*& refButton,
+        QDialogButtonBox::StandardButton standardButton,
+        QVector<QDialogButtonBox::ButtonRole> acceptedRoles);
 };
 
 
@@ -45,7 +51,8 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     defaultButton(nullptr),
     buttonAccent(QnButtonAccent::Standard),
     escapeButton(nullptr),
-    icon(QnMessageBoxIcon::NoIcon)
+    icon(QnMessageBoxIcon::NoIcon),
+    buttonDetection(QnButtonDetection::DefaultButton | QnButtonDetection::EscapeButton)
 {
 }
 
@@ -66,19 +73,30 @@ void QnMessageBoxPrivate::init()
     q->ui->mainLabel->setForegroundRole(QPalette::Light);
     q->ui->mainLabel->setOpenExternalLinks(true);
     q->setResizeToContentsMode(Qt::Vertical);
-
-    detectEscapeButton();
-    detectDefaultButton();
-    stylizeButtons();
 }
 
-void QnMessageBoxPrivate::detectDefaultButton()
+void QnMessageBoxPrivate::detectSpecificButton(
+    QAbstractButton*& refSpecificButton,
+    QDialogButtonBox::StandardButton standardButton,
+    QVector<QDialogButtonBox::ButtonRole> validRoles)
 {
     Q_Q(QnMessageBox);
 
+    // Don't look for button if it is specified
+    if (refSpecificButton)
+        return;
+
+    const auto buttons = q->ui->buttonBox->buttons();
+    if (buttons.size() == 1)
+    {
+        // Single button automatically becomes "specific"
+        refSpecificButton = buttons.first();
+        return;
+    }
+
     // Ok button automatically becomes default button
-    defaultButton = q->ui->buttonBox->button(QDialogButtonBox::Ok);
-    if (defaultButton)
+    refSpecificButton = q->ui->buttonBox->button(standardButton);
+    if (refSpecificButton)
         return;
 
     QMultiHash<QDialogButtonBox::ButtonRole, QAbstractButton*> buttonsByRole;
@@ -86,46 +104,27 @@ void QnMessageBoxPrivate::detectDefaultButton()
     for (QAbstractButton* button: q->buttons())
         buttonsByRole.insert(q->buttonRole(button), button);
 
-    for (const auto role: {
-        QDialogButtonBox::AcceptRole,
-        QDialogButtonBox::YesRole,
-        QDialogButtonBox::ApplyRole
-    })
+    for (const auto role: validRoles)
     {
         const auto buttons = buttonsByRole.values(role);
         if (buttons.size() == 1)
         {
-            defaultButton = buttons.first();
+            refSpecificButton = buttons.first();
             break;
         }
     }
 }
 
+void QnMessageBoxPrivate::detectDefaultButton()
+{
+    detectSpecificButton(defaultButton, QDialogButtonBox::Ok,
+        { QDialogButtonBox::AcceptRole, QDialogButtonBox::YesRole, QDialogButtonBox::ApplyRole });
+}
+
 void QnMessageBoxPrivate::detectEscapeButton()
 {
-    Q_Q(QnMessageBox);
-
-    // Cancel button automatically becomes escape button
-    escapeButton = q->ui->buttonBox->button(QDialogButtonBox::Cancel);
-    if (escapeButton)
-        return;
-
-    QMultiHash<QDialogButtonBox::ButtonRole, QAbstractButton*> buttonsByRole;
-    for (QAbstractButton* button : q->buttons())
-        buttonsByRole.insert(q->buttonRole(button), button);
-
-    for (const auto role : {
-        QDialogButtonBox::RejectRole,
-        QDialogButtonBox::NoRole
-    })
-    {
-        const auto buttons = buttonsByRole.values(role);
-        if (buttons.size() == 1)
-        {
-            defaultButton = buttons.first();
-            break;
-        }
-    }
+    detectSpecificButton(escapeButton, QDialogButtonBox::Cancel,
+        { QDialogButtonBox::RejectRole, QDialogButtonBox::NoRole });
 }
 
 void QnMessageBoxPrivate::stylizeButtons()
@@ -134,7 +133,7 @@ void QnMessageBoxPrivate::stylizeButtons()
 
     for (QAbstractButton *button : q->buttons())
     {
-        if (button != defaultButton)
+        if (button != defaultButton) //< Only single default button is allowed
         {
             resetButtonStyle(button);
             continue;
@@ -278,27 +277,6 @@ void QnMessageBox::addButton(
 
     ui->buttonBox->addButton(button, role);
     d->customButtons.append(button);
-
-    d->detectEscapeButton();
-    d->detectDefaultButton();
-    d->stylizeButtons();
-}
-
-QPushButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
-{
-    switch (button)
-    {
-        case QnMessageBoxCustomButton::Overwrite:
-            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-        case QnMessageBoxCustomButton::Delete:
-            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-        case QnMessageBoxCustomButton::Reset:
-            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-        case QnMessageBoxCustomButton::Skip:
-            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
-        default:
-            return nullptr;
-    }
 }
 
 QPushButton* QnMessageBox::addCustomButton(
@@ -332,14 +310,11 @@ QPushButton* QnMessageBox::addButton(
     QPushButton* result = ui->buttonBox->addButton(text, role);
     d->customButtons.append(result);
 
-    d->detectEscapeButton();
     if (accent != QnButtonAccent::NoAccent)
     {
         d->buttonAccent = accent;
         d->defaultButton = result;
     }
-
-    d->stylizeButtons();
 
     return result;
 }
@@ -351,10 +326,6 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
     QPushButton *addedButton = ui->buttonBox->addButton(button);
     d->customButtons.append(addedButton);
 
-    d->detectEscapeButton();
-    d->detectDefaultButton();
-    d->stylizeButtons();
-
     return addedButton;
 }
 
@@ -364,11 +335,6 @@ void QnMessageBox::removeButton(QAbstractButton *button)
 
     ui->buttonBox->removeButton(button);
     d->customButtons.removeOne(button);
-    if (!ui->buttonBox->buttons().contains(d->escapeButton))
-        d->detectEscapeButton();
-    if (!ui->buttonBox->buttons().contains(d->defaultButton))
-        d->detectDefaultButton();
-    d->stylizeButtons();
 }
 
 QList<QAbstractButton *> QnMessageBox::buttons() const
@@ -388,11 +354,6 @@ void QnMessageBox::setStandardButtons(
     Q_D(QnMessageBox);
 
     ui->buttonBox->setStandardButtons(buttons);
-    if (!ui->buttonBox->buttons().contains(d->escapeButton))
-        d->detectEscapeButton();
-    if (!ui->buttonBox->buttons().contains(d->defaultButton))
-        d->detectDefaultButton();
-    d->stylizeButtons();
 }
 
 QDialogButtonBox::StandardButtons QnMessageBox::standardButtons() const
@@ -663,9 +624,22 @@ void QnMessageBox::setChecked(bool checked)
     ui->checkBox->setChecked(checked);
 }
 
+void QnMessageBox::setButtonAutoDetection(QnButtonDetection detection)
+{
+    Q_D(QnMessageBox);
+    d->buttonDetection = detection;
+}
+
 int QnMessageBox::exec()
 {
     Q_D(QnMessageBox);
+
+    if (d->buttonDetection.testFlag(QnButtonDetection::DefaultButton))
+        d->detectDefaultButton();
+    if (d->buttonDetection.testFlag(QnButtonDetection::EscapeButton))
+        d->detectEscapeButton();
+    if (d->buttonDetection)
+        d->stylizeButtons();
 
     adjustSize();
 
@@ -702,13 +676,7 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         )
     {
         if (d->escapeButton)
-        {
-#ifdef Q_OS_MAC
-            d->escapeButton->animateClick();
-#else
             d->escapeButton->click();
-#endif
-        }
         return;
     }
 

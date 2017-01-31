@@ -104,10 +104,10 @@ void QnLocalSettingsDialog::accept()
 
         dialog.setStandardButtons(QDialogButtonBox::Cancel);
         const auto restartNowButton = dialog.addButton(
-            tr("Restart Now"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+            tr("Restart Now"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
 
         dialog.addButton(
-            tr("Restart Later"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+            tr("Restart Later"), QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
 
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;

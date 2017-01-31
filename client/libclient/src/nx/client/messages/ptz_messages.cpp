@@ -38,9 +38,10 @@ bool Ptz::deletePresetInUse(QWidget* parent)
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Preset used by some tours. Delete it anyway?"),
         tr("These tours will become invalid."),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes, parent);
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Delete);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     dialog.setCheckBoxEnabled();
 
     const auto result = (dialog.exec() != QDialogButtonBox::Cancel);

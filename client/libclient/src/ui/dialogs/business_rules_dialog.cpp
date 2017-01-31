@@ -396,7 +396,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Reset,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

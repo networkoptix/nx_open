@@ -833,8 +833,9 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
 
-        messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
+            QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();

@@ -323,7 +323,7 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
         QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Restart %1 in compatibility mode?").arg(QnClientAppInfo::applicationDisplayName()),
-            extras, QDialogButtonBox::Cancel, QDialogButtonBox::No, parentWidget);
+            extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
         dialog.addButton(tr("Restart"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 

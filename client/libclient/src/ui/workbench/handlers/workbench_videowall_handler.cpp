@@ -1538,7 +1538,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
@@ -2063,7 +2064,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
