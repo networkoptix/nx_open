@@ -10,21 +10,9 @@ from os.path import dirname, join, exists, isfile
 from fnmatch import fnmatch
 
 def main():
-    utildir = join(dirname(os.path.abspath(__file__)))
-    shellscript = "{0}/validate_jsons.sh".format(utildir)
-
     root = os.getcwd()
     pattern = "*.json"
-
-    command = 'chmod +x {0} && {0}'.format(shellscript)
-    p = subprocess.Popen(command, shell=True, stdout=PIPE)
-    out, err = p.communicate()
-    print out
-    p.wait()
-    if p.returncode:  
-        print "failed with code: %s" % str(p.returncode) 
-        sys.exit(1)
-        
+       
     for path, subdirs, files in os.walk(root):
         for name in files:
             if fnmatch(name, pattern) and name != 'globals.json' and name != 'serverProperties.json':
