@@ -723,8 +723,6 @@ void QnFlirEIPResource::checkAlarmStatus(quint64 timerId)
     if (!m_inputPortMonitored)
         return;
 
-    qDebug() << "Checking alarm status" << m_currentCheckingAlarmNumber + 1;
-
     MessageRouterRequest request;
     const quint8 kAlarmAttributeCode = 0x01;
 
@@ -754,12 +752,10 @@ void QnFlirEIPResource::checkAlarmStatusDone()
         && response.generalStatus == CIPGeneralStatus::kSuccess)
     {
         m_alarmStates[m_currentCheckingAlarmNumber] = alarmState;
-        qDebug() << "Checking alarm measure function type";
         getAlarmMeasurementFuncType();
     }
     else
     {
-        qDebug() << "Alarm status is the same (or error occured) checking next alarm";
         scheduleNextAlarmCheck();
     }
 }
@@ -769,8 +765,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncType()
     QString measFuncTypeAttr = lit(".image.sysimg.alarms.measfunc.")
         + QString::number(m_currentCheckingAlarmNumber + 1)
         + lit(".measFuncType");
-
-    qDebug() << "Get meas func type varname"  << measFuncTypeAttr;
 
     MessageRouterRequest request =
         buildPassthroughGetRequest(FlirEIPPassthroughService::kReadAscii, measFuncTypeAttr);
@@ -784,9 +778,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncTypeDone()
 {
     auto response = m_alarmsEipAsyncClient->getResponse();
     auto measFuncType = parseAsciiEIPResponse(response);
-
-    qDebug() << "Got alarm measurment func type:"
-        << measFuncType << response.data.toHex();
 
     if (response.generalStatus == CIPGeneralStatus::kSuccess
         && m_supportedMeasFuncs.contains(measFuncType))
@@ -808,8 +799,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncId()
         + QString::number(m_currentCheckingAlarmNumber + 1)
         + lit(".measFuncId");
 
-    qDebug() << "Meas func id varname" << measFuncIdAttr;
-
     MessageRouterRequest request =
         buildPassthroughGetRequest(FlirEIPPassthroughService::kReadInt32, measFuncIdAttr);
 
@@ -827,8 +816,6 @@ void QnFlirEIPResource::getAlarmMeasurementFuncIdDone()
     if (response.generalStatus == CIPGeneralStatus::kSuccess
         && findAlarmInputByTypeAndId(id, m_currentCheckingMeasFuncType, port))
     {
-        qDebug() << "Emitting signal cameraInput" << port.id;
-
         emit cameraInput(
             toSharedPointer(),
             port.id,
