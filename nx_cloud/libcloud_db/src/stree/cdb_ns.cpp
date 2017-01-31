@@ -22,6 +22,7 @@ CdbAttrNameSet::CdbAttrNameSet()
 
     registerResource(attr::systemId, "systemId", QVariant::String);
     registerResource(attr::systemStatus, "systemStatus", QVariant::Int);
+    registerResource(attr::customization, "customization", QVariant::String);
 
     registerResource(attr::dataAccountRightsOnSystem, "data.accountRightsOnSystem", QVariant::String);
 

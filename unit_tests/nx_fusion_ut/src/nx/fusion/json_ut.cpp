@@ -71,9 +71,11 @@ namespace {
 
 struct MockData
 {
-    int a, b, c;
+    int a = 661;
+    int b = 662;
+    int c = 663;
 
-    MockData(): a(661), b(662), c(663) {}
+    MockData() = default;
 
     MockData(int a, int b, int c): a(a), b(b), c(c) {}
 
@@ -89,8 +91,8 @@ struct MockData
     static DeprecatedFieldNames* getDeprecatedFieldNames()
     {
         static DeprecatedFieldNames kDeprecatedFieldNames{
-            {"b", "deprecatedB"},
-            {"c", "deprecatedC"},
+            {lit("b"), lit("deprecatedB")},
+            {lit("c"), lit("deprecatedC")},
         };
         return &kDeprecatedFieldNames;
     }
@@ -117,7 +119,7 @@ TEST_F(QnFusionTestFixture, deserializeStruct)
     ASSERT_EQ(data, deserializedData);
 }
 
-TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedField)
+TEST_F(QnFusionTestFixture, deserializeStructWithDeprecatedFields)
 {
     const MockData data(113, 115, 117);
 

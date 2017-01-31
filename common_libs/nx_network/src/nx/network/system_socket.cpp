@@ -1109,6 +1109,14 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 #endif
 }
 
+template<typename TargetType, typename SourceType>
+int intDuration(SourceType duration)
+{
+    const auto repr = std::chrono::duration_cast<TargetType>(duration).count();
+    NX_ASSERT(repr >= std::numeric_limits<int>::min() && repr <= std::numeric_limits<int>::max());
+    return (int) repr;
+}
+
 bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
 {
     #if defined( _WIN32 )
@@ -1116,8 +1124,8 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
         if( info )
         {
             ka.onoff = TRUE;
-            ka.keepalivetime = (int) info->time.count() * 1000; // s to ms
-            ka.keepaliveinterval = (int) info->interval.count() * 1000; // s to ms
+            ka.keepalivetime = intDuration<std::chrono::milliseconds>(info->time);
+            ka.keepaliveinterval = intDuration<std::chrono::milliseconds>(info->interval);
 
             // the value can not be changed, 0 means default
             info->probeCount = 0;
@@ -1139,11 +1147,11 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
             return true;
 
         #if defined( Q_OS_LINUX )
-            const int time = (int) info->time.count();
+            const int time = intDuration<std::chrono::seconds>(info->time);
             if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE, &time, sizeof(time) ) < 0 )
                 return false;
 
-            const int interval = (int) info->interval.count();
+            const int interval = intDuration<std::chrono::seconds>(info->interval);
             if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(interval) ) < 0 )
                 return false;
 
@@ -1151,7 +1159,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
             if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count) ) < 0 )
                 return false;
         #elif defined( Q_OS_MACX )
-            const int time = (int) info->time.count();
+            const int time = intDuration<std::chrono::seconds>(info->time);
             if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, sizeof(time) ) < 0 )
                 return false;
         #endif

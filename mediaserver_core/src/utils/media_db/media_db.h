@@ -215,7 +215,6 @@ private:
     QDataStream m_stream;
 
     mutable QnMutex m_mutex;
-    mutable QnMutex m_writeQueueMutex;
     QnWaitCondition m_cond;
     QnWaitCondition m_writerDoneCond;
     bool m_needStop;
