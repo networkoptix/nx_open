@@ -31,10 +31,6 @@
       <translation>http://digital-watchdog.com</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>dwcc.cloud</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>HW58JB7FUF.tv.dwcc.DwMobile</translation>
     </message>    

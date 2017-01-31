@@ -31,10 +31,6 @@
       <translation>https://www.cox.com/</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>cloud-demo.hdw.mx</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>C6ZWGSKK3B.com.cox.cb.hdsec</translation>
     </message>

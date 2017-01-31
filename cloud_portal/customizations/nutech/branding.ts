@@ -31,10 +31,6 @@
       <translation>http://www.nutechnational.com</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>dwcc.cloud</translation>
-    </message> 
-    <message>
       <source>IOS_APP_LINK</source>
       <translation>https://itunes.apple.com/us/app/dw-spectrum/id1090087818?mt=8</translation>
     </message>
