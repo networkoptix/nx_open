@@ -97,7 +97,8 @@ GenericProduct
             "cloudName": customization.cloudName,
             "freeLicenseCount": customization.freeLicenseCount,
             "freeLicenseKey": customization.freeLicenseKey,
-            "freeLicenseIsTrial": customization.freeLicenseIsTrial
+            "freeLicenseIsTrial": customization.freeLicenseIsTrial,
+            "defaultWebPages": customization.defaultWebPages
         })
     }
     Group

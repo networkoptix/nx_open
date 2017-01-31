@@ -50,6 +50,9 @@ Module
     property string backgroundImage:
         '{"enabled": true, "name": ":/skin/background.png", "mode": "Crop", "opacity": "0.03"}'
 
+    property string defaultWebPages:
+        '{"Home Page": "http://networkoptix.com", "Support": "http://support.networkoptix.com"}'
+
     property string macBundleIdentifier: "com.networkoptix.HDWitness2"
 
     property stringList translations: [
