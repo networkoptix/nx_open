@@ -69,6 +69,7 @@ void QnMessageBoxPrivate::init()
 
     detectEscapeButton();
     detectDefaultButton();
+    stylizeButtons();
 }
 
 void QnMessageBoxPrivate::detectDefaultButton()
@@ -80,18 +81,22 @@ void QnMessageBoxPrivate::detectDefaultButton()
     if (defaultButton)
         return;
 
-    // if the message box has one AcceptRole button, make it the default button
-    for (QAbstractButton *button: q->buttons())
+    QMultiHash<QDialogButtonBox::ButtonRole, QAbstractButton*> buttonsByRole;
+
+    for (QAbstractButton* button: q->buttons())
+        buttonsByRole.insert(q->buttonRole(button), button);
+
+    for (const auto role: {
+        QDialogButtonBox::AcceptRole,
+        QDialogButtonBox::YesRole,
+        QDialogButtonBox::ApplyRole
+    })
     {
-        if (q->buttonRole(button) == QDialogButtonBox::AcceptRole)
+        const auto buttons = buttonsByRole.values(role);
+        if (buttons.size() == 1)
         {
-            if (defaultButton)
-            {
-                // already detected!
-                defaultButton = nullptr;
-                break;
-            }
-            defaultButton = button;
+            defaultButton = buttons.first();
+            break;
         }
     }
 }
@@ -105,44 +110,20 @@ void QnMessageBoxPrivate::detectEscapeButton()
     if (escapeButton)
         return;
 
-    // If there is only one button make it the escape button
-    const QList<QAbstractButton *> buttons = q->buttons();
-    if (buttons.size() == 1)
-    {
-        escapeButton = buttons.first();
-        return;
-    }
+    QMultiHash<QDialogButtonBox::ButtonRole, QAbstractButton*> buttonsByRole;
+    for (QAbstractButton* button : q->buttons())
+        buttonsByRole.insert(q->buttonRole(button), button);
 
-    // if the message box has one RejectRole button, make it the escape button
-    for (QAbstractButton *button: q->buttons())
+    for (const auto role : {
+        QDialogButtonBox::RejectRole,
+        QDialogButtonBox::NoRole
+    })
     {
-        if (q->buttonRole(button) == QDialogButtonBox::RejectRole)
+        const auto buttons = buttonsByRole.values(role);
+        if (buttons.size() == 1)
         {
-            if (escapeButton)
-            {
-                // already detected!
-                escapeButton = nullptr;
-                break;
-            }
-            escapeButton = button;
-        }
-    }
-
-    if (escapeButton)
-        return;
-
-    // if the message box has one NoRole button, make it the escape button
-    for (int i = 0; i < buttons.size(); ++i)
-    {
-        if (q->buttonRole(buttons[i]) == QDialogButtonBox::NoRole)
-        {
-            if (escapeButton)
-            {
-                // already detected!
-                escapeButton = nullptr;
-                break;
-            }
-            escapeButton = buttons[i];
+            defaultButton = buttons.first();
+            break;
         }
     }
 }
