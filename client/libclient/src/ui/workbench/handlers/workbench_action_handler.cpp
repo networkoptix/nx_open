@@ -2023,6 +2023,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setText(tr("Components of the System have different versions:"));
     messageBox->setInformativeText(extras);
+    messageBox->setCheckBoxEnabled();
 
     const auto updateButton = messageBox->addButton(
         tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);

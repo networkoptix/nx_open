@@ -105,9 +105,9 @@ void QnMessageBoxPrivate::detectEscapeButton()
     if (escapeButton)
         return;
 
-    // If there is only one button and it doesn't have AcceptRole, make it the escape button
+    // If there is only one button make it the escape button
     const QList<QAbstractButton *> buttons = q->buttons();
-    if (buttons.size() == 1 && (q->buttonRole(buttons.first()) != QDialogButtonBox::AcceptRole))
+    if (buttons.size() == 1)
     {
         escapeButton = buttons.first();
         return;
@@ -298,10 +298,8 @@ void QnMessageBox::addButton(
     ui->buttonBox->addButton(button, role);
     d->customButtons.append(button);
 
-    if (!d->escapeButton)
-        d->detectEscapeButton();
-    if (!d->defaultButton)
-        d->detectDefaultButton();
+    d->detectEscapeButton();
+    d->detectDefaultButton();
     d->stylizeButtons();
 }
 
@@ -353,8 +351,7 @@ QPushButton* QnMessageBox::addButton(
     QPushButton* result = ui->buttonBox->addButton(text, role);
     d->customButtons.append(result);
 
-    if (!d->escapeButton)
-        d->detectEscapeButton();
+    d->detectEscapeButton();
     if (accent != QnButtonAccent::NoAccent)
     {
         d->buttonAccent = accent;
@@ -373,11 +370,8 @@ QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
     QPushButton *addedButton = ui->buttonBox->addButton(button);
     d->customButtons.append(addedButton);
 
-    if (!d->escapeButton)
-        d->detectEscapeButton();
-
-    if (!d->defaultButton)
-        d->detectDefaultButton();
+    d->detectEscapeButton();
+    d->detectDefaultButton();
     d->stylizeButtons();
 
     return addedButton;
