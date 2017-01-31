@@ -81,6 +81,8 @@ public:
 
     void setProxyVia(const SocketAddress& proxyEndpoint)
     {
+        NX_ASSERT(proxyEndpoint.port > 0);
+
         QnMutexLocker lk(&m_mutex);
         m_auth.proxyEndpoint = proxyEndpoint;
     }
