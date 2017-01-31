@@ -19,7 +19,16 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiResourceStatusData>& tran, NotificationSource source)
         {
-            NX_LOG(lit("%1 Emit statusChanged signal for id %2")
+            auto rpResource = qnResPool->getResourceById(tran.params.id);
+            if (rpResource && rpResource->getParentId() == qnCommon->moduleGUID() && source == NotificationSource::Remote)
+            {
+                NX_LOG(lit("%1 Received statusChanged signal for resource %2 from remote peer. This resource is our own resource. Ignoring.")
+                        .arg(QString::fromLatin1(Q_FUNC_INFO))
+                        .arg(tran.params.id.toString()), cl_logDEBUG2);
+                return;
+            }
+
+            NX_LOG(lit("%1 Emit statusChanged signal for resource %2")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
                     .arg(tran.params.id.toString()), cl_logDEBUG2);
             emit statusChanged( QnUuid(tran.params.id), tran.params.status );
