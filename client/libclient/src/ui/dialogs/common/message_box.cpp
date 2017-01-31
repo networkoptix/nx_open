@@ -107,7 +107,7 @@ void QnMessageBoxPrivate::detectEscapeButton()
 
     // If there is only one button and it doesn't have AcceptRole, make it the escape button
     const QList<QAbstractButton *> buttons = q->buttons();
-    if (buttons.size() == 1)
+    if (buttons.size() == 1 && (q->buttonRole(buttons.first()) != QDialogButtonBox::AcceptRole))
     {
         escapeButton = buttons.first();
         return;

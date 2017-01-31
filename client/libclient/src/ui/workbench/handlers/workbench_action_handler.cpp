@@ -2024,17 +2024,17 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setText(tr("Components of the System have different versions:"));
     messageBox->setInformativeText(extras);
 
-    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
     const auto updateButton = messageBox->addButton(
         tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox->addButton(
+        tr("Skip"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
 
-    const bool confirmed = ((messageBox->exec() != QDialogButtonBox::Cancel)
-        && (messageBox->clickedButton() == updateButton));
+    messageBox->exec();
 
     if (messageBox->isChecked())
         qnClientShowOnce->setFlag(kVersionMismatchShowOnceKey);
 
-    if (confirmed)
+    if (messageBox->clickedButton() == updateButton)
         menu()->trigger(QnActions::SystemUpdateAction);
 }
 
