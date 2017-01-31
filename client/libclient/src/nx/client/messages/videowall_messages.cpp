@@ -23,7 +23,7 @@ bool VideoWall::switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstans
 
     const auto closeButton =
         dialog.addButton(tr("Close"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    dialog.addButton(tr("Keep"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+    dialog.addButton(tr("Keep"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
 
     const auto result = dialog.exec();
 
