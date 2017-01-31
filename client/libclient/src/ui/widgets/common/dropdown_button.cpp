@@ -246,8 +246,7 @@ QPoint QnDropdownButton::menuPosition() const
     globalRect.moveTopRight(mapToGlobal(rect().bottomRight() + QPoint(0, 1)));
 
     const auto desktop = QApplication::desktop();
-    return QnGeometry::movedInto(globalRect, desktop->screenGeometry(
-        desktop->screenNumber(this))).topLeft().toPoint();
+    return QnGeometry::movedInto(globalRect, desktop->screenGeometry(this)).topLeft().toPoint();
 }
 
 void QnDropdownButton::actionsUpdated()
