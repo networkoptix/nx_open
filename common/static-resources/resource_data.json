@@ -1770,6 +1770,33 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Redvision|RVX-IP30-IRWL-W"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  0.3333,    -1],
+                        "logical": [  -90,  60]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 77,
+                        "space": "35MmEquiv"
+                    }
+                }
+            },
+            "onvifPtzDigitsAfterDecimalPoint": 7
         }		
     ]
 }
