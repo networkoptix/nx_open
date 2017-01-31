@@ -655,7 +655,7 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
             httpClient->doGet(testUrl);
         }
 
-        constexpr const auto responseWaitDelay = std::chrono::seconds(2);
+        constexpr const auto responseWaitDelay = std::chrono::seconds(3);
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
     }

@@ -126,6 +126,7 @@ bool QnTcpListener::bindToLocalAddress()
     {
         QnMutexLocker lk(&d->mutex);
         d->localEndpoint = d->serverSocket->getLocalAddress();
+        d->localPort = d->localEndpoint.port;
     }
 
     NX_LOGX(lm("Server started at %1").str(localAddress), cl_logINFO);
