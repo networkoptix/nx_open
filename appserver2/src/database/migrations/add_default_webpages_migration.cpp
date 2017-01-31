@@ -1,15 +1,14 @@
 #include "add_default_webpages_migration.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
 
 #include <core/resource/resource_type.h>
-#include <core/resource/webpage_resource.h>
 
 #include <database/api/db_webpage_api.h>
 
 #include <nx_ec/data/api_webpage_data.h>
-
-#include <utils/common/app_info.h>
 
 #include <nx/utils/log/log.h>
 
@@ -19,34 +18,40 @@ namespace migrations {
 
 bool addDefaultWebpages(const QSqlDatabase& database)
 {
-    auto addWebPage = [&database](const QString& target)
+    auto addWebPage = [&database](const QString& name, const QString& url)
         {
-            QUrl url(target);
-            if (!url.isValid() || url.host().isEmpty())
-                return true;
+            NX_ASSERT(!name.isEmpty());
+            NX_ASSERT(QUrl(url).isValid());
+            if (name.isEmpty() || url.isEmpty() || !QUrl(url).isValid())
+                return false;
 
             // keeping consistency with QnWebPageResource
             ApiWebPageData webPage;
-            webPage.id = guidFromArbitraryData(url.toString().toUtf8());
+            webPage.id = guidFromArbitraryData(url);
             webPage.typeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kWebPageTypeId);
-            webPage.url = target;
-            webPage.name = QnWebPageResource::nameForUrl(url);
+            webPage.url = url;
+            webPage.name = name;
             return api::saveWebPage(database, webPage);
         };
 
-    QSet<QString> urls;
-    urls.insert(QnAppInfo::companyUrl().trimmed());
-    urls.insert(QnAppInfo::supportLink().trimmed());
-
-    for (const auto& url: urls)
+    QFile config(":/serverProperties.json");
+    if (!config.open(QIODevice::ReadOnly))
     {
-        if (url.isEmpty())
-            continue;
+        NX_LOG(lit("Could not read serverProperties.json"), cl_logERROR);
+        return true; // We don't want to crash if partner did not fill any of these
+    }
 
-        bool success = addWebPage(url);
+    QString encoded = config.readAll();
+    QJsonObject configContents = QJsonDocument::fromJson(encoded.toUtf8()).object();
+    QJsonObject defaultWebPages = configContents.value("defaultWebPages").toObject();
+    for (auto iter = defaultWebPages.constBegin(); iter != defaultWebPages.constEnd(); ++iter)
+    {
+        const QString name = iter.key();
+        const QString url = iter->toString();
+        bool success = addWebPage(name, url);
         NX_ASSERT(success);
         if (!success)
-            NX_LOG(lit("Invalid predefined url %1").arg(url), cl_logERROR);
+            NX_LOG(lit("Invalid predefined url %1: %2").arg(name).arg(url), cl_logERROR);
     }
 
     return true; // We don't want to crash if partner did not fill any of these

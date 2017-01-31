@@ -55,6 +55,7 @@
 #include <nx_ec/dummy_handler.h>
 
 #include <nx/client/messages/resources_messages.h>
+#include <nx/client/messages/videowall_messages.h>
 
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
@@ -125,7 +126,6 @@
 #include <ui/workbench/workbench_welcome_screen.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>    //TODO: #GDM dependencies
-#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -834,13 +834,13 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             mainWindow());
 
         messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
 
         /* If user is sure, return invalid cameras back to list. */
-        if (result != QDialogButtonBox::Cancel)
+        if ((result != QDialogButtonBox::Cancel) && (skipButton != messageBox.clickedButton()))
             modifiedResources << errorResources;
     }
 
@@ -1532,7 +1532,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
         if (checkedFlags == Qn::user)
             QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
         else
-            QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(mainWindow());
+            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
 
         return false;
     }

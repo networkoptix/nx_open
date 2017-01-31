@@ -186,8 +186,6 @@ Rectangle
                     }
                 }
 
-                model: modelLoader.item;
-
                 Loader
                 {
                     id: modelLoader;
@@ -201,6 +199,14 @@ Rectangle
                             filterCaseSensitivity: Qt.CaseInsensitive;
                             filterRole: 257;    // Search text role
                         }
+                    }
+
+                    onItemChanged:
+                    {
+                        if (grid.model)
+                            grid.setPage(0);
+
+                        grid.model = item;
                     }
                 }
 
@@ -453,8 +459,6 @@ Rectangle
         {
             if (grid.watcher.currentItem)
                 grid.watcher.currentItem.forceCollapsedState();
-
-            pageSwitcher.setPage(0);
         }
     }
 }

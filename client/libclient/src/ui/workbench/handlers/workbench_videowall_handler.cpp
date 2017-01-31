@@ -84,12 +84,13 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
-#include <nx/client/messages/resources_messages.h>
+#include <nx/client/messages/videowall_messages.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 
 #include <nx/utils/collection.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
 #include <utils/license_usage_helper.h>
@@ -613,10 +614,16 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(
 
 bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) const
 {
+    NX_ASSERT(videowall);
+    if (!videowall)
+        return false;
+
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        qWarning() << "Warning: pc UUID is null, cannot start Video Wall on this pc";
+        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(videowall->getId().toString()), cl_logERROR);
+
         return false;
     }
 
@@ -690,10 +697,10 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 {
     if (!videoWall)
     {
-        qWarning() << "Warning: videowall not exists anymore, cannot open videowall item";
+        NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
         closeInstanceDelayed();
-        return;
     }
+        return;
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
     updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
@@ -1222,10 +1229,12 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
     if (!videoWall || videoWall->items()->getItems().isEmpty())
     {
-        if (!videoWall)
-            qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
-        else
-            qWarning() << "Warning: videowall is empty, cannot start videowall on this pc";
+        QString message = videoWall
+            ? lit("Warning: videowall %1 is empty, cannot start videowall on this pc")
+            : lit("Warning: videowall %1 not exists, cannot start videowall on this pc");
+
+        NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
+
         QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
         closeInstanceDelayed();
         return;
@@ -1234,7 +1243,9 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        qWarning() << "Warning: pc UUID is null, cannot start videowall on this pc";
+        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(m_videoWallMode.guid.toString()), cl_logERROR);
+
         closeInstanceDelayed();
         return;
     }
@@ -1444,7 +1455,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            anotherVideoWallExistMessage(mainWindow());
+            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -2319,7 +2330,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const e
     // skip outdated messages and hope for the best
     if (sequence < m_videoWallMode.sequenceByPcUuid[controllerUuid])
     {
-        qWarning() << "outdated control message" << message;
+        NX_ASSERT(false, "outdated control message");
         return;
     }
 
@@ -3043,9 +3054,4 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
     { // e.g. workbench layout is empty
         qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
     }
-}
-
-void QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(QWidget* parent)
-{
-    QnMessageBox::warning(parent, tr("There is another Video Wall with the same name"));
 }

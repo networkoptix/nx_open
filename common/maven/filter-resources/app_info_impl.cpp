@@ -198,4 +198,3 @@ bool QnAppInfo::freeLicenseIsTrial()
 {
     return ${freeLicenseIsTrial};
 }
-

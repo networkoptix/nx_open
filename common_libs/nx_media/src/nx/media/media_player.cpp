@@ -1040,8 +1040,8 @@ PlayerStatistics Player::currentStatistics() const
         return result;
 
     int channelCount = 1;
-    if (const auto layout = d->archiveReader->getDPVideoLayout())
-        channelCount = layout->channelCount();
+    if (auto camera = d->resource.dynamicCast<QnVirtualCameraResource>())
+        channelCount = camera->getVideoLayout()->channelCount();
 
     for (int i = 0; i < channelCount; i++)
     {
