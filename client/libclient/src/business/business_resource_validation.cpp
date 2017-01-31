@@ -172,10 +172,10 @@ bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
     if (!m_warningLabel)
         return true;
 
-    bool valid = isValidList(selected);
+    bool valid = isValidList(selected, QString());
     m_warningLabel->setVisible(!valid);
     if (!valid)
-        m_warningLabel->setText(getText(selected));
+        m_warningLabel->setText(getText(selected, true, QString()));
     return true;
 }
 
