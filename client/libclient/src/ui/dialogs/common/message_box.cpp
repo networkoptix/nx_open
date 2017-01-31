@@ -316,7 +316,7 @@ QPushButton* QnMessageBox::addCustomButton(QnMessageBoxCustomButton button)
         case QnMessageBoxCustomButton::Reset:
             return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
         case QnMessageBoxCustomButton::Skip:
-            return addCustomButton(button, QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+            return addCustomButton(button, QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
         default:
             return nullptr;
     }

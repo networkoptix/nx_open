@@ -838,9 +838,11 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
+        if (result == QDialogButtonBox::Cancel)
+            return;
 
         /* If user is sure, return invalid cameras back to list. */
-        if ((result != QDialogButtonBox::Cancel) && (skipButton != messageBox.clickedButton()))
+        if (skipButton != messageBox.clickedButton())
             modifiedResources << errorResources;
     }
 
