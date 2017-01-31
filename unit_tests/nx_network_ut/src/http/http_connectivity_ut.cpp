@@ -47,10 +47,10 @@ public:
 
     //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
-        nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
-        nx_http::Request request,
-        nx_http::Response* const response,
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler completionHandler)
     {
         nx_http::ConnectionEvents events;
@@ -61,9 +61,9 @@ public:
                 std::thread serverThread(
                     [sock = std::move(socket)]()
                     {
-                        auto sent = sock->send(playMessage());
+                        sock->send(playMessage());
                         std::this_thread::sleep_for(std::chrono::seconds(1));
-                        sent = sock->send(teardownMessage());
+                        sock->send(teardownMessage());
                         std::this_thread::sleep_for(std::chrono::seconds(1));   
                     });
                 
