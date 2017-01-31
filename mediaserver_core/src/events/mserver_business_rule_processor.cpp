@@ -940,8 +940,9 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
             if (simplified.isEmpty()) //fast check
                 return;
 
-            if (nx::email::isValidAddress(simplified))
-                recipients.append(simplified);
+            QnEmailAddress address(simplified);
+            if (address.isValid())
+                recipients.append(address.value());
         };
 
 
