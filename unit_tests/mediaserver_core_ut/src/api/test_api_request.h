@@ -2,10 +2,13 @@
 
 /**@file
  * Utils for testing Rest API from the client side.
+ *
+ * Logging is done either via NX_LOG() or, if a LOG macro is available, via LOG().
  */
 
 #include <QJsonDocument>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/fusion/model_functions.h>
@@ -15,6 +18,12 @@
 namespace nx {
 namespace test {
 namespace {
+
+#if defined(LOG)
+    #define DO_LOG(ARG) LOG(ARG)
+#else
+    #define DO_LOG(ARG) NX_LOG((ARG), cl_logDEBUG1)
+#endif
 
 typedef nx::utils::MoveOnlyFunc<QByteArray(const QByteArray&)> PreprocessJsonFunc;
 
@@ -36,7 +45,15 @@ void testApiPost(
     if (preprocessJsonFunc)
         request = preprocessJsonFunc(request);
 
+    DO_LOG(lm("POST %1").arg(urlStr));
+    DO_LOG(lm("    REQUEST: %2").arg(request));
+
     httpClient.doPost(url, "application/json", request);
+
+    const auto responseStr = httpClient.fetchMessageBodyBuffer();
+    DO_LOG(lm("    RESPONSE: %1").arg(responseStr));
+    DO_LOG(lm("    STATUS: %1").arg(httpClient.response()->statusLine.statusCode));
+
     ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
 }
 
@@ -93,15 +110,18 @@ void testApiGet(
     QUrl url = launcher.apiUrl();
     url.setPath(urlStr);
 
+    DO_LOG(lit("GET %1").arg(urlStr));
+
     ASSERT_TRUE(httpClient.doGet(url));
+
+    const auto responseStr = httpClient.fetchMessageBodyBuffer();
+    DO_LOG(lm("    RESPONSE: %1").arg(responseStr));
+    DO_LOG(lm("    STATUS: %1").arg(httpClient.response()->statusLine.statusCode));
 
     ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
 
     if (responseData)
-    {
-        const auto responseBody = httpClient.fetchMessageBodyBuffer();
-        ASSERT_TRUE(QJson::deserialize(responseBody, responseData));
-    }
+        ASSERT_TRUE(QJson::deserialize(responseStr, responseData));
 }
 
 } // namespace
