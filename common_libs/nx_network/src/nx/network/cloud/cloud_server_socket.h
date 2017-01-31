@@ -2,7 +2,7 @@
 #define nx_cc_cloud_server_socket_h
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>

@@ -28,6 +28,10 @@ public:
     /** Handler called just after broken tcp connection has been restored */
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
 
+    /** Timer is called over and over again until connection is closed */
+    void setConnectionTimer(
+        std::chrono::milliseconds period, AbstractAsyncClient::TimerHandler handler);
+
     /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;

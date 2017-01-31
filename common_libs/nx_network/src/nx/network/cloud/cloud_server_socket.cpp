@@ -401,7 +401,7 @@ void CloudServerSocket::onListenRequestCompleted(
         const auto keepAliveOptions = response.tcpConnectionKeepAlive
             ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
 
-        if (response.cloudConnectVersion >= hpm::api::CloudConnectVersion::serverChecksOwnState)
+        if (response.cloudConnectVersion >= hpm::api::CloudConnectVersion::serverChecksConnectionState)
             m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
         else
             m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);

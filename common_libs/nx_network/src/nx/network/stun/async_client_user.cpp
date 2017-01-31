@@ -43,6 +43,22 @@ void AsyncClientUser::setOnReconnectedHandler(
         m_asyncGuard.sharedGuard().get());
 }
 
+void AsyncClientUser::setConnectionTimer(
+    std::chrono::milliseconds period, AbstractAsyncClient::TimerHandler handler)
+{
+    m_client->addConnectionTimer(
+        period,
+        [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
+        {
+            if (auto lock = guard->lock())
+                return post(std::move(handler));
+
+            NX_LOG(lm("AsyncClientUser(%1). Ignoring timer handler")
+                .arg(this), cl_logDEBUG1);
+        },
+        m_asyncGuard.sharedGuard().get());
+}
+
 void AsyncClientUser::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     disconnectFromClient();

@@ -10,7 +10,8 @@
 
 #include "abstract_cloud_system_credentials_provider.h"
 #include "cloud_module_url_fetcher.h"
-#include "mediator_connections.h"
+#include "mediator_client_connections.h"
+#include "mediator_server_connections.h"
 
 namespace nx {
 namespace hpm {
