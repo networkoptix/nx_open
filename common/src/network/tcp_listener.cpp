@@ -321,8 +321,8 @@ void QnTcpListener::run()
             if (d->localPort == 0 && d->serverSocket)
                 d->localPort = d->serverSocket->getLocalAddress().port;
 
-            AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             doPeriodicTasks();
+            AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if(clientSocket)
             {
                 if (d->connections.size() > d->maxConnections)
