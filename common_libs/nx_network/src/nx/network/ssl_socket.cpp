@@ -125,7 +125,7 @@ public:
 
     void decreasePendingIOCount()
     {
-        NX_ASSERT(m_pendingIoCount != 0);
+        NX_ASSERT(m_pendingIoCount > 0);
         --m_pendingIoCount;
         if (m_pendingIoCount == 0) {
             // Check if we can invoke the IO operations, if the IO
@@ -1331,8 +1331,8 @@ SslSocket::SslSocket(
     init();
     initOpenSSLGlobalLock();
 
-    // NOTE: Currently all IO operations are implemented over async because initial SSL
-    //     implementation is to wtisted to support runtime mode switches.
+    // NOTE: Currently all IO operations are implemented over async because current SSL
+    //     implementation is too twisted to support runtime mode switches.
     // TODO: SSL sockets should be reimplemented to simplify overall appoarch and support
     //     runtime mode switches.
     bool nonBlockingMode = false;
@@ -1546,7 +1546,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     }
 
     unsigned int timeout = 0;
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT)
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
     {
         if (!d->wrappedSocket->getRecvTimeout(&timeout))
             return -1;
@@ -1564,8 +1564,12 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     auto setPromise =
         [d](SystemError::ErrorCode code, size_t size)
         {
-            if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
-                promisePtr->set_value({code, size});
+            d->wrappedSocket->post(
+                [d, code, size]()
+                {
+                    if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                        promisePtr->set_value({code, size});
+                });
         };
 
     if (flags & MSG_WAITALL)
@@ -1575,7 +1579,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     auto result = promise.get_future().get();
 
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT)
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
     {
         if (!d->wrappedSocket->setRecvTimeout(timeout))
             return -1;
@@ -1626,8 +1630,12 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
         localBuffer,
         [d](SystemError::ErrorCode code, size_t size)
         {
-            if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
-                promisePtr->set_value({code, size});
+            d->wrappedSocket->post(
+                [d, code, size]()
+                {
+                    if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                        promisePtr->set_value({code, size});
+                });
         });
 
     auto result = promise.get_future().get();
