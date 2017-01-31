@@ -2,6 +2,7 @@
 #include "ui_local_settings_dialog.h"
 
 #include <client/client_settings.h>
+#include <client/client_app_info.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -18,8 +19,6 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_desktop_camera_watcher.h>
-
-#include <utils/common/app_info.h>
 
 QnLocalSettingsDialog::QnLocalSettingsDialog(QWidget *parent):
     base_type(parent),
@@ -100,8 +99,8 @@ void QnLocalSettingsDialog::accept()
     if (isRestartRequired())
     {
         QnMessageBox dialog(this);
-        dialog.setText(tr("Some changes will take effect only after %1 Client restart")
-            .arg(QnAppInfo::productNameLong()));
+        dialog.setText(tr("Some changes will take effect only after %1 restart")
+            .arg(QnClientAppInfo::applicationDisplayName()));
 
         dialog.setStandardButtons(QDialogButtonBox::Cancel);
         const auto restartNowButton = dialog.addButton(
