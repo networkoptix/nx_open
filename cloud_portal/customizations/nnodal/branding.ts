@@ -31,10 +31,6 @@
       <translation>http://nnodal.com</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>cloud-demo.hdw.mx</translation>
-    </message>
-    <message>
       <source>COMPANY_NAME</source>
       <translation>nvision</translation>
     </message>

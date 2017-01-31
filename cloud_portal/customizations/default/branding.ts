@@ -31,10 +31,6 @@
       <translation>http://networkoptix.com</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>cloud-demo.hdw.mx</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>L6FE34GJWM.com.networkoptix.NxMobile</translation>
     </message>
@@ -46,7 +42,6 @@
       <source>ANDROID_APP_LINK</source>
       <translation>https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness</translation>
     </message>
-
     <message>
       <source>COMPANY_NAME</source>
       <translation>Network Optix</translation>

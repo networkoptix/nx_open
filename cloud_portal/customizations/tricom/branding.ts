@@ -4,35 +4,35 @@
     <name>global</name>
     <message>
       <source>PRODUCT_NAME</source>
-      <translation>VMS Demo Cloud</translation>
+      <translation>Tricom Cloud</translation>
     </message>
     <message>
       <source>CLIENT_PROTOCOL</source>
-      <translation>demo-vms</translation>
+      <translation>mvss-vms</translation>
     </message>
     <message>
       <source>VMS_NAME</source>
-      <translation>VMS Demonstration</translation>
+      <translation>Tricom MVSS</translation>
     </message>
     <message>
       <source>{{downloadLink}}</source>
-      <translation>http://www.networkoptix.com/live-demo#fulltrial</translation>
+      <translation>http://tricomresearch.com/tricomvms</translation>
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://support.networkoptix.com</translation>
+      <translation>http://tricomresearch.com/support.html</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>http://support.networkoptix.com</translation>
+      <translation>http://tricomresearch.com/support.html</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>http://networkoptix.com</translation>
+      <translation>http://tricomresearch.com/</translation>
     </message>
     <message>
       <source>{{iOSappID}}</source>
-      <translation>L6FE34GJWM.com.networkoptix.NxMobile</translation>
+      <translation>disabled</translation>
     </message>
     <message>
       <source>IOS_APP_LINK</source>
@@ -41,10 +41,10 @@
     <message>
       <source>ANDROID_APP_LINK</source>
       <translation>disabled</translation>
-    </message>      
+    </message>     
     <message>
       <source>COMPANY_NAME</source>
-      <translation>Network Optix</translation>
+      <translation>Tricom Research, Inc.</translation>
     </message>
-  </context>    
+  </context>
 </TS>

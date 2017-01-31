@@ -417,12 +417,12 @@ td{
 }
 
 /* add beta-symbol after product name everywhere */
-/* .product-name.add-version:after{
+.product-name.add-version:after{
   content: "\03B2";
   font-style: italic;
   opacity: 0.5;
   font-size: 90%;
-}*/
+}
 
 
 .inline-block{
@@ -669,4 +669,8 @@ h2.version-number{
     padding-left: 10px;
     line-height:16px;
     color:$dark16;
+}
+
+.help-topic{
+    margin-top:10px;
 }
