@@ -1,21 +1,12 @@
-#include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <memory>
-#include <mutex>
-#include <vector>
 #include <queue>
 
 #include <QtCore/QElapsedTimer>
-
 #include <gtest/gtest.h>
 
-#include <common/common_globals.h>
-#include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/httpclient.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>
-#include <nx/utils/random.h>
 #include <nx/utils/std/thread.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
@@ -23,35 +14,20 @@
 
 namespace nx_http {
 
-nx::Buffer playMessage()
-{
-    return nx::Buffer("PLAY\r\n");
-};
-
-nx::Buffer teardownMessage()
-{
-    return nx::Buffer("TEARDOWN\r\n");
-};
+static const nx::Buffer kPlayMessage("PLAY\r\n");
+static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
 
 class TakingSocketRestHandler: public nx_http::AbstractHttpRequestHandler
 {
     
 public:
-    TakingSocketRestHandler()
-    {
-    }
 
-    virtual ~TakingSocketRestHandler()
-    {
-    }
-
-    //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
+        nx_http::RequestProcessedHandler completionHandler) override
     {
         nx_http::ConnectionEvents events;
         events.onResponseHasBeenSent = 
@@ -61,9 +37,17 @@ public:
                 std::thread serverThread(
                     [sock = std::move(socket)]()
                     {
-                        sock->send(playMessage());
+                        int result = 0;
+                        sock->setNonBlockingMode(false);
+
                         std::this_thread::sleep_for(std::chrono::seconds(1));
-                        sock->send(teardownMessage());
+                        result = sock->send(kPlayMessage);
+                        
+                        ASSERT_GT(result, 0);
+                        std::this_thread::sleep_for(std::chrono::seconds(1));
+                        result = sock->send(kTeardownMessage);
+
+                        ASSERT_GT(result, 0);
                         std::this_thread::sleep_for(std::chrono::seconds(1));   
                     });
                 
@@ -82,14 +66,6 @@ class TakingHttpSocketTest: public ::testing::Test
 {
 
 protected:
-    TakingHttpSocketTest()
-    {
-    }
-
-    ~TakingHttpSocketTest()
-    {
-    }
-
     std::unique_ptr<TestHttpServer> testHttpServer()
     {
         return std::make_unique<TestHttpServer>();
@@ -145,7 +121,7 @@ protected:
         return message;
     }
 
-    void launchTest(bool withSsl)
+    void launchTest(const QString& scheme)
     {
         const auto kRestHandlerPath = lit("/test");
         const std::size_t kReadBufferSize = 65536;
@@ -187,8 +163,6 @@ protected:
             httpClient->setResponseReadTimeoutMs(kTimeoutMs);
             httpClient->setMessageBodyReadTimeoutMs(kTimeoutMs);
 
-            QString scheme = withSsl ? lit("https") : lit("http");
-
             const QUrl url(lit("%1://%2%3")
                 .arg(scheme)
                 .arg(httpServer->serverAddress().toString())
@@ -221,21 +195,20 @@ protected:
                 if (bytesRead > 0)
                     parse(readBuffer, bytesRead);
 
-                auto message = getMessage();
-
-                if (!message.isEmpty())
+                nx::Buffer message;
+                while (!(message = getMessage()).isEmpty())
                 {
                     if (messageNumber == kPlayMessageNumber)
                     {
-                        ASSERT_EQ(playMessage(), message)
-                            << "Expected '" << playMessage().data() << "', got " << message.data();
+                        ASSERT_EQ(kPlayMessage, message)
+                            << "Expected '" << kPlayMessage.data() << "', got " << message.data();
 
                         gotPlayMessage = true;
                     }
                     else if (messageNumber == kTeardownMessageNumber)
                     {
-                        ASSERT_EQ(teardownMessage(), message)
-                            << "Expected '" << teardownMessage().data() << "', got " << message.data();
+                        ASSERT_EQ(kTeardownMessage, message)
+                            << "Expected '" << kTeardownMessage.data() << "', got " << message.data();
 
                         gotTeardownMessage = true;
                     }
@@ -254,10 +227,10 @@ protected:
                 << ", got: " << messageNumber - 1;
 
             ASSERT_TRUE(gotPlayMessage)
-                << "Have not got '" << playMessage().data() << "' message";
+                << "Have not got '" << kPlayMessage.data() << "' message";
 
             ASSERT_TRUE(gotTeardownMessage)
-                << "Have not got '" << teardownMessage().data() << "' message";;
+                << "Have not got '" << kTeardownMessage.data() << "' message";;
 
             decltype(httpClient) localHttpClient;
             std::swap(httpClient, localHttpClient);
@@ -272,14 +245,14 @@ private:
     mutable QnMutex m_mutex;
 };
 
-TEST_F(TakingHttpSocketTest, TakingSocketSSl)
+TEST_F(TakingHttpSocketTest, SslSocket)
 {
-    launchTest(true);
+    launchTest(lit("https"));
 }
 
-TEST_F(TakingHttpSocketTest, TakingSocketNonSSl)
+TEST_F(TakingHttpSocketTest, TcpSocket)
 {
-    launchTest(false);
+    launchTest(lit("http"));
 } 
 
 } // namespace nx_http

@@ -213,7 +213,6 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     m_asyncHttpClient->dispatch(
         [this, &sock, &socketTakenPromise]()
         {   
-            
             QnMutexLocker lock(&m_mutex);
             m_terminated = true;
             
