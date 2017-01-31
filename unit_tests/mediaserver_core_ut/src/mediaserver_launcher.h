@@ -20,6 +20,7 @@ public:
     ~MediaServerLauncher();
 
     SocketAddress endpoint() const;
+    int port() const;
 
     void addSetting(const QString& name, const QString& value);
 
