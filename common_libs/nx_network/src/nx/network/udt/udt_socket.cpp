@@ -824,8 +824,7 @@ bool UdtStreamSocket::connectToIp(
 // =====================================================================
 // UdtStreamServerSocket implementation
 // =====================================================================
-UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion)
-:
+UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
 {
     open();
@@ -948,15 +947,21 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
                 UDT::getlasterror().getErrorCode()));
         return nullptr;
     }
-    else
-    {
+
 #ifdef TRACE_UDT_SOCKET
-        NX_LOG(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
+    NX_LOGX(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
 #endif
-        return new UdtStreamSocket(
-            new detail::UdtSocketImpl(ret),
-            detail::SocketState::connected);
+    auto acceptedSocket = new UdtStreamSocket(
+        new detail::UdtSocketImpl(ret),
+        detail::SocketState::connected);
+
+    if (!acceptedSocket->setSendTimeout(0) || !acceptedSocket->setRecvTimeout(0))
+    {
+        delete acceptedSocket;
+        return nullptr;
     }
+
+    return acceptedSocket;
 }
 
 }   //network

@@ -865,6 +865,35 @@ void socketSimpleAcceptMixed(
     ASSERT_NE(accepted, nullptr) << lastError();
 }
 
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void acceptedSocketOptionsInheritance(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker)
+{
+    auto server = serverMaker();
+    auto serverGuard = makeScopedGuard([&](){ server->pleaseStopSync(); });
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(10 * 1000));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(server->listen(testClientCount()));
+    auto serverAddress = server->getLocalAddress();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->connect(serverAddress, 3000));
+
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool)accepted);
+
+    unsigned int acceptedSocketRecvTimeout = 0;
+    ASSERT_TRUE(accepted->getRecvTimeout(&acceptedSocketRecvTimeout));
+    unsigned int acceptedSocketSendTimeout = 0;
+    ASSERT_TRUE(accepted->getSendTimeout(&acceptedSocketSendTimeout));
+
+    // Timeouts are not inherited.
+    ASSERT_EQ(0, acceptedSocketRecvTimeout);
+    ASSERT_EQ(0, acceptedSocketSendTimeout);
+}
+
 template<typename ClientSocketMaker>
 void socketSingleAioThread(const ClientSocketMaker& clientMaker)
 {
@@ -1216,6 +1245,8 @@ typedef nx::network::test::StopType StopType;
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleAcceptMixed) \
         { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, AcceptedSocketOptionsInheritance) \
+        { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
     Type(Name, AcceptTimeoutSync) \
         { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
     Type(Name, AcceptTimeoutAsync) \
