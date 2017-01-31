@@ -2564,7 +2564,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
-        if (!conf || conf->SourceToken != srcToken)
+        if (!conf || conf->SourceToken != srcToken || !(conf->Bounds))
             continue;
 
         {
