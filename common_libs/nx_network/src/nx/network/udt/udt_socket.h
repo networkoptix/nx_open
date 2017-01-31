@@ -147,6 +147,9 @@ public:
 
 private:
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    bool needToSwitchRecvMode(int flags, bool* requiredRecvMode);
+    bool setRecvMode(bool isRecvSync);
+    int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
@@ -155,8 +158,7 @@ private:
     Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class NX_NETWORK_API UdtStreamServerSocket
-:
+class NX_NETWORK_API UdtStreamServerSocket:
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:

@@ -17,6 +17,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/guard.h>
 
 #include "udt_common.h"
 #include "udt_socket_impl.h"
@@ -24,9 +25,6 @@
 #ifdef _WIN32
 #include "../win32_socket_tools.h"
 #endif
-
-#define ADDR_(x) reinterpret_cast<sockaddr*>(x)
-
 
 namespace nx {
 namespace network {
@@ -165,7 +163,7 @@ bool UdtSocket<InterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
     sockaddr_in addr;
     detail::AddressFrom(localAddress, &addr);
-    int ret = UDT::bind(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
+    int ret = UDT::bind(m_impl->udtHandle, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     if (ret != 0)
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -177,7 +175,7 @@ SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 {
     sockaddr_in addr;
     int len = sizeof(addr);
-    if (UDT::getsockname(m_impl->udtHandle, ADDR_(&addr), &len) != 0)
+    if (UDT::getsockname(m_impl->udtHandle, reinterpret_cast<sockaddr*>(&addr), &len) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -193,8 +191,6 @@ SocketAddress UdtSocket<InterfaceToImplement>::getLocalAddress() const
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::close()
 {
-    //NX_ASSERT(!isClosed());
-
     if (m_impl->udtHandle == UDT::INVALID_SOCK)
         return true;    //already closed
 
@@ -219,7 +215,9 @@ bool UdtSocket<InterfaceToImplement>::close()
 template<typename InterfaceToImplement>
 bool UdtSocket<InterfaceToImplement>::shutdown()
 {
-    //TODO #ak implementing shutdown via close may lead to undefined behavior in case of handle reuse
+    // TODO #ak: Implementing shutdown via close may lead to undefined behavior in case of handle reuse.
+    // But, UDT allocates socket handles as atomic increment, so handle reuse is 
+    // hard to imagine in real life.
 
 #if 0   //no LINGER
     const int ret = UDT::close(m_impl->udtHandle);
@@ -593,61 +591,21 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    int sz;
-    if (flags & MSG_DONTWAIT)
+    ScopedGuard<std::function<void()>> socketModeGuard;
+
+    bool requiredRecvMode = false;
+    if (needToSwitchRecvMode(flags, &requiredRecvMode))
     {
-        bool value;
-        if (!getNonBlockingMode(&value))
+        if (!setRecvMode(requiredRecvMode))
             return -1;
-
-        if (!setNonBlockingMode(true))
-            return -1;
-
-        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags & ~MSG_DONTWAIT);
-
-        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
-        if (!setNonBlockingMode(value))
-            return -1;
-        // Restoring system error code.
-        SystemError::setLastErrorCode(sysErrorCodeBak);
-    }
-    else
-    {
-        sz = UDT::recv(m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, flags);
+        socketModeGuard = ScopedGuard<std::function<void()>>(
+            [requiredRecvMode, this]() { setRecvMode(!requiredRecvMode); });
     }
 
-    if (sz == UDT::ERROR)
-    {
-        const int udtErrorCode = UDT::getlasterror().getErrorCode();
-        const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
+    const int bytesRead = UDT::recv(
+        m_impl->udtHandle, reinterpret_cast<char*>(buffer), bufferLen, 0);
 
-        if (sysErrorCode != SystemError::wouldBlock)
-            m_state = detail::SocketState::open;
-
-        // UDT doesn't translate the EOF into a recv with zero return, but instead
-        // it returns error with 2001 error code. We need to detect this and translate
-        // back with a zero return here .
-        if (udtErrorCode == CUDTException::ECONNLOST)
-        {
-            return 0;
-        }
-        else if (udtErrorCode == CUDTException::EINVSOCK)
-        {
-            // This is another very ugly hack since after our patch for UDT.
-            // UDT cannot distinguish a clean close or a crash. And I cannot
-            // come up with perfect way to patch the code and make it work.
-            // So we just hack here. When we encounter an error Invalid socket,
-            // it should be a clean close when we use a epoll.
-            return 0;
-        }
-        SystemError::setLastErrorCode(sysErrorCode);
-    }
-    else if (sz == 0)
-    {
-        //connection has been closed
-        m_state = detail::SocketState::open;
-    }
-    return sz;
+    return handleRecvResult(bytesRead);
 }
 
 int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
@@ -674,7 +632,7 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
 SocketAddress UdtStreamSocket::getForeignAddress() const {
     sockaddr_in addr;
     int len = sizeof(addr);
-    if (UDT::getpeername(m_impl->udtHandle, ADDR_(&addr), &len) != 0)
+    if (UDT::getpeername(m_impl->udtHandle, reinterpret_cast<sockaddr*>(&addr), &len) != 0)
     {
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
@@ -807,7 +765,7 @@ bool UdtStreamSocket::connectToIp(
         if (!setNonBlockingMode(nbk_sock))
             return false;
     }
-    int ret = UDT::connect(m_impl->udtHandle, ADDR_(&addr), sizeof(addr));
+    int ret = UDT::connect(m_impl->udtHandle, reinterpret_cast<sockaddr*>(&addr), sizeof(addr));
     // The UDT connect will always return zero even if such operation is async which is
     // different with the existed Posix/Win32 socket design. So if we meet an non-zero
     // value, the only explanation is an error happened which cannot be solved.
@@ -819,6 +777,78 @@ bool UdtStreamSocket::connectToIp(
     }
     m_state = detail::SocketState::connected;
     return true;
+}
+
+bool UdtStreamSocket::needToSwitchRecvMode(int flags, bool* requiredRecvMode)
+{
+    if (flags == 0)
+        return false;
+
+    bool currentMode = false;
+    int len = sizeof(currentMode);
+    int ret = UDT::getsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &currentMode, &len);
+    if (ret != 0)
+    {
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+        return false;
+    }
+
+    if (flags & MSG_DONTWAIT)
+        *requiredRecvMode = false;
+    else if (flags & MSG_WAITALL)
+        *requiredRecvMode = true;
+
+    return currentMode != *requiredRecvMode;
+}
+
+bool UdtStreamSocket::setRecvMode(bool isRecvSync)
+{
+    auto ret = UDT::setsockopt(m_impl->udtHandle, 0, UDT_RCVSYN, &isRecvSync, sizeof(isRecvSync));
+    if (ret != 0)
+    {
+        SystemError::setLastErrorCode(
+            detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
+    }
+
+    return ret == 0;
+}
+
+int UdtStreamSocket::handleRecvResult(int recvResult)
+{
+    if (recvResult == UDT::ERROR)
+    {
+        const int udtErrorCode = UDT::getlasterror().getErrorCode();
+        const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
+
+        if (sysErrorCode != SystemError::wouldBlock)
+            m_state = detail::SocketState::open;
+
+        // UDT doesn't translate the EOF into a recv with zero return, but instead
+        // it returns error with 2001 error code. We need to detect this and translate
+        // back with a zero return here .
+        if (udtErrorCode == CUDTException::ECONNLOST)
+        {
+            return 0;
+        }
+        else if (udtErrorCode == CUDTException::EINVSOCK)
+        {
+            // This is another very ugly hack since after our patch for UDT.
+            // UDT cannot distinguish a clean close or a crash. And I cannot
+            // come up with perfect way to patch the code and make it work.
+            // So we just hack here. When we encounter an error Invalid socket,
+            // it should be a clean close when we use a epoll.
+            return 0;
+        }
+        SystemError::setLastErrorCode(sysErrorCode);
+    }
+    else if (recvResult == 0)
+    {
+        //connection has been closed
+        m_state = detail::SocketState::open;
+    }
+
+    return recvResult;
 }
 
 // =====================================================================
