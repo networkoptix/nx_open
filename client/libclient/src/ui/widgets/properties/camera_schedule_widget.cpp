@@ -190,6 +190,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     scrollBar->setUseMaximumSpace(true);
 
     ui->enableRecordingCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
+    ui->enableRecordingCheckBox->setForegroundRole(QPalette::ButtonText);
 
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityLow), Qn::QualityLow);
     ui->qualityComboBox->addItem(toDisplayString(Qn::QualityNormal), Qn::QualityNormal);

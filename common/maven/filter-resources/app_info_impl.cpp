@@ -199,3 +199,7 @@ bool QnAppInfo::freeLicenseIsTrial()
     return ${freeLicenseIsTrial};
 }
 
+QString QnAppInfo::defaultWebPages()
+{
+    return QStringLiteral("${defaultWebPages}");
+}

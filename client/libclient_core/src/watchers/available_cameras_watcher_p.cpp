@@ -145,22 +145,17 @@ void PermissionsBasedWatcher::addCamera(const QnResourcePtr& resource)
     if (camera->hasFlags(Qn::desktop_camera))
         return;
 
-    const auto key = camera->getId();
-    const auto existing = m_cameras.find(key);
-    if (existing != m_cameras.cend())
-    {
-        NX_ASSERT(*existing == camera);
+    const auto id = camera->getId();
+    if (m_cameras.contains(id))
         return;
-    }
 
-    m_cameras.insert(key, camera);
+    m_cameras.insert(id, camera);
     emit cameraAdded(resource);
 }
 
 void PermissionsBasedWatcher::removeCamera(const QnResourcePtr& resource)
 {
     const auto camera = m_cameras.take(resource->getId());
-    NX_ASSERT(camera);
     if (!camera)
         return;
 

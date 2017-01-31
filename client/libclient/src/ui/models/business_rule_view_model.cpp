@@ -885,7 +885,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             switch (m_actionType)
             {
                 case QnBusiness::SendMailAction:
-                    return QnSendEmailActionDelegate::isValidList(filtered);
+                    return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case QnBusiness::CameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
                         QnBusiness::toResources<QnCameraRecordingPolicy::resource_type>(filtered));

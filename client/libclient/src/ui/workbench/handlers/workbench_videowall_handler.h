@@ -36,8 +36,6 @@ public:
     bool saveReviewLayout(const QnLayoutResourcePtr &layout, std::function<void(int, ec2::ErrorCode)> callback);
     bool saveReviewLayout(QnWorkbenchLayout *layout, std::function<void(int, ec2::ErrorCode)> callback);
 
-    static void anotherVideoWallExistMessage(QWidget* parent);
-
 private:
     enum class ItemAction {
         Added,
