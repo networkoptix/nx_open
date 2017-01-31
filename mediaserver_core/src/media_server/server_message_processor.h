@@ -31,7 +31,7 @@ protected:
     virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
     virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
 
-    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus ) override;
+    virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus, ec2::NotificationSource source) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
     void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
