@@ -8,17 +8,17 @@ angular.module('webadminApp')
         $scope.connect = connect;
         $scope.Config = Config;
         if(connect) {
-            $scope.title = 'Connect system to <span class="product-name">Nx Cloud</span>';
+            $scope.title = 'Connect system to <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.actionLabel = 'Connect System';
 
-            $scope.successMessage = 'System is connected to <span class="product-name">Nx Cloud</span>';
+            $scope.successMessage = 'System is connected to <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.errorMessage = 'Can\'t connect: some error happened';
 
         }else{
-            $scope.title = 'Disconnect system from <span class="product-name">Nx Cloud</span>';
+            $scope.title = 'Disconnect system from <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.actionLabel = 'Disconnect System';
 
-            $scope.successMessage = 'System was disconnected from <span class="product-name">Nx Cloud</span>';
+            $scope.successMessage = 'System was disconnected from <span class="product-name">' + Config.cloud.productName + '</span>';
             $scope.errorMessage = 'Some error happened';
         }
 
