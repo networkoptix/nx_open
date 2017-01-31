@@ -97,7 +97,7 @@ public:
             {
                 auto menu = m_durationButton->menu();
                 auto action = menu->addAction(text);
-                action->setData(duration.count());
+                action->setData(qint64(duration.count()));
                 action->setToolTip(buttonText);
                 return action;
             };
