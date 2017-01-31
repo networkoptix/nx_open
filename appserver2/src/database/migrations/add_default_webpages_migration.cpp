@@ -10,8 +10,6 @@
 
 #include <nx_ec/data/api_webpage_data.h>
 
-#include <utils/common/app_info.h>
-
 #include <nx/utils/log/log.h>
 
 namespace ec2 {
@@ -36,9 +34,17 @@ bool addDefaultWebpages(const QSqlDatabase& database)
             return api::saveWebPage(database, webPage);
         };
 
-    QString encoded = QnAppInfo::defaultWebPages();
-    QJsonObject urls = QJsonDocument::fromJson(encoded.toUtf8()).object();
-    for (auto iter = urls.constBegin(); iter != urls.constEnd(); ++iter)
+    QFile config(":/serverProperties.json");
+    if (!config.open(QIODevice::ReadOnly))
+    {
+        NX_LOG(lit("Could not read serverProperties.json"), cl_logERROR);
+        return true; // We don't want to crash if partner did not fill any of these
+    }
+
+    QString encoded = config.readAll();
+    QJsonObject configContents = QJsonDocument::fromJson(encoded.toUtf8()).object();
+    QJsonObject defaultWebPages = configContents.value("defaultWebPages").toObject();
+    for (auto iter = defaultWebPages.constBegin(); iter != defaultWebPages.constEnd(); ++iter)
     {
         const QString name = iter.key();
         const QString url = iter->toString();

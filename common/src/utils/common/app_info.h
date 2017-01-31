@@ -58,11 +58,6 @@ public:
     static Q_INVOKABLE QString defaultCloudPortalUrl();
     static Q_INVOKABLE QString defaultCloudModulesXmlUrl();
     static Q_INVOKABLE QString cloudName();
-        
-    /** Default pages list, added to database on server start.
-     * Format: "{name: url, name: url, ...}"
-     */
-    static Q_INVOKABLE QString defaultWebPages();
 
     static Q_INVOKABLE int freeLicenseCount();
     static Q_INVOKABLE QString freeLicenseKey();
