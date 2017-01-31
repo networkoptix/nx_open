@@ -86,7 +86,7 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>${environment.dir}/dev_tools/validate_jsons.py</argument>
+                                <argument>${root.dir}/build_utils/python/validate_jsons.py</argument>
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>
                         </configuration>
