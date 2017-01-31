@@ -1,7 +1,6 @@
 #if !defined(EDGE_SERVER) && !defined(DISABLE_FESTIVAL)
 #include "text_to_wav.h"
 
-#include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
 #include <mutex>
@@ -15,7 +14,6 @@
 #endif
 
 static char festivalVoxPath[256];
-
 
 #if (_XOPEN_SOURCE >= 700 || _POSIX_C_SOURCE >= 200809L) && 0
 #include <stdio.h>
@@ -50,7 +48,6 @@ namespace
         chars[i] = (data[i]/256)+128;
 
     }
-
 
     int get_word_size(enum EST_sample_type_t sample_type)
     {
@@ -253,9 +250,6 @@ namespace
 }
 #endif
 
-static std::once_flag festivalInitialized;
-static std::once_flag festivalDenitialized;
-
 static void initFestival(const QString binaryPath)
 {
 #ifdef QN_USE_VLD
@@ -268,7 +262,6 @@ static void initFestival(const QString binaryPath)
 #else
     sprintf( festivalVoxPath, "%s/../Resources/vox/", binaryPath.toLatin1().constData() );
 #endif
-    qDebug() << "=====> FESTIVAL_VOX_PATH:" << festivalVoxPath;
     festival_libdir = festivalVoxPath;
 
     const int heap_size = 1510000;  // default scheme heap size
@@ -284,27 +277,6 @@ static void deinitFestival()
     festival_wait_for_spooler();
     festival_tidy_up();
 }
-
-
-class FestivalInitializer
-{
-public:
-    FestivalInitializer(const QString& binaryPath, std::function<void()> handler)
-    {
-        std::call_once(festivalInitialized, initFestival, binaryPath);
-        if (handler)
-            handler();
-    }
-
-    ~FestivalInitializer()
-    {
-        /*
-         * Really we should not do it more than once.
-         * Guarding to prevent troubles in unit tests.
-         */
-        std::call_once(festivalDenitialized, deinitFestival);
-    }
-};
 
 static int my_festival_text_to_wave(const EST_String &text,EST_Wave &wave)
 {
@@ -372,12 +344,28 @@ static bool textToWavInternal(const QString& text, QIODevice* const dest, QnAudi
     return result;
 }
 
+class FestivalInitializer
+{
 
-TextToWaveServer::TextToWaveServer(const QString& binaryPath)
-:
+public:
+    FestivalInitializer(const QString& binaryPath, nx::utils::promise<void>& initializedPromise)
+    {
+        initFestival(binaryPath);
+        initializedPromise.set_value();
+    };
+
+    ~FestivalInitializer()
+    {
+        deinitFestival();
+    };
+};
+
+
+TextToWaveServer::TextToWaveServer(const QString& binaryPath):
     m_binaryPath(binaryPath),
     m_prevTaskID(1)
 {
+    m_initializedFuture = m_initializedPromise.get_future();
 }
 
 TextToWaveServer::~TextToWaveServer()
@@ -385,15 +373,15 @@ TextToWaveServer::~TextToWaveServer()
     stop();
 }
 
+void TextToWaveServer::waitForStarted()
+{
+    m_initializedFuture.get();
+}
+
 void TextToWaveServer::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
     m_textQueue.push( QSharedPointer<SynthetiseSpeechTask>(new SynthetiseSpeechTask()) );
-}
-
-void TextToWaveServer::setOnInitializedHandler(std::function<void()> handler)
-{
-    m_onInitializedHandler = handler;
 }
 
 int TextToWaveServer::generateSoundAsync( const QString& text, QIODevice* const dest )
@@ -422,7 +410,7 @@ void TextToWaveServer::run()
 {
     initSystemThreadId();
 
-    FestivalInitializer festivalInitializer(m_binaryPath, m_onInitializedHandler);
+    FestivalInitializer(m_binaryPath, m_initializedPromise);
 
     while( !needToStop() )
     {

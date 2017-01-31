@@ -219,18 +219,11 @@ int main(int argc, char **argv)
 #endif
 
 #ifndef DISABLE_FESTIVAL
-    QString defaultBinaryPath;
-    if (argc > 0)
-        defaultBinaryPath = QString::fromUtf8(argv[0]);
-
     std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
-        nx::utils::file_system::applicationDirPath(defaultBinaryPath));
+        nx::utils::file_system::applicationDirPath(argc, argv));
 
-    nx::utils::promise<void> promise;
-    auto fut = promise.get_future();
-    textToWaveServer->setOnInitializedHandler([&promise](){promise.set_value();});
     textToWaveServer->start();
-    fut.wait();
+    textToWaveServer->waitForStarted();
 #endif
 
     /* These attributes must be set before application instance is created. */

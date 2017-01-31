@@ -205,19 +205,17 @@ QString applicationFileNameInternal(const QString& /*defaultFileName*/)
 
     return res;
 }
-#endif
-#elif defined(Q_OS_MAC)
-QString applicationFileNameInternal(const QString& defaultFileName)
-{
-    return QString();
-}
-#endif
-
+#endif // #if defined(Q_OS_WINRT) && _MSC_VER < 1900
+#endif // #ifdef Q_OS_WIN
 
 QString applicationDirPath(const QString& defaultFilePath)
-{
-    uint32_t someTest;
+{    
     return QFileInfo(applicationFilePath(defaultFilePath)).path();
+}
+
+QString applicationDirPath(int argc, char** argv)
+{
+    return QFileInfo(applicationFilePath(argc, argv)).path();
 }
 
 QString applicationFilePath(const QString& defaultFilePath)
@@ -273,6 +271,15 @@ QString applicationFilePath(const QString& defaultFilePath)
 
 #endif
     return QString();
+}
+
+QString applicationFilePath(int argc, char** argv)
+{
+    QString defaultFilePath;
+    if (argc > 0)
+        defaultFilePath = QString::fromUtf8(argv[0]);
+
+    return applicationFilePath(defaultFilePath);
 }
 
 } // namespace file_system
