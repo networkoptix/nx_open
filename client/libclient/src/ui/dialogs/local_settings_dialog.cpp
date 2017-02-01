@@ -107,7 +107,7 @@ void QnLocalSettingsDialog::accept()
             tr("Restart Now"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
 
         dialog.addButton(
-            tr("Restart Later"), QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
+            tr("Restart Later"), QDialogButtonBox::NoRole);
 
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return;

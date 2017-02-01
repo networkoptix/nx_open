@@ -1,6 +1,6 @@
 #include "helper.h"
 
-#include <private/qfont_p.h>
+#include <QtGui/private/qfont_p.h>
 
 namespace style
 {

@@ -55,7 +55,7 @@ private:
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall) const;
 
-    void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
+    void switchToVideoWallMode(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);

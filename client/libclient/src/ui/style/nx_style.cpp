@@ -25,8 +25,9 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QInputDialog>
-#include <private/qfont_p.h>
-#include <private/qabstractitemview_p.h>
+
+#include <QtGui/private/qfont_p.h>
+#include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>

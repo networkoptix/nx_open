@@ -114,13 +114,13 @@ public:
     QPushButton* addCustomButton(
         QnMessageBoxCustomButton button,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent);
+        QnButtonAccent accent = QnButtonAccent::NoAccent);
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton* addButton(
         const QString &text,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent);
+        QnButtonAccent accent = QnButtonAccent::NoAccent);
     QPushButton* addButton(QDialogButtonBox::StandardButton button);
     void removeButton(QAbstractButton *button);
 

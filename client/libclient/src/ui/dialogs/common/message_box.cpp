@@ -314,6 +314,7 @@ QPushButton* QnMessageBox::addButton(
     {
         d->buttonAccent = accent;
         d->defaultButton = result;
+        d->buttonDetection &= ~int(QnButtonDetection::DefaultButton);
     }
 
     return result;
