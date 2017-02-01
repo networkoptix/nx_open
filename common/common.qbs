@@ -156,5 +156,11 @@ GenericProduct
 
         cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
         cpp.includePaths: base.concat([project.sourceDirectory + "/common_libs/nx_network/src"])
+
+        Properties
+        {
+            condition: qbs.targetOS.contains("android")
+            cpp.dynamicLibraries: ["nx_streaming", "nx_network"]
+        }
     }
 }

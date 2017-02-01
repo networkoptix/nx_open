@@ -1232,9 +1232,9 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnRunningVideowallActionCondition(this));
 
     factory(QnActions::DetachFromVideoWallAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        text(tr("Detach Layout")).
+        text(tr("Clear Screen")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
 

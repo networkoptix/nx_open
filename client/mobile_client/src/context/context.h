@@ -11,6 +11,18 @@ class QnUserWatcher;
 class QnCloudUrlHelper;
 class NxGlobalsObject;
 
+namespace nx {
+namespace client {
+namespace mobile {
+
+class QmlSettingsAdaptor;
+
+} // namespace mobile
+} // namespace client
+} // namespace nx
+
+using nx::client::mobile::QmlSettingsAdaptor;
+
 class QnContext: public QObject
 {
     Q_OBJECT
@@ -18,6 +30,7 @@ class QnContext: public QObject
 
     Q_PROPERTY(NxGlobalsObject* Nx MEMBER m_nxGlobals CONSTANT)
     Q_PROPERTY(QnConnectionManager* connectionManager MEMBER m_connectionManager CONSTANT)
+    Q_PROPERTY(nx::client::mobile::QmlSettingsAdaptor* settings MEMBER m_settings CONSTANT)
     Q_PROPERTY(QnMobileAppInfo* applicationInfo MEMBER m_appInfo CONSTANT)
     Q_PROPERTY(QnCloudStatusWatcher* cloudStatusWatcher READ cloudStatusWatcher CONSTANT)
     Q_PROPERTY(QnMobileClientUiController* uiController READ uiController CONSTANT)
@@ -38,6 +51,7 @@ public:
     QnMobileClientUiController* uiController() const { return m_uiController; }
     QnCloudStatusWatcher* cloudStatusWatcher() const;
     QnUserWatcher* userWatcher() const;
+    QmlSettingsAdaptor* settings() const;
 
     Q_INVOKABLE void quitApplication();
 
@@ -90,6 +104,7 @@ signals:
 private:
     NxGlobalsObject* m_nxGlobals;
     QnConnectionManager *m_connectionManager;
+    QmlSettingsAdaptor* m_settings;
     QnMobileAppInfo *m_appInfo;
     QnMobileClientUiController* m_uiController;
     QnCloudUrlHelper* m_cloudUrlHelper;

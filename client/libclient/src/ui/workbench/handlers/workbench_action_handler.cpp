@@ -51,6 +51,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -714,9 +715,24 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
     }
 }
 
-void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
+    const auto currentLayout = workbench()->currentLayout();
+
+    // Check if we are in videowall control mode
+    QnUuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    if (!videoWallItemGuid.isNull())
+    {
+        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(videoWallItemGuid);
+        const auto resources = parameters.resources();
+
+        // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
+        if (!nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index, resources, true))
+            return;
+    }
+
+    parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(QnActions::OpenInLayoutAction, parameters);
 }
 
@@ -2091,7 +2107,6 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
 }
-
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
 {
