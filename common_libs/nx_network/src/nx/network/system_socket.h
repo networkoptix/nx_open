@@ -261,6 +261,7 @@ public:
 
 private:
     bool setListen(int queueLen);
+    void stopWhileInAioThread();
 };
 
 class NX_NETWORK_API UDPSocket:

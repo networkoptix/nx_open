@@ -927,14 +927,23 @@ void UdtStreamServerSocket::cancelIOSync()
 }
 
 void UdtStreamServerSocket::pleaseStop(
-    nx::utils::MoveOnlyFunc< void() > handler )
+    nx::utils::MoveOnlyFunc< void() > completionHandler)
 {
-    m_aioHelper->cancelIOAsync( std::move( handler ) );
+    // TODO #ak: Add general implementation to Socket class and remove this method.
+    dispatch(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+    else
+        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
@@ -959,5 +968,10 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
     }
 }
 
-}   //network
-}   //nx
+void UdtStreamServerSocket::stopWhileInAioThread()
+{
+    m_aioHelper->stopPolling();
+}
+
+} // namespace network
+} // namespace nx

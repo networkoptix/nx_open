@@ -1,5 +1,4 @@
-#ifndef __UDT_SOCKET_H__
-#define __UDT_SOCKET_H__
+#pragma once
 
 #include <memory>
 
@@ -7,7 +6,6 @@
 #include "../socket_common.h"
 #include "../system_socket.h"
 #include "../aio/event_type.h"
-
 
 namespace nx {
 namespace network {
@@ -17,7 +15,7 @@ namespace aio {
 template<class SocketType> class AsyncSocketImplHelper;
 template<class SocketType> class AsyncServerSocketHelper;
 
-}   //aio
+} // namespace aio
 
 // I put the implementator inside of detail namespace to avoid namespace pollution.
 // The reason is that I see many of the class prefer using Implementator , maybe 
@@ -35,8 +33,7 @@ enum class SocketState
 
 // Adding a level indirection to make C++ type system happy.
 template<class InterfaceToImplement>
-class UdtSocket
-:
+class UdtSocket:
     public Pollable,
     public InterfaceToImplement
 {
@@ -93,8 +90,7 @@ protected:
 
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
-class NX_NETWORK_API UdtStreamSocket
-:
+class NX_NETWORK_API UdtStreamSocket:
     public UdtSocket<AbstractStreamSocket>
 {
 public:
@@ -155,8 +151,7 @@ private:
     Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class NX_NETWORK_API UdtStreamServerSocket
-:
+class NX_NETWORK_API UdtStreamServerSocket:
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:
@@ -184,10 +179,10 @@ public:
 private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
 
+    void stopWhileInAioThread();
+
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };
 
-}   //network
-}   //nx
-
-#endif // __UDT_SOCKET_H__
+} // namespace network
+} // namespace nx

@@ -2104,6 +2104,11 @@ void SslServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     return m_delegateSocket->pleaseStop(std::move(handler));
 }
 
+void SslServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+{
+    return m_delegateSocket->pleaseStopSync(assertIfCalledUnderLock);
+}
+
 void SslServerSocket::acceptAsync(
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,

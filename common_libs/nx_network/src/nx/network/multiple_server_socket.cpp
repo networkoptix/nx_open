@@ -218,10 +218,22 @@ void MultipleServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
     m_timerSocket.pleaseStop(
         [this, handler = std::move(handler)]()
         {
-            NX_LOGX(lm("Stopped"), cl_logDEBUG1);
-            m_serverSockets.clear();
+            stopWhileInAioThread();
             handler();
         });
+}
+
+void MultipleServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+{
+    if (m_timerSocket.isInSelfAioThread())
+    {
+        stopWhileInAioThread();
+        m_timerSocket.pleaseStopSync(assertIfCalledUnderLock);
+    }
+    else
+    {
+        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
+    }
 }
 
 Pollable* MultipleServerSocket::pollable()
@@ -435,6 +447,12 @@ void MultipleServerSocket::cancelIoFromAioThread()
     m_timerSocket.cancelSync();
     for (auto& socketContext: m_serverSockets)
         socketContext.stopAccepting();
+}
+
+void MultipleServerSocket::stopWhileInAioThread()
+{
+    NX_LOGX(lm("Stopped"), cl_logDEBUG1);
+    m_serverSockets.clear();
 }
 
 } // namespace network

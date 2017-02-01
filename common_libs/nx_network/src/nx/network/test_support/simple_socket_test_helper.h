@@ -982,6 +982,23 @@ void socketAcceptCancelAsync(
     }
 }
 
+template<typename ServerSocketMaker>
+void serverSocketPleaseStopCancelsPostedCall(
+    const ServerSocketMaker& serverMaker)
+{
+    auto serverSocket = serverMaker();
+    nx::utils::promise<void> socketStopped;
+    serverSocket->post(
+        [&serverSocket, &socketStopped]()
+        {
+            serverSocket->post([]() { ASSERT_TRUE(false); });
+            serverSocket->pleaseStopSync();
+            socketStopped.set_value();
+        });
+    socketStopped.get_future().wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx
@@ -1027,6 +1044,8 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopAsync) \
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::pleaseStop); } \
+    Type(Name, PleaseStopCancelsPostedCall) \
+        { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 
 #define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleSync) \
