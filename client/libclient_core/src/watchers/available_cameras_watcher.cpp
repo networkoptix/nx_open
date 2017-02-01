@@ -17,7 +17,7 @@ public:
 public:
     QnUserResourcePtr user;
 
-    bool acceptAllCameras = false;
+    bool userHasAdminPermissions = false;
     bool useLayouts = false;
 
     QScopedPointer<detail::Watcher> watcher;
@@ -36,15 +36,13 @@ QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent):
             if (!subject.isUser() || subject.user() != d->user)
                 return;
 
-            bool acceptAllCameras = value.testFlag(Qn::GlobalAdminPermission);
-            if (d->acceptAllCameras != acceptAllCameras)
+            const bool userHasAdminPermissions = value.testFlag(Qn::GlobalAdminPermission);
+            if (d->userHasAdminPermissions != userHasAdminPermissions)
             {
-                d->acceptAllCameras = acceptAllCameras;
+                d->userHasAdminPermissions = userHasAdminPermissions;
                 d->updateWatcher();
             }
         });
-
-    d->updateWatcher();
 }
 
 QnAvailableCamerasWatcher::~QnAvailableCamerasWatcher()
@@ -64,6 +62,8 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr& user)
         return;
 
     d->user = user;
+    d->userHasAdminPermissions =
+        user && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
     d->updateWatcher();
 }
 
@@ -111,9 +111,10 @@ void QnAvailableCamerasWatcherPrivate::updateWatcher()
         watcher.reset();
     }
 
-    if (acceptAllCameras)
-        watcher.reset(new detail::PermissionsBasedWatcher(QnUserResourcePtr()));
-    else if (useLayouts)
+    if (!user)
+        return;
+
+    if (useLayouts && !userHasAdminPermissions)
         watcher.reset(new detail::LayoutBasedWatcher(user));
     else
         watcher.reset(new detail::PermissionsBasedWatcher(user));
