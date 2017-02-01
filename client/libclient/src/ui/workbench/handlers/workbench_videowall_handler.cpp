@@ -689,8 +689,8 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     {
         NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
         closeInstanceDelayed();
-    }
         return;
+    }
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
     updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
