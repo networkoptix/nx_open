@@ -231,9 +231,9 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
-        tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole, QnButtonAccent::NoAccent);
+        tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
     dialog.addButton(
-        tr("Enable Secondary Stream"), QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
+        tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
 
     dialog.setButtonAutoDetection(QnButtonDetection::EscapeButton);
     if (dialog.exec() == QDialogButtonBox::Cancel)

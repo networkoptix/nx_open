@@ -835,7 +835,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
 
         messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
         const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
-            QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
+            QDialogButtonBox::NoRole);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
@@ -2029,7 +2029,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     const auto updateButton = messageBox->addButton(
         tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
     messageBox->addButton(
-        tr("Skip"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+        tr("Skip"), QDialogButtonBox::RejectRole);
 
     messageBox->exec();
 

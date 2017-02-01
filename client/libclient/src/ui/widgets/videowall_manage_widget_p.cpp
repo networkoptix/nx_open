@@ -739,8 +739,8 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
                 QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
                 q_ptr);
 
-            dialog.addCustomButton(QnMessageBoxCustomButton::Delete
-                , QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+                QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
             if (dialog.exec() == QDialogButtonBox::Cancel)
                 return;
         }
