@@ -2691,7 +2691,9 @@ void MediaServerProcess::run()
     BeforeRestoreDbData::clearSettings(settings);
 
     addFakeVideowallUser();
-    initStoragesAsync(messageProcessor.data());
+
+    if (!MSSettings::roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
+        initStoragesAsync(messageProcessor.data());
 
     if (!QnPermissionsHelper::isSafeMode())
     {

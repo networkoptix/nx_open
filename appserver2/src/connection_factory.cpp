@@ -1664,7 +1664,6 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
             });
     }
 
-
     return ErrorCode::ok;
 }
 
