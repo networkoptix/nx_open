@@ -259,3 +259,29 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
         ASSERT_TRUE(fileRecIt == bufferManager.getFileToRec().end());
     }
 }
+
+TEST(BufferedFileWriter, VariousSizes)
+{
+    const QByteArray kTestFileName("test_data1.bin");
+    const QByteArray kTestPattern("1234567890");
+
+    for (int fileBlockSize = 32768; fileBlockSize < 327680; fileBlockSize += 15000)
+        for (int minBufSize = 1; minBufSize < 10000; minBufSize += 2000)
+            for (int testDataSize = 65536; testDataSize < 65536 * 5; testDataSize += 5000)
+            {
+                QFile::remove(kTestFileName);
+
+                std::unique_ptr<QBufferedFile> testFile(
+                    new QBufferedFile(
+                        std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
+                        fileBlockSize,
+                        minBufSize,
+                        QnUuid::fromStringSafe("{33531ee9-c4c5-4a95-b708-25e3fa00ff5f}")
+                    ));
+
+                ASSERT_TRUE(testFile->open(QIODevice::WriteOnly));
+
+                std::vector<char> testData(testDataSize);
+                testFile->writeData(testData.data(), testData.size());
+            }
+}
