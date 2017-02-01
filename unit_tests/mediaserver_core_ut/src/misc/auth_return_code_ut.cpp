@@ -14,6 +14,7 @@
 #include <api/model/cookie_login_data.h>
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
+#include "utils/common/sleep.h"
 
 class AuthReturnCodeTest : public ::testing::Test
 {
@@ -65,6 +66,11 @@ void testServerReturnCode(
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
     while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
     {
+        if (mediaServerLauncher->port() == 0)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
         QUrl url = mediaServerLauncher->apiUrl();
         url.setPath("/ec2/getUsers");
         if (httpClient.doGet(url))

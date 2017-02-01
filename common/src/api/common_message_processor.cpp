@@ -237,11 +237,17 @@ void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &da
 }
 
 
-void QnCommonMessageProcessor::on_resourceStatusChanged( const QnUuid& resourceId, Qn::ResourceStatus status )
+void QnCommonMessageProcessor::on_resourceStatusChanged(
+    const QnUuid& resourceId,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource source)
 {
+    if (source == ec2::NotificationSource::Local)
+        return; //< ignore local setStatus call. Data already in the resourcePool
+
     QnResourcePtr resource = qnResPool->getResourceById(resourceId);
     if (resource)
-        onResourceStatusChanged(resource, status);
+        onResourceStatusChanged(resource, status, source);
     else
         qnStatusDictionary->setValue(resourceId, status);
 }
@@ -601,12 +607,12 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
                     .arg(resource->getId().toString())
                     .arg(resource->getName())
                     .arg(resource->getUrl()), cl_logDEBUG2);
-            emit resource->statusChanged(resource, Qn::StatusChangeReason::Default);
+            emit resource->statusChanged(resource, Qn::StatusChangeReason::Local);
         }
     }
 
     for(const ec2::ApiResourceStatusData& statusData: params)
-        on_resourceStatusChanged(statusData.id , statusData.status);
+        on_resourceStatusChanged(statusData.id, statusData.status, ec2::NotificationSource::Remote);
 }
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)

@@ -861,8 +861,16 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended && time != DATETIME_NOW)
     {
+        /**
+         * Function m_extTimeSrc->onEofReached is used for EOF logic.
+         * This call is required to prevent unexpected EOF signal after async seek() call.
+         * But variable m_eofSignalSended is used to display state in UI only.
+         * So, I've introduced this hack. Don't update this variable unless 1-st frame will be received.
+         * Otherwise client could get change true -> false -> true state if seek to the same position.
+         */
+
         m_extTimeSrc->onEofReached(this, false);
-        m_eofSignalSended = false;
+        //m_eofSignalSended = false;
     }
     clearUnprocessedData();
     {

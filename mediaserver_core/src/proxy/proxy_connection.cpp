@@ -18,6 +18,7 @@
 #include "transaction/transaction_message_bus.h"
 
 #include <nx/network/socket.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <utils/common/systemerror.h>
@@ -100,15 +101,8 @@ bool QnProxyConnectionProcessor::isProtocol(const QString& protocol) const
 
 int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol)
 {
-    QString p = protocol.toLower();
-    if (p == "http")
-        return 80;
-    else if (p == "https")
-        return 443;
-    else if (p == "rtsp")
-        return 554;
-    else
-        return -1;
+    const auto port = nx::network::url::getDefaultPortForScheme(protocol);
+    return port == 0 ? -1 : port;
 }
 
 bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)

@@ -28,6 +28,7 @@
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
 #include "http/custom_headers.h"
+#include "resource_status_watcher.h"
 
 QnServerMessageProcessor::QnServerMessageProcessor()
 :
@@ -167,7 +168,10 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
+void QnServerMessageProcessor::onResourceStatusChanged(
+    const QnResourcePtr &resource,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource source)
 {
     if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
     {
@@ -178,7 +182,19 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
         manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
     }
-    else {
+    else if (resource->getParentId() == qnCommon->moduleGUID() &&
+        resource.dynamicCast<QnStorageResource>())
+    {
+        NX_LOG(lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
+            .arg(QString::fromLatin1(Q_FUNC_INFO))
+            .arg(resource->getId().toString()), cl_logDEBUG2);
+
+        // Rewrite resource status to DB and send to the foreign peer
+        if (resource->getStatus() != status)
+            QnResourceStatusWatcher::instance()->updateResourceStatus(resource);
+    }
+    else
+    {
         resource->setStatus(status, Qn::StatusChangeReason::GotFromRemotePeer);
     }
 }

@@ -242,7 +242,7 @@ void QnGLRenderer::setBlurFactor(qreal value)
     m_blurFactor = value;
 }
 
-void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
+Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 {
     GLint prevViewPort[4];
     glGetIntegerv(GL_VIEWPORT, prevViewPort);
@@ -259,7 +259,7 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 
     m_blurBufferA->bind();
     static const qreal kOpaque = 1.0;
-    drawVideoData(sourceRect, dstPaintRect, kOpaque);
+    auto result = drawVideoData(sourceRect, dstPaintRect, kOpaque);
     m_blurBufferA->release();
 
     const int kIterations = 8;
@@ -282,6 +282,7 @@ void QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
 
     renderer->setModelViewMatrix(prevMatrix);
     glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+    return result;
 }
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
@@ -301,7 +302,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
         return result;
 
     if (result == Qn::NewFrameRendered)
-        renderBlurFBO(sourceRect);
+        result = renderBlurFBO(sourceRect);
 
     // paint to screen
     const float v_array[] =

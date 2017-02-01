@@ -10,7 +10,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/connect_data.h>
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_client_connections.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
 #include <nx/utils/type_utils.h>
