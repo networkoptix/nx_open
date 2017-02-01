@@ -106,23 +106,24 @@ void LayoutBasedWatcher::at_layoutItemRemoved(const QnUuid& id)
 PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user):
     Watcher(user)
 {
+    NX_ASSERT(user);
+    if (!user)
+        return;
+
     const auto accessProvider = qnResourceAccessProvider;
 
-    if (user)
-    {
-        connect(accessProvider, &QnResourceAccessProvider::accessChanged, this,
-            [this, accessProvider, user]
-            (const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
-            {
-                if (!subject.isUser() || subject.user() != user)
-                    return;
+    connect(accessProvider, &QnResourceAccessProvider::accessChanged, this,
+        [this, accessProvider, user]
+        (const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
+        {
+            if (!subject.isUser() || subject.user() != user)
+                return;
 
-                if (accessProvider->hasAccess(user, resource))
-                    addCamera(resource);
-                else
-                    removeCamera(resource);
-            });
-    }
+            if (accessProvider->hasAccess(user, resource))
+                addCamera(resource);
+            else
+                removeCamera(resource);
+        });
 
     for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
     {
