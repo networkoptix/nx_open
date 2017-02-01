@@ -217,14 +217,15 @@ void QnStorageUrlDialog::accept()
 
     if (storageAlreadyUsed(m_storage.url))
     {
-        const auto extras = tr("It's not recommended to use one recording location for different servers.")
+        const auto extras =
+            tr("It's not recommended to use one recording location for different servers.")
             + L'\n' + tr("Add this storage anyway?");
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,
             tr("Storage path used by another server"),
             extras, QDialogButtonBox::Cancel);
-        messageBox.addButton(tr("Add Storage"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
+        messageBox.addButton(tr("Add Storage"),
+            QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 
         if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;

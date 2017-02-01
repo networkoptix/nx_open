@@ -592,7 +592,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
                         .arg(res->getId().toString())
                         .arg(res->getName())
                         .arg(res->getUrl()), cl_logDEBUG2);
-                emit res->statusChanged(res, Qn::StatusChangeReason::Default);
+                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
             }
         }
     }

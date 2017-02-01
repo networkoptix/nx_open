@@ -1408,7 +1408,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded({ClearLog, ResyncLog});
     }
 
-    if (updateName.endsWith(lit("/84_add_default_webpages.sql")))
+    if (updateName.endsWith(lit("/85_add_default_webpages.sql")))
     {
         return ec2::database::migrations::addDefaultWebpages(m_sdb)
             && resyncIfNeeded(ResyncWebPages);

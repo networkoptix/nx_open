@@ -11,9 +11,10 @@ Item
     id: videoNavigation
 
     property string resourceId
-    property var mediaPlayer
 
-    property bool paused: mediaPlayer.playbackState != QnPlayer.Playing
+    property var videoScreenController
+
+    property bool paused: videoScreenController.mediaPlayer.playbackState !== QnPlayer.Playing
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -24,6 +25,8 @@ Item
         id: d
 
         readonly property bool hasArchive: timeline.startBound > 0
+        readonly property bool liveMode:
+            videoScreenController && videoScreenController.mediaPlayer.liveMode
 
         function updateNavigatorPosition()
         {
@@ -45,7 +48,7 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
-        resourceId: mediaPlayer.resourceId
+        resourceId: videoScreenController.resourceId
     }
 
     Timer
@@ -141,7 +144,7 @@ Item
             width: parent.width
             height: 104
 
-            stickToEnd: mediaPlayer.liveMode && !paused
+            stickToEnd: d.liveMode && !paused
 
             chunkBarHeight: 32
             textY: height - chunkBarHeight - 16 - 24
@@ -153,18 +156,18 @@ Item
             {
                 if (!moving)
                 {
-                    mediaPlayer.position = position
+                    videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
-                        mediaPlayer.play()
+                        videoScreenController.play()
                 }
             }
-            onPositionTapped: mediaPlayer.position = position
+            onPositionTapped: videoScreenController.setPosition(position)
             onPositionChanged:
             {
                 if (!dragging)
                     return
 
-                mediaPlayer.position = position
+                videoScreenController.setPosition(position)
             }
 
             onDraggingChanged:
@@ -172,7 +175,7 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    mediaPlayer.pause()
+                    videoScreenController.pause()
                 }
             }
 
@@ -180,8 +183,8 @@ Item
             {
                 target: timeline
                 property: "position"
-                value: mediaPlayer.position
-                when: !timeline.moving && !mediaPlayer.liveMode
+                value: videoScreenController.mediaPlayer.position
+                when: !timeline.moving && !d.liveMode
             }
         }
 
@@ -302,9 +305,9 @@ Item
                 onClicked:
                 {
                     playbackController.checked = false
-                    mediaPlayer.playLive()
+                    videoScreenController.playLive()
                 }
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -348,7 +351,7 @@ Item
                 text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                 color: ColorTheme.windowText
 
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -358,7 +361,7 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
+                y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
                 Behavior on y { NumberAnimation { duration: 200 } }
 
                 width: timeLabel.visible ? timeLabel.width : liveLabel.width
@@ -368,7 +371,7 @@ Item
                 {
                     id: timeLabel
                     dateTime: timeline.positionDate
-                    visible: !mediaPlayer.liveMode
+                    visible: !d.liveMode
                 }
 
                 Text
@@ -379,7 +382,7 @@ Item
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
-                    visible: mediaPlayer.liveMode
+                    visible: d.liveMode
                 }
             }
         }
@@ -392,14 +395,14 @@ Item
             anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: !paused && (mediaPlayer.loading || timeline.dragging)
+            loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
             paused: videoNavigation.paused
             onClicked:
             {
                 if (paused)
-                    mediaPlayer.play()
+                    videoScreenController.play()
                 else
-                    mediaPlayer.pause()
+                    videoScreenController.pause()
             }
         }
 
@@ -443,7 +446,7 @@ Item
             onDatePicked:
             {
                 close()
-                mediaPlayer.position = date.getTime()
+                videoScreenController.setPosition(date.getTime())
             }
         }
     }
@@ -457,4 +460,10 @@ Item
     }
 
     Component.onCompleted: d.updateNavigatorPosition()
+
+    Connections
+    {
+        target: videoScreenController
+        onPlayerJump: timeline.jumpTo(position)
+    }
 }

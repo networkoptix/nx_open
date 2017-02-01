@@ -16,6 +16,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
+#include <client/client_app_info.h>
 
 #include <ui/common/palette.h>
 #include <ui/models/sorted_server_updates_model.h>
@@ -38,7 +39,6 @@
 #include <update/low_free_space_warning.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/common/app_info.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/connection_diagnostics_helper.h>
 
@@ -443,10 +443,9 @@ void QnServerUpdatesWidget::discardChanges()
         const auto cancelUpdateButton = dialog.addButton(
             tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
         dialog.addButton(
-            tr("Continue in Background"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
+            tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
-        if ((dialog.exec() != QDialogButtonBox::Cancel) &&
-            (dialog.clickedButton() == cancelUpdateButton))
+        if (dialog.clickedButton() == cancelUpdateButton)
         {
             cancelUpdate();
         }
@@ -837,15 +836,15 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
                     {
                         QnMessageBox::success(this,
                             tr("Server update completed"),
-                            tr("Please update %1 Client manually using an installation package.")
-                                .arg(QnAppInfo::productNameLong()));
+                            tr("Please update %1 manually using an installation package.")
+                                .arg(QnClientAppInfo::applicationDisplayName()));
                     }
                     else
                     {
                         QnMessageBox::success(this,
                             tr("Update completed"),
-                            tr("%1 Client will be restarted to the updated version.")
-                                .arg(QnAppInfo::productNameLong()));
+                            tr("%1 will be restarted to the updated version.")
+                                .arg(QnClientAppInfo::applicationDisplayName()));
                     }
                 }
                 else

@@ -289,7 +289,7 @@ PageBase
 
         VideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 
@@ -299,7 +299,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 

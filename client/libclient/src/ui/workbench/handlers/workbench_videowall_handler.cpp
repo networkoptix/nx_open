@@ -17,6 +17,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_app_info.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -84,19 +85,19 @@
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
 
-#include <nx/client/messages/resources_messages.h>
+#include <nx/client/messages/videowall_messages.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 
 #include <nx/utils/collection.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
 #include <utils/unity_launcher_workaround.h>
-#include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -613,10 +614,16 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(
 
 bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) const
 {
+    NX_ASSERT(videowall);
+    if (!videowall)
+        return false;
+
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        qWarning() << "Warning: pc UUID is null, cannot start Video Wall on this pc";
+        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(videowall->getId().toString()), cl_logERROR);
+
         return false;
     }
 
@@ -629,37 +636,33 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     return false;
 }
 
-void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall)
+void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
-    if (!canStartVideowall(videoWall))
-    {
-        NX_ASSERT(false, "Can't reach here because of action condition");
-        return;
-    }
-
-    QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Close %1 Client before starting Video Wall?").arg(QnAppInfo::productNameLong()),
-        QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
-
-    const auto closeButton =
-        dialog.addButton(tr("Close"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    dialog.addButton(tr("Keep"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
-
-    const auto result = dialog.exec();
-    if (result == QDialogButtonBox::Cancel)
-        return;
-
-    if (dialog.clickedButton() == closeButton)
-        closeInstanceDelayed();
-
     QnUuid pcUuid = qnSettings->pcUuid();
-    foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
+    NX_ASSERT(!pcUuid.isNull(), "Action condition must not allow us to get here.");
+    if (pcUuid.isNull())
+        return;
+
+    QList<QnVideoWallItem> items;
+    for (const auto& item: videoWall->items()->getItems())
     {
         if (item.pcUuid != pcUuid || item.runtimeStatus.online)
             continue;
+        items.append(item);
+    }
+    NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
+    if (items.isEmpty())
+        return;
 
+    bool closeCurrentInstance = false;
+    if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+        return;
+
+    if (closeCurrentInstance)
+        closeInstanceDelayed();
+
+    for (const auto& item: items)
+    {
         QStringList arguments;
         arguments << lit("--videowall");
         arguments << videoWall->getId().toString();
@@ -690,7 +693,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 {
     if (!videoWall)
     {
-        qWarning() << "Warning: videowall not exists anymore, cannot open videowall item";
+        NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
         closeInstanceDelayed();
         return;
     }
@@ -1222,10 +1225,12 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnVideoWallResourcePtr videoWall = qnResPool->getResourceById<QnVideoWallResource>(m_videoWallMode.guid);
     if (!videoWall || videoWall->items()->getItems().isEmpty())
     {
-        if (!videoWall)
-            qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
-        else
-            qWarning() << "Warning: videowall is empty, cannot start videowall on this pc";
+        QString message = videoWall
+            ? lit("Warning: videowall %1 is empty, cannot start videowall on this pc")
+            : lit("Warning: videowall %1 not exists, cannot start videowall on this pc");
+
+        NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
+
         QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
         closeInstanceDelayed();
         return;
@@ -1234,7 +1239,9 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
     {
-        qWarning() << "Warning: pc UUID is null, cannot start videowall on this pc";
+        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
+            .arg(m_videoWallMode.guid.toString()), cl_logERROR);
+
         closeInstanceDelayed();
         return;
     }
@@ -1444,7 +1451,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            anotherVideoWallExistMessage(mainWindow());
+            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -1537,7 +1544,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
@@ -1566,7 +1574,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (!validateLicenses(tr("Activate one more license to start the Video Wall.")))
         return;
 
-    startVideowallAndExit(videoWall);
+    switchToVideoWallMode(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
@@ -2062,7 +2070,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
@@ -2319,7 +2328,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const e
     // skip outdated messages and hope for the best
     if (sequence < m_videoWallMode.sequenceByPcUuid[controllerUuid])
     {
-        qWarning() << "outdated control message" << message;
+        NX_ASSERT(false, "outdated control message");
         return;
     }
 
@@ -3043,9 +3052,4 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
     { // e.g. workbench layout is empty
         qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
     }
-}
-
-void QnWorkbenchVideoWallHandler::anotherVideoWallExistMessage(QWidget* parent)
-{
-    QnMessageBox::warning(parent, tr("There is another Video Wall with the same name"));
 }

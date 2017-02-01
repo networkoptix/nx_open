@@ -413,10 +413,16 @@
                             <name>filter</name>
                             <description>This parameter is used for motion search ("periodsType" must be 1).
                                 Match motion on a video by specified rectangle.
-                                <br/>Format: <code>&lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;</code>
-                                <br/>Each "rectI" format: <code>&lt;x,y,width,height&gt;</code>
+                                <br/>Format: string with a JSON list of <i>sensors</i>,
+                                each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+                                <br/><code>{"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>, "height": <i>height</i>}</code>
                                 <br/>All values are measured in relative portions of a video frame,
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
+                                <i>x</i> and <i>width</i> in range [0..43], <i>y</i> and <i>height</i> in range [0..31],
+                                zero is the left-top corner.
+                                <br/>Example of a full-frame rectangle for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
+                                <br/>Example of two rectangles for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
                             </description>
                             <optional>true</optional>
                         </param>
@@ -457,125 +463,7 @@
                                 </value>
                                 <value>
                                     <name>1</name>
-                                    <description>Only chunks with motion (parameter "motionRegions" is required).</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>keepSmallChunks</name>
-                            <optional>true</optional>
-                            <description>If specified, standalone chunks smaller than the detail
-                            level are not removed from the result.</description>
-                        </param>
-                        <param>
-                            <name>limit</name>
-                            <optional>true</optional>
-                            <description>Maximum number of chunks to return.</description>
-                        </param>
-                        <param>
-                            <name>flat</name>
-                            <optional>true</optional>
-                            <description>If specified, do not group chunk lists by server.</description>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:
-                          if no "flat" parameter is specified,
-                          "reply" field is the list which contains for each server its GUID (as "guid"
-                          field) and the list of chunks (as "periods" field); if "flat" parameter
-                          is specified, "reply" field is just the list of chunks.
-                          <br/>Each chunk is a pair of <code>(durationMs, startTimeMs)</code>.
-                          Chunks are merged for all requested cameras.
-                          Start time and duration are in milliseconds since epoch.
-                          Duration of -1 means the last chunk is being recorded now.</caption>
-                    </result>
-                </function>
-                <function>
-                    <name>recordedTimePeriods</name>
-                    <description>Return the recorded chunks info for the specified cameras.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>id</name>
-                            <description>Camera unique id.
-                                This parameter can be used several times to define a list of cameras.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>physicalId</name>
-                            <description>Camera physical id.
-                                This parameter can be used several times to define a list of cameras.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>mac</name>
-                            <description>Camera MAC address.
-                                This parameter can be used several times to define a list of cameras.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>startTime</name>
-                            <description>Start time of the interval (in milliseconds since epoch,
-                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
-                                auto-detected).</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>endTime</name>
-                            <description>End time of the interval (in milliseconds since epoch,
-                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
-                                auto-detected).</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>filter</name>
-                            <description>This parameter is used for motion search ("periodsType" must be 1).
-                                Match motion on a video by specified rectangle.
-                                <br/>Format: <code>&lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;</code>
-                                <br/>Each "rectI" format: <code>&lt;x,y,width,height&gt;</code>
-                                <br/>All values are measured in relative portions of a video frame,
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
-                            </description>
-                            <optional>true</optional>
-                        </param>
-                        <param proprietary="true">
-                            <name>format</name>
-                            <description>Data format. Default value is "json".</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>ubjson</name>
-                                    <description>Universal Binary JSON data format.</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>JSON data format.</description>
-                                </value>
-                                <value>
-                                    <name>periods</name>
-                                    <description>Internal comperssed binary format.</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>detail</name>
-                            <description>Chunk detail level, in microseconds. Time periods
-                                that are shorter than the detail level are discarded. You can treat
-                                the detail level as the amount of microseconds per screen pixel.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>periodsType</name>
-                            <description>Chunk type.</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>0</name>
-                                    <description>All records.</description>
-                                </value>
-                                <value>
-                                    <name>1</name>
-                                    <description>Only chunks with motion (parameter "motionRegions" is required).</description>
+                                    <description>Only chunks with motion (parameter "filter" is required).</description>
                                 </value>
                             </values>
                         </param>

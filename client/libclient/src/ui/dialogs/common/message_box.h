@@ -23,6 +23,15 @@ enum class QnMessageBoxIcon
     Success
 };
 
+enum class QnButtonDetection
+{
+    NoDetection = 0x0,
+    DefaultButton = 0x1,
+    EscapeButton = 0x2
+};
+Q_DECLARE_FLAGS(QnButtonDetections, QnButtonDetection)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnButtonDetections)
+
 enum class QnButtonAccent
 {
     NoAccent,
@@ -102,17 +111,16 @@ public:
 public:
     virtual ~QnMessageBox();
 
-    QPushButton* addCustomButton(QnMessageBoxCustomButton button);
     QPushButton* addCustomButton(
         QnMessageBoxCustomButton button,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent);
+        QnButtonAccent accent = QnButtonAccent::NoAccent);
 
     void addButton(QAbstractButton *button, QDialogButtonBox::ButtonRole role);
     QPushButton* addButton(
         const QString &text,
         QDialogButtonBox::ButtonRole role,
-        QnButtonAccent accent);
+        QnButtonAccent accent = QnButtonAccent::NoAccent);
     QPushButton* addButton(QDialogButtonBox::StandardButton button);
     void removeButton(QAbstractButton *button);
 
@@ -169,6 +177,9 @@ public:
 
     bool isChecked() const;
     void setChecked(bool checked);
+
+
+    void setButtonAutoDetection(QnButtonDetection detection);
 
     virtual int exec() override;
 

@@ -6,14 +6,21 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/ec_api.h>
+#include <nx/utils/singleton.h>
 
-class QnResourceStatusWatcher : public QObject
+class QnResourceStatusWatcher:
+    public QObject,
+    public Singleton<QnResourceStatusWatcher>
 {
     Q_OBJECT
 public:
     QnResourceStatusWatcher();
+    void updateResourceStatus(const QnResourcePtr& resource);
+signals:
+    void statusChanged(const QnResourcePtr& resource);
 private slots:
     void at_resource_statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason reason);
+    void updateResourceStatusInternal(const QnResourcePtr& resource);
 private:
     bool isSetStatusInProgress(const QnResourcePtr &resource);
     void updateResourceStatusAsync(const QnResourcePtr &resource);

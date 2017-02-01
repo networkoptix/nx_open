@@ -7,7 +7,7 @@
 namespace nx {
 namespace test {
 
-TEST(BookmarksGet, invalidData)
+TEST(BookmarksGet, noBookmarks)
 {
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());

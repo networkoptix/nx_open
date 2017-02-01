@@ -9,7 +9,7 @@ namespace nx {
 namespace stun {
 
 class NX_NETWORK_API AbstractAsyncClient:
-    public network::aio::Timer
+    public network::aio::BasicPollable
 {
 public:
     struct Settings
@@ -35,6 +35,7 @@ public:
     typedef std::function<void()> ReconnectHandler;
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, Message)> RequestHandler;
+    typedef std::function<void()> TimerHandler;
 
     /** Asynchronously openes connection to the server
      *
@@ -75,6 +76,10 @@ public:
      */
     virtual void sendRequest(
         Message request, RequestHandler handler, void* client = 0) = 0;
+
+    /** Schedules repetable timer until disconnect */
+    virtual void addConnectionTimer(
+        std::chrono::milliseconds period, TimerHandler handler, void* client) = 0;
 
     /** Returns local address if client is connected to the server */
     virtual SocketAddress localAddress() const = 0;

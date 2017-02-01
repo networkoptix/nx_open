@@ -90,7 +90,8 @@ bool Resources::overrideLayout(QWidget* parent)
     messageBox.setText(tr("Overwrite existing layout?"));
     messageBox.setInformativeText(tr("There is another layout with the same name."));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
@@ -150,7 +151,8 @@ bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layou
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     return (messageBox.exec() != QDialogButtonBox::Cancel);
 }
@@ -262,7 +264,8 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     messageBox.setText(text);
     messageBox.setInformativeText(extras);
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, true));
     messageBox.setCheckBoxEnabled();
 

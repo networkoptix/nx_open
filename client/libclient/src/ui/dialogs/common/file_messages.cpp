@@ -10,7 +10,8 @@ bool QnFileMessages::confirmOverwrite(
         tr("Overwrite existing file?"), fileName,
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     return (dialog.exec() != QDialogButtonBox::Cancel);
 }
 
