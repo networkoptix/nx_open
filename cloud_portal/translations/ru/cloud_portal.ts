@@ -20,47 +20,57 @@
     <message>
       <location/>
       <source>Save</source>
-      <translation>Сохранить</translation>
+      <translation>Спасти</translation>
     </message>
     <message>
       <location/>
-      <source>Log in to</source>
-      <translation>Войти в</translation>
+      <source>Share</source>
+      <translation>Поделиться</translation>
     </message>
     <message>
       <location/>
-      <source>You are already logged in to portal.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Log out to continue, or cancel to go to your systems</source>
-      <translation> </translation>
+      <source>Continue with current account</source>
+      <translation>Продолжить с этой учетной записью</translation>
     </message>
     <message>
       <location/>
       <source>Ok</source>
-      <translation>Да</translation>
+      <translation>Ладушки</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cancel</source>
+      <translation>Нетушки</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Log in to PRODUCT_NAME</source>
+      <translation>Войти в PRODUCT_NAME</translation>
     </message>
     <message>
       <location/>
       <source>Log out</source>
-      <translation>Выйти</translation>
+      <translation>Отойти</translation>
+    </message>
+    <message>
+      <location/>
+      <source>You are already logged in</source>
+      <translation>Уже вошли</translation>
     </message>
     <message>
       <location/>
       <source>You are going to restrict the access to this user. Are you sure?</source>
-      <translation> </translation>
+      <translation>Уверенность есть?</translation>
     </message>
     <message>
       <location/>
       <source>System was successfully disconnected from PRODUCT_NAME</source>
-      <translation> </translation>
+      <translation>Система успешнь отсоединена от PRODUCT_NAME</translation>
     </message>
     <message>
       <location/>
       <source>System is unreachable</source>
-      <translation> </translation>
+      <translation>Система недоступна</translation>
     </message>
     <message>
       <location/>
@@ -79,8 +89,13 @@
     </message>
     <message>
       <location/>
+      <source>IMeMyMine</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Your system</source>
-      <translation>Ваша система</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
@@ -90,12 +105,12 @@
     <message>
       <location/>
       <source>Disconnect</source>
-      <translation>Отключить</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Удалить</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
@@ -105,12 +120,12 @@
     <message>
       <location/>
       <source>Save</source>
-      <translation>Сохранить</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Open in</source>
-      <translation>Открыть в</translation>
+      <source>Open in VMS_NAME</source>
+      <translation> </translation>
     </message>
     <message>
       <location/>
@@ -130,7 +145,7 @@
     <message>
       <location/>
       <source>System name</source>
-      <translation>Имя системы</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
@@ -139,17 +154,107 @@
     </message>
     <message>
       <location/>
-      <source>en</source>
+      <source>LANGUAGE</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Download</source>
-      <translation>Скачать</translation>
+      <source>x86</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>x64</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>X</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>x64</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>x86</source>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Install VMS_NAME to view your system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>ANDROID_APP_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>IOS_APP_LINK</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Windows</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mac OS</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ubuntu</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ubuntu Linux</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Download VMS_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Client only</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Configuration tool</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Client &amp; Server</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Server only</source>
       <translation> </translation>
     </message>
     <message>
@@ -179,7 +284,107 @@
     </message>
     <message>
       <location/>
-      <source>{{portalDomain}}</source>
+      <source>Not found</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This user already has administrator permissions.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>ok</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cloud DB returned an unexpected response.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account hasn't been activated yet. &lt;a href=&quot;/activate&quot;&gt;Send activation link again&lt;/a&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Changing own permissions is not allowed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System not found.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This email has not been registered in portal.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You do not have permissions to perform this action.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Some parameters on the form are incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login or password are incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This email address has been already registered.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>You don't have access to this system.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Account was already activated or confirmation code is incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Current password is incorrect.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account has been already activated.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unexpected error occured.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Already exists</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wrong password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>VMS_NAME application was not detected. &lt;a href=&quot;/download&quot;&gt;Download&lt;/a&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This account has been blocked.</source>
       <translation> </translation>
     </message>
     <message>
@@ -295,111 +500,6 @@
     <message>
       <location/>
       <source>CLIENT_PROTOCOL:</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Not found</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This user already has administrator permissions.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>ok</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Cloud DB returned an unexpected response.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This account hasn't been activated yet. &lt;a href=&quot;/activate&quot;&gt;Send activation link again&lt;/a&gt;</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Changing own permissions is not allowed.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System not found.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This email has not been registered in portal.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You do not have permissions to perform this action.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Some parameters on the form are incorrect.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Login or password are incorrect.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This email address has been already registered.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You don't have access to this system.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Account was already activated or confirmation code is incorrect.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Current password is incorrect.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This account has been already activated.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Unexpected error occured.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Already exists</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wrong password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>VMS_NAME application was not detected. &lt;a href=&quot;/download&quot;&gt;Download&lt;/a&gt;</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This account has been blocked.</source>
       <translation> </translation>
     </message>
     <message>
@@ -590,11 +690,6 @@
     </message>
     <message>
       <location/>
-      <source>readonly</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Save</source>
       <translation> </translation>
     </message>
@@ -628,7 +723,7 @@
     </message>
     <message>
       <location/>
-      <source>We've sent a password reset message to your email address. Open it up to reset the password.</source>
+      <source>--&gt;We've sent a password reset message to your email address. Open it up to reset the password.</source>
       <translation> </translation>
     </message>
     <message>
@@ -653,6 +748,11 @@
     </message>
     <message>
       <location/>
+      <source>We've sent a password reset message to your email address. Open it up to reset the password.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Reset Password</source>
       <translation> </translation>
     </message>
@@ -668,22 +768,7 @@
     </message>
     <message>
       <location/>
-      <source>activate</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/login</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/login&quot; validate-email</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Send&quot; validate-email</source>
+      <source>Send</source>
       <translation> </translation>
     </message>
     <message>
@@ -826,27 +911,12 @@
     </message>
     <message>
       <location/>
-      <source>{id:'dummy',isOnline:true}</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>danger</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Danger</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Standard</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>default</source>
       <translation> </translation>
     </message>
     <message>
@@ -860,16 +930,21 @@
     <message>
       <location filename="views/download.html"/>
       <source>Download</source>
-      <translation>Скачать</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Latest version</source>
-      <translation>Свежак</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>What's new?</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
     <message>
@@ -922,6 +997,11 @@
     </message>
     <message>
       <location/>
+      <source>Create account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>First name</source>
       <translation> </translation>
     </message>
@@ -967,7 +1047,12 @@
     </message>
     <message>
       <location/>
-      <source>By clicking 'Create Account', you agree to our</source>
+      <source>By clicking 'Create Account', you agree</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>to</source>
       <translation> </translation>
     </message>
     <message>
@@ -977,17 +1062,7 @@
     </message>
     <message>
       <location/>
-      <source>validate-email readonly</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Password</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/content/eula</source>
       <translation> </translation>
     </message>
     <message>
@@ -1009,32 +1084,17 @@
       <source>You do not have access to the system information.</source>
       <translation> </translation>
     </message>
-    <message>
-      <location/>
-      <source>gettingSystem&quot;</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>views/systems.html</name>
     <message>
       <location filename="views/systems.html"/>
       <source>Systems</source>
-      <translation>Системы</translation>
-    </message>
-    <message>
-      <location/>
-      <source>gettingSystems</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Search</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>system&quot;</source>
+      <source>Search&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1048,16 +1108,6 @@
     <message>
       <location/>
       <source>Close</source>
-      <translation>Закрыть</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Cancel</source>
-      <translation>Отменить</translation>
-    </message>
-    <message>
-      <location/>
-      <source>modal&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1066,7 +1116,7 @@
     <message>
       <location filename="views/components/footer.html"/>
       <source>About</source>
-      <translation>О</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
@@ -1075,23 +1125,33 @@
     </message>
     <message>
       <location/>
-      <source>Download</source>
-      <translation>Скачать</translation>
+      <source>Download VMS_NAME</source>
+      <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Help</source>
-      <translation>Помощь</translation>
+      <source>Known limitations</source>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation>Поддержка</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Terms</source>
-      <translation>Условия</translation>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;copy; 2017 COMPANY_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>language-select</source>
+      <translation> </translation>
     </message>
   </context>
   <context>
@@ -1099,59 +1159,62 @@
     <message>
       <location filename="views/components/header.html"/>
       <source>About</source>
-      <translation>О!</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Systems</source>
-      <translation>Системы</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Log in</source>
-      <translation>Войти</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Create Account</source>
-      <translation>Зарегистрироваться</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Account Settings</source>
-      <translation>Настройки</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Change Password</source>
-      <translation>Сменить пароль</translation>
+      <translation> </translation>
     </message>
     <message>
       <location/>
       <source>Log out</source>
-      <translation>Выйти</translation>
+      <translation> </translation>
     </message>
+    <message>
+      <location/>
+      <source>/content/about</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>views/components/language-select.html</name>
   </context>
   <context>
     <name>views/components/open-client-button.html</name>
     <message>
       <location filename="views/components/open-client-button.html"/>
-      <source>default</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>!system.isOnline &amp;&amp;</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>=Config.systemStatuses.onlineStatus</source>
+      <source>=$root.C.systemStatuses.onlineStatus</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>L.system.openClient&quot;</source>
+      <source>$root.L.system.openClient&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1164,43 +1227,32 @@
     </message>
     <message>
       <location/>
-      <source>fair&lt;span class=&quot;label label-danger&quot; ng-if=&quot;passwordInput.password.$error.weak &amp;&amp;
-                  !passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.minlength&quot; title=&quot;&quot;&gt;weak&lt;span class=&quot;label label-danger&quot; ng-if=&quot;passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.minlength &amp;&amp;
-                  !passwordInput.password.$error.required&quot; title=&quot;&quot;&gt;too common&lt;span class=&quot;label label-danger&quot; ng-if=&quot;passwordInput.password.$error.minlength &amp;&amp;
-                  !passwordInput.password.$error.pattern&quot; title=&quot;&quot;&gt;too short</source>
+      <source>fair</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>incorrect&lt;span ng-if=&quot;passwordInput.password.$error.weak &amp;&amp;
-                  !passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.required&quot;span ng-if=&quot;passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.required&quot;span ng-if=&quot;passwordInput.password.$error.minlength &amp;&amp;
-                  !passwordInput.password.$error.pattern&quot;&gt;Password is required.</source>
+      <source>weak</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>&amp;&amp;
-                  !passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.minlength&quot;  &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.minlength &amp;&amp;
-                  !passwordInput.password.$error.required&quot;  &amp;&amp;
-                  !passwordInput.password.$error.pattern&quot;   &amp;&amp;
-                  !passwordInput.password.$error.common &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.required&quot; &amp;&amp;
-                  !passwordInput.password.$error.pattern &amp;&amp;
-                  !passwordInput.password.$error.required&quot; &amp;&amp;
-                  !passwordInput.password.$error.pattern&quot;</source>
+      <source>too common</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>too short</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incorrect</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password is required.</source>
       <translation> </translation>
     </message>
   </context>
@@ -1257,11 +1309,6 @@
       <source>&amp;nbsp;</source>
       <translation> </translation>
     </message>
-    <message>
-      <location/>
-      <source>system&quot;</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>views/components/system-users.html</name>
@@ -1293,11 +1340,6 @@
     <message>
       <location/>
       <source>&amp;nbsp;&amp;nbsp;Delete</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>gettingSystemUsers</source>
       <translation> </translation>
     </message>
     <message>
@@ -1340,12 +1382,7 @@
     </message>
     <message>
       <location/>
-      <source>danger</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>L.system.confirmDisconnectAction&quot;</source>
+      <source>$root.L.system.confirmDisconnectAction&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1373,17 +1410,7 @@
     </message>
     <message>
       <location/>
-      <source>validate-email</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Log in</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/restore_password&quot;</source>
+      <source>Log in&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1401,12 +1428,7 @@
     </message>
     <message>
       <location/>
-      <source>primary</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>L.system.confirmRenameAction&quot;</source>
+      <source>$root.L.system.confirmRenameAction&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1430,11 +1452,6 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>validate-email readonly</source>
       <translation> </translation>
     </message>
     <message>
@@ -1525,10 +1542,10 @@
     </message>
   </context>
   <context>
-    <name>views/static/help.html</name>
+    <name>views/static/faq.html</name>
     <message>
-      <location filename="views/static/help.html"/>
-      <source>How to use</source>
+      <location filename="views/static/faq.html"/>
+      <source>Known limitations in</source>
       <translation> </translation>
     </message>
     <message>
@@ -1538,7 +1555,32 @@
     </message>
     <message>
       <location/>
-      <source>How to connect system to the cloud</source>
+      <source>Remote connectivity.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>In order to get remote connectivity to work without port forwarding, DDNS, VPN etc, software has to &quot;punch the UDP hole&quot; on the client side as well as on the server side. Success depends on many factors such as router model/firmware, ISP network type (cell, cable, wi-fi) and infrastructure, country etc. In spite of working well in general (based on our observations), it may not work in a particular case. Thus, there is a chance to face the situation where it's possible to connect to the system from one network/place and impossible from another. If the issue is met it could be fixed by manual port forwarding setup. DDNS is never needed (even in a case of non-static public IP address).</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cloud System Merge.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cloud systems merging is not supported at the moment. A local system could be merged with the cloud one at any given time. So in order to merge 2 cloud systems one should be disconnected from the cloud.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Offline Login.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Cloud credentials cannot be used to connect to the system which has no Internet at the moment. In order to connect to such system locally (such as &quot;admin&quot;) local user login credentials should be used.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1548,7 +1590,7 @@
     </message>
     <message>
       <location/>
-      <source>If you have more questions,</source>
+      <source>If you have any questions,</source>
       <translation> </translation>
     </message>
     <message>
@@ -1612,11 +1654,6 @@
     <message>
       <location/>
       <source>Create account now</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>/register&quot;</source>
       <translation> </translation>
     </message>
   </context>
