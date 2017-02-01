@@ -130,6 +130,7 @@ Drawer
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
                 onClicked: Workflow.openSettingsScreen()
+                visible: false
             }
 
             SideNavigationButton
