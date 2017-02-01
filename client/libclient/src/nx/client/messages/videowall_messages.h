@@ -11,6 +11,8 @@ public:
     static void anotherVideoWall(QWidget* parent);
 
     static bool switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstanse);
+
+    static void localFilesForbidden(QWidget* parent);
 };
 
 

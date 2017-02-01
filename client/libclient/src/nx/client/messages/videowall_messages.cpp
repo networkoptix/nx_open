@@ -33,6 +33,14 @@ bool VideoWall::switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstans
     return result != QDialogButtonBox::Cancel;
 }
 
+void VideoWall::localFilesForbidden(QWidget* parent)
+{
+    QnMessageBox::warning(parent,
+        tr("Local files can't be placed on Video Wall Screen attached to another computer"),
+        tr("To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.")
+        );
+}
+
 } // namespace messages
 } // namespace client
 } // namespace nx

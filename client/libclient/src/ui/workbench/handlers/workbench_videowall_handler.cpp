@@ -1929,10 +1929,16 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     {
         case Action::AddAction:
         case Action::SetAction:
-            resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            if (checkLocalFiles(targetIndex, targetLayout))
+                resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         case Action::SwapAction:
-            swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
+                swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         default:
             break;
@@ -2987,6 +2993,29 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
     }
 
+}
+
+bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& index,
+    const QnLayoutResourcePtr& layout)
+{
+    if (!layout)
+        return true;
+
+    const bool itemBelongsToThisPc = index.item().pcUuid == qnSettings->pcUuid();
+    if (itemBelongsToThisPc)
+        return true;
+
+    bool hasLocalFiles = boost::algorithm::any_of(layout->layoutResources(),
+        [](const QnResourcePtr& resource)
+        {
+            return resource->hasFlags(Qn::local_media);
+        });
+
+    if (!hasLocalFiles)
+        return true;
+
+    nx::client::messages::VideoWall::localFilesForbidden(mainWindow());
+    return false;
 }
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const
