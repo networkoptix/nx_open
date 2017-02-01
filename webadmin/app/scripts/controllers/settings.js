@@ -144,7 +144,10 @@ angular.module('webadminApp')
             });
         }
 
-        function errorHandler(){
+        function errorHandler(result){
+            if(result == 'cancel'){ // That's fine, dialog was cancelled
+                return false;
+            }
             dialogs.alert (L.settings.connnetionError);
             return false;
         }
