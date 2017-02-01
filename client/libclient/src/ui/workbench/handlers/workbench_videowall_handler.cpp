@@ -3001,21 +3001,8 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    const bool itemBelongsToThisPc = index.item().pcUuid == qnSettings->pcUuid();
-    if (itemBelongsToThisPc)
-        return true;
-
-    bool hasLocalFiles = boost::algorithm::any_of(layout->layoutResources(),
-        [](const QnResourcePtr& resource)
-        {
-            return resource->hasFlags(Qn::local_media);
-        });
-
-    if (!hasLocalFiles)
-        return true;
-
-    nx::client::messages::VideoWall::localFilesForbidden(mainWindow());
-    return false;
+    return nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+        layout->layoutResources().toList());
 }
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const

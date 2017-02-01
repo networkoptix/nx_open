@@ -1,8 +1,15 @@
 #include "videowall_messages.h"
 
+#include <client/client_app_info.h>
+#include <client/client_settings.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+
 #include <ui/dialogs/common/message_box.h>
 
-#include <client/client_app_info.h>
+#include <utils/common/delayed.h>
 
 namespace nx {
 namespace client {
@@ -33,13 +40,40 @@ bool VideoWall::switchToVideoWallMode(QWidget* parent, bool* closeCurrentInstans
     return result != QDialogButtonBox::Cancel;
 }
 
-void VideoWall::localFilesForbidden(QWidget* parent)
+bool VideoWall::checkLocalFiles(QWidget* parent,
+    const QnVideoWallItemIndex& index,
+    const QnResourceList& resources,
+    bool displayDelayed)
 {
-    QnMessageBox::warning(parent,
-        tr("Local files can't be placed on Video Wall Screen attached to another computer"),
-        tr("To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.")
-        );
+    const bool itemBelongsToThisPc = index.item().pcUuid == qnSettings->pcUuid();
+    if (itemBelongsToThisPc)
+        return true;
+
+    bool hasLocalFiles = boost::algorithm::any_of(resources,
+        [](const QnResourcePtr& resource)
+        {
+            return resource->hasFlags(Qn::local_media);
+        });
+
+    if (!hasLocalFiles)
+        return true;
+
+    auto execMessage = [parent]
+        {
+            QnMessageBox::warning(parent,
+                tr("Local files can't be placed on Video Wall Screen attached to another computer"),
+                tr("To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.")
+            );
+        };
+
+    if (displayDelayed)
+        executeDelayedParented(execMessage, kDefaultDelay, parent);
+    else
+        execMessage();
+
+    return false;
 }
+
 
 } // namespace messages
 } // namespace client
