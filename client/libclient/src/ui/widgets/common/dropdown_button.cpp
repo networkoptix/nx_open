@@ -1,6 +1,6 @@
 #include "dropdown_button.h"
 
-#include <private/qpushbutton_p.h>
+#include <QtWidgets/private/qpushbutton_p.h>
 
 #include <ui/common/geometry.h>
 #include <ui/style/helper.h>
