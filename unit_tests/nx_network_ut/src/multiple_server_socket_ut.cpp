@@ -153,7 +153,7 @@ TEST_F(MultipleServerSocket, add_remove)
     connectionGenerator.pleaseStopSync();
 }
 
-TEST_F(MultipleServerSocket, add_remove2)
+TEST_F(MultipleServerSocket, existing_sockets_are_handled_properly_after_adding_a_new_one)
 {
     addRegularTcpServerSocket();
     startAccepting();
