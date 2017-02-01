@@ -347,13 +347,13 @@ public:
         return m_eof;
     }
 
-    bool asyncSend(
+    void asyncSend(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& handler);
+        std::function<void(SystemError::ErrorCode, std::size_t)> handler);
 
-    bool asyncRecv(
+    void asyncRecv(
         nx::Buffer* buffer,
-        std::function<void(SystemError::ErrorCode,std::size_t)>&& handler);
+        std::function<void(SystemError::ErrorCode, std::size_t)> handler);
 
     void clear()
     {
@@ -856,25 +856,20 @@ void SslAsyncBioHelper::asyncPerform(SslAsyncOperation* operation)
     }
 }
 
-bool SslAsyncBioHelper::asyncSend(
+void SslAsyncBioHelper::asyncSend(
     const nx::Buffer& buffer,
-    std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
+    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
-    NX_ASSERT(m_handshakeStage == HANDSHAKE_DONE || !m_isServer,
-        "SSL server is not supposed to send before recv");
-
-    m_write->reset(&buffer,std::move(handler));
+    m_write->reset(&buffer, std::move(handler));
     asyncPerform(m_write.get());
-    return true;
 }
 
-bool SslAsyncBioHelper::asyncRecv(
+void SslAsyncBioHelper::asyncRecv(
     nx::Buffer* buffer,
-    std::function<void(SystemError::ErrorCode,std::size_t)>&& handler)
+    std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
-    m_read->reset(buffer,std::move(handler));
+    m_read->reset(buffer, std::move(handler));
     asyncPerform(m_read.get());
-    return true;
 }
 
 class MixedSslAsyncBioHelper : public SslAsyncBioHelper
@@ -905,17 +900,15 @@ public:
         m_isSsl(false)
     {}
 
-    // User could not issue a async_send before a async_recv . Otherwise
-    // we are in trouble since we don't know the type of the underly socking
     void asyncSend(
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& op)
     {
-            // When you see this, it means you screw up since the very first call should
-            // be a async_recv instead of async_send here .
-            NX_ASSERT(m_isInitialized);
-            NX_ASSERT(m_isSsl);
-            SslAsyncBioHelper::asyncSend(buffer,std::move(op));
+        // We have to recive some data at first to be able to understand if this connection
+        // is secure or not by analyzing client's request.
+        NX_ASSERT(m_isInitialized);
+        NX_ASSERT(m_isSsl);
+        SslAsyncBioHelper::asyncSend(buffer,std::move(op));
     }
 
     void asyncRecv(
@@ -1984,8 +1977,16 @@ void MixedSslSocket::sendAsync(
     if (!d->initState && !d->useSSL)
         return d->wrappedSocket->sendAsync(buffer, std::move(handler));
 
+
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
-    if (helper->is_initialized() && !helper->is_ssl())
+    if (!helper->is_initialized())
+    {
+        NX_ASSERT(false, "SSL server is not supposed to send before recv");
+        return d->wrappedSocket->post(
+            [handler = std::move(handler)]() { handler(SystemError::notSupported, (size_t) -1); });
+    }
+
+    if (!helper->is_ssl())
         return d->wrappedSocket->sendAsync(buffer,std::move(handler));
 
     d->wrappedSocket->dispatch(
@@ -1997,7 +1998,7 @@ void MixedSslSocket::sendAsync(
             if (!d->initState)
                 helper->set_ssl(d->useSSL);
 
-            if (helper->is_initialized() && !helper->is_ssl())
+            if (!helper->is_ssl())
                 return d->wrappedSocket->sendAsync(buffer, std::move(handler));
 
             d->wrappedSocket->post(
