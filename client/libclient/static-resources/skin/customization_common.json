@@ -627,7 +627,10 @@
 
     "QnCalendarWidget": {
         "palette": { "default": {
-            "highlight": "dark4"
+            "highlight": "dark4",
+            "base":  "dark7",
+            "alternateBase": "dark7",
+            "window": "dark7"
         }}
     },
 

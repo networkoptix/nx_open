@@ -35,6 +35,7 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -3839,7 +3840,8 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion))
+                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                    && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
                     QnObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
