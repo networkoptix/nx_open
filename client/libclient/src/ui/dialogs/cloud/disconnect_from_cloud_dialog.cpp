@@ -56,6 +56,14 @@ public:
     void showFailure(const QString &message = QString());
 
     void setupUi();
+    enum class VisibleButton
+    {
+        Ok,
+        Next
+    };
+
+    void setVisibleButton(VisibleButton button);
+
     bool validateAuth();
 private:
     Scenario calculateScenario() const;
@@ -223,6 +231,21 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
     lockUi(false);
 }
 
+void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
+{
+    const bool okButtonVisible = (button == VisibleButton::Ok);
+    const auto style = static_cast<QnButtonAccent>(okButtonVisible
+        ? QnButtonAccent::Warning
+        : QnButtonAccent::Standard);
+    const auto defaultButton = (okButtonVisible ? okButton : nextButton);
+
+    okButton->setVisible(okButtonVisible);
+    nextButton->setVisible(!okButtonVisible);
+
+    Q_Q(QnDisconnectFromCloudDialog);
+    q->setDefaultButton(defaultButton, style);
+}
+
 void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
@@ -231,13 +254,12 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
     okButton = new QnBusyIndicatorButton(q);
     okButton->setText(tr("Disconnect"));
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
-    setWarningButtonStyle(okButton);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
-    setAccentStyle(nextButton);
     q->addButton(nextButton, QDialogButtonBox::ActionRole);
-    nextButton->setVisible(false);
+
+    setVisibleButton(VisibleButton::Ok);
 
     switch (scenario)
     {
@@ -250,7 +272,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            q->setDefaultButton(okButton);
+            setVisibleButton(VisibleButton::Ok);
             break;
         }
         case Scenario::CloudOwner:
@@ -264,7 +286,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            q->setDefaultButton(okButton);
+            setVisibleButton(VisibleButton::Ok);
             break;
         }
         case Scenario::CloudOwnerOnly:
@@ -272,9 +294,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
             q->setText(enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            okButton->setVisible(false);
-            nextButton->setVisible(true);
-            q->setDefaultButton(nextButton);
+            setVisibleButton(VisibleButton::Next);
             nextButton->disconnect(this);
             connect(nextButton, &QPushButton::clicked, this,
                 &QnDisconnectFromCloudDialogPrivate::validateCloudPassword);
@@ -285,7 +305,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
             q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(tr("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
-            q->setDefaultButton(okButton);
+            q->setDefaultButton(okButton, QnButtonAccent::Warning);
             break;
     }
 
@@ -413,9 +433,8 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
         + disconnectWarnMessage());
     q->removeCustomWidget(resetPasswordWidget);
     resetPasswordWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
-    nextButton->setVisible(false);
-    okButton->setVisible(true);
-    q->setDefaultButton(okButton);
+
+    setVisibleButton(VisibleButton::Ok);
 }
 
 void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()

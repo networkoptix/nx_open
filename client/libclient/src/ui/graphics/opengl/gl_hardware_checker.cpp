@@ -1,9 +1,12 @@
 #include "gl_hardware_checker.h"
 
-#include <nx/utils/log/log.h>
+#include <client/client_app_info.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/software_version.h>
-#include <utils/common/app_info.h>
+
+#include <nx/utils/log/log.h>
+
 
 bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     QByteArray extensionsString = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
@@ -32,7 +35,7 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     {
         QnMessageBox::warning(nullptr,
             tr("Video card drivers are outdated or not installed"),
-            tr("%1 Client may not work properly.").arg(QnAppInfo::productNameLong()));
+            tr("%1 may not work properly.").arg(QnClientAppInfo::applicationDisplayName()));
     }
 
     return contextIsValid;

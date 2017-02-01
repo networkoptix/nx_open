@@ -94,9 +94,9 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
             .arg(settings.server)
             .arg(port)
             .arg(SmtpClient::toString(connectionType))
-            .arg(SystemError::toString(errorCode)
+            .arg(SystemError::toString(errorCode))
             .arg(lastSmtpResult.toString())
-            ), cl_logWARNING );
+            , cl_logWARNING );
         return lastSmtpResult;
     }
 
@@ -108,8 +108,8 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
             NX_LOG( lit("SMTP. Failed to login to %1:%2 Error: %3")
                 .arg(settings.server)
                 .arg(port)
-                .arg(lastSmtpResult.toString()
-                ), cl_logWARNING );
+                .arg(lastSmtpResult.toString())
+                , cl_logWARNING );
             smtp.quit();
             return lastSmtpResult;
         }
@@ -122,9 +122,9 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
         NX_LOG( lit("SMTP. Failed to send mail to %1:%2. %3 Error %4")
             .arg(settings.server)
             .arg(port)
-            .arg(SystemError::toString(errorCode)
+            .arg(SystemError::toString(errorCode))
             .arg(lastSmtpResult.toString())
-            ), cl_logWARNING );
+            , cl_logWARNING );
         smtp.quit();
         return lastSmtpResult;
     }

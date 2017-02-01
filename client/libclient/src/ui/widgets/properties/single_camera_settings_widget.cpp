@@ -773,10 +773,11 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
-        tr("Set Recording to \"Always\""), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+        tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
     dialog.addButton(
-        tr("Enable Secondary Stream"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+        tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
 
+    dialog.setButtonAutoDetection(QnButtonDetection::EscapeButton);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return  false;
 
@@ -911,7 +912,8 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Reset,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
