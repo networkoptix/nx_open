@@ -20,7 +20,8 @@ class DnsResolver:
 public:
     DnsResolver():
         m_prevResolveRequestId(0),
-        m_expectedResponseCount(0)
+        m_expectedResponseCount(0),
+        m_timeShifted(false)
     {
         using namespace std::placeholders;
 
@@ -44,7 +45,7 @@ protected:
         startResolveAsync(easyToResolveHost);
     }
 
-    void assertIfRegularTaskDidNotTimedOut()
+    void assertIfRegularTaskDidNotTimeOut()
     {
         QnMutexLocker lock(&m_mutex);
         waitForResolveResult(&lock, easyToResolveHost);
@@ -78,20 +79,17 @@ private:
     QnWaitCondition m_cond;
     std::list<nx::utils::test::ScopedTimeShift> m_shiftedTime;
     std::list<QString> m_pipelinedRequests;
+    bool m_timeShifted;
 
     SystemError::ErrorCode testResolve(
         const QString& hostName,
         int /*ipVersion*/,
         std::deque<HostAddress>* resolvedAddress)
     {
-        using namespace nx::utils::test;
-
         if (hostName == hardToResolveHost)
         {
-            // Shifting time instead of sleep.
-            m_shiftedTime.push_back(ScopedTimeShift(
-                ClockType::steady,
-                m_dnsResolver.resolveTimeout() + std::chrono::seconds(1)));
+            addRegularTask();
+            shiftTimeIfNeeded(); //< Emulating delay in this method.
         }
 
         if (!m_pipelinedRequests.empty())
@@ -143,13 +141,27 @@ private:
         while (m_requestIdToResolveResult.find(requestId) == m_requestIdToResolveResult.end())
             m_cond.wait(lock->mutex());
     }
+
+    void shiftTimeIfNeeded()
+    {
+        using namespace nx::utils::test;
+
+        QnMutexLocker lock(&m_mutex);
+        if (m_timeShifted)
+            return;
+
+        m_shiftedTime.push_back(ScopedTimeShift(
+            ClockType::steady,
+            m_dnsResolver.resolveTimeout() + std::chrono::seconds(1)));
+        m_timeShifted = true;
+    }
 };
 
 TEST_F(DnsResolver, resolve_fails_with_timeout)
 {
     addTaskThatTakesMoreThanResolveTimeout();
-    addRegularTask();
-    assertIfRegularTaskDidNotTimedOut();
+    // Regular task will be added when executing "long" task.
+    assertIfRegularTaskDidNotTimeOut();
 }
 
 TEST_F(DnsResolver, pipelining_resolve_request)

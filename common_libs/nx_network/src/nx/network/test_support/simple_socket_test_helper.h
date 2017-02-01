@@ -474,6 +474,146 @@ void socketSimpleAsync(
     }
 }
 
+static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
+
+    Buffer buffer;
+    buffer.reserve(kTestMessage.size());
+
+    std::promise<void> promise;
+    receiver->readAsyncAtLeast(
+        &buffer, kTestMessage.size(),
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(size, kTestMessage.size());
+            EXPECT_EQ(buffer, kTestMessage);
+            promise.set_value();
+        });
+
+    promise.get_future().wait();
+}
+
+static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    std::promise<void> promise;
+    sender->sendAsync(
+        kTestMessage,
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(kTestMessage.size(), size);
+            promise.set_value();
+        });
+
+    Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << lastError();
+    EXPECT_EQ(buffer, kTestMessage);
+    promise.get_future().wait();
+}
+
+static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    ASSERT_EQ(sender->send(kTestMessage), kTestMessage.size()) << lastError();
+
+    Buffer buffer(kTestMessage.size(), Qt::Uninitialized);
+    EXPECT_EQ(buffer.size(), receiver->recv(buffer.data(), buffer.size(), MSG_WAITALL)) << lastError();
+}
+
+static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
+{
+    std::promise<void> sendPromise;
+    sender->sendAsync(
+        kTestMessage,
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            ASSERT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            ASSERT_EQ(kTestMessage.size(), size);
+            sendPromise.set_value();
+        });
+
+    Buffer buffer;
+    buffer.reserve(kTestMessage.size());
+
+    std::promise<void> readPromise;
+    receiver->readAsyncAtLeast(
+        &buffer, kTestMessage.size(),
+        [&](SystemError::ErrorCode code, size_t size)
+        {
+            EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
+            EXPECT_EQ(kTestMessage.size(), size);
+            readPromise.set_value();
+        });
+
+    sendPromise.get_future().wait();
+    readPromise.get_future().wait();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSyncAsyncSwitch(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    bool bothNonBlocking,
+    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
+{
+    static const std::chrono::milliseconds kTimeout(1500);
+
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(100));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    ASSERT_FALSE((bool) server->accept()) << lastError();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->setRecvTimeout(kTimeout.count()));
+
+    std::promise<void> connectPromise;
+    client->connectAsync(
+        *endpointToConnectTo,
+        [&](SystemError::ErrorCode code)
+        {
+            EXPECT_EQ(code, SystemError::noError);
+            connectPromise.set_value();
+        });
+
+    connectPromise.get_future().wait();
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool) accepted);
+
+    ASSERT_TRUE(accepted->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(accepted->setRecvTimeout(kTimeout.count()));
+    transferAsyncSync(client.get(), accepted.get());
+    transferSyncAsync(accepted.get(), client.get());
+
+    if (bothNonBlocking)
+    {
+        ASSERT_TRUE(accepted->setNonBlockingMode(true));
+        transferAsync(client.get(), accepted.get());
+        transferAsync(accepted.get(), client.get());
+        ASSERT_TRUE(client->setNonBlockingMode(false));
+    }
+    else
+    {
+        ASSERT_TRUE(client->setNonBlockingMode(false));
+        transferSync(client.get(), accepted.get());
+        transferSync(accepted.get(), client.get());
+        ASSERT_TRUE(accepted->setNonBlockingMode(true));
+    }
+
+    transferSyncAsync(client.get(), accepted.get());
+    transferAsyncSync(accepted.get(), client.get());
+}
+
 template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketMultiConnect(
     const ServerSocketMaker& serverMaker,
@@ -725,6 +865,35 @@ void socketSimpleAcceptMixed(
     ASSERT_NE(accepted, nullptr) << lastError();
 }
 
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void acceptedSocketOptionsInheritance(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker)
+{
+    auto server = serverMaker();
+    auto serverGuard = makeScopedGuard([&](){ server->pleaseStopSync(); });
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(10 * 1000));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress));
+    ASSERT_TRUE(server->listen(testClientCount()));
+    auto serverAddress = server->getLocalAddress();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->connect(serverAddress, 3000));
+
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool)accepted);
+
+    unsigned int acceptedSocketRecvTimeout = 0;
+    ASSERT_TRUE(accepted->getRecvTimeout(&acceptedSocketRecvTimeout));
+    unsigned int acceptedSocketSendTimeout = 0;
+    ASSERT_TRUE(accepted->getSendTimeout(&acceptedSocketSendTimeout));
+
+    // Timeouts are not inherited.
+    ASSERT_EQ(0, acceptedSocketRecvTimeout);
+    ASSERT_EQ(0, acceptedSocketSendTimeout);
+}
+
 template<typename ClientSocketMaker>
 void socketSingleAioThread(const ClientSocketMaker& clientMaker)
 {
@@ -851,7 +1020,7 @@ void socketConnectCancelAsync(
 }
 
 template<typename ClientSocketMaker>
-void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
+void socketIsValidAfterPleaseStop(const ClientSocketMaker& clientMaker)
 {
     auto socket = clientMaker();
     ASSERT_TRUE(socket->setNonBlockingMode(true));
@@ -861,6 +1030,67 @@ void socketIsInValidStateAfterCancellation(const ClientSocketMaker& clientMaker)
 
     socket->pleaseStopSync();
     socket->setRecvBufferSize(128 * 1024);
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketIsUsefulAfterCancelIo(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    boost::optional<SocketAddress> endpointToConnectTo = boost::none)
+{
+    static const std::chrono::milliseconds kTimeout(3000);
+    static const std::chrono::milliseconds kMinDelay(1), kMaxDelay(1000);
+
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(100));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logINFO);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    ASSERT_FALSE((bool) server->accept()) << lastError();
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    ASSERT_TRUE(client->setSendTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->setRecvTimeout(kTimeout.count()));
+    ASSERT_TRUE(client->connect(*endpointToConnectTo, kTimeout.count()));
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+
+    std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
+    ASSERT_TRUE((bool) accepted);
+    transferAsyncSync(client.get(), accepted.get());
+    transferSyncAsync(accepted.get(), client.get());
+
+    nx::Buffer buffer;
+    buffer.reserve(100);
+    for (std::chrono::milliseconds delay = kMinDelay; delay <= kMaxDelay; delay *= 10)
+    {
+        NX_LOG(lm("Cancel read: %1").arg(delay), cl_logINFO);
+        client->readSomeAsync(&buffer, [](SystemError::ErrorCode, size_t) { FAIL(); });
+
+        std::this_thread::sleep_for(delay);
+        client->cancelIOSync(aio::EventType::etRead);
+
+        transferSyncAsync(accepted.get(), client.get());
+        transferAsyncSync(client.get(), accepted.get());
+    }
+
+    for (std::chrono::milliseconds delay = kMinDelay; delay <= kMaxDelay; delay *= 10)
+    {
+        NX_LOG(lm("Cancel write: %1").arg(delay), cl_logINFO);
+        client->sendAsync(kTestMessage, [](SystemError::ErrorCode, size_t) { /*pass*/ });
+
+        std::this_thread::sleep_for(delay);
+        client->cancelIOSync(aio::EventType::etWrite);
+    }
+
+    buffer.resize(100);
+    ASSERT_GT(accepted->recv(buffer.data(), buffer.size()), 0);
 }
 
 template<typename ServerSocketMaker>
@@ -1007,12 +1237,16 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::cancelIo); } \
     Type(Name, ConnectPleaseStopAsync) \
         { nx::network::test::socketConnectCancelAsync(mkClient, StopType::pleaseStop); } \
-    Type(Name, SocketIsInValidStateAfterCancellation) \
-        { nx::network::test::socketIsInValidStateAfterCancellation(mkClient); } \
+    Type(Name, ValidAfterPleaseStop) \
+        { nx::network::test::socketIsValidAfterPleaseStop(mkClient); } \
+    Type(Name, UsefulAfterCancelIo) \
+        { nx::network::test::socketIsUsefulAfterCancelIo(mkServer, mkClient, endpointToConnectTo); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleAcceptMixed) \
         { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, AcceptedSocketOptionsInheritance) \
+        { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
     Type(Name, AcceptTimeoutSync) \
         { nx::network::test::socketAcceptTimeoutSync(mkServer); } \
     Type(Name, AcceptTimeoutAsync) \
@@ -1035,6 +1269,10 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, SimpleAsync) \
         { nx::network::test::socketSimpleAsync(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, SimpleSyncAsyncSwitch) \
+        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, false, endpointToConnectTo); } \
+    Type(Name, SimpleAsyncSyncSwitch) \
+        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, true, endpointToConnectTo); } \
     Type(Name, SimpleMultiConnect) \
         { nx::network::test::socketMultiConnect(mkServer, mkClient, endpointToConnectTo); } \
 
