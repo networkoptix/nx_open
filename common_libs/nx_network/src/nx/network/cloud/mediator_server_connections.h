@@ -45,7 +45,6 @@ public:
             nx::hpm::api::PingResponse)> completionHandler)
     {
         this->doAuthRequest(
-            stun::extension::methods::ping,
             std::move(requestData),
             std::move(completionHandler));
     }
@@ -142,7 +141,7 @@ private:
 
 typedef MediatorServerConnection<stun::UdpClient> MediatorServerUdpConnection;
 
-class MediatorServerTcpConnection:
+class NX_NETWORK_API MediatorServerTcpConnection:
     public MediatorServerConnection<stun::AsyncClientUser>
 {
 public:
