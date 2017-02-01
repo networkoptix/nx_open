@@ -54,15 +54,14 @@ private slots:
 
     void licenseDetailsRequested(const QModelIndex& index);
 
+    void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
+
     void showMessage(
         QnMessageBoxIcon icon,
         const QString& text,
         const QString& extras,
         CopyToClipboardButton button);
 
-    void at_licenseRemoved(int reqID, ec2::ErrorCode errorCode, QnLicensePtr license);
-
-signals:
     void showMessageLater(
         QnMessageBoxIcon icon,
         const QString& text,
