@@ -113,27 +113,23 @@ LabelStyleFlags getDescriptionStyle(bool isError)
 
 void setupLabel(QLabel* label, LabelStyleFlags style)
 {
-    bool isDescription = style.testFlag(kDescriptionStyle);
+    const bool isDescription = style.testFlag(kDescriptionStyle);
+    const bool isError = style.testFlag(kErrorStyle);
 
     auto font = label->font();
-    const int pixelSize = (isDescription
-        ? 36
-        : (style.testFlag(kErrorStyle) ? 88 : 80));
+    const int pixelSize = (isDescription ? 36 : (isError ? 88 : 80));
+    const int areaWidth = (isError ? 960 : 800);
 
     font.setPixelSize(pixelSize);
     font.setWeight(isDescription ? QFont::Normal : QFont::Light);
     label->setFont(font);
 
     label->setAlignment(Qt::AlignCenter);
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    label->setWordWrap(isDescription);
 
-    label->setWordWrap(false);
-
-    if (isDescription)
-    {
-        label->setFixedWidth(qMin(960, label->minimumSizeHint().width()));
-        label->setWordWrap(true);
-    }
+    label->setFixedWidth(isDescription
+        ? areaWidth
+        : qMax(areaWidth, label->minimumSizeHint().width()));
 
     const auto color = (style.testFlag(kErrorStyle)
         ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
