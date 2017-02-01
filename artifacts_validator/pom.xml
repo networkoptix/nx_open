@@ -65,12 +65,12 @@
             <id>cloud-parameter-check</id>
             <activation>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudGroup</name>
                     <value>!prod</value>
                 </property>
             </activation>
             <properties>
-                <cloud.parameter>${cloud.group}</cloud.parameter>
+                <cloud.parameter>${cloudGroup}</cloud.parameter>
             </properties>
         </profile>
     </profiles>

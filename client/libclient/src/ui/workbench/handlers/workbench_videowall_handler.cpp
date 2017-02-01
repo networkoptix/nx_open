@@ -17,6 +17,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_app_info.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -97,7 +98,6 @@
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
 #include <utils/unity_launcher_workaround.h>
-#include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -644,21 +644,11 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Close %1 Client before starting Video Wall?").arg(QnAppInfo::productNameLong()),
-        QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
-
-    const auto closeButton =
-        dialog.addButton(tr("Close"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    dialog.addButton(tr("Keep"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
-
-    const auto result = dialog.exec();
-    if (result == QDialogButtonBox::Cancel)
+    bool closeCurrentInstance = false;
+    if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
         return;
 
-    if (dialog.clickedButton() == closeButton)
+    if (closeCurrentInstance)
         closeInstanceDelayed();
 
     QnUuid pcUuid = qnSettings->pcUuid();
@@ -1548,7 +1538,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
@@ -2073,7 +2064,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
         QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     const auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)

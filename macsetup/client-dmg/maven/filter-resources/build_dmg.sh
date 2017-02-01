@@ -21,7 +21,7 @@ ln -s /Applications $SRC/Applications
 mv $SRC/client.app "$APP_DIR"
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
-cp logo.icns .VolumeIcon.icns
+cp logo.icns $SRC/.VolumeIcon.icns
 
 function hexify
 {

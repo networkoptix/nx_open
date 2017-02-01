@@ -833,14 +833,17 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
 
-        messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
+            QDialogButtonBox::NoRole, QnButtonAccent::NoAccent);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
+        if (result == QDialogButtonBox::Cancel)
+            return;
 
         /* If user is sure, return invalid cameras back to list. */
-        if ((result != QDialogButtonBox::Cancel) && (skipButton != messageBox.clickedButton()))
+        if (skipButton != messageBox.clickedButton())
             modifiedResources << errorResources;
     }
 
@@ -2021,18 +2024,19 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setText(tr("Components of the System have different versions:"));
     messageBox->setInformativeText(extras);
+    messageBox->setCheckBoxEnabled();
 
-    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
     const auto updateButton = messageBox->addButton(
         tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox->addButton(
+        tr("Skip"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
 
-    const bool confirmed = ((messageBox->exec() != QDialogButtonBox::Cancel)
-        && (messageBox->clickedButton() == updateButton));
+    messageBox->exec();
 
     if (messageBox->isChecked())
         qnClientShowOnce->setFlag(kVersionMismatchShowOnceKey);
 
-    if (confirmed)
+    if (messageBox->clickedButton() == updateButton)
         menu()->trigger(QnActions::SystemUpdateAction);
 }
 
