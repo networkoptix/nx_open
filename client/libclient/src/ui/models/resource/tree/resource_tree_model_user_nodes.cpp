@@ -533,13 +533,14 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
 
 void QnResourceTreeModelUserNodes::clean()
 {
-    for (auto node : m_allNodes)
+    for (auto node: m_allNodes)
         node->deinitialize();
     m_recorders.clear();
     m_shared.clear();
     m_placeholders.clear();
     m_users.clear();
     m_roles.clear();
+    m_allNodes.clear();
 }
 
 void QnResourceTreeModelUserNodes::cleanupRecorders()

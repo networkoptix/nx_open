@@ -790,8 +790,8 @@ Qn::ActionVisibility QnTreeNodeTypeCondition::check(const QnActionParameters &pa
     if (parameters.hasArgument(Qn::NodeTypeRole))
     {
         Qn::NodeType nodeType = parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>();
-        return m_nodeTypes.contains(nodeType) 
-            ? Qn::EnabledAction 
+        return m_nodeTypes.contains(nodeType)
+            ? Qn::EnabledAction
             : Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
@@ -1156,6 +1156,9 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
 
 Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionParameters &parameters) {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
+        return Qn::InvisibleAction;
+
+    if (qnCommon->isReadOnly())
         return Qn::InvisibleAction;
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {

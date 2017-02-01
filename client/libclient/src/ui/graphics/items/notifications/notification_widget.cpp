@@ -145,17 +145,9 @@ void QnNotificationToolTipWidget::pointTo(const QPointF& pos)
     updateTailPos();
 }
 
-void QnNotificationToolTipWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
-{
-    if (event->button() == Qt::RightButton)
-        emit closeTriggered();
-}
-
 void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton button)
 {
-    if (button == Qt::RightButton)
-        emit closeTriggered();
-    else
+    if (button == Qt::LeftButton)
         emit thumbnailClicked();
 }
 
@@ -202,7 +194,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_tooltipWidget->installEventFilter(this);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::buttonClicked,    this, &QnNotificationWidget::buttonClicked);
-    connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::at_thumbnail_clicked);
+    connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::triggerDefaultAction);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::closeTriggered,   this, &QnNotificationWidget::closeTriggered);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::tailPosChanged,   this, &QnNotificationWidget::updateToolTipPosition);
     connect(this,            &QnNotificationWidget::geometryChanged,         this, &QnNotificationWidget::updateToolTipPosition);
@@ -393,19 +385,8 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
 {
     Qt::MouseButton button = event->button();
 
-    if (button == Qt::RightButton)
-    {
-        emit closeTriggered();
-    }
-    else if (button == Qt::LeftButton)
-    {
+    if (button == Qt::LeftButton)
         triggerDefaultAction();
-    }
-}
-
-void QnNotificationWidget::at_thumbnail_clicked()
-{
-    triggerDefaultAction();
 }
 
 void QnNotificationWidget::at_loop_sound()

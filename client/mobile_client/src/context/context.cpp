@@ -20,6 +20,7 @@
 #include <helpers/nx_globals_object.h>
 #include <helpers/system_helpers.h>
 #include <settings/last_connection.h>
+#include <settings/qml_settings_adaptor.h>
 #include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
@@ -34,6 +35,7 @@ QnContext::QnContext(QObject* parent) :
     base_type(parent),
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
+    m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_uiController(new QnMobileClientUiController(this)),
     m_cloudUrlHelper(new QnCloudUrlHelper(
@@ -92,6 +94,11 @@ QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 QnUserWatcher* QnContext::userWatcher() const
 {
     return qnCommon->instance<QnUserWatcher>();
+}
+
+QmlSettingsAdaptor* QnContext::settings() const
+{
+    return m_settings;
 }
 
 void QnContext::quitApplication()

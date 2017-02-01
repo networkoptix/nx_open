@@ -25,6 +25,7 @@ public:
         LiteMode,
         MaxFfmpegResolution,
         ShowCameraInfo,
+        LiveVideoPreviews,
 
         BasePath,
         TestMode,
@@ -77,6 +78,10 @@ private:
             bool,
             showCameraInfo, setShowCameraInfo,
             ShowCameraInfo, false)
+        QN_DECLARE_RW_PROPERTY(
+            bool,
+            liveVideoPreviews, setLiveVideoPreviews,
+            LiveVideoPreviews, true)
 
         QN_DECLARE_RW_PROPERTY(QString,                     basePath,                   setBasePath,                BasePath,                   lit("qrc:///"))
         QN_DECLARE_RW_PROPERTY(bool,                        testMode,                   setTestMode,                TestMode,                   false)

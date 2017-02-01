@@ -5,7 +5,7 @@
 // Config for debugging the tests.
 static const struct
 {
-    const bool enableHangOnFinish = true;
+    const bool enableHangOnFinish = false;
     const bool forceLog = true;
 } conf{};
 #include <nx/utils/test_support/test_utils.h>
