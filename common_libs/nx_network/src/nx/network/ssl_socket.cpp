@@ -1476,7 +1476,7 @@ SslSocket::~SslSocket()
 {
     Q_D(SslSocket);
     if (!d->nonBlockingMode)
-        d->wrappedSocket->pleaseStopSync();
+        d->wrappedSocket->pleaseStopSync(false);
 
     delete d->wrappedSocket;
     delete d_ptr;
