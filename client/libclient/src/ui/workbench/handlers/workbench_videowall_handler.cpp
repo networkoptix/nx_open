@@ -636,13 +636,23 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     return false;
 }
 
-void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall)
+void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
-    if (!canStartVideowall(videoWall))
-    {
-        NX_ASSERT(false, "Can't reach here because of action condition");
+    QnUuid pcUuid = qnSettings->pcUuid();
+    NX_ASSERT(!pcUuid.isNull(), "Action condition must not allow us to get here.");
+    if (pcUuid.isNull())
         return;
+
+    QList<QnVideoWallItem> items;
+    for (const auto& item: videoWall->items()->getItems())
+    {
+        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
+            continue;
+        items.append(item);
     }
+    NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
+    if (items.isEmpty())
+        return;
 
     bool closeCurrentInstance = false;
     if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
@@ -651,12 +661,8 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (closeCurrentInstance)
         closeInstanceDelayed();
 
-    QnUuid pcUuid = qnSettings->pcUuid();
-    foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
+    for (const auto& item: items)
     {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-
         QStringList arguments;
         arguments << lit("--videowall");
         arguments << videoWall->getId().toString();
@@ -1568,7 +1574,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (!validateLicenses(tr("Activate one more license to start the Video Wall.")))
         return;
 
-    startVideowallAndExit(videoWall);
+    switchToVideoWallMode(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
