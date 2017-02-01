@@ -132,7 +132,7 @@
                             <arguments>
                                 <argument>get_cloud_url.py</argument>
                                 <argument>--target=${project.build.directory}/cloud_instance.properties</argument>
-                                <argument>--instance=${cloud.group}</argument>
+                                <argument>--instance=${cloudGroup}</argument>
                                 <argument>--customization=${customization}</argument>
                                 <argument>--host=${cloudHost}</argument>
                                 <argument>--verbose</argument>

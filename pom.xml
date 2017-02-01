@@ -194,7 +194,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloud.group>dev</cloud.group>
+        <cloudGroup>dev</cloudGroup>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -1254,12 +1254,12 @@
             <id>artifact-name-cloud</id>
             <activation>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudGroup</name>
                     <value>!prod</value>
                 </property>
             </activation>
             <properties>
-                <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
+                <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
 
