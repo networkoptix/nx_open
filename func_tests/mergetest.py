@@ -15,7 +15,7 @@ from functest_util import generateKey
 
 TEST_SYSTEM_NAME_1="MergeTestSystem1"
 TEST_SYSTEM_NAME_2="MergeTestSystem2"
-CLOUD_SERVER='cloud-test.hdw.mx'
+CLOUD_SERVER='cloud-dev.hdw.mx'
 CLOUD_USER_NAME='anikitin@networkoptix.com'
 CLOUD_USER_PWD='qweasd123'
 DEFAULT_CUSTOMIZATION='default'
