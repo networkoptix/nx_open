@@ -372,8 +372,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 	    enum class StatusChangeReason
     {
-        Default,
-        CreateInitialData,
+        Local,
         GotFromRemotePeer
     };
 

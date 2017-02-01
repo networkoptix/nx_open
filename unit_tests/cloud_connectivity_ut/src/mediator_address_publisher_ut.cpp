@@ -56,6 +56,11 @@ public:
             });
     }
 
+    virtual void addConnectionTimer(
+        std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/)
+    {
+    }
+
     virtual SocketAddress localAddress() const override
     {
         return SocketAddress();

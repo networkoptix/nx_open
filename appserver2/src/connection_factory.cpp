@@ -815,12 +815,12 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     /**%apidoc GET /ec2/getStorages
      * Read the list of current storages.
      * %param[default] format
-     * %param[opt] id Server unique id. If omitted, return storages for all servers.
+     * %param[opt] id Parent server unique id. If omitted, return storages for all servers.
      * %return List of storages.
      *     %param id Storage unique id.
-     *     %param parentId Is empty.
+     *     %param parentId Id of a server to which the storage belongs.
      *     %param name Storage name.
-     *     %param url Is empty.
+     *     %param url Storage URL.
      *     %param spaceLimit Storage space to leave free on the storage,
      *         in bytes.
      *     %param usedForWriting Whether writing to the storage is allowed.
@@ -830,7 +830,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value local
      *         %value smb
      *     %param addParams List of storage additional parameters.
-     *         Intended for internal use; leave empty when creating a new storage.
+     *         Intended for internal use.
      *     %param isBackup Whether the storage is used for backup.
      *         %value false
      *         %value true
@@ -1663,6 +1663,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
                 }
             });
     }
+
 
     return ErrorCode::ok;
 }

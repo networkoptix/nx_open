@@ -72,7 +72,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default);
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so

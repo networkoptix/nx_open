@@ -23,6 +23,11 @@ SocketAddress MediaServerLauncher::endpoint() const
     return SocketAddress(HostAddress::localhost, m_mediaServerProcess->getTcpPort());
 }
 
+int MediaServerLauncher::port() const
+{
+    return m_mediaServerProcess->getTcpPort();
+}
+
 void MediaServerLauncher::addSetting(const QString& name, const QString& value)
 {
     m_customSettings.emplace_back(name, value);

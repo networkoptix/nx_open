@@ -1,6 +1,6 @@
-#ifndef NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
-#define NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
+#pragma once
 
+#include <list>
 #include <queue>
 
 #include <nx/utils/std/cpp14.h>
@@ -79,21 +79,23 @@ public:
     size_t count() const;
 
 protected:
-    struct NX_NETWORK_API ServerSocketHandle
+    struct NX_NETWORK_API ServerSocketContext
     {
         std::unique_ptr<AbstractStreamServerSocket> socket;
         bool isAccepting;
 
-        ServerSocketHandle(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketHandle(ServerSocketHandle&&) = default;
-        ServerSocketHandle& operator=(ServerSocketHandle&&) = default;
+        ServerSocketContext(std::unique_ptr<AbstractStreamServerSocket> socket_);
+        ServerSocketContext(ServerSocketContext&&) = default;
+        ServerSocketContext& operator=(ServerSocketContext&&) = default;
 
         AbstractStreamServerSocket* operator->() const;
         void stopAccepting();
     };
 
-    void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
-                  AbstractStreamSocket* socket);
+    void accepted(
+        ServerSocketContext* source,
+        SystemError::ErrorCode code,
+        AbstractStreamSocket* socket);
 
     void cancelIoFromAioThread();
 
@@ -103,7 +105,7 @@ protected:
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
     aio::Timer m_timerSocket;
-    std::vector<ServerSocketHandle> m_serverSockets;
+    std::list<ServerSocketContext> m_serverSockets;
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> m_acceptHandler;
@@ -125,5 +127,3 @@ std::unique_ptr<AbstractStreamServerSocket> MultipleServerSocket::make()
 
 } // namespace network
 } // namespace nx
-
-#endif // NX_NETWORK_MULTIPLE_SERVER_SOCKET_H

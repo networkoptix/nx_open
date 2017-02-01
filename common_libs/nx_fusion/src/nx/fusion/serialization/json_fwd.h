@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QString>
+#include <QtCore/QHash>
+
 class QJsonValue;
 class QnJsonContext;
 

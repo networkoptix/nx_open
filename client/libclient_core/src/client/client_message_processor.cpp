@@ -126,7 +126,10 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
+void QnClientMessageProcessor::onResourceStatusChanged(
+    const QnResourcePtr &resource,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource /*source*/)
 {
     resource->setStatus(status);
 }

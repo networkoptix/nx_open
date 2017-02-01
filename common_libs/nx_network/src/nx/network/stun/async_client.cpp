@@ -11,7 +11,7 @@ AsyncClient::AsyncClient(Settings timeouts):
     m_settings(timeouts),
     m_useSsl(false),
     m_state(State::disconnected),
-    m_timer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
+    m_reconnectTimer(std::make_unique<nx::network::RetryTimer>(m_settings.reconnectPolicy))
 {
     bindToAioThread(getAioThread());
 }
@@ -25,7 +25,7 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
 {
     network::aio::BasicPollable::bindToAioThread(aioThread);
 
-    m_timer->bindToAioThread(aioThread);
+    m_reconnectTimer->bindToAioThread(aioThread);
     if (m_baseConnection)
         m_baseConnection->bindToAioThread(aioThread);
     if (m_connectingSocket)
@@ -77,6 +77,20 @@ void AsyncClient::sendRequest(
                 .arg( static_cast< int >( m_state ) ) );
             return;
     };
+}
+
+void AsyncClient::addConnectionTimer(
+    std::chrono::milliseconds period, TimerHandler handler, void* client)
+{
+    QnMutexLocker lock(&m_mutex);
+    if (m_state != State::connected)
+        return;
+
+    const auto timer = m_connectionTimers.emplace(
+        client, std::make_unique<network::aio::Timer>(getAioThread())).first;
+
+    startTimer(timer, period, std::move(handler));
+
 }
 
 SocketAddress AsyncClient::localAddress() const
@@ -256,6 +270,7 @@ void AsyncClient::closeConnectionImpl(
     auto connectingSocket = std::move(m_connectingSocket);
     auto requestQueue = std::move(m_requestQueue);
     auto requestsInProgress = std::move(m_requestsInProgress);
+    m_connectionTimers.clear();
 
     lock->unlock();
     {
@@ -268,7 +283,7 @@ void AsyncClient::closeConnectionImpl(
     lock->relock();
 
     NX_LOGX(lm("Scheduling reconnect attempt"), cl_logDEBUG1);
-    m_timer->scheduleNextTry(
+    m_reconnectTimer->scheduleNextTry(
         [this]
         {
             NX_LOGX(lm("Trying to restore connection to STUN server %1 ...")
@@ -338,7 +353,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
-    m_timer->cancelSync();
+    m_reconnectTimer->cancelSync();
     NX_ASSERT(!m_baseConnection);
     NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logINFO);
 
@@ -414,12 +429,31 @@ void AsyncClient::processMessage(Message message)
     }
 }
 
+void AsyncClient::startTimer(
+    ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler)
+{
+    timer->second->start(
+        period,
+        [this, client = timer->first, period, handler = std::move(handler)]() mutable
+        {
+            handler();
+
+            QnMutexLocker lock(&m_mutex);
+            const auto timer = m_connectionTimers.find(client);
+            if (timer == m_connectionTimers.end())
+                return; //< Timer is canceled.
+
+            startTimer(timer, period, std::move(handler));
+        });
+}
+
 void AsyncClient::stopWhileInAioThread()
 {
     NX_LOGX(lm("Stopped"), cl_logINFO);
-    m_timer.reset();
+    m_reconnectTimer.reset();
     m_baseConnection.reset();
     m_connectingSocket.reset();
+    m_connectionTimers.clear();
 }
 
 const char* AsyncClient::toString(State state) const
