@@ -302,7 +302,11 @@ void QnUserSettingsDialog::updatePermissions()
 {
     updateControlsVisibility();
 
-    PermissionsInfoTable helper(context()->user());
+    const auto currentUser = context()->user();
+    if (!currentUser)
+        return;
+
+    PermissionsInfoTable helper(currentUser);
     if (isPageVisible(ProfilePage))
     {
         Qn::UserRole role = m_user->userRole();
