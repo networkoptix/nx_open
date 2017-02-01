@@ -71,7 +71,7 @@ private:
 
 private:
     int m_currentIndex = -1;
-    QAction* m_currentAction;
+    QAction* m_currentAction = nullptr;
     Qt::ItemDataRole m_buttonTextRole = Qt::DisplayRole;
     bool m_displayActionIcon = false;
 
