@@ -116,6 +116,10 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
 
         if (!video && camera) {
+
+            if (roundMethod == QnThumbnailRequestData::PreciseMethod)
+                return getMostPreciseImageFromLive(camera, useHQ, time, prefferedChannel);
+
             video = camera->getFrameByTime(useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
             time = DATETIME_NOW;
         }
@@ -309,4 +313,57 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
         }
     }
     return outFrame;
+}
+
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getMostPreciseImageFromLive(
+    QnVideoCameraPtr& camera,
+    bool useHq,
+    quint64 time,
+    int channel)
+{
+    auto iframeOrGop = camera->getIframeOrGopByTime(useHq, time, channel);
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+
+    if (!iframeOrGop)
+        CLVideoDecoderOutputPtr();
+
+    bool gotFrame = false;
+    auto iframe = iframeOrGop->iframe;
+    auto& gop = iframeOrGop->gop;
+
+    if (iframe)
+    {
+        
+        QnFfmpegVideoDecoder decoder(iframe->compressionType, iframe, false);
+
+        gotFrame = decoder.decode(iframe, &outFrame);
+        if (!gotFrame)
+            gotFrame = decoder.decode(iframe, &outFrame); //< Decode twice. Why do we do it?
+
+        if (gotFrame)
+            return outFrame;
+    }
+    else if (gop && !gop->isEmpty())
+    {
+        auto randomAccess = gop->lock();
+        auto firstFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(0));
+
+        if (!firstFrame)
+            return CLVideoDecoderOutputPtr();
+
+        QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
+
+        for ( auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
+        {
+            auto frame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(i));
+            gotFrame = decoder.decode(frame, &outFrame) && frame->timestamp >= time;
+            if (gotFrame)
+                break;
+        }
+
+        if (gotFrame)
+            return outFrame;
+    }
+
+    return CLVideoDecoderOutputPtr();
 }

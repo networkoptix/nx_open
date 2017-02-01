@@ -19,6 +19,12 @@
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
 
+struct EitherIframeOrGop
+{
+    QnConstCompressedVideoDataPtr iframe;
+    std::unique_ptr<QnDataPacketQueue> gop;
+};
+
 class QnVideoCamera: public QObject, public QnAbstractVideoCamera
 {
     Q_OBJECT
@@ -43,8 +49,10 @@ public:
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
     QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
     QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime, int channel) const;
+    std::unique_ptr<EitherIframeOrGop> getIframeOrGopByTime(bool primaryLiveStream, quint64 time, int channel);
+
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
-	Q_SLOT void at_camera_resourceChanged();
+    Q_SLOT void at_camera_resourceChanged();
     void beforeStop();
 
     bool isSomeActivity() const;
