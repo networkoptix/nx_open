@@ -314,20 +314,7 @@
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
-                    </execution>
-                    <execution>
-                        <id>get-cloud-url-property</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
-                            </files>
-                            <quiet>true</quiet>
-                        </configuration>
-                    </execution>                    
+                    </execution>                 
                 </executions>
             </plugin>
             <plugin>
