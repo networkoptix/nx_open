@@ -11,6 +11,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/algorithm/cxx11/copy_if.hpp>
 
 #include <common/common_module.h>
 
@@ -304,6 +305,16 @@ public:
         connect(videowall.data(), &QnResource::nameChanged, this, [this](const QnResourcePtr &resource) { setName(resource->getName()); });
     }
 };
+
+auto offlineItemOnThisPc = []
+    {
+        QnUuid pcUuid = qnSettings->pcUuid();
+        NX_ASSERT(!pcUuid.isNull(), "Invalid pc state.");
+        return [pcUuid](const QnVideoWallItem& item)
+            {
+                return !pcUuid.isNull() && item.pcUuid == pcUuid && !item.runtimeStatus.online;
+            };
+    };
 
 } /* anonymous namespace */
 
@@ -618,38 +629,15 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     if (!videowall)
         return false;
 
-    QnUuid pcUuid = qnSettings->pcUuid();
-    if (pcUuid.isNull())
-    {
-        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
-            .arg(videowall->getId().toString()), cl_logERROR);
-
-        return false;
-    }
-
-    foreach(const QnVideoWallItem &item, videowall->items()->getItems())
-    {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-        return true;
-    }
-    return false;
+    return boost::algorithm::any_of(videowall->items()->getItems().values(), offlineItemOnThisPc());
 }
 
 void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
-    QnUuid pcUuid = qnSettings->pcUuid();
-    NX_ASSERT(!pcUuid.isNull(), "Action condition must not allow us to get here.");
-    if (pcUuid.isNull())
-        return;
-
     QList<QnVideoWallItem> items;
-    for (const auto& item: videoWall->items()->getItems())
-    {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-        items.append(item);
-    }
+    boost::algorithm::copy_if(videoWall->items()->getItems().values(), std::back_inserter(items),
+        offlineItemOnThisPc());
+
     NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
     if (items.isEmpty())
         return;
@@ -2073,14 +2061,14 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n matrices?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
-    const auto result = messageBox.exec();
-    if (result != QDialogButtonBox::Yes)
+
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;

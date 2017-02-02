@@ -40,7 +40,8 @@ void DecoderRegistrar::registerDecoders(
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<AndroidVideoDecoder>(allocator,
             kHardwareDecodersCount);
-        AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
+        // HW audio decoder crashes in readOutputBuffer() for some reason. So far disabling it...
+        // AudioDecoderRegistry::instance()->addPlugin<AndroidAudioDecoder>();
     }
     #endif // Q_OS_ANDROID
 

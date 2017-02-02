@@ -56,16 +56,13 @@ def main():
     args = parser.parse_args()
 
     print "Requesting cloud host for customization {0}, instance {1}".format(args.customization, args.instance)
-    validHost = args.host and not args.host.startswith('$')
-    if validHost:
-        print "Provided host {0}, network request will not occur".format(args.host)
 
     global verbose
     verbose = args.verbose
     if verbose and args.target:
         print "Result will be saved to {0}".format(args.target)
         
-    host = args.host if validHost else getHostOnline(args.instance, args.customization, args.timeout)
+    host = getHostOnline(args.instance, args.customization, args.timeout)
     if host:
         writeToTarget(host, args.target)
     else:
