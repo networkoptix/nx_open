@@ -893,6 +893,7 @@ public:
 
 public:
     static const int kSnifferDataHeaderLength = 2;
+    static const int kSnifferBufferLength = 512;
 
     MixedSslAsyncBioHelper(SSL* ssl, AbstractStreamSocket* socket)
         :SslAsyncBioHelper(ssl,socket,true),
@@ -916,8 +917,7 @@ public:
         std::function<void(SystemError::ErrorCode,std::size_t)>&& completionHandler)
     {
         if (!m_isInitialized) {
-            // We need to sniffer the buffer here
-            m_snifferBuffer.reserve(kSnifferDataHeaderLength);
+            m_snifferBuffer.reserve(kSnifferBufferLength);
             socket()->readSomeAsync(
                 &m_snifferBuffer,
                 std::bind(
@@ -988,19 +988,16 @@ private:
                 m_isInitialized = true;
             }
 
-            // If we are SSL, we need to push the data into the buffer
-            SslAsyncBioHelper::injectSnifferData(m_snifferBuffer);
-
             // If it is an SSL we still need to continue our async operation
             // otherwise we call the failed callback for the upper usage class
             // it should be MixedSslSocket class
             if (m_isSsl) {
-                // request a SSL async recv
-                SslAsyncBioHelper::asyncRecv(
-                    data.buffer, std::move(data.completionHandler));
+                SslAsyncBioHelper::injectSnifferData(m_snifferBuffer);
+                m_snifferBuffer.clear();
+                SslAsyncBioHelper::asyncRecv(data.buffer, std::move(data.completionHandler));
             } else {
-                // request a common async recv
                 data.buffer->append(m_snifferBuffer);
+                m_snifferBuffer.clear();
                 data.completionHandler(SystemError::noError, data.buffer->size());
             }
         }
