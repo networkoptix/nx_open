@@ -21,12 +21,21 @@ namespace test {
 class CrossNatConnector:
     public TunnelConnector
 {
+public:
+    CrossNatConnector()
+    {
+        init();
+    }
+
+private:
+    void init()
+    {
+        ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+    }
 };
 
 TEST_F(CrossNatConnector, timeout)
 {
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
     const std::chrono::milliseconds connectTimeout(nx::utils::random::number(1000, 4000));
 
     // Timing out mediator response by providing incorrect mediator address to connector.
@@ -44,8 +53,6 @@ TEST_F(CrossNatConnector, timeout)
 
 TEST_F(CrossNatConnector, target_host_not_found)
 {
-    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-
     const auto system1 = mediator().addRandomSystem();
     const auto server1 = mediator().addRandomServer(system1);
 
@@ -61,6 +68,23 @@ TEST_F(CrossNatConnector, target_host_not_found)
     ASSERT_EQ(SystemError::hostNotFound, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
 }
+
+TEST_F(CrossNatConnector, no_nat_traversal_method_available)
+{
+    ConnectorFactory::setEnabledCloudConnectMask(0);
+
+    const auto system1 = mediator().addRandomSystem();
+    const auto server1 = mediator().addRandomServer(system1);
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::milliseconds::zero(),
+        nx::hpm::MediaServerEmulator::ActionToTake::proceedWithConnection);
+
+    ASSERT_NE(SystemError::noError, connectResult.errorCode);
+}
+
+//-------------------------------------------------------------------------------------------------
+// CrossNatConnectorRedirect
 
 class CrossNatConnectorRedirect:
     public CrossNatConnector
