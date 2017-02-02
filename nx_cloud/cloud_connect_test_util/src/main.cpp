@@ -48,6 +48,13 @@ int main(int argc, const char* argv[])
     QnLog::applyArguments(args);
     SocketGlobals::applyArguments(args);
 
+    if (args.get("disable-udp"))
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+            ~((int)cloud::CloudConnectType::udpHp));
+    }
+
     // reading mode
     if (args.get("listen"))
         return nx::cctu::runInListenMode(args);
@@ -57,13 +64,6 @@ int main(int argc, const char* argv[])
 
     if (args.get("http-client"))
         return nx::cctu::runInHttpClientMode(args);
-
-    if (args.get("disable-udp"))
-    {
-        cloud::ConnectorFactory::setEnabledCloudConnectMask(
-            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
-            ~((int)cloud::CloudConnectType::udpHp));
-    }
 
     std::cerr<<"error. Unknown mode"<<std::endl;
     printHelp();
