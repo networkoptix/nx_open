@@ -421,6 +421,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
+    const auto clientMessageProcessor = QnClientMessageProcessor::instance();
+    connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
 
     if (m_videoWallMode.active)
     {
@@ -428,7 +431,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
         connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
             [this]
             {

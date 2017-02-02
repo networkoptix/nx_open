@@ -73,6 +73,8 @@ const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customiz
 
 const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
+const qreal kSelectionOpacity = 0.2;
+
 const float noAspectRatio = -1.0;
 
 //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
@@ -1044,7 +1046,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
         return;
 
     painter->fillRect(rect,
-        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), 0.1));
+        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), kSelectionOpacity));
 }
 
 float QnResourceWidget::defaultAspectRatio() const

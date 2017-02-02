@@ -137,8 +137,8 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
     }
 
     m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
-    m_mergeDialog->exec();
-    delete m_mergeDialog;
+    m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
+    m_mergeDialog->open();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode)
