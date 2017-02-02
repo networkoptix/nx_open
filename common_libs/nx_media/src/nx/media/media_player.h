@@ -95,6 +95,11 @@ class Player: public QObject
 
     Q_PROPERTY(QRect videoGeometry READ videoGeometry WRITE setVideoGeometry NOTIFY videoGeometryChanged)
 
+    /**
+     * Is (0, 0) if no video is playing or the resolution is not available.
+     */
+    Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
+
 public:
     enum class State
     {
@@ -183,6 +188,9 @@ public:
     // Namespace specification is required for QML.
     Q_INVOKABLE nx::media::PlayerStatistics currentStatistics() const;
 
+    bool isAudioEnabled() const;
+    void setAudioEnabled(bool value);
+
 public slots:
     void play();
     void pause();
@@ -201,6 +209,7 @@ signals:
     void videoQualityChanged();
     void videoGeometryChanged();
     void currentResolutionChanged();
+    void audioEnabledChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
