@@ -50,7 +50,7 @@ private:
 
     bool m_updateDisabled;
     ImageCorrectionParams m_params;
-    QnMediaResourceWidget* m_widget;
+    QPointer<QnMediaResourceWidget> m_widget;
 
     ImageCorrectionParams m_backupParams;
 };
