@@ -83,7 +83,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);
-    m_showButton->setZValue(ControlItemZOrder);
+    m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -146,7 +146,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::RightEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(item, item, Qt::RightEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 }
 
