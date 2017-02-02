@@ -9,8 +9,10 @@ def host = properties.cloudHost?.trim()
 
 if (!host)
 {
-    project.properties.cloudHost = requestHost(properties.customization, properties.cloudGroup)
-    println("cloudHost resolved to " + project.properties.cloudHost)
+    host = requestHost(properties.customization, properties.cloudGroup)
+    println("cloudHost resolved to " + host)
+    for (project in session.getProjects())
+        project.properties.cloudHost = host
 }
 else
 {

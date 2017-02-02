@@ -157,6 +157,16 @@
                             <source>${project.basedir}/generate_pro_file.groovy</source>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>get_cloud_host</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <source>${project.basedir}/get_cloud_host.groovy</source>
+                        </configuration>
+                    </execution>                    
                 </executions>
             </plugin>
         </plugins>
