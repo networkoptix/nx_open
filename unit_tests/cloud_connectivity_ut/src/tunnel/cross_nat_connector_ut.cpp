@@ -87,7 +87,7 @@ TEST_F(CrossNatConnector, no_nat_traversal_method_available)
 // CrossNatConnectorRedirect
 
 class CrossNatConnectorRedirect:
-    public CrossNatConnector
+    public TunnelConnector
 {
 public:
     CrossNatConnectorRedirect():
