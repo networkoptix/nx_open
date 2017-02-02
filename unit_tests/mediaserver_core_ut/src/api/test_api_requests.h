@@ -46,7 +46,7 @@ void testApiPost(
         request = preprocessRequestFunc(request);
 
     NX_LOG(lm("[TEST] POST %1").arg(urlStr), cl_logINFO);
-    NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(request));
+    NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(request), cl_logINFO);
 
     httpClient.doPost(url, "application/json", request);
 
