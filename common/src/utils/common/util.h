@@ -1,5 +1,4 @@
-#ifndef _UNIVERSAL_CLIENT_UTIL_H
-#define _UNIVERSAL_CLIENT_UTIL_H
+#pragma once
 
 #include <QtCore/QString>
 
@@ -8,7 +7,6 @@ char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
 #if defined (Q_OS_WIN32)
-#include <windows.h>
 
 struct WinDriveInfo
 {
@@ -20,13 +18,14 @@ struct WinDriveInfo
     };
 
     QString path;
-    DWORD type;
+    unsigned long type;
     int access;
 
-    WinDriveInfo() :
-        type(DRIVE_UNKNOWN),
+    WinDriveInfo():
+        type(0),
         access(NoAccess)
-    {}
+    {
+    }
 };
 
 using WinDriveInfoList = QList<WinDriveInfo>;
@@ -128,5 +127,3 @@ QString debugTime(qint64 timeMSec, const QString &fmt = QString());
  * Convert QDateTime to HTTP header date format (rfc822#section-5)
  */
 QByteArray dateTimeToHTTPFormat(const QDateTime& value);
-
-#endif // _UNIVERSAL_CLIENT_UTIL_H
