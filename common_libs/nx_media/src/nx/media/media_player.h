@@ -96,7 +96,7 @@ class Player: public QObject
     Q_PROPERTY(QRect videoGeometry READ videoGeometry WRITE setVideoGeometry NOTIFY videoGeometryChanged)
 
     /**
-     * Is (0, 0) if no video is playing or the resolution is not available.
+     * Enable or disable audio playback. It has not effect if media hasn't audio track.
      */
     Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
 
