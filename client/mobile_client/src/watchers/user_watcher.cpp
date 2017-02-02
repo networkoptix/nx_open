@@ -26,13 +26,7 @@ QnUserResourcePtr findUser(const QString& userName)
    */
     const auto serverId = QnUuid::fromStringSafe(userName);
     if (!serverId.isNull() && qnCommon->remoteGUID() == serverId)
-    {
-        for (const auto& user: users)
-        {
-            if (user->isOwner())
-                return user;
-        }
-    }
+        return qnResPool->getAdministrator();
 
     for (const auto& user: users)
     {
