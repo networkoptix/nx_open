@@ -30,10 +30,10 @@
                 LicenseUrl="License.html" />
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="Server only" />
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleServerOnly)" />
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ServerPackageGroup"/>

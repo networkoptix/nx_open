@@ -1,5 +1,6 @@
 <Include>
 
+    <?define installerLanguage="${installer.language}"?>
     <?define companyName="${company.name}"?>
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
 
