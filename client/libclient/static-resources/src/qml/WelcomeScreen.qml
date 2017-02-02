@@ -375,7 +375,7 @@ Rectangle
             text: qsTr("Loading...");
             color: Style.colors.mid;
             font: Style.fonts.preloader;
-            anchors.horizontalCenter: parent.horizontalCenter;
+            x: (parent.width - width) / 2 + 4;
         }
     }
 
