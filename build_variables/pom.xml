@@ -120,7 +120,7 @@
                             <skip>buildenv.skip</skip>
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>
                         </configuration>
-                    </execution>                 
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -139,7 +139,7 @@
                                 <file>target/rebuild.properties</file>
                             </files>
                         </configuration>
-                    </execution>                  
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -166,7 +166,7 @@
                         <configuration>
                             <source>${project.basedir}/get_cloud_host.groovy</source>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
