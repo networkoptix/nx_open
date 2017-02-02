@@ -212,8 +212,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
     // local settings
-    connect(action(QnActions::PreferencesGeneralTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesGeneralTabAction_triggered()));
-    connect(action(QnActions::PreferencesNotificationTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesNotificationTabAction_triggered()));
+    connect(action(QnActions::PreferencesGeneralTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
+        Qt::QueuedConnection);
+    connect(action(QnActions::PreferencesNotificationTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
+        Qt::QueuedConnection);
 
     // system administration
     connect(action(QnActions::SystemAdministrationAction), &QAction::triggered, this,
@@ -1027,6 +1031,13 @@ void QnWorkbenchActionHandler::openSystemAdministrationDialog(int page)
     systemAdministrationDialog()->setCurrentPage(page);
 }
 
+void QnWorkbenchActionHandler::openLocalSettingsDialog(int page)
+{
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(page);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_showcaseAction_triggered()
 {
     QDesktopServices::openUrl(qnSettings->showcaseUrl());
@@ -1034,20 +1045,6 @@ void QnWorkbenchActionHandler::at_showcaseAction_triggered()
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
