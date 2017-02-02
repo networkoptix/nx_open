@@ -3448,10 +3448,16 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     }
     _onvifEvents__PullMessagesResponse response;
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    const bool useHttpReader = resData.value<bool>(
+        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER, 
+        false);
+
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
             std::move(soapWrapper),
-            &PullPointSubscriptionWrapper::pullMessages ),
+            &PullPointSubscriptionWrapper::pullMessages,
+            useHttpReader),
         [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
             for( void* pObj: memToFreeOnResponseDone )
                 ::free( pObj );

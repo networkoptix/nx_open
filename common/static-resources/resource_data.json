@@ -652,6 +652,10 @@
             }
         },
         {
+            "keys": ["Hikvision|DS-2CD63CDF-IS"],
+            "parseOnvifNotificationsWithHttpReader": true
+        },
+        {
             "keys": [
                 "DW|DWC-MPTZ20X", 
                 "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
