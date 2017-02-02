@@ -320,6 +320,7 @@ void QnLicenseManagerWidget::showMessage(
     QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
     messageBox->setIcon(icon);
     messageBox->setText(text);
+    messageBox->setInformativeText(extras);
 
     if (button == CopyToClipboardButton::Show)
     {
@@ -328,6 +329,7 @@ void QnLicenseManagerWidget::showMessage(
         connect(button, &QPushButton::clicked, this,
             [this, extras] { qApp->clipboard()->setText(extras); });
     }
+
     messageBox->setStandardButtons(QDialogButtonBox::Ok);
     messageBox->setEscapeButton(QDialogButtonBox::Ok);
     messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -723,7 +725,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     }
     else if (messageId == lit("InvalidKey"))
     {
-        showMessageLater(QnMessageBoxIcon::Critical,
+        showMessageLater(QnMessageBoxIcon::Warning,
             tr("Invalid license key"),
             tr("Please make sure it is entered correctly. ")
             + L'\n' + getProblemPersistMessage(),
