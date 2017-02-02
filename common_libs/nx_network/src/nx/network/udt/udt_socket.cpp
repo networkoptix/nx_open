@@ -593,13 +593,16 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     ScopedGuard<std::function<void()>> socketModeGuard;
 
-    bool requiredRecvMode = false;
-    if (needToSwitchRecvMode(flags, &requiredRecvMode))
+    boost::optional<bool> newRecvMode;
+    if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
+        return -1;
+
+    if (newRecvMode)
     {
-        if (!setRecvMode(requiredRecvMode))
+        if (!setRecvMode(*newRecvMode))
             return -1;
         socketModeGuard = ScopedGuard<std::function<void()>>(
-            [requiredRecvMode, this]() { setRecvMode(!requiredRecvMode); });
+            [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 
     const int bytesRead = UDT::recv(
@@ -779,10 +782,14 @@ bool UdtStreamSocket::connectToIp(
     return true;
 }
 
-bool UdtStreamSocket::needToSwitchRecvMode(int flags, bool* requiredRecvMode)
+bool UdtStreamSocket::checkIfRecvModeSwitchIsRequired(
+    int flags,
+    boost::optional<bool>* requiredRecvMode)
 {
-    if (flags == 0)
-        return false;
+    *requiredRecvMode = boost::none;
+
+    if ((flags & (MSG_DONTWAIT | MSG_WAITALL)) == 0)
+        return true;
 
     bool currentMode = false;
     int len = sizeof(currentMode);
@@ -794,12 +801,16 @@ bool UdtStreamSocket::needToSwitchRecvMode(int flags, bool* requiredRecvMode)
         return false;
     }
 
+    bool requiredRecvModeTmp = false;
     if (flags & MSG_DONTWAIT)
-        *requiredRecvMode = false;
+        requiredRecvModeTmp = false;
     else if (flags & MSG_WAITALL)
-        *requiredRecvMode = true;
+        requiredRecvModeTmp = true;
 
-    return currentMode != *requiredRecvMode;
+    if (currentMode != requiredRecvModeTmp)
+        *requiredRecvMode = requiredRecvModeTmp;
+
+    return true;
 }
 
 bool UdtStreamSocket::setRecvMode(bool isRecvSync)
