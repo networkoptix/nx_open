@@ -2061,14 +2061,14 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n matrices?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
-    const auto result = messageBox.exec();
-    if (result != QDialogButtonBox::Yes)
+
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
