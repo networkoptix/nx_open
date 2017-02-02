@@ -51,7 +51,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 QString QnVirtualCameraResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    QTextStream(&result)
+        << QnNetworkResource::toSearchString()
+        << " "
+        << getModel()
+        << " "
+        << getFirmware()
+        << " "
+        << getVendor(); //TODO: #Elric evil!
     return result;
 }
 
