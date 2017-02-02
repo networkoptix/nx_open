@@ -154,5 +154,10 @@ var Config = {
             'Inactive',
             'Active'
         ]
+    },
+
+    setup:{
+        waitForMergeCredentialsToApply: 1000,
+        retriesForMergeCredentialsToApply: 15
     }
 };
