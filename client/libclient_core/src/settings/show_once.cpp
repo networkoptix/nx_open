@@ -3,6 +3,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QStandardPaths>
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 QString pathForId(const QString& id)
@@ -11,15 +13,26 @@ QString pathForId(const QString& id)
     return target.absoluteFilePath(id);
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace settings {
 
-ShowOnce::ShowOnce(const QString& id, QObject* parent):
-    base_type(parent),
-    m_storage(new QSettings(pathForId(id), QSettings::IniFormat))
+ShowOnce::ShowOnce(const QString& id, StorageFormat format, QObject* parent):
+    base_type(parent)
 {
+    switch (format)
+    {
+        case StorageFormat::File:
+            m_storage.reset(new QSettings(pathForId(id), QSettings::IniFormat));
+            break;
+        default:
+            NX_ASSERT(format == StorageFormat::Section);
+            m_storage.reset(new QSettings());
+            m_storage->beginGroup(id);
+            break;
+    }
+
     m_storage->sync();
 }
 
