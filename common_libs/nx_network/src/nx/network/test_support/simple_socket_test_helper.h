@@ -612,6 +612,9 @@ void socketSyncAsyncSwitch(
 
     transferSyncAsync(client.get(), accepted.get());
     transferAsyncSync(accepted.get(), client.get());
+
+    client->pleaseStopSync();
+    accepted->pleaseStopSync();
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
