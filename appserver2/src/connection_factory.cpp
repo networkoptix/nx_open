@@ -81,13 +81,8 @@ void Ec2DirectConnectionFactory::pleaseStop()
 
 void Ec2DirectConnectionFactory::join()
 {
-    QnMutexLocker lk(&m_mutex);
-    while(m_runningRequests > 0)
-    {
-        lk.unlock();
-        QThread::msleep(1000);
-        lk.relock();
-    }
+    // Cancelling all ongoing requests.
+    m_remoteQueryProcessor.pleaseStopSync();
 }
 
 // Implementation of AbstractECConnectionFactory::testConnectionAsync
