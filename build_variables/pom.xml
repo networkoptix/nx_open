@@ -148,16 +148,6 @@
                 <version>2.0</version>
                 <executions>
                     <execution>
-                        <id>get_cloud_host</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source>${project.basedir}/get_cloud_host.groovy</source>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>generate_pro_file</id>
                         <phase>generate-sources</phase>
                         <goals>
