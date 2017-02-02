@@ -146,7 +146,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::RightEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::RightEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 }
 
