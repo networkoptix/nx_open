@@ -22,6 +22,70 @@
 #include <utils/common/app_info.h>
 #include <nx/utils/thread/mutex.h>
 
+#if defined (Q_OS_WIN32)
+WinDriveInfoList getWinDrivesInfo()
+{
+    WinDriveInfoList result;
+    const DWORD drivesBufLen = 512;
+    TCHAR drivesBuf[drivesBufLen];
+    TCHAR driveString[] = TEXT(" :\\";)
+    TCHAR driveSysString[] = TEXT("\\\\.\\ :");
+    WinDriveInfo driveInfo;
+
+    if (!GetLogicalDriveStrings(drivesBufLen, drivesBuf))
+        return result;
+
+    LPTSTR pdrivesBuf = drivesBuf;
+
+    do
+    {
+        driveInfo = WinDriveInfo();
+        *driveString = *pdrivesBuf;
+        driveInfo.path = QString::fromWCharArray(driveString);
+        *(driveSysString + 4) = *pdrivesBuf;
+
+        HANDLE driveHandle = CreateFile(driveSysString, 
+                                        FILE_READ_ATTRIBUTES, 
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                        NULL,
+                                        OPEN_EXISTING,
+                                        0,
+                                        NULL);
+        if (driveHandle == INVALID_HANDLE_VALUE)
+            goto end;
+        WORD bytesReturned;
+        bool success = DeviceIoControl(driveHandle,
+                                        IOCTL_STORAGE_CHECK_VERIFY2,
+                                        NULL, 0,
+                                        NULL, 0,
+                                        (LPDWORD)&bytesReturned,
+                                        NULL);
+        if (!success)
+        {
+            CloseHandle(driveHandle);
+            goto end;
+        }
+        driveInfo.access |= WinDriveInfo::Readable;
+        success = DeviceIoControl(driveHandle,
+                                  IOCTL_DISK_IS_WRITABLE,
+                                  NULL, 0,
+                                  NULL, 0,
+                                  (LPDWORD)&bytesReturned,
+                                  NULL);
+        driveInfo.access |= success ? WinDriveInfo::Writable : 0;
+        driveInfo.type = GetDriveType(driveString);
+
+        CloseHandle(driveHandle);
+        result.append(driveInfo);
+
+    end:
+        while (*++pdrivesBuf);
+    } 
+    while(*++pdrivesBuf != L'\0');
+
+    return result;
+}
+#endif
 
 bool removeDir(const QString &dirName)
 {

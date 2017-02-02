@@ -7,6 +7,33 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
+#if defined (Q_OS_WIN32)
+#include <windows.h>
+
+struct WinDriveInfo
+{
+    enum Access
+    {
+        NoAccess = 0,
+        Readable = 1,
+        Writable = 2,
+    };
+
+    QString path;
+    DWORD type;
+    int access;
+
+    WinDriveInfo() :
+        type(DRIVE_UNKNOWN),
+        access(NoAccess)
+    {}
+};
+
+using WinDriveInfoList = QList<WinDriveInfo>;
+
+WinDriveInfoList getWinDrivesInfo();
+#endif
+
 /**
  * Remove directory recursively.
  *
