@@ -12,31 +12,33 @@ class QnTimePeriod;
 class QnTimePeriodStorage;
 
 
-class QnCalendarItemDelegate: public Customized<QStyledItemDelegate> {
+class QnCalendarItemDelegate: public Customized<QStyledItemDelegate>
+{
     Q_OBJECT
     Q_PROPERTY(QnCalendarColors colors READ colors WRITE setColors)
-    typedef Customized<QStyledItemDelegate> base_type;
+    using base_type = Customized<QStyledItemDelegate>;
 
 public:
-    QnCalendarItemDelegate(QObject *parent = NULL);
+    QnCalendarItemDelegate(QObject* parent = nullptr);
 
-    const QnCalendarColors &colors() const;
-    void setColors(const QnCalendarColors &colors);
+    const QnCalendarColors& colors() const;
+    void setColors(const QnCalendarColors& colors);
 
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-    void paintCell(QPainter *painter
-        , const QRect &rect
-        , const QnTimePeriod &localPeriod
-        , const QnTimePeriodStorage &primaryPeriods
-        , const QnTimePeriodStorage &secondaryPeriods
-        , bool isSelected) const;
+    void paintCell(QPainter* painter,
+        const QRect& rect,
+        const QnTimePeriod& localPeriod,
+        const QnTimePeriodStorage& primaryPeriods,
+        const QnTimePeriodStorage& secondaryPeriods,
+        bool isSelected) const;
 
-    void paintCellText(QPainter *painter
-        , const QPalette &palette
-        , const QRect &rect
-        , const QString &text
-        , bool isEnabled) const;
+    void paintCellText(QPainter* painter,
+        const QPalette& palette,
+        const QRect& rect,
+        const QString& text,
+        bool isEnabled,
+        QPalette::ColorRole foregroundRole = QPalette::Text) const;
 
 private:
     QnCalendarColors m_colors;

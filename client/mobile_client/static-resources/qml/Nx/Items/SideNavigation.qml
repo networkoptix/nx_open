@@ -129,8 +129,8 @@ Drawer
             {
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
-                visible: false//!liteMode
                 onClicked: Workflow.openSettingsScreen()
+                visible: false
             }
 
             SideNavigationButton

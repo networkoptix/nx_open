@@ -367,6 +367,9 @@ void QnSingleCameraSettingsWidget::submitToResource()
             m_camera->setName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
+        if (ui->passwordEdit->hasFocus() && ui->passwordEdit->echoMode() == QLineEdit::PasswordEchoOnEdit)
+            setFocus();
+
         QAuthenticator loginEditAuth;
         loginEditAuth.setUser(ui->loginEdit->text().trimmed());
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());

@@ -1929,10 +1929,16 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     {
         case Action::AddAction:
         case Action::SetAction:
-            resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            if (checkLocalFiles(targetIndex, targetLayout))
+                resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         case Action::SwapAction:
-            swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
+                swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         default:
             break;
@@ -2987,6 +2993,16 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
     }
 
+}
+
+bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& index,
+    const QnLayoutResourcePtr& layout)
+{
+    if (!layout)
+        return true;
+
+    return nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+        layout->layoutResources().toList());
 }
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const

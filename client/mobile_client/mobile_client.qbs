@@ -4,7 +4,7 @@ import qbs.FileInfo
 GenericProduct
 {
     name: "mobile_client"
-    type: "application"
+    type: qbs.targetOS.contains("android") ? "dynamiclibrary" : "application"
 
     condition: project.withMobileClient
 

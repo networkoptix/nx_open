@@ -96,6 +96,8 @@ Page
         keepStatuses: !resourcesScreen.warningVisible
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
+        paused: !activePage
+
         ScrollIndicator.vertical: ScrollIndicator
         {
             leftPadding: 6

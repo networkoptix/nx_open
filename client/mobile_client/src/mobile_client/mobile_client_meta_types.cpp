@@ -28,6 +28,7 @@
 #include <helpers/lite_client_layout_helper.h>
 #include <helpers/cloud_url_helper.h>
 #include <utils/developer_settings_helper.h>
+#include <settings/qml_settings_adaptor.h>
 
 using namespace nx::client::mobile;
 
@@ -48,6 +49,10 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
+    qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
+        "Nx.Settings", 1, 0, "MobileSettings",
+        lit("Cannot create an instance of MobileSettings."));
+
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");

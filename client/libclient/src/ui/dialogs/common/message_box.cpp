@@ -61,7 +61,25 @@ void QnMessageBoxPrivate::init()
     Q_Q(QnMessageBox);
 
     connect(q->ui->buttonBox, &QDialogButtonBox::clicked, this,
-        [this](QAbstractButton *button) { clickedButton = button; });
+        [this](QAbstractButton *button)
+        {
+            Q_Q(QnMessageBox);
+            clickedButton = button;
+            const auto role = q->ui->buttonBox->buttonRole(button);
+            switch (role)
+            {
+                case QDialogButtonBox::AcceptRole:
+                case QDialogButtonBox::YesRole:
+                case QDialogButtonBox::RejectRole:
+                case QDialogButtonBox::NoRole:
+                case QDialogButtonBox::HelpRole:
+                    // These roles are handled in QMessageBox
+                    break;
+                default:
+                    q->accept();
+                    break;
+            }
+        });
 
     q->ui->checkBox->hide();
     q->ui->secondaryLine->hide();

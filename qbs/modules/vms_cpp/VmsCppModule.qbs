@@ -46,7 +46,6 @@ Module
         enableDataProviders: false
         enableSoftwareMotionDetection: false
         enableSendMail: false
-        Android.ndk.platform: "android-16"
     }
     Properties
     {
