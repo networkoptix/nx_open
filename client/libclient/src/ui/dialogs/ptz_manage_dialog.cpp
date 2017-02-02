@@ -89,6 +89,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent):
     m_submitting(false)
 {
     ui->setupUi(this);
+    setupTableChangesConfirmation();
+
 
     ui->previewGroupBox->hide(); // TODO: #dklychkov implement preview fetching and remove this line
 
@@ -165,6 +167,17 @@ QnPtzManageDialog::~QnPtzManageDialog()
     return;
 }
 
+void QnPtzManageDialog::setupTableChangesConfirmation()
+{
+     // To make sure we committed all changes to the table we should remove focus from it
+    const auto confirmTableChanges = [this]() { ui->buttonBox->setFocus(); };
+    const auto buttons = findChildren<QAbstractButton*>(QString());
+    for (auto buttonBox : buttons)
+        buttonBox->connect(buttonBox, &QAbstractButton::clicked, this, confirmTableChanges);
+
+    connect(ui->buttonBox, &QDialogButtonBox::clicked, this, confirmTableChanges);
+}
+
 void QnPtzManageDialog::keyPressEvent(QKeyEvent *event)
 {
     switch (event->key())
@@ -190,8 +203,6 @@ void QnPtzManageDialog::reject()
 
 void QnPtzManageDialog::accept()
 {
-    ui->buttonBox->setFocus(); //< to force table editor to commit changes
-
     saveData();
 
     clear();
