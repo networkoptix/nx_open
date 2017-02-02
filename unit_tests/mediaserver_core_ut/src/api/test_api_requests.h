@@ -24,6 +24,13 @@ PreprocessRequestFunc keepOnlyJsonFields(const QSet<QString>& fields);
 
 PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
+namespace api_requests_detail {
+
+// TODO: Consider moving to nx_http::HttpClient.
+nx_http::BufferType readResponse(nx_http::HttpClient* httpClient);
+
+} // namespace api_requests_detail
+
 /**
  * Perform HTTP POST Rest API request synchronously. To be used inside ASSERT_NO_FATAL_FAILURE().
  */
@@ -50,9 +57,8 @@ void testApiPost(
 
     httpClient.doPost(url, "application/json", request);
 
-    // TODO: #mshevchenko: Call in a loop; add comment to the method.
-    const auto responseStr = httpClient.fetchMessageBodyBuffer();
-    NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(responseStr), cl_logINFO);
+    const auto response = api_requests_detail::readResponse(&httpClient);
+    NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(response), cl_logINFO);
     NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient.response()->statusLine.statusCode),
         cl_logINFO);
 
@@ -79,15 +85,15 @@ void testApiGet(
 
     ASSERT_TRUE(httpClient.doGet(url));
 
-    const auto responseStr = httpClient.fetchMessageBodyBuffer();
-    NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(responseStr), cl_logINFO);
+    const auto response = api_requests_detail::readResponse(&httpClient);
+    NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(response), cl_logINFO);
     NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient.response()->statusLine.statusCode),
         cl_logINFO);
 
     ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
 
     if (responseData)
-        ASSERT_TRUE(QJson::deserialize(responseStr, responseData));
+        ASSERT_TRUE(QJson::deserialize(response, responseData));
 }
 
 } // namespace test

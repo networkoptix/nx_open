@@ -5,6 +5,18 @@
 namespace nx {
 namespace test {
 
+namespace api_requests_detail {
+
+nx_http::BufferType readResponse(nx_http::HttpClient* httpClient)
+{
+    nx_http::BufferType response;
+    while (!httpClient->eof())
+        response.append(httpClient->fetchMessageBodyBuffer());
+    return response;
+}
+
+} // namespace api_requests_detail
+
 namespace {
 
 /**
