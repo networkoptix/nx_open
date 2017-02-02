@@ -52,6 +52,7 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
+    bool isInSelfAioThread() const;
 
     //---------------------------------------------------------------------------------------------
     // Implementation of QnStoppable::*
@@ -103,7 +104,7 @@ protected:
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
     bool* m_terminated;
-    aio::Timer m_timerSocket;
+    aio::Timer m_timer;
     std::list<ServerSocketContext> m_serverSockets;
     nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
