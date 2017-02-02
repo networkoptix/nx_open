@@ -14,16 +14,11 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 #include <core/dataprovider/live_stream_provider.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
-
-struct EitherIframeOrGop
-{
-    QnConstCompressedVideoDataPtr iframe;
-    std::unique_ptr<QnDataPacketQueue> gop;
-};
 
 class QnVideoCamera: public QObject, public QnAbstractVideoCamera
 {
@@ -37,7 +32,6 @@ public:
     virtual QnLiveStreamProviderPtr getPrimaryReader() override;
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
-
     int copyLastGop(
         bool primaryLiveStream, 
         qint64 skipTime, 
@@ -48,10 +42,14 @@ public:
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
     QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
-    QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime, int channel) const;
-    std::unique_ptr<EitherIframeOrGop> getIframeOrGopByTime(bool primaryLiveStream, quint64 time, int channel);
-
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
+
+    std::unique_ptr<QnDataPacketQueue> getFrameSequenceByTime(
+        bool primaryLiveStream,
+        qint64 time,
+        int channel,
+        QnThumbnailRequestData::RoundMethod roundMethod) const;
+
     Q_SLOT void at_camera_resourceChanged();
     void beforeStop();
 

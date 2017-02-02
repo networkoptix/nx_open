@@ -49,6 +49,10 @@ private:
         bool useHq,
         quint64 time,
         int channel);
+
+    static CLVideoDecoderOutputPtr decodeFrameSequence(
+        std::unique_ptr<QnDataPacketQueue>& sequence,
+        quint64 time);
 };
 
 #endif // __GET_IMAGE_HELPER_H__

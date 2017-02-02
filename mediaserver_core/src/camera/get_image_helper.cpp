@@ -70,18 +70,20 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource
 }
 
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
-                                                                   bool useHQ,
-                                                                   QnThumbnailRequestData::RoundMethod roundMethod,
-                                                                   const QnSecurityCamResourcePtr &res,
-                                                                   QnServerArchiveDelegate& serverDelegate,
-                                                                   int prefferedChannel)
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
+    qint64 time,
+    bool useHQ,
+    QnThumbnailRequestData::RoundMethod roundMethod,
+    const QnSecurityCamResourcePtr &res,
+    QnServerArchiveDelegate& serverDelegate,
+    int prefferedChannel)
 {
     auto camera = qnCameraPool->getVideoCamera(res);
 
-    QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
+    std::unique_ptr<QnDataPacketQueue> videoSequence;
+
     if (time == DATETIME_NOW)
     {
         // get live data
@@ -115,19 +117,31 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
         }
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
 
-        if (!video && camera) {
-
-            if (roundMethod == QnThumbnailRequestData::PreciseMethod)
-                return getMostPreciseImageFromLive(camera, useHQ, time, prefferedChannel);
-
-            video = camera->getFrameByTime(useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
-            time = DATETIME_NOW;
-        }
+        // try approx frame from GOP keeper
         if (!video && camera)
-            video = camera->getFrameByTime(!useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
+        {
+            videoSequence = camera->getFrameSequenceByTime(
+                useHQ,
+                time,
+                prefferedChannel,
+                roundMethod);
+        }
+
+        if (!videoSequence && camera)
+        {
+            videoSequence = camera->getFrameSequenceByTime(
+                !useHQ,
+                time,
+                prefferedChannel,
+                roundMethod);
+        }
     }
+
+    if (videoSequence)
+        return decodeFrameSequence(videoSequence, time);
+
     if (!video)
-        return QSharedPointer<CLVideoDecoderOutput>();
+        return CLVideoDecoderOutputPtr();
 
     QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     bool gotFrame = false;
@@ -150,8 +164,10 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
+
     if (video)
         outFrame->channel = video->channelNumber;
+
     return outFrame;
 }
 
@@ -315,52 +331,27 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
     return outFrame;
 }
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getMostPreciseImageFromLive(
-    QnVideoCameraPtr& camera,
-    bool useHq,
-    quint64 time,
-    int channel)
+CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
+    std::unique_ptr<QnDataPacketQueue>& sequence,
+    quint64 time)
 {
-    auto iframeOrGop = camera->getIframeOrGopByTime(useHq, time, channel);
-    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-
-    if (!iframeOrGop)
-        CLVideoDecoderOutputPtr();
+    if (!sequence || sequence->isEmpty())
+        return CLVideoDecoderOutputPtr();
 
     bool gotFrame = false;
-    auto iframe = iframeOrGop->iframe;
-    auto& gop = iframeOrGop->gop;
+    auto randomAccess = sequence->lock();
+    auto firstFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(0));
+    
+    if (!firstFrame)
+        return CLVideoDecoderOutputPtr();
 
-    if (iframe)
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+    QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
+
+    for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
     {
-        
-        QnFfmpegVideoDecoder decoder(iframe->compressionType, iframe, false);
-
-        gotFrame = decoder.decode(iframe, &outFrame);
-        if (!gotFrame)
-            gotFrame = decoder.decode(iframe, &outFrame); //< Decode twice. Why do we do it?
-
-        if (gotFrame)
-            return outFrame;
-    }
-    else if (gop && !gop->isEmpty())
-    {
-        auto randomAccess = gop->lock();
-        auto firstFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(0));
-
-        if (!firstFrame)
-            return CLVideoDecoderOutputPtr();
-
-        QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
-
-        for ( auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
-        {
-            auto frame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(i));
-            gotFrame = decoder.decode(frame, &outFrame) && frame->timestamp >= time;
-            if (gotFrame)
-                break;
-        }
-
+        auto frame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(i));
+        gotFrame = decoder.decode(frame, &outFrame) && frame->timestamp >= time;
         if (gotFrame)
             return outFrame;
     }
