@@ -1352,8 +1352,7 @@ TCPServerSocket::~TCPServerSocket()
 {
     if (isInSelfAioThread())
     {
-        TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
-        d->asyncServerSocketHelper.stopPolling();
+        stopWhileInAioThread();
         return;
     }
 

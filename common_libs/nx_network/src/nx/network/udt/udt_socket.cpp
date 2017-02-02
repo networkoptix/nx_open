@@ -824,8 +824,7 @@ bool UdtStreamSocket::connectToIp(
 // =====================================================================
 // UdtStreamServerSocket implementation
 // =====================================================================
-UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion)
-:
+UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
     m_aioHelper(new aio::AsyncServerSocketHelper<UdtStreamServerSocket>(this))
 {
     open();
@@ -836,7 +835,8 @@ UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion)
 
 UdtStreamServerSocket::~UdtStreamServerSocket()
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 bool UdtStreamServerSocket::listen( int backlog )
