@@ -10,8 +10,10 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <client/client_settings.h>
 
@@ -19,6 +21,7 @@
 #include <ui/help/business_help.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -232,18 +235,20 @@ QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
     return QModelIndex();
 }
 
-bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
+bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action) const
 {
     QnBusiness::EventType eventType = action.eventParams.eventType;
-    if (action.hasFlags(QnBusinessActionData::VideoLinkExists))
+    if (action.hasFlags(QnBusinessActionData::VideoLinkExists)
+        && hasAccessToCamera(action.eventParams.eventResourceId))
     {
         return true;
     }
-    else if (eventType >= QnBusiness::UserDefinedEvent)
+
+    if (eventType >= QnBusiness::UserDefinedEvent)
     {
         for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
         {
-            if (qnResPool->getResourceById(id))
+            if (qnResPool->getResourceById(id) && hasAccessToCamera(id))
                 return true;
         }
     }
@@ -256,7 +261,8 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessA
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) {
+QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) const
+{
     if (column == DescriptionColumn && hasVideoLink(action))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
@@ -421,8 +427,11 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
 
         if (eventType == QnBusiness::CameraMotionEvent)
         {
-            if (action.hasFlags(QnBusinessActionData::VideoLinkExists))
-                result = tr("Motion video");
+            if (hasVideoLink(action))
+            {
+                const auto cameraId = action.eventParams.eventResourceId;
+                result = (hasAccessToArchive(cameraId) ? tr("Motion video") : tr("Open camera"));
+            }
         }
         else
         {
@@ -444,6 +453,27 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     default:
         return QString();
     }
+}
+
+bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
+{
+    const auto cameraResource = getResourceById(cameraId);
+    if (!cameraResource.dynamicCast<QnVirtualCameraResource>())
+    {
+        NX_ASSERT(false, "Resource is not a camera");
+        return false;
+    }
+    return qnResourceAccessProvider->hasAccess(context()->user(), cameraResource);
+}
+
+bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
+{
+    if (!getResourceById(cameraId).dynamicCast<QnVirtualCameraResource>())
+    {
+        NX_ASSERT(false, "Resource is not a camera");
+        return false;
+    }
+    return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
 }
 
 int QnEventLogModel::helpTopicIdData(const Column& column, const QnBusinessActionData &action) {
@@ -632,10 +662,15 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const {
     return QnResourcePtr();
 }
 
-qint64 QnEventLogModel::eventTimestamp(int row) const {
-    if (row >= 0) {
+qint64 QnEventLogModel::eventTimestamp(int row) const
+{
+    if (row >= 0)
+    {
         const QnBusinessActionData& action = m_index->at(row);
-        return action.eventParams.eventTimestampUsec;
+        const bool accessDenied = ((action.eventParams.eventType == QnBusiness::CameraMotionEvent)
+            && !hasAccessToArchive(action.eventParams.eventResourceId));
+
+        return (accessDenied ? AV_NOPTS_VALUE : action.eventParams.eventTimestampUsec);
     }
     return AV_NOPTS_VALUE;
 }
