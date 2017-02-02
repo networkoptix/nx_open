@@ -73,7 +73,7 @@ void QnMessageBoxPrivate::init()
                 case QDialogButtonBox::RejectRole:
                 case QDialogButtonBox::NoRole:
                 case QDialogButtonBox::HelpRole:
-                    // These roles are handled in QMessageBox
+                    // These roles are handled in QDialogButtonBox
                     break;
                 default:
                     q->accept();
