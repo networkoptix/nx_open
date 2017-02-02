@@ -11,10 +11,12 @@ if (!host)
 {
     host = requestHost(properties.customization, properties.cloudGroup)
     println("cloudHost resolved to " + host)
-    for (project in session.getProjects())
-        project.properties.cloudHost = host
 }
 else
 {
-    println("Using predefined cloudHost: " + properties.cloudHost)
+    println("Using predefined cloudHost: " + host)
 }
+
+println("Writing cloudHost: " + host + " to file " + properties.targetPropertiesFile)
+def file = new File(properties.targetPropertiesFile)
+file.write("cloudHost=" + host)
