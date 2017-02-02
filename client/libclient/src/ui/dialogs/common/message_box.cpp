@@ -14,27 +14,27 @@
 
 class QnMessageBoxPrivate : public QObject
 {
-    QnMessageBox *q_ptr;
+    QnMessageBox* q_ptr;
     Q_DECLARE_PUBLIC(QnMessageBox)
 
 public:
-    QAbstractButton *clickedButton;
-    QList<QAbstractButton *> customButtons;
-    QAbstractButton *defaultButton;
+    QAbstractButton* clickedButton;
+    QList<QAbstractButton*> customButtons;
+    QAbstractButton* defaultButton;
     QnButtonAccent buttonAccent;
-    QAbstractButton *escapeButton;
+    QAbstractButton* escapeButton;
     QList<QLabel*> informativeLabels;
     QList<QWidget*> customWidgets;
     QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
     QnButtonDetections buttonDetection;
-    QnMessageBoxPrivate(QnMessageBox *parent);
+    QnMessageBoxPrivate(QnMessageBox* parent);
 
     void init();
     void detectDefaultButton();
     void detectEscapeButton();
     void stylizeButtons();
-    int execReturnCode(QAbstractButton *button) const;
+    int execReturnCode(QAbstractButton* button) const;
 
 private:
     void detectSpecificButton(
@@ -61,7 +61,7 @@ void QnMessageBoxPrivate::init()
     Q_Q(QnMessageBox);
 
     connect(q->ui->buttonBox, &QDialogButtonBox::clicked, this,
-        [this](QAbstractButton *button)
+        [this](QAbstractButton* button)
         {
             Q_Q(QnMessageBox);
             clickedButton = button;
@@ -164,7 +164,7 @@ void QnMessageBoxPrivate::stylizeButtons()
     }
 }
 
-int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
+int QnMessageBoxPrivate::execReturnCode(QAbstractButton* button) const
 {
     Q_Q(const QnMessageBox);
 
@@ -177,10 +177,7 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton *button) const
     return ret;
 }
 
-QnMessageBox::QnMessageBox(
-    QWidget* parent
-    , Qt::WindowFlags flags)
-    :
+QnMessageBox::QnMessageBox(QWidget* parent, Qt::WindowFlags flags):
     base_type(parent, flags),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
@@ -287,9 +284,7 @@ QDialogButtonBox::StandardButton QnMessageBox::success(
     return execute(parent, QnMessageBoxIcon::Success, text, extras, buttons, defaultButton);
 }
 
-void QnMessageBox::addButton(
-        QAbstractButton *button,
-        QDialogButtonBox::ButtonRole role)
+void QnMessageBox::addButton(QAbstractButton* button, QDialogButtonBox::ButtonRole role)
 {
     Q_D(QnMessageBox);
 
@@ -302,7 +297,6 @@ QPushButton* QnMessageBox::addCustomButton(
     QDialogButtonBox::ButtonRole role,
     QnButtonAccent accent)
 {
-    QPushButton* result = nullptr;
     switch (button)
     {
         case QnMessageBoxCustomButton::Overwrite:
@@ -319,7 +313,7 @@ QPushButton* QnMessageBox::addCustomButton(
 }
 
 QPushButton* QnMessageBox::addButton(
-    const QString &text,
+    const QString& text,
     QDialogButtonBox::ButtonRole role,
     QnButtonAccent accent)
 {
@@ -339,17 +333,17 @@ QPushButton* QnMessageBox::addButton(
     return result;
 }
 
-QPushButton *QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
+QPushButton* QnMessageBox::addButton(QDialogButtonBox::StandardButton button)
 {
     Q_D(QnMessageBox);
 
-    QPushButton *addedButton = ui->buttonBox->addButton(button);
+    QPushButton* addedButton = ui->buttonBox->addButton(button);
     d->customButtons.append(addedButton);
 
     return addedButton;
 }
 
-void QnMessageBox::removeButton(QAbstractButton *button)
+void QnMessageBox::removeButton(QAbstractButton* button)
 {
     Q_D(QnMessageBox);
 
@@ -357,22 +351,18 @@ void QnMessageBox::removeButton(QAbstractButton *button)
     d->customButtons.removeOne(button);
 }
 
-QList<QAbstractButton *> QnMessageBox::buttons() const
+QList<QAbstractButton*> QnMessageBox::buttons() const
 {
     return ui->buttonBox->buttons();
 }
 
-QDialogButtonBox::ButtonRole QnMessageBox::buttonRole(
-        QAbstractButton *button) const
+QDialogButtonBox::ButtonRole QnMessageBox::buttonRole(QAbstractButton* button) const
 {
     return ui->buttonBox->buttonRole(button);
 }
 
-void QnMessageBox::setStandardButtons(
-        QDialogButtonBox::StandardButtons buttons)
+void QnMessageBox::setStandardButtons(QDialogButtonBox::StandardButtons buttons)
 {
-    Q_D(QnMessageBox);
-
     ui->buttonBox->setStandardButtons(buttons);
 }
 
@@ -381,14 +371,12 @@ QDialogButtonBox::StandardButtons QnMessageBox::standardButtons() const
     return ui->buttonBox->standardButtons();
 }
 
-QDialogButtonBox::StandardButton QnMessageBox::standardButton(
-        QAbstractButton *button) const
+QDialogButtonBox::StandardButton QnMessageBox::standardButton(QAbstractButton* button) const
 {
     return ui->buttonBox->standardButton(button);
 }
 
-QPushButton *QnMessageBox::button(
-        QDialogButtonBox::StandardButton which) const
+QPushButton* QnMessageBox::button(QDialogButtonBox::StandardButton which) const
 {
     return ui->buttonBox->button(which);
 }
@@ -427,20 +415,20 @@ void QnMessageBox::setDefaultButton(
     if (button == QDialogButtonBox::NoButton)
         return;
 
-    QPushButton *buttonWidget = ui->buttonBox->button(button);
+    QPushButton* buttonWidget = ui->buttonBox->button(button);
     NX_ASSERT(buttonWidget, "Non-existing default button");
 
     if (buttonWidget)
         setDefaultButton(buttonWidget, accent);
 }
 
-QAbstractButton *QnMessageBox::escapeButton() const
+QAbstractButton* QnMessageBox::escapeButton() const
 {
     Q_D(const QnMessageBox);
     return d->escapeButton;
 }
 
-void QnMessageBox::setEscapeButton(QAbstractButton *button)
+void QnMessageBox::setEscapeButton(QAbstractButton* button)
 {
     Q_D(QnMessageBox);
 
@@ -620,7 +608,7 @@ void QnMessageBox::removeCustomWidget(QWidget* widget)
         d->focusWidget = nullptr;
 }
 
-void QnMessageBox::setCustomCheckBoxText(const QString &text)
+void QnMessageBox::setCustomCheckBoxText(const QString& text)
 {
     ui->checkBox->setText(text);
     setCheckBoxEnabled(!text.isEmpty());
@@ -670,7 +658,7 @@ int QnMessageBox::exec()
     return d->execReturnCode(clickedButton());
 }
 
-void QnMessageBox::closeEvent(QCloseEvent *event)
+void QnMessageBox::closeEvent(QCloseEvent* event)
 {
     Q_D(QnMessageBox);
 
@@ -715,10 +703,9 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
             textToCopy += info + separator;
 
         QString buttonTexts;
-        QList<QAbstractButton *> buttons = ui->buttonBox->buttons();
-        for (int i = 0; i < buttons.count(); i++)
+        for (auto pb: ui->buttonBox->buttons())
         {
-            buttonTexts += buttons[i]->text() + QLatin1String("   ");
+            buttonTexts += pb->text() + lit("   ");
         }
         textToCopy += buttonTexts + separator;
         QApplication::clipboard()->setText(textToCopy);
@@ -731,10 +718,8 @@ void QnMessageBox::keyPressEvent(QKeyEvent *event)
         int key = event->key() & ~Qt::MODIFIER_MASK;
         if (key)
         {
-            const QList<QAbstractButton *> buttons = ui->buttonBox->buttons();
-            for (int i = 0; i < buttons.count(); ++i)
+            for (auto pb: ui->buttonBox->buttons())
             {
-                QAbstractButton *pb = buttons.at(i);
                 QKeySequence shortcut = pb->shortcut();
                 if (!shortcut.isEmpty() &&
                     key == int(shortcut[0] & ~Qt::MODIFIER_MASK))
