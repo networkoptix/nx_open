@@ -10,6 +10,7 @@
 #include "abstract_socket.h"
 #include "socket_common.h"
 #include "socket_impl_helper.h"
+#include "ssl/ssl_engine.h"
 
 // Forward
 struct bio_st;
@@ -31,27 +32,7 @@ typedef AbstractSocketImplementationDelegate<
         std::function<AbstractStreamServerSocket*()>
     > SslSocketServerImplementationDelegate;
 
-class NX_NETWORK_API SslEngine
-{
-    static const size_t kBufferSize;
-    static const int kRsaLength;
-    static const std::chrono::seconds kCertExpiration;
-
-public:
-    static String makeCertificateAndKey(
-        const String& name, const String& country, const String& company);
-
-    static bool useCertificateAndPkey(const String& certData);
-
-    static void useOrCreateCertificate(
-        const QString& filePath,
-        const String& name, const String& country, const String& company);
-
-    static void useRandomCertificate(const String& module);
-};
-
-class NX_NETWORK_API SslSocket
-:
+class NX_NETWORK_API SslSocket:
     public SslSocketImplementationDelegate
 {
     typedef SslSocketImplementationDelegate base_type;
