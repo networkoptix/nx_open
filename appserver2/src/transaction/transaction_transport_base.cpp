@@ -1545,20 +1545,25 @@ void QnTransactionTransportBase::startListeningNonSafe()
     NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
     m_httpStreamReader.resetState();
 
-    if( m_incomingDataSocket )
-    {
-        using namespace std::chrono;
-        m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(
-            duration_cast<milliseconds>(kSocketSendTimeout).count());
-        m_incomingDataSocket->setNonBlockingMode(true);
-        using namespace std::placeholders;
-        m_lastReceiveTimer.restart();
-        m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-        m_incomingDataSocket->readSomeAsync(
-            &m_readBuffer,
-            std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
-    }
+    post(
+        [this]()
+        {
+            using namespace std::chrono;
+            using namespace std::placeholders;
+
+            if (!m_incomingDataSocket)
+                return;
+
+            m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_incomingDataSocket->setSendTimeout(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());
+            m_incomingDataSocket->setNonBlockingMode(true);
+            m_lastReceiveTimer.restart();
+            m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
+            m_incomingDataSocket->readSomeAsync(
+                &m_readBuffer,
+                std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
+        });
 }
 
 void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )
