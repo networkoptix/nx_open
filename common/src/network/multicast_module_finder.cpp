@@ -281,6 +281,7 @@ void QnMulticastModuleFinder::run() {
             m_prevPingClock = currentClock;
         }
 
+        QnMutexLocker lk(&m_mutex);
         int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
 
         if (socketCount == 0)
