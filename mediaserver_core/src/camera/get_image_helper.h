@@ -51,7 +51,7 @@ private:
         int channel);
 
     static CLVideoDecoderOutputPtr decodeFrameSequence(
-        std::unique_ptr<QnDataPacketQueue>& sequence,
+        std::unique_ptr<QnConstDataPacketQueue>& sequence,
         quint64 time);
 };
 

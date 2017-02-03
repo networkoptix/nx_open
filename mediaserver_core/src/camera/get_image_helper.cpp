@@ -82,7 +82,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
-    std::unique_ptr<QnDataPacketQueue> videoSequence;
+    std::unique_ptr<QnConstDataPacketQueue> videoSequence;
 
     if (time == DATETIME_NOW)
     {
@@ -137,7 +137,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
         }
     }
 
-    if (videoSequence)
+    if (videoSequence && videoSequence->size() > 0)
         return decodeFrameSequence(videoSequence, time);
 
     if (!video)
@@ -332,7 +332,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
 }
 
 CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
-    std::unique_ptr<QnDataPacketQueue>& sequence,
+    std::unique_ptr<QnConstDataPacketQueue>& sequence,
     quint64 time)
 {
     if (!sequence || sequence->isEmpty())
@@ -340,8 +340,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     bool gotFrame = false;
     auto randomAccess = sequence->lock();
-    auto firstFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(0));
-    
+    auto firstFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(0));
+
     if (!firstFrame)
         return CLVideoDecoderOutputPtr();
 
@@ -350,7 +350,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
 
     for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
     {
-        auto frame = std::dynamic_pointer_cast<QnCompressedVideoData>(randomAccess.at(i));
+        auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
         gotFrame = decoder.decode(frame, &outFrame) && frame->timestamp >= time;
         if (gotFrame)
             return outFrame;

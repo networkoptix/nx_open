@@ -44,7 +44,7 @@ public:
     QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
 
-    std::unique_ptr<QnDataPacketQueue> getFrameSequenceByTime(
+    std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
         bool primaryLiveStream,
         qint64 time,
         int channel,
