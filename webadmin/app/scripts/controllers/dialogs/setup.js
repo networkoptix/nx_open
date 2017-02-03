@@ -301,7 +301,9 @@ angular.module('webadminApp')
         };
         function remoteErrorHandler(error){
             logMediaserverError(error);
-
+            if(!error.data){
+                error.data = error;
+            }
             var errorMessage = 'Connection error (' + error.status + ')';
             if(error.data && error.data.errorString && error.data.errorString!='') {
                 errorMessage = formatError(error.data.errorString);
@@ -323,6 +325,12 @@ angular.module('webadminApp')
                         break;
 
                     default:
+
+                        $scope.settings.remoteError = errorMessage;
+                        if(error.data.error == 3){
+                            $scope.next('mergeTemporaryFailure');
+                            break;
+                        }
                         $scope.next('mergeFailure');
                         break;
                 }
@@ -340,7 +348,7 @@ angular.module('webadminApp')
             $scope.settings.remoteError = false;
 
             $log.log("Request /api/mergeSystems ...");
-            mediaserver.mergeSystems(
+            return mediaserver.mergeSystems(
                 systemUrl,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
@@ -352,12 +360,42 @@ angular.module('webadminApp')
                 }
 
                 $log.log("Mediaserver connected system to another");
-                $log.log("Apply new credentials ... ");
-                updateCredentials($scope.settings.remoteLogin, $scope.settings.remotePassword, false).catch(remoteErrorHandler);
+                return updateCredentialsAfterMerge();
             },remoteErrorHandler);
         }
 
+        function updateCredentialsAfterMerge(){
+            $log.log("Apply new credentials ... ");
+            return updateCredentials($scope.settings.remoteLogin, $scope.settings.remotePassword, false).catch(mergeLoginErrorHandler);
+        }
 
+
+        var retries = 0;
+        function mergeLoginErrorHandler(error){
+            /*
+            From https://networkoptix.atlassian.net/browse/VMS-5057
+
+             You need to check temporary unavailable error code and retry perform request:
+             delay between requests 1 second
+             total time 15 seconds
+             if very last request still contains code "temporary unauthorized" you need to show separate error message. something "System is still being merged. please try again later".
+
+
+             Serverside related changes:
+
+             result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+             +        return nx_http::StatusCode::ok;
+
+             */
+
+            retries++;
+            if(retries > Config.setup.retriesForMergeCredentialsToApply){ // Several attempts
+                retries = 0;
+                // Show error
+                return remoteErrorHandler(error);
+            }
+            return $timeout(updateCredentialsAfterMerge, Config.setup.pollingTimeout);
+        }
         function logMediaserverError(error, message){
             if(message){
                 $log.log(message);
@@ -600,7 +638,7 @@ angular.module('webadminApp')
 
         function waitForReboot(){
             $scope.next(0); // Go to loading
-            var poll = $poll(pingServer, 1000, 5000);
+            var poll = $poll(pingServer, Config.setup.pollingTimeout, Config.setup.firstPollingRequest);
 
             function pingServer(){
                 return mediaserver.getModuleInformation(true).then(function(){
@@ -610,6 +648,21 @@ angular.module('webadminApp')
                 });
             }
         }
+
+
+        function checkIfSystemIsReady(){
+            var poll = $poll(reCheckSystem, Config.setup.slowPollingTimeout, Config.setup.firstPollingRequest);
+            function reCheckSystem(){
+                return mediaserver.getModuleInformation(true).then(function(result){
+                    console.log(result);
+                    if(!result.data.reply.flags.newSystem){
+                        window.location.reload();
+                        $poll.cancel(poll);
+                    }
+                });
+            }
+        }
+
 
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
@@ -744,6 +797,13 @@ angular.module('webadminApp')
                         $scope.next('merge');
                     }
                 },
+                mergeTemporaryFailure:{
+                    retry: function () {
+                        window.location.reload();
+                    },
+                    finish: true
+                },
+
 
                 localLogin: {
                     back: function () {
@@ -828,8 +888,9 @@ angular.module('webadminApp')
                 readCloudHost();
                 getAdvancedSettings();
                 discoverSystems();
+                checkIfSystemIsReady();
             },function(error){
-                checkMySystem().catch(function(){
+                checkMySystem().then(checkIfSystemIsReady, function(){
                     $log.log("Couldn't run setup wizard: auth failed");
                     $log.error(error);
                     if( $location.search().retry) {
