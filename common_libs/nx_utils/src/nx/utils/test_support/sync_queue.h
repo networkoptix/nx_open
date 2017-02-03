@@ -34,7 +34,7 @@ public:
         if (!value)
         {
             timedOut();
-            return Base::ResultType();
+            return typename Base::ResultType();
         }
 
         return std::move(*value);
