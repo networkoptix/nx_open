@@ -32,7 +32,10 @@ public:
     {
         auto value = Base::pop(m_timeout);
         if (!value)
+        {
             timedOut();
+            return Base::ResultType();
+        }
 
         return std::move(*value);
     }
