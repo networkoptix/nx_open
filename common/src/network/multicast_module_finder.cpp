@@ -199,7 +199,7 @@ RevealResponse *QnMulticastModuleFinder::getCachedValue(const quint8* buffer, co
     return response;
 }
 
-bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
+bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket, QnMutexLockerBase* lock) {
     const size_t readBufferSize = UDPSocket::MAX_PACKET_SIZE;
     quint8 readBuffer[readBufferSize];
 
@@ -233,6 +233,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response->port == 0)
         return true;
 
+    lock->unlock();
     emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
 
     return true;
@@ -309,7 +310,7 @@ void QnMulticastModuleFinder::run() {
             if (udpSocket == m_serverSocket.data())
                 processDiscoveryRequest(udpSocket);
             else
-                processDiscoveryResponse(udpSocket);
+                processDiscoveryResponse(udpSocket, &lk);
         }
     }
 

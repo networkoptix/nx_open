@@ -71,7 +71,7 @@ protected:
 
 private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
-    bool processDiscoveryResponse(UDPSocket *udpSocket);
+    bool processDiscoveryResponse(UDPSocket *udpSocket, QnMutexLockerBase* lock);
     void updateInterfaces();
     void clearInterfaces();
     RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
