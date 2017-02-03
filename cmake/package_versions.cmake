@@ -1,4 +1,4 @@
-set(qt_version "5.6.1")
+set(qt_version "5.6.2")
 set(boost_version "1.60.0")
 set(openssl_version "1.0.2e")
 set(ffmpeg_version "3.1.1")

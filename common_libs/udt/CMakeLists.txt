@@ -1,4 +1,4 @@
-find_sources(src CPP_FILES)
+find_sources(src CPP_FILES HPP_FILES)
 
 add_library(udt
     ${CPP_FILES}

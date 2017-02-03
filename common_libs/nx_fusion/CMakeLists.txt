@@ -1,7 +1,8 @@
-find_sources(src CPP_FILES)
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
 add_library(nx_fusion
-    ${CPP_FILES}
+    ${CPP_FILES} ${MOC_FILES}
     src/StdAfx.cpp src/StdAfx.h)
 
 add_precompiled_header(nx_fusion src/StdAfx.h FORCEINCLUDE)

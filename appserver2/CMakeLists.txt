@@ -1,8 +1,10 @@
-find_sources(src CPP_FILES)
-generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/appserver2.qrc "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
+generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/appserver2.qrc
+    "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
 
 add_library(appserver2
-    ${CPP_FILES}
+    ${CPP_FILES} ${MOC_FILES}
     src/StdAfx.cpp src/StdAfx.h
     ${CMAKE_CURRENT_BINARY_DIR}/appserver2.qrc
 )

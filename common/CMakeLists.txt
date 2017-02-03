@@ -1,4 +1,5 @@
-find_sources(src CPP_FILES)
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/common.qrc
     "${CMAKE_CURRENT_SOURCE_DIR}/static-resources"
     "${customization_dir}/common/resources"
@@ -10,7 +11,7 @@ configure_file(
 )
 
 add_library(common
-    ${CPP_FILES}
+    ${CPP_FILES} ${MOC_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp
     src/StdAfx.cpp src/StdAfx.h
     ${CMAKE_CURRENT_BINARY_DIR}/common.qrc

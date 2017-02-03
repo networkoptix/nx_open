@@ -1,4 +1,5 @@
-find_sources(src CPP_FILES)
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
 configure_file(
     maven/filter-resources/libconnection_mediator_app_info_impl.cpp
@@ -6,7 +7,7 @@ configure_file(
 )
 
 add_library(connection_mediator
-    ${CPP_FILES}
+    ${CPP_FILES} ${MOC_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/libconnection_mediator_app_info_impl.cpp
     src/StdAfx.cpp src/StdAfx.h
 )

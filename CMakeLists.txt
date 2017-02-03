@@ -15,7 +15,6 @@ set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 if(NOT WIN32)
@@ -77,6 +76,9 @@ find_package(Qt5
 )
 
 include(compiler_options)
+
+# Required for QN_DECLARE_METAOBJECT_HEADER
+include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
 add_subdirectory(common_libs)
 add_subdirectory(common)

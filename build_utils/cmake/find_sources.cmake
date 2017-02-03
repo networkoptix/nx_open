@@ -41,8 +41,8 @@ function(pick_file file_name result_name)
   set(${result_name} TRUE PARENT_SCOPE)
 endfunction()
 
-function(find_sources src_dir var)
-    file(GLOB_RECURSE CODE_FILES ${src_dir}/*.cpp)
+function(find_files src_dir extension var)
+    file(GLOB_RECURSE CODE_FILES ${src_dir}/*.${extension})
 
     foreach(file_name ${CODE_FILES})
       pick_file(${file_name} PICK)
@@ -52,4 +52,12 @@ function(find_sources src_dir var)
     endforeach()
 
     set(${var} ${RESULT_FILES} PARENT_SCOPE)
+endfunction()
+
+function(find_sources src_dir src_var hpp_var)
+    find_files(${src_dir} "cpp" cpp_files)
+    set(${src_var} ${cpp_files} PARENT_SCOPE)
+
+    find_files(${src_dir} "h" hpp_files)
+    set(${hpp_var} ${hpp_files} PARENT_SCOPE)
 endfunction()
