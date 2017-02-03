@@ -78,7 +78,7 @@ Pane
         z: 1
         anchors.right: parent.right
         icon: lp("/images/edit.png")
-        visible: authenticationDataModel.hasData
+        visible: !cloudSystem && authenticationDataModel.hasData
         onClicked:
         {
             Workflow.openSavedSession(

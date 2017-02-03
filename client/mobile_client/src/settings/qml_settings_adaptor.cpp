@@ -26,6 +26,8 @@ QmlSettingsAdaptor::QmlSettingsAdaptor(QObject* parent):
 
 bool QmlSettingsAdaptor::liveVideoPreviews() const
 {
+    // TODO: #dklychkov Enable after beta is out
+    return false;
     return qnSettings->liveVideoPreviews();
 }
 

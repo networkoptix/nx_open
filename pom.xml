@@ -323,7 +323,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
+                                <file>${root.dir}/.cloudHost.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>

@@ -155,9 +155,6 @@ protected:
     void at_webAdminAction_triggered();
     void at_webClientAction_triggered();
 
-    void at_preferencesGeneralTabAction_triggered();
-    void at_preferencesNotificationTabAction_triggered();
-
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
@@ -214,6 +211,7 @@ private:
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
     void openSystemAdministrationDialog(int page);
+    void openLocalSettingsDialog(int page);
 
     QnAdjustVideoDialog* adjustVideoDialog();
 

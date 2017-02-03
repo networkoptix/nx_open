@@ -118,7 +118,9 @@ void QnDirectModuleFinder::start() {
 void QnDirectModuleFinder::pleaseStop() {
     m_checkTimer->stop();
     m_requestQueue.clear();
-    for (QnAsyncHttpClientReply *reply: m_activeRequests) {
+    for (auto reply: m_activeRequests)
+    {
+        reply->disconnect(this);
         reply->asyncHttpClient()->pleaseStopSync();
         reply->deleteLater();
     }
