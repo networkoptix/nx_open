@@ -7,18 +7,23 @@
 
 #include <nx/utils/log/log.h>
 
+#include "pollset_factory.h"
 
 namespace nx {
 namespace network {
 namespace aio {
 namespace detail {
 
-AIOThreadImpl::AIOThreadImpl()
-:
+AIOThreadImpl::AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSetToUse):
     newReadMonitorTaskCount(0),
     newWriteMonitorTaskCount(0),
     processingPostedCalls(0)
 {
+    if (pollSetToUse)
+        pollSet = std::move(pollSetToUse);
+    else
+        pollSet = PollSetFactory::instance()->create();
+
     m_monotonicClock.restart();
 }
 
@@ -119,7 +124,7 @@ void AIOThreadImpl::processPollSetModificationQueue(TaskType taskFilter)
                 NX_ASSERT(task.postHandler);
                 NX_ASSERT(!task.taskCompletionEvent && !task.taskCompletionHandler);
                 postedCalls.push_back(std::move(task));
-                //this task differs from every else in a way that it is not processed here, 
+                //this task differs from every else in a way that it is not processed here,
                     //just moved to another container. TODO #ak is it really needed to move to another container?
                 it = pollSetModificationQueue.erase(it);
                 continue;
@@ -164,11 +169,13 @@ void AIOThreadImpl::addSockToPollset(
     bool failedToAddToPollset = false;
     if (eventType != aio::etTimedOut)
     {
-        if (!pollSet.add(socket, eventType, handlingData.get()))
+        if (!pollSet->add(socket, eventType, handlingData.get()))
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
             failedToAddToPollset = true;
+            NX_LOG(lm("Failed to add %1(%2) to pollset. %3")
+                .strs(boost::core::demangle(typeid(*socket).name()), (void*)socket,
+                    SystemError::toString(errorCode)), cl_logWARNING);
         }
     }
     socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
@@ -204,7 +211,7 @@ void AIOThreadImpl::removeSocketFromPollSet(Pollable* sock, aio::EventType event
         delete static_cast<AIOEventHandlingDataHolder*>(userData);
     userData = nullptr;
     if (eventType == aio::etRead || eventType == aio::etWrite)
-        pollSet.remove(sock, eventType);
+        pollSet->remove(sock, eventType);
 }
 
 void AIOThreadImpl::removeSocketsFromPollSet()
@@ -258,7 +265,7 @@ bool AIOThreadImpl::removeReverseTask(
             it = pollSetModificationQueue.erase(it);
             //removing futher tChangingTimeout tasks
             for (;
-            it != pollSetModificationQueue.end();
+                it != pollSetModificationQueue.end();
                 ++it)
             {
                 if (it->socket == sock && it->eventType == eventType)
@@ -283,13 +290,11 @@ bool AIOThreadImpl::removeReverseTask(
 //!Processes events from \a pollSet
 void AIOThreadImpl::processSocketEvents(const qint64 curClock)
 {
-    for (typename UnifiedPollSet::const_iterator
-        it = pollSet.begin();
-        it != pollSet.end();
-        )
+    auto it = pollSet->getSocketEventsIterator();
+    while (it->next())
     {
-        Pollable* const socket = it.socket();
-        const aio::EventType sockEventType = it.eventType();
+        Pollable* const socket = it->socket();
+        const aio::EventType sockEventType = it->eventReceived();
         const aio::EventType handlerToInvokeType =
             (sockEventType == aio::etRead || sockEventType == aio::etWrite)
             ? sockEventType
@@ -297,9 +302,9 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
                 ? aio::etRead
                 : aio::etWrite);
 
-        //TODO #ak in case of error pollSet reports etError once, 
+        //TODO #ak in case of error pollSet reports etError once,
         //but two handlers may be registered for socket.
-        //So, we must notify both (if they differ, probably). 
+        //So, we must notify both (if they differ, probably).
         //Currently, leaving as-is since any socket installs single handler for both events
 
         //TODO #ak notify second handler (if any) and if it not removed by first handler
@@ -317,7 +322,6 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
         if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0) //socket has been removed from watch
         {
             --handlingData->beingProcessed;
-            ++it;
             continue;
         }
         //eventTriggered is allowed to call removeFromWatch which can remove socket from pollset
@@ -326,9 +330,8 @@ void AIOThreadImpl::processSocketEvents(const qint64 curClock)
         if (handlingData->timeout > 0)
             handlingData->updatedPeriodicTaskClock = curClock + handlingData->timeout;
         --handlingData->beingProcessed;
-        //NOTE element, this iterator points to, could be removed in eventTriggered call, 
+        //NOTE element, this iterator points to, could be removed in eventTriggered call,
         //but it is still safe to increment this iterator
-        ++it;
     }
 }
 

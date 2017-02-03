@@ -9,6 +9,7 @@
 #include <ui/animation/animator_group.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -37,6 +38,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_yAnimator(new VariantAnimator(this)),
     m_opacityProcessor(new HoverFocusProcessor(parentWidget))
 {
+    item->setProperty(Qn::NoHandScrollOver, true);
     item->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     item->setPos(0.0, 0.0);
     item->setZValue(ControlItemZOrder);
@@ -76,7 +78,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::BottomEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::BottomEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateControlsGeometry();
@@ -166,6 +168,15 @@ void TitleWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 bool TitleWorkbenchPanel::isHovered() const
 {
     return m_opacityProcessor->isHovered();
+}
+
+void TitleWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
 }
 
 bool TitleWorkbenchPanel::isUsed() const

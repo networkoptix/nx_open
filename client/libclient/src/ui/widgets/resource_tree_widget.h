@@ -58,6 +58,9 @@ public:
 
     void expandAll();
 
+    /** Expands checked and partially checked nodes. */
+    void expandChecked();
+
     QPoint selectionPos() const;
 
     /**
@@ -144,6 +147,8 @@ private slots:
 
     void updateColumns();
     void updateFilter();
+
+    void expandCheckedRecursively(const QModelIndex& from);
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;

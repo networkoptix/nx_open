@@ -177,6 +177,7 @@ TEST_F(OutgoingTunnelConnectionTest, common)
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    tunnelConnection.start();
 
     auto connectContexts = startConnections(&tunnelConnection, connectionsToCreate);
 
@@ -218,6 +219,7 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    tunnelConnection.start();
 
     m_serverSocket->pleaseStopSync();
     m_serverSocket.reset();
@@ -273,6 +275,7 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
             nx::network::SocketGlobals::aioService().getRandomAioThread(),
             QnUuid::createUuid().toByteArray(),
             std::move(udtConnection));
+        tunnelConnection.start();
 
         auto connectContexts = startConnections(&tunnelConnection, connectionsToCreate);
 
@@ -282,10 +285,13 @@ TEST_F(OutgoingTunnelConnectionTest, cancellation)
         {
             auto future = connectContext.connectedPromise.get_future();
             ASSERT_TRUE(future.valid());
-            auto result = future.get();
-            ASSERT_TRUE(
-                result.errorCode == SystemError::noError || 
-                result.errorCode == SystemError::interrupted);
+            if (future.wait_for(std::chrono::seconds::zero()) == std::future_status::ready)
+            {
+                auto result = future.get();
+                ASSERT_TRUE(
+                    result.errorCode == SystemError::noError || 
+                    result.errorCode == SystemError::interrupted);
+            }
         }
     }
 }
@@ -315,6 +321,7 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection),
         udpTunnelKeepAlive);
+    tunnelConnection.start();
 
     nx::utils::promise<void> controlConnectionClosedPromise;
     tunnelConnection.setControlConnectionClosedHandler(

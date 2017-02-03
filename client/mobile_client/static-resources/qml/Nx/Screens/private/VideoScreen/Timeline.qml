@@ -20,8 +20,6 @@ Item
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
 
-    signal dragFinished()
-    signal moveFinished()
     signal positionTapped(real position)
 
     function zoomIn()
@@ -44,6 +42,11 @@ Item
         timelineView.clearCorrection()
     }
 
+    function jumpTo(position)
+    {
+        timeline.setPositionImmediately(position)
+    }
+
     QnTimelineView
     {
         id: timeline
@@ -59,11 +62,7 @@ Item
 
         font.pixelSize: 16
 
-        onMoveFinished:
-        {
-            moving = false
-            root.moveFinished()
-        }
+        onMoveFinished: moving = false
     }
 
     PinchArea
@@ -123,7 +122,6 @@ Item
                 if (timeline.moving)
                 {
                     timeline.dragging = false
-                    root.dragFinished()
                     timeline.finishDrag(mouse.x)
                 }
                 else

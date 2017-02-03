@@ -1,48 +1,62 @@
 #include "app_info.h"
 
+#include <nx/utils/app_info.h>
+
 QnAppInfo::QnAppInfo(QObject* parent):
     QObject(parent)
 {
 }
 
+QString QnAppInfo::organizationNameForSettings()
+{
+#ifdef _WIN32
+    return organizationName();
+#else
+    return linuxOrganizationName();
+#endif
+}
+
+QString QnAppInfo::armBox()
+{
+    return nx::utils::AppInfo::armBox();
+}
+
+QString QnAppInfo::applicationPlatform()
+{
+    return nx::utils::AppInfo::applicationPlatform();
+}
+
+QString QnAppInfo::applicationArch()
+{
+    return nx::utils::AppInfo::applicationArch();
+}
+
 bool QnAppInfo::isArm()
 {
-    return applicationArch() == lit("arm");
+    return nx::utils::AppInfo::isArm();
 }
 
 bool QnAppInfo::isBpi()
 {
-    return armBox() == lit("bpi");
+    return nx::utils::AppInfo::isBpi();
 }
 
 bool QnAppInfo::isNx1()
 {
-    return armBox() == lit("nx1");
+    return nx::utils::AppInfo::isNx1();
 }
 
 bool QnAppInfo::isAndroid()
 {
-    return applicationPlatform() == lit("android");
+    return nx::utils::AppInfo::isAndroid();
 }
 
 bool QnAppInfo::isIos()
 {
-    return applicationPlatform() == lit("ios");
+    return nx::utils::AppInfo::isIos();
 }
 
 bool QnAppInfo::isMobile()
 {
-    return isAndroid() || isIos();
-}
-
-QString QnAppInfo::applicationFullVersion()
-{
-    static const QString kBeta = beta() ? lit("-beta") : QString();
-    static const QString kFullVersion = lit("%1-%2-%3%4")
-        .arg(applicationVersion())
-        .arg(applicationRevision())
-        .arg(customizationName().replace(L' ', L'_'))
-        .arg(kBeta);
-
-    return kFullVersion;
+    return nx::utils::AppInfo::isMobile();
 }

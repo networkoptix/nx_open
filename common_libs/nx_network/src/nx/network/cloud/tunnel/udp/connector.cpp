@@ -10,6 +10,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "outgoing_tunnel_connection.h"
 #include "rendezvous_connector_with_verification.h"
@@ -36,6 +37,9 @@ TunnelConnector::TunnelConnector(
     NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
+
+    m_timer = std::make_unique<aio::Timer>();
+    m_timer->bindToAioThread(getAioThread());
 }
 
 TunnelConnector::~TunnelConnector()
@@ -44,11 +48,17 @@ TunnelConnector::~TunnelConnector()
     stopWhileInAioThread();
 }
 
-void TunnelConnector::stopWhileInAioThread()
+void TunnelConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    m_rendezvousConnectors.clear();
-    m_udtConnection.reset();    //we do not use this connection so can just remove it here
-    m_chosenRendezvousConnector.reset();
+    AbstractTunnelConnector::bindToAioThread(aioThread);
+
+    for (auto& rendezvousConnector: m_rendezvousConnectors)
+        rendezvousConnector->bindToAioThread(aioThread);
+    if (m_udtConnection)
+        m_udtConnection->bindToAioThread(aioThread);
+    if (m_chosenRendezvousConnector)
+        m_chosenRendezvousConnector->bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
 }
 
 int TunnelConnector::getPriority() const
@@ -120,6 +130,14 @@ void TunnelConnector::ioFailure(SystemError::ErrorCode /*errorCode*/)
     //if error happens when sending connect result report, 
     //  it will be reported to TunnelConnector::connectSessionReportSent too
     //  and we will handle error there
+}
+
+void TunnelConnector::stopWhileInAioThread()
+{
+    m_rendezvousConnectors.clear();
+    m_udtConnection.reset();    //we do not use this connection so can just remove it here
+    m_chosenRendezvousConnector.reset();
+    m_timer.reset();
 }
 
 void TunnelConnector::onUdtConnectionEstablished(
@@ -201,7 +219,7 @@ void TunnelConnector::onHandshakeComplete(SystemError::ErrorCode errorCode)
     rendezvousConnector.reset();
 
     //introducing delay to give server some time to call accept (work around udt bug)
-    timer()->start(
+    m_timer->start(
         std::chrono::milliseconds(200),
         [this]
         {
@@ -221,7 +239,7 @@ void TunnelConnector::holePunchingDone(
         cl_logDEBUG2);
 
     //we are in aio thread
-    timer()->cancelSync();
+    m_timer->cancelSync();
 
     std::unique_ptr<AbstractOutgoingTunnelConnection> tunnelConnection;
     if (resultCode == api::NatTraversalResultCode::ok)

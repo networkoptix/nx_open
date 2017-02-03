@@ -252,4 +252,55 @@ QnTextInput
         y: positionListener.scenePos.y + localY
         parent: control.activeFocus ? Window.contentItem : control
     }
+
+    onPressAndHold:
+    {
+        contextMenu.x = pos.x
+        contextMenu.y = pos.y
+
+        control.persistentSelection = true
+        contextMenu.open()
+        control.persistentSelection = false
+    }
+
+    Menu
+    {
+        id: contextMenu
+
+        /**
+         * TODO: figure out why height is not calculated correctly
+         * TODO: figure out why invisible MenuItem does not disapper from
+         * menu and draws blank space instead
+         */
+        height: 4 * cutItem.height
+
+        MenuItem
+        {
+            id: cutItem
+            text: qsTr("Cut")
+            enabled: control.selectedText.length
+            onTriggered: { control.cut() }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Copy")
+            enabled: control.selectedText.length
+            onTriggered: { control.copy() }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Paste")
+            enabled: control.canPaste
+            onTriggered: { control.paste() }
+        }
+
+        MenuItem
+        {
+            text: qsTr("Select All")
+            enabled: (control.selectedText != control.text)
+            onTriggered: { control.selectAll() }
+        }
+    }
 }

@@ -503,7 +503,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         m_recentlyDeleted.clear();
     }
 
-    if (processDiscoveredResources(resources))
+    if (processDiscoveredResources(resources, SearchType::Full))
     {
         dtsAssignment();
         return resources;
@@ -519,88 +519,23 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     if (!camRes)
         return QnNetworkResourcePtr();
 
-    DLOG(lit("%1 Checking resource %2")
-        .arg(QString::fromLatin1(Q_FUNC_INFO))
-        .arg(NetResString(netRes)));
+    auto existResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
+    if (existResource)
+        return existResource;
 
-    QnNetworkResourceList existResList = qnResPool->getResources<QnNetworkResource>();
-    existResList = existResList.filtered(
-        [&netRes](const QnNetworkResourcePtr& existRes)
-        {
-            DLOG(lit("%1 Existing candidate: %2").arg(FL1(Q_FUNC_INFO)).arg(NetResString(existRes)));
-
-            bool sameHostAddress = !netRes->getHostAddress().isEmpty() 
-                && !existRes->getHostAddress().isEmpty() 
-                && netRes->getHostAddress() == existRes->getHostAddress();
-
-            auto netUrlHost = QUrl(netRes->getUrl()).host();
-            auto existUrlHost = QUrl(existRes->getUrl()).host();
-
-            bool sameUrlHost = !netUrlHost.isEmpty() 
-                && !existUrlHost.isEmpty() 
-                && existUrlHost == netUrlHost;
-
-            bool sameIp = sameHostAddress || sameUrlHost;
-
-            DLOG(lit("%1 sameIp = %2, parent = %3, getStatus() == online = %4")
-                .arg(FL1(Q_FUNC_INFO))
-                .arg(sameIp)
-                .arg((bool)qnResPool->getResourceById(existRes->getParentId()))
-                .arg(existRes->getStatus() != Qn::Offline));
-                
-            return sameIp && (bool)qnResPool->getResourceById(existRes->getParentId()); 
-        });
-
-    if (existResList.isEmpty())
+    for (const auto& existRes: qnResPool->getResources<QnVirtualCameraResource>())
     {
-        DLOG(lit("%1 existRes list is empty").arg(QString::fromLatin1(Q_FUNC_INFO)));
-    }
-
-    for(const QnNetworkResourcePtr& existRes: existResList)
-    {
-        QnVirtualCameraResourcePtr existCam = existRes.dynamicCast<QnVirtualCameraResource>();
-        if (!existCam)
-            continue;
-
-        bool newIsRtsp = (camRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-        bool existIsRtsp = (existCam->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-        if (newIsRtsp && !existIsRtsp)
-            continue;
-
-        bool sameMACs = !existRes->getMAC().isNull() && !netRes->getMAC().isNull()
-            && existRes->getMAC() == netRes->getMAC();
-
-        bool sameIds = !existRes->getUniqueId().isEmpty() && !netRes->getUniqueId().isEmpty()
-            && existRes->getUniqueId() == netRes->getUniqueId();
-
-        QUrl url1(existRes->getUrl());
-        QUrl url2(netRes->getUrl());
-
-        bool samePorts = !url1.isEmpty() && !url2.isEmpty() && url1.port() == url2.port();
-
-        DLOG(lit("%1 Checking if resources are the same\n \
-                \t existRes: %2\n \
-                \t MAC1 == MAC2: %3\n \
-                \t UniqueId1 == UniqueId2: %4\n \
-                \t port1 == port2: %5\n")
-                     .arg(QString::fromLatin1(Q_FUNC_INFO))
-                     .arg(NetResString(existRes))
-                     .arg(sameMACs)
-                     .arg(sameIds)
-                     .arg(samePorts));
-
-        bool isSameResource = sameMACs || sameIds || samePorts; 
-        if (isSameResource)
-            return existRes; // camera found by different drivers on the same port
+        bool sameChannels = netRes->getChannel() == existRes->getChannel();
+        bool sameMACs = !existRes->getMAC().isNull() && existRes->getMAC() == netRes->getMAC();
+        if (sameChannels && sameMACs)
+            return existRes;
     }
 
     return QnNetworkResourcePtr();
 }
 
-bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
+bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, SearchType /*searchType*/)
 {
-    QnMutexLocker lock( &m_discoveryMutex );
-
     //excluding already existing resources
     QnResourceList::iterator it = resources.begin();
     while (it != resources.end())
@@ -649,7 +584,13 @@ int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMa
             if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
                 continue;
 
-            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
+                auto url = QUrl(itr.key());
+                if (url.path() == lit("/"))
+                    url.setPath(lit(""));
+
+                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(
+                    url.toString(QUrl::StripTrailingSlash), itr.value());
+
             inserted.value().searcher = searcher;
 			resourceHasBeenAdded = true;
         }
@@ -705,7 +646,7 @@ void QnResourceDiscoveryManager::at_resourceAdded(const QnResourcePtr& resource)
 bool QnResourceDiscoveryManager::containManualCamera(const QString& url)
 {
     QnMutexLocker lock( &m_searchersListMutex );
-    return m_manualCameraMap.contains(url);
+    return m_manualCameraMap.contains(QUrl(url).toString(QUrl::StripTrailingSlash));
 }
 
 QnResourceDiscoveryManager::ResourceSearcherList QnResourceDiscoveryManager::plugins() const {
@@ -811,6 +752,6 @@ void QnResourceDiscoveryManager::updateSearchersUsage()
 
 void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)
 {
-    processDiscoveredResources(resources);
+    processDiscoveredResources(resources, SearchType::Partial);
     m_resourceProcessor->processResources(resources);
 }

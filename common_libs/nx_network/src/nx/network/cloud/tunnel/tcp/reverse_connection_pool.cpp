@@ -1,7 +1,6 @@
 #include "reverse_connection_pool.h"
 #include "reverse_connection_holder.h"
 
-#include <nx/network/cloud/data/client_bind_data.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 
@@ -43,7 +42,7 @@ bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool wait
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
-        SocketGlobals::outgoingTunnelPool().selfPeerId(),
+        SocketGlobals::outgoingTunnelPool().ownPeerId(),
         serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
@@ -60,8 +59,8 @@ uint16_t ReverseConnectionPool::port() const
     return m_acceptor.address().port;
 }
 
-std::shared_ptr<ReverseConnectionHolder>
-    ReverseConnectionPool::getConnectionHolder(const String& hostName)
+std::shared_ptr<ReverseConnectionSource>
+    ReverseConnectionPool::getConnectionSource(const String& hostName)
 {
     QnMutexLocker lk(&m_mutex);
     const auto suffix = getHostSuffix(hostName);
@@ -157,14 +156,18 @@ bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)
     hpm::api::ClientBindRequest request;
     request.originatingPeerID = m_acceptor.selfHostName();
     request.tcpReverseEndpoints.push_back(SocketAddress(m_publicIp, m_acceptor.address().port));
-    m_mediatorConnection->send(
+    m_mediatorConnection->bind(
         std::move(request),
-        [this, registrationPromise](nx::hpm::api::ResultCode code)
+        [this, registrationPromise](
+            hpm::api::ResultCode code, hpm::api::ClientBindResponse responce)
         {
             if (code == nx::hpm::api::ResultCode::ok)
             {
                 NX_LOGX(lm("Registred on mediator by %1 with %2")
                     .strs(m_acceptor.selfHostName(), m_acceptor.address()), cl_logINFO);
+
+                if (auto& options = responce.tcpConnectionKeepAlive)
+                    m_mediatorConnection->client()->setKeepAliveOptions(std::move(*options));
             }
             else
             {

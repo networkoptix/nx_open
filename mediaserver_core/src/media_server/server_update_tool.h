@@ -35,6 +35,8 @@ public:
     bool installUpdate(const QString &updateId);
     void installUpdateDelayed(const QString &updateId);
 
+    void removeUpdateFiles(const QString& updateId);
+
 private:
     qint64 addUpdateFileChunkInternal(const QString &updateId, const QByteArray &data, qint64 offset);
     ReplyCode processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync);

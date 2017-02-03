@@ -35,6 +35,14 @@ namespace nx_http
 #endif
     }
 
+    int defaultPortForScheme(const StringType& scheme)
+    {
+        if (strcasecmp(scheme, StringType("http")) == 0)
+            return DEFAULT_HTTP_PORT;
+        if (strcasecmp(scheme, StringType("https")) == 0)
+            return DEFAULT_HTTPS_PORT;
+        return -1;
+    }
 
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
     {
@@ -234,10 +242,12 @@ namespace nx_http
                     return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
-                case moved:
-                    return StringType("Moved");
                 case movedPermanently:
                     return StringType("Moved Permanently");
+                case found:
+                    return StringType("Found");
+                case seeOther:
+                    return StringType("See Other");
                 case notModified:
                     return StringType("Not Modified");
                 case badRequest:
@@ -409,6 +419,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType RequestLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class StatusLine
@@ -469,6 +485,12 @@ namespace nx_http
         *dstBuffer += "\r\n";
     }
 
+    StringType StatusLine::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
 
     ////////////////////////////////////////////////////////////
     //// class Request
@@ -569,6 +591,13 @@ namespace nx_http
         return buf;
     }
 
+    StringType Request::toString() const
+    {
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
     BufferType Request::getCookieValue(const BufferType& name) const
     {
         nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );
@@ -622,14 +651,14 @@ namespace nx_http
     }
 
 
-    BufferType Response::toString() const
+    StringType Response::toString() const
     {
         BufferType buf;
         serialize( &buf );
         return buf;
     }
 
-    BufferType Response::toMultipartString(const ConstBufferRefType& boundary) const
+    StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
     {
         BufferType buf;
         serializeMultipartResponse( &buf, boundary );
@@ -748,7 +777,7 @@ namespace nx_http
         type = MessageType::none;
     }
 
-    BufferType Message::toString() const
+    StringType Message::toString() const
     {
         BufferType str;
         switch( type )

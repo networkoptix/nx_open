@@ -4,7 +4,6 @@ set -e
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=${installer.name}-mediaserver
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
@@ -17,12 +16,9 @@ ETCTARGET=$TARGET/etc
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 SYSTEMDTARGET=/etc/systemd/system
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${artifact.name.server}
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -105,6 +101,7 @@ if [ '${arch}' != 'arm' ]; then chmod 755 $SHARESTAGE/dbsync-2.2/bin/{dbsync,cer
 
 # Copy mediaserver binary and sqldrivers
 install -m 755 $SERVER_BIN_PATH/mediaserver $BINSTAGE/mediaserver-bin
+install -m 755 $SERVER_BIN_PATH/testcamera $BINSTAGE
 install -m 755 $SERVER_BIN_PATH/external.dat $BINSTAGE
 install -m 755 $SCRIPTS_PATH/config_helper.py $BINSTAGE
 install -m 755 $SCRIPTS_PATH/shell_utils.sh $BINSTAGE
@@ -132,6 +129,6 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-(cd $STAGEBASE; zip -y ./server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ./* -i *.*)
-mv $STAGEBASE/server-update-${platform}-${arch}-$VERSION.${buildNumber}.zip ${project.build.directory}
+(cd $STAGEBASE; zip -y ./$UPDATE_NAME ./* -i *.*)
+mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

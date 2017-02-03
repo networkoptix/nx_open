@@ -12,39 +12,19 @@ class QnStatusOverlayController: public Connective<QObject>
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnStatusOverlayWidget::Controls visibleItems READ visibleItems
-        NOTIFY visibleItemsChanged);
-    Q_PROPERTY(Qn::ResourceStatusOverlay statusOverlay READ statusOverlay
-        WRITE setStatusOverlay NOTIFY statusOverlayChanged)
-    Q_PROPERTY(Button currentButton READ currentButton WRITE setCurrentButton
-        NOTIFY currentButtonChanged)
-    Q_PROPERTY(bool isErrorOverlay READ isErrorOverlay NOTIFY isErrorOverlayChanged)
-
     typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
-
     using base_type = Connective<QObject>;
 public:
-    enum class Button
-    {
-        kNoButton,
-        kDiagnostics,
-        kIoEnable,
-        kMoreLicenses,
-        kSettings
-    };
-
     QnStatusOverlayController(const QnResourcePtr& resource,
         const StatusOverlayWidgetPtr& widget, QObject* parent = nullptr);
 
     virtual ~QnStatusOverlayController() = default;
 
     Qn::ResourceStatusOverlay statusOverlay() const;
-    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay);
+    void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animated);
 
-    Button currentButton() const;
-    void setCurrentButton(Button button);
-
-    QString caption() const;
+    Qn::ResourceOverlayButton currentButton() const;
+    void setCurrentButton(Qn::ResourceOverlayButton button);
 
     bool isErrorOverlay() const;
 
@@ -58,13 +38,13 @@ public:
     static QString statusIcon(Qn::ResourceStatusOverlay overlay);
 
 signals:
-    void statusOverlayChanged();
+    void statusOverlayChanged(bool animated);
 
     void currentButtonChanged();
 
     void isErrorOverlayChanged();
 
-    void buttonClicked();
+    void buttonClicked(Qn::ResourceOverlayButton button);
 
     void visibleItemsChanged();
 
@@ -73,7 +53,7 @@ private:
 
     void updateWidgetItems();
 
-    void onStatusOverlayChanged();
+    void onStatusOverlayChanged(bool animated);
 
     QnStatusOverlayWidget::Controls errorVisibleItems();
     QnStatusOverlayWidget::Controls normalVisibleItems();
@@ -89,6 +69,6 @@ private:
 
     QnStatusOverlayWidget::Controls m_visibleItems;
     Qn::ResourceStatusOverlay m_statusOverlay;
-    Button m_currentButton;
+    Qn::ResourceOverlayButton m_currentButton;
     bool m_isErrorOverlay;
 };

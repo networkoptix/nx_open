@@ -9,7 +9,7 @@
             <functions>
                 <function>
                     <name>bookmarks</name>
-                    <description>Reads bookmarks using specified parameters</description>
+                    <description>Read bookmarks using the specified parameters.</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -22,7 +22,7 @@
                         <param>
                             <name>startTime</name>
                             <description>
-                                Start time of interval with bookmarks (milliseconds since epoch).
+                                Start time of the interval with bookmarks (in milliseconds since epoch).
                                 Default value is 0. Should be less than endTime.
                             </description>
                             <optional>true</optional>
@@ -30,33 +30,33 @@
                         <param>
                             <name>endTime</name>
                             <description>
-                                End time of interval with bookmarks (milliseconds since epoch).
-                                Default value is current time. Should be greater than startTime.
+                                End time of the interval with bookmarks (in milliseconds since epoch).
+                                Default value is the current time. Should be greater than startTime.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>sortBy</name>
                             <description>
-                                Sorts result by specified value. Default value is "startTime".
+                                Field to sort the results by. Default value is "startTime".
                             </description>
                             <optional>true</optional>
                             <values>
                                 <value>
                                     <name>name</name>
-                                    <description>Sorts bookmarks by name</description>
+                                    <description>Sort bookmarks by name.</description>
                                 </value>
                                 <value>
                                     <name>startTime</name>
-                                    <description>Sorts bookmarks by start time</description>
+                                    <description>Sort bookmarks by start time.</description>
                                 </value>
                                 <value>
                                     <name>duration</name>
-                                    <description>Sorts bookmarks by duration</description>
+                                    <description>Sort bookmarks by duration.</description>
                                 </value>
                                 <value>
                                     <name>cameraName</name>
-                                    <description>Sorts bookmarks by camera name</description>
+                                    <description>Sort bookmarks by camera name.</description>
                                 </value>
                             </values>
                         </param>
@@ -69,48 +69,48 @@
                             <values>
                                 <value>
                                     <name>asc</name>
-                                    <description>Ascending sort order</description>
+                                    <description>Ascending sort order.</description>
                                 </value>
                                 <value>
                                     <name>desc</name>
-                                    <description>Descending sort order</description>
+                                    <description>Descending sort order.</description>
                                 </value>
                             </values>
                         </param>
                         <param>
                             <name>limit</name>
-                            <description>Maximum number of bookmarks which will be returned.
-                            Unlimited by default.
+                            <description>Maximum number of bookmarks to return.
+                                Unlimited by default.
                             </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>filter</name>
-                            <description>Text-search filter string</description>
+                            <description>Text-search filter string.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -120,12 +120,12 @@
                 </function>
                 <function>
                     <name>bookmarks/add</name>
-                    <description>Adds bokmark to the target server</description>
+                    <description>Add a bookmark to the target server.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -137,56 +137,56 @@
                         </param>
                         <param>
                             <name>name</name>
-                            <description>Caption of bookmark</description>
+                            <description>Caption of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
-                            <description>Details of bookmark</description>
+                            <description>Details of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>timeout</name>
-                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <description>Time during which the recorded period should be preserved (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>startTime</name>
-                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <description>Start time of the bookmark (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>duration</name>
-                            <description>Length of bookmark (milliseconds)</description>
+                            <description>Length of the bookmark (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>tag</name>
-                            <description>Applied tag. Several tag parameters could be used to specify multiple tags</description>
+                            <description>Applied tag. Several tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -196,36 +196,36 @@
                 </function>
                 <function>
                     <name>bookmarks/delete</name>
-                    <description>Removes bookmark with specified identifier</description>
+                    <description>Remove a bookmark with the specified identifier.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -235,36 +235,36 @@
                 </function>
                 <function>
                     <name>bookmarks/tags</name>
-                    <description>Returns currently used tags</description>
+                    <description>Return currently used tags.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>limit</name>
-                            <description>Maximum number of tags</description>
+                            <description>Maximum number of tags to return.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -274,12 +274,12 @@
                 </function>
                 <function>
                     <name>bookmarks/update</name>
-                    <description>Updates bookmark information</description>
+                    <description>Update information for a bookmark.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>guid</name>
-                            <description>Identifier of bookmark</description>
+                            <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -291,56 +291,56 @@
                         </param>
                         <param>
                             <name>name</name>
-                            <description>Caption of bookmark</description>
+                            <description>Caption of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
-                            <description>Details of bookmark</description>
+                            <description>Details of the bookmark.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>timeout</name>
-                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <description>Time during which the recorded period should be preserved (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>startTime</name>
-                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <description>Start time of the bookmark (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>duration</name>
-                            <description>Length of bookmark (milliseconds)</description>
+                            <description>Length of the bookmark (in milliseconds).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>tag</name>
-                            <description>Applied tag. Serveral tag parameters could be used to specify multiple tags</description>
+                            <description>Applied tag. Serveral tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>format</name>
-                            <description>Data format.</description>
-                            <optional>false</optional>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
                             <values>
                                 <value>
                                     <name>ubjson</name>
-                                    <description>universal binary json data format</description>
+                                    <description>Universal Binary JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>json</name>
-                                    <description>json data format</description>
+                                    <description>JSON data format.</description>
                                 </value>
                                 <value>
                                     <name>xml</name>
-                                    <description>xml data format</description>
+                                    <description>XML data format.</description>
                                 </value>
                                 <value>
                                     <name>csv</name>
                                     <description>
-                                        CSV data format. In case of hierarchical structure only
-                                        top level data will be provided
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
                                     </description>
                                 </value>
                             </values>
@@ -352,10 +352,148 @@
                     <name>updateInformation/freeSpaceForUpdateFiles</name>
                     <description>Get free space available for downloading and extracting update files.</description>
                     <method>GET</method>
-                    <params/>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>XML data format.</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
                     <result>
-                        <caption>Returns the amount of free space available for update files in bytes
-                            for each online server in the system.</caption>
+                        <caption>Return the amount of free space available for update files in bytes
+                            for each online server in the system, in the specified format.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>recordedTimePeriods</name>
+                    <description>Return the recorded chunks info for the specified cameras.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                 MAC address (not supported for certain cameras).
+                                 This parameter can be used several times to define a list of cameras.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <description>Start time of the interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>endTime</name>
+                            <description>End time of the interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>filter</name>
+                            <description>This parameter is used for motion search ("periodsType" must be 1).
+                                Match motion on a video by specified rectangle.
+                                <br/>Format: string with a JSON list of <i>sensors</i>,
+                                each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+                                <br/><code>{"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>, "height": <i>height</i>}</code>
+                                <br/>All values are measured in relative portions of a video frame,
+                                <i>x</i> and <i>width</i> in range [0..43], <i>y</i> and <i>height</i> in range [0..31],
+                                zero is the left-top corner.
+                                <br/>Example of a full-frame rectangle for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
+                                <br/>Example of two rectangles for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>periods</name>
+                                    <description>Internal comperssed binary format.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>detail</name>
+                            <description>Chunk detail level, in microseconds. Time periods
+                                that are shorter than the detail level are discarded. You can treat
+                                the detail level as the amount of microseconds per screen pixel.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>periodsType</name>
+                            <description>Chunk type.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>0</name>
+                                    <description>All records.</description>
+                                </value>
+                                <value>
+                                    <name>1</name>
+                                    <description>Only chunks with motion (parameter "filter" is required).</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>keepSmallChunks</name>
+                            <optional>true</optional>
+                            <description>If specified, standalone chunks smaller than the detail
+                            level are not removed from the result.</description>
+                        </param>
+                        <param>
+                            <name>limit</name>
+                            <optional>true</optional>
+                            <description>Maximum number of chunks to return.</description>
+                        </param>
+                        <param>
+                            <name>flat</name>
+                            <optional>true</optional>
+                            <description>If specified, do not group chunk lists by server.</description>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Return JSON object with error code, error message and the list of JSON objects in "reply" field:
+                          if no "flat" parameter is specified,
+                          "reply" field is the list which contains for each server its GUID (as "guid"
+                          field) and the list of chunks (as "periods" field); if "flat" parameter
+                          is specified, "reply" field is just the list of chunks.
+                          <br/>Each chunk is a pair of <code>(durationMs, startTimeMs)</code>.
+                          Chunks are merged for all requested cameras.
+                          Start time and duration are in milliseconds since epoch.
+                          Duration of -1 means the last chunk is being recorded now.</caption>
                     </result>
                 </function>
             </functions>
@@ -392,13 +530,12 @@
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start of time period at ms since 1.1.1970 (UTC
-                                format).</description>
+                            <description>Start of time period (in milliseconds since epoch).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End of time period at ms since 1.1.1970 (UTC format).</description>
+                            <description>End of time period (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -424,7 +561,7 @@
                 <function proprietary="true">
                     <name>restoreState</name>
                     <description>Restore server state to default. Cleans database and system name.</description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>POST</method>
                     <params>
                         <param>
@@ -443,7 +580,7 @@
                         Detach media server from cloud. Local admin user is enabled, admin password is changed to new value (if specified), all cloud users are disabled. Cloud link is removed.
                         Function can be called either via GET or POST method. POST data should be a json object.
                     </description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET, POST</method>
                     <params>
                         <param>
@@ -462,7 +599,7 @@
                     Configure server system name and password. This function can be called for server with default system name. Otherwise function returns error.
                     This method requires owner permissions.
                 </description>
-                <permissions>At least Admin.</permissions>
+                <permissions>Administrator.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -486,7 +623,7 @@
                     Configure server system name and attach it to cloud. This function can be called for server with default system name. Otherwise function returns error.
                     This method requires owner permissions.
                 </description>
-                <permissions>At least Admin.</permissions>
+                <permissions>Administrator.</permissions>
                 <method>POST</method>
                 <params>
                   <param>
@@ -548,7 +685,7 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Return XML with parameter value</caption>
+                        <caption>Return JSON object with error code, error message and diagnostics result.</caption>
                     </result>
                 </function>
                 <function>
@@ -616,23 +753,22 @@
                         </param>
                         <param>
                             <name>time</name>
-                            <description>required image time. Microseconds since 1970 UTC or string
-                                in format "YYYY-MM-DDThh24:mi:ss.zzz". Date format is auto detected.
+                            <description>Required image time (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
                                 Also, additional special values are allowed.</description>
                             <optional>false</optional>
                             <values>
                                 <value>
-                                    <name>YYYY-MM-DDThh24:mi:ss.zzz</name>
-                                    <description>Human readable date format</description>
+                                    <name><i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i></name>
+                                    <description>Human-readable date format/</description>
                                 </value>
                                 <value>
-                                    <name>[0..9]*</name>
-                                    <description>Microseconds since 1970 UTC</description>
+                                    <name>number (in a string)</name>
+                                    <description>Milliseconds since epoch.</description>
                                 </value>
                                 <value>
                                     <name>NOW</name>
-                                    <description>Live position (no frame is returned if camera is
-                                        offline</description>
+                                    <description>Live position (no frame is returned if camera is offline</description>
                                 </value>
                                 <value>
                                     <name>LATEST</name>
@@ -741,22 +877,21 @@
                 </function>
                 <function>
                     <name>getEvents</name>
-                    <description>Returns event log information in the requested format.</description>
+                    <description>Returns event log information.</description>
                     <permissions>At least Advanced Viewer.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>Start time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>
+                                End time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -790,21 +925,19 @@
                 </function>
                 <function>
                     <name>auditLog</name>
-                    <description>Returns audit log information at requested format.</description>
+                    <description>Returns audit log information in the requested format.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>Start time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>End time of a time interval(as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -814,53 +947,60 @@
                 </function>
                 <function>
                     <name>manualCamera/search</name>
-                    <description>Search cameras in manual mode</description>
+                    <description>Start searching for the cameras in manual mode.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>start_ip</name>
-                            <description>First IP address in range to scan.</description>
+                            <description>First IP address in the range to scan.</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>end_ip</name>
-                            <description>Last IP address in range to scan.</description>
+                            <description>Last IP address in the range to scan.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Camera(s) port to check. Port is auto-detected if parameter
-                                is absent.</description>
+                            <description>Camera(s) IP port to check. Port is auto-detected if this
+                                parameter is omitted.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>user</name>
-                            <description>Username for the cameras</description>
+                            <description>Camera(s) username.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>password</name>
-                            <description>Password for the cameras</description>
+                            <description>Camera(s) password.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with camera names, manufacturers and urls.</caption>
+                        <caption>JSON object with the initial status of camera search process,
+                            including processUuid used for other /api/manualCamera calls, and the
+                            list of objects describing cameras found to the moment.</caption>
                     </result>
                 </function>
                 <function>
                     <name>manualCamera/status</name>
-                    <description>Get manual adding progress.</description>
+                    <description>Get the current status of the process of searching for the cameras.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>Process unique id, can be obtained from "processUuid"
+                                field in the result of /api/manualCamera/search.</description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with progress value.</caption>
+                      <caption>
+                        JSON object with the initial status of camera search process,
+                        including processUuid used for other /api/manualCamera calls, and the
+                        list of objects describing cameras found to the moment.
+                      </caption>
                     </result>
                 </function>
                 <function>
@@ -870,12 +1010,60 @@
                     <params>
                         <param>
                             <name>uuid</name>
-                            <description>Process unique id.</description>
+                            <description>
+                              Process unique id, can be obtained from "processUuid"
+                              field in the result of /api/manualCamera/search.
+                            </description>
                             <optional>false</optional>
                         </param>
                     </params>
                     <result>
-                        <caption>XML with OK message or error code.</caption>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
+                    </result>
+                </function>
+                <function proprietary="true">
+                    <name>manualCamera/add</name>
+                    <description>Manually add camera(s). If several cameras are added, parameters
+                        "url" and "manufacturer" must be defined several times with incrementing
+                        suffix "0", "1", etc.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>url0</name>
+                            <description>
+                              Camera url, can be obtained from
+                              "reply.cameras[].url" field in the result of
+                              /api/manualCamera/status.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>uniqueId0</name>
+                            <description>Camera physical id, can be obtained from
+                                "reply.cameras[].uniqueId" field in the result of
+                                /api/manualCamera/status.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>manufacturer0</name>
+                            <description>
+                              Camera manufacturer, can be obtained from
+                              "reply.cameras[].manufacturer" field in the result of
+                              /api/manualCamera/status.</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>user</name>
+                            <description>Username for the cameras.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>Password for the cameras.</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>JSON object with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
               <function>
@@ -1058,7 +1246,7 @@ content type "application/json". Example of such object:
                         </param>
                     </params>
                     <result>
-                        <caption>JSON message with error code and error message.</caption>
+                        <caption>JSON message with error message and error code (0 means OK).</caption>
                     </result>
                 </function>
                 <function>
@@ -1125,249 +1313,185 @@ content type "application/json". Example of such object:
                     </result>
                 </function>
                 <function>
-                    <name>RecordedTimePeriods</name>
-                    <description>Recorded chunk info by specified cameras.</description>
-                    <method>GET</method>
-                    <params>
-                        <param>
-                            <name>cameraId</name>
-                            <description>Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
-                                 MAC address (not supported for certain cameras).
-                                 Parameter can be used several times to define a list of cameras.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>startTime</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>endTime</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>filter</name>
-                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle.
-                                Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
-                                rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
-                            </description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Allowed values: "json", "xml", "txt", "bin".
-                                Default value "json"</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>detail</name>
-                            <description>Chunk detail level, in microseconds. Time periods/chunks
-                                that are shorter than the detail level are discarded. You can use
-                                detail level as amount of microseconds per screen
-                                pixel.</description>
-                            <optional>false</optional>
-                        </param>
-                        <param>
-                            <name>periodsType</name>
-                            <description>Chunk type.</description>
-                            <optional>false</optional>
-                            <values>
-                                <value>
-                                    <name>0</name>
-                                    <description>All records</description>
-                                </value>
-                                <value>
-                                    <name>1</name>
-                                    <description>Only chunk with motion (parameter motionRegions required)</description>
-                                </value>
-                            </values>
-                        </param>
-                    </params>
-                    <result>
-                        <caption>Chunks data in requested format. Chunks are merged for all requested
-                        cameras. Time and duration defined in UTC milliseconds. Response contains pairs [begin,duration]. Duration=-1 means last chunk is recording now.</caption>
-                    </result>
-                </function>
-                <function>
                     <name>restart</name>
                     <description>Restarts the server.</description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code.</caption>
+                      <caption>JSON with error code.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>statistics</name>
                     <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML data with statistics.</caption>
+                      <caption>JSON data with statistics.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>storageSpace</name>
                     <description>Returns a list of all server storages.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>XML with server storages.</caption>
+                      <caption>JSON data with server storages.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>storageStatus</name>
                     <description>Check if specified folder can be used as a server storage.</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>path</name>
-                            <description>Folder to check.</description>
-                            <optional>false</optional>
-                        </param>
+                      <param>
+                        <name>path</name>
+                        <description>Folder to check.</description>
+                        <optional>false</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON data. "OK" if specified folder may be used for writing on
-                        the server. Otherwise returns "FAIL" </caption>
+                      <caption>
+                        JSON data. "OK" if specified folder may be used for writing on
+                        the server. Otherwise returns "FAIL"
+                      </caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>gettime</name>
                     <description>Return server time (in milliseconds since epoch), time zone and authentication realm (realm is added for convenience)</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON data.</caption>
+                      <caption>JSON data.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>saveCloudSystemCredentials</name>
                     <description>Sets or resets cloud credentials (systemId and authorization key) to be used by system</description>
                     <method>POST</method>
                     <params>
-                        <param>
-                            <name>cloudSystemId</name>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>cloudAuthenticationKey</name>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                        <param>
-                            <name>reset</name>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>true</name>
-                                    <description>If specified, removes cloud credentials from DB. System will not connect to cloud anymore</description>
-                                </value>
-                            </values>
-                        </param>
+                      <param>
+                        <name>cloudSystemId</name>
+                        <optional>true</optional>
+                        <values/>
+                      </param>
+                      <param>
+                        <name>cloudAuthenticationKey</name>
+                        <optional>true</optional>
+                        <values/>
+                      </param>
+                      <param>
+                        <name>reset</name>
+                        <optional>true</optional>
+                        <values>
+                          <value>
+                            <name>true</name>
+                            <description>If specified, removes cloud credentials from DB. System will not connect to cloud anymore</description>
+                          </value>
+                        </values>
+                      </param>
                     </params>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>activateLicense</name>
                     <description>Activate new license and return license JSON data if success</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>key</name>
-                            <description>License serial number</description>
-                            <optional>false</optional>
-                        </param>
+                      <param>
+                        <name>key</name>
+                        <description>License serial number</description>
+                        <optional>false</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON data.</caption>
+                      <caption>JSON data.</caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Updates server by the package contained in POST body</description>
                     <method>POST</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code
+                      <caption>
+                        JSON with error code
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
                         INCOMPATIBLE_SYSTEM if the update file is targeted for another system;
                         EXTRACTION_ERROR if some extraction problems were found (e.g. not enough space);
-                        INSTALLATION_ERROR if the server could not execute installation script.</caption>
+                        INSTALLATION_ERROR if the server could not execute installation script.
+                      </caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>installUpdate</name>
                     <description>Install update from zip package which should be in the request body.</description>
                     <method>POST</method>
                     <params/>
                     <result/>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>onEvent</name>
-                    <description>Process an event from an external system. Reserved for future
-                        use.</description>
+                    <description>
+                      Process an event from an external system. Reserved for future
+                      use.
+                    </description>
                     <method>POST</method>
                     <params/>
                     <result/>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>discoveredPeers</name>
                     <description>Returns a list of the discovered peers.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with a list of the discovered peers</caption>
+                      <caption>JSON with a list of the discovered peers</caption>
                     </result>
-                </function>
-                <function proprietary="true">
+                  </function>
+                  <function proprietary="true">
                     <name>restart</name>
                     <description>Restart the server.</description>
                     <method>GET</method>
                     <params/>
                     <result/>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>moduleInformation</name>
                     <description>Get information about the server.</description>
                     <method>GET</method>
                     <params>
-                        <param>
-                            <name>allModules</name>
-                            <description>Set it to true to get all modules from the system.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>showAddresses</name>
-                            <description>Set it to true to show server addresses.</description>
-                            <optional>true</optional>
-                        </param>
+                      <param>
+                        <name>allModules</name>
+                        <description>Set it to true to get all modules from the system.</description>
+                        <optional>true</optional>
+                      </param>
+                      <param>
+                        <name>showAddresses</name>
+                        <description>Set it to true to show server addresses.</description>
+                        <optional>true</optional>
+                      </param>
                     </params>
                     <result>
-                        <caption>JSON object with module information.</caption>
+                      <caption>JSON object with module information.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>moduleInformationAuthenticated</name>
                     <description>The same as moduleInformation but requires authentication. Useful to test connection.</description>
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON object with module information.</caption>
+                      <caption>JSON object with module information.</caption>
                     </result>
-                </function>
-                <function>
+                  </function>
+                  <function>
                     <name>configure</name>
                     <description>Configure server parameters.</description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1406,7 +1530,7 @@ content type "application/json". Example of such object:
                 <function>
                     <name>mergeSystems</name>
                     <description>Merge two systems.</description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1531,9 +1655,8 @@ content type "application/json". Example of such object:
                             <name>exec_cmd</name>
                             <description>
                               HTTP url path to execute. This parameter could be repeated several times to execute several nested methods.
-							                All additions parameters after current "exec_cmd" and before next "exec_cmd" are passed as parameters
-							                to the nested method.
-							              </description>
+                              All additions parameters after current "exec_cmd" and before next "exec_cmd" are passed as parameters
+                              to the nested method.</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -1564,7 +1687,7 @@ content type "application/json". Example of such object:
                     <description>Execute any script from subfolder "scripts" of media server. Script name provides directly in a URL path like "/api/execute/script1.sh".
                                  All URL parameters are passed directly to a script as an parameters.
                     </description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1574,7 +1697,7 @@ content type "application/json". Example of such object:
                 <function proprietary="true">
                     <name>scriptList</name>
                     <description>Returns list of scripts to execute.</description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>GET</method>
                     <params/>
                     <result>
@@ -1604,10 +1727,9 @@ http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=Cre
                         <param>
                             <name>timestamp</name>
                             <description>
-                                Event date and time. It can be either a number of milliseconds
-                                since epoch (1970-01-01 00:00, UTC), or a human-readable date and
-                                time in ISO 8601 format. If "timestamp" is absent, current server
-                                date and time is used.
+                              Event date and time (as a string containing time in milliseconds since epoch,
+                              or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                              If "timestamp" is absent, the current server date and time is used.
                             </description>
                             <optional>true</optional>
                         </param>
@@ -1748,66 +1870,66 @@ the respective JSON fields can be empty.</description>
 <p>
 Parameters should be passed as a JSON array of objects in POST message body with
 content type "application/json". Example of such object can be seen in
-the result of /api/iflist GET function.
+the result of GET /api/iflist function.
 </p>
                     </description>
-                    <permissions>At least Admin.</permissions>
+                    <permissions>Administrator.</permissions>
                     <method>POST</method>
-                        <params>
-                          <param>
-                            <name>name</name>
-                            <description>Interface name.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>ipAddr</name>
-                            <description>IP address with dot-separated decimal components.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>netMask</name>
-                            <description>Network mask with dot-separated decimal components.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>mac</name>
-                            <description>MAC address with colon-separated upper-case hex components.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>gateway</name>
-                            <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>dhcp</name>
-                            <description></description>
-                            <optional>false</optional>
-                            <values>
-                                <value>
-                                    <name>false</name>
-                                    <description>DHCP is not used, IP address and other parameters
+                    <params>
+                      <param>
+                        <name>name</name>
+                        <description>Interface name.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>ipAddr</name>
+                        <description>IP address with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>netMask</name>
+                        <description>Network mask with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>mac</name>
+                        <description>MAC address with colon-separated upper-case hex components.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>gateway</name>
+                        <description>IP address of the gateway with dot-separated decimal components. Can be empty.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>dhcp</name>
+                        <description></description>
+                        <optional>false</optional>
+                        <values>
+                            <value>
+                                <name>false</name>
+                                <description>DHCP is not used, IP address and other parameters
 should be specified in the respective JSON fields.</description>
-                                </value>
-                                <value>
-                                    <name>true</name>
-                                    <description>IP address and other parameters assigned via DHCP,
+                            </value>
+                            <value>
+                                <name>true</name>
+                                <description>IP address and other parameters assigned via DHCP,
 the respective JSON fields can be empty.</description>
-                                </value>
-                            </values>
-                          </param>
-                          <param>
-                            <name>extraParams</name>
-                            <description>JSON object with data in the internal format.</description>
-                            <optional>false</optional>
-                          </param>
-                          <param>
-                            <name>dns_servers</name>
-                            <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
-                            <optional>false</optional>
-                          </param>
-                        </params>
-                    </function>
+                            </value>
+                        </values>
+                      </param>
+                      <param>
+                        <name>extraParams</name>
+                        <description>JSON object with data in the internal format.</description>
+                        <optional>false</optional>
+                      </param>
+                      <param>
+                        <name>dns_servers</name>
+                        <description>Space-separated list of IP addresses with dot-separated decimal components.</description>
+                        <optional>false</optional>
+                      </param>
+                    </params>
+                </function>
                 <function proprietary="true">
                     <name>settime</name>
                     <description>
@@ -1825,7 +1947,8 @@ the respective JSON fields can be empty.</description>
                       </param>
                       <param>
                         <name>datetime</name>
-                        <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <description>System date and time (as a string containing time in milliseconds since epoch,
+                            or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                         <optional>false</optional>
                       </param>
                     </params>
@@ -1857,7 +1980,8 @@ the respective JSON fields can be empty.</description>
                   </param>
                   <param>
                     <name>dateTime</name>
-                    <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                    <description>Date and time (as string containing time in milliseconds since epoch,
+                         or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                     <optional>false</optional>
                   </param>
                 </params>
@@ -1944,9 +2068,11 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default server opens camera from live position. This parameter defines position in an archive in
-                                                        milliseconds since epoch, microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                                        Position can be passed via standard RTSP attribute as well as via URL parameter</description>
+                            <description>By default, the server opens a camera at the live position.
+                                This parameter defines position in an archive
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1957,13 +2083,13 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
                                          Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>codec</name>
-                            <description>Defines video codec used for transcoding. Default value H263.</description>
+                            <description>Defines video codec used for transcoding. Default value is H263.</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -2032,21 +2158,23 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions
-                                         milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                         Otherwise, LIVE stream is provided</description>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Otherwise, LIVE stream is provided</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>endPos</name>
-                            <description>If present then specifies archive stream end positions. It used only if "pos" parameter is present.
-                                         Milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                         </description>
+                            <description>If present, specifies archive stream end position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                It is used only if "pos" parameter is present.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degree. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2061,7 +2189,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                     </params>
                     <result>
-                        <caption>Video stream in requested format</caption>
+                        <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
                 <function>
@@ -2080,7 +2208,9 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>Camera archive position to open. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
+                            <description>Camera archive position to open
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2116,7 +2246,9 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>Fragment start time. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
+                            <description>Fragment start time
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2136,7 +2268,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                     </params>
                     <result>
-                        <caption>Video stream in requested format</caption>
+                        <caption>Video stream in the requested format</caption>
                     </result>
                 </function>
             </functions>

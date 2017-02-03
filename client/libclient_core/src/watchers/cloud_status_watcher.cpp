@@ -58,6 +58,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
         if (system.localId.isNull())
             system.localId = guidFromArbitraryData(system.cloudId);
 
+        system.online = (systemData.stateOfHealth == nx::cdb::api::SystemHealth::online);
         system.name = QString::fromStdString(systemData.name);
         system.ownerAccountEmail = QString::fromStdString(systemData.ownerAccountEmail);
         system.ownerFullName = QString::fromStdString(systemData.ownerFullName);
@@ -189,7 +190,7 @@ QString QnCloudStatusWatcher::cloudLogin() const
 
 QString QnCloudStatusWatcher::cloudPassword() const
 {
-    return credentials().password;
+    return credentials().password.value();
 }
 
 QString QnCloudStatusWatcher::effectiveUserName() const
@@ -254,7 +255,7 @@ void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnCredentials(credentials.user.toLower(), credentials.password);
+        QnCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
         return;
@@ -436,7 +437,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(credentials.user.toStdString(),
-        credentials.password.toStdString());
+        credentials.password.value().toStdString());
 
     /* Very simple email check. */
     if (credentials.user.contains(L'@'))
@@ -470,7 +471,7 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
         emit q->statusChanged(status);
 
     if (isNewErrorCode && (errorCode != QnCloudStatusWatcher::NoError))
-        emit q->errorChanged();
+        emit q->errorChanged(errorCode);
 }
 
 void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)

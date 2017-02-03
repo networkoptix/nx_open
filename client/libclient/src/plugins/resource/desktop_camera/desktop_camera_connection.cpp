@@ -12,6 +12,7 @@
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 #include <nx/streaming/config.h>
+#include <nx/network/buffered_stream_socket.h>
 
 
 static const int CONNECT_TIMEOUT = 1000 * 5;
@@ -231,6 +232,20 @@ void QnDesktopCameraConnection::terminatedSleep(int sleep)
         msleep(10);
 }
 
+QSharedPointer<AbstractStreamSocket> QnDesktopCameraConnection::takeSocketFromHttpClient(
+    std::unique_ptr<nx_http::HttpClient>& httpClient)
+{
+    auto socket = QSharedPointer<nx::network::BufferedStreamSocket>(
+        new nx::network::BufferedStreamSocket(httpClient->takeSocket()));
+
+    auto buffer = httpClient->fetchMessageBodyBuffer();
+
+    if (buffer.size())
+        socket->injectRecvData(std::move(buffer));
+
+    return socket;
+}
+
 void QnDesktopCameraConnection::pleaseStop()
 {
     {
@@ -254,13 +269,11 @@ void QnDesktopCameraConnection::run()
         auth.setUser(QnAppServerConnectionFactory::url().userName());
         auth.setPassword(QnAppServerConnectionFactory::url().password());
         {
-            decltype(httpClient) oldHttpClient;
+            decltype(httpClient) localHttpClient(new nx_http::HttpClient());
             QnMutexLocker lock(&m_mutex);
             tcpSocket.reset();
             processor.reset();
-            // Removing httpClient with no lock to be on the safe side
-            oldHttpClient = std::move(httpClient);
-            httpClient.reset(new nx_http::HttpClient());
+            std::swap(httpClient, localHttpClient);
         }
 
         httpClient->addAdditionalHeader("user-name", auth.user().toUtf8());
@@ -277,6 +290,7 @@ void QnDesktopCameraConnection::run()
         }
 
         QUrl url(m_server->getApiUrl());
+        url.setScheme(lit("http"));
         url.setPath(lit("/desktop_camera"));
 
         if (!httpClient->doGet(url))
@@ -288,7 +302,7 @@ void QnDesktopCameraConnection::run()
         {
             decltype(httpClient) localHttpClient;
             QnMutexLocker lock(&m_mutex);
-            tcpSocket = QSharedPointer<AbstractStreamSocket>(httpClient->takeSocket().release());
+            tcpSocket = takeSocketFromHttpClient(httpClient);
             std::swap(httpClient, localHttpClient);
             processor.reset(new QnDesktopCameraConnectionProcessor(tcpSocket, 0, m_owner));
         }
@@ -309,10 +323,9 @@ void QnDesktopCameraConnection::run()
         }
     }
 
-    decltype(httpClient) oldHttpClient;
+    decltype(httpClient) localHttpClient;
     QnMutexLocker lock( &m_mutex );
     processor.reset();
-    oldHttpClient = std::move(httpClient);
-    httpClient.reset();
+    std::swap(httpClient, localHttpClient);
     tcpSocket.reset();
 }

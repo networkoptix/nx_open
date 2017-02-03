@@ -138,8 +138,6 @@ public:
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 protected:
-    QnMutex m_discoveryMutex;
-
     unsigned int m_runNumber;
 
     virtual void run();
@@ -153,7 +151,12 @@ protected slots:
     void at_resourceDeleted(const QnResourcePtr& resource);
     void at_resourceAdded(const QnResourcePtr& resource);
 protected:
-    virtual bool processDiscoveredResources(QnResourceList& resources);
+    enum class SearchType
+    {
+        Full,
+        Partial
+    };
+    virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType);
     bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     void updateLocalNetworkInterfaces();

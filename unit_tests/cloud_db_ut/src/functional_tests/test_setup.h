@@ -1,26 +1,18 @@
-/**********************************************************
-* Sep 29, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_UT_TEST_SETUP_H
-#define NX_CDB_UT_TEST_SETUP_H
+#pragma once
 
 #include <gtest/gtest.h>
 
 #include <test_support/cdb_launcher.h>
 
-
 namespace nx {
 namespace cdb {
 
-class CdbFunctionalTest
-:
+class CdbFunctionalTest:
     public CdbLauncher,
     public ::testing::Test
 {
 public:
-    //!Calls \a start
+    /** Calls CdbLauncher::start. */
     CdbFunctionalTest();
     ~CdbFunctionalTest();
 
@@ -32,6 +24,9 @@ public:
     AccountWithPassword addActivatedAccount2();
     api::SystemData addRandomSystemToAccount(
         const AccountWithPassword& account);
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account,
+        const api::SystemData& systemPrototype);
     void shareSystemEx(
         const AccountWithPassword& from,
         const api::SystemData& what,
@@ -42,9 +37,23 @@ public:
         const api::SystemData& what,
         const std::string& emailToShareWith,
         api::SystemAccessRole targetRole);
+
+    void enableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
+    void disableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
+
+private:
+    void setUserEnabledFlag(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom,
+        bool isEnabled);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_UT_TEST_SETUP_H
+} // namespace cdb
+} // namespace nx

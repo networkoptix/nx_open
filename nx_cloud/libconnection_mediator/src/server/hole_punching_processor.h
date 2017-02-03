@@ -13,15 +13,12 @@
 
 namespace nx {
 
-namespace stun {
-class MessageDispatcher;
-}
+namespace stun { class MessageDispatcher; }
 
 namespace hpm {
 
-namespace conf {
-    class Settings;
-}
+namespace conf { class Settings; }
+namespace stats { class AbstractCollector; }
 
 class ListeningPeerPool;
 
@@ -29,8 +26,7 @@ class ListeningPeerPool;
  * Handles requests used to establish hole punching connection.
  * Implements hole punching connection mediation techniques.
  */
-class HolePunchingProcessor
-:
+class HolePunchingProcessor:
     protected RequestProcessor
 {
 public:
@@ -38,8 +34,11 @@ public:
         const conf::Settings& settings,
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
-        ListeningPeerPool* const listeningPeerPool);
+        ListeningPeerPool* listeningPeerPool,
+        stats::AbstractCollector* statisticsCollector);
     virtual ~HolePunchingProcessor();
+
+    void stop();
 
     void connect(
         const ConnectionStrongRef& connection,
@@ -64,7 +63,8 @@ private:
     > ConnectSessionsDictionary;
 
     const conf::Settings& m_settings;
-    ListeningPeerPool* const m_listeningPeerPool;
+    ListeningPeerPool* m_listeningPeerPool;
+    stats::AbstractCollector* m_statisticsCollector;
     QnMutex m_mutex;
     //map<id, connection initiation>
     ConnectSessionsDictionary m_activeConnectSessions;

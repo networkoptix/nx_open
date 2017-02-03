@@ -1,7 +1,7 @@
 Config.helpLinks.push({
-    url: "http://tricomresearch.com/support.html",
+    url: "http://www.ubiquitysmart.com/",
     title: "Support",
-    description:"Have a question about specific features of your MVSS system?",
+    description:"Have a question about specific features of your system?",
     button:"get support",
     target: "new" // new|frame
 });

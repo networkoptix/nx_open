@@ -14,7 +14,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 #include <nx/utils/singleton.h>
 #include "nx/utils/type_utils.h"
 #include "core/resource_access/user_access_data.h"
@@ -24,6 +24,10 @@
 
 namespace ec2
 {
+
+namespace aux {
+bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
+}
 
 class LicenseManagerImpl;
 
@@ -73,6 +77,9 @@ namespace detail
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
+
     public:
         QnDbManager();
         virtual ~QnDbManager();
@@ -205,7 +212,10 @@ namespace detail
         ErrorCode doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList);
 
         //getStorages
-        ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& cameraList);
+        ErrorCode getStorages(const QString& filterStr, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(
+            const ParentId& parentId, ApiStorageDataList& storageList);
+        ErrorCode doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList);
 
         //get resource status
         ErrorCode doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList);
@@ -228,8 +238,8 @@ namespace detail
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& id, ApiUserDataList& userList);
 
-        //getUserGroupList
-        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserGroupDataList& groupList);
+        //getUserRoleList
+        ErrorCode doQueryNoLock(const QnUuid& id, ApiUserRoleDataList& userRoleList);
 
         //getPredefinedRoles
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiPredefinedRoleDataList& rolesList);
@@ -304,7 +314,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserGroupData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserRoleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiAccessRightsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/) {
             NX_ASSERT(0, Q_FUNC_INFO, "This transaction can't be executed directly!"); // we MUSTN'T be here
@@ -513,10 +523,10 @@ namespace detail
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
         ErrorCode checkExistingUser(const QString &name, qint32 internalId);
-        ErrorCode insertOrReplaceUserGroup(const ApiUserGroupData& data);
-        ErrorCode removeUserGroup( const QnUuid& guid );
+        ErrorCode insertOrReplaceUserRole(const ApiUserRoleData& data);
+        ErrorCode removeUserRole( const QnUuid& guid );
         ErrorCode setAccessRights(const ApiAccessRightsData& data);
-        ErrorCode cleanAccessRights(const QnUuid& userOrGroupId);
+        ErrorCode cleanAccessRights(const QnUuid& userOrRoleId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnUuid& id);
@@ -566,6 +576,26 @@ namespace detail
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
+        enum ResyncFlag
+        {
+            None                    =      0,
+            ClearLog                =    0x1,
+            ResyncLog               =    0x2,
+            ResyncLicences          =    0x4,
+            ResyncFiles             =    0x8,
+            ResyncCameraAttributes  =   0x10,
+            ResyncServerAttributes  =   0x20,
+            ResyncServers           =   0x40,
+            ResyncLayouts           =   0x80,
+            ResyncRules             =  0x100,
+            ResyncUsers             =  0x200,
+            ResyncStorages          =  0x400,
+            ResyncClientInfo        =  0x800,
+            ResyncVideoWalls        = 0x1000,
+            ResyncWebPages          = 0x2000,
+        };
+        Q_DECLARE_FLAGS(ResyncFlags, ResyncFlag)
+
         QMap<int, QnUuid> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
 
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
@@ -576,7 +606,7 @@ namespace detail
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class ObjectType, class ObjectListType>
+        template <class FilterType, class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(ApiCommand::Value command, std::function<bool (ObjectType& data)> updater = nullptr);
 
         template <class ObjectListType>
@@ -602,6 +632,8 @@ namespace detail
 
         ErrorCode getLicenses(ApiLicenseDataList& data, QSqlDatabase& database);
 
+        /** Raise flags if db is not just created. Always returns true. */
+        bool resyncIfNeeded(ResyncFlags flags);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -620,24 +652,11 @@ namespace detail
         QnDbTransactionExt m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
-        // todo: move this variables to QFlag
-        bool m_needClearLog;
-        bool m_needResyncLog;
-        bool m_needResyncLicenses;
-        bool m_needResyncFiles;
-        bool m_needResyncCameraUserAttributes;
-        bool m_needResyncServerUserAttributes;
-        bool m_needResyncMediaServers;
+
         bool m_dbJustCreated;
         bool m_isBackupRestore;
-        bool m_needResyncLayout;
-        bool m_needResyncbRules;
-        bool m_needResyncUsers;
-        bool m_needResyncStorages;
-        bool m_needResyncClientInfoData;
-        bool m_needResyncVideoWall = false;
-
         bool m_dbReadOnly;
+        ResyncFlags m_resyncFlags;
     };
 } // namespace detail
 
@@ -665,8 +684,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->videowalls);
@@ -694,8 +713,8 @@ public:
         filterData(data->cameras);
         filterData(data->cameraUserAttributesList);
         filterData(data->users);
-        filterData(data->userGroups);
-        filterData(data->userGroups);
+        filterData(data->userRoles);
+        filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
         filterData(data->cameraHistory);

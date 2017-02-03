@@ -5,6 +5,11 @@ $icon-font-path: "../fonts/";
 @import 'master';
 
 
+.master .horisontal-line-text .line {
+  border-top-color:$dark12;
+}
+
+
 body.inline-webadmin{
   padding:0 !important;
   margin:0 !important;
@@ -28,6 +33,10 @@ body.inline-webadmin{
   position:absolute;
   bottom:0;
   width:100%;
+}
+
+.inline-webadmin .panel-body-big{
+  margin-top: 60px;
 }
 
 .hint{

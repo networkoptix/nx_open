@@ -2,7 +2,7 @@
 #define nx_cc_cloud_server_socket_h
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/cloud/tunnel/incoming_tunnel_pool.h>
 #include <nx/network/retry_timer.h>
 #include <nx/network/socket_attributes_cache.h>
@@ -52,6 +52,7 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     //!Implementation of AbstractSocket::*
     void post(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -68,6 +69,8 @@ public:
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
+
+    bool isInSelfAioThread();
 
     /** Invokes listen on mediator */
     void registerOnMediator(
@@ -90,7 +93,8 @@ protected:
 
     void initTunnelPool(int queueLen);
     void startAcceptor(std::unique_ptr<AbstractTunnelAcceptor> acceptor);
-    void onListenRequestCompleted(nx::hpm::api::ResultCode resultCode);
+    void onListenRequestCompleted(
+        nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response);
     void acceptAsyncInternal(
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode code,
@@ -113,6 +117,10 @@ protected:
         SystemError::ErrorCode code,
         AbstractStreamSocket*)> m_savedAcceptHandler;
     hpm::api::ConnectionMethods m_supportedConnectionMethods = 0xFFFF; //< No limits by default
+    nx::utils::MoveOnlyFunc<void(hpm::api::ResultCode)> m_registrationHandler;
+
+private:
+    void stopWhileInAioThread();
 };
 
 } // namespace cloud

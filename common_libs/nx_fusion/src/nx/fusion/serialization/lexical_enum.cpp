@@ -98,13 +98,12 @@ bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *tar
         if(QnLexical::deserialize(value, target))
             return true;
 
-    bool success;
-    if(m_caseSensitivity == Qt::CaseSensitive)
-        success = deserializeEnumInternal(m_valueByName, value, target);
-    else
-        success = deserializeEnumInternal(m_valueByLowerName, value.toLower(), target);
+    bool success = (m_caseSensitivity == Qt::CaseSensitive)
+        ? deserializeEnumInternal(m_valueByName, value, target)
+        : deserializeEnumInternal(m_valueByLowerName, value.toLower(), target);
     if (success)
         return success;
+    // TODO: Add if (!m_numeric) and fix the comment.
     return QnLexical::deserialize(value, target); // try number again
 }
 
@@ -163,7 +162,7 @@ bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *ta
 
     for(const QString &name: names) {
         QString trimmedName = name.trimmed();
-        
+
         if(trimmedName.isEmpty()) {
             if(names.size() == 1) {
                 return true; /* Target is already zero at this point. */

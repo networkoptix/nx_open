@@ -8,7 +8,7 @@
 
 namespace
 {
-    static const QSize kSetupWizardSize(520, 456);
+    static const QSize kSetupWizardSize(496, 392);
 
     QUrl constructUrl(const QUrl &baseUrl)
     {
@@ -91,5 +91,11 @@ void QnSetupWizardDialog::setCloudCredentials(const QnCredentials& value)
 {
     Q_D(QnSetupWizardDialog);
     d->loginInfo.cloudEmail = value.user;
-    d->loginInfo.cloudPassword = value.password;
+    d->loginInfo.cloudPassword = value.password.value();
+}
+
+bool QnSetupWizardDialog::savePassword() const
+{
+    Q_D(const QnSetupWizardDialog);
+    return d->loginInfo.savePassword;
 }

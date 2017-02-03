@@ -56,6 +56,6 @@ void serializeField(
         serializeField(urlQuery, fieldName, value.get());
 }
 
-} // namespace nx
-} // namespace network
 } // namespace url
+} // namespace network
+} // namespace nx

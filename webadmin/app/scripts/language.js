@@ -7,7 +7,9 @@ var L = {
         openLinkWithTitle: 'To {{title}} visit this link'
     },
     setup:{
-        createAccount: 'create account'
+        createAccount: 'create account',
+        errorNoHDD: 'This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.',
+        errorNoNetwork: 'This device needs network connection to work.<br>Please connect it to your local network ot Internet'
     },
     passwordRequirements:
     {
@@ -36,6 +38,9 @@ var L = {
         confirmDisconnectFromCloud:'Disconnect system from the {{CLOUD_NAME}}',
         confirmDisconnectFromCloudTitle:'Do you want to disconnect your system? It will be unreachable from the internet then.',
         confirmDisconnectFromCloudAction: 'Disconnect',
+        disconnectedSuccess: 'System was disconnected successfully',
+        connectedSuccess: 'System was connected successfully',
+
         createLocalOwner:null,
         createLocalOwnerTitle:'Create local administrator',
 
@@ -51,18 +56,25 @@ var L = {
         systemIsUnreacheble: 'System is unreachable or doesn\'t exist.',
         incorrectCurrentPassword: 'Incorrect current password',
         incorrectRemotePassword: 'Login or password are incorrect',
-        incompatibleVersion: 'Found system has incompatible version.',
+        incompatibleVersion: 'System is unreachable, doesn\'t exist or has incompatible version.',
         wrongUrl: 'Unable to connect to specified server.',
+        newSystemError: 'Can\'t merge systems. Remote system is not configured yet',
         safeMode: 'Can\'t merge systems. Remote system is in safe mode.',
         configError: 'Can\'t merge systems. Maybe one of the systems is in safe mode.',
         cloudError: 'Can\'t merge systems. Dependent system is connected to cloud. You need to disconnect it first.',
+        cloudBothError: 'Can\'t merge systems. Both systems are connected to cloud. You need to disconnect one first.',
         cloudHostConflict: 'Can\'t merge systems, because servers are built with different cloud hosts',
         licenceError: 'Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.',
         connectionFailed: 'Connection failed: ',
         unknownError: 'Unknown error',
         mergeFailed: 'Merge failed: ',
-        mergeSucceed: 'Merge succeed.'
-    },
+        mergeSucceed: 'Merge succeed.',
+        newSystemDisplayName: 'New system',
+        incompatibleProtocol:'incompatible version',
+        incompatibleCloudHost: 'cloud conflict',
+        incompatibleCloudState:'cloud connected'
+
+},
     login:{
         incorrectPassword: 'Login or password is incorrect'
     },

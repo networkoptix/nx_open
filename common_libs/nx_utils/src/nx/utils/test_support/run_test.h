@@ -8,45 +8,52 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
-#include <nx/utils/test_support/test_options.h>
+#include <nx/utils/move_only_func.h>
+
+#include "test_options.h"
 
 namespace nx {
 namespace utils {
+namespace test {
 
-inline int runTest(
-    int argc, const char* argv[],
-    std::function<void(const ArgumentParser& args)> extraInit = nullptr)
+typedef std::vector<MoveOnlyFunc<void()>> DeinitFunctions;
+typedef MoveOnlyFunc<DeinitFunctions(const ArgumentParser& args)> InitFunction;
+
+/**
+ * Sets up environment and runs Google Tests. Should be used for all unit tests.
+ */
+inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullptr)
 {
+    nx::utils::setOnAssertHandler([&](const QnLogMessage& m) { FAIL() << m.toStdString(); });
     nx::utils::FlagConfig::setOutputAllowed(false);
+
+    // NOTE: On osx InitGoogleTest(...) should be called independent of InitGoogleMock(...)
+    ::testing::InitGoogleTest(&argc, (char**)argv);
 
     #ifdef USE_GMOCK
         ::testing::InitGoogleMock(&argc, (char**)argv);
-    #else
-        ::testing::InitGoogleTest(&argc, (char**)argv);
     #endif
 
     ArgumentParser args(argc, argv);
     TestOptions::applyArguments(args);
     QnLog::applyArguments(args);
 
-    #ifdef NX_NETWORK_SOCKET_GLOBALS
-        network::SocketGlobalsHolder sgGuard;
-        network::SocketGlobals::applyArguments(args);
-    #endif
-
+    DeinitFunctions deinitFunctions;
     if (extraInit)
-        extraInit(args);
+        deinitFunctions = extraInit(args);
 
     const int result = RUN_ALL_TESTS();
+    for (const auto& deinit: deinitFunctions)
+        deinit();
+
     return result;
 }
 
-inline int runTest(
-    int argc, char* argv[],
-    std::function<void(const ArgumentParser& args)> extraInit = nullptr)
+inline int runTest(int argc, char* argv[], InitFunction extraInit = nullptr)
 {
     return runTest(argc, (const char**)argv, std::move(extraInit));
 }
 
+} // namespace test
 } // namespace utils
 } // namespace nx

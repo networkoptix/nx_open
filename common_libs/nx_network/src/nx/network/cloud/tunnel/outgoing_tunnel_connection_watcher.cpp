@@ -16,7 +16,6 @@ OutgoingTunnelConnectionWatcher::OutgoingTunnelConnectionWatcher(
     m_inactivityTimer(std::make_unique<aio::Timer>())
 {
     bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
-    launchInactivityTimer();
 }
 
 OutgoingTunnelConnectionWatcher::~OutgoingTunnelConnectionWatcher()
@@ -29,14 +28,20 @@ void OutgoingTunnelConnectionWatcher::bindToAioThread(
 {
     BaseType::bindToAioThread(aioThread);
 
-    m_tunnelConnection->bindToAioThread(getAioThread());
-    m_inactivityTimer->bindToAioThread(getAioThread());
+    m_tunnelConnection->bindToAioThread(aioThread);
+    m_inactivityTimer->bindToAioThread(aioThread);
 }
 
 void OutgoingTunnelConnectionWatcher::stopWhileInAioThread()
 {
     m_tunnelConnection.reset();
     m_inactivityTimer.reset();
+}
+
+void OutgoingTunnelConnectionWatcher::start()
+{
+    launchInactivityTimer();
+    m_tunnelConnection->start();
 }
 
 void OutgoingTunnelConnectionWatcher::establishNewConnection(
@@ -46,7 +51,7 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
 {
     post(
         [this, timeout = std::move(timeout), socketAttributes = std::move(socketAttributes),
-            handler = std::move(handler)]()
+            handler = std::move(handler)]() mutable
         {
             launchInactivityTimer();
             m_tunnelConnection->establishNewConnection(
@@ -54,7 +59,6 @@ void OutgoingTunnelConnectionWatcher::establishNewConnection(
                 std::move(socketAttributes),
                 std::move(handler));
         });
-
 }
 
 void OutgoingTunnelConnectionWatcher::launchInactivityTimer()

@@ -4,7 +4,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('nativeClient', function ($q, $log, $location, dialogs) {
+    .factory('nativeClient', function ($q, $log, $location, dialogs, $sessionStorage) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -18,7 +18,10 @@ angular.module('webadminApp')
             }
         }
 
-        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket');
+        var wsUri = $location.search().clientWebSocket || parseUrl('clientWebSocket') || $sessionStorage.clientWebSocket;
+        if(wsUri){
+            $sessionStorage.clientWebSocket = wsUri;
+        }
 
         return {
             init:function(){
@@ -119,15 +122,16 @@ angular.module('webadminApp')
                 }
                 return $q.reject();
             },
-            updateCredentials:function(login,password,isCloud){
+            updateCredentials:function(login,password,isCloud,savePassword){
+                savePassword = !!savePassword; // Convert any value to boolean
                 $log.log("try to update credentials for native client");
                 if(nativeClientObject && nativeClientObject.updateCredentials){
-                    return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud));
+                    return $q.resolve(nativeClientObject.updateCredentials (login,password,isCloud,savePassword));
                 }
 
                 if(socketClientController && socketClientController.updateCredentials){
                     var deferred = $q.defer();
-                    socketClientController.updateCredentials(login,password,isCloud,function(result){
+                    socketClientController.updateCredentials(login,password,isCloud,savePassword,function(result){
                         deferred.resolve(result);
                     });
                     return deferred.promise;

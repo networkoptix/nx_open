@@ -47,6 +47,12 @@ static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
 static const size_t kTypicalMtuSize = 1500;
 
+enum InitializationFlags
+{
+    disableUdt = 0x01,
+    disableCloudConnect = 0x02
+};
+
 } // network
 } // nx
 
@@ -108,13 +114,13 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* utf8Str);
-    SocketAddress(const QUrl& url);
 
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
     bool operator<(const SocketAddress& rhs) const;
 
     QString toString() const;
+    std::string toStdString() const;
     QUrl toUrl(const QString& scheme = QString()) const;
     bool isNull() const;
 

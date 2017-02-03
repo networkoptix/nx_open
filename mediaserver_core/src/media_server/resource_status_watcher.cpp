@@ -9,6 +9,12 @@
 QnResourceStatusWatcher::QnResourceStatusWatcher()
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
+    connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
+}
+
+void QnResourceStatusWatcher::updateResourceStatus(const QnResourcePtr& resource)
+{
+    emit statusChanged(resource);
 }
 
 bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resource)
@@ -16,12 +22,14 @@ bool QnResourceStatusWatcher::isSetStatusInProgress(const QnResourcePtr &resourc
     return m_setStatusInProgress.contains(resource->getId());
 }
 
-void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource)
+void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason)
 {
-    //NX_ASSERT(!resource->hasFlags(Qn::foreigner), Q_FUNC_INFO, "Status changed for foreign resource!");
-    //if (resource.dynamicCast<QnMediaServerResource>())
-    //    return;
+    if (reason == Qn::StatusChangeReason::Local)
+        updateResourceStatusInternal(resource);
+}
 
+void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& resource)
+{
     if (!isSetStatusInProgress(resource))
         updateResourceStatusAsync(resource);
     else

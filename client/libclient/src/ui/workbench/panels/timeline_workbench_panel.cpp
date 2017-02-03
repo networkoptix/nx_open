@@ -113,12 +113,16 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
-    connect(display(), &QnWorkbenchDisplay::widgetChanged, this,
+
+    auto handleWidgetChanged =
         [this](Qn::ItemRole role)
         {
             if (role == Qn::ZoomedRole)
                 m_showWidget->setVisible(!isPinned());
-        });
+        };
+
+    connect(display(), &QnWorkbenchDisplay::widgetChanged,
+        this, handleWidgetChanged, Qt::QueuedConnection /*queue past setOpened(false)*/);
 
     m_showingProcessor->addTargetItem(m_showButton);
     m_showingProcessor->addTargetItem(m_showWidget);
@@ -273,7 +277,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::TopEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::TopEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateGeometry();
@@ -363,6 +367,28 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
     auto parentWidgetRect = m_parentWidget->rect();
     qreal newY = parentWidgetRect.bottom()
         + (opened ? -item->size().height() : kHidePanelOffset);
+
+    if (opened)
+    {
+        item->speedSlider()->setToolTipEnabled(true);
+        item->volumeSlider()->setToolTipEnabled(true);
+    }
+    else
+    {
+        const auto handleClosed =
+            [this]()
+            {
+                item->speedSlider()->setToolTipEnabled(false);
+                item->volumeSlider()->setToolTipEnabled(false);
+                disconnect(m_yAnimator, &VariantAnimator::finished, this, nullptr);
+            };
+
+        if (animate)
+            connect(m_yAnimator, &VariantAnimator::finished, this, handleClosed);
+        else
+            handleClosed();
+    }
+
     if (animate)
         m_yAnimator->animateTo(newY);
     else
@@ -370,12 +396,6 @@ void TimelineWorkbenchPanel::setOpened(bool opened, bool animate)
 
     m_resizerWidget->setEnabled(opened);
     item->timeSlider()->setTooltipVisible(opened);
-
-    if (!opened)
-    {
-        item->speedSlider()->hideToolTip();
-        item->volumeSlider()->hideToolTip();
-    }
 
     emit openedChanged(opened, animate);
 }
@@ -393,7 +413,6 @@ void TimelineWorkbenchPanel::setVisible(bool visible, bool animate)
 
     m_visible = visible;
 
-    item->setEnabled(visible); /* So that it doesn't handle mouse events while disappearing. */
     updateOpacity(animate);
 
     if (m_autoHideTimer)
@@ -410,7 +429,7 @@ void TimelineWorkbenchPanel::setVisible(bool visible, bool animate)
 
 qreal TimelineWorkbenchPanel::opacity() const
 {
-    return opacityAnimator(item)->targetValue().toDouble();
+    return opacityAnimator(m_showButton)->targetValue().toDouble();
 }
 
 void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
@@ -420,25 +439,27 @@ void TimelineWorkbenchPanel::setOpacity(qreal opacity, bool animate)
 
     if (animate)
     {
-        m_opacityAnimatorGroup->pause();
-        for (auto abstractAnimator: m_opacityAnimatorGroup->animators())
-        {
-            auto animator = qobject_cast<VariantAnimator*>(abstractAnimator);
-            NX_ASSERT(animator);
-            if (!animator)
-                continue;
+        auto itemAnimator = opacityAnimator(item);
+        auto buttonAnimator = opacityAnimator(m_showButton);
 
-            animator->setTargetValue(opacity);
+        m_opacityAnimatorGroup->pause();
+
+        itemAnimator->setTargetValue(opacity * masterOpacity());
+        buttonAnimator->setTargetValue(opacity);
+
+        for (auto animator: { itemAnimator, buttonAnimator })
+        {
             qnWorkbenchAnimations->setupAnimator(animator, visible
                 ? Animations::Id::TimelineShow
                 : Animations::Id::TimelineHide);
         }
+
         m_opacityAnimatorGroup->start();
     }
     else
     {
         m_opacityAnimatorGroup->stop();
-        item->setOpacity(opacity);
+        item->setOpacity(opacity * masterOpacity());
         m_showButton->setOpacity(opacity);
     }
 
@@ -459,13 +480,13 @@ void TimelineWorkbenchPanel::updateOpacity(bool animate)
         qnWorkbenchAnimations->setupAnimator(animator, buttonsVisible
             ? Animations::Id::TimelineButtonsShow
             : Animations::Id::TimelineButtonsHide);
-        animator->animateTo(buttonsOpacity);
+        animator->animateTo(buttonsOpacity * masterOpacity());
     }
     else
     {
         if (hasOpacityAnimator(m_zoomButtonsWidget))
             opacityAnimator(m_zoomButtonsWidget)->stop();
-        m_zoomButtonsWidget->setOpacity(buttonsOpacity);
+        m_zoomButtonsWidget->setOpacity(buttonsOpacity * masterOpacity());
     }
 }
 
@@ -480,6 +501,15 @@ QRectF TimelineWorkbenchPanel::effectiveGeometry() const
     if (m_yAnimator->isRunning())
         geometry.moveTop(m_yAnimator->targetValue().toReal());
     return geometry;
+}
+
+void TimelineWorkbenchPanel::stopAnimations()
+{
+    if (!m_yAnimator->isRunning())
+        return;
+
+    m_yAnimator->stop();
+    item->setY(m_yAnimator->targetValue().toDouble());
 }
 
 bool TimelineWorkbenchPanel::isThumbnailsVisible() const
@@ -629,7 +659,7 @@ void TimelineWorkbenchPanel::at_resizerWidget_geometryChanged()
         targetHeight = maxHeight;
 
     QRectF geometry = item->geometry();
-    if (!qFuzzyCompare(geometry.height(), targetHeight))
+    if (!qFuzzyEquals(geometry.height(), targetHeight))
     {
         qreal targetTop = parentBottom - targetHeight;
         geometry.setHeight(targetHeight);

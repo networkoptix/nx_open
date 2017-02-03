@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/connective.h>
-#include <network/system_description.h>
+#include <network/cloud_system_description.h>
 #include <finders/abstract_systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 
@@ -32,28 +32,21 @@ private:
 
     void setCloudSystems(const QnCloudSystemList &systems);
 
-    void updateSystemInternal(const QString& cloudId,
-        const QnSystemDescription::PointerType& system);
-
-    void pingServerInternal(const QString &host
-        , int serverPriority
-        , const QString &systemId);
-
-    void checkOutdatedServersInternal(const QnSystemDescription::PointerType &system);
+    void pingCloudSystem(const QString &cloudSystemId);
 
     void updateSystems();
 
     void tryRemoveAlienServer(const QnModuleInformation &serverInfo);
 
+    void updateOnlineStateUnsafe(const QnCloudSystemList& targetSystems);
+
 private:
     typedef QScopedPointer<QTimer> QTimerPtr;
-    typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
+    typedef QHash<QString, QnCloudSystemDescription::PointerType> SystemsHash;
     typedef QHash<int, QString> RequestIdToSystemHash;
 
     const QTimerPtr m_updateSystemsTimer;
     mutable QnMutex m_mutex;
 
     SystemsHash m_systems;
-    SystemsHash m_factorySystems;       //< Stores cloud-factory systems with one factory server
-    RequestIdToSystemHash m_requestToSystem;
 };

@@ -124,7 +124,7 @@ private:
 
     void onTransactionsReadFromLog(
         api::ResultCode resultCode,
-        std::vector<TransactionLogRecord> serializedTransaction,
+        std::vector<dao::TransactionLogRecord> serializedTransaction,
         ::ec2::QnTranState readedUpTo);
 
     void enableOutputChannel();

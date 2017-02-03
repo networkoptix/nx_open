@@ -25,17 +25,21 @@ class VmsGatewayProxyTestHandler
     public nx_http::AbstractHttpRequestHandler
 {
 public:
-    VmsGatewayProxyTestHandler()
+    VmsGatewayProxyTestHandler(boost::optional<bool> securityExpectation):
+        m_securityExpectation(securityExpectation)
     {
     }
 
     virtual void processRequest(
-        nx_http::HttpServerConnection* const /*connection*/,
+        nx_http::HttpServerConnection* const connection,
         stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler )
     {
+        if (m_securityExpectation)
+            EXPECT_EQ(m_securityExpectation.get(), connection->isSsl());
+
         QUrlQuery requestQuery(request.requestLine.url.query());
 
         if (request.requestLine.url.path() == testPath &&
@@ -64,6 +68,8 @@ public:
             completionHandler(nx_http::StatusCode::badRequest);
         }
     }
+
+    boost::optional<bool> m_securityExpectation;
 };
 
 class VmsGatewayProxyTest
@@ -73,7 +79,13 @@ class VmsGatewayProxyTest
 public:
     void SetUp() override
     {
-        testHttpServer()->registerRequestProcessor<VmsGatewayProxyTestHandler>(testPath);
+        testHttpServer()->registerRequestProcessor<VmsGatewayProxyTestHandler>(
+            testPath,
+            [this]()
+            {
+                QnMutexLocker lock(&m_mutex);
+                return std::make_unique<VmsGatewayProxyTestHandler>(m_securityExpectation);
+            });
     }
 
     void testProxyUrl(
@@ -89,6 +101,7 @@ public:
         const QUrl& url,
         nx_http::StatusCode::Value expectedReponseStatusCode)
     {
+        NX_LOGX(lm("testProxyUrl(%1)").str(url), cl_logINFO);
         httpClient->setResponseReadTimeoutMs(1000*1000);
         ASSERT_TRUE(httpClient->doGet(url));
         ASSERT_EQ(
@@ -108,6 +121,16 @@ public:
 
         ASSERT_EQ(testMsgBody, msgBody);
     }
+
+    void expectSecurity(boost::optional<bool> isEnabled)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_securityExpectation = isEnabled;
+    }
+
+private:
+    QnMutex m_mutex;
+    boost::optional<bool> m_securityExpectation{boost::none};
 };
 
 TEST_F(VmsGatewayProxyTest, IpSpecified)
@@ -143,18 +166,108 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
 TEST_F(VmsGatewayProxyTest, SslEnabled)
 {
     addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
     ASSERT_TRUE(startAndWaitUntilStarted());
 
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("https://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("https://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
     testProxyUrl(QUrl(lit("http://%1/http:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
 
+    expectSecurity(true);
     testProxyUrl(QUrl(lit("http://%1/ssl:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
 
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("http://%1/https:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+}
+
+TEST_F(VmsGatewayProxyTest, SslEnforced)
+{
+    addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/preferedSslMode", "enabled");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("https://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("http://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+}
+
+TEST_F(VmsGatewayProxyTest, SslRestricted)
+{
+    addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/preferedSslMode", "disabled");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("https://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("https://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(false);
+    testProxyUrl(QUrl(lit("http://%1/http:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(true);
+    testProxyUrl(QUrl(lit("http://%1/ssl:%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
+
+    expectSecurity(true);
     testProxyUrl(QUrl(lit("http://%1/https:%2%3")
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
@@ -164,7 +277,14 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
 TEST_F(VmsGatewayProxyTest, SslForbidden)
 {
     addArg("-http/sslSupport", "false");
+    addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
     ASSERT_TRUE(startAndWaitUntilStarted());
+    expectSecurity(false);
+
+    testProxyUrl(QUrl(lit("http://%1/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
 
     testProxyUrl(QUrl(lit("http://%1/http:%2%3")
         .arg(endpoint().toString())
@@ -223,6 +343,23 @@ TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
     nx_http::HttpClient httpClient;
     httpClient.setProxyVia(endpoint());
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
+}
+
+TEST_F(VmsGatewayProxyTest, ModRewrite)
+{
+    addArg("-http/sslSupport", "true");
+    addArg("-cloudConnect/sslAllowed", "true");
+    ASSERT_TRUE(startAndWaitUntilStarted());
+
+    testProxyUrl(QUrl(lit("http://%1/gateway/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().address.toString())
+        .arg(testPathAndQuery)));
+
+    testProxyUrl(QUrl(lit("https://%1/gateway/%2%3")
+        .arg(endpoint().toString())
+        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testPathAndQuery)));
 }
 
 }   // namespace test

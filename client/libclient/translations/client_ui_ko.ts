@@ -142,6 +142,34 @@
     </message>
 </context>
 <context>
+    <name>ApplauncherControlDialog</name>
+    <message>
+        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">외부 장치 추가...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check</source>
+        <translation type="unfinished">확인</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Not Checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Installed Versions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -210,11 +238,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>모든서버 오프라인상태,Audit데이터 사용불가</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Filter</source>
         <translation type="unfinished">필터 초기화</translation>
     </message>
@@ -222,6 +245,11 @@
         <location/>
         <source>Email settings</source>
         <translation type="unfinished">이메일 설정</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -238,16 +266,6 @@
     </message>
     <message>
         <location/>
-        <source>Finish:</source>
-        <translation>종료</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start:</source>
-        <translation>시작</translation>
-    </message>
-    <message>
-        <location/>
         <source>Limit Bandwidth to:</source>
         <translation>네트워크 사이즈 제한</translation>
     </message>
@@ -259,6 +277,16 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -446,22 +474,12 @@
     </message>
     <message>
         <location/>
-        <source>Event log</source>
-        <translation>이벤트 로그</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Advanced...</source>
-        <translation>고급...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Log...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -600,11 +618,6 @@
     </message>
     <message>
         <location/>
-        <source>This camera has no advanced settings</source>
-        <translation>이 카메라는 상세 설정이 없습니다.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Advanced settings are unavailable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -738,6 +751,14 @@
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
         <translation>ID 입력:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -895,14 +916,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>CloudUserPanelWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1019,7 +1032,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Event Rules</source>
+        <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1154,16 +1167,6 @@ to the cloud&gt;</source>
     <name>GeneralPreferencesWidget</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
-        <source>Main Media Folder</source>
-        <translation>주 저장 위치 설정</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Extra Media Folders</source>
-        <translation>추가 저장 위치 설정</translation>
-    </message>
-    <message>
-        <location/>
         <source>Misc</source>
         <translation>기타</translation>
     </message>
@@ -1184,11 +1187,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Browse...</source>
-        <translation type="unfinished">찾기...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add...</source>
         <translation type="unfinished">추가(&amp;A)...</translation>
     </message>
@@ -1199,8 +1197,33 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots</source>
-        <translation type="unfinished">PC시작 시 자동 실행:</translation>
+        <source>Local Media Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>First Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Second Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run application when PC Boots</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1339,16 +1362,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Search Base:</source>
-        <translation>검색 기본</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Filter:</source>
-        <translation>검색조건</translation>
-    </message>
-    <message>
-        <location/>
         <source>Optional</source>
         <translation>추가 조건</translation>
     </message>
@@ -1364,18 +1377,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Server URL:</source>
-        <translation type="unfinished">서버 URL:</translation>
+        <source>Server URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Admin DN:</source>
-        <translation type="unfinished">관리자 DN</translation>
+        <source>Admin DN</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation type="unfinished">비밀번호:</translation>
+        <source>Password</source>
+        <translation type="unfinished">비밀번호</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1631,11 +1654,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Restart required.</source>
-        <translation>재 시작 요청.</translation>
-    </message>
-    <message>
-        <location/>
         <source> seconds</source>
         <translation>초</translation>
     </message>
@@ -1671,16 +1689,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Show extra info in tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time</source>
-        <translation type="unfinished">투어 전환 간격 시간:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Image</source>
         <translation type="unfinished">이미지:</translation>
     </message>
@@ -1693,6 +1701,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Intensity</source>
         <translation type="unfinished">강도:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show additional info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1925,6 +1943,11 @@ to the cloud&gt;</source>
         <source>Form</source>
         <translation>틀</translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
@@ -2083,12 +2106,12 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Update System</source>
+        <source>Link copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Link copied</source>
+        <source>You have the latest version installed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2257,11 +2280,6 @@ to the cloud&gt;</source>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
-        <source>Video Recording</source>
-        <translation>비디오 저장</translation>
-    </message>
-    <message>
-        <location/>
         <source>Temporary Folder</source>
         <translation>임시 폴더</translation>
     </message>
@@ -2302,61 +2320,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Native</source>
-        <translation>네이티브</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quarter Native</source>
-        <translation>쿼터 네이티브</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1920x1080</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1280x720</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>640x480</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>320x240</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Best</source>
-        <translation>최상</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Average</source>
-        <translation>평균</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Performance</source>
-        <translation>성능</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio Grabber</source>
-        <translation>오디오 포착</translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>최상 화질및 해상도는 강력한 PC사용시에만 추천합니다.</translation>
     </message>
@@ -2374,16 +2337,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Recording Quality</source>
         <translation type="unfinished">저장 화질:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Device</source>
-        <translation type="unfinished">주 장치:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device</source>
-        <translation type="unfinished">외부장치:</translation>
     </message>
 </context>
 <context>
@@ -2813,8 +2766,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished">서버가 Offline상태여서 통계 불가합니다.</translation>
+        <source>Server is offline. Statistics are not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2841,11 +2794,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">선택하지 않은 장치에 다른 문제가 발생하지 않으나, 녹화는 멈춤, 예전 데이터 삭제 가능 합니다.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Reindex Archive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2862,6 +2810,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2987,17 +2940,17 @@ Click &quot;New role&quot; button to create one.</source>
     <name>UserSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>User Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

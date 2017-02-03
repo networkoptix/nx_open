@@ -65,7 +65,8 @@ void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
     switch (message.operation)
     {
         case QnVideoWallControlMessage::Exit:
-            qApp->quit();
+            if (uiController)
+                uiController->disconnectFromSystem();
             break;
 
         default:

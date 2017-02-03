@@ -22,13 +22,18 @@
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+
+#include <QtGui/QDesktopServices>
+
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QDesktopServices>
-#include <QtSingleApplication>
 
-#include <common/systemexcept.h>
+#include <QtSingleApplication>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -40,6 +45,7 @@
 #include <nx/utils/timer_manager.h>
 
 #include <nx/audio/audiodevice.h>
+#include <nx/utils/crash_dump/systemexcept.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_handler.h>
@@ -54,6 +60,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 namespace
 {
@@ -70,6 +77,29 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
+
+    if (startupParams.customUri.isValid())
+    {
+        QPointer<QNetworkAccessManager> manager(new QNetworkAccessManager(application));
+        QObject::connect(manager.data(), &QNetworkAccessManager::finished,
+            [manager](QNetworkReply* reply)
+            {
+                qDebug() << lit("Cloud Reply received: %1").arg(QLatin1String(reply->readAll()));
+                reply->deleteLater();
+                manager->deleteLater();
+            });
+
+        QUrl url(QnAppInfo::defaultCloudPortalUrl());
+        url.setPath(lit("/api/utils/visitedKey"));
+        qDebug() << "Sending Cloud Portal Confirmation to" << url.toString();
+
+        QJsonObject data{{lit("key"), startupParams.customUri.authenticator().encode()}};
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, lit("application/json"));
+
+        manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
+    }
+
 
     if (!allowMultipleClientInstances)
     {
@@ -162,10 +192,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
 
+    // Wait while deleteLater objects will be freed
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+    waitingForObjectsToBeFreed.join();
+
     return result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
@@ -174,10 +208,6 @@ int main(int argc, char **argv)
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::installGlobalUnhandledExceptionHandler();
-#endif
-
-#ifdef Q_OS_LINUX
-    linux_exception::installCrashSignalHandler();
 #endif
 
 #ifdef Q_OS_MAC

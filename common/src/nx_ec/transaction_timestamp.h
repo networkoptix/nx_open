@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include <QtCore/QObject>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
@@ -63,8 +65,11 @@ public:
         return (sequence > 0) ? true : (ticks > right);
     }
 
-    Timestamp& operator-=(std::uint64_t right)
+    Timestamp& operator-=(std::int64_t right)
     {
+        if (right < 0)
+            return operator+=(-right);
+
         const auto ticksBak = ticks;
         ticks -= right;
         if (ticks > ticksBak)   //< Overflow?
@@ -72,8 +77,11 @@ public:
         return *this;
     }
 
-    Timestamp& operator+=(std::uint64_t right)
+    Timestamp& operator+=(std::int64_t right)
     {
+        if (right < 0)
+            return operator-=(-right);
+
         const auto ticksBak = ticks;
         ticks += right;
         if (ticks < ticksBak)   //< Overflow?
@@ -158,4 +166,6 @@ QString toString(const Timestamp& val);
 
 QN_FUSION_DECLARE_FUNCTIONS(Timestamp, (json)(ubjson)(xml)(csv_record))
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::Timestamp);
 

@@ -23,7 +23,7 @@ struct UserAccessData
     UserAccessData();
     explicit UserAccessData(const QnUuid& userId, Access access = Access::Default);
 
-    UserAccessData(const UserAccessData &other) = default;
+    UserAccessData(const UserAccessData&) = default;
 
     bool isNull() const { return userId.isNull(); }
 };

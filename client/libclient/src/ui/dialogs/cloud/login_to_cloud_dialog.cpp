@@ -10,7 +10,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/custom_style.h>
-#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/input_field.h>
 
@@ -53,7 +52,8 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    setWindowTitle(tr("Log in to %1").arg(QnAppInfo::cloudName()));
+    setWindowTitle(tr("Log in to %1", "%1 is name of cloud (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
     ui->loginInputField->setValidator(Qn::defaultEmailValidator(false));
@@ -77,8 +77,10 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
-    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!").arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png"));
+    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is name of cloud (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName()));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png",
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
@@ -103,7 +105,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     d->updateUi();
     d->lockUi(false);
 
-    ui->loginButton->setProperty(style::Properties::kAccentStyleProperty, true);
+    setAccentStyle(ui->loginButton);
 
     setResizeToContentsMode(Qt::Vertical | Qt::Horizontal);
 }
@@ -217,7 +219,6 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
     const auto errorCode = qnCloudStatusWatcher->error();
     qnCloudStatusWatcher->disconnect(this);
 
-    QString message;
     switch (errorCode)
     {
         case QnCloudStatusWatcher::NoError:
@@ -230,21 +231,12 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
         case QnCloudStatusWatcher::UnknownError:
         default:
         {
-            message = tr("Can not login to %1").arg(QnAppInfo::cloudName());
+            Q_Q(QnLoginToCloudDialog);
+
+            QnMessageBox::critical(q, tr("Failed to login to %1",
+                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
             break;
         }
     }
-
-    Q_Q(QnLoginToCloudDialog);
-
-    if (!message.isEmpty())
-    {
-        QnMessageBox::critical(q,
-            helpTopic(q),
-            tr("Error"),
-            message,
-            QDialogButtonBox::Ok);
-    }
-
     unlockUi();
 }

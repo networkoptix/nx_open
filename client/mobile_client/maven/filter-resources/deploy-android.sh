@@ -22,7 +22,7 @@ if [[ "${build.configuration}" == "release" ]]; then
 else
     SOURCE_APK=apk/bin/QtApp-debug.apk
 fi
-TARGET_APK=${final.artifact.name}.apk
+TARGET_APK=${artifact.name.client}.apk
 
 rm -rf $BUILD_TARGET
 
@@ -31,4 +31,4 @@ set -e
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
 ${qt.dir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-libmobile_client.so-deployment-settings.json --output $BUILD_TARGET $*
 
-cp $SOURCE_APK $TARGET_APK
+mv $SOURCE_APK $TARGET_APK

@@ -40,9 +40,9 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-    void saveParams();
-    void saveParamsAsync();
-    int saveAsync();
+    virtual void saveParams();
+    virtual void saveParamsAsync();
+    virtual int saveAsync();
     void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
 
     //! Camera source URL, commonly - rtsp link.
@@ -63,6 +63,7 @@ private:
     QnAbstractDTSFactory* m_dtsFactory;
     int m_issueCounter;
     QElapsedTimer m_lastIssueTimer;
+    std::map<Qn::ConnectionRole, QString> m_cachedStreamUrls;
 };
 
 

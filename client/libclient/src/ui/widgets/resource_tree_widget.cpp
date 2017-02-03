@@ -58,17 +58,17 @@ public:
         invalidateFilter();
     }
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
     {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
         {
-            Qt::CheckState checkState = static_cast<Qt::CheckState>(value.toInt());
+            //TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
             emit beforeRecursiveOperation();
-            setCheckStateRecursive(index, checkState);
-            setCheckStateRecursiveUp(index, checkState);
+            base_type::setData(index, value, Qt::CheckStateRole);
             emit afterRecursiveOperation();
             return true;
         }
+
         return base_type::setData(index, value, role);
     }
 
@@ -80,11 +80,8 @@ public:
 private:
     /**
      * Helper function to list nodes in the correct order.
-     * Root nodes are strictly ordered, but there are two types of nodes which
-     * are inserted in between: current user node and videowall node.
-     * Videowalls are pinned between Layouts and WebPages.
-     * CurrentUser is pinned between CurrentSystem and Separator.
-     * Also when we are not logged in, LocalResources node is displayed on top.
+     * Root nodes are strictly ordered, but there is one type of node which is inserted in between:
+     * videowall nodes, which are pinned between Layouts and WebPages.
      */
     qreal nodeOrder(const QModelIndex &index) const
     {
@@ -93,24 +90,10 @@ private:
             return nodeType;
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        bool isUser = resource->flags().testFlag(Qn::user);
-        if (isUser)
-            return 0.5 * (Qn::CurrentSystemNode + Qn::SeparatorNode);
-
         bool isVideoWall = resource->flags().testFlag(Qn::videowall);
         if (isVideoWall)
             return 0.5 * (Qn::LayoutsNode + Qn::WebPagesNode);
 
-        /* Comparison between layouts and shared layouts. */
-        bool isLayout = resource->flags().testFlag(Qn::layout);
-        if (isLayout)
-            return nodeType;
-
-        /* We should get here only when comparing local resources node with resources when we are not logged in. */
-        if (resource->hasFlags(Qn::local))
-            return Qn::LocalSeparatorNode + 1;
-
-        /* We still can get here when comparing recorders with cameras. */
         return nodeType;
     }
 
@@ -118,47 +101,12 @@ private:
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const
     {
-        Qn::NodeType leftNodeType = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        Qn::NodeType rightNodeType = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-
-        if (leftNodeType != rightNodeType)
-        {
-            /* Check default behavior first. */
-            if (leftNodeType != Qn::ResourceNode && rightNodeType != Qn::ResourceNode)
-                return leftNodeType < rightNodeType;
-
-            qreal leftOrder = nodeOrder(left);
-            qreal rightOrder = nodeOrder(right);
-            if (!qFuzzyEquals(leftOrder, rightOrder))
-                return leftOrder < rightOrder;
-        }
+        qreal leftOrder = nodeOrder(left);
+        qreal rightOrder = nodeOrder(right);
+        if (!qFuzzyEquals(leftOrder, rightOrder))
+            return leftOrder < rightOrder;
 
         return resourceLessThan(left, right);
-    }
-
-    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state)
-    {
-        QModelIndex root = index.sibling(index.row(), Qn::NameColumn);
-        for (int i = 0; i < rowCount(root); ++i)
-            setCheckStateRecursive(this->index(i, Qn::CheckColumn, root), state);
-        base_type::setData(index, state, Qt::CheckStateRole);
-    }
-
-    void setCheckStateRecursiveUp(const QModelIndex &index, Qt::CheckState state)
-    {
-        QModelIndex root = index.parent();
-        if (!root.isValid())
-            return;
-
-        for (int i = 0; (i < rowCount(root)) && (state == Qt::Checked); ++i)
-            if (this->index(i, Qn::CheckColumn, root).data(Qt::CheckStateRole).toInt() != Qt::Checked)
-                state = Qt::Unchecked;
-
-        QModelIndex checkRoot = root.sibling(root.row(), Qn::CheckColumn);
-        if (checkRoot.data(Qt::CheckStateRole).toInt() == state)
-            return;
-        base_type::setData(checkRoot, state, Qt::CheckStateRole);
-        setCheckStateRecursiveUp(root, state);
     }
 
     virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override
@@ -203,7 +151,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     m_itemDelegate->setFixedHeight(0); // automatic height
     ui->resourcesTreeView->setItemDelegateForColumn(Qn::NameColumn, m_itemDelegate);
     ui->resourcesTreeView->setProperty(style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndents(0, 0)));
+        QVariant::fromValue(QnIndents(0, 1)));
 
     connect(ui->resourcesTreeView, &QnTreeView::enterPressed, this,
         [this](const QModelIndex& index){emit activated(index, false); });
@@ -311,6 +259,27 @@ void QnResourceTreeWidget::expandAll()
     ui->resourcesTreeView->expandAll();
 }
 
+void QnResourceTreeWidget::expandChecked()
+{
+    auto model = ui->resourcesTreeView->model();
+
+    for (int i = 0; i < model->rowCount(ui->resourcesTreeView->rootIndex()); ++i)
+        expandCheckedRecursively(model->index(i, Qn::NameColumn));
+}
+
+void QnResourceTreeWidget::expandCheckedRecursively(const QModelIndex& from)
+{
+    if (!from.isValid())
+        return;
+
+    auto checkStateIndex = from.sibling(from.row(), Qn::CheckColumn);
+    if (checkStateIndex.data(Qt::CheckStateRole).toInt() != Qt::Unchecked)
+        expand(from);
+
+    for (int i = 0; i < from.model()->rowCount(from); ++i)
+        expandCheckedRecursively(from.child(i, Qn::NameColumn));
+}
+
 QPoint QnResourceTreeWidget::selectionPos() const
 {
     QModelIndexList selectedRows = ui->resourcesTreeView->selectionModel()->selectedRows();
@@ -370,10 +339,15 @@ void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 
     m_graphicsTweaksFlags = flags;
 
+    /*
+     * Currently this is not working: hidden row does not receive full update when scrolled up.
+     * It was working only due to full tree repainting inside graphics proxy widget.
+
     if (flags & Qn::HideLastRow)
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     else
         ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, QVariant());
+    */
 
     if (flags & Qn::BypassGraphicsProxy)
     {

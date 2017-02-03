@@ -136,15 +136,6 @@ public:
         /** Full set of background options. */
         BACKGROUND_IMAGE,
 
-        /** A list of the urls that were discovered by QnDirectModuleFinder. */
-        KNOWN_SERVER_URLS,
-
-        /**
-         * Flags for messages that should be displayed to user only once
-         * (usually with 'Do not show anymore' checkbox).
-         */
-        SHOW_ONCE_MESSAGES,
-
         LOG_LEVEL,
         EC2_TRAN_LOG_LEVEL,
 
@@ -169,6 +160,9 @@ public:
      */
     bool isWritable() const;
     QSettings* rawSettings();
+
+signals:
+    void saved();
 
 protected:
     virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
@@ -230,12 +224,10 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isGlDoubleBuffer,       setGLDoubleBuffer,          GL_DOUBLE_BUFFER,           true)
         QN_DECLARE_RW_PROPERTY(bool,                        isVSyncEnabled,         setVSyncEnabled,            GL_VSYNC,                   true)
         QN_DECLARE_RW_PROPERTY(quint64,                     userIdleTimeoutMSecs,   setUserIdleTimeoutMSecs,    USER_IDLE_TIMEOUT_MSECS,    0)
-        QN_DECLARE_RW_PROPERTY(Qn::ShowOnceMessages,        showOnceMessages,       setShowOnceMessages,        SHOW_ONCE_MESSAGES,         0)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
-        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)

@@ -223,6 +223,36 @@
             "forceSingleStream": true
         },
         {
+            "keys":[
+                "Axis|P7216*"
+            ],
+            "ignoreONVIF": true
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Cube",
+                "Network Optix|E12A"
+            ],
+            "nxDeviceModel": "Nx-Cube-0512A",
+            "nxDeviceName": "Nx-Cube"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome",
+                "Network Optix|E924"
+            ],
+            "nxDeviceModel": "Nx-Dome-05924",
+            "nxDeviceName": "Nx-Dome"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Fisheye",
+                "Network Optix|E925"
+            ],
+            "nxDeviceModel": "Nx-Fisheye-05925",
+            "nxDeviceName": "Nx-Fisheye"
+        },
+        {
             "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
@@ -344,7 +374,18 @@
                 "Axis|P7214*",
                 "Axis|M70114*",
                 "Axis|P7016*",
-                "UNIVIEW|DVS4116"
+                "UNIVIEW|DVS4116",
+                "Axis|P7216*",
+                "Axis|AXISP7216*",
+                "VS8801|*",
+                "*|VS8801",
+                "VS8401|*",
+                "*|VS8401",
+                "DW|DW-CPUHDE04",
+                "DW|DW-CPUHDE08",
+                "DW|DW-CPUHDE16",
+                "DW|VMAX A1",
+                "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
         },
@@ -416,6 +457,14 @@
             "isRTSPSupported": false
     	},
         {
+            "keys": ["ArecontVision|20185DN"],
+            "forceRtspSupport": true
+        },
+        {
+            "keys": ["ArecontVision|*"],
+            "forceRtcpReports": true
+        },
+        {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
                 "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H", 
@@ -434,7 +483,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -493,7 +543,10 @@
         },
         {
             "keys": [
-                "General|IP Camera"
+                "General|IP Camera",
+                "H264|N51820L",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR",
+                "TRUEN Co. Ltd.|*"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -504,7 +557,9 @@
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
                 "Cellinx|STH795",
-                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
+                "H264|N51820L",
+                "onvif|v047-1"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -630,7 +685,64 @@
             }
         },
         {
-            "keys":["Honeywell|H4D3PRV3", "Honeywell|H4D3PRV2"],
+            "keys":[
+                "Honeywell|H4D3PRV3", 
+                "Honeywell|H4D3PRV2", 
+                "Honeywell|HBD2PR1",
+                "Honeywell|H2D2PR1",
+                "Honeywell|HED1PR3",
+                "Honeywell|HED3PR3",
+                "Honeywell|HBD1PR1",
+                "Honeywell|HBD3PR1",
+                "Honeywell|HBD3PR2",
+                "Honeywell|HCL2G",
+                "Honeywell|HCW2G",
+                "Honeywell|HCW4G",
+                "Honeywell|H3W2GR1",
+                "Honeywell|H3W4GR1",
+                "Honeywell|H3W2GR2",
+                "Honeywell|H4L2GR1",
+                "Honeywell|H4W2GR1",
+                "Honeywell|H4W4GR1",
+                "Honeywell|H4W2GR2",
+                "Honeywell|HBL2GR1",
+                "Honeywell|HBW2GR1",
+                "Honeywell|HBW4GR1",
+                "Honeywell|HBW2GR3",
+                "Honeywell|HCD1F",
+                "Honeywell|HCD2F",
+                "Honeywell|HCW1F",
+                "Honeywell|H3D1F1",
+                "Honeywell|H3D1F2",
+                "Honeywell|H3D1F3",
+                "Honeywell|H3D2F1",
+                "Honeywell|H3D2F2",
+                "Honeywell|H3W1F1",
+                "Honeywell|H4D1F1",
+                "Honeywell|H4D1F2",
+                "Honeywell|H4D1F3",
+                "Honeywell|H4D2F1",
+                "Honeywell|H4D2F2",
+                "Honeywell|H4W1F1",
+                "Honeywell|H4D1FR1",
+                "Honeywell|HBD2FR1",
+                "Honeywell|HBD2FR2",
+                "Honeywell|H2S1P6",
+                "Honeywell|H2S2P6",
+                "Honeywell|HCW2S2",
+                "Honeywell|HCD3S2",
+                "Honeywell|HCD5S2",
+                "Honeywell|H3D2S2",
+                "Honeywell|H3D3S2",
+                "Honeywell|H3D5S2",
+                "Honeywell|H3D2SR2",
+                "Honeywell|H3D3SR2",
+                "Honeywell|H3D5SR2",
+                "Honeywell|H4D2S2",
+                "Honeywell|H4D3S2",
+                "Honeywell|H4D5S2",
+                "Honeywell|HDZ302LIW"
+            ],
             "preferredAuthScheme": "Automatic"
         },
         {
@@ -976,6 +1088,33 @@
         },
         {
             "keys": [
+                "HITRON|NFX-22153D1", "DigitalWatchdog|DWC-MPTZ30X", "DW|DWC-MPTZ30X"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [-1,   1],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [    1,  1.09449,    1.19767,    1.31801,    1.45551,    1.62733,    1.81642,    2.03983,    2.32341,    2.65,   3.05392,    3.56091,    4.2226,    5.10784,    6.19068,    7.63443,    9.57659,    13.26291,    16.18121,    21.55702,    32.15519],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },        
+        {
+            "keys": [
                 "eneo|PXD-2030PTZ1080"
             ],
             "ptzMapper": {
@@ -1203,7 +1342,7 @@
         },
         {
             "keys": [
-                "Sony|SNC-WR630", "Sony|SNC-WR630|2.1.2"
+                "Sony|SNC-WR630", "Sony|SNC-WR600"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1515,7 +1654,7 @@
 		},
         {
             "keys":[
-                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA"
+                "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
                 "min": 32,
@@ -1561,6 +1700,56 @@
                 "user": "root",
                 "password": "pass"
             }
+        },
+        {
+            "keys": ["DW|DWC-MV950TIR"],
+            "forceOnvifAdvancedParameters": true
+
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            },
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
         }
     ]
 }

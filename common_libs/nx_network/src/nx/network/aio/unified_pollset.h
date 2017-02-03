@@ -8,10 +8,10 @@
 #include <map>
 #include <set>
 
+#include "abstract_pollset.h"
 #include "event_type.h"
 #include "nx/network/abstract_socket.h"
 #include "nx/network/system_socket.h"
-
 
 typedef int UDTSOCKET;
 
@@ -28,6 +28,21 @@ enum class CurrentSet
     udtWrite,
     sysRead,
     sysWrite
+};
+
+class NX_NETWORK_API AbstractUdtEpollWrapper
+{
+public:
+    virtual ~AbstractUdtEpollWrapper() = default;
+
+    /** Follows UDT::epoll_wait API. */
+    virtual int epollWait(
+        int epollFd,
+        std::map<UDTSOCKET, int>* readReadyUdtSockets,
+        std::map<UDTSOCKET, int>* writeReadyUdtSockets,
+        int64_t timeoutMillis,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) = 0;
 };
 
 class NX_NETWORK_API UnifiedPollSet
@@ -63,51 +78,56 @@ public:
     };
 
     UnifiedPollSet();
+    UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper>);
     virtual ~UnifiedPollSet();
 
-    //!Returns true, if all internal data has been initialized successfully
+    /**
+     * Returns true, if all internal data has been initialized successfully.
+     */
     bool isValid() const;
 
-    //!Interrupts \a poll method, blocked in other thread
-    /*!
-        This is the only method which is allowed to be called from different thread.
-        poll, called after interrupt, will return immediately. But, it is unspecified whether it will return multiple times if interrupt has been called multiple times
-    */
+    /**
+     * Interrupts \a poll method, blocked in other thread.
+     * This is the only method which is allowed to be called from different thread.
+     * poll, called after interrupt, will return immediately. 
+     * But, it is unspecified whether it will return 
+     * multiple times if interrupt has been called multiple times.
+     */
     void interrupt();
 
-    //!Add socket to set. Does not take socket ownership
-    /*!
-        \param eventType event to monitor on socket \a sock
-        \param userData
-        \return true, if socket added to set
-        \note This method does not check, whether \a sock is already in pollset
-        \note Ivalidates all iterators
-        \note \a userData is associated with pair (\a sock, \a eventType)
-    */
+    /**
+     * Add socket to set.
+     * @param userData This value is associated with pair (socket, eventType)
+     * @return true, if socket added to set
+     * @note This method does not check, whether socket is already in pollset.
+     * @note Ivalidates all iterators.
+     */
     bool add(Pollable* const sock, EventType eventType, void* userData = NULL);
-    //!Do not monitor event \a eventType on socket \a sock anymore
-    /*!
-        \note Ivalidates all iterators to the left of removed element. So, it is ok to iterate signalled sockets and remove current element:
-        following iterator increment operation will perform safely
-    */
+    /**
+     * @note Ivalidates all iterators to the left of removed element. 
+     * So, it is ok to iterate signalled sockets and remove current element.
+     * Subsequent iterator increment operation will perform safely.
+     */
     void remove(Pollable* const sock, EventType eventType);
-    //!Returns number of sockets in pollset
-    /*!
-        Returned value should only be used for comparision against size of another \a UnifiedPollSet instance
-    */
     size_t size() const;
-    /*!
-        \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
-        If < 0, method blocks till event
-        \return -1 on error, 0 if \a millisToWait timeout has expired, > 0 - number of socket whose state has been changed
-        \note If multiple event occured on same socket each event will be present as a single element
-    */
-    int poll(int millisToWait = INFINITE_TIMEOUT);
+    /**
+     * @param millisToWait if 0, method returns immediatly (useful to test socket state).
+     * @return -1 on error, 0 if timeout has expired, > 0 - number of socket whose state has been changed
+     * @note If multiple event occured on same socket each event 
+     * will be present as a single element when iterating.
+     * @note Invalidates iterators.
+     */
+    int poll(int millisToWait = kInfiniteTimeout);
     int poll(std::chrono::milliseconds timeout) { return poll(timeout.count()); }
 
-    //!Returns iterator pointing to first socket, which state has been changed in previous \a poll call
+    /**
+     * @return Iterator pointing to the first socket, 
+     * which state has been changed in previous UnifiedPollSet::poll call.
+     */
     const_iterator begin() const;
-    //!Returns iterator pointing to next element after last socket, which state has been changed in previous \a poll call
+    /**
+     * Returns iterator pointing just beyond last socket, which state has been changed in previous UnifiedPollSet::poll call.
+     */
     const_iterator end() const;
 
 private:
@@ -125,6 +145,8 @@ private:
     std::map<UDTSOCKET, int> m_writeUdtFds;
     std::map<AbstractSocket::SOCKET_HANDLE, int> m_readSysFds;
     std::map<AbstractSocket::SOCKET_HANDLE, int> m_writeSysFds;
+
+    std::unique_ptr<AbstractUdtEpollWrapper> m_udtEpollWrapper;
 
     template<typename SocketHandle>
     bool addSocket(
@@ -159,6 +181,6 @@ private:
     void removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet);
 };
 
-}   //aio
-}   //network
-}   //nx
+} // namespace aio
+} // namespace network
+} // namespace nx

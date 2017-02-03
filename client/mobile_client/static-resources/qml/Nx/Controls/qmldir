@@ -6,6 +6,7 @@ TextField 1.0 TextField.qml
 IconButton 1.0 IconButton.qml
 CheckBox 1.0 CheckBox.qml
 Switch 1.0 Switch.qml
+LabeledSwitch 1.0 LabeledSwitch.qml
 StackView 1.0 StackView.qml
 ToolBar 1.0 ToolBar.qml
 SearchToolBar 1.0 SearchToolBar.qml
@@ -22,3 +23,4 @@ CircleBusyIndicator 1.0 CircleBusyIndicator.qml
 WarningPanel 1.0 WarningPanel.qml
 FieldWarning 1.0 FieldWarning.qml
 ZoomableFlickable 1.0 ZoomableFlickable.qml
+WheelSwitchArea 1.0 WheelSwitchArea.qml

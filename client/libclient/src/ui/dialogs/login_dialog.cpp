@@ -18,44 +18,46 @@
 
 #include <core/resource/resource.h>
 
-#include <ui/actions/action_manager.h>
-#include <ui/dialogs/connection_name_dialog.h>
-#include <ui/widgets/rendering_widget.h>
-#include <ui/style/skin.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/help/help_topic_accessor.h>
-#include <ui/help/help_topics.h>
-#include <ui/workaround/gl_widget_factory.h>
-
 #include <network/module_finder.h>
 #include <network/networkoptixmodulerevealcommon.h>
+#include <network/system_helpers.h>
+
+#include <nx/utils/raii_guard.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
+#include <rest/server/json_rest_result.h>
+#include <client_core/client_core_settings.h>
 
 #include <utils/applauncher_utils.h>
+#include <utils/common/app_info.h>
 #include <utils/common/url.h>
 #include <utils/common/util.h>
+#include <utils/connection_diagnostics_helper.h>
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/filetypesupport.h>
 
-#include "connection_testing_dialog.h"
-#include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
-
+#include <ui/actions/action_manager.h>
+#include <ui/dialogs/connection_name_dialog.h>
+#include <ui/dialogs/connection_testing_dialog.h>
+#include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
-
-#include <utils/connection_diagnostics_helper.h>
-
-#include <utils/common/app_info.h>
 #include <ui/style/custom_style.h>
-#include <nx/utils/raii_guard.h>
-#include <nx/network/http/asynchttpclient.h>
-#include <rest/server/json_rest_result.h>
-#include <client_core/client_core_settings.h>
+#include <ui/style/skin.h>
+#include <ui/widgets/rendering_widget.h>
+#include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-
+#include <ui/workbench/workbench_context.h>
+#include <helpers/system_helpers.h>
 
 namespace {
+
 static const QnUuid kCustomConnectionLocalId;
+
+constexpr int kMinIntroWidth = 550;
 
 static std::array<const char*, 5> kIntroNames {
     "intro.mkv",
@@ -77,13 +79,16 @@ void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled)
     }
 }
 
-QStandardItem* newConnectionItem(const QString& text, const QUrl& url)
+QStandardItem* newConnectionItem(const QString& text, const QUrl& url, bool isValid = true)
 {
     if (url.isEmpty())
         return nullptr;
 
     auto result = new QStandardItem(text);
     result->setData(url, Qn::UrlRole);
+    if (!isValid)
+        result->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
+
     return result;
 }
 
@@ -93,14 +98,10 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
      * At first we check if we have stored connection to same system
      * with specified user and it stores password.
      */
-    const auto recent = qnClientCoreSettings->recentLocalConnections();
-    const auto itConnection = std::find_if(recent.begin(), recent.end(),
-        [localId, userName = url.userName()](const QnLocalConnectionData& data)
-        {
-            return ((data.localId == localId) && (userName == data.url.userName()));
-        });
 
-    if ((itConnection != recent.end()) && (itConnection->isStoredPassword()))
+    using namespace nx::client::core::helpers;
+
+    if (getCredentials(localId, url.userName()).isValid())
         return true;
 
     /**
@@ -122,7 +123,19 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
     return savedConnectionFound;
 }
 
-} // anonymous namespace
+struct AutoFoundSystemViewModel
+{
+    QString title;
+    QUrl url;
+    bool isValid = true;
+
+    bool operator<(const AutoFoundSystemViewModel& other) const
+    {
+        return QString::compare(title, other.title, Qt::CaseInsensitive) < 0;
+    }
+};
+
+} // namespace
 
 /************************************************************************/
 /* QnFoundSystemData                                                             */
@@ -162,6 +175,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
     setWindowTitle(tr("Connect to Server..."));
     setHelpTopic(this, Qn::Login_Help);
 
+    m_renderingWidget->setEffectiveWidth(kMinIntroWidth);
+
     QHBoxLayout* bbLayout = dynamic_cast<QHBoxLayout*>(ui->buttonBox->layout());
     NX_ASSERT(bbLayout);
     if (bbLayout)
@@ -173,7 +188,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         versionLabel->setFont(font);
         bbLayout->insertWidget(0, versionLabel);
     }
-
 
     QString introPath;
     for (auto name: kIntroNames)
@@ -191,7 +205,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
 
     QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
     layout->setSpacing(0);
-    layout->setContentsMargins(0, 0, 0, 10);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_renderingWidget);
     DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(m_renderingWidget);
 
@@ -241,7 +255,9 @@ QnLoginDialog::QnLoginDialog(QWidget *parent):
         at_moduleFinder_moduleChanged(moduleInformation);
 }
 
-QnLoginDialog::~QnLoginDialog() {}
+QnLoginDialog::~QnLoginDialog()
+{
+}
 
 void QnLoginDialog::updateFocus()
 {
@@ -278,10 +294,13 @@ void QnLoginDialog::accept()
         return;
 
     QUrl url = currentUrl();
+	const auto guard = QPointer<QnLoginDialog>(this);
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
-        [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        [this, url, guard](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
         {
+            if (!guard)
+                return;
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
@@ -291,6 +310,8 @@ void QnLoginDialog::accept()
             auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
+            if (!guard)
+                return;
             switch (status)
             {
                 case Qn::SuccessConnectionResult:
@@ -307,6 +328,7 @@ void QnLoginDialog::accept()
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
+                case Qn::IncompatibleCloudHostConnectionResult:
                     menu()->trigger(QnActions::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
@@ -401,7 +423,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         QUrl url;
         url.setPort(DEFAULT_APPSERVER_PORT);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
-        url.setUserName(lit("admin"));
+        url.setUserName(helpers::kFactorySystemUser);
 
         customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
     }
@@ -411,10 +433,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     std::sort(customConnections.begin(), customConnections.end(),
         [](const QnConnectionData& left, const QnConnectionData& right)
         {
-            if (left.isCustom() == right.isCustom())
-                return (left.name < right.name);
-
-            return left.isCustom();
+            return QString::compare(left.name, right.name, Qt::CaseInsensitive) < 0;
         });
 
     for (const auto& connection : customConnections)
@@ -432,50 +451,54 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
         QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
+        return;
     }
-    else
+
+    QList<AutoFoundSystemViewModel> viewModels;
+    viewModels.reserve(m_foundSystems.size());
+
+    for (const QnFoundSystemData& data : m_foundSystems)
     {
-        for (const QnFoundSystemData& data: m_foundSystems)
+        auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
+
+        /* Do not show servers with incompatible customization or cloud host */
+        if (!qnRuntime->isDevMode()
+            && compatibilityCode == Qn::IncompatibleInternalConnectionResult)
         {
-            QUrl url = data.url;
-
-            auto compatibilityCode = QnConnectionValidator::validateConnection(data.info);
-
-            /* Do not show servers with incompatible customization or cloud host */
-            if (!qnRuntime->isDevMode()
-                && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
-                    || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
-            {
-                    continue;
-            }
-
-            bool isCompatible = (compatibilityCode == Qn::SuccessConnectionResult);
-
-            QString title;
-            if (!data.info.systemName.isEmpty())
-            {
-                title = lit("%3 - (%1:%2)")
-                    .arg(url.host()).arg(url.port()).arg(data.info.systemName);
-            }
-            else
-            {
-                title = lit("%1:%2").arg(url.host()).arg(url.port());
-            }
-
-            if (!isCompatible)
-            {
-                title += lit(" (v%1)")
-                    .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
-            }
-
-            QStandardItem* item = new QStandardItem(title);
-            item->setData(url, Qn::UrlRole);
-
-            if (!isCompatible)
-                item->setData(QBrush(qnGlobals->errorTextColor()), Qt::TextColorRole);
-            m_autoFoundItem->appendRow(item);
+            continue;
         }
+
+        AutoFoundSystemViewModel vm;
+        vm.url = data.url;
+        vm.isValid = (compatibilityCode == Qn::SuccessConnectionResult);
+
+        if (!data.info.systemName.isEmpty())
+        {
+            vm.title = lit("%3 - (%1:%2)")
+                .arg(vm.url.host()).arg(vm.url.port()).arg(data.info.systemName);
+        }
+        else
+        {
+            vm.title = lit("%1:%2").arg(vm.url.host()).arg(vm.url.port());
+        }
+
+        if (!vm.isValid)
+        {
+            vm.title += lit(" (v%1)")
+                .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+        }
+
+        viewModels.push_back(vm);
     }
+
+    std::sort(viewModels.begin(), viewModels.end());
+    for (const auto& vm: viewModels)
+    {
+        auto item = ::newConnectionItem(vm.title, vm.url, vm.isValid);
+        m_autoFoundItem->appendRow(item);
+    }
+
+
 }
 
 void QnLoginDialog::updateAcceptibility()
@@ -518,7 +541,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
     ui->loginLineEdit->setText(url.userName().isEmpty()
-        ? lit("admin")  // 99% of users have only one login - admin
+        ? helpers::kFactorySystemUser  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
 
@@ -593,26 +616,17 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::question(
-            this,
+        QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
             tr("There is an another connection with the same name."),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
+            QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
-        switch (button)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::No:
-                name = connections.generateUniqueName(name);
-                break;
-            case QDialogButtonBox::Yes:
-                connections.removeOne(name);
-                break;
-            default:
-                break;
-        }
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+            QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        connections.removeOne(name);
     }
 
     const QUrl url = currentUrl();
@@ -622,6 +636,7 @@ void QnLoginDialog::at_saveButton_clicked()
         connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
+    qnSettings->save();
 
     resetSavedSessionsModel();
 
@@ -658,20 +673,19 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::question(
-        this,
-        tr("Delete connection?"),
-//         tr("Are you sure you want to delete this connection: %1?")
-//         + L'\n' + connection.name,
-        connection.name,
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete connection?"), connection.name,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
 
-    if (result != QDialogButtonBox::Yes)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     connections.removeOne(connection.name);
     qnSettings->setCustomConnections(connections);
+    qnSettings->save();
     resetConnectionsModel();
 }
 
@@ -679,7 +693,35 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 {
     auto addresses = qnModuleFinder->moduleAddresses(moduleInformation.id);
 
-    if (addresses.isEmpty())
+    auto isCloudAddress =
+        [](const HostAddress& address) -> bool
+        {
+            return nx::network::SocketGlobals::addressResolver()
+                .isCloudHostName(address.toString());
+        };
+
+    auto isLoopback =
+        [](const HostAddress& address) -> bool
+        {
+            return QHostAddress(address.toString()).isLoopback();
+        };
+
+    bool loopback = false;
+    SocketAddress address;
+
+    for (const auto& current: addresses)
+    {
+        if (isCloudAddress(current.address))
+            continue;
+
+        address = current;
+
+        loopback = isLoopback(current.address);
+        if (loopback)
+            break;
+    }
+
+    if (address.isNull())
     {
         at_moduleFinder_moduleLost(moduleInformation);
         return;
@@ -687,25 +729,15 @@ void QnLoginDialog::at_moduleFinder_moduleChanged(const QnModuleInformation &mod
 
     QnFoundSystemData data;
     data.info = moduleInformation;
-
-    /* prefer localhost */
-    SocketAddress address = SocketAddress(QHostAddress(QHostAddress::LocalHost).toString(),
-        moduleInformation.port);
-    if (!addresses.contains(address))
-        address = *addresses.cbegin();
-
     data.url.setScheme(lit("http"));
     data.url.setHost(address.address.toString());
     data.url.setPort(address.port);
 
     if (m_foundSystems.contains(moduleInformation.id))
     {
-        QnFoundSystemData &oldData = m_foundSystems[moduleInformation.id];
-        if (!QHostAddress(address.address.toString()).isLoopback()
-                && addresses.contains(oldData.url.host()))
-        {
+        QnFoundSystemData& oldData = m_foundSystems[moduleInformation.id];
+        if (!loopback && addresses.contains(oldData.url.host()))
             data.url.setHost(oldData.url.host());
-        }
 
         if (oldData != data)
         {

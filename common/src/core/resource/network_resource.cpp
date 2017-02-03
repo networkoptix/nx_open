@@ -18,6 +18,7 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
+#include <nx_ec/data/api_camera_data.h>
 
 
 QnNetworkResource::QnNetworkResource():
@@ -98,19 +99,19 @@ void QnNetworkResource::setPhysicalId(const QString &physicalId)
 void QnNetworkResource::setAuth(const QAuthenticator &auth)
 {
     setProperty(
-        Qn::CAMERA_CREDENTIALS_PARAM_NAME, 
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
         nx::utils::encodeHexStringFromStringAES128CBC(
-            lit("%1:%2").arg(auth.user()) 
+            lit("%1:%2").arg(auth.user())
                         .arg(auth.password())));
 }
 
 void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
 {
     setProperty(
-        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
+        Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
         nx::utils::encodeHexStringFromStringAES128CBC(
-            lit("%1:%2").arg(auth.user()) 
-                        .arg(auth.password()))); 
+            lit("%1:%2").arg(auth.user())
+                        .arg(auth.password())));
 }
 
 QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
@@ -189,7 +190,12 @@ QString QnNetworkResource::toString() const
 QString QnNetworkResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); //TODO: #Elric evil!
+    QTextStream(&result)
+        << QnResource::toSearchString()
+        << " "
+        << getPhysicalId()
+        << " "
+        << getMAC().toString(); //TODO: #Elric evil!
     return result;
 }
 
@@ -317,13 +323,9 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 }
 */
 
-QnUuid QnNetworkResource::uniqueIdToId(const QString& uniqId)
+QnUuid QnNetworkResource::physicalIdToId(const QString& physicalId)
 {
-    NX_ASSERT(!uniqId.isEmpty());
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(uniqId.toUtf8());
-    QnUuid id = QnUuid::fromRfc4122(md5.result());
-    return id;
+    return ec2::ApiCameraData::physicalIdToId(physicalId);
 }
 
 void QnNetworkResource::initializationDone()

@@ -435,6 +435,7 @@ module.exports = function (grunt) {
                             '*.html',
                             '*.xml',
                             '*.xsl',
+                            '*.json',
                             'views/{,*/}*.html',
                             'scripts/language.js',
                             'customization/*',

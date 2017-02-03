@@ -4,6 +4,11 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/fusion/serialization/lexical.h>
+
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include <api/model/ping_reply.h>
@@ -24,10 +29,7 @@
 #include "utils/common/delete_later.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
-#include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 #include <common/common_module.h>
 #include <api/global_settings.h>
@@ -363,7 +365,7 @@ SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
-    return SocketAddress(QUrl(m_url));
+    return nx::network::url::getEndpoint(QUrl(m_url));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const
@@ -570,7 +572,7 @@ bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
     return false;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (getStatus() != newStatus)
     {
@@ -579,14 +581,18 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
             m_statusTimer.restart();
         }
 
-        QnResource::setStatus(newStatus, silenceMode);
-        if (!silenceMode)
+        QnResource::setStatus(newStatus, reason);
+        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        for(const QnResourcePtr& res: childList)
         {
-            QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-            for(const QnResourcePtr& res: childList)
+            if (res->hasFlags(Qn::depend_on_parent_status))
             {
-                if (res->hasFlags(Qn::depend_on_parent_status))
-                    emit res->statusChanged(res);
+                NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                        .arg(QString::fromLatin1(Q_FUNC_INFO))
+                        .arg(res->getId().toString())
+                        .arg(res->getName())
+                        .arg(res->getUrl()), cl_logDEBUG2);
+                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
             }
         }
     }

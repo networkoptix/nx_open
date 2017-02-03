@@ -150,7 +150,7 @@ APPLY(201, removeResource, ApiIdData, \
 APPLY(202, setResourceStatus, ApiResourceStatusData, \
                        true,  /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdRfc4122Helper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
                        ResourceNotificationManagerHelper(), \
                        AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -161,7 +161,7 @@ APPLY(202, setResourceStatus, ApiResourceStatusData, \
 APPLY(213, removeResourceStatus, ApiIdData, /* Remove records from vms_resource_status by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("status"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -259,7 +259,7 @@ APPLY(211, getStatusList, ApiResourceStatusDataList, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(212, removeResources, ApiIdDataList, \
@@ -289,7 +289,7 @@ APPLY(301, saveCamera, ApiCameraData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        CameraNotificationManagerHelper(), \
-                       ModifyResourceAccess(false), /* save permission checker */ \
+                       ModifyCameraDataAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -301,7 +301,7 @@ APPLY(302, saveCameras, ApiCameraDataList, \
                        InvalidGetHashHelper(), /* getHash*/ \
                        [] (const QnTransaction<ApiCameraDataList> &tran, const NotificationParams &notificationParams) \
                          { \
-                            notificationParams.cameraNotificationManager->triggerNotification(tran); \
+                            notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source); \
                          }, \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
@@ -400,7 +400,7 @@ APPLY(313, getCamerasEx, ApiCameraDataExList, \
 APPLY(314, removeCameraUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("camera_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -477,7 +477,7 @@ APPLY(405, getMediaServerUserAttributesList, ApiMediaServerUserAttributesDataLis
 APPLY(406, removeServerUserAttributes, ApiIdData, \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("server_attributes"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -609,7 +609,7 @@ APPLY(504, setAccessRights, ApiAccessRightsData, \
 APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_rights by resource id */ \
                        true, /* persistent*/ \
                        false, /* system*/ \
-                       CreateHashByIdHelper(), /* getHash*/ \
+                       CreateHashByIdRfc4122Helper("access_rights"), /* getHash*/ \
                        &apiIdDataTriggerNotificationHelper, /* trigger notification*/ \
                        ModifyResourceAccess(true), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
@@ -617,7 +617,7 @@ APPLY(509, removeAccessRights, ApiIdData, /* Remove records from vms_access_righ
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),                     \
                        RegularTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(505, getUserGroups, ApiUserGroupDataList, \
+APPLY(505, getUserRoles, ApiUserRoleDataList, \
                        false, \
                        false, \
                        InvalidGetHashHelper(), \
@@ -628,7 +628,7 @@ APPLY(505, getUserGroups, ApiUserGroupDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(506, saveUserGroup, ApiUserGroupData, \
+APPLY(506, saveUserRole, ApiUserRoleData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
@@ -639,12 +639,12 @@ APPLY(506, saveUserGroup, ApiUserGroupData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(507, removeUserGroup, ApiIdData, \
+APPLY(507, removeUserRole, ApiIdData, \
                        true, \
                        false, \
                        CreateHashByIdHelper(), \
                        &apiIdDataTriggerNotificationHelper, \
-                       RemoveUserGroupAccess(), /* save permission checker */ \
+                       RemoveUserRoleAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -822,7 +822,7 @@ APPLY(904, removeStoredFile, ApiStoredFilePath, \
                        [] (const QnTransaction<ApiStoredFilePath> &tran, const NotificationParams &notificationParams) \
                         { \
                             NX_ASSERT(tran.command == ApiCommand::removeStoredFile); \
-                            notificationParams.storedFileNotificationManager->triggerNotification(tran); \
+                            notificationParams.storedFileNotificationManager->triggerNotification(tran, notificationParams.source); \
                         }, \
                        AllowForAllAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
@@ -1099,7 +1099,7 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        false, \
                        InvalidGetHashHelper(), \
                        [] (const QnTransaction<ApiSystemIdData> &tran, const NotificationParams &notificationParams) \
-                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran, notificationParams.source); }, \
                        AdminOnlyAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
@@ -1236,7 +1236,7 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
+                       LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
                        false, \
                        false, \
@@ -1314,6 +1314,11 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
     {
         /** Id of user or entity who created transaction. */
         QnUuid author;
+
+        bool operator==(const HistoryAttributes& rhs) const
+        {
+            return author == rhs.author;
+        }
     };
 
     #define HistoryAttributes_Fields (author)
@@ -1383,6 +1388,15 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         TransactionType::Value transactionType;
         HistoryAttributes historyAttributes;
 
+        bool operator==(const QnAbstractTransaction& rhs) const
+        {
+            return command == rhs.command
+                && peerID == rhs.peerID
+                && persistentInfo == rhs.persistentInfo
+                && transactionType == rhs.transactionType
+                && historyAttributes == rhs.historyAttributes;
+        }
+
         QString toString() const;
         bool isLocal() const { return transactionType == TransactionType::Local; }
         bool isCloud() const { return transactionType == TransactionType::Cloud; }
@@ -1432,6 +1446,17 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
         }
 
         T params;
+
+        bool operator==(const QnTransaction& rhs) const
+        {
+            return QnAbstractTransaction::operator==(rhs)
+                && params == rhs.params;
+        }
+
+        bool operator!=(const QnTransaction& rhs) const
+        {
+            return !(*this == rhs);
+        }
     };
 
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::PersistentInfo, (json)(ubjson)(xml)(csv_record))

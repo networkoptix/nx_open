@@ -32,13 +32,13 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateDetailsText();
 
     const auto updateStatusesHandler = [this]()
-    {
-        const auto status = m_webView->status();
-        const auto resourceStatus = (status == kPageLoadFailed ? Qn::Offline : Qn::Online);
-        resource()->setStatus(resourceStatus);
+        {
+            const auto status = m_webView->status();
+            const auto resourceStatus = (status == kPageLoadFailed ? Qn::Offline : Qn::Online);
+            resource()->setStatus(resourceStatus);
 
-        updateStatusOverlay();
-    };
+            updateStatusOverlay(true);
+        };
 
     connect(m_webView, &QnGraphicsWebView::statusChanged, this, updateStatusesHandler);
 

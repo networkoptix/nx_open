@@ -10,10 +10,10 @@ namespace ec2
     public:
         QnUserNotificationManager( );
 
-        void triggerNotification(const QnTransaction<ApiUserData>& tran);
-        void triggerNotification(const QnTransaction<ApiIdData>& tran);
-        void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran);
-        void triggerNotification(const QnTransaction<ApiUserGroupData>& tran);
+        void triggerNotification(const QnTransaction<ApiUserData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiUserRoleData>& tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnUserNotificationManager> QnUserNotificationManagerPtr;
@@ -29,9 +29,9 @@ namespace ec2
         virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
 
-        virtual int getUserGroups(impl::GetUserGroupsHandlerPtr handler) override;
-        virtual int saveUserGroup(const ec2::ApiUserGroupData& group, impl::SimpleHandlerPtr handler) override;
-        virtual int removeUserGroup(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
+        virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) override;
+        virtual int saveUserRole(const ec2::ApiUserRoleData& userRole, impl::SimpleHandlerPtr handler) override;
+        virtual int removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
 
         virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
         virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) override;

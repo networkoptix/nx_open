@@ -48,6 +48,8 @@ public:
     virtual bool isHovered() const override;
 
     virtual QRectF effectiveGeometry() const override;
+
+    virtual void stopAnimations() override;
 protected:
     void setProxyUpdatesEnabled(bool updatesEnabled) override;
 

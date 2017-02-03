@@ -37,7 +37,7 @@ enum class SystemStatus
     // TODO: #ak remove "ss" prefix.
     ssInvalid = 0,
     /**
-     * System has been bound but not a single request from 
+     * System has been bound but not a single request from
      * that system has been received by cloud.
      */
     ssNotActivated,
@@ -118,7 +118,7 @@ public:
     std::string accountEmail;
     std::string systemId;
     SystemAccessRole accessRole;
-    std::string groupId;
+    std::string userRoleId;
     std::string customPermissions;
     bool isEnabled;
     //TODO #ak this field is redundant here. Move it to libcloud_db internal data structures
@@ -142,7 +142,7 @@ public:
         return accountEmail == rhs.accountEmail
             && systemId == rhs.systemId
             && accessRole == rhs.accessRole
-            && groupId == rhs.groupId
+            && userRoleId == rhs.userRoleId
             && customPermissions == rhs.customPermissions
             && isEnabled == rhs.isEnabled;
     }
@@ -230,7 +230,7 @@ public:
     std::vector<SystemAccessRoleData> sharingPermissions;
     SystemHealth stateOfHealth;
     /**
-     * This number shows how often user, performing request, 
+     * This number shows how often user, performing request,
      * uses this system in comparision to other systems.
      */
     float usageFrequency;
@@ -272,6 +272,17 @@ class UserSessionDescriptor
 public:
     boost::optional<std::string> accountEmail;
     boost::optional<std::string> systemId;
+};
+
+enum class FilterField
+{
+    customization,
+};
+
+class Filter
+{
+public:
+    std::map<FilterField, std::string> nameToValue;
 };
 
 } // namespace api

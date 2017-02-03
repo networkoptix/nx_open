@@ -27,12 +27,12 @@ Item
     property bool isExpanded: false;
     property bool isAvailable: false;
     property real expandedOpacity: shadow.opacity;
-    property bool isOnline: false;
+    property bool isConnectable: false;
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
 
-    signal collapsedTileClicked();
+    signal collapsedTileClicked(int buttons, int x, int y);
 
     property bool forceImmediateAnimation: false;
 
@@ -112,7 +112,7 @@ Item
                 PropertyChanges
                 {
                     target: hideTileButton;
-                    opacity: (control.isOnline ? 0 : 1);
+                    opacity: (isConnectable ? 0 : 1);
                 }
 
                 PropertyChanges
@@ -289,14 +289,18 @@ Item
         {
             id: toggleMouseArea;
 
+            property int pressedButtons: 0;
+
             x: (control.isExpanded ? -parent.x : 0);
             y: (control.isExpanded ? -parent.y : 0);
             width: tileHolder.parent.width;
             height: tileHolder.parent.height;
 
+            acceptedButtons: (Qt.LeftButton | Qt.RightButton);
             hoverEnabled: true;
             onPressed:
             {
+                pressedButtons = mouse.buttons;
                 if (context.connectingToSystem.length)
                     return;
 
@@ -309,11 +313,11 @@ Item
 
             onReleased:
             {
-                if (context.connectingToSystem.length)
+                if (context.connectingToSystem.length || control.isExpanded)
                     return;
 
-                if (!control.isExpanded)
-                    control.collapsedTileClicked();
+                control.collapsedTileClicked(toggleMouseArea.pressedButtons,
+                    mouse.x, mouse.y);
             }
         }
 
@@ -432,8 +436,10 @@ Item
                     bkgColor: tileArea.color;
                     onClicked:
                     {
-                        var id = (isCloudTile ? control.systemId : control.localId);
-                        context.hideSystem(id);
+                        // Hides both cloud and local offline tiles
+                        if (isCloudTile)
+                            context.hideSystem(control.systemId);
+                        context.hideSystem(control.localId);
                     }
                 }
 
@@ -441,19 +447,25 @@ Item
                 {
                     id: areaLoader;
 
+                    property bool visibleIndicators:
+                        ((primaryIndicator.visible && (primaryIndicator.opacity == 1.0))
+                         || (otherIndicator.visible && (otherIndicator.opacity == 1.0)));
                     anchors.left: parent.left;
-                    anchors.right: parent.right;
+                    anchors.right: (visibleIndicators
+                        ? indicatorsRow.left
+                        : parent.right);
                     anchors.top: systemNameLabel.bottom;
 
                     anchors.leftMargin: 12;
-                    anchors.rightMargin: 16;
+                    anchors.rightMargin: (visibleIndicators ? 0 : 16);
 
                     sourceComponent: control.centralAreaDelegate;
                 }
 
-
                 Row
                 {
+                    id: indicatorsRow;
+
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.rightMargin: 14;

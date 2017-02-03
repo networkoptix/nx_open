@@ -226,9 +226,12 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
-        case SystemUri::ClientCommand::ConnectToSystem:
+        case SystemUri::ClientCommand::Client:
         {
             QString systemId = uri.systemId();
+            if (systemId.isEmpty())
+                return false;
+
             bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
 
             QUrl systemUrl = QUrl::fromUserInput(systemId);
@@ -246,12 +249,13 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
             menu()->trigger(QnActions::ConnectAction, parameters);
-            break;
+            return true;
+
         }
         default:
             break;
     }
-    return true;
+    return false;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
@@ -305,16 +309,16 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show Login Dialog.
     */
+    const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setVisibleControls(true);
+
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()
-        && !haveInputFiles)
+        && !haveInputFiles
+        && !connectUsingCommandLineAuth(startupParams)
+        )
     {
-        if (!connectUsingCommandLineAuth(startupParams))
-        {
-            const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
-            welcomeScreen->setVisibleControls(true);
-            return false;
-        }
+        return false;
     }
 
     if (!startupParams.videoWallGuid.isNull())

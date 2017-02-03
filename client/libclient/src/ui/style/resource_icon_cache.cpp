@@ -51,7 +51,6 @@ QString baseToString(QnResourceIconCache::Key base)
 
         QN_STRINGIFY(Layout);
         QN_STRINGIFY(SharedLayout);
-        QN_STRINGIFY(VideoWallLayout);
         QN_STRINGIFY(Layouts);
         QN_STRINGIFY(SharedLayouts);
 
@@ -114,7 +113,6 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(HealthMonitor,           loadIcon(lit("tree/health_monitor.png")));
     m_cache.insert(Layout,                  loadIcon(lit("tree/layout.png")));
     m_cache.insert(SharedLayout,            loadIcon(lit("tree/layout_shared.png")));
-    m_cache.insert(VideoWallLayout,         loadIcon(lit("tree/layout_videowall.png")));
     m_cache.insert(Layouts,                 loadIcon(lit("tree/layouts.png")));
     m_cache.insert(SharedLayouts,           loadIcon(lit("tree/layouts_shared.png")));
     m_cache.insert(Camera,                  loadIcon(lit("tree/camera.png")));
@@ -139,6 +137,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Server | Incompatible,   loadIcon(lit("tree/server_incompatible.png")));
     m_cache.insert(Server | Control,        loadIcon(lit("tree/server_current.png")));
     m_cache.insert(Server | Unauthorized,   loadIcon(lit("tree/server_unauthorized.png")));
+    m_cache.insert(HealthMonitor| Offline,  loadIcon(lit("tree/health_monitor_offline.png")));
     m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
     m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
     m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));
@@ -239,7 +238,16 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 
     Key status = Unknown;
 
-    if (auto layout = resource.dynamicCast<QnLayoutResource>())
+    // Fake servers
+    if (flags.testFlag(Qn::fake))
+    {
+        auto server = resource.dynamicCast<QnMediaServerResource>();
+        NX_ASSERT(server);
+        status = helpers::serverBelongsToCurrentSystem(server->getModuleInformation())
+            ? Incompatible
+            : Online;
+    }
+    else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;
@@ -268,14 +276,6 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
                 break;
 
             case Qn::Incompatible:
-                if (auto server = resource.dynamicCast<QnMediaServerResource>())
-                {
-                    if (!helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
-                    {
-                        status = Online;
-                        break;
-                    }
-                }
                 status = Incompatible;
                 break;
 

@@ -10,6 +10,9 @@ struct QnModuleInformation;
 
 namespace helpers {
 
+static const QString kFactorySystemUser = lit("admin");
+static const QString kFactorySystemPassword = lit("admin");
+
 /*
 * Extracts system id. Result is:
 * - identifier of server if it is in "new state"
@@ -31,10 +34,17 @@ bool isNewSystem(const QnConnectionInfo& info);
 bool isNewSystem(const QnModuleInformation& info);
 bool isNewSystem(const QnCloudSystem& info);
 
+bool isCloudSystem(const QnModuleInformation& info);
+
 QnUuid currentSystemLocalId();
 
 bool currentSystemIsNew();
 
 bool serverBelongsToCurrentSystem(const QnModuleInformation& info);
 
+/**
+ * Checks whether user login is local or cloud.
+ * We suppose local login does not have '@' symbol whereas cloud does
+ */
+bool isLocalUser(const QString& login);
 } // helpers

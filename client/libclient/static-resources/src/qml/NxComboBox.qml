@@ -38,6 +38,24 @@ ComboBox
         target: (model ? model : null);
         ignoreUnknownSignals: true;
 
+        onDataChanged:
+        {
+            if ((topLeft.row > thisComponent.currentIndex)
+                || (bottomRight.row < thisComponent.currentIndex))
+            {
+                return;
+            }
+
+            /**
+              * Since dataChanged signal is not handled by ComboBox properly we have to reload
+              * updated data manually. The best decision is to force index change because in this
+              * case data for each role is updated
+              */
+            var lastIndex = thisComponent.currentIndex;
+            thisComponent.currentIndex = -1;
+            thisComponent.currentIndex = lastIndex;
+        }
+
         onRowsRemoved:
         {
             if (currentIndex == -1)
@@ -101,9 +119,7 @@ ComboBox
     focus: true;
 
     height: 28;
-
     opacity: (enabled ? 1.0 : 0.3);
-
 
     onActiveFocusChanged:
     {
@@ -127,6 +143,7 @@ ComboBox
 
         height: parent.height;
         width: parent.width - 28;
+        hoverEnabled: true;
 
         onClicked:
         {
@@ -154,7 +171,7 @@ ComboBox
             ? Style.darkerColor(Style.colors.shadow, 1)
             : Style.colors.shadow);
         border.color: Style.darkerColor(Style.colors.shadow, 1);
-        radius: 1;
+        radius: 2;
     }
 
     contentItem: Item
@@ -169,6 +186,7 @@ ComboBox
             rightPadding: 8;
 
             selectByMouse: true;
+            selectionColor: Style.textEdit.selectionColor;
             clip: true;
             width: parent.width - indicatorItem.width;
             height: parent.height;
@@ -207,13 +225,27 @@ ComboBox
             verticalAlignment: Text.AlignVCenter;
         }
 
-        Rectangle
+        Item
         {
             id: indicatorItem;
             width: 28;
             height: thisComponent.height;
             anchors.right: parent.right;
-            color: backgroundItem.color;    // TODO: change
+            visible: thisComponent.isEditMode;
+            Rectangle
+            {
+                width: 26;
+                height: 26;
+                anchors.centerIn: parent;
+                color:
+                {
+                    if (thisComponent.pressed)
+                        return Style.lighterColor(Style.colors.shadow, 1);
+                    if (hoverArea.containsMouse)
+                        return Style.lighterColor(Style.colors.shadow, 2);
+                    return backgroundItem.color;
+                }
+            }
 
             Image
             {
@@ -222,6 +254,15 @@ ComboBox
                 source: (thisComponent.expanded
                     ? "qrc:/skin/theme/drop_collapse.png"
                     : "qrc:/skin/theme/drop_expand.png");
+            }
+
+            MouseArea
+            {
+                id: hoverArea;
+
+                anchors.fill: parent;
+                hoverEnabled: true;
+                acceptedButtons: Qt.NoButton;
             }
         }
     }
@@ -254,6 +295,7 @@ ComboBox
             {
                 height: 24;
                 width: parent.width;
+                radius: 2;
 
                 color: (popupItem.isHovered ? Style.dropDown.hoveredBkgColor
                     : Style.dropDown.bkgColor);
@@ -267,11 +309,12 @@ ComboBox
                     clip: true;
                     leftPadding: 8;
                     rightPadding: 8;
+                    elide: Text.ElideRight;
 
                     standardColor: Style.dropDown.textColor;
                     hoveredColor: Style.dropDown.hoveredTextColor;
 
-                    text: model[thisComponent.textRole];
+                    text: index >= 0 ? model[thisComponent.textRole] : "";
 
                     onClicked:
                     {
@@ -298,25 +341,3 @@ ComboBox
         readOnlyTextItem.text = thisComponent.currentText;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -119,6 +119,9 @@ public:
         }
         else
         {
+            if (!nx::network::SocketGlobals::isInitialized())
+                return;
+
             static const char* kFailureMessage =
                 "You MUST cancel running async socket operation before "
                 "deleting socket if you delete socket from non-aio thread";
@@ -333,6 +336,7 @@ public:
         }
         else
         {
+            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
             nx::utils::promise< bool > promise;
             cancelIOAsync(eventType, [&]() { promise.set_value(true); });
             promise.get_future().wait();
@@ -557,7 +561,8 @@ private:
             boost::none,
             [this, resolvedAddress, sendTimeout]()
             {
-                connectToIp( resolvedAddress, sendTimeout );
+                NX_CRITICAL( resolvedAddress.address.isIpAddress() );
+                this->m_socket->connect( resolvedAddress, sendTimeout );
             });    //to be called between pollset.add and pollset.polladdress
         return true;
     }
@@ -802,11 +807,6 @@ private:
                 this->m_socket, aio::etTimedOut, true);
             m_timerHandler = nullptr;
         }
-    }
-
-    bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis)
-    {
-        return this->m_socket->connectToIp(remoteAddress, timeoutMillis);
     }
 };
 

@@ -1,474 +1,399 @@
 #include "io_module_overlay_widget.h"
+#include "io_module_form_overlay_contents.h"
+#include "io_module_grid_overlay_contents.h"
 
-#include <QtWidgets/QGraphicsRectItem>
-
-#include <core/resource/camera_resource.h>
 #include <api/app_server_connection.h>
+#include <core/resource/camera_resource.h>
 #include <camera/iomodule/iomodule_monitor.h>
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/camera_output_business_action.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/connective.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
-#include <ui/style/skin.h>
-#include <ui/graphics/items/standard/graphics_label.h>
-#include <ui/graphics/items/standard/graphics_pixmap.h>
-#include <ui/graphics/items/generic/masked_proxy_widget.h>
 
 namespace {
-    const int reconnectDelay = 1000 * 5;
-    const int commandExecuteTimeout = 1000 * 6;
-    const int stateCheckInterval = 1000;
-    const char *ioPortPropertyName = "ioPort";
 
-    const int maxPortNameLength = 20;
-    const int inputFontSize = 15;
-    const int outputFontSize = 12;
-    const int portFontSize = 12;
+constexpr int kReconnectDelayMs = 1000 * 5;
+constexpr int kCommandExecuteTimeoutMs = 1000 * 6;
+constexpr int kStateCheckIntervalMs = 1000;
 
-    class IndicatorWidget : public GraphicsPixmap {
-        QPixmap m_onPixmap;
-        QPixmap m_offPixmap;
-        bool m_isOn;
+} // namespace
 
-    public:
-        IndicatorWidget(const QPixmap &onPixmap, const QPixmap &offPixmap, QGraphicsItem *parent = 0)
-            : GraphicsPixmap(parent)
-            , m_onPixmap(onPixmap)
-            , m_offPixmap(offPixmap)
-            , m_isOn(false)
-        {
-            setPixmap(m_offPixmap);
-        }
-
-        bool isOn() const {
-            return m_isOn;
-        }
-
-        void setOn(bool on) {
-            if (on == m_isOn)
-                return;
-
-            m_isOn = on;
-            setPixmap(m_isOn ? m_onPixmap : m_offPixmap);
-        }
-    };
-
-    QGraphicsGridLayout *createGridLayout()
-    {
-        typedef QPair<int, Qt::Alignment> ColumnInfo;
-        typedef QVector<ColumnInfo> ColumnInfoVector;
-        static const ColumnInfoVector kColumns = []() -> ColumnInfoVector
-        {
-            const Qt::AlignmentFlag aligns[] =
-            {
-                Qt::AlignRight      // Input name
-                , Qt::AlignCenter   // Input state
-                , Qt::AlignLeft     // Input caption
-
-                , Qt::AlignCenter   // Spacer
-
-                , Qt::AlignRight    // Output name
-                , Qt::AlignCenter   // Output state
-                , Qt::AlignLeft     // Output caption
-            };
-            const int count = sizeof(aligns) / sizeof(aligns[0]);
-
-            ColumnInfoVector result;
-            for (int columnIndex = 0; columnIndex != count; ++columnIndex)
-                result.push_back(ColumnInfo(columnIndex, aligns[columnIndex]));
-
-            return result;
-        }();
-
-        QGraphicsGridLayout * const result = new QGraphicsGridLayout();
-        for (auto &column: kColumns)
-            result->setColumnAlignment(column.first, column.second);
-
-        return result;
-    }
-}
-
-class QnIoModuleOverlayWidgetPrivate : public Connective<QObject> {
-    typedef Connective<QObject> base_type;
+class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>
+{
+    using base_type = Connective<QObject>;
 
     Q_DISABLE_COPY(QnIoModuleOverlayWidgetPrivate)
     Q_DECLARE_PUBLIC(QnIoModuleOverlayWidget)
     Q_DECLARE_TR_FUNCTIONS(QnIoModuleOverlayWidgetPrivate)
 
 public:
-    QnIoModuleOverlayWidget * const q_ptr;
+    QnIoModuleOverlayWidget* const q_ptr;
+    QScopedPointer<QnIoModuleOverlayContents> contents;
 
-    QnVirtualCameraResourcePtr camera;
+    QnVirtualCameraResourcePtr module;
     QnIOModuleMonitorPtr monitor;
-    bool connectionOpened;
-    QPixmap indicatorOnPixmap;
-    QPixmap indicatorOffPixmap;
-    QnIoModuleColors colors;
-    bool inputEnabled;
+    bool connectionOpened = false;
+    bool userInputEnabled = false;
 
-    struct ModelData {
-        ModelData() : indicator(nullptr) {}
-
-        QnIOPortData ioConfigData;      // port configuration parameters: name e.t.c
-        QnIOStateData ioState;          // current port state on or off
-        IndicatorWidget *indicator;
-        QElapsedTimer buttonPressTime;  // button press timeout
+    struct StateData
+    {
+        QnIOPortData config;            //< port configuration
+        QnIOStateData state;            //< current port state
+        QElapsedTimer stateChangeTimer; //< state change timout timer
     };
 
-    QMap<QString, ModelData> model;
-    QTimer *timer;
+    QnIOPortDataList ports;
+    QMap<QString, StateData> states;
+    QTimer* const timer;
+    QGraphicsLinearLayout* const layout;
+    QnIoModuleOverlayWidget::Style overlayStyle;
 
-    QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget);
+    QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget);
 
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
-    void addIoItem(ModelData *data);
-    void updateControls();
+    void setContents(QnIoModuleOverlayContents* newContents);
+
+    void setIOModule(const QnVirtualCameraResourcePtr& newModule);
+    void setPorts(const QnIOPortDataList& newPorts);
+
+    void updateContents();
+    void updateOverlayStyle();
 
     void openConnection();
+    void toggleState(const QString& port);
 
-    void at_cameraStatusChanged(const QnResourcePtr &resource);
-    void at_cameraPropertyChanged(const QnResourcePtr &resource, const QString &key);
+    void at_cameraStatusChanged(const QnResourcePtr& resource);
+    void at_cameraPropertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_connectionOpened();
     void at_connectionClosed();
-    void at_ioStateChanged(const QnIOStateData &value);
-    void at_buttonClicked();
+    void at_stateChanged(const QnIOStateData& value);
     void at_timerTimeout();
-
-    QGraphicsLayoutItem *createButton(QnIoModuleOverlayWidgetPrivate::ModelData *data);
-    QGraphicsLayoutItem *createLabel(QnIoModuleOverlayWidgetPrivate::ModelData *data);
-
-private:
-    void clearControlsLayout();
-
-    QGraphicsGridLayout *controlsLayout;
-    int m_inputsCount;
-    int m_outputsCount;
-
 };
 
-QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget *widget):
+/*
+QnIoModuleOverlayWidgetPrivate
+*/
+
+QnIoModuleOverlayWidgetPrivate::QnIoModuleOverlayWidgetPrivate(QnIoModuleOverlayWidget* widget):
     base_type(widget),
     q_ptr(widget),
-    connectionOpened(false),
-    indicatorOnPixmap(qnSkin->pixmap("legacy/io_indicator_on.png")),
-    indicatorOffPixmap(qnSkin->pixmap("legacy/io_indicator_off.png")),
-    colors(),
-    inputEnabled(false),
     timer(new QTimer(this)),
-    controlsLayout(createGridLayout()),
-    m_inputsCount(0),
-    m_outputsCount(0)
+    layout(new QGraphicsLinearLayout(Qt::Vertical, widget)),
+    overlayStyle(QnIoModuleOverlayWidget::Style::Default)
 {
     widget->setAutoFillBackground(true);
 
-    enum
-    {
-        kOuterMargin = 24
-        , kTopMargin = kOuterMargin * 2
-    };
+    connect(timer, &QTimer::timeout, this, &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
+    timer->setInterval(kStateCheckIntervalMs);
 
-    controlsLayout->setContentsMargins(kOuterMargin, kTopMargin, kOuterMargin, kOuterMargin);
-
-    enum { kVeryBigStretch = 1000 };
-    QGraphicsLinearLayout * const v = new QGraphicsLinearLayout(Qt::Vertical);
-    v->addItem(controlsLayout);
-    v->addStretch(kVeryBigStretch);
-
-    QGraphicsLinearLayout * const h = new QGraphicsLinearLayout(Qt::Horizontal);
-    h->addItem(v);
-    h->addStretch(kVeryBigStretch);
-
-    widget->setLayout(h);
-
-    connect(timer,  &QTimer::timeout,   this,   &QnIoModuleOverlayWidgetPrivate::at_timerTimeout);
-    timer->setInterval(stateCheckInterval);
+    updateOverlayStyle();
 }
 
-void QnIoModuleOverlayWidgetPrivate::setCamera(const QnVirtualCameraResourcePtr &camera) {
-    Q_Q(QnIoModuleOverlayWidget);
+void QnIoModuleOverlayWidgetPrivate::setContents(QnIoModuleOverlayContents* newContents)
+{
+    NX_ASSERT(newContents);
+    contents.reset(newContents);
 
+    layout->addItem(newContents);
+
+    connect(contents, &QnIoModuleOverlayContents::userClicked,
+        this, &QnIoModuleOverlayWidgetPrivate::toggleState);
+
+    updateContents();
+}
+
+void QnIoModuleOverlayWidgetPrivate::updateOverlayStyle()
+{
+    auto style = overlayStyle;
+    if (module)
+    {
+        style = QnLexical::deserialized<QnIoModuleOverlayWidget::Style>(
+            module->getProperty(Qn::IO_OVERLAY_STYLE_PARAM_NAME),
+            QnIoModuleOverlayWidget::Style::Default);
+    }
+
+    bool needToCreateNewContents = style != overlayStyle || !contents;
+    if (!needToCreateNewContents)
+        return;
+
+    overlayStyle = style;
+
+    switch (overlayStyle)
+    {
+        case QnIoModuleOverlayWidget::Style::Tile:
+            setContents(new QnIoModuleGridOverlayContents());
+            break;
+
+        case QnIoModuleOverlayWidget::Style::Form:
+        default:
+            setContents(new QnIoModuleFormOverlayContents());
+            break;
+    }
+}
+
+void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePtr& newModule)
+{
+    Q_Q(QnIoModuleOverlayWidget);
     timer->stop();
 
-    if (this->camera)
-        disconnect(this->camera, nullptr, this, nullptr);
+    if (module)
+        module->disconnect(this);
 
-    this->camera = camera;
+    module = newModule;
+    if (module && !module->isIOModule())
+    {
+        NX_ASSERT(false, Q_FUNC_INFO, "Must be I/O module!");
+        module.clear();
+    }
 
-    if (!camera) {
+    states.clear();
+
+    if (!module)
+    {
         monitor.reset();
+        setPorts({});
         q->setEnabled(false);
         return;
     }
 
-    monitor.reset(new QnIOModuleMonitor(camera));
-    connect(monitor,    &QnIOModuleMonitor::connectionOpened,   this,   &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
-    connect(monitor,    &QnIOModuleMonitor::connectionClosed,   this,   &QnIoModuleOverlayWidgetPrivate::at_connectionClosed);
-    connect(monitor,    &QnIOModuleMonitor::ioStateChanged,     this,   &QnIoModuleOverlayWidgetPrivate::at_ioStateChanged);
+    monitor.reset(new QnIOModuleMonitor(module));
 
-    connect(camera,     &QnResource::propertyChanged,   this,       &QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged);
-    connect(camera,     &QnResource::statusChanged,     this,       &QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged);
+    connect(monitor, &QnIOModuleMonitor::connectionOpened,
+        this, &QnIoModuleOverlayWidgetPrivate::at_connectionOpened);
+    connect(monitor, &QnIOModuleMonitor::connectionClosed,
+        this, &QnIoModuleOverlayWidgetPrivate::at_connectionClosed);
+    connect(monitor, &QnIOModuleMonitor::ioStateChanged,
+        this, &QnIoModuleOverlayWidgetPrivate::at_stateChanged);
 
+    connect(module, &QnResource::propertyChanged,
+        this, &QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged);
+    connect(module, &QnResource::statusChanged,
+        this, &QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged);
+
+    updateOverlayStyle();
+
+    setPorts(module->getIOPorts());
     timer->start();
-
-    updateControls();
 }
 
-QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createButton(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
-    QFont font = qApp->font();
-    font.setPixelSize(outputFontSize);
-
-    QFontMetrics metrics(font);
-    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));
-
-    QPushButton *button = new QPushButton(metrics.elidedText(data->ioConfigData.outputName, Qt::ElideRight, maxWidth));
-    button->setFont(font);
-
-    button->setProperty(ioPortPropertyName, data->ioConfigData.id);
-    button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    button->setAutoDefault(false);
-    button->setEnabled(inputEnabled);
-    if (inputEnabled)
-        QObject::connect(button, &QPushButton::clicked, this, &QnIoModuleOverlayWidgetPrivate::at_buttonClicked);
-
-    Q_Q(QnIoModuleOverlayWidget);
-    QGraphicsProxyWidget *buttonProxy = new QnMaskedProxyWidget(q);
-    QPalette palette = button->palette();
-    palette.setColor(QPalette::Window, colors.buttonBackground);
-    button->setPalette(palette);
-    buttonProxy->setWidget(button);
-
-    return buttonProxy;
-}
-
-QGraphicsLayoutItem *QnIoModuleOverlayWidgetPrivate::createLabel(QnIoModuleOverlayWidgetPrivate::ModelData *data)
+void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
 {
-    QFont font = qApp->font();
-    font.setPixelSize(inputFontSize);
+    ports = newPorts;
 
-    QFontMetrics metrics(font);
-    int maxWidth = metrics.width(QString(maxPortNameLength, L'w'));
-
-    Q_Q(QnIoModuleOverlayWidget);
-    GraphicsLabel *descriptionLabel = new GraphicsLabel(metrics.elidedText(data->ioConfigData.inputName, Qt::ElideRight, maxWidth), q);
-    descriptionLabel->setFont(font);
-    descriptionLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-    descriptionLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    return descriptionLabel;
-}
-
-void QnIoModuleOverlayWidgetPrivate::addIoItem(QnIoModuleOverlayWidgetPrivate::ModelData *data) {
-    if (data->ioConfigData.portType != Qn::PT_Input && data->ioConfigData.portType != Qn::PT_Output)
-        return;
-
-    Q_Q(QnIoModuleOverlayWidget);
-
-    QFont font = qApp->font();
-    font.setPixelSize(portFontSize);
-
-    GraphicsLabel *portIdLabel = new GraphicsLabel(data->ioConfigData.id, q);
-    portIdLabel->setFont(font);
-    portIdLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-    portIdLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-    QPalette palette = portIdLabel->palette();
-    palette.setColor(QPalette::WindowText, colors.idLabel);
-    portIdLabel->setPalette(palette);
-
-    data->indicator = new IndicatorWidget(indicatorOnPixmap, indicatorOffPixmap, q);
-    data->indicator->setOn(data->ioState.isActive);
-
-    const bool isOutput = (data->ioConfigData.portType == Qn::PT_Output);
-
-    enum
+    for (const auto& port : ports)
     {
-        kInputsStartColumn = 0,
-        kIndicatorColumnOffset = 1,
-        kCaptionColumnOffset = 2,
-        kSpacerColumn = 3,
-        kOutputsStartColumn = 4
-    };
-
-    const int startColumn = (isOutput ? kOutputsStartColumn : kInputsStartColumn);
-    int &itemsCount = (isOutput ? m_outputsCount : m_inputsCount);
-
-    controlsLayout->addItem(portIdLabel, itemsCount, startColumn);
-    controlsLayout->addItem(data->indicator, itemsCount, startColumn + kIndicatorColumnOffset);
-
-    QGraphicsLayoutItem * const thirdItem = (isOutput ? createButton(data) : createLabel(data));
-    controlsLayout->addItem(thirdItem, itemsCount, startColumn + kCaptionColumnOffset, Qt::AlignCenter);
-
-    ++itemsCount;
-
-    enum
-    {
-        kNoSpacing = 0
-        , kSpacingSize = 48
-    };
-
-    controlsLayout->setColumnFixedWidth(kSpacerColumn, m_inputsCount ? kSpacingSize : kNoSpacing);
-}
-
-void QnIoModuleOverlayWidgetPrivate::clearControlsLayout()
-{
-    m_inputsCount = 0;
-    m_outputsCount = 0;
-    while (controlsLayout->count())
-    {
-        enum { kFirstItemIndex = 0 };
-        QGraphicsLayoutItem * const item = controlsLayout->itemAt(kFirstItemIndex);
-        controlsLayout->removeAt(kFirstItemIndex);
-        delete item;
+        auto& item = states[port.id];
+        item.config = port;
+        item.state.id = port.id;
     }
-}
 
-void QnIoModuleOverlayWidgetPrivate::updateControls() {
-    clearControlsLayout();
-
-    for (const auto &value: camera->getIOPorts())
-        model[value.id].ioConfigData = value;
-
-    for (auto it = model.begin(); it != model.end(); ++it)
-        addIoItem(&it.value());
-
-    if (!connectionOpened)
+    if (monitor && !connectionOpened)
         openConnection();
+
+    contents->portsChanged(ports, userInputEnabled);
+
+    for (const auto& item: states)
+        contents->stateChanged(item.config, item.state);
 }
 
-void QnIoModuleOverlayWidgetPrivate::openConnection() {
+void QnIoModuleOverlayWidgetPrivate::updateContents()
+{
+    /* This is a "hard-reset" of widgets displaying I/O ports
+     * It is called when colors or user input enabled state is changed
+     * This normally should not happen often when I/O module overlay is open */
+    if (module)
+        setPorts(module->getIOPorts());
+}
+
+void QnIoModuleOverlayWidgetPrivate::openConnection()
+{
     if (!monitor->open())
         at_connectionClosed();
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged(const QnResourcePtr &resource) {
+void QnIoModuleOverlayWidgetPrivate::at_cameraStatusChanged(const QnResourcePtr& resource)
+{
     if (resource->getStatus() < Qn::Online)
         at_connectionClosed();
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePtr &resource, const QString &key) {
-    Q_UNUSED(resource)
+void QnIoModuleOverlayWidgetPrivate::at_cameraPropertyChanged(const QnResourcePtr& resource, const QString& key)
+{
+    if (resource != module)
+        return;
+
     if (key == Qn::IO_SETTINGS_PARAM_NAME)
-        updateControls();
+    {
+        setPorts(module->getIOPorts());
+    }
+    else if (key == Qn::IO_OVERLAY_STYLE_PARAM_NAME)
+    {
+        updateOverlayStyle();
+    }
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_connectionOpened() {
+void QnIoModuleOverlayWidgetPrivate::at_connectionOpened()
+{
     Q_Q(QnIoModuleOverlayWidget);
     connectionOpened = true;
     q->setEnabled(true);
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_connectionClosed() {
+void QnIoModuleOverlayWidgetPrivate::at_connectionClosed()
+{
     Q_Q(QnIoModuleOverlayWidget);
 
     q->setEnabled(false);
     connectionOpened = false;
 
-    for (auto it = model.begin(); it != model.end(); ++it)
-        it->buttonPressTime.invalidate();
+    for (auto& item: states)
+        item.stateChangeTimer.invalidate();
 
-    executeDelayedParented([this](){ openConnection(); }, reconnectDelay, this);
+    executeDelayedParented([this](){ openConnection(); }, kReconnectDelayMs, this);
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_ioStateChanged(const QnIOStateData &value) {
-    auto it = model.find(value.id);
-    if (it == model.end())
-        return;
-
-    it->buttonPressTime.invalidate();
-    if (it->indicator)
-        it->indicator->setOn(value.isActive);
-    it->ioState = value;
-}
-
-void QnIoModuleOverlayWidgetPrivate::at_buttonClicked()
+void QnIoModuleOverlayWidgetPrivate::at_stateChanged(const QnIOStateData& value)
 {
-    NX_ASSERT(inputEnabled);
-    if (!inputEnabled)
+    auto it = states.find(value.id);
+    if (it == states.end())
         return;
 
-    QString port = sender()->property(ioPortPropertyName).toString();
-    if (port.isEmpty())
+    it->state = value;
+    it->stateChangeTimer.invalidate();
+
+    contents->stateChanged(it->config, it->state);
+}
+
+void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
+{
+    if (port.isEmpty() || !userInputEnabled)
         return;
 
-    auto it = model.find(port);
-    if (it == model.end())
+    auto it = states.find(port);
+    if (it == states.end())
         return;
+
+    /* Ignore if we didn't receive response from previous toggle yet: */
+    if (it->stateChangeTimer.isValid())
+        return;
+
+    /* Send fake early state change to make UI look more responsive: */
+    auto newState = it->state;
+    newState.isActive = !newState.isActive;
+    contents->stateChanged(it->config, newState);
 
     QnBusinessEventParameters eventParams;
     eventParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
 
     QnBusinessActionParameters params;
-    params.relayOutputId = it->ioConfigData.id;
-    params.durationMs = it->ioConfigData.autoResetTimeoutMs;
-    QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(eventParams));
+    params.relayOutputId = it->config.id;
+    params.durationMs = it->config.autoResetTimeoutMs;
 
+    QnCameraOutputBusinessActionPtr action(new QnCameraOutputBusinessAction(eventParams));
     action->setParams(params);
-    action->setResources(QVector<QnUuid>() << camera->getId());
-    action->setToggleState(it->ioState.isActive ? QnBusiness::InactiveState : QnBusiness::ActiveState);
+    action->setResources({ module->getId() });
+    action->setToggleState(it->state.isActive ? QnBusiness::InactiveState : QnBusiness::ActiveState);
 
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
-        connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, camera->getParentId(), this, []{});
+        connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, module->getParentId(), this, [] {});
 
-    if (it->indicator)
-        it->indicator->setOn(!it->ioState.isActive);
-    it->buttonPressTime.restart();
+    it->stateChangeTimer.restart();
 }
 
-void QnIoModuleOverlayWidgetPrivate::at_timerTimeout() {
-    for (auto it = model.begin(); it != model.end(); ++it) {
-        ModelData &data = it.value();
-        if (!data.indicator)
+void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
+{
+    for (auto& item: states)
+    {
+        if (!item.stateChangeTimer.isValid())
             continue;
 
-        if (data.indicator->isOn() != data.ioState.isActive && data.buttonPressTime.isValid() && data.buttonPressTime.hasExpired(commandExecuteTimeout)) {
-            bool wrongState = data.indicator->isOn();
-            data.indicator->setOn(data.ioState.isActive);
-            data.buttonPressTime.invalidate();
-            QString portName = data.ioConfigData.getName();
-            QString message = wrongState ? tr("Failed to turn on IO port '%1'")
-                                         : tr("Failed to turn off IO port '%1'");
-            QnMessageBox::warning(nullptr, tr("IO port error"), message.arg(portName));
+        //TODO: Probably rewrite this logic
+
+        /* If I/O port toggle is confirmed by the monitor, stateChangeTimer is invalidated. */
+        /* If stateChangeTimer is valid and expired, I/O port toggle was unsuccessful: */
+        if (item.stateChangeTimer.hasExpired(kCommandExecuteTimeoutMs))
+        {
+            contents->stateChanged(item.config, item.state);
+
+            item.stateChangeTimer.invalidate();
+
+            const auto portName = item.config.getName();
+            const auto message = item.state.isActive
+                ? tr("Failed to turn off I/O port %1")
+                : tr("Failed to turn on I/O port %1");
+
+            QnMessageBox::warning(nullptr, message.arg(portName));
         }
     }
 }
 
+/*
+QnIoModuleOverlayWidget
+*/
 
-QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(QGraphicsWidget *parent)
-    : base_type(parent)
-    , d_ptr(new QnIoModuleOverlayWidgetPrivate(this))
+QnIoModuleOverlayWidget::QnIoModuleOverlayWidget(QGraphicsWidget* parent):
+    base_type(parent),
+    d_ptr(new QnIoModuleOverlayWidgetPrivate(this))
 {
 }
 
-QnIoModuleOverlayWidget::~QnIoModuleOverlayWidget() {}
+QnIoModuleOverlayWidget::~QnIoModuleOverlayWidget()
+{
+}
 
-void QnIoModuleOverlayWidget::setCamera(const QnVirtualCameraResourcePtr &camera) {
+void QnIoModuleOverlayWidget::setIOModule(const QnVirtualCameraResourcePtr& module)
+{
     Q_D(QnIoModuleOverlayWidget);
-    d->setCamera(camera);
+    d->setIOModule(module);
 }
 
-const QnIoModuleColors &QnIoModuleOverlayWidget::colors() const {
-    Q_D(const QnIoModuleOverlayWidget);
-    return d->colors;
-}
-
-void QnIoModuleOverlayWidget::setColors(const QnIoModuleColors &colors) {
-    Q_D(QnIoModuleOverlayWidget);
-    d->colors = colors;
-    d->updateControls();
-}
-
-bool QnIoModuleOverlayWidget::inputEnabled() const
+QnIoModuleOverlayWidget::Style QnIoModuleOverlayWidget::overlayStyle() const
 {
     Q_D(const QnIoModuleOverlayWidget);
-    return d->inputEnabled;
+    return d->overlayStyle;
 }
 
-void QnIoModuleOverlayWidget::setInputEnabled(bool value)
+bool QnIoModuleOverlayWidget::userInputEnabled() const
+{
+    Q_D(const QnIoModuleOverlayWidget);
+    return d->userInputEnabled;
+}
+
+void QnIoModuleOverlayWidget::setUserInputEnabled(bool value)
 {
     Q_D(QnIoModuleOverlayWidget);
-    d->inputEnabled = value;
-    d->updateControls();
+    if (d->userInputEnabled == value)
+        return;
+
+    d->userInputEnabled = value;
+    d->updateContents();
 }
+
+/*
+QnIoModuleOverlayContents
+*/
+
+QnIoModuleOverlayContents::QnIoModuleOverlayContents():
+    base_type()
+{
+    setAcceptedMouseButtons(Qt::NoButton);
+    setAcceptHoverEvents(false);
+}
+
+QnIoModuleOverlayContents::~QnIoModuleOverlayContents()
+{
+}
+
+QnIoModuleOverlayWidget* QnIoModuleOverlayContents::overlayWidget() const
+{
+    return qgraphicsitem_cast<QnIoModuleOverlayWidget*>(parentItem());
+}
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnIoModuleOverlayWidget, Style,
+    (QnIoModuleOverlayWidget::Style::Form, "Form")
+    (QnIoModuleOverlayWidget::Style::Tile, "Tile")
+)

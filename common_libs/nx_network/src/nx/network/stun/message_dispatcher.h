@@ -32,6 +32,8 @@ public:
     MessageDispatcher();
     MessageDispatcher(const MessageDispatcher&) = delete;
     MessageDispatcher& operator=(const MessageDispatcher&) = delete;
+    MessageDispatcher(MessageDispatcher&&) = default;
+    MessageDispatcher& operator=(MessageDispatcher&&) = default;
 
     virtual ~MessageDispatcher();
 

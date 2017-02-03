@@ -70,23 +70,26 @@ namespace
 
 // --------------------- QnRtspIoDevice --------------------------
 
-QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP):
+QnRtspIoDevice::QnRtspIoDevice(QnRtspClient* owner, bool useTCP, quint16 mediaPort, quint16 rtcpPort):
     m_owner(owner),
-    m_tcpMode(false),
+    m_tcpMode(useTCP),
     m_mediaSocket(0),
     m_rtcpSocket(0),
+    m_mediaPort(mediaPort),
+    m_remoteEndpointRtcpPort(rtcpPort),
     ssrc(0),
-    m_rtpTrackNum(0)
+    m_rtpTrackNum(0),
+    m_reportTimerStarted(false),
+    m_forceRtcpReports(false)
 {
-    m_tcpMode = useTCP;
     if (!m_tcpMode)
     {
         m_mediaSocket = SocketFactory::createDatagramSocket().release();
-        m_mediaSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_mediaSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_mediaSocket->setRecvTimeout(500);
 
         m_rtcpSocket = SocketFactory::createDatagramSocket().release();
-        m_rtcpSocket->bind( SocketAddress( HostAddress::anyHost, 0 ) );
+        m_rtcpSocket->bind(SocketAddress(HostAddress::anyHost, 0));
         m_rtcpSocket->setRecvTimeout(500);
     }
 }
@@ -143,6 +146,8 @@ void QnRtspIoDevice::processRtcpData()
 {
     quint8 rtcpBuffer[MAX_RTCP_PACKET_SIZE];
     quint8 sendBuffer[MAX_RTCP_PACKET_SIZE];
+
+    bool rtcpReportAlreadySent = false;
     while( m_rtcpSocket->hasData() )
     {
         SocketAddress senderEndpoint;
@@ -162,7 +167,37 @@ void QnRtspIoDevice::processRtcpData()
                 m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
+            {
                 m_rtcpSocket->send(sendBuffer, outBufSize);
+                rtcpReportAlreadySent = true;
+            }
+        }
+    }
+
+    if (m_forceRtcpReports && !rtcpReportAlreadySent)
+    {
+        if (!m_reportTimerStarted)
+        {
+            m_reportTimer.start();
+            m_reportTimerStarted = true;
+        }
+
+        if (m_reportTimer.elapsed() > 5000)
+        {
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
+            if (outBufSize > 0)
+            {
+                auto remoteEndpoint = SocketAddress(m_hostAddress, m_remoteEndpointRtcpPort);
+                if (!m_rtcpSocket->setDestAddr(remoteEndpoint))
+                {
+                    qWarning()
+                        << "RTPIODevice::processRtcpData(): setDestAddr() failed: "
+                        << SystemError::getLastOSErrorText();
+                }
+                m_rtcpSocket->send(sendBuffer, outBufSize);
+            }
+
+            m_reportTimer.restart();
         }
     }
 }
@@ -633,7 +668,6 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
 
-    if (m_tcpSock->isClosed())
     {
         QnMutexLocker lock(&m_socketMutex);
         m_tcpSock = SocketFactory::createStreamSocket();
@@ -1123,7 +1157,15 @@ bool QnRtspClient::sendSetup()
                         }
                     }
                 }
-
+                else if (tmpList[k].startsWith(QLatin1String("server_port"))) {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        tmpParams = tmpParams[1].split(QLatin1String("-"));
+                        if (tmpParams.size() == 2) {
+                            trackInfo->setRemoteEndpointRtcpPort(tmpParams[1].toInt());
+                        }
+                    }
+                }
             }
         }
 
@@ -1165,9 +1207,11 @@ bool QnRtspClient::sendSetParameter( const QByteArray& paramName, const QByteArr
 
 void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 startPos, qint64 endPos )
 {
+    nx_http::StringType rangeVal;
     if (startPos != qint64(AV_NOPTS_VALUE))
     {
-        nx_http::StringType rangeVal;
+        //There is no guarantee that every RTSP server understands utc ranges.
+        //RFC requires only npt ranges support.
         if (startPos != DATETIME_NOW)
             rangeVal += "clock=" + nx_http::StringType::number(startPos);
         else
@@ -1180,10 +1224,16 @@ void QnRtspClient::addRangeHeader( nx_http::Request* const request, qint64 start
             else
                 rangeVal += "clock";
         }
-        nx_http::insertOrReplaceHeader(
-            &request->headers,
-            nx_http::HttpHeader("Range", rangeVal));
+
     }
+    else
+    {
+        rangeVal += "npt=0.000-";
+    }
+
+    nx_http::insertOrReplaceHeader(
+        &request->headers,
+        nx_http::HttpHeader("Range", rangeVal));
 }
 
 QByteArray QnRtspClient::getGuid()
@@ -1744,6 +1794,10 @@ QAuthenticator QnRtspClient::getAuth() const
     return m_auth;
 }
 
+QUrl QnRtspClient::getUrl() const
+{
+    return m_url;
+}
 
 void QnRtspClient::setAudioEnabled(bool value)
 {

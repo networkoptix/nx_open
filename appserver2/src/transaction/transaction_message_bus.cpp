@@ -558,7 +558,8 @@ void QnTransactionMessageBus::at_gotTransaction(
         return;
     }
 
-    NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
+    if (!transportHeader.isNull())
+        NX_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
 
     using namespace std::placeholders;
     if (!handleTransaction(
@@ -785,7 +786,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return; // already processed. do not proxy and ignore transaction
             if (m_handler)
-                m_handler->triggerNotification(tran);
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
             break;
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
@@ -850,7 +851,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
 
             if (m_handler)
-                m_handler->triggerNotification(tran);
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
 
             // this is required to allow client place transactions directly into transaction message bus
             if (tran.command == ApiCommand::getFullInfo)
@@ -1278,6 +1279,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
     switch (transport->getState())
     {
         case QnTransactionTransport::Error:
+            lock.unlock();
             transport->close();
             break;
         case QnTransactionTransport::Connected:
@@ -1318,9 +1320,14 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State)
 
             m_runtimeTransactionLog->clearOldRuntimeData(QnTranStateKey(transport->remotePeer().id, transport->remotePeer().instanceId));
             if (sendInitialData(transport))
+            {
                 connectToPeerEstablished(transport->remotePeer());
+            }
             else
+            {
+                lock.unlock();
                 transport->close();
+            }
             break;
         }
         case QnTransactionTransport::ReadyForStreaming:
@@ -1508,7 +1515,8 @@ void QnTransactionMessageBus::removePeersWithTimeout(const QSet<QnUuid>& lostPee
             {
                 if (transport->getState() == QnTransactionTransport::Closed)
                     continue; // it's going to close soon
-                if (transport->remotePeer().id == itr.key() && transport->remotePeer().peerType == Qn::PT_Server)
+                if (transport->remotePeer().id == itr.key() &&
+                    ec2::ApiPeerData::isServer(transport->remotePeer().peerType))
                 {
                     qWarning() << "No alive info during timeout. reconnect to peer" << transport->remotePeer().id;
                     transport->setState(QnTransactionTransport::Error);
@@ -1841,7 +1849,7 @@ void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRunti
 {
     // data was changed by local transaction log (old data instance for same peer was removed), emit notification to apply new data version outside
     if (m_handler)
-        m_handler->triggerNotification(tran);
+        m_handler->triggerNotification(tran, NotificationSource::Local);
 }
 
 void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)

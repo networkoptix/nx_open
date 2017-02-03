@@ -33,16 +33,6 @@ QString QnAppInfo::applicationRevision()
     return QStringLiteral("${changeSet}");
 }
 
-QString QnAppInfo::applicationPlatform()
-{
-    return QStringLiteral("${platform}");
-}
-
-QString QnAppInfo::applicationArch()
-{
-    return QStringLiteral("${arch}");
-}
-
 QString QnAppInfo::applicationPlatformModification()
  {
     return QStringLiteral("${modification}");
@@ -79,17 +69,6 @@ QString QnAppInfo::sigarVersion()
 QString QnAppInfo::boostVersion()
 {
     return QStringLiteral("${boost.version}");
-}
-
-QString QnAppInfo::armBox()
-{
-    //#ak for now box has sense value on ARM devices only.
-        //On other platforms it is used by build system for internal purposes
-#ifdef __arm__
-    return QStringLiteral("${box}");
-#else
-    return QString();
-#endif
 }
 
 bool QnAppInfo::beta()
@@ -197,7 +176,7 @@ QString QnAppInfo::defaultCloudPortalUrl()
 
 QString QnAppInfo::defaultCloudModulesXmlUrl()
 {
-    return QString::fromLatin1("http://%1/api/cloud_modules2.xml").arg(defaultCloudHost());
+    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
 }
 
 QString QnAppInfo::cloudName()
@@ -219,4 +198,3 @@ bool QnAppInfo::freeLicenseIsTrial()
 {
     return ${freeLicenseIsTrial};
 }
-

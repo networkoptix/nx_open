@@ -17,7 +17,11 @@
 // -------------------------------------------------------------------------- //
 class QnPtzControllerPoolPrivate {
 public:
-    QnPtzControllerPoolPrivate(): mode(QnPtzControllerPool::NormalControllerConstruction), executorThread(NULL), commandThreadPool(NULL) {}
+    QnPtzControllerPoolPrivate(): 
+        mode(QnPtzControllerPool::NormalControllerConstruction),
+        executorThread(NULL),
+        commandThreadPool(NULL),
+        deinitialized(false){}
 
     void updateController(const QnResourcePtr &resource);
 
@@ -28,6 +32,7 @@ public:
     QThreadPool *commandThreadPool;
     QnResourcePool *resourcePool;
     QnPtzControllerPool *q;
+    std::atomic<bool> deinitialized;
 };
 
 
@@ -82,19 +87,32 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 
 QnPtzControllerPool::~QnPtzControllerPool()
 {
-    while(!d->controllerByResource.isEmpty())
-        unregisterResource(d->controllerByResource.begin().key());
+    deinitialize();
+}
 
-    //have to wait until all posted events have been processed, deleteLater can be called
+void QnPtzControllerPool::deinitialize()
+{
+    if (!d->deinitialized)
+    {
+        while (!d->controllerByResource.isEmpty())
+        {
+            auto resourcePtr = d->controllerByResource.begin().key();
+            unregisterResource(resourcePtr);
+        }
+
+        //have to wait until all posted events have been processed, deleteLater can be called
         //within event slot, that's why we specify second parameter
-    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( d->executorThread, 3 );
-    waitingForObjectsToBeFreed.join();
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(d->executorThread, 3);
+        waitingForObjectsToBeFreed.join();
 
-    d->executorThread->exit();
-    d->executorThread->wait();
+        d->executorThread->exit();
+        d->executorThread->wait();
 
-    d->commandThreadPool->clear();
-    d->commandThreadPool->waitForDone();
+        d->commandThreadPool->clear();
+        d->commandThreadPool->waitForDone();
+
+        d->deinitialized = true;
+    }
 }
 
 QThread *QnPtzControllerPool::executorThread() const {

@@ -6,8 +6,9 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/string.h>
 #include <nx/utils/test_support/utils.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
@@ -370,9 +371,7 @@ TEST_F(Ec2MserverCloudSynchronization, rename_system)
                 ->addRemotePeer(cdbEc2TransactionUrl());
         }
 
-        const std::string newSystemName =
-            nx::utils::random::generate(10, 'a', 'z').toStdString();
-
+        const std::string newSystemName(nx::utils::generateRandomName(10).data());
         if (updateInCloud)
         {
             ASSERT_EQ(
@@ -541,7 +540,7 @@ TEST_F(Ec2MserverCloudSynchronization, transaction_timestamp)
                 ownerAccount().password,
                 registeredSystemData().id,
                 &systemUsers));
-        ASSERT_EQ(1, systemUsers.size());
+        ASSERT_EQ(1U, systemUsers.size());
     }
 }
 

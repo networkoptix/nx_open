@@ -21,8 +21,7 @@ using nx::hpm::MediaServerEmulator;
 
 constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(15);
 
-class UdpTunnelConnector
-    :
+class UdpTunnelConnector:
     public cloud::test::TunnelConnector
 {
 public:
@@ -46,7 +45,6 @@ TEST_F(UdpTunnelConnector, general)
 
 TEST_F(UdpTunnelConnector, noSynAck)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto connectResult = doSimpleConnectTest(
@@ -59,31 +57,29 @@ TEST_F(UdpTunnelConnector, noSynAck)
 
 TEST_F(UdpTunnelConnector, badSynAck)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const auto connectResult = doSimpleConnectTest(
-        std::chrono::seconds::zero(),   //no timeout
+        std::chrono::seconds::zero(), //< No timeout.
         MediaServerEmulator::ActionToTake::sendBadSynAck);
 
     ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
-//currently, this test requires hack in UnreliableMessagePipeline::messageSent:
-//  errorCode has to be set to SystemError::connectionReset
-//TEST_F(UdpTunnelConnector, remotePeerUdpPortNotAccessible)
-//{
-//    //starting mediator
-//    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
-//
-//    const auto connectResult = doSimpleConnectTest(
-//        std::chrono::seconds::zero(),   //no timeout
-//        MediaServerEmulator::ActionToTake::proceedWithConnection);
-//
-//    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
-//    ASSERT_EQ(nullptr, connectResult.connection);
-//}
+// Currently, this test requires hack in UnreliableMessagePipeline::messageSent:
+// errorCode has to be set to SystemError::connectionReset.
+TEST_F(UdpTunnelConnector, DISABLED_remotePeerUdpPortNotAccessible)
+{
+    ASSERT_TRUE(mediator().startAndWaitUntilStarted());
+
+    const auto connectResult = doSimpleConnectTest(
+        std::chrono::seconds::zero(), //< No timeout.
+        MediaServerEmulator::ActionToTake::proceedWithConnection);
+
+    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(nullptr, connectResult.connection);
+}
 
 TEST_F(UdpTunnelConnector, cancellation)
 {
@@ -92,12 +88,11 @@ TEST_F(UdpTunnelConnector, cancellation)
 
 TEST_F(UdpTunnelConnector, timeout)
 {
-    //starting mediator
     ASSERT_TRUE(mediator().startAndWaitUntilStarted());
 
     const std::chrono::milliseconds connectTimeout(utils::random::number(1000, 4000));
 
-    //timing out udt connection...
+    // Timing out udt connection...
     boost::optional<SocketAddress> mediatorAddressForConnector;
 
     const auto connectResult = doSimpleConnectTest(
@@ -141,7 +136,7 @@ TEST_F(UdpTunnelConnector, connecting_peer_in_the_same_lan_as_mediator)
             return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
 
-    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen().first);
 
     nx::utils::promise<ConnectResult> connectedPromise;
     CrossNatConnector connector(

@@ -10,8 +10,9 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
+#include <ui/graphics/items/generic/slider_tooltip_widget.h>
 
-#include "slider_tooltip_widget.h"
+#include <nx/utils/math/fuzzy.h>
 
 namespace {
 const int toolTipHideDelay = 2500;
@@ -55,7 +56,8 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
     m_toolTipUnderMouse(false),
     m_pendingPositionUpdate(false),
     m_instantPositionUpdate(false),
-    m_tooltipMargin(0)
+    m_tooltipMargin(0),
+    m_toolTipEnabled(true)
 {
     setOrientation(Qt::Horizontal);
 
@@ -83,7 +85,7 @@ qreal QnToolTipSlider::tooltipMargin() const
 
 void QnToolTipSlider::setTooltipMargin(qreal margin)
 {
-    if (qFuzzyCompare(margin, m_tooltipMargin))
+    if (qFuzzyEquals(margin, m_tooltipMargin))
         return;
 
     m_tooltipMargin = margin;
@@ -148,21 +150,32 @@ void QnToolTipSlider::hideToolTip(bool animated)
     }
 }
 
+void QnToolTipSlider::setToolTipEnabled(bool enabled)
+{
+    if (enabled == m_toolTipEnabled)
+        return;
+
+    m_toolTipEnabled = enabled;
+
+    if (!enabled)
+        hideToolTip(false);
+}
+
 void QnToolTipSlider::showToolTip(bool animated)
 {
     using namespace nx::client::ui::workbench;
     qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
         Animations::Id::TimelineTooltipShow);
 
-    const qreal kOpaque = 1.0;
+    const qreal opacity = (m_toolTipEnabled ? 1.0 : 0.0);
     if (animated)
     {
-        m_tooltipWidgetVisibilityAnimator->animateTo(kOpaque);
+        m_tooltipWidgetVisibilityAnimator->animateTo(opacity);
     }
     else
     {
         m_tooltipWidgetVisibilityAnimator->stop();
-        m_tooltipWidgetVisibility = kOpaque;
+        m_tooltipWidgetVisibility = opacity;
     }
 }
 

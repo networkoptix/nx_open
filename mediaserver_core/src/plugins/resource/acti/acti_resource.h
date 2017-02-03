@@ -27,8 +27,10 @@ class QnActiResource
 {
     Q_OBJECT
 
-    typedef QMap<QString, QString> ActiSystemInfo;
 public:
+
+    typedef QMap<QString, QString> ActiSystemInfo;
+
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
     static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
@@ -58,6 +60,8 @@ public:
     virtual int getMaxFps() const override;
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
+
+    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
 
     /*!
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
@@ -126,7 +130,7 @@ private:
     QMap<int, QString> parseVideoBitrateCap(const QByteArray& bitrateCap) const;
     QString bitrateToDefaultString(int bitrateKbps) const; 
 
-    void initializePtz();
+    void initialize2WayAudio( const ActiSystemInfo& systemInfo );
     void initializeIO( const ActiSystemInfo& systemInfo );
     bool isRtspAudioSupported(const QByteArray& platform, const QByteArray& firmware) const;
     void fetchAndSetAdvancedParameters();
@@ -161,6 +165,8 @@ private:
 
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
+
+    boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
 
 private:
@@ -219,6 +225,8 @@ private:
     boost::optional<bool> m_audioInputOn;
     QnCameraAdvancedParams m_advancedParameters;
     QnCameraAdvancedParams m_advancedParametersCache;
+
+    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 #endif // #ifdef ENABLE_ACTI

@@ -3,6 +3,7 @@
 
 #include <helpers/cloud_url_helper.h>
 
+#include <ui/common/accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/custom_style.h>
@@ -37,42 +38,27 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
     QnCloudUrlHelper urlHelper(
         SystemUri::ReferralSource::DesktopClient,
         SystemUri::ReferralContext::SettingsDialog);
-    ui->manageAccountLabel->setText(makeHref(tr("Manage account"),
+    ui->manageAccountLabel->setText(makeHref(tr("Account Settings"),
         urlHelper.accountManagementUrl()));
 
-    connect(ui->enabledButton, &QPushButton::toggled, this, &QnCloudUserPanelWidget::enabledChanged);
-    setHelpTopic(ui->enabledButton, Qn::UserSettings_DisableUser_Help);
+    static const QMargins kSpacingByContentsMargin(
+        0, style::Metrics::kDefaultLayoutSpacing.height(), 0, 0);
+    ui->manageAccountLabel->setContentsMargins(ui->manageAccountLabel->contentsMargins()
+        + kSpacingByContentsMargin);
 }
 
 QnCloudUserPanelWidget::~QnCloudUserPanelWidget()
-{}
-
-bool QnCloudUserPanelWidget::enabled() const
 {
-    return ui->enabledButton->isChecked();
 }
 
-void QnCloudUserPanelWidget::setEnabled(bool value)
+bool QnCloudUserPanelWidget::isManageLinkShown() const
 {
-    ui->enabledButton->setChecked(value);
+    return !ui->manageAccountLabel->isHidden();
 }
 
-QnCloudUserPanelWidget::Options QnCloudUserPanelWidget::options() const
+void QnCloudUserPanelWidget::setManageLinkShown(bool value)
 {
-    Options result = 0;
-    if (!ui->enabledButton->isHidden())
-        result |= ShowEnableButtonOption;
-
-    if (!ui->manageAccountLabel->isHidden())
-        result |= ShowManageLinkOption;
-
-    return result;
-}
-
-void QnCloudUserPanelWidget::setOptions(Options value)
-{
-    ui->enabledButton->setHidden(!value.testFlag(ShowEnableButtonOption));
-    ui->manageAccountLabel->setHidden(!value.testFlag(ShowManageLinkOption));
+    ui->manageAccountLabel->setHidden(!value);
 }
 
 QString QnCloudUserPanelWidget::email() const
@@ -94,4 +80,25 @@ void QnCloudUserPanelWidget::setFullName(const QString& value)
 {
     ui->nameLabel->setText(value);
     ui->nameLabel->setVisible(!value.trimmed().isEmpty());
+}
+
+AbstractAccessor* QnCloudUserPanelWidget::createIconWidthAccessor()
+{
+    const auto getLabelWidth =
+        [](const QObject* object) -> QVariant
+        {
+            if (auto panel = qobject_cast<const QnCloudUserPanelWidget*>(object))
+                return panel->ui->iconLabel->minimumSizeHint().width();
+
+            return QVariant();
+        };
+
+    const auto setLabelWidth =
+        [](QObject* object, const QVariant& value)
+        {
+            if (auto panel = qobject_cast<const QnCloudUserPanelWidget*>(object))
+                panel->ui->iconLabel->setFixedWidth(value.toInt());
+        };
+
+    return newAccessor(getLabelWidth, setLabelWidth);
 }

@@ -16,7 +16,7 @@
     <properties>
         <product.title>Paxton Integration Module Installer</product.title>    
         <root.dir>${basedir}/../../..</root.dir>
-        <finalName>${installer.name}-paxton-plugin.${release.version}.${buildNumber}.msi</finalName>
+        <finalName>${artifact.name.paxton_plugin}.msi</finalName>
     </properties> 
     <dependencies>
         <dependency>

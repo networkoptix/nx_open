@@ -285,17 +285,20 @@ void AccountManager::reactivateAccount(
     bool requestSourceSecured = false;
     authzInfo.get(attr::secureSource, &requestSourceSecured);
 
+    auto notification = std::make_unique<ActivateAccountNotification>();
+    notification->customization = existingAccount->customization;
+
     using namespace std::placeholders;
     m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
-        [this](
+        [this, notification = std::move(notification)](
             nx::db::QueryContext* const queryContext,
             const std::string& accountEmail,
-            data::AccountConfirmationCode* const resultData)
+            data::AccountConfirmationCode* const resultData) mutable
         {
             return issueAccountActivationCode(
                 queryContext,
                 accountEmail, 
-                std::make_unique<ActivateAccountNotification>(),
+                std::move(notification),
                 resultData);
         },
         std::move(accountEmail.email),
@@ -400,21 +403,9 @@ db::DBResult AccountManager::insertAccount(
     if (account.customization.empty())
         account.customization = QnAppInfo::customizationName().toStdString();
 
-    QSqlQuery insertAccountQuery(*queryContext->connection());
-    insertAccountQuery.prepare(
-        R"sql(
-        INSERT INTO account (id, email, password_ha1, password_ha1_sha256, full_name, customization, status_code)
-        VALUES  (:id, :email, :passwordHa1, :passwordHa1Sha256, :fullName, :customization, :statusCode)
-        )sql");
-    QnSql::bind(account, &insertAccountQuery);
-    if (!insertAccountQuery.exec())
-    {
-        NX_LOG(lm("Could not insert account (%1, %2) into DB. %3")
-            .arg(account.email).arg(QnLexical::serialized(account.statusCode))
-            .arg(insertAccountQuery.lastError().text()),
-            cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
-    }
+    const auto dbResult = m_accountDbController.insert(queryContext, account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, account = std::move(account)]()
@@ -541,12 +532,11 @@ db::DBResult AccountManager::fillCache()
 
     //starting async operation
     using namespace std::placeholders;
-    m_dbManager->executeSelect<int>(
-        std::bind(&AccountManager::fetchAccounts, this, _1, _2),
+    m_dbManager->executeSelect(
+        std::bind(&AccountManager::fetchAccounts, this, _1),
         [&cacheFilledPromise](
             nx::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult,
-            int /*dummyResult*/ )
+            db::DBResult dbResult)
         {
             cacheFilledPromise.set_value( dbResult );
         });
@@ -556,9 +546,7 @@ db::DBResult AccountManager::fillCache()
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( 
-    nx::db::QueryContext* queryContext,
-    int* const /*dummyResult*/ )
+db::DBResult AccountManager::fetchAccounts(nx::db::QueryContext* queryContext)
 {
     QSqlQuery readAccountsQuery(*queryContext->connection());
     readAccountsQuery.setForwardOnly(true);
@@ -645,10 +633,12 @@ nx::db::DBResult AccountManager::registerNewAccountInDb(
         return nx::db::DBResult::ioError;
     }
 
+    auto notification = std::make_unique<ActivateAccountNotification>();
+    notification->customization = accountData.customization;
     return issueAccountActivationCode(
         queryContext,
         accountData.email,
-        std::make_unique<ActivateAccountNotification>(),
+        std::move(notification),
         confirmationCode);
 }
 
@@ -959,7 +949,12 @@ nx::db::DBResult AccountManager::resetPassword(
     const std::string& accountEmail,
     data::AccountConfirmationCode* const confirmationCode)
 {
-    const auto dbResult = createPasswordResetCode(
+    data::AccountData account;
+    nx::db::DBResult dbResult = fetchAccountByEmail(queryContext, accountEmail, &account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    dbResult = createPasswordResetCode(
         queryContext, accountEmail, confirmationCode);
     if (dbResult != nx::db::DBResult::ok)
     {
@@ -967,8 +962,9 @@ nx::db::DBResult AccountManager::resetPassword(
             .arg(accountEmail), cl_logDEBUG1);
         return dbResult;
     }
-
+    
     RestorePasswordNotification notification;
+    notification.customization = account.customization;
     notification.setAddressee(accountEmail);
     notification.setActivationCode(confirmationCode->code);
 

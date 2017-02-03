@@ -9,6 +9,7 @@ Page
     property bool activePage: StackView.status === StackView.Active
     property int pageStatus: StackView.status
     property bool sideNavigationEnabled: true
+    property var screenOrientation: Qt.PrimaryOrientation
 
     background: Rectangle { color: ColorTheme.windowBackground }
 
@@ -16,7 +17,10 @@ Page
     onActivePageChanged:
     {
         if (activePage)
+        {
             updateSideNavigation()
+            setScreenOrientation(screenOrientation)
+        }
     }
 
     Keys.onPressed:
@@ -29,6 +33,8 @@ Page
                 Workflow.popCurrentScreen()
             else if (event.key != Qt.Key_Escape)
                 quitApplication()
+            else
+                return
 
             event.accepted = true
         }

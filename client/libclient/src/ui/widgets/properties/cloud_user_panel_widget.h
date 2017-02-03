@@ -8,29 +8,20 @@ namespace Ui {
 class CloudUserPanelWidget;
 }
 
-/** Widget for displaying filtered set of accessible resources, for user or user group. */
-class QnCloudUserPanelWidget : public QnPanel
+class AbstractAccessor;
+
+/** Widget for displaying cloud user heading. */
+class QnCloudUserPanelWidget: public QnPanel
 {
     Q_OBJECT
+    using base_type = QnPanel;
 
-    typedef QnPanel base_type;
 public:
-    enum Option
-    {
-        NoOptions              = 0,
-        ShowEnableButtonOption = 0x1,
-        ShowManageLinkOption   = 0x2
-    };
-    Q_DECLARE_FLAGS(Options, Option)
-
-    QnCloudUserPanelWidget(QWidget* parent = 0);
+    QnCloudUserPanelWidget(QWidget* parent = nullptr);
     virtual ~QnCloudUserPanelWidget();
 
-    bool enabled() const;
-    void setEnabled(bool value);
-
-    Options options() const;
-    void setOptions(Options value);
+    bool isManageLinkShown() const;
+    void setManageLinkShown(bool value);
 
     QString email() const;
     void setEmail(const QString& value);
@@ -38,8 +29,7 @@ public:
     QString fullName() const;
     void setFullName(const QString& value);
 
-signals:
-    void enabledChanged(bool value);
+    static AbstractAccessor* createIconWidthAccessor();
 
 private:
     QScopedPointer<Ui::CloudUserPanelWidget> ui;

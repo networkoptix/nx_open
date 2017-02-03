@@ -15,9 +15,6 @@
 #include <utils/connection_diagnostics_helper.h>
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
-#include <ui/models/system_hosts_model.h>
-#include <ui/models/filtering_systems_model.h>
-#include <ui/models/recent_local_connections_model.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/nx_style.h>
 #include <ui/dialogs/login_dialog.h>
@@ -28,7 +25,7 @@
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
-
+#include <helpers/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 
@@ -40,10 +37,6 @@ QWidget* createMainView(QObject* context, QQuickView* quickView)
 {
     static const auto kWelcomeScreenSource = lit("qrc:/src/qml/WelcomeScreen.qml");
     static const auto kContextVariableName = lit("context");
-
-    qmlRegisterType<QnSystemHostsModel>("NetworkOptix.Qml", 1, 0, "QnSystemHostsModel");
-    qmlRegisterType<QnRecentLocalConnectionsModel>("NetworkOptix.Qml", 1, 0, "QnRecentLocalConnectionsModel");
-    qmlRegisterType<QnFilteringSystemsModel>("NetworkOptix.Qml", 1, 0, "QnFilteringSystemsModel");
 
     auto holder = new QStackedWidget();
     holder->addWidget(new QWidget());
@@ -145,13 +138,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
             context()->action(QnActions::EscapeHotkeyAction)->setEnabled(!m_visible);
         });
 
-    connect(this, &QnWorkbenchWelcomeScreen::globalPreloaderVisibleChanged, this,
-        [this]()
-        {
-            if (globalPreloaderVisible())
-                setVisibleControls(true);
-        });
-
     setVisible(true);
     setVisibleControls(false);
     connect(qnSettings, &QnClientSettings::valueChanged, this, [this](int valueId)
@@ -177,8 +163,8 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
     if (qnSettings->autoLogin())
         return; // Do nothing in case of auto-login option set
 
-    if (system->isCloudSystem() || !system->isOnline())
-        return; // Do nothing with cloud and offline (recent) systems
+    if (system->isCloudSystem() || !system->isConnectable())
+        return; // Do nothing with cloud and not connectable systems
 
     static const auto wrongServers =
         [](const QnSystemDescriptionPtr& system) -> bool
@@ -206,29 +192,27 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
 
     if (initial)
     {
-        const auto recentConnections = qnClientCoreSettings->recentLocalConnections();
-        const auto itConnection = std::find_if(recentConnections.begin(), recentConnections.end(),
-            [localId = system->localId()](const QnLocalConnectionData& data)
-            {
-                return (localId == data.localId);
-            });
-
         if (wrongServers(system))
             return;
 
-        if ((itConnection != recentConnections.end()) && !itConnection->password.isEmpty())
-        {
-            static const bool kNeverAutologin = false;
-            static const bool kAlwaysStorePassword = true;
+        const auto credentialsList =
+            qnClientCoreSettings->systemAuthenticationData()[system->localId()];
 
-            const auto firstServerId = system->servers().first().id;
-            const auto serverHost = system->getServerHost(firstServerId);
-            connectToLocalSystem(system->id(), serverHost.toString(),
-                itConnection->url.userName(), itConnection->password.value(),
-                kAlwaysStorePassword, kNeverAutologin);
-
+        if (credentialsList.isEmpty() || credentialsList.first().password.isEmpty())
             return;
-        }
+
+        static const bool kNeverAutologin = false;
+        static const bool kAlwaysStorePassword = true;
+
+        const auto credentials = credentialsList.first();
+        const auto firstServerId = system->servers().first().id;
+        const auto serverHost = system->getServerHost(firstServerId);
+
+        connectToLocalSystem(system->id(), serverHost.toString(),
+            credentials.user, credentials.password.value(),
+            kAlwaysStorePassword, kNeverAutologin);
+
+        return;
     }
 
     // Just expand online local tile
@@ -410,6 +394,23 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
         autoLogin);
 }
 
+void QnWorkbenchWelcomeScreen::forgetPassword(
+    const QString& localSystemId,
+    const QString& userName)
+{
+    const auto localId = QnUuid::fromStringSafe(localSystemId);
+    if (localId.isNull())
+        return;
+
+    const auto callback = [localId, userName]()
+        {
+            nx::client::core::helpers::storeCredentials(
+                localId, QnCredentials(userName, QString()));
+        };
+
+    executeDelayedParented(callback, 0, this);
+}
+
 void QnWorkbenchWelcomeScreen::forceActiveFocus()
 {
     m_quickView->requestActivate();
@@ -435,7 +436,7 @@ void QnWorkbenchWelcomeScreen::connectToSystemInternal(
 
             QUrl url = serverUrl;
             if (!credentials.password.isEmpty())
-                url.setPassword(credentials.password);
+                url.setPassword(credentials.password.value());
             if (!credentials.user.isEmpty())
                 url.setUserName(credentials.user);
 
@@ -469,7 +470,7 @@ void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
 void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
 {
     setVisibleControls(false);
-    const auto controlsGuard = QnRaiiGuard::createDestructable(
+    const auto controlsGuard = QnRaiiGuard::createDestructible(
         [this]() { setVisibleControls(true); });
 
     const auto showDialogHandler = [this, serverUrl, controlsGuard]()
@@ -484,22 +485,25 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             if (dialog->exec() != QDialog::Accepted)
                 return;
 
+            bool autoLogin = false;
             if (dialog->localCredentials().isValid())
             {
                 connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
-                    false, false, controlsGuard);
+                    dialog->savePassword(), autoLogin, controlsGuard);
             }
             else if (dialog->cloudCredentials().isValid())
             {
                 const auto cloudCredentials = dialog->cloudCredentials();
 
-                // We suppose that connection to cloud from new systems is always permanent
-                qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
-                qnClientCoreSettings->setCloudPassword(cloudCredentials.password);
+                if (dialog->savePassword())
+                {
+                    qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
+                    qnClientCoreSettings->setCloudPassword(cloudCredentials.password.value());
+                }
 
                 qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
                 connectToSystemInternal(QString(), serverUrl, cloudCredentials,
-                    false, false, controlsGuard);
+                    dialog->savePassword(), autoLogin, controlsGuard);
             }
 
         };
@@ -530,6 +534,11 @@ void QnWorkbenchWelcomeScreen::createAccount()
 }
 
 //
+
+QColor QnWorkbenchWelcomeScreen::getContrastColor(const QString& group)
+{
+    return m_palette.colors(group).contrastColor();
+}
 
 QColor QnWorkbenchWelcomeScreen::getPaletteColor(const QString& group, int index)
 {

@@ -46,7 +46,7 @@ protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 
     QSet<QnUuid> selectedResourcesInternal(const QModelIndex& parent = QModelIndex()) const;
-    int setSelectedResourcesInternal(const QSet<QnUuid>& selected,
+    void setSelectedResourcesInternal(const QSet<QnUuid>& selected,
         const QModelIndex& parent = QModelIndex());
 
 private:

@@ -29,6 +29,7 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 
 #include <ui/workbench/workbench_context.h>
@@ -37,6 +38,8 @@
 #include <ui/workaround/hidpi_workarounds.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
+
+#include <nx/utils/log/log.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -133,7 +136,6 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
     ui->eventRulesButton->setIcon(qnSkin->icon("buttons/event_rules.png"));
-    ui->loadingProgressBar->hide();
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->gridEvents->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -156,6 +158,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnEventLogDialog::at_eventsGrid_clicked);
     connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnEventLogDialog::at_eventsGrid_customContextMenuRequested);
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
+
+    QnItemViewAutoHider::create(ui->gridEvents, tr("No events"));
 
     reset();
 }
@@ -241,13 +245,13 @@ void QnEventLogDialog::updateData()
     // update UI
 
     m_resetFilterAction->setEnabled(isFilterExist());
-    if (!m_requests.isEmpty()) {
-        ui->gridEvents->setDisabled(true);
-        ui->stackedWidget->setCurrentWidget(ui->gridPage);
+    if (!m_requests.isEmpty())
+    {
+        ui->stackedWidget->setCurrentWidget(ui->progressPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
     }
-    else {
+    else
+    {
         requestFinished(); // just clear grid
         ui->stackedWidget->setCurrentWidget(ui->warnPage);
     }
@@ -319,6 +323,8 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
 
     if (httpStatus == 0 && events && !events->empty())
         m_allEvents << events;
+    else if (httpStatus != 0)
+        NX_LOG(lit("Error %1 while requesting even log").arg(httpStatus), cl_logDEBUG1);
 
     if (m_requests.isEmpty())
         requestFinished();
@@ -328,20 +334,24 @@ void QnEventLogDialog::requestFinished()
 {
     m_model->setEvents(m_allEvents);
     m_allEvents.clear();
-    ui->gridEvents->setDisabled(false);
     setCursor(Qt::ArrowCursor);
+
     auto start = ui->dateRangeWidget->startDate();
     auto end = ui->dateRangeWidget->endDate();
-
     if (start != end)
+    {
         ui->statusLabel->setText(tr("Event log for period from %1 to %2 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::DefaultLocaleLongDate))
-        .arg(end.toString(Qt::DefaultLocaleLongDate)));
+            .arg(start.toString(Qt::DefaultLocaleLongDate))
+            .arg(end.toString(Qt::DefaultLocaleLongDate)));
+    }
     else
+    {
         ui->statusLabel->setText(tr("Event log for %1 - %n event(s) found", "", m_model->rowCount())
-        .arg(start.toString(Qt::DefaultLocaleLongDate)));
-    ui->loadingProgressBar->hide();
+            .arg(start.toString(Qt::DefaultLocaleLongDate)));
+    }
+
     ui->gridEvents->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    ui->stackedWidget->setCurrentWidget(ui->gridPage);
 }
 
 void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
@@ -349,7 +359,12 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     if (m_lastMouseButton != Qt::LeftButton)
         return;
 
-    QnResourceList resources = m_model->resourcesForPlayback(idx);
+    QnResourceList resources = m_model->resourcesForPlayback(idx).filtered(
+        [this](const QnResourcePtr& resource)
+        {
+            return accessController()->hasPermissions(resource, Qn::ReadPermission);
+        });
+
     if (!resources.isEmpty())
     {
         qint64 pos = m_model->eventTimestamp(idx.row())/1000;

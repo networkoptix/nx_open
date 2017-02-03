@@ -57,7 +57,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, systemId)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accountEmail)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, accessRole)
-MAKE_FIELD_NAME_STR_CONST(SystemSharing, groupId)
+MAKE_FIELD_NAME_STR_CONST(SystemSharing, userRoleId)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, customPermissions)
 MAKE_FIELD_NAME_STR_CONST(SystemSharing, isEnabled)
 
@@ -77,8 +77,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
         urlQuery.queryItemValue(SystemSharing_accessRole_field),
         api::SystemAccessRole::none,
         &success);
-    systemSharing->groupId =
-        urlQuery.queryItemValue(SystemSharing_groupId_field).toStdString();
+    systemSharing->userRoleId =
+        urlQuery.queryItemValue(SystemSharing_userRoleId_field).toStdString();
     systemSharing->customPermissions =
         urlQuery.queryItemValue(SystemSharing_customPermissions_field).toStdString();
     if (urlQuery.hasQueryItem(SystemSharing_isEnabled_field))
@@ -99,8 +99,8 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
         SystemSharing_accessRole_field,
         QnLexical::serialized(data.accessRole));
     urlQuery->addQueryItem(
-        SystemSharing_groupId_field,
-        QString::fromStdString(data.groupId));
+        SystemSharing_userRoleId_field,
+        QString::fromStdString(data.userRoleId));
     urlQuery->addQueryItem(
         SystemSharing_customPermissions_field,
         QString::fromStdString(data.customPermissions));
@@ -147,6 +147,33 @@ void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery)
     urlQuery->addQueryItem(
         SystemId_systemId_field,
         QString::fromStdString(data.systemId));
+}
+
+
+////////////////////////////////////////////////////////////
+//// class Filter
+////////////////////////////////////////////////////////////
+
+void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery)
+{
+    for (const auto& param: data.nameToValue)
+    {
+        urlQuery->addQueryItem(
+            QnLexical::serialized(param.first),
+            QString::fromStdString(param.second));
+    }
+}
+
+void serialize(QnJsonContext* /*ctx*/, const Filter& filter, QJsonValue* target)
+{
+    QJsonObject localTarget = target->toObject();
+    for (const auto& param: filter.nameToValue)
+    {
+        localTarget.insert(
+            QnLexical::serialized(param.first),
+            QString::fromStdString(param.second));
+    }
+    *target = localTarget;
 }
 
 
@@ -300,4 +327,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, SystemAccessRole,
     (nx::cdb::api::SystemAccessRole::cloudAdmin, "cloudAdmin")
     (nx::cdb::api::SystemAccessRole::maintenance, "maintenance")
     (nx::cdb::api::SystemAccessRole::owner, "owner")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cdb::api, FilterField,
+    (nx::cdb::api::FilterField::customization, "customization")
 )

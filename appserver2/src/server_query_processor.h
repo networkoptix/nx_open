@@ -22,12 +22,80 @@ namespace ec2 {
 
 namespace detail {
 
+namespace aux {
+template<typename Handler>
+struct ScopeHandlerGuard
+{
+    const ErrorCode *ecode;
+    Handler handler;
+
+    ScopeHandlerGuard(const ErrorCode *ecode, Handler handler):
+        ecode(ecode),
+        handler(std::move(handler))
+    {}
+
+    ScopeHandlerGuard(const ScopeHandlerGuard<Handler>&) = delete;
+    ScopeHandlerGuard<Handler>& operator=(const ScopeHandlerGuard<Handler>&) = delete;
+
+    ScopeHandlerGuard(ScopeHandlerGuard<Handler>&&) = default;
+    ScopeHandlerGuard<Handler>& operator=(ScopeHandlerGuard<Handler>&&) = default;
+
+    ~ScopeHandlerGuard()
+    {
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
+    }
+};
+
+template<typename Handler>
+ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler handler)
+{
+    return ScopeHandlerGuard<Handler>(&errorCode, handler);
+}
+
+struct AuditData
+{
+    ECConnectionAuditManager* auditManager;
+    QnAuthSession authSession;
+    Qn::UserAccessData userAccessData;
+
+    AuditData(
+        ECConnectionAuditManager* auditManager,
+        const QnAuthSession& authSession,
+        const Qn::UserAccessData& userAccessData)
+        :
+        auditManager(auditManager),
+        authSession(authSession),
+        userAccessData(userAccessData)
+    {}
+};
+
+template<class DataType>
+void triggerNotification(
+    const AuditData& auditData,
+    const QnTransaction<DataType>& tran)
+{
+    // Add audit record before notification to ensure removed resource is still alive.
+    if (auditData.auditManager &&
+        auditData.userAccessData != Qn::kSystemAccess) //< don't add to audit log if it's server side update
+    {
+        auditData.auditManager->addAuditRecord(
+            tran.command,
+            tran.params,
+            auditData.authSession);
+    }
+
+    QnAppServerConnectionFactory::getConnection2()
+        ->notificationManager()
+        ->triggerNotification(tran, NotificationSource::Local);
+}
+}
+
 class ServerQueryProcessor;
 
 struct PostProcessTransactionFunction
 {
     template<class T>
-    void operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const;
+    void operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const;
 };
 
 class ServerQueryProcessor
@@ -254,24 +322,15 @@ public:
 
     void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
 
-    template<class DataType>
-    void triggerNotification(
-        const AbstractECConnectionPtr& connection,
-        const QnTransaction<DataType>& tran)
-    {
-        // Add audit record before notification to ensure removed resource is still alive.
-        if (m_auditManager)
-        {
-            m_auditManager->addAuditRecord(
-                tran.command,
-                tran.params,
-                m_authSession);
-        }
+private:
+    static PostProcessList& getStaticPostProcessList();
+    static QnMutex& getStaticUpdateMutex();
 
-        connection->notificationManager()->triggerNotification(tran);
+    aux::AuditData createAuditDataCopy()
+    {
+        return aux::AuditData(m_auditManager, m_authSession, m_userAccessData);
     }
 
-private:
     /**
      * @param syncFunction ErrorCode(QnTransaction<QueryDataType>&,
      *     PostProcessList*)
@@ -283,19 +342,12 @@ private:
         SyncFunctionType syncFunction)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto SCOPED_GUARD_FUNC =
-            [&errorCode, &completionHandler](ServerQueryProcessor*)
-            {
-                QnConcurrent::run(
-                    Ec2ThreadPool::instance(), std::bind(completionHandler, errorCode));
-            };
-        std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD(
-            this, SCOPED_GUARD_FUNC);
+        auto scopeGuard = aux::createScopeHandlerGuard(errorCode, completionHandler);
 
-        static PostProcessList transactionsPostProcessList;
+        PostProcessList& transactionsPostProcessList = getStaticPostProcessList();
+        QnMutex& updateDataMutex = getStaticUpdateMutex();
         // Starting transaction.
         {
-            static QnMutex updateDataMutex;
             QnMutexLocker lock(&updateDataMutex);
             std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             PostProcessList localPostProcessList;
@@ -315,7 +367,12 @@ private:
             }
             else
             {
-                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), this, tran));
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+                {
+                    errorCode = ErrorCode::forbidden;
+                    return;
+                }
+                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
             }
 
             std::function<void()> postProcessAction;
@@ -447,9 +504,14 @@ private:
             case ApiObject_Storage:
             {
                 RUN_AND_CHECK_ERROR(
+                    removeObjParamsHelper(tran, connection, transactionsPostProcessList),
+                    lit("Remove storage params failed"));
+
+                RUN_AND_CHECK_ERROR(
                     removeResourceStatusHelper(
                         tran.params.id,
-                        transactionsPostProcessList),
+                        transactionsPostProcessList,
+                        tran.transactionType),
                     lit("Remove resource status failed"));
 
                 break;
@@ -547,7 +609,7 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), this, tran));
+        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
 
         return errorCode;
     }
@@ -564,6 +626,10 @@ private:
                 return removeResourceSync(tran, ApiObject_User, transactionsPostProcessList);
             case ApiCommand::removeCamera:
                 return removeResourceSync(tran, ApiObject_Camera, transactionsPostProcessList);
+            case ApiCommand::removeStorage:
+                return removeResourceSync(tran, ApiObject_Storage, transactionsPostProcessList);
+            case ApiCommand::removeVideowall:
+                return removeResourceSync(tran, ApiObject_Videowall, transactionsPostProcessList);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
@@ -660,23 +726,10 @@ private:
 };
 
 template<class T>
-void PostProcessTransactionFunction::operator()(ServerQueryProcessor* processor, const QnTransaction<T>& tran) const
+void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const
 {
-    // Local transactions (such as setStatus for servers) should only be sent to clients.
-    if (tran.isLocal())
-    {
-        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
-        // Important check. Empty target means "send to all peers".
-        if (!clients.isEmpty())
-            qnTransactionBus->sendTransaction(tran, clients);
-    }
-    else
-    {
-        // Send transaction to all peers.
-        qnTransactionBus->sendTransaction(tran);
-    }
-
-    processor->triggerNotification(QnAppServerConnectionFactory::getConnection2(), tran);
+    qnTransactionBus->sendTransaction(tran);
+    aux::triggerNotification(auditData, tran);
 }
 
 } // namespace detail

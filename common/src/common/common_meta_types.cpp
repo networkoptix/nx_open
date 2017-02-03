@@ -95,6 +95,7 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -284,6 +285,8 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::ConnectionResult>();
 
+    qRegisterMetaType<ec2::Timestamp>("Timestamp");
+
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
@@ -314,7 +317,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiFullInfoData>("ec2::ApiFullInfoData");
     qRegisterMetaType<ec2::ApiUserData>("ec2::ApiUserData");
-    qRegisterMetaType<ec2::ApiUserGroupData>("ec2::ApiUserGroupData");
+    qRegisterMetaType<ec2::ApiUserRoleData>("ec2::ApiUserRoleData");
     qRegisterMetaType<ec2::ApiPredefinedRoleData>("ec2::ApiPredefinedRoleData");
     qRegisterMetaType<ec2::ApiAccessRightsData>("ec2::ApiAccessRightsData");
     qRegisterMetaType<ec2::ApiLayoutData>("ec2::ApiLayoutData");
@@ -348,6 +351,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
     qRegisterMetaType<QnServerFields>();
+
+    qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

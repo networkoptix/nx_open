@@ -101,8 +101,14 @@ Column
             onCheckedChanged:
             {
                 if (!checked)
+                {
+                    passwordTextItem.text = "";
                     autoLoginCheckBoxItem.checked = false;
+                }
             }
+
+            KeyNavigation.tab: autoLoginCheckBoxItem;
+            KeyNavigation.backtab: passwordTextField;
         }
 
         NxCheckBox
@@ -115,17 +121,22 @@ Column
             text: qsTr("Auto-login");
 
             onAccepted: control.connectButtonClicked();
+
+            KeyNavigation.tab: connectButton;
+            KeyNavigation.backtab: savePasswordCheckBoxControl;
         }
     }
 
     NxButton
     {
+        id: connectButton;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
         isAccentButton: true;
 
         KeyNavigation.tab: control.nextTabObject;
+        KeyNavigation.backtab: autoLoginCheckBoxItem;
 
         onClicked: { control.connectButtonClicked(); }
 

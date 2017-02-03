@@ -142,6 +142,34 @@
     </message>
 </context>
 <context>
+    <name>ApplauncherControlDialog</name>
+    <message>
+        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">Ajouter stockage externe...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Version:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check</source>
+        <translation type="unfinished">Vérifier</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Not Checked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Installed Versions</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
@@ -210,11 +238,6 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>Tous les serveurs sont hors ligne, Données de vérification non disponibles.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Filter</source>
         <translation type="unfinished">Effacer le filtre</translation>
     </message>
@@ -222,6 +245,11 @@
         <location/>
         <source>Email settings</source>
         <translation type="unfinished">Paramètres Courriel</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -238,16 +266,6 @@
     </message>
     <message>
         <location/>
-        <source>Finish:</source>
-        <translation>Fin:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start:</source>
-        <translation>Début:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Limit Bandwidth to:</source>
         <translation>Limite de débit:</translation>
     </message>
@@ -259,6 +277,16 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -446,22 +474,12 @@
     </message>
     <message>
         <location/>
-        <source>Advanced...</source>
-        <translation>Avancée ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Event log</source>
-        <translation>Journal d&apos;événement</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Event Log...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -600,11 +618,6 @@
     </message>
     <message>
         <location/>
-        <source>This camera has no advanced settings</source>
-        <translation>Cette caméra n&apos;a pas de paramètres avancés</translation>
-    </message>
-    <message>
-        <location/>
         <source>Advanced settings are unavailable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -738,6 +751,14 @@
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
         <translation>ID d&apos;entrée:</translation>
+    </message>
+</context>
+<context>
+    <name>CameraListDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -896,14 +917,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>CloudUserPanelWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/properties/cloud_user_panel_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1020,7 +1033,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Event Rules</source>
+        <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1155,16 +1168,6 @@ to the cloud&gt;</source>
     <name>GeneralPreferencesWidget</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
-        <source>Main Media Folder</source>
-        <translation>Dossier Média Principal</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Extra Media Folders</source>
-        <translation>Dossiers média supplémentaires</translation>
-    </message>
-    <message>
-        <location/>
         <source>Misc</source>
         <translation>Divers</translation>
     </message>
@@ -1185,11 +1188,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Browse...</source>
-        <translation type="unfinished">Parcourir...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add...</source>
         <translation type="unfinished">&amp;Ajouter...</translation>
     </message>
@@ -1200,8 +1198,33 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots</source>
-        <translation type="unfinished">Ouvrir l&apos;application quand le PC démarre:</translation>
+        <source>Local Media Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>First Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished">Aucun</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Second Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run application when PC Boots</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1340,16 +1363,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Search Base:</source>
-        <translation>Base Recherche:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Filter:</source>
-        <translation>Filtre Recherche:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Optional</source>
         <translation>Facultatif</translation>
     </message>
@@ -1365,18 +1378,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Server URL:</source>
-        <translation type="unfinished">Serveur URL:</translation>
+        <source>Server URL</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Admin DN:</source>
-        <translation type="unfinished">Ad&amp;min DN:</translation>
+        <source>Admin DN</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation type="unfinished">Mot de passe:</translation>
+        <source>Password</source>
+        <translation type="unfinished">Mot de passe</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Base</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Filter</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1632,11 +1655,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Restart required.</source>
-        <translation>Redémarrage nécessaire.</translation>
-    </message>
-    <message>
-        <location/>
         <source> seconds</source>
         <translation>Secondes</translation>
     </message>
@@ -1672,16 +1690,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Show extra info in tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time</source>
-        <translation type="unfinished">Durée de cycle du Tour de séquence:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Image</source>
         <translation type="unfinished">Image:</translation>
     </message>
@@ -1694,6 +1702,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Intensity</source>
         <translation type="unfinished">Intensité:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show additional info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1926,6 +1944,11 @@ to the cloud&gt;</source>
         <source>Form</source>
         <translation>Formulaire</translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
@@ -2084,12 +2107,12 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Update System</source>
+        <source>Link copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Link copied</source>
+        <source>You have the latest version installed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2258,11 +2281,6 @@ to the cloud&gt;</source>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
-        <source>Video Recording</source>
-        <translation>Enregistrement Vidéo</translation>
-    </message>
-    <message>
-        <location/>
         <source>Capture Mode</source>
         <translation>Mode de capture</translation>
     </message>
@@ -2288,55 +2306,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Native</source>
-        <translation>Native</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1920x1080</source>
-        <translation>1920x1080</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1280x720</source>
-        <translation>1280x720</translation>
-    </message>
-    <message>
-        <location/>
-        <source>640x480</source>
-        <translation>640x480</translation>
-    </message>
-    <message>
-        <location/>
-        <source>320x240</source>
-        <translation>320x240</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Best</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>Meilleur</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Performance</source>
-        <translation>Performance</translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>Aucun</translation>
-    </message>
-    <message>
-        <location/>
         <source>Capture Cursor</source>
         <translation>Curseur de capture</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Average</source>
-        <translation>Moyenne</translation>
     </message>
     <message>
         <location/>
@@ -2347,16 +2318,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Additional Options</source>
         <translation>Options additionnelles</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quarter Native</source>
-        <translation>Quart natif</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio Grabber</source>
-        <translation>Capture Audio</translation>
     </message>
     <message>
         <location/>
@@ -2377,16 +2338,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Recording Quality</source>
         <translation type="unfinished">Qualité d&apos;enregistrement:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Device</source>
-        <translation type="unfinished">Périphérique primaire:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device</source>
-        <translation type="unfinished">Périphérique externe:</translation>
     </message>
 </context>
 <context>
@@ -2816,8 +2767,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished">Serveurs Hors Ligne. Statistiques non disponible.</translation>
+        <source>Server is offline. Statistics are not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2844,12 +2795,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop. It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished">Décocher le stockage fera rien d&apos;autre que l&apos;arrêt de l&apos;écriture.
-Il ne sera pas refuser de supprimer les séquences du disque.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Reindex Archive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2866,6 +2811,11 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     <message>
         <location/>
         <source>Backup Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2991,17 +2941,17 @@ Click &quot;New role&quot; button to create one.</source>
     <name>UserSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>User Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

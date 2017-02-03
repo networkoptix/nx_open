@@ -39,42 +39,59 @@ MaskedComboBox
 
     areaDelegate: Item
     {
-        width: row.width;
-        height: row.height;
 
-        Row
+        height: Math.max(imageItem.height, textItem.height, pencilImage.height);
+        Image
         {
-            id: row;
-            spacing: 4;
+            id: imageItem;
 
-            Image
+            anchors.left: parent.left;
+            anchors.verticalCenter: parent.verticalCenter;
+
+            width: 16;
+            height: 16;
+            source: (!enabled ? disabledIconUrl
+                : (hoverArea.containsMouse ? hoveredIconUrl : iconUrl));
+        }
+
+        NxLabel
+        {
+            id: textItem;
+
+            anchors.left: imageItem.right;
+            anchors.right: (control.isAvailable ? pencilImageHolder.left : parent.right);
+            leftPadding: 4;
+            rightPadding: 4;
+            anchors.verticalCenter: parent.verticalCenter;
+
+            disableable: control.isAvailable;
+            isHovered: hoverArea.containsMouse;
+            font: Style.fonts.systemTile.info;
+            standardColor: control.standardLabelColor;
+            hoveredColor: control.hoveredLabelColor;
+            disabledColor: control.disabledLabelColor;
+            elide: Text.ElideRight;
+
+            Binding
             {
-                id: imageItem;
-
-                width: 16;
-                height: 16;
-                source: (!enabled ? disabledIconUrl
-                    : (hoverArea.containsMouse ? hoveredIconUrl : iconUrl));
+                target: textItem;
+                property: "text";
+                value: control.displayValue;
             }
+        }
 
-            NxLabel
-            {
-                id: textItem;
+        Item
+        {
+            id: pencilImageHolder;
 
-                disableable: control.isAvailable;
-                isHovered: hoverArea.containsMouse;
-                font: Style.fonts.systemTile.info;
-                standardColor: control.standardLabelColor;
-                hoveredColor: control.hoveredLabelColor;
-                disabledColor: control.disabledLabelColor;
-
-                Binding
-                {
-                    target: textItem;
-                    property: "text";
-                    value: control.displayValue;
-                }
-            }
+            property real xPosition: (imageItem.x + imageItem.width + textItem.contentWidth
+                + textItem.leftPadding + textItem.rightPadding);
+            x: ((xPosition + width) > parent.width
+                ? parent.width - pencilImage.width
+                : xPosition + textItem.rightPadding);
+            anchors.verticalCenter: parent.verticalCenter;
+            width: pencilImage.width;
+            height: pencilImage.height;
 
             Image
             {
@@ -84,7 +101,6 @@ MaskedComboBox
                 source: hoverExtraIconUrl;
             }
         }
-
         MouseArea
         {
             id: hoverArea;

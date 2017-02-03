@@ -4,6 +4,7 @@
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
@@ -55,8 +56,8 @@ protected:
         std::this_thread::sleep_for(kTunnelInactivityTimeout);
 
         network::test::socketSimpleSync(
-            [&](){ return std::move(serverSocket); },
-            [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
+            [&]() { return std::move(serverSocket); },
+            []() { return std::make_unique<CloudStreamSocket>(AF_INET); },
             SocketAddress(hostName));
     }
 
@@ -89,14 +90,6 @@ TEST_F(TcpReverseConnectTest, SimpleSyncClientSystem)
     simpleTest(std::move(serverSocket), m_system.id);
 }
 
-TEST_F(TcpReverseConnectTest, SimpleAsyncClientSystem)
-{
-    // Client binds 1st, meditor resieves indication on listen.
-    enableReveseConnectionsOnClient();
-    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
-    simpleTest(std::move(serverSocket), m_system.id);
-}
-
 TEST_F(TcpReverseConnectTest, SimpleMultiserver)
 {
     // Test with 1 server.
@@ -119,6 +112,20 @@ TEST_F(TcpReverseConnectTest, SimpleMultiserver)
 
     // Ensure new tunnel to open and function normaly.
     simpleTest(std::move(serverSocket2), m_system.id);
+}
+
+TEST_F(TcpReverseConnectTest, SimpleSyncSsl)
+{
+    enableReveseConnectionsOnClient();
+    std::unique_ptr<AbstractStreamServerSocket> serverSocket = cloudServerSocket(m_server);
+
+    // Wait some time to let reverse connections to be estabilished.
+    std::this_thread::sleep_for(kTunnelInactivityTimeout);
+
+    network::test::socketSimpleSync(
+        [&]() { return std::make_unique<SslServerSocket>(serverSocket.release(), false); },
+        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        SocketAddress(m_server->fullName()));
 }
 
 TEST_F(TcpReverseConnectTest, Load)

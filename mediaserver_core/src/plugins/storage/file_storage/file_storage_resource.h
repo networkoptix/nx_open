@@ -53,15 +53,15 @@ public:
 
     virtual QString getPath() const override;
 
-    qint64 getTotalSpaceWithoutInit();
+    qint64 calculateAndSetTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
-private:
     qint64 calcInitialSpaceLimit();
+private:
 
     QString removeProtocolPrefix(const QString& url);
     Qn::StorageInitResult initOrUpdateInternal();

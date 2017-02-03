@@ -8,28 +8,28 @@ namespace ec2
     QnUserNotificationManager::QnUserNotificationManager()
     {}
 
-    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran)
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserData>& tran, NotificationSource source)
     {
         NX_ASSERT(tran.command == ApiCommand::saveUser);
-        emit addedOrUpdated(tran.params, tran.peerID);
+        emit addedOrUpdated(tran.params, source);
     }
 
-    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserGroupData>& tran)
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiUserRoleData>& tran, NotificationSource /*source*/)
     {
-        NX_ASSERT(tran.command == ApiCommand::saveUserGroup);
-        emit groupAddedOrUpdated(tran.params);
+        NX_ASSERT(tran.command == ApiCommand::saveUserRole);
+        emit userRoleAddedOrUpdated(tran.params);
     }
 
-    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran)
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
     {
-        NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserGroup);
+        NX_ASSERT(tran.command == ApiCommand::removeUser || tran.command == ApiCommand::removeUserRole);
         if (tran.command == ApiCommand::removeUser)
             emit removed(tran.params.id);
-        else if (tran.command == ApiCommand::removeUserGroup)
-            emit groupRemoved(tran.params.id);
+        else if (tran.command == ApiCommand::removeUserRole)
+            emit userRoleRemoved(tran.params.id);
     }
 
-    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran)
+    void QnUserNotificationManager::triggerNotification(const QnTransaction<ApiAccessRightsData>& tran, NotificationSource /*source*/)
     {
         NX_ASSERT(tran.command == ApiCommand::setAccessRights);
         emit accessRightsChanged(tran.params);
@@ -125,24 +125,25 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int ec2::QnUserManager<QueryProcessorType>::getUserGroups(impl::GetUserGroupsHandlerPtr handler)
+    int ec2::QnUserManager<QueryProcessorType>::getUserRoles(impl::GetUserRolesHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiUserGroupDataList& result)
+        auto queryDoneHandler = [reqID, handler](ErrorCode errorCode, const ApiUserRoleDataList& result)
         {
             handler->done(reqID, errorCode, result);
         };
-        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiUserGroupDataList, decltype(queryDoneHandler)>
-            (ApiCommand::getUserGroups, QnUuid(), queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiUserRoleDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getUserRoles, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
     template<class QueryProcessorType>
-    int ec2::QnUserManager<QueryProcessorType>::saveUserGroup(const ec2::ApiUserGroupData& group, impl::SimpleHandlerPtr handler)
+    int ec2::QnUserManager<QueryProcessorType>::saveUserRole(
+        const ec2::ApiUserRoleData& userRole, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::saveUserGroup, group,
+            ApiCommand::saveUserRole, userRole,
             [handler, reqID](ec2::ErrorCode errorCode)
             {
                 handler->done(reqID, errorCode);
@@ -151,11 +152,11 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
-    int ec2::QnUserManager<QueryProcessorType>::removeUserGroup(const QnUuid& id, impl::SimpleHandlerPtr handler)
+    int ec2::QnUserManager<QueryProcessorType>::removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
-            ApiCommand::removeUserGroup, ApiIdData(id),
+            ApiCommand::removeUserRole, ApiIdData(id),
             [handler, reqID](ec2::ErrorCode errorCode)
             {
                 handler->done(reqID, errorCode);

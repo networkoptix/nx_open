@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/aio/abstract_pollable.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/pollable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/move_only_func.h>
@@ -24,7 +24,7 @@ static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
  * @code {*.cpp}
  *     //Received data from remote host. Empty buffer signals end-of-file.
  *     void bytesReceived( const nx::Buffer& buf );
- *     //Submitted data has been sent, \a m_writeBuffer has some free space.
+ *     //Submitted data has been sent, m_writeBuffer has some free space.
  *     void readyToSendData();
  * @endcode
  *
@@ -49,8 +49,10 @@ static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
 template<
     class CustomConnectionType
 > class BaseServerConnection:
-    public nx::network::aio::AbstractPollable
+    public nx::network::aio::BasicPollable
 {
+    typedef nx::network::aio::BasicPollable BaseType;
+
 public:
     typedef BaseServerConnection<CustomConnectionType> SelfType;
 
@@ -60,13 +62,15 @@ public:
      */
     BaseServerConnection(
         StreamConnectionHolder<CustomConnectionType>* connectionManager,
-        std::unique_ptr<AbstractCommunicatingSocket> streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         m_connectionManager(connectionManager),
         m_streamSocket(std::move(streamSocket)),
         m_bytesToSend(0),
         m_isSendingData(false)
     {
+        bindToAioThread(m_streamSocket->getAioThread());
+
         m_readBuffer.reserve(READ_BUFFER_CAPACITY);
     }
 
@@ -75,34 +79,11 @@ public:
         stopWhileInAioThread();
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
-    {
-        m_streamSocket->pleaseStop(
-            [this, handler = std::move(handler)]
-            {
-                stopWhileInAioThread();
-                handler();
-            });
-    }
-
-    virtual nx::network::aio::AbstractAioThread* getAioThread() const override
-    {
-        return m_streamSocket->getAioThread();
-    }
-
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
+        BaseType::bindToAioThread(aioThread);
+
         m_streamSocket->bindToAioThread(aioThread);
-    }
-
-    virtual void post(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_streamSocket->post(std::move(func));
-    }
-
-    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override
-    {
-        m_streamSocket->dispatch(std::move(func));
     }
 
     /**
@@ -175,7 +156,7 @@ public:
         return false;
     }
 
-    const std::unique_ptr<AbstractCommunicatingSocket>& socket() const
+    const std::unique_ptr<AbstractStreamSocket>& socket() const
     {
         return m_streamSocket;
     }
@@ -184,7 +165,7 @@ public:
      * Moves socket to the caller.
      * BaseServerConnection instance MUST be deleted just after this call.
      */
-    std::unique_ptr<AbstractCommunicatingSocket> takeSocket()
+    std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
         auto socket = std::move(m_streamSocket);
         socket->cancelIOSync(nx::network::aio::etNone);
@@ -219,7 +200,7 @@ protected:
 
 private:
     StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
-    std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
+    std::unique_ptr<AbstractStreamSocket> m_streamSocket;
     nx::Buffer m_readBuffer;
     size_t m_bytesToSend;
     std::forward_list<nx::utils::MoveOnlyFunc<void()>> m_connectionClosedHandlers;
@@ -227,6 +208,12 @@ private:
 
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_streamSocket.reset();
+        triggerConnectionClosedEvent();
+    }
 
     void onBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead)
     {
@@ -290,15 +277,10 @@ private:
 
     void triggerConnectionClosedEvent()
     {
-        auto connectionClosedHandlers = std::move(m_connectionClosedHandlers);
-        m_connectionClosedHandlers.clear();
+        decltype(m_connectionClosedHandlers) connectionClosedHandlers;
+        connectionClosedHandlers.swap(m_connectionClosedHandlers);
         for (auto& connectionCloseHandler: connectionClosedHandlers)
             connectionCloseHandler();
-    }
-
-    void stopWhileInAioThread()
-    {
-        triggerConnectionClosedEvent();
     }
 
     void resetInactivityTimer()

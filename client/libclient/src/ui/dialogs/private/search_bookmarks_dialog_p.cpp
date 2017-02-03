@@ -21,6 +21,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/style/skin.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -118,8 +119,10 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnSearchBookmarksDialogPrivate::reset);
 
+    m_ui->filterLineEdit->lineEdit()->setPlaceholderText(
+        tr("Search"));
 
-    m_ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Search bookmarks by name, tag or description"));
+    QnItemViewAutoHider::create(m_ui->gridBookmarks, tr("No bookmarks"));
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()

@@ -20,14 +20,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${artifact.name.server}.tar.gz
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 BUILD_DIR="`mktemp -d`"
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -155,7 +149,7 @@ if [ ! -f $PACKAGE_NAME ]; then
   echo "Distribution is not created! Exiting"
   exit 1
 fi
-zip ./$UPDATE_NAME.zip ./*
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip

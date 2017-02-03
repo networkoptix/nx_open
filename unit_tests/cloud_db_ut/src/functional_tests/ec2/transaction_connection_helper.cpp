@@ -57,7 +57,7 @@ TransactionConnectionHelper::ConnectionId
     m_connections.emplace(
         connectionId,
         std::move(connectionContext));
-    const QUrl url(lit("http://%1/ec2/events").arg(appserver2Endpoint.toString()));
+    const QUrl url(lit("http://%1/cdb/ec2/events").arg(appserver2Endpoint.toString()));
     transactionConnectionPtr->doOutgoingConnect(url);
 
     return connectionId;
@@ -68,6 +68,9 @@ bool TransactionConnectionHelper::waitForState(
     ConnectionId connectionId,
     std::chrono::milliseconds durationToWait)
 {
+    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming 
+    //    transition in onTransactionConnectionStateChanged.
+
     using namespace std::chrono;
 
     QnMutexLocker lk(&m_mutex);

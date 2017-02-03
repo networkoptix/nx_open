@@ -3,13 +3,14 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 
+#include "settings.h"
+
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 namespace conf {
 
-class Settings;
 class RunTimeOptions;
 
 } // namespace conf
@@ -46,9 +47,9 @@ private:
 
     struct TargetWithOptions
     {
-        nx_http::StatusCode::Value status;
+        nx_http::StatusCode::Value status = nx_http::StatusCode::notImplemented;
         SocketAddress target;
-        bool isSsl;
+        conf::SslMode sslMode = conf::SslMode::followIncomingConnection;
 
         TargetWithOptions(nx_http::StatusCode::Value status_, SocketAddress target_ = {});
     };
@@ -60,7 +61,7 @@ private:
     TargetWithOptions cutTargetFromUrl(nx_http::Request* const request);
     TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
 
-    void onConnected(SystemError::ErrorCode errorCode);
+    void onConnected(const SocketAddress& targetAddress, SystemError::ErrorCode errorCode);
     void onMessageFromTargetHost(nx_http::Message message);
 };
 

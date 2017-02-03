@@ -9,9 +9,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/fisheye/fisheye_calibration_widget.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+#include <utils/common/event_processors.h>
 
 
 QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
@@ -22,18 +25,22 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
 
-    static const QSize kPixmapSize(48, 48);
-
-    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png"), kPixmapSize));
-    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png"), kPixmapSize));
-    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png"), kPixmapSize));
-    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png"), kPixmapSize));
-    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png"), kPixmapSize));
-    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"), kPixmapSize));
-    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"), kPixmapSize));
-    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"), kPixmapSize));
-
-
+    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"),
+        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);
@@ -103,6 +110,25 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
         {
             ui->autoCalibrationButton->setEnabled(true);
         });
+
+    const QSize kSpacing = style::Metrics::kDefaultLayoutSpacing;
+    auto updateAutoCalibrationButtonGeometry = [this, kSpacing]
+        {
+            const auto size = ui->autoCalibrationButton->sizeHint();
+            auto parentSize = ui->calibrateWidget->geometry().size();
+            const int x = parentSize.width() - size.width() - kSpacing.width();
+            const int y = parentSize.height() - size.height() - kSpacing.height();
+
+            ui->autoCalibrationButton->setGeometry(QRect(QPoint(x, y), size));
+        };
+
+    installEventHandler(ui->calibrateWidget, QEvent::Resize, this,
+        updateAutoCalibrationButtonGeometry);
+
+    updateAutoCalibrationButtonGeometry();
+
+    ui->calibrateWidget->setMinimumHeight(ui->autoCalibrationButton->sizeHint().height()
+        + kSpacing.height() * 2);
 }
 
 QnFisheyeSettingsWidget::~QnFisheyeSettingsWidget()

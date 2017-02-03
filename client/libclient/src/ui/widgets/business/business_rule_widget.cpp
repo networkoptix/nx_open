@@ -19,6 +19,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <ui/common/aligner.h>
 #include <ui/common/palette.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/dialogs/week_time_schedule_dialog.h>
@@ -35,6 +36,19 @@
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
+
+namespace {
+
+QIcon iconHelper(QIcon base)
+{
+    if (base.isNull())
+        return base;
+
+    return QIcon(QnSkin::maximumSizePixmap(base,
+        QIcon::Selected, QIcon::Off, false));
+}
+
+} // namespace
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     base_type(parent),
@@ -66,6 +80,12 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     connect(ui->aggregationWidget, SIGNAL(valueChanged()), this, SLOT(updateModelAggregationPeriod()));
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
+
+    auto aligner1 = new QnAligner(this);
+    aligner1->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
+
+    auto aligner2 = new QnAligner(this);
+    aligner2->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
 
     retranslateUi();
 }
@@ -149,7 +169,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
     if (fields & QnBusiness::EventResourcesField)
     {
         ui->eventResourcesHolder->setText(m_model->data(QnBusiness::SourceColumn).toString());
-        ui->eventResourcesHolder->setIcon(m_model->data(QnBusiness::SourceColumn, Qt::DecorationRole).value<QIcon>());
+        ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(QnBusiness::SourceColumn,
+            Qt::DecorationRole).value<QIcon>()));
     }
 
     if (fields & QnBusiness::ActionTypeField)
@@ -192,7 +213,8 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
     if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
     {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
-        ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
+        ui->actionResourcesHolder->setIcon(iconHelper(m_model->data(QnBusiness::TargetColumn,
+            Qt::DecorationRole).value<QIcon>()));
     }
 
     if (fields & QnBusiness::AggregationField)

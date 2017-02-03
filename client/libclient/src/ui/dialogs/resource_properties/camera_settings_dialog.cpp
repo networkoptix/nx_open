@@ -26,7 +26,7 @@
 
 namespace {
 
-static const QSize kMinimumSize(900, 560);
+static const int kMinimumWidth = 900; //< do not set minimum height
 static const QSize kOptimalSize(900, 880);
 
 /* Initial dialog height - 40px less than screen height. */
@@ -38,7 +38,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     base_type(parent),
     m_ignoreAccept(false)
 {
-    setMinimumSize(kMinimumSize);
+    setMinimumWidth(kMinimumWidth);
 
     int maximumHeight = mainWindow()->geometry().height();
     if (auto windowHandle = mainWindow()->windowHandle())
@@ -48,7 +48,6 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     }
     int optimalHeight = std::min(kOptimalSize.height(),
         maximumHeight - kSizeOffset);
-    optimalHeight = std::max(optimalHeight, kMinimumSize.height());
 
     QSize optimalSize(kOptimalSize.width(), optimalHeight);
     QRect targetGeometry(QPoint(0, 0), optimalSize);
@@ -65,7 +64,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     m_openButton = new QPushButton(tr("Show on Layout"));
     m_buttonBox->addButton(m_openButton, QDialogButtonBox::HelpRole);
 
-    m_diagnoseButton = new QPushButton(tr("Event Log"));
+    m_diagnoseButton = new QPushButton(tr("Event Log..."));
     m_buttonBox->addButton(m_diagnoseButton, QDialogButtonBox::HelpRole);
 
     m_rulesButton = new QPushButton();
@@ -127,9 +126,9 @@ void QnCameraSettingsDialog::retranslateUi()
     ), cameras);
 
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-        tr("Device Rules"), tr("Devices Rules"),
-        tr("Camera Rules"), tr("Cameras Rules"),
-        tr("I/O Module Rules"), tr("I/O Modules Rules")
+        tr("Device Rules..."), tr("Devices Rules..."),
+        tr("Camera Rules..."), tr("Cameras Rules..."),
+        tr("I/O Module Rules..."), tr("I/O Modules Rules...")
     ), cameras);
 
     setWindowTitle(windowTitle);
@@ -230,29 +229,25 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const auto question = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
-            tr("Apply changes to the following %n devices?", "", unsavedCameras.size()),
-            tr("Apply changes to the following %n cameras?", "", unsavedCameras.size()),
-            tr("Apply changes to the following %n I/O modules?", "", unsavedCameras.size())
+        const auto extras = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+            tr("Changes to the following %n devices are not saved:", "", unsavedCameras.size()),
+            tr("Changes to the following %n cameras are not saved:", "", unsavedCameras.size()),
+            tr("Changes to the following %n I/O Modules are not saved:", "", unsavedCameras.size())
         ), unsavedCameras);
 
-        QnMessageBox messageBox(
-            QnMessageBox::Warning,
-            Qn::Empty_Help,
-            tr("Changes are not saved"),
-            tr("Changes are not saved"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            mainWindow());
-        messageBox.setDefaultButton(QDialogButtonBox::Yes);
-        messageBox.setInformativeText(question);
+        QnMessageBox messageBox(QnMessageBoxIcon::Question,
+            tr("Apply changes before switching to another camera?"), extras,
+            QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Apply, mainWindow());
+
         messageBox.addCustomWidget(new QnResourceListView(unsavedCameras));
-        auto result = messageBox.exec();
+        const auto result = messageBox.exec();
         switch (result)
         {
-            case QDialogButtonBox::Yes:
+            case QDialogButtonBox::Apply:
                 submitToResources();
                 break;
-            case QDialogButtonBox::No:
+            case QDialogButtonBox::Discard:
                 break;
             default:
                 /* Cancel changes. */

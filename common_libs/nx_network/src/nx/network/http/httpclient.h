@@ -19,13 +19,13 @@
 
 namespace nx_http {
 
-/** Sync http client.
-    This is  a synchronous wrapper on top of \a AsyncHttpClient.
-    \note This class is not thread-safe
-    \warning Message body is read ascynhronously to some internal buffer
-*/
-class NX_NETWORK_API HttpClient
-    :
+/**
+ * Synchronous http client.
+ * This is a synchronous wrapper on top of AsyncHttpClient.
+ * @note This class is not thread-safe.
+ * @warning Message body is read ascynhronously to some internal buffer.
+ */
+class NX_NETWORK_API HttpClient:
     public QObject,
     public QnStoppable
 {
@@ -46,8 +46,15 @@ public:
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
+
+    bool doPut(
+        const QUrl& url,
+        const nx_http::StringType& contentType,
+        nx_http::StringType messageBody);
+
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
+    bool isValid() const;
     bool eof() const;
     /**
         Blocks, if internal message body buffer is empty
@@ -55,6 +62,7 @@ public:
     BufferType fetchMessageBodyBuffer();
     void addAdditionalHeader(const StringType& key, const StringType& value);
     const QUrl& url() const;
+    const QUrl& contentLocationUrl() const;
     StringType contentType() const;
 
     /** See \a AsyncHttpClient::setSubsequentReconnectTries */
@@ -71,6 +79,7 @@ public:
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
+    void setAuthType(AsyncHttpClient::AuthType value);
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
@@ -82,6 +91,7 @@ private:
     QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
     bool m_done;
+    bool m_error;
     bool m_terminated;
     nx_http::BufferType m_msgBodyBuffer;
     std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
@@ -93,7 +103,9 @@ private:
     boost::optional<QString> m_userAgent;
     boost::optional<QString> m_userName;
     boost::optional<QString> m_userPassword;
+    std::size_t m_maxInternalBufferSize;
     boost::optional<SocketAddress> m_proxyEndpoint;
+    boost::optional<AsyncHttpClient::AuthType> m_authType;
 
     void instanciateHttpClient();
     template<typename AsyncClientFunc>
@@ -106,4 +118,4 @@ private:
     void onReconnected();
 };
 
-}   //namespace nx_http
+} // namespace nx_http

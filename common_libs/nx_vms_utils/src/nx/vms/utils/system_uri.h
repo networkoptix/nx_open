@@ -43,9 +43,9 @@ public:
     enum class ClientCommand
     {
         None,
-        Client,             /**< Just open the client */
         LoginToCloud,       /**< Login to cloud. Auth is required. */
-        ConnectToSystem,    /**< Login to system. System id and auth are required. */
+        Client,             /**< Open client and optionally login to system. */
+        OpenOnPortal,       /**< Open the given system on the portal. Never native. */
     };
 
     enum class SystemAction
@@ -101,6 +101,8 @@ public:
     {
         QString user;
         QString password;
+
+        NX_VMS_UTILS_API QString encode() const;
     };
     Auth authenticator() const;
     void setAuthenticator(const Auth& value);
@@ -108,8 +110,8 @@ public:
 
     struct Referral
     {
-        ReferralContext context;
-        ReferralSource source;
+        ReferralContext context = ReferralContext::None;
+        ReferralSource source = ReferralSource::None;
     };
     Referral referral() const;
     void setReferral(const Referral& value);
@@ -144,7 +146,7 @@ public:
     bool operator==(const SystemUri& other) const;
 private:
     QScopedPointer<SystemUriPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(SystemUri);
+    Q_DECLARE_PRIVATE(SystemUri)
 };
 
 } // namespace utils

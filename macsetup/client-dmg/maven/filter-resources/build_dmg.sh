@@ -5,22 +5,23 @@ LIBRARIES=${libdir}/lib/${build.configuration}
 SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
-DMG_FILE="${finalName}.dmg"
+DMG_FILE="${artifact.name.client}.dmg"
+APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
 
 AS_SRC=app-store
-PKG_FILE="${finalName}.pkg"
+PKG_FILE="${artifact.name.client}.pkg"
 
 QT_DIR="${qt.dir}"
 QT_VERSION="${qt.version}"
 
 ln -s /Applications $SRC/Applications
 
-mv $SRC/client.app "$SRC/${display.product.name}.app"
-mkdir -p "$SRC/Nx Witness.app/Contents/Resources"
-cp logo.icns "$SRC/Nx Witness.app/Contents/Resources/appIcon.icns"
-cp logo.icns .VolumeIcon.icns
+mv $SRC/client.app "$APP_DIR"
+mkdir -p "$APP_DIR/Contents/Resources"
+cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
+cp logo.icns $SRC/.VolumeIcon.icns
 
 function hexify
 {
@@ -48,14 +49,14 @@ function patch_dsstore
 patch_dsstore "$SRC/DS_Store" "$SRC/.DS_Store" $RELEASE_VERSION
 rm "$SRC/DS_Store"
 
-python macdeployqt.py "$SRC/${display.product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
+python macdeployqt.py "$APP_DIR" "$BINARIES" "$LIBRARIES" "$HELP" "$QT_DIR" "$QT_VERSION"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
 
 # Boris, move this to a separate script (of even folder), please
 rm -rf "$AS_SRC"
 mkdir "$AS_SRC"
-cp -a "$SRC/${display.product.name}.app" "$AS_SRC"
+cp -a "$APP_DIR" "$AS_SRC"
 
 if [ '${mac.skip.sign}' == 'false'  ]
 then
@@ -84,7 +85,7 @@ fi
 
 if [ '${mac.skip.sign}' == 'false'  ]
 then
-    codesign -f -v --deep -s "${mac.sign.identity}" "$SRC/${display.product.name}.app"
+    codesign -f -v --deep -s "${mac.sign.identity}" "$APP_DIR"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns
@@ -94,7 +95,7 @@ hdiutil create -srcfolder $SRC -volname "$VOLUME_NAME" -format UDRW -ov "raw-$DM
 
 mv update.json $SRC
 cd dmg-folder
-zip -y -r ../client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*.app *.json
+zip -y -r ../${artifact.name.client_update}.zip ./*.app *.json
 cd ..
 
 rm -rf $TMP

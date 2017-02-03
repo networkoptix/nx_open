@@ -20,7 +20,10 @@
 
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
+
 #include <network/authenticate_helper.h>
+#include <network/system_helpers.h>
+
 #include <nx/network/nettools.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
@@ -36,6 +39,11 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <api/resource_property_adaptor.h>
+
+#include <QtCore/QJsonDocument>
+#include <QtXmlPatterns/QXmlSchema>
+#include <QtXmlPatterns/QXmlSchemaValidator>
+#include <QtXml/QDomDocument>
 
 #include "server_connector.h"
 #include "server/server_globals.h"
@@ -296,7 +304,7 @@ bool resetSystemToStateNew()
 
     auto adminUserResource = qnResPool->getAdministrator();
     PasswordData data;
-    data.password = QnServer::kDefaultAdminPassword;
+    data.password = helpers::kFactorySystemPassword;
     return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
@@ -416,4 +424,38 @@ void nx::SystemName::clear()
 {
     m_value.clear();
     m_prevValue.clear();
+}
+
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody)
+{
+    static const QByteArray kDefaultContentType("text/plain");
+    static const QByteArray kJsonContentType("application/json");
+    static const QByteArray kXMLContentType("application/xml");
+    static const QByteArray kHTMLContentType("text/html; charset=utf-8");
+
+    if (msgBody.isEmpty())
+        return QByteArray();
+
+    QJsonParseError error;
+    QJsonDocument document = QJsonDocument::fromJson(msgBody, &error);
+    if(error.error == QJsonParseError::NoError)
+        return kJsonContentType;
+
+    const QRegExp regExpr(lit("<html[^<]*>"));
+
+    int pos = regExpr.indexIn(QString::fromUtf8(msgBody));
+    while (pos >= 0)
+    {
+        // Check that <html pattern found not inside string
+        int quoteCount = QByteArray::fromRawData(msgBody.data(), pos).count('\"');
+        if (quoteCount % 2 == 0)
+            return kHTMLContentType;
+        pos = regExpr.indexIn(msgBody, pos+1);
+    }
+
+    QDomDocument xmlDoc;
+    if (xmlDoc.setContent(msgBody))
+        return kXMLContentType;
+
+    return kDefaultContentType;
 }

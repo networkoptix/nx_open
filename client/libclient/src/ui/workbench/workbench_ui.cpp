@@ -80,8 +80,9 @@ Qn::PaneState makePaneState(bool opened, bool pinned = true)
     return pinned ? (opened ? Qn::PaneState::Opened : Qn::PaneState::Closed) : Qn::PaneState::Unpinned;
 }
 
-const int kHideControlsTimeoutMs = 2000;
+constexpr int kHideControlsTimeoutMs = 2000;
 
+constexpr qreal kZoomedTimelineOpacity = 0.9;
 
 } // anonymous namespace
 
@@ -169,7 +170,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
-        Qt::TopEdge, NxUi::kShadowThickness, true);
+        m_controlsWidget, Qt::TopEdge, NxUi::kShadowThickness, QnEdgeShadowWidget::kInner);
     windowedTitleShadow->setZValue(NxUi::ShadowItemZOrder);
 
 #ifdef QN_DEBUG_WIDGET
@@ -186,7 +187,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* After widget was removed we can possibly increase margins. */
     connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
-        &QnWorkbenchUi::updateViewportMargins, Qt::QueuedConnection);
+        &QnWorkbenchUi::updateViewportMarginsAnimated, Qt::QueuedConnection);
 
     connect(action(QnActions::FreespaceAction), &QAction::triggered, this, &QnWorkbenchUi::at_freespaceAction_triggered);
     connect(action(QnActions::EffectiveMaximizeAction), &QAction::triggered, this,
@@ -271,6 +272,7 @@ void QnWorkbenchUi::storeSettings()
     thumbnails.span = m_timeline->lastThumbnailsHeight;
 
     qnSettings->setPaneSettings(settings);
+    qnSettings->save();
 }
 
 void QnWorkbenchUi::updateCursor()
@@ -429,7 +431,7 @@ void QnWorkbenchUi::setFlags(Flags flags)
     m_flags = flags;
 
     updateActivityInstrumentState();
-    updateViewportMargins();
+    updateViewportMargins(false);
 }
 
 bool QnWorkbenchUi::isTitleUsed() const
@@ -437,7 +439,7 @@ bool QnWorkbenchUi::isTitleUsed() const
     return m_title && m_title->isUsed();
 }
 
-void QnWorkbenchUi::updateViewportMargins()
+void QnWorkbenchUi::updateViewportMargins(bool animate)
 {
     using boost::algorithm::any_of;
 
@@ -474,7 +476,12 @@ void QnWorkbenchUi::updateViewportMargins()
     if (oldMargins == newMargins)
         return;
     display()->setViewportMargins(newMargins);
-    display()->fitInView(true);
+    display()->fitInView(animate);
+}
+
+void QnWorkbenchUi::updateViewportMarginsAnimated()
+{
+    updateViewportMargins(true);
 }
 
 void QnWorkbenchUi::updateActivityInstrumentState()
@@ -638,9 +645,9 @@ void QnWorkbenchUi::at_activityStarted()
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
 {
-    bool alreadyZoomed = m_widgetByRole[role] != nullptr;
+    bool alreadyZoomed = m_widgetByRole[Qn::ZoomedRole] != nullptr;
 
-    QnResourceWidget *newWidget = display()->widget(role);
+    QnResourceWidget* newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
     /* Update activity listener instrument. */
@@ -664,6 +671,12 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             /* Viewport margins have changed, force fit-in-view. */
             display()->fitInView();
         }
+
+        qreal masterOpacity = newWidget ? kZoomedTimelineOpacity : NxUi::kOpaque;
+        if (m_timeline)
+            m_timeline->setMasterOpacity(masterOpacity);
+        if (m_calendar)
+            m_calendar->setMasterOpacity(masterOpacity);
     }
 
     if (qnRuntime->isVideoWallMode())
@@ -703,10 +716,13 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     /* We lay everything out manually. */
 
+    if (m_timeline)
+        m_timeline->stopAnimations();
     m_timeline->updateGeometry();
 
     if (m_title)
     {
+        m_title->stopAnimations();
         m_title->item->setGeometry(QRectF(
             0.0,
             m_title->item->pos().y(),
@@ -716,15 +732,22 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     if (m_notifications)
     {
+        m_notifications->stopAnimations();
         if (m_notifications->xAnimator->isRunning())
             m_notifications->xAnimator->stop();
         m_notifications->item->setX(rect.right() + (isNotificationsOpened() ? -m_notifications->item->size().width() : 1.0 /* Just in case. */));
     }
 
+    if (m_tree)
+        m_tree->stopAnimations();
+
+    if (m_calendar)
+        m_calendar->stopAnimations();
+
     updateTreeGeometry();
     updateNotificationsGeometry();
     updateFpsGeometry();
-    updateViewportMargins();
+    updateViewportMargins(false);
 }
 
 void QnWorkbenchUi::createControlsWidget()
@@ -854,7 +877,7 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMargins);
+        &QnWorkbenchUi::updateViewportMarginsAnimated);
 
 }
 
@@ -906,12 +929,12 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_title, &NxUi::AbstractWorkbenchPanel::visibleChanged, this,
-        [this]
+        [this](bool /*value*/, bool animated)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
             updateFpsGeometry();
-            updateViewportMargins();
+            updateViewportMargins(animated);
         });
 
     connect(m_title, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
@@ -1051,7 +1074,7 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateControlsVisibilityAnimated);
 
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
-        &QnWorkbenchUi::updateViewportMargins);
+        &QnWorkbenchUi::updateViewportMarginsAnimated);
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateFpsGeometry);
 }
@@ -1185,7 +1208,7 @@ void QnWorkbenchUi::createTimelineWidget(const QnPaneSettings& settings)
             updateTreeGeometry();
             updateNotificationsGeometry();
             updateCalendarVisibility(animated);
-            updateViewportMargins();
+            updateViewportMargins(animated);
         });
 
     connect(m_timeline, &NxUi::AbstractWorkbenchPanel::hoverEntered, this,

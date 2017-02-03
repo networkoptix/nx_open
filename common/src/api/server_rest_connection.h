@@ -141,6 +141,8 @@ namespace rest
         Handle sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback = HttpCompletionFunc());
 
         QnMediaServerResourcePtr getServerWithInternetAccess() const;
+
+        void trace(int handle, const QString& message) const;
     private:
         QnUuid m_serverId;
         QMap<Handle, HttpCompletionFunc> m_runningRequests;

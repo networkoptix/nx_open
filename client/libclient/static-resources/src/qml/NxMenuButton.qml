@@ -8,28 +8,35 @@ NxImageButton
 
     visible: menu;
 
-    forcePressed: (menu && menu.visible);
-    onClicked: menu.open();
+    onClicked:
+    {
+        if (!menu)
+            return;
+
+        forcePressed = true;
+        prevMenuParent = menu.parent;
+        menu.parent = control;
+        menu.y = height;
+        menu.x = 0;
+        menu.open();
+    }
+
+    Connections
+    {
+        target: control.menu;
+        onVisibleChanged:
+        {
+            if (menu.visible || !forcePressed)
+                return;
+
+            menu.parent = prevMenuParent;
+            forcePressed = false;
+        }
+    }
 
     standardIconUrl: "qrc:/skin/welcome_page/drop_menu.png";
     hoveredIconUrl: "qrc:/skin/welcome_page/drop_menu_hovered.png";
     pressedIconUrl: "qrc:/skin/welcome_page/drop_menu_pressed.png";
 
-    onMenuChanged:
-    {
-        if (!control.menu)
-            return;
-
-        menu.parent = control;
-        updateMenuPosition();
-    }
-
-    onWidthChanged: { updateMenuPosition(); }
-    onHeightChanged: { updateMenuPosition(); }
-
-    function updateMenuPosition()
-    {
-        if (menu)
-            menu.y = height;
-    }
+    property variant prevMenuParent: null;
 }

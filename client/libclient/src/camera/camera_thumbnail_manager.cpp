@@ -142,6 +142,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnSecurityCa
     request.size = m_thumnailSize;
     request.imageFormat = QnThumbnailRequestData::JpgFormat;
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+    request.format = Qn::SerializationFormat::UbjsonFormat;
 
     if (!qnCommon->currentServer())
         return kInvalidHandle;

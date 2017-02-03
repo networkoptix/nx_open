@@ -45,13 +45,19 @@ void QnClientCoreSettings::writeValueToSettings(
 
         case RecentLocalConnections:
         {
-            auto list = value.value<QnLocalConnectionDataList>();
-            processedValue = QString::fromUtf8(QJson::serialized(list));
+            auto connections = value.value<RecentLocalConnectionsHash>();
+            processedValue = QString::fromUtf8(QJson::serialized(connections));
+            break;
+        }
+        case SystemAuthenticationData:
+        {
+            auto data = value.value<SystemAuthenticationDataHash>();
+            processedValue = QString::fromUtf8(QJson::serialized(data));
             break;
         }
         case LocalSystemWeightsData:
         {
-            auto list = value.value<QnWeightDataList>();
+            auto list = value.value<WeightDataList>();
             processedValue = QString::fromUtf8(QJson::serialized(list));
             break;
         }
@@ -62,8 +68,16 @@ void QnClientCoreSettings::writeValueToSettings(
             break;
         }
         case CloudPassword:
+        {
             processedValue = nx::utils::xorEncrypt(value.toString(), kEncodeXorKey);
             break;
+        }
+        case KnownServerUrls:
+        {
+            auto list = value.value<QList<QUrl>>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
+            break;
+        }
         default:
             break;
     }
@@ -81,11 +95,15 @@ QVariant QnClientCoreSettings::readValueFromSettings(
     {
         case RecentLocalConnections:
             return qVariantFromValue(
-                QJson::deserialized<QnLocalConnectionDataList>(baseValue.toByteArray()));
+                QJson::deserialized<RecentLocalConnectionsHash>(baseValue.toByteArray()));
+
+        case SystemAuthenticationData:
+            return qVariantFromValue(
+                QJson::deserialized<SystemAuthenticationDataHash>(baseValue.toByteArray()));
 
         case LocalSystemWeightsData:
             return qVariantFromValue(
-                QJson::deserialized<QnWeightDataList>(baseValue.toByteArray()));
+                QJson::deserialized<WeightDataList>(baseValue.toByteArray()));
 
         case RecentCloudSystems:
             return qVariantFromValue(
@@ -94,6 +112,9 @@ QVariant QnClientCoreSettings::readValueFromSettings(
         case CloudPassword:
             return nx::utils::xorDecrypt(baseValue.toString(), kEncodeXorKey);
 
+        case KnownServerUrls:
+            return qVariantFromValue(
+                QJson::deserialized<QList<QUrl>>(baseValue.toByteArray()));
         default:
             break;
     }

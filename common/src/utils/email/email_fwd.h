@@ -25,6 +25,10 @@ struct QnEmailSmtpServerPreset;
 struct QnEmailSettings;
 class  QnEmailAddress;
 
+enum class SmtpReplyCode;
+enum class SmtpError;
+struct SmtpOperationResult;
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::ConnectionType), (metatype)(lexical))
 
 #endif // QN_EMAIL_FWD_H

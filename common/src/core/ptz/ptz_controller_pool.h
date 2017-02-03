@@ -52,6 +52,8 @@ protected:
 
     Q_SLOT void updateController(const QnResourcePtr &resource);
 
+    virtual void deinitialize();
+
 private:
     friend class QnPtzControllerCreationCommand;
     friend class QnPtzControllerPoolPrivate;

@@ -4,15 +4,10 @@
 #include <private/qqmlvaluetype_p.h>
 
 #include <context/connection_manager.h>
-#include <context/context_settings.h>
-#include <context/session_settings.h>
 #include <ui/timeline/timeline.h>
 #include <ui/qml/quick_item_mouse_tracker.h>
 #include <ui/qml/text_input.h>
 #include <ui/models/systems_model.h>
-#include <ui/models/recent_local_connections_model.h>
-#include <ui/models/system_hosts_model.h>
-#include <ui/models/ordered_systems_model.h>
 #include <models/camera_list_model.h>
 #include <models/calendar_model.h>
 #include <models/layouts_model.h>
@@ -32,25 +27,32 @@
 #include <controllers/lite_client_controller.h>
 #include <helpers/lite_client_layout_helper.h>
 #include <helpers/cloud_url_helper.h>
+#include <utils/developer_settings_helper.h>
+#include <settings/qml_settings_adaptor.h>
 
-void QnMobileClientMetaTypes::initialize() {
+using namespace nx::client::mobile;
+
+void QnMobileClientMetaTypes::initialize()
+{
     QnClientCoreMetaTypes::initialize();
 
     registerMetaTypes();
     registerQmlTypes();
 }
 
-void QnMobileClientMetaTypes::registerMetaTypes() {
+void QnMobileClientMetaTypes::registerMetaTypes()
+{
+    qRegisterMetaType<nx::media::PlayerStatistics>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterUncreatableType<QnConnectionManager>("com.networkoptix.qml", 1, 0, "QnConnectionManager", lit("Cannot create an instance of QnConnectionManager."));
     qmlRegisterUncreatableType<QnMobileAppInfo>("com.networkoptix.qml", 1, 0, "QnMobileAppInfo", lit("Cannot create an instance of QnMobileAppInfo."));
-    qmlRegisterUncreatableType<QnContextSettings>("com.networkoptix.qml", 1, 0, "QnContextSettings", lit("Cannot create an instance of QnContextSettings."));
     qmlRegisterUncreatableType<QnCloudUrlHelper>("com.networkoptix.qml", 1, 0, "QnCloudUrlHelper", lit("Cannot create an instance of QnCloudUrlHelper."));
-    qmlRegisterType<QnOrderedSystemsModel>("com.networkoptix.qml", 1, 0, "QnSystemsModel");
-    qmlRegisterType<QnRecentLocalConnectionsModel>("com.networkoptix.qml", 1, 0, "QnRecentLocalConnectionsModel");
-    qmlRegisterType<QnSystemHostsModel>("com.networkoptix.qml", 1, 0, "QnSystemHostsModel");
+    qmlRegisterUncreatableType<nx::client::mobile::QmlSettingsAdaptor>(
+        "Nx.Settings", 1, 0, "MobileSettings",
+        lit("Cannot create an instance of MobileSettings."));
+
     qmlRegisterType<QnCameraListModel>("com.networkoptix.qml", 1, 0, "QnCameraListModel");
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
@@ -69,6 +71,8 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
+    qmlRegisterType<utils::DeveloperSettingsHelper>(
+        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
 
     qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);

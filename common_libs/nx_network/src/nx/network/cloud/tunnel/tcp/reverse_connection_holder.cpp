@@ -1,6 +1,7 @@
 #include "reverse_connection_holder.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -9,16 +10,37 @@ namespace tcp {
 
 ReverseConnectionHolder::ReverseConnectionHolder(aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
-    m_socketCount(0)
+    m_socketCount(0),
+    m_timer(std::make_unique<aio::Timer>())
 {
+    m_timer->bindToAioThread(aioThread);
+}
+
+ReverseConnectionHolder::~ReverseConnectionHolder()
+{
+    stopWhileInAioThread();
+}
+
+void ReverseConnectionHolder::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    aio::BasicPollable::bindToAioThread(aioThread);
+    m_timer->bindToAioThread(aioThread);
+
+    NX_ASSERT(m_socketCount, "Thread can not be changed in working state");
+    for (auto& socket: m_sockets)
+        socket->bindToAioThread(aioThread);
 }
 
 void ReverseConnectionHolder::stopWhileInAioThread()
 {
+    m_timer.reset();
+    m_socketCount = 0;
+    m_sockets.clear();
 }
 
 void ReverseConnectionHolder::saveSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
+    NX_ASSERT(isInSelfAioThread());
     if (!m_handlers.empty())
     {
         NX_LOGX(lm("Use new socket(%1), %2 sockets left")
@@ -49,7 +71,7 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
         [this, expirationTime = std::chrono::steady_clock::now() + timeout,
             handler = std::move(handler)]() mutable
         {
-            if (m_sockets.size())
+            if (!m_sockets.empty())
             {
                 auto socket = std::move(m_sockets.front());
                 --m_socketCount;
@@ -69,24 +91,30 @@ void ReverseConnectionHolder::takeSocket(std::chrono::milliseconds timeout, Hand
                     return handler(SystemError::timedOut, nullptr);
 
                 if (m_handlers.empty() || expirationTime < m_handlers.begin()->first)
-                {
-                    timer()->start(
-                        timeLeft,
-                        [this]()
-                        {
-                            const auto now = std::chrono::steady_clock::now();
-                            for (auto it = m_handlers.begin(); it != m_handlers.end(); )
-                            {
-                                if (it->first > now)
-                                    return;
-
-                                it->second(SystemError::timedOut, nullptr);
-                                it = m_handlers.erase(it);
-                            }
-                        });
-                }
+                    startCleanupTimer(timeLeft);
 
                 m_handlers.emplace(expirationTime, std::move(handler));
+            }
+        });
+}
+
+void ReverseConnectionHolder::startCleanupTimer(std::chrono::milliseconds timeLeft)
+{
+    m_timer->start(
+        timeLeft,
+        [this]()
+        {
+            const auto now = std::chrono::steady_clock::now();
+            for (auto it = m_handlers.begin(); it != m_handlers.end(); )
+            {
+                const auto timeLeft = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    it->first - now);
+
+                if (timeLeft.count() > 0)
+                    return startCleanupTimer(timeLeft);
+
+                it->second(SystemError::timedOut, nullptr);
+                it = m_handlers.erase(it);
             }
         });
 }

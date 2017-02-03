@@ -18,5 +18,5 @@ lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
 ulimit -n 8192
 ulimit -c unlimited
 
-ARGS="-e --disable-crash-handler"
+ARGS="-e"
 exec start-stop-daemon --start -d $VMS_DIR/bin --exec $VMS_DIR/bin/mediaserver-bin -- $ARGS

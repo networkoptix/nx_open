@@ -116,9 +116,15 @@ void QnMediaServerUpdateTool::setPeerStageProgress(const QnUuid &peerId, QnPeerU
     emit peerStageProgressChanged(peerId, stage, progress);
 }
 
-void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result) {
-    emit updateFinished(result);
+void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result)
+{
     setStage(QnFullUpdateStage::Init);
+
+    m_updateProcess->deleteLater();
+    m_updateProcess = nullptr;
+
+    /* We must emit signal after m_updateProcess clean, so ::isUpdating() will return false. */
+    emit updateFinished(result);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
@@ -253,7 +259,9 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
         return false;
 
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
+
     m_updateProcess->pleaseStop();
+
     return true;
 }
 
@@ -335,21 +343,17 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget& target)
         this, &QnMediaServerUpdateTool::setPeerStage);
     connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,
         this, &QnMediaServerUpdateTool::setPeerStageProgress);
-    connect(m_updateProcess, &QnUpdateProcess::updateFinished,
-        this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,
         this, &QnMediaServerUpdateTool::targetsChanged);
     connect(m_updateProcess, &QnUpdateProcess::lowFreeSpaceWarning,
         this, &QnMediaServerUpdateTool::lowFreeSpaceWarning, Qt::BlockingQueuedConnection);
 
-    connect(m_updateProcess, &QThread::finished, this,
-        [this, incompatibleTargets, clearTargetsWhenFinished]()
+    connect(m_updateProcess, &QnUpdateProcess::updateFinished, this,
+        [this, incompatibleTargets, clearTargetsWhenFinished](const QnUpdateResult& result)
         {
+            finishUpdate(result);
+
             const auto watcher = qnDesktopClientMessageProcessor->incompatibleServerWatcher();
-
-            m_updateProcess->deleteLater();
-            m_updateProcess = nullptr;
-
             for (const auto& id: incompatibleTargets)
                 watcher->keepServer(id, false);
 

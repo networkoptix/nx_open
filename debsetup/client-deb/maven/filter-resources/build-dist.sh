@@ -7,7 +7,6 @@ FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
-PACKAGENAME=${installer.name}-client
 VERSION=${release.version}
 FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}
@@ -22,12 +21,9 @@ ICONTARGET=$USRTARGET/share/icons
 LIBTARGET=$TARGET/lib
 INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
-BETA=""
-if [[ "${beta}" == "true" ]]; then
-  BETA="-beta"
-fi
 
-FINALNAME=${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}$BETA
+FINALNAME=${artifact.name.client}
+UPDATE_NAME=${artifact.name.client_update}.zip
 
 STAGEBASE=deb
 STAGE=$STAGEBASE/$FINALNAME
@@ -66,6 +62,7 @@ mkdir -p "$STAGE/etc/xdg/$FULL_COMPANY_NAME"
 mv -f debian/client.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_PRODUCT_NAME"
 mv -f debian/applauncher.conf $STAGE/etc/xdg/"$FULL_COMPANY_NAME"/"$FULL_APPLAUNCHER_NAME"
 mv -f usr/share/applications/icon.desktop usr/share/applications/${installer.name}.desktop
+mv -f usr/share/applications/protocol.desktop usr/share/applications/${uri.protocol}.desktop
 
 # Copy client binary, old version libs
 cp -r $CLIENT_BIN_PATH/desktop_client $BINSTAGE/client-bin
@@ -125,6 +122,7 @@ chmod 755 $BINSTAGE/*
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
+chmod g-s $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
@@ -138,9 +136,12 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
+
+mkdir -p $STAGETARGET/share/icons
+cp -r $ICONSTAGE/* $STAGETARGET/share/icons
 cp -r bin/update.json $STAGETARGET
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
-echo "zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip $STAGETARGET"
+echo "zip -y -r $UPDATE_NAME $STAGETARGET"
 cd $STAGETARGET
-zip -y -r client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ./*
-mv -f client-update-${platform}-${arch}-${release.version}.${buildNumber}.zip ${project.build.directory}
+zip -y -r $UPDATE_NAME ./*
+mv -f $UPDATE_NAME ${project.build.directory}

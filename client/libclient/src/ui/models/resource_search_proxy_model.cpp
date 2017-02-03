@@ -50,6 +50,38 @@ const QnResourceCriterionGroup & QnResourceSearchProxyModel::criteria()
     return m_criterionGroup;
 }
 
+QnResourceSearchQuery QnResourceSearchProxyModel::query() const
+{
+    return m_query;
+}
+
+void QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
+{
+    if (m_query == query)
+        return;
+
+    m_query = query;
+
+    clearCriteria();
+    setFilterWildcard(L'*' + query.text + L'*');
+    if (query.text.isEmpty())
+    {
+        addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject,
+            QnResourceCriterion::Reject));
+    }
+    else
+    {
+        addCriterion(QnResourceCriterionGroup(query.text));
+        addCriterion(QnResourceCriterion(Qn::user));
+        addCriterion(QnResourceCriterion(Qn::layout));
+    }
+    if (query.flags != 0)
+    {
+        addCriterion(QnResourceCriterion(query.flags, QnResourceProperty::flags,
+            QnResourceCriterion::Next, QnResourceCriterion::Reject));
+    }
+}
+
 void QnResourceSearchProxyModel::invalidateFilter()
 {
     m_invalidating = false;
@@ -73,13 +105,16 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
         return true;
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
+    if (isSeparatorNode(nodeType))
+        return false;
+
     if (nodeType == Qn::UsersNode)
         return false; /* We don't want users in search. */
 
-    if (nodeType == Qn::OtherSystemsNode)
-        return false; /* We don't want other systems in search. */
-
-    if (nodeType == Qn::RecorderNode)
+    if (nodeType == Qn::RecorderNode
+        || nodeType == Qn::LocalResourcesNode
+        || nodeType == Qn::OtherSystemsNode)
     {
         for (int i = 0; i < sourceModel()->rowCount(index); i++)
         {
@@ -88,6 +123,10 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
         }
         return false;
     }
+
+    /* Simply filter by text. */
+    if (nodeType == Qn::CloudSystemNode)
+        return base_type::filterAcceptsRow(source_row, source_parent);
 
     QnResourcePtr resource = this->resource(index);
     if (!resource)

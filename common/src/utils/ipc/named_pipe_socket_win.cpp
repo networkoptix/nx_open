@@ -84,7 +84,11 @@ SystemError::ErrorCode NamedPipeSocket::write( const void* buf, unsigned int byt
 }
 
 //!Reads in synchronous mode
-SystemError::ErrorCode NamedPipeSocket::read( void* buf, unsigned int bytesToRead, unsigned int* const bytesRead )
+SystemError::ErrorCode NamedPipeSocket::read(
+    void* buf,
+    unsigned int bytesToRead,
+    unsigned int* const bytesRead,
+    int /*timeoutMs*/)
 {
     DWORD numberOfBytesRead = 0;
     BOOL res = ReadFile(

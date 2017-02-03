@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 7, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <chrono>
@@ -11,7 +6,13 @@
 #include <tuple>
 #include <type_traits>
 
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/timer.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/network/cloud/data/connect_data.h>
+#include <nx/network/cloud/mediator_client_connections.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/result_counter.h>
 #include <nx/utils/type_utils.h>
 #include <utils/common/systemerror.h>
 
@@ -19,10 +20,6 @@
 #include "abstract_outgoing_tunnel_connection.h"
 #include "abstract_tunnel_connector.h"
 #include "connector_factory.h"
-#include "nx/network/aio/basic_pollable.h"
-#include "nx/network/cloud/address_resolver.h"
-#include "nx/network/cloud/data/connect_data.h"
-#include "nx/network/cloud/mediator_connections.h"
 
 namespace nx {
 namespace network {
@@ -51,6 +48,8 @@ public:
     SocketAddress localAddress() const;
     void replaceOriginatingHostAddress(const QString& address);
 
+    static utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
+
 protected:
     virtual void messageReceived(
         SocketAddress sourceAddress,
@@ -72,11 +71,15 @@ private:
     std::unique_ptr<AbstractOutgoingTunnelConnection> m_connection;
     bool m_done;
     nx::hpm::api::ConnectionParameters m_connectionParameters;
+    std::unique_ptr<aio::Timer> m_timer;
+
+    static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
 
     void issueConnectRequestToMediator(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
     void onConnectResponse(
+        stun::TransportHeader stunTransportHeader,
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     std::chrono::milliseconds calculateTimeLeftForConnect();

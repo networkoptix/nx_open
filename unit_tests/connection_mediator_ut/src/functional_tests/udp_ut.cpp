@@ -34,7 +34,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
 
     nx::stun::MessageParser messageParser;
     nx::stun::MessageSerializer messageSerializer;
-    auto udpSocket = SocketFactory::createDatagramSocket();
+    const auto udpSocket = std::make_unique<network::UDPSocket>();
     udpSocket->setRecvTimeout(3000);
 
     //for (int j = 0; j < 1000; ++j)
@@ -45,7 +45,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         nx::stun::Message requestMessage(
             stun::Header(
                 nx::stun::MessageClass::request,
-                nx::stun::cc::methods::resolvePeer));
+                nx::stun::extension::methods::resolvePeer));
         request.serialize(&requestMessage);
         messageSerializer.setMessage(&requestMessage);
         nx::Buffer sendBuffer;
@@ -53,7 +53,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
         size_t bytesWritten = 0;
         ASSERT_EQ(nx_api::SerializerState::done, messageSerializer.serialize(&sendBuffer, &bytesWritten));
         ASSERT_EQ(bytesWritten, sendBuffer.size());
-        ASSERT_TRUE(udpSocket->sendTo(sendBuffer, stunEndpoint()));
+        ASSERT_TRUE(udpSocket->sendTo(sendBuffer.data(), sendBuffer.size(), stunEndpoint()));
 
         //reading response
         nx::Buffer recvBuffer;

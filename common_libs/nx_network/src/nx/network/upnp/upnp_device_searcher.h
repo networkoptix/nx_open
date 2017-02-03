@@ -11,7 +11,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
@@ -19,11 +18,12 @@
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/network/aio/aioeventhandler.h>
+#include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
+#include <nx/utils/atomic_unique_ptr.h>
 
 namespace nx_upnp {
 
@@ -142,10 +142,11 @@ private:
     };
 
     const unsigned int m_discoverTryTimeoutMS;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     quint64 m_timerID;
     nx::utils::AsyncOperationGuard m_handlerGuard;
     std::map< QString, std::map< SearchHandler*, uint > > m_handlers;
+    mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
     char* m_readBuf;
@@ -157,6 +158,10 @@ private:
     bool m_terminated;
     QElapsedTimer m_cacheTimer;
 
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> m_receiveSocket;
+    nx::Buffer m_receiveBuffer;
+    bool m_needToUpdateReceiveSocket;
+
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     void onSomeBytesRead(
@@ -166,6 +171,8 @@ private:
         size_t bytesRead ) noexcept;
 
     void dispatchDiscoverPackets();
+    bool needToUpdateReceiveSocket() const;
+    nx::utils::AtomicUniquePtr<AbstractDatagramSocket> updateReceiveSocketUnsafe();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );
     void startFetchDeviceXml(
         const QByteArray& uuidStr,

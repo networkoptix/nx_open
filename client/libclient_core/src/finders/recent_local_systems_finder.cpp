@@ -3,6 +3,7 @@
 #include <client_core/client_core_settings.h>
 #include <client_core/local_connection_data.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
 
 namespace {
 
@@ -43,20 +44,30 @@ QnSystemDescriptionPtr QnRecentLocalSystemsFinder::getSystem(const QString &id) 
 void QnRecentLocalSystemsFinder::updateSystems()
 {
     SystemsHash newSystems;
-    for (const auto& connection: qnClientCoreSettings->recentLocalConnections())
+    const auto connections = qnClientCoreSettings->recentLocalConnections();
+    for (auto it = connections.begin(); it != connections.end(); ++it)
     {
-        if (connection.localId.isNull())
+        if (it.key().isNull() || it->urls.isEmpty())
             continue;
 
-        const auto system = QnSystemDescription::createLocalSystem(
-            connection.localId.toString(), connection.localId, connection.systemName);
+        const auto connection = it.value();
+
+        for (const auto& url: connection.urls)
+        {
+            if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+                continue;
+        }
+
+        const auto system = QnLocalSystemDescription::create(
+            it.key().toString(), it.key(), connection.systemName);
 
         static const int kVeryFarPriority = 100000;
 
         QnModuleInformation fakeServerInfo;
         fakeServerInfo.id = QnUuid::createUuid();   // It SHOULD be new unique id
+        fakeServerInfo.systemName = connection.systemName;
         system->addServer(fakeServerInfo, kVeryFarPriority, false);
-        system->setServerHost(fakeServerInfo.id, connection.url);
+        system->setServerHost(fakeServerInfo.id, connection.urls.first());
         newSystems.insert(system->id(), system);
     }
 
@@ -154,13 +165,13 @@ void QnRecentLocalSystemsFinder::setFinalSystems(const SystemsHash& newFinalSyst
     const auto added = newSystemsKeys - currentKeys;
     const auto removed = currentKeys - newSystemsKeys;
 
+    for (const auto& systemId: removed)
+        removeFinalSystem(systemId);
+
     for (const auto& systemId: added)
     {
         const auto system = newFinalSystems.value(systemId);
         m_finalSystems.insert(systemId, system);
         emit systemDiscovered(system);
     }
-
-    for (const auto& systemId: removed)
-        removeFinalSystem(systemId);
 }

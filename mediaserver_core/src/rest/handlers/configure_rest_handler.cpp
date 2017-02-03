@@ -28,7 +28,7 @@
 
 #include <rest/helpers/permissions_helper.h>
 #include <api/global_settings.h>
-
+#include <api/resource_property_adaptor.h>
 
 namespace
 {
@@ -81,7 +81,7 @@ int QnConfigureRestHandler::execute(
         return CODE_OK;
     }
 
-    /* set system id */
+    /* set system id and move tran log time */
     const auto oldSystemId = qnGlobalSettings->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())
     {
@@ -107,6 +107,13 @@ int QnConfigureRestHandler::execute(
                 ec2::DummyHandler::instance(),
                 &ec2::DummyHandler::onRequestDone);
         }
+    }
+
+    // rewrite system settings to update transaction time
+    if (data.rewriteLocalSettings)
+    {
+        QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+        qnGlobalSettings->resynchronizeNowSync();
     }
 
     /* set port */

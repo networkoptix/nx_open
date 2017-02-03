@@ -1,6 +1,7 @@
 #include "aligner.h"
 
 #include <ui/common/accessor.h>
+#include <ui/style/helper.h>
 #include <utils/common/event_processors.h>
 
 namespace
@@ -34,12 +35,12 @@ namespace
 QnAligner::QnAligner(QObject* parent /*= nullptr*/):
     base_type(parent),
     m_defaultAccessor(new WidgetSizeAccessor()),
-    m_skipInvisible(false)
+    m_skipInvisible(false),
+    m_minimumSize(style::Hints::kMinimumFormLabelWidth)
 {
     if (parent)
         installEventHandler(parent, { QEvent::Show, QEvent::LayoutRequest }, this, &QnAligner::align);
 }
-
 
 QnAligner::~QnAligner()
 {
@@ -60,6 +61,11 @@ void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
     align();
 }
 
+void QnAligner::clear()
+{
+    m_widgets.clear();
+}
+
 void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor)
 {
     NX_ASSERT(!m_accessorByClassName.contains(className));
@@ -71,7 +77,7 @@ void QnAligner::align()
     if (m_widgets.isEmpty())
         return;
 
-    int maxWidth = 0;
+    int maxWidth = m_minimumSize;
     const bool alignInvisible = !m_skipInvisible;
 
     for (auto w : m_widgets)
@@ -114,5 +120,19 @@ void QnAligner::setSkipInvisible(bool value)
         return;
 
     m_skipInvisible = value;
+    align();
+}
+
+int QnAligner::minimumSize() const
+{
+    return m_minimumSize;
+}
+
+void QnAligner::setMinimumSize(int value)
+{
+    if (m_minimumSize == value)
+        return;
+
+    m_minimumSize = value;
     align();
 }

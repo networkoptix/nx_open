@@ -18,6 +18,7 @@
 
 
 #include <ui/graphics/items/resource/decodedpicturetoopengluploader.h>
+#include <ui/graphics/shaders/blur_shader_program.h>
 
 class CLVideoDecoderOutput;
 class ScreenshotInterface;
@@ -48,6 +49,7 @@ public:
 
     QnYv12ToRgbaShaderProgram *yv12ToRgba;
     QnNv12ToRgbShaderProgram *nv12ToRgb;
+    QnBlurShaderProgram* m_blurShader;
 };
 
 
@@ -63,6 +65,11 @@ public:
         Called with corresponding QGLContext is surely alive
     */
     void beforeDestroy();
+
+    /**
+     * Set blur in range [0..1]
+     */
+    void setBlurFactor(qreal value);
 
     Qn::RenderStatus paint(const QRectF &sourceRect, const QRectF &targetRect);
 
@@ -120,14 +127,16 @@ private:
     void drawVideoTextureDirectly(
         const QRectF& tex0Coords,
         unsigned int tex0ID,
-        const float* v_array );
+        const float* v_array,
+        qreal opacity);
 
     //!Draws texture \a tex0ID with fisheye effect to the screen
     void drawFisheyeRGBVideoTexture(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
         const QRectF& tex0Coords,
         unsigned int tex0ID,
-        const float* v_array);
+        const float* v_array,
+        qreal opacity);
 
     //!Draws to the screen YV12 image represented with three textures (one for each plane YUV) using shader which mixes all three planes to RGB
     void drawYV12VideoTexture(
@@ -137,7 +146,8 @@ private:
         unsigned int tex1ID,
         unsigned int tex2ID,
         const float* v_array,
-        bool isStillImage);
+        bool isStillImage,
+        qreal opacity);
     //!Draws YUV420 with alpha channel
     void drawYVA12VideoTexture(
         const DecodedPictureToOpenGLUploader::ScopedPictureLock& /*picLock*/,
@@ -146,13 +156,15 @@ private:
         unsigned int tex1ID,
         unsigned int tex2ID,
         unsigned int tex3ID,
-        const float* v_array );
+        const float* v_array,
+        qreal opacity);
     //!Draws to the screen NV12 image represented with two textures (Y-plane and UV-plane) using shader which mixes both planes to RGB
     void drawNV12VideoTexture(
         const QRectF& tex0Coords,
         unsigned int tex0ID,
         unsigned int tex1ID,
-        const float* v_array );
+        const float* v_array,
+        qreal opacity);
     //!Draws currently binded texturere
     /*!
      * \param v_array
@@ -162,6 +174,19 @@ private:
     void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
+    Qn::RenderStatus drawVideoData(
+        const QRectF &sourceRect,
+        const QRectF &targetRect,
+        qreal opacity);
+
+    Qn::RenderStatus prepareBlurBuffers();
+    Qn::RenderStatus renderBlurFBO(const QRectF &sourceRect);
+    void doBlurStep(
+        const QRectF& sourceRect,
+        const QRectF& dstRect,
+        GLuint texture,
+        const QVector2D& textureOffset,
+        bool isHorizontalPass);
 
 private:
     bool m_initialized;
@@ -171,6 +196,11 @@ private:
     QSharedPointer<QOpenGLVertexArrayObject> m_vertices;
     QOpenGLBuffer m_positionBuffer;
     QOpenGLBuffer m_textureBuffer;
+
+    std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferA;
+    std::unique_ptr<QOpenGLFramebufferObject> m_blurBufferB;
+    qreal m_blurFactor;
+    qreal m_prevBlurFactor;
 };
 
 #endif //QN_GL_RENDERER_H

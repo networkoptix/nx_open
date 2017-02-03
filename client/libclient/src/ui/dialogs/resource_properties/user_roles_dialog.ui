@@ -35,11 +35,11 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QStackedWidget" name="groupInfoStackedWidget">
+    <widget class="QStackedWidget" name="userRoleInfoStackedWidget">
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="noGroupsPage">
+     <widget class="QWidget" name="noUserRolesPage">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label">
@@ -57,7 +57,7 @@ Click &quot;New role&quot; button to create one.</string>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="groupInfoPage">
+     <widget class="QWidget" name="userRoleInfoPage">
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QTabWidget" name="tabWidget">
@@ -71,7 +71,7 @@ Click &quot;New role&quot; button to create one.</string>
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QnPanel" name="groupsPanel" native="true">
+    <widget class="QnPanel" name="userRolesPanel" native="true">
      <property name="minimumSize">
       <size>
        <width>200</width>
@@ -95,7 +95,7 @@ Click &quot;New role&quot; button to create one.</string>
        <number>0</number>
       </property>
       <item>
-       <widget class="QnTreeView" name="groupsTreeView">
+       <widget class="QnTreeView" name="userRolesTreeView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
           <horstretch>0</horstretch>
@@ -143,14 +143,14 @@ Click &quot;New role&quot; button to create one.</string>
          <number>16</number>
         </property>
         <item>
-         <widget class="Line" name="groupsListUnderline">
+         <widget class="Line" name="userRolesListUnderline">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="newGroupButton">
+         <widget class="QPushButton" name="newUserRoleButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>

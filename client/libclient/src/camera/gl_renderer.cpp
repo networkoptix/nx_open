@@ -1,6 +1,7 @@
 #include "gl_renderer.h"
 
 #include <QtGui/qopengl.h>
+#include <QOpenGLFramebufferObject>
 
 #include <cassert>
 
@@ -44,6 +45,8 @@ namespace {
         return result;
     }
 
+    static const int kMaxBlurSize = 2048;
+
 } // anonymous namespace
 
 
@@ -55,6 +58,7 @@ QnGlRendererShaders::QnGlRendererShaders(QObject *parent): QObject(parent) {
     yv12ToRgbWithGamma = new QnYv12ToRgbWithGammaShaderProgram(this);
     yv12ToRgba = new QnYv12ToRgbaShaderProgram(this);
     nv12ToRgb = new QnNv12ToRgbShaderProgram(this);
+    m_blurShader = new QnBlurShaderProgram(this);
 
 
     const QString GAMMA_STRING(lit("clamp(pow(max(y+ yLevels2, 0.0) * yLevels1, yGamma), 0.0, 1.0)"));
@@ -121,10 +125,9 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
 
     m_initialized(false),
     m_positionBuffer(QOpenGLBuffer::VertexBuffer),
-    m_textureBuffer(QOpenGLBuffer::VertexBuffer)
-
-    //m_extraMin(-PI/4.0),
-    //m_extraMax(PI/4.0) // rotation range
+    m_textureBuffer(QOpenGLBuffer::VertexBuffer),
+    m_blurFactor(0.0),
+    m_prevBlurFactor(0.0)
 {
     NX_ASSERT( context );
 
@@ -156,12 +159,179 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
+Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
+{
+    QSize result;
+    DecodedPictureToOpenGLUploader::ScopedPictureLock picLock(m_decodedPictureProvider);
+    if (!picLock.get())
+    {
+        NX_LOG(lit("Exited QnGLRenderer::paint (1)"), cl_logDEBUG2);
+        return Qn::NothingRendered;
+    }
+
+    result = QSize(picLock->width(), picLock->height());
+    if (result.width() > kMaxBlurSize)
+    {
+        qreal ar = result.width() / (qreal) result.height();
+        result = QSize(kMaxBlurSize, kMaxBlurSize / ar);
+    }
+
+    if (!m_blurBufferA || m_blurBufferA->size() != result)
+    {
+        m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
+        m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
+        return Qn::NewFrameRendered;
+    }
+
+    if (qFuzzyEquals(m_blurFactor, m_prevBlurFactor))
+        return picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
+    m_prevBlurFactor = m_blurFactor;
+    return Qn::NewFrameRendered;
+}
+
+void QnGLRenderer::doBlurStep(
+    const QRectF& sourceRect,
+    const QRectF& dstRect,
+    GLuint texture,
+    const QVector2D& textureOffset,
+    bool isHorizontalPass)
+{
+    const float v_array[] =
+    {
+        (float)dstRect.left(),
+        (float)dstRect.bottom(),
+
+        (float)dstRect.right(),
+        (float)dstRect.bottom(),
+
+        (float)dstRect.right(),
+        (float)dstRect.top(),
+
+        (float)dstRect.left(),
+        (float)dstRect.top()
+
+    };
+
+    const float tx_array[8] =
+    {
+        (float)sourceRect.x(), (float)sourceRect.y(),
+        (float)sourceRect.right(), (float)sourceRect.top(),
+        (float)sourceRect.right(), (float)sourceRect.bottom(),
+        (float)sourceRect.x(), (float)sourceRect.bottom()
+    };
+
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glCheckError("glBindTexture");
+
+    m_shaders->m_blurShader->bind();
+    m_shaders->m_blurShader->setTexture(0);
+    m_shaders->m_blurShader->setTextureOffset(textureOffset);
+
+    m_shaders->m_blurShader->setHorizontalPass(isHorizontalPass);
+    //m_shaders->m_blurShader->setBlurSize(9);
+    // m_shaders->m_blurShader->setSigma(6);
+    drawBindedTexture(m_shaders->m_blurShader, v_array, tx_array);
+    m_shaders->m_blurShader->release();
+
+}
+
+void QnGLRenderer::setBlurFactor(qreal value)
+{
+    m_blurFactor = value;
+}
+
+Qn::RenderStatus QnGLRenderer::renderBlurFBO(const QRectF &sourceRect)
+{
+    GLint prevViewPort[4];
+    glGetIntegerv(GL_VIEWPORT, prevViewPort);
+
+    auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
+    auto prevMatrix = renderer->getModelViewMatrix();
+    renderer->setModelViewMatrix(QMatrix4x4());
+
+    QRectF dstPaintRect(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+
+    // first step: blur to FBO_A
+    QSize blurSize = m_blurBufferA->size();
+    glViewport(0, 0, blurSize.width(), blurSize.height());
+
+    m_blurBufferA->bind();
+    static const qreal kOpaque = 1.0;
+    auto result = drawVideoData(sourceRect, dstPaintRect, kOpaque);
+    m_blurBufferA->release();
+
+    const int kIterations = 8;
+
+    QOpenGLFramebufferObject* fboA = m_blurBufferA.get();
+    QOpenGLFramebufferObject* fboB = m_blurBufferB.get();
+    for (int i = 0; i < kIterations; ++i)
+    {
+        // blur A->B, B->A several times
+        const float blurStep = (kIterations - i - 1) * m_blurFactor * 1.2;
+        const QVector2D textureOffset(
+            1.0 / kMaxBlurSize * blurStep,
+            1.0 / kMaxBlurSize * blurStep);
+
+        fboB->bind();
+        doBlurStep(sourceRect, dstPaintRect, fboA->texture(), textureOffset, i % 2 == 0);
+        fboB->release();
+        std::swap(fboA, fboB);
+    }
+
+    renderer->setModelViewMatrix(prevMatrix);
+    glViewport(prevViewPort[0], prevViewPort[1], prevViewPort[2], prevViewPort[3]);
+    return result;
+}
+
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &targetRect)
 {
-    NX_LOG( lit("Entered QnGLRenderer::paint"), cl_logDEBUG2 );
-
     QOpenGLFunctions::initializeOpenGLFunctions();
 
+    if (qFuzzyEquals(m_blurFactor, 0.0))
+    {
+        m_blurBufferA.reset();
+        m_blurBufferB.reset();
+        m_prevBlurFactor = 0.0;
+        return drawVideoData(sourceRect, targetRect, m_decodedPictureProvider.opacity());
+    }
+
+    Qn::RenderStatus result = prepareBlurBuffers();
+    if (result == Qn::NothingRendered || result == Qn::CannotRender)
+        return result;
+
+    if (result == Qn::NewFrameRendered)
+        result = renderBlurFBO(sourceRect);
+
+    // paint to screen
+    const float v_array[] =
+    {
+        (float)targetRect.left(),
+        (float)targetRect.bottom(),
+
+        (float)targetRect.right(),
+        (float)targetRect.bottom(),
+
+        (float)targetRect.right(),
+        (float)targetRect.top(),
+
+        (float)targetRect.left(),
+        (float)targetRect.top()
+
+    };
+
+    drawVideoTextureDirectly(sourceRect, m_blurBufferA->texture(),
+        v_array, m_decodedPictureProvider.opacity());
+
+    return result;
+}
+
+Qn::RenderStatus QnGLRenderer::drawVideoData(
+    const QRectF &sourceRect,
+    const QRectF &targetRect,
+    qreal opacity)
+{
     DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
     if( !picLock.get() )
     {
@@ -198,12 +368,12 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                         picLock,
                         QnGeometry::subRect(picLock->textureRect(), sourceRect),
                         picLock->glTextures()[0],
-                        v_array );
+                        v_array, opacity);
                 else
                     drawVideoTextureDirectly(
                         QnGeometry::subRect(picLock->textureRect(), sourceRect),
                         picLock->glTextures()[0],
-                        v_array );
+                        v_array, opacity);
                 break;
 
             case AV_PIX_FMT_YUVA420P:
@@ -215,7 +385,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
                     picLock->glTextures()[3],
-                    v_array );
+                    v_array, opacity);
                 break;
 
             case AV_PIX_FMT_YUV420P:
@@ -227,7 +397,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
                     v_array,
-                    picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage);
+                    picLock->flags() & QnAbstractMediaData::MediaFlags_StillImage, opacity);
                 break;
 
             case AV_PIX_FMT_NV12:
@@ -236,7 +406,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
                     QnGeometry::subRect(picLock->textureRect(), sourceRect),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
-                    v_array );
+                    v_array, opacity);
                 break;
 
             default:
@@ -268,7 +438,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &sourceRect, const QRectF &tar
 void QnGLRenderer::drawVideoTextureDirectly(
     const QRectF& tex0Coords,
     unsigned int tex0ID,
-    const float* v_array )
+    const float* v_array,
+    qreal opacity)
 {
     cl_log.log( lit("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
 
@@ -286,7 +457,7 @@ void QnGLRenderer::drawVideoTextureDirectly(
     auto renderer = QnOpenGLRendererManager::instance(QGLContext::currentContext());
     auto shader = renderer->getTextureShader();
     shader->bind();
-    shader->setColor(QVector4D(1.0f,1.0f,1.0f,1.0f));
+    shader->setColor(QVector4D(1.0f,1.0f,1.0f, opacity));
     shader->setTexture(0);
     drawBindedTexture(shader, v_array, tx_array);
     shader->release();
@@ -313,7 +484,8 @@ void QnGLRenderer::drawYV12VideoTexture(
     unsigned int tex1ID,
     unsigned int tex2ID,
     const float* v_array,
-    bool isStillImage)
+    bool isStillImage,
+    qreal opacity)
 {
     float tx_array[8] = {
         (float)tex0Coords.x(), (float)tex0Coords.y(),
@@ -377,7 +549,7 @@ void QnGLRenderer::drawYV12VideoTexture(
     shader->setYTexture( 0 );
     shader->setUTexture( 1 );
     shader->setVTexture( 2 );
-    shader->setOpacity(m_decodedPictureProvider.opacity());
+    shader->setOpacity(opacity);
 
     if (fisheyeShader) {
         fisheyeShader->setDewarpingParams(mediaParams, itemParams, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
@@ -415,7 +587,8 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
     const DecodedPictureToOpenGLUploader::ScopedPictureLock& picLock,
     const QRectF& tex0Coords,
     unsigned int tex0ID,
-    const float* v_array)
+    const float* v_array,
+    qreal opacity)
 {
 
     float tx_array[8] = {
@@ -448,7 +621,7 @@ void QnGLRenderer::drawFisheyeRGBVideoTexture(
 
     fisheyeShader->bind();
     fisheyeShader->setRGBATexture( 0 );
-    fisheyeShader->setOpacity(m_decodedPictureProvider.opacity());
+    fisheyeShader->setOpacity(opacity);
 
     fisheyeShader->setDewarpingParams(mediaParams, itemParams, ar, (float)tex0Coords.right(), (float)tex0Coords.bottom());
 
@@ -472,7 +645,8 @@ void QnGLRenderer::drawYVA12VideoTexture(
     unsigned int tex1ID,
     unsigned int tex2ID,
     unsigned int tex3ID,
-    const float* v_array )
+    const float* v_array,
+    qreal opacity)
 {
     Q_UNUSED(picLock)
 
@@ -491,7 +665,7 @@ void QnGLRenderer::drawYVA12VideoTexture(
     m_shaders->yv12ToRgba->setUTexture( 1 );
     m_shaders->yv12ToRgba->setVTexture( 2 );
     m_shaders->yv12ToRgba->setATexture( 3 );
-    m_shaders->yv12ToRgba->setOpacity(m_decodedPictureProvider.opacity() );
+    m_shaders->yv12ToRgba->setOpacity(opacity);
 
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, tex3ID);
@@ -518,7 +692,8 @@ void QnGLRenderer::drawNV12VideoTexture(
     const QRectF& tex0Coords,
     unsigned int yPlaneTexID,
     unsigned int uvPlaneTexID,
-    const float* v_array )
+    const float* v_array,
+    qreal opacity)
 {
     float tx_array[8] = {
         0.0f, 0.0f,
@@ -531,7 +706,7 @@ void QnGLRenderer::drawNV12VideoTexture(
     //m_shaders->nv12ToRgb->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
     m_shaders->nv12ToRgb->setYTexture( 0 );//yPlaneTexID );
     m_shaders->nv12ToRgb->setUVTexture( 1 );//uvPlaneTexID );
-    m_shaders->nv12ToRgb->setOpacity( m_decodedPictureProvider.opacity() );
+    m_shaders->nv12ToRgb->setOpacity(opacity);
     m_shaders->nv12ToRgb->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
     glActiveTexture(GL_TEXTURE1);

@@ -78,7 +78,8 @@ struct ConfigureSystemData : public PasswordData
         PasswordData(),
         wholeSystem(false),
         sysIdTime(0),
-        port(0)
+        port(0),
+        rewriteLocalSettings(false)
     {
     }
 
@@ -103,6 +104,7 @@ struct ConfigureSystemData : public PasswordData
     std::vector<ec2::ApiUserData> foreignUsers;
     ec2::ApiResourceParamDataList foreignSettings;
     ec2::ApiResourceParamWithRefDataList additionParams;
+    bool rewriteLocalSettings;
 };
 
 /*
@@ -113,12 +115,17 @@ struct ConfigureSystemData : public PasswordData
 bool changeLocalSystemId(const ConfigureSystemData& data);
 
 /**
+ * Auto detect HTTP content type based on message body
+ */
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
+
+/**
  * @return false if failed to save some data.
  */
 bool resetSystemToStateNew();
 
 
-#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)
+#define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (ConfigureSystemData),

@@ -8,21 +8,28 @@
 /**
  * Analogue of gtest's ASSERT_EQ but supports placing in non-void methods (throws on failure).
  */
-#define NX_GTEST_ASSERT_EQ(expected, actual) \
-    do \
+#define NX_GTEST_ASSERT_EQ(expected, actual) do \
+{ \
+    bool resultE31cf27915b242999a4e22c7757d94de = false; \
+    [&]() -> void \
     { \
-        bool result = false; \
-        auto x = [&]() -> void \
-        { \
-            ASSERT_EQ(expected, actual); \
-            result = true; \
-        }; \
-        x(); \
-        if (!result) \
-        { \
-            throw std::runtime_error( \
-                "This is work around ASSERT_* inability to be used " \
-                "in non-void method. Just ignore..."); \
-        } \
+        ASSERT_EQ(expected, actual); \
+        resultE31cf27915b242999a4e22c7757d94de = true; \
+    }(); \
+    if (!resultE31cf27915b242999a4e22c7757d94de) \
+    { \
+        throw std::runtime_error( \
+            "This is work around ASSERT_* inability to be used " \
+            "in non-void method. Just ignore..."); \
     } \
-    while (0)
+} while (0)
+
+#define NX_GTEST_ASSERT_TRUE(expected) do \
+{ \
+    NX_GTEST_ASSERT_EQ(true, expected); \
+} while (0)
+
+#define NX_GTEST_ASSERT_FALSE(expected) do \
+{ \
+    NX_GTEST_ASSERT_EQ(false, expected); \
+} while (0)

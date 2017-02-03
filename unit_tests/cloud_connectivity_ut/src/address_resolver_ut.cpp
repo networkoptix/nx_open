@@ -21,17 +21,17 @@ public:
 
         s_stunClient = std::make_shared<stun::test::AsyncClientMock>();
         s_stunClient->emulateRequestHandler(
-            stun::cc::methods::resolvePeer,
+            stun::extension::methods::resolvePeer,
             [](
                 stun::Message request,
                 stun::AbstractAsyncClient::RequestHandler handler )
             {
-                const auto attr = request.getAttribute<stun::cc::attrs::HostName>();
+                const auto attr = request.getAttribute<stun::extension::attrs::HostName>();
                 ASSERT_TRUE(attr);
 
                 stun::Message response(stun::Header(
                     stun::MessageClass::successResponse,
-                    stun::cc::methods::resolvePeer,
+                    stun::extension::methods::resolvePeer,
                     std::move(request.header.transactionId)));
 
                 const auto host = QString::fromUtf8(attr->getString());
@@ -45,12 +45,12 @@ public:
                 if (it == s_endpoints.end())
                 {
                     response.header.messageClass = stun::MessageClass::errorResponse;
-                    response.newAttribute<stun::attrs::ErrorDescription>(404);
+                    response.newAttribute<stun::attrs::ErrorCode>(404);
                 }
                 else
                 {
-                    response.newAttribute<stun::cc::attrs::PublicEndpointList>(it->second);
-                    response.newAttribute<stun::cc::attrs::ConnectionMethods>("1");
+                    response.newAttribute<stun::extension::attrs::PublicEndpointList>(it->second);
+                    response.newAttribute<stun::extension::attrs::ConnectionMethods>("1");
                 }
 
                 handler(SystemError::noError, std::move(response));
@@ -121,6 +121,11 @@ public:
     }
 
 private:
+    virtual bool isMediatorAvailable() const override
+    {
+        return true;
+    }
+
     static std::map<QString, std::list<SocketAddress>> s_endpoints;
     static std::shared_ptr<stun::test::AsyncClientMock> s_stunClient;
 };

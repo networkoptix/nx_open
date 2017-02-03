@@ -92,7 +92,17 @@ public:
     bool isInitialized() const;
 
     void synchronizeNow();
+
+    /**
+     * Save all settings to database
+     */
+    bool resynchronizeNowSync();
+
+    /**
+    * Save modified settings to database
+    */
     bool synchronizeNowSync();
+
     bool takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer);
 
     QSet<QString> disabledVendorsSet() const;
@@ -198,6 +208,9 @@ public:
 
     bool arecontRtspEnabled() const;
     void setArecontRtspEnabled(bool newVal) const;
+
+    int maxRtpRetryCount() const;
+    void setMaxRtpRetryCount(int newVal);
 
     std::chrono::seconds proxyConnectTimeout() const;
 
@@ -307,6 +320,8 @@ private:
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
+
+    QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     AdaptorList m_allAdaptors;
 

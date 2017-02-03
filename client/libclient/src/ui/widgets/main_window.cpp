@@ -58,7 +58,6 @@
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
-#include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/watchers/workbench_server_port_watcher.h>
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
@@ -87,6 +86,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
+#include <watchers/server_address_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -224,9 +224,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchExportHandler>();
     context->instance<QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
-#ifdef _DEBUG
     context->instance<QnWorkbenchDebugHandler>();
-#endif
     context->instance<QnWorkbenchVideoWallHandler>();
     context->instance<QnWorkbenchWebPageHandler>();
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
@@ -237,7 +235,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
-    context->instance<QnWorkbenchServerAddressWatcher>();
+    context->instance<QnServerAddressWatcher>();
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
@@ -287,7 +285,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::ToggleTourModeAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
-    addAction(action(QnActions::DebugShowResourcePoolAction));
     addAction(action(QnActions::DebugControlPanelAction));
     addAction(action(QnActions::SystemAdministrationAction));
     if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))

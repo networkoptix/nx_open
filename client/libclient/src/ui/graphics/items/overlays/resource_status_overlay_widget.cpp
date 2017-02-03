@@ -27,6 +27,7 @@ QnMaskedProxyWidget* makeMaskedProxy(
     const auto result = new QnMaskedProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
+    result->setCacheMode(QGraphicsItem::NoCache);
 
     if (transparent)
         makeTransparentForMouse(result);
@@ -38,7 +39,7 @@ void setupButton(QPushButton& button)
 {
     static const auto kDefaultButtonHeight = 28.0;
 
-    button.setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    button.setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     button.setFixedHeight(kDefaultButtonHeight);
 
     static const auto kButtonName = lit("itemStateExtraActionButton");
@@ -85,23 +86,54 @@ void setupButton(QPushButton& button)
     button.setStyleSheet(kStyleSheet);
 }
 
-void setupCaptionLabel(QLabel* label, bool isErrorStyle)
+enum LabelStyleFlag
 {
+    kNormalStyle = 0x0,
+    kErrorStyle = 0x1,
+    kDescriptionStyle = 0x2
+};
+
+Q_DECLARE_FLAGS(LabelStyleFlags, LabelStyleFlag)
+
+LabelStyleFlags getCaptionStyle(bool isError)
+{
+    return static_cast<LabelStyleFlags>(isError
+        ? LabelStyleFlag::kErrorStyle
+        : LabelStyleFlag::kNormalStyle);
+}
+
+LabelStyleFlags getDescriptionStyle(bool isError)
+{
+    const LabelStyleFlag errorFlag = static_cast<LabelStyleFlag>(isError
+        ? LabelStyleFlag::kErrorStyle
+        : LabelStyleFlag::kNormalStyle);
+
+    return static_cast<LabelStyleFlags>(LabelStyleFlag::kDescriptionStyle | errorFlag);
+}
+
+void setupLabel(QLabel* label, LabelStyleFlags style)
+{
+    const bool isDescription = style.testFlag(kDescriptionStyle);
+    const bool isError = style.testFlag(kErrorStyle);
+
     auto font = label->font();
-    font.setPixelSize(isErrorStyle ? 88 : 80);
-    font.setWeight(QFont::Light);
+    const int pixelSize = (isDescription ? 36 : (isError ? 88 : 80));
+    const int areaWidth = (isError ? 960 : 800);
+
+    font.setPixelSize(pixelSize);
+    font.setWeight(isDescription ? QFont::Normal : QFont::Light);
     label->setFont(font);
 
     label->setAlignment(Qt::AlignCenter);
-    label->setFixedWidth(960);
-    label->setMinimumHeight(qMax(120, label->heightForWidth(label->width())));
-    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    label->setWordWrap(true);
-    label->setVisible(false);
+    label->setWordWrap(isDescription);
 
-    const auto color = isErrorStyle
+    label->setFixedWidth(isDescription
+        ? areaWidth
+        : qMax(areaWidth, label->minimumSizeHint().width()));
+
+    const auto color = (style.testFlag(kErrorStyle)
         ? qnNxStyle->mainColor(QnNxStyle::Colors::kRed)
-        : qnNxStyle->mainColor(QnNxStyle::Colors::kContrast);
+        : qnNxStyle->mainColor(QnNxStyle::Colors::kContrast));
     setPaletteColor(label, QPalette::WindowText, color);
 }
 
@@ -124,9 +156,9 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
 
     m_centralAreaImage(new QLabel()),
     m_caption(new QLabel()),
+    m_description(new QLabel()),
 
-    m_button(new QPushButton()),
-    m_description(new QnWordWrappedLabel())
+    m_button(new QPushButton())
 {
     setAutoFillBackground(true);
     makeTransparentForMouse(this);
@@ -166,7 +198,7 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
     m_caption->setVisible(captionVisible);
 
     m_button->setVisible(buttonVisible);
-    m_description->setVisible(descriptionVisible && !buttonVisible);
+    m_description->setVisible(descriptionVisible);
 
     m_visibleControls = controls;
     updateAreasSizes();
@@ -180,7 +212,9 @@ void QnStatusOverlayWidget::setIconOverlayPixmap(const QPixmap& pixmap)
 
 void QnStatusOverlayWidget::setIcon(const QPixmap& pixmap)
 {
-    const auto size = pixmap.size();
+    const auto size = pixmap.isNull()
+        ? QSize(0, 0)
+        : pixmap.size() / pixmap.devicePixelRatio();
     m_centralAreaImage->setPixmap(pixmap);
     m_centralAreaImage->setFixedSize(size);
     m_centralAreaImage->setVisible(!pixmap.isNull());
@@ -193,14 +227,15 @@ void QnStatusOverlayWidget::setErrorStyle(bool isErrorStyle)
 
     m_errorStyle = isErrorStyle;
 
-    setupCaptionLabel(m_caption, isErrorStyle);
+    setupLabel(m_caption, getCaptionStyle(isErrorStyle));
+    setupLabel(m_description, getDescriptionStyle(isErrorStyle));
     updateAreasSizes();
 }
 
 void QnStatusOverlayWidget::setCaption(const QString& caption)
 {
     m_caption->setText(caption);
-    setupCaptionLabel(m_caption, m_errorStyle);
+    setupLabel(m_caption, getCaptionStyle(m_errorStyle));
     updateAreasSizes();
 }
 
@@ -213,6 +248,7 @@ void QnStatusOverlayWidget::setButtonText(const QString& text)
 void QnStatusOverlayWidget::setDescription(const QString& description)
 {
     m_description->setText(description);
+    setupLabel(m_description, getDescriptionStyle(m_errorStyle));
     updateAreasSizes();
 }
 
@@ -233,9 +269,16 @@ void QnStatusOverlayWidget::setupPreloader()
 void QnStatusOverlayWidget::setupCentralControls()
 {
     m_centralAreaImage->setVisible(false);
-    setupCaptionLabel(m_caption, m_errorStyle);
+
+    setupLabel(m_caption, getCaptionStyle(m_errorStyle));
+    m_caption->setVisible(false);
+
+    setupLabel(m_description, getDescriptionStyle(m_errorStyle));
+    m_description->setVisible(false);
 
     const auto container = new QWidget();
+    container->setObjectName(lit("centralContainer"));
+    container->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setPaletteColor(container, QPalette::Window, Qt::transparent);
 
     const auto layout = new QVBoxLayout(container);
@@ -243,14 +286,18 @@ void QnStatusOverlayWidget::setupCentralControls()
 
     layout->addWidget(m_centralAreaImage, 0, Qt::AlignHCenter);
     layout->addWidget(m_caption, 0, Qt::AlignHCenter);
+    layout->addWidget(m_description, 0, Qt::AlignHCenter);
 
-    layout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+    const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    horizontalLayout->addStretch(1);
+    horizontalLayout->addItem(makeMaskedProxy(container, m_centralHolder, true));
+    horizontalLayout->addStretch(1);
 
-    const auto holderLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
-    holderLayout->setContentsMargins(16, 60, 16, 60);
-    holderLayout->addStretch(1);
-    holderLayout->addItem(makeMaskedProxy(container, m_centralHolder, true));
-    holderLayout->addStretch(1);
+    const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_centralHolder);
+    verticalLayout->setContentsMargins(16, 60, 16, 60);
+    verticalLayout->addStretch(1);
+    verticalLayout->addItem(horizontalLayout);
+    verticalLayout->addStretch(1);
 
     m_centralHolder->setOpacity(0.7);
     makeTransparentForMouse(m_centralHolder);
@@ -261,19 +308,27 @@ void QnStatusOverlayWidget::setupExtrasControls()
     setupButton(*m_button);
     m_button->setVisible(false);
 
-    m_description->label()->setAlignment(Qt::AlignHCenter);
-    m_description->setVisible(false);
+    /* Even though there's only one button in the extras holder,
+     * a container widget with a layout must be created, otherwise
+     * graphics proxy doesn't handle size hint changes at all. */
 
-    const auto layout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
-    layout->setContentsMargins(16, 0, 16, 16);
+    const auto container = new QWidget();
+    container->setObjectName(lit("extrasContainer"));
 
-    const auto buttonProxy = makeMaskedProxy(m_button, m_extrasHolder, false);
-    layout->addItem(buttonProxy);
-    layout->setAlignment(buttonProxy, Qt::AlignHCenter);
+    const auto layout = new QHBoxLayout(container);
+    layout->setContentsMargins(QMargins());
+    layout->addWidget(m_button);
 
-    const auto descriptionProxy = makeMaskedProxy(m_description, m_extrasHolder, true);
-    layout->addItem(descriptionProxy);
-    layout->setAlignment(descriptionProxy, Qt::AlignHCenter);
+    const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    horizontalLayout->addStretch(1);
+    horizontalLayout->addItem(makeMaskedProxy(container, m_extrasHolder, false));
+    horizontalLayout->addStretch(1);
+
+    const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_extrasHolder);
+    verticalLayout->setContentsMargins(16, 0, 16, 16);
+    verticalLayout->addStretch(1);
+    verticalLayout->addItem(horizontalLayout);
+    verticalLayout->addStretch(1);
 
     makeTransparentForMouse(m_extrasHolder);
 }
@@ -346,7 +401,9 @@ void QnStatusOverlayWidget::updateAreasSizes()
     m_extrasHolder->setPos(0, height - extrasHeight);
     m_extrasHolder->setFixedSize(QSizeF(rect.width(), extrasHeight));
 
-    const QSizeF imageSize = m_imageItem.pixmap().size();
+    const QSizeF imageSize = m_imageItem.pixmap().isNull()
+        ? QSizeF(0, 0)
+        : QSizeF(m_imageItem.pixmap().size()) / m_imageItem.pixmap().devicePixelRatioF();
     auto imageSceneSize = imageSize * scale;
     const auto aspect = (imageSceneSize.isNull() || !imageSceneSize.height() || !imageSceneSize.width()
         ? 1

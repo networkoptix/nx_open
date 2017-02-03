@@ -1,16 +1,27 @@
 <?xml version='1.0' encoding='windows-1252'?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
     <Fragment Id='FragmentClientPackage'>
         <PackageGroup Id="ClientPackageGroup">
             <MsiPackage
                 Id="ClientPackage"
                 Name="$(var.ClientMsiName)"
                 SourceFile="bin/strip/$(var.ClientMsiName)"
+                InstallCondition="InstallClientOnly=1 OR InstallClientAndServer=1"
                 Vital="yes"
-                Cache="no"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>
         </PackageGroup>
+    </Fragment>
+
+    <Fragment Id='FragmentClientConditions'>
+        <?include BuildVars.wxi ?>
+
+        <util:ProductSearch
+            Id="ClientMsiSearch"
+            UpgradeCode="$(var.clientUpgradeCode)"
+            Result="state"
+            Variable="ClientInstalled" />
     </Fragment>
 </Wix>

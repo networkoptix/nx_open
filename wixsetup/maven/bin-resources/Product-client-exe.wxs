@@ -13,18 +13,26 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
 
-        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-            <bal:WixStandardBootstrapperApplication
-                LicenseFile="License.rtf"
-                LogoFile="logo-64x64.png"
-                SuppressRepair="yes"
+        <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="License.html" />
+            <Payload SourceFile="installer_bg.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
+
+            <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
+                LicenseUrl="License.html" 
                 ShowFilesInUse="yes"
-                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"
-            />
+                SuppressRepair="yes"
+                LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 
-        <Chain>
+        <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeClient.wxl" />
+
+        <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="ClientPackageGroup"/>
         </Chain>
     </Bundle>

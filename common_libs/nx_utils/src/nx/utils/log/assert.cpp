@@ -6,11 +6,20 @@ namespace nx {
 namespace utils {
 
 /** Change to see more or less records at the end of execution */
-static size_t kShowTheMostCount(30);
+static const size_t kShowTheMostCount(30);
 
-void logError(const lm& message)
+static std::function<void(const QnLogMessage&)> g_onAssertHandler;
+
+void logAssert(const QnLogMessage& message)
 {
     NX_LOG(message, cl_logERROR);
+    if (g_onAssertHandler)
+        g_onAssertHandler(message);
+}
+
+void setOnAssertHandler(std::function<void(const QnLogMessage&)> handler)
+{
+    g_onAssertHandler = std::move(handler);
 }
 
 AssertTimer::TimeInfo::TimeInfo()

@@ -47,7 +47,7 @@ QnStatusOverlayController::QnStatusOverlayController(
     m_buttonTexts(getButtonCaptions(resource)),
     m_visibleItems( QnStatusOverlayWidget::Control::kNoControl),
     m_statusOverlay(Qn::EmptyOverlay),
-    m_currentButton(Button::kNoButton),
+    m_currentButton(Qn::ResourceOverlayButton::Empty),
 
     m_isErrorOverlay(isErrorOverlayCheck(m_statusOverlay))
 {
@@ -60,8 +60,11 @@ QnStatusOverlayController::QnStatusOverlayController(
     connect(this, &QnStatusOverlayController::currentButtonChanged,
         this, &QnStatusOverlayController::updateVisibleItems);
 
-    connect(m_widget, &QnStatusOverlayWidget::actionButtonClicked,
-        this, &QnStatusOverlayController::buttonClicked);
+    connect(m_widget, &QnStatusOverlayWidget::actionButtonClicked, this,
+        [this]
+        {
+            emit buttonClicked(m_currentButton);
+        });
 
     connect(this, &QnStatusOverlayController::isErrorOverlayChanged, this,
         [this]() { m_widget->setErrorStyle(isErrorOverlay()); });
@@ -102,7 +105,7 @@ void QnStatusOverlayController::updateWidgetItems()
     m_widget->setIconOverlayPixmap(qnSkin->pixmap(statusIcon(statusOverlay())));
 }
 
-void QnStatusOverlayController::onStatusOverlayChanged()
+void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
 {
     NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
     if (!m_widget)
@@ -127,9 +130,10 @@ QnStatusOverlayWidget::Controls QnStatusOverlayController::errorVisibleItems()
     if (!statusIcon(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kIcon;
 
-    if (m_currentButton != Button::kNoButton)
+    if (m_currentButton != Qn::ResourceOverlayButton::Empty)
         result |= QnStatusOverlayWidget::Control::kButton;
-    else if (!descriptionText(overlay).isEmpty())
+
+    if (!descriptionText(overlay).isEmpty())
         result |= QnStatusOverlayWidget::Control::kDescription;
 
     return result;
@@ -156,21 +160,22 @@ Qn::ResourceStatusOverlay QnStatusOverlayController::statusOverlay() const
     return m_statusOverlay;
 }
 
-void QnStatusOverlayController::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay)
+void QnStatusOverlayController::setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay,
+    bool animated)
 {
     if (m_statusOverlay == statusOverlay)
         return;
 
     m_statusOverlay = statusOverlay;
-    emit statusOverlayChanged();
+    emit statusOverlayChanged(animated);
 }
 
-QnStatusOverlayController::Button QnStatusOverlayController::currentButton() const
+Qn::ResourceOverlayButton QnStatusOverlayController::currentButton() const
 {
     return m_currentButton;
 }
 
-void QnStatusOverlayController::setCurrentButton(Button button)
+void QnStatusOverlayController::setCurrentButton(Qn::ResourceOverlayButton button)
 {
     if (m_currentButton == button)
         return;
@@ -222,8 +227,9 @@ QString QnStatusOverlayController::captionText(Qn::ResourceStatusOverlay overlay
 
 QString QnStatusOverlayController::descriptionText(Qn::ResourceStatusOverlay overlay)
 {
-    // TODO: add description and state for no access rights situation
-    return QString();
+    return (overlay == Qn::UnauthorizedOverlay
+        ? tr("Please check authentication information")
+        : QString());
 }
 
 QString QnStatusOverlayController::statusIcon(Qn::ResourceStatusOverlay overlay)
@@ -259,10 +265,10 @@ QnStatusOverlayController::getButtonCaptions(const QnResourcePtr& resource)
         ? resource.dynamicCast<QnVirtualCameraResource>()
         : QnVirtualCameraResourcePtr());
     IntStringHash result;
-    result.insert(toInt(QnStatusOverlayController::Button::kDiagnostics), tr("Diagnostics"));
-    result.insert(toInt(QnStatusOverlayController::Button::kIoEnable), tr("Enable"));
-    result.insert(toInt(QnStatusOverlayController::Button::kMoreLicenses), tr("Activate License"));
-    result.insert(toInt(QnStatusOverlayController::Button::kSettings),
+    result.insert(toInt(Qn::ResourceOverlayButton::Diagnostics), tr("Diagnostics"));
+    result.insert(toInt(Qn::ResourceOverlayButton::IoEnable), tr("Enable"));
+    result.insert(toInt(Qn::ResourceOverlayButton::MoreLicenses), tr("Activate License"));
+    result.insert(toInt(Qn::ResourceOverlayButton::Settings),
         QnDeviceDependentStrings::getNameFromSet(settingNameSet, camera));
     return result;
 }

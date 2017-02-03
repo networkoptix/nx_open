@@ -16,6 +16,7 @@ class QnStorageResource: public QnAbstractStorageResource
     using base_type = QnAbstractStorageResource;
 public:
     static const qint64 kNasStorageLimit;
+    static const qint64 kThirdPartyStorageLimit;
 
     QnStorageResource();
     virtual ~QnStorageResource();

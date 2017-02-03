@@ -23,7 +23,7 @@ static const struct
     const bool enableHangOnFinish = false;
     const bool forceLog = false;
     const bool logMockCameraStreams = true;
-} conf;
+} conf{};
 #include <nx/utils/test_support/test_utils.h>
 
 namespace nx {
@@ -414,7 +414,7 @@ protected:
         // Init singletons.
         m_common = new QnCommonModule();
         m_common->setModuleGUID(QnUuid::createUuid());
-        m_common->store<QnFfmpegInitializer>(new QnFfmpegInitializer());
+        m_common->store(new QnFfmpegInitializer());
 
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>();

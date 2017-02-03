@@ -13,6 +13,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/utils/disconnect_helper.h>
+
 class QComboBox;
 class QLineEdit;
 class QTabWidget;
@@ -119,6 +121,9 @@ public:
 
     bool isScrollBarVisible() const;
 
+    void hideToolTip();
+    void showToolTip();
+
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -158,11 +163,8 @@ private:
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
-    void hideToolTip();
-    void showToolTip();
-    void updateIcons();
 
-    void forceUpdateFilter() { updateFilter(true); }
+    void updateIcons();
 
     void at_tabWidget_currentChanged(int index);
 
@@ -186,6 +188,7 @@ private:
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
+    QnDisconnectHelperPtr m_disconnectHelper;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H

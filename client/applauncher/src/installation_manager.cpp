@@ -17,8 +17,8 @@
 #include <utils/update/zip_utils.h>
 
 #if defined(Q_OS_MACX)
-#include <platform/core_foundation_mac/cf_url.h>
-#include <platform/core_foundation_mac/cf_string.h>
+#include <nx/utils/platform/core_foundation_mac/cf_url.h>
+#include <nx/utils/platform/core_foundation_mac/cf_string.h>
 #endif
 
 namespace {
@@ -118,7 +118,10 @@ void InstallationManager::updateInstalledVersionsInformation()
             installation->setNeedsVerification(verify);
 
             if (verify && !installation->verify())
+            {
+                NX_LOG(QString::fromLatin1("Compatibility version %1 was not verified").arg(version), cl_logDEBUG1);
                 return;
+            }
 
             installation->setVersion(QnSoftwareVersion(version));
             installations.insert(installation->version(), installation);

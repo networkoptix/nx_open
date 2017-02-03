@@ -25,6 +25,8 @@ public:
     QnCredentials localCredentials() const;
     QnCredentials cloudCredentials() const;
     void setCloudCredentials(const QnCredentials& value);
+
+    bool savePassword() const;
 private:
     Q_DECLARE_PRIVATE(QnSetupWizardDialog)
     QScopedPointer<QnSetupWizardDialogPrivate> d_ptr;

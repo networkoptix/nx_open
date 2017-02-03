@@ -15,6 +15,7 @@
 #include <utils/math/color_transformations.h>
 
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/delegates/calendar_item_delegate.h>
 #include <ui/common/palette.h>
 
@@ -38,6 +39,8 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
+    setProperty(style::Properties::kDontPolishFontProperty, true);
+
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
     monthButton->setMenu(NULL);
@@ -51,9 +54,11 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent)
     QTableView *tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     tableView->horizontalHeader()->setMinimumSectionSize(18);
     connect(tableView, SIGNAL(changeDate(const QDate &, bool)), this, SIGNAL(dateClicked(const QDate &)));
-    //setPaletteColor(tableView, QPalette::Highlight, QColor(0, 0, 0, 255));
 
     installEventHandler(tableView->viewport(), QEvent::Paint, this, &QnCalendarWidget::updateCurrentTime);
+
+    tableView->ensurePolished();
+    setPaletteColor(tableView, QPalette::AlternateBase, tableView->palette().color(QPalette::Base));
 
     QAbstractItemModel *model = tableView->model();
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));
@@ -124,10 +129,18 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
     const bool isSelected = m_selectedPeriod.intersects(localPeriod);
 
-    const QnTimePeriodStorage &primaryPeriods =
-        (m_currentTimePeriodsVisible ? m_currentPeriodStorage : m_emptyPeriodStorage);
+    const int dayOfWeek = date.dayOfWeek();
+    const auto foregroundRole = (dayOfWeek == Qt::Saturday || dayOfWeek == Qt::Sunday) && isEnabled
+        ? QPalette::BrightText
+        : QPalette::Text;
+
+    const QnTimePeriodStorage& primaryPeriods = (m_currentTimePeriodsVisible
+        ? m_currentPeriodStorage
+        : m_emptyPeriodStorage);
+
     m_delegate->paintCell(painter, rect, localPeriod, primaryPeriods, m_syncedPeriodStorage, isSelected);
-    m_delegate->paintCellText(painter, palette(), rect, QString::number(date.day()), isEnabled);
+    m_delegate->paintCellText(painter, palette(), rect,
+        QString::number(date.day()), isEnabled, foregroundRole);
 }
 
 void QnCalendarWidget::updateEmpty() {

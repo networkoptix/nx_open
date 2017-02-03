@@ -29,6 +29,11 @@ enum IDType
     ConnectAction,
 
     /**
+    * Connects to cloud system.
+    */
+    ConnectToCloudSystemAction,
+
+    /**
      * Disconnects from server.
      */
     DisconnectAction,
@@ -58,6 +63,11 @@ enum IDType
      * Opens notifications settings preferences tab.
      */
     PreferencesNotificationTabAction,
+
+    /**
+    * Opens notifications settings preferences tab.
+    */
+    PreferencesCloudTabAction,
 
     /**
      * Shows / hides FPS display.
@@ -350,11 +360,9 @@ enum IDType
     WebClientAction,
 
     /**
-     * Opens web client in the default browser. Placed in submenu
-     * TODO: #ynikitenkov Add ability to add action both in submenu and context menu,
-     * now it is not available
-     */
-    WebClientActionSubMenu,
+     * Opens web admin for given server in the default browser.
+    */
+    WebAdminAction,
 
     /**
      * Opens business events editing dialog.
@@ -1051,11 +1059,6 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
-     * Shows resource pool.
-     */
-    DebugShowResourcePoolAction,
-
-    /**
      * Generates PTZ calibration screenshots.
      */
     DebugCalibratePtzAction,
@@ -1096,6 +1099,9 @@ enum IDType
      * Opens cloud account management page in the browser.
      */
     OpenCloudManagementUrl,
+
+    /** Hide cloud promo */
+    HideCloudPromoAction,
 
     ActionCount,
 

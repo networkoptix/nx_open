@@ -40,6 +40,7 @@ class QnWorkbenchItem;
 class QnWorkbenchLayout;
 class QnResourceWidget;
 class QnResourceDisplay;
+typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
 class VariantAnimator;
 class WidgetAnimator;
@@ -182,7 +183,7 @@ public:
 
     QnResourceWidget* activeWidget() const;
 
-    QnResourceDisplay *display(QnWorkbenchItem *item) const;
+    QnResourceDisplayPtr display(QnWorkbenchItem *item) const;
 
     QnClientVideoCamera *camera(QnWorkbenchItem *item) const;
 
@@ -280,8 +281,6 @@ public:
     bool isChangingLayout() const { return m_inChangeLayout; } // TODO: #GDM this is evil
 
     QnResourceWidget *zoomTargetWidget(QnResourceWidget *widget) const;
-
-    void ensureRaisedConeItem(QnResourceWidget *widget);
 
     QRectF raisedGeometry(const QRectF &widgetGeometry, qreal rotation) const;
 

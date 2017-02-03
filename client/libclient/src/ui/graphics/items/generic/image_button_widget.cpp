@@ -79,7 +79,7 @@ class QnImageButtonHoverProgressAccessor : public AbstractAccessor
     virtual void set(QObject *object, const QVariant &value) const override
     {
         QnImageButtonWidget *widget = static_cast<QnImageButtonWidget *>(object);
-        if (qFuzzyCompare(widget->m_hoverProgress, value.toReal()))
+        if (qFuzzyEquals(widget->m_hoverProgress, value.toReal()))
             return;
 
         widget->m_hoverProgress = value.toReal();

@@ -19,9 +19,9 @@ TEST(RetryTimer, tryCount)
     for (const auto retryCount: retryCountValues)
     {
         RetryPolicy policy;
-        policy.setMaxRetryCount(retryCount);
-        policy.setInitialDelay(std::chrono::milliseconds(1));
-        policy.setMaxDelay(std::chrono::milliseconds(1));
+        policy.maxRetryCount = retryCount;
+        policy.initialDelay = std::chrono::milliseconds(1);
+        policy.maxDelay = std::chrono::milliseconds(1);
 
         RetryTimer retryTimer(policy);
 
@@ -53,13 +53,13 @@ TEST(RetryTimer, delayCalculation)
 
     for (const auto maxDelay: maxDelayValues)
     {
-        for (const auto delayMultiplier : delayMultiplierValues)
+        for (const auto delayMultiplier: delayMultiplierValues)
         {
             RetryPolicy policy;
-            policy.setMaxRetryCount(RetryPolicy::kInfiniteRetries);
-            policy.setDelayMultiplier(delayMultiplier);
-            policy.setInitialDelay(initialDelay);
-            policy.setMaxDelay(maxDelay);
+            policy.maxRetryCount = RetryPolicy::kInfiniteRetries;
+            policy.delayMultiplier = delayMultiplier;
+            policy.initialDelay = initialDelay;
+            policy.maxDelay = maxDelay;
 
             RetryTimer retryTimer(policy);
             std::vector<std::chrono::milliseconds> delays;

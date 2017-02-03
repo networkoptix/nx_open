@@ -9,6 +9,7 @@ class QnConnectToCurrentSystemTool;
 class QnProgressDialog;
 class QnMergeSystemsDialog;
 
+// TODO: #ynikitenkov Rename class. Change "incompatible" to something more sensible (like 'fake')
 class QnWorkbenchIncompatibleServersActionHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware
@@ -21,11 +22,13 @@ public:
     ~QnWorkbenchIncompatibleServersActionHandler();
 
 private:
-    void connectToCurrentSystem(const QnUuid& target, const QString& initialPassword = QString());
-    bool validateStartLicenses(const QnUuid& target, const QString& adminPassword);
+    void connectToCurrentSystem(const QnFakeMediaServerResourcePtr& server);
+    bool validateStartLicenses(const QnFakeMediaServerResourcePtr& server, const QString& adminPassword);
     bool serverHasStartLicenses(
         const QnMediaServerResourcePtr& server,
         const QString& adminPassword);
+
+    QString requestPassword() const;
 
     void at_connectToCurrentSystemAction_triggered();
     void at_mergeSystemsAction_triggered();

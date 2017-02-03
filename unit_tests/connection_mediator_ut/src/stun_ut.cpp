@@ -1,15 +1,17 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/sync_queue.h>
+
+#include <common/common_globals.h>
+#include <utils/common/guard.h>
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
@@ -62,16 +64,18 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 TEST_F( StunCustomTest, Ping )
 {
     AsyncClient client;
+    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+
     client.connect( address );
 
-    stun::Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
-    request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
-    request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
+    stun::Message request( Header( MessageClass::request, stun::extension::methods::ping ) );
+    request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
+    request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
 
     std::list< SocketAddress > allEndpoints;
     allEndpoints.push_back( GOOD_ADDRESS );
     allEndpoints.push_back( BAD_ADDRESS );
-    request.newAttribute< stun::cc::attrs::PublicEndpointList >( allEndpoints );
+    request.newAttribute< stun::extension::attrs::PublicEndpointList >( allEndpoints );
     request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
 
     cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
@@ -86,9 +90,9 @@ TEST_F( StunCustomTest, Ping )
 
     const auto& response = result.second;
     ASSERT_EQ( response.header.messageClass, MessageClass::successResponse );
-    ASSERT_EQ( response.header.method, stun::cc::methods::ping );
+    ASSERT_EQ( response.header.method, stun::extension::methods::ping );
 
-    const auto eps = response.getAttribute< stun::cc::attrs::PublicEndpointList >();
+    const auto eps = response.getAttribute< stun::extension::attrs::PublicEndpointList >();
     ASSERT_NE( eps, nullptr );
 
     // only good address is expected to be returned
@@ -98,12 +102,14 @@ TEST_F( StunCustomTest, Ping )
 TEST_F( StunCustomTest, BindResolve )
 {
     AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect( address );
     {
-        stun::Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
-        request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
-        request.newAttribute< stun::cc::attrs::ServerId >( SERVER_ID );
-        request.newAttribute< stun::cc::attrs::PublicEndpointList >(
+        stun::Message request( Header( MessageClass::request, stun::extension::methods::bind ) );
+        request.newAttribute< stun::extension::attrs::SystemId >( SYSTEM_ID );
+        request.newAttribute< stun::extension::attrs::ServerId >( SERVER_ID );
+        request.newAttribute< stun::extension::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 
         request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
@@ -118,12 +124,14 @@ TEST_F( StunCustomTest, BindResolve )
     }
 
     AsyncClient connectClient;
+    auto connectClientGuard = makeScopedGuard([&connectClient]() { connectClient.pleaseStopSync(); });
+
     connectClient.connect( address );
     {
         stun::Message request( Header(
-            MessageClass::request, stun::cc::methods::resolveDomain ) );
-        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
+            MessageClass::request, stun::extension::methods::resolveDomain ) );
+        request.newAttribute< stun::extension::attrs::PeerId >( "SomeClient" );
+        request.newAttribute< stun::extension::attrs::HostName >( SYSTEM_ID );
 
         nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
@@ -132,16 +140,16 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::successResponse );
 
-        const auto attr = result.second.getAttribute< stun::cc::attrs::HostNameList >();
+        const auto attr = result.second.getAttribute< stun::extension::attrs::HostNameList >();
         ASSERT_NE( attr, nullptr );
         ASSERT_EQ( attr->get(), std::vector< String >(
             1, SERVER_ID + "." + SYSTEM_ID ) );
     }
     {
         stun::Message request( Header(
-            MessageClass::request, stun::cc::methods::resolvePeer ) );
-        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >(
+            MessageClass::request, stun::extension::methods::resolvePeer ) );
+        request.newAttribute< stun::extension::attrs::PeerId >( "SomeClient" );
+        request.newAttribute< stun::extension::attrs::HostName >(
             SERVER_ID + "." + SYSTEM_ID );
 
         nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
@@ -151,15 +159,15 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::successResponse );
 
-        const auto eps = result.second.getAttribute< stun::cc::attrs::PublicEndpointList >();
+        const auto eps = result.second.getAttribute< stun::extension::attrs::PublicEndpointList >();
         ASSERT_NE( eps, nullptr );
         ASSERT_EQ( eps->get(), std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
     }
     {
         stun::Message request( Header(
-            MessageClass::request, stun::cc::methods::resolveDomain) );
-        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( "WrongDomain" );
+            MessageClass::request, stun::extension::methods::resolveDomain) );
+        request.newAttribute< stun::extension::attrs::PeerId >( "SomeClient" );
+        request.newAttribute< stun::extension::attrs::HostName >( "WrongDomain" );
 
         nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
@@ -168,15 +176,15 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::errorResponse );
 
-        const auto err = result.second.getAttribute< stun::attrs::ErrorDescription >();
+        const auto err = result.second.getAttribute< stun::attrs::ErrorCode >();
         ASSERT_NE( err, nullptr );
-        ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
+        ASSERT_EQ( err->getCode(), stun::extension::error::notFound );
     }
     {
         stun::Message request( Header(
-            MessageClass::request, stun::cc::methods::resolvePeer) );
-        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( "WrongHost" );
+            MessageClass::request, stun::extension::methods::resolvePeer) );
+        request.newAttribute< stun::extension::attrs::PeerId >( "SomeClient" );
+        request.newAttribute< stun::extension::attrs::HostName >( "WrongHost" );
 
         nx::utils::TestSyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
@@ -185,9 +193,9 @@ TEST_F( StunCustomTest, BindResolve )
         ASSERT_EQ( result.first, SystemError::noError );
         ASSERT_EQ( result.second.header.messageClass, MessageClass::errorResponse );
 
-        const auto err = result.second.getAttribute< stun::attrs::ErrorDescription >();
+        const auto err = result.second.getAttribute< stun::attrs::ErrorCode >();
         ASSERT_NE( err, nullptr );
-        ASSERT_EQ( err->getCode(), stun::cc::error::notFound );
+        ASSERT_EQ( err->getCode(), stun::extension::error::notFound );
     }
 }
 
@@ -198,7 +206,7 @@ IndicatinonQueue listenForClientBind(
 {
     auto queue = std::make_unique<utils::TestSyncMultiQueue<String, SocketAddress>>();
     client->setIndicationHandler(
-        stun::cc::indications::connectionRequested,
+        stun::extension::indications::connectionRequested,
         [queue = queue.get(), &settings](stun::Message message)
         {
             api::ConnectionRequestedEvent event;
@@ -263,30 +271,36 @@ void bindClientSync(AsyncClient* client, const String& id, const SocketAddress& 
 TEST_F(StunCustomTest, ClientBind)
 {
     typedef std::chrono::seconds s;
-    auto& params = const_cast<api::ConnectionParameters&>(settings.connectionParameters());
+    auto& params = const_cast<conf::ConnectionParameters&>(settings.connectionParameters());
     params.tcpReverseRetryPolicy = nx::network::RetryPolicy(3, s(1), 2, s(7));
     params.tcpReverseHttpTimeouts = nx_http::AsyncHttpClient::Timeouts(s(1), s(2), s(3));
     cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
 
     AsyncClient msClient;
+    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+
     msClient.connect(address);
     const auto msIndications = listenForClientBind(&msClient, SERVER_ID, settings);
 
-    auto bindClient = std::make_unique<AsyncClient>();
-    bindClient->connect(address);
-    bindClientSync(bindClient.get(), "VmsGateway", GOOD_ADDRESS);
+    AsyncClient bindClient;
+    auto bindClientGuard = makeScopedGuard([&bindClient]() { bindClient.pleaseStopSync(); });
+
+    bindClient.connect(address);
+    bindClientSync(&bindClient, "VmsGateway", GOOD_ADDRESS);
 
     AsyncClient msClient2;
+    auto msClient2Guard = makeScopedGuard([&msClient2]() { msClient2.pleaseStopSync(); });
+
     msClient2.connect(address);
     const auto msIndications2 = listenForClientBind(&msClient2, SERVER_ID2, settings);
 
     // Both servers get just one indication:
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", GOOD_ADDRESS);
 
-    bindClientSync(bindClient.get(), "VmsGateway", BAD_ADDRESS);
+    bindClientSync(&bindClient, "VmsGateway", BAD_ADDRESS);
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway", BAD_ADDRESS);
 
-    auto bindClient2 = std::make_unique<AsyncClient>();;
+    auto bindClient2 = std::make_unique<AsyncClient>();
     bindClient2->connect(address);
     bindClientSync(bindClient2.get(), "VmsGateway2", GOOD_ADDRESS);
 
@@ -294,11 +308,14 @@ TEST_F(StunCustomTest, ClientBind)
     expectIndicationForEach({msIndications.get(), msIndications2.get()}, "VmsGateway2", GOOD_ADDRESS);
 
     // Disconnect one gateway:
+    bindClient2->pleaseStopSync();
     bindClient2.reset();
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     // The next server gets only one indication:
     AsyncClient msClient3;
+    auto msClient3Guard = makeScopedGuard([&msClient3]() { msClient3.pleaseStopSync(); });
+
     msClient3.connect(address);
     const auto msIndications3 = listenForClientBind(&msClient3, SERVER_ID, settings);
     expectIndicationForEach({msIndications3.get()}, "VmsGateway", BAD_ADDRESS);

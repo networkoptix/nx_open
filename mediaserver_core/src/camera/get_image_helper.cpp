@@ -281,7 +281,11 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
             filterChain << QnAbstractImageFilterPtr( new QnRotateImageFilter( rotation ) );
         }
         for( auto filter : filterChain )
+        {
             frame = filter->updateImage( frame );
+            if (!frame)
+                break;
+        }
         if( frame )
             outFrame = frame;
     }
@@ -295,7 +299,11 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
             {
                 channelMask &= ~(1 << frame->channel);
                 for( auto filter : filterChain )
+                {
                     frame = filter->updateImage( frame );
+                    if (!frame)
+                        break;
+                }
                 outFrame = frame;
             }
         }

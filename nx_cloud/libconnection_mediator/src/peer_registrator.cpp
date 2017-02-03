@@ -5,7 +5,7 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 
 #include "listening_peer_pool.h"
 #include "data/listening_peer.h"
@@ -26,23 +26,35 @@ PeerRegistrator::PeerRegistrator(
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::bind,
+            stun::extension::methods::bind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
                 { bind( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::listen,
+            stun::extension::methods::listen,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
-                processRequestWithNoOutput(
+                processRequestWithOutput(
                     &PeerRegistrator::listen,
                     this,
                     std::move(connection),
                     std::move(message));
             } ) &&
 
+
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::resolveDomain,
+            stun::extension::methods::getConnectionState,
+            [this](const ConnectionStrongRef& connection, stun::Message message)
+            {
+                processRequestWithOutput(
+                    &PeerRegistrator::checkOwnState,
+                    this,
+                    std::move(connection),
+                    std::move(message));
+            } ) &&
+
+        dispatcher->registerRequestProcessor(
+            stun::extension::methods::resolveDomain,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -53,7 +65,7 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::resolvePeer,
+            stun::extension::methods::resolvePeer,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
@@ -64,10 +76,10 @@ PeerRegistrator::PeerRegistrator(
             }) &&
 
         dispatcher->registerRequestProcessor(
-            stun::cc::methods::clientBind,
+            stun::extension::methods::clientBind,
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
-                processRequestWithNoOutput(
+                processRequestWithOutput(
                     &PeerRegistrator::clientBind,
                     this,
                     std::move(connection),
@@ -131,7 +143,7 @@ void PeerRegistrator::bind(
         mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
-    if (const auto attr = requestMessage.getAttribute< stun::cc::attrs::PublicEndpointList >())
+    if (const auto attr = requestMessage.getAttribute< stun::extension::attrs::PublicEndpointList >())
         peerDataLocker.value().endpoints = attr->get();
     else
         peerDataLocker.value().endpoints.clear();
@@ -148,10 +160,10 @@ void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
     stun::Message requestMessage,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::ListenResponse)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
-        return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
+        return completionHandler(api::ResultCode::badTransport, {});    //Only tcp is allowed for listen request
 
     MediaserverData mediaserverData;
     nx::String errorMessage;
@@ -187,9 +199,42 @@ void PeerRegistrator::listen(
             cl_logDEBUG1);
     }
 
-    completionHandler(api::ResultCode::ok);
+    api::ListenResponse response;
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    response.cloudConnectVersion = hpm::api::kCurrentCloudConnectVersion;
+    completionHandler(api::ResultCode::ok, std::move(response));
+
     for (auto& indication: clientBindIndications)
         connection->sendMessage(std::move(indication));
+}
+
+void PeerRegistrator::checkOwnState(
+    const ConnectionStrongRef& connection,
+    api::GetConnectionStateRequest /*requestData*/,
+    stun::Message requestMessage,
+    std::function<void(api::ResultCode, api::GetConnectionStateResponse)> completionHandler)
+{
+    MediaserverData mediaserverData;
+    nx::String errorMessage;
+    const api::ResultCode resultCode =
+        getMediaserverData(connection, requestMessage, &mediaserverData, &errorMessage);
+    if (resultCode != api::ResultCode::ok)
+    {
+        sendErrorResponse(
+            connection,
+            requestMessage.header,
+            resultCode,
+            api::resultCodeToStunErrorCode(resultCode),
+            errorMessage);
+        return;
+    }
+
+    api::GetConnectionStateResponse response;
+    auto peer = m_listeningPeerPool->findAndLockPeerDataByHostName(mediaserverData.hostName());
+    if (peer && peer->value().isListening)
+        response.state = api::GetConnectionStateResponse::State::listening;
+
+    completionHandler(api::ResultCode::ok, std::move(response));
 }
 
 void PeerRegistrator::resolveDomain(
@@ -263,14 +308,14 @@ void PeerRegistrator::clientBind(
     const ConnectionStrongRef& connection,
     api::ClientBindRequest requestData,
     stun::Message /*requestMessage*/,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::ClientBindResponse)> completionHandler)
 {
     const auto reject = [&](api::ResultCode code)
     {
         NX_LOGX(lm("Reject client bind (requested from %1): %2")
             .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
 
-        completionHandler(code);
+        completionHandler(code, {});
     };
 
     // Only local peers are alowed while auth is not avaliable for clients:
@@ -309,7 +354,10 @@ void PeerRegistrator::clientBind(
             m_boundClients.erase(it);
         });
 
-    completionHandler(api::ResultCode::ok);
+    api::ClientBindResponse response;
+    response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
+    completionHandler(api::ResultCode::ok, std::move(response));
+
     for (const auto& connectionRef: listeningPeerConnections)
         if (const auto connection = connectionRef.lock())
             connection->sendMessage(indication);

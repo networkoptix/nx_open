@@ -13,12 +13,13 @@ public:
 
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
+    static Q_INVOKABLE QString organizationNameForSettings();
     static Q_INVOKABLE QString realm();
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
-    static Q_INVOKABLE QString applicationPlatform();
 
+    static Q_INVOKABLE QString applicationPlatform();
     static Q_INVOKABLE QString applicationArch();
     static Q_INVOKABLE QString applicationPlatformModification();
     static Q_INVOKABLE QString applicationCompiler();
@@ -68,7 +69,5 @@ public:
     static Q_INVOKABLE bool isAndroid();
     static Q_INVOKABLE bool isIos();
     static Q_INVOKABLE bool isMobile();
-
-    static Q_INVOKABLE QString applicationFullVersion();
 };
 

@@ -26,9 +26,14 @@
 
 HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 {
-    connect(
+    Qn::directConnect(
         QnResourcePool::instance(), &QnResourcePool::resourceChanged,
         this, &HostSystemPasswordSynchronizer::at_adminUserChanged );
+}
+
+HostSystemPasswordSynchronizer::~HostSystemPasswordSynchronizer()
+{
+    directDisconnectAll();
 }
 
 void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr& user )

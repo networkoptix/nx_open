@@ -6,7 +6,9 @@ QnTableView::QnTableView(QWidget* parent):
     base_type(parent),
     m_tracker(new QnItemViewHoverTracker(this))
 {
-
+    /* Make the defaults consistent with QTreeView: */
+    horizontalHeader()->setHighlightSections(false);
+    verticalHeader()->setHighlightSections(false);
 }
 
 QnTableView::~QnTableView()
@@ -21,16 +23,16 @@ QSize QnTableView::viewportSizeHint() const
      *  To check local visibility isHidden() must be used
      *  So as a workaround we adjust sizeHint after Qt if !scrollbar.isVisible() && !scrollbar.isHidden()
      *  It can happen during complicated layout recalculation, and sometimes scrollbar sizes are weird at this place.
-     *  So we use style()->pixelMetric(QStyle::PM_ScrollBarExtent).
+     *  So we use style()->pixelMetric(QStyle::PM_ScrollBarExtent) as an upper size limit.
      */
 
     QSize size = base_type::viewportSizeHint();
 
     if (!verticalScrollBar()->isVisible() && !verticalScrollBar()->isHidden())
-        size.rwidth() += style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+        size.rwidth() += qMin(verticalScrollBar()->width(), style()->pixelMetric(QStyle::PM_ScrollBarExtent));
 
     if (!horizontalScrollBar()->isVisible() && !horizontalScrollBar()->isHidden())
-        size.rheight() += style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+        size.rheight() += qMin(horizontalScrollBar()->height(), style()->pixelMetric(QStyle::PM_ScrollBarExtent));
 
     return size;
 }

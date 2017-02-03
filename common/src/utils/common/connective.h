@@ -11,8 +11,9 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QPointer>
 
+#include <nx/utils/unused.h>
+
 #include "forward.h"
-#include "unused.h"
 
 /* Properly defined NULL is required for this class to work, so we just redefine 
  * it here. Defining it only in config.h doesn't work for some compilers. */

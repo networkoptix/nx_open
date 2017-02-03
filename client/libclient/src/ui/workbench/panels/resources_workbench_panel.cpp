@@ -78,10 +78,12 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
         &ResourceTreeWorkbenchPanel::updateControlsGeometry);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &ResourceTreeWorkbenchPanel::updateControlsGeometry);
+    connect(item, &QGraphicsWidget::geometryChanged, widget,
+        &QnResourceBrowserWidget::hideToolTip);
 
     action(QnActions::ToggleTreeAction)->setChecked(settings.state == Qn::PaneState::Opened);
     m_showButton->setFocusProxy(item);
-    m_showButton->setZValue(ControlItemZOrder);
+    m_showButton->setZValue(BackgroundItemZOrder); /*< To make it paint under the tooltip. */
     connect(action(QnActions::ToggleTreeAction), &QAction::toggled, this,
         [this](bool checked)
         {
@@ -144,7 +146,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_pinButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::RightEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(item, item, Qt::RightEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 }
 
@@ -250,6 +252,15 @@ QRectF ResourceTreeWorkbenchPanel::effectiveGeometry() const
     return geometry;
 }
 
+void ResourceTreeWorkbenchPanel::stopAnimations()
+{
+    if (!xAnimator->isRunning())
+        return;
+
+    xAnimator->stop();
+    item->setX(xAnimator->targetValue().toDouble());
+}
+
 void ResourceTreeWorkbenchPanel::updateResizerGeometry()
 {
     if (m_updateResizerGeometryLater)
@@ -305,7 +316,12 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
         return;
     }
 
-    const qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+    qreal x = display()->view()->mapFromGlobal(QCursor::pos()).x();
+
+    /* Calculating real border position. */
+    x += 0.5 + kResizerWidth;
+    if (widget->isScrollBarVisible())
+        x += widget->style()->pixelMetric(QStyle::PM_ScrollBarExtent);
 
     const qreal minWidth = item->effectiveSizeHint(Qt::MinimumSize).width();
 
@@ -316,7 +332,7 @@ void ResourceTreeWorkbenchPanel::at_resizerWidget_geometryChanged()
     const qreal targetWidth = qBound(minWidth, x, maxWidth);
 
     QRectF geometry = item->geometry();
-    if (!qFuzzyCompare(geometry.width(), targetWidth))
+    if (!qFuzzyEquals(geometry.width(), targetWidth))
     {
         geometry.setWidth(targetWidth);
         geometry.setLeft(0);

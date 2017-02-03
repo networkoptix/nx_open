@@ -63,17 +63,18 @@ protected:
     virtual void startDrag(DragInfo *info) override;
 
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
+
 private:
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& item);
     void at_doubleClicked(Qt::MouseButton button);
-    void at_infoButton_toggled(bool toggled);
 
     void initInfoOverlay();
 
     void updateLayout();
     void updateView();
     void updateInfo();
+    void updateHud(bool animate);
 
     /** \returns false if item image is still loading */
     bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);

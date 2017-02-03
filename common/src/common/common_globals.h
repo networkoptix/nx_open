@@ -11,7 +11,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/datetime.h>
 #include <nx/utils/literal.h>
@@ -370,6 +370,13 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
+	    enum class StatusChangeReason
+    {
+        Local,
+        GotFromRemotePeer
+    };
+
+
     enum BitratePerGopType {
         BPG_None,
         BPG_Predefined,
@@ -549,6 +556,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_OldMobileClient = 3,
         PT_MobileClient = 4,
         PT_CloudServer = 5,
+        PT_OldServer = 6, //< 2.6 or below
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
@@ -613,6 +621,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
          * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid.
          */
         LC_Start,
+
+        /**
+          * Camera with Free license can be recorded without license activation. It always available to use
+          */
+        LC_Free,
 
         /**
          * Invalid license. Required when the correct license type is not known in current version.
@@ -840,7 +853,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     */
     enum class UserRole
     {
-        CustomUserGroup = -2,
+        CustomUserRole = -2,
         CustomPermissions = -1,
         Owner = 0,
         Administrator,
@@ -856,10 +869,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         UnauthorizedConnectionResult,               /*< Invalid login/password. */
         LdapTemporaryUnauthorizedConnectionResult,  /*< LDAP server is not accessible. */
         CloudTemporaryUnauthorizedConnectionResult, /*< CLOUD server is not accessible. */
-        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization or cloud host. */
+        IncompatibleInternalConnectionResult,       /*< Server has incompatible customization. */
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
-        IncompatibleProtocolConnectionResult        /*< Ec2 protocol versions differs.*/
+        IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
+        ForbiddenConnectionResult                   /*< Connection is not allowed yet. Try again later*/
     };
 
     /**
@@ -876,6 +890,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
 } // namespace Qn
 
+Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 
 // TODO: #Elric #enum
 

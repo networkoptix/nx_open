@@ -10,7 +10,7 @@
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
-    if (nx::network::SocketGlobals::debugConfiguration().multipleServerSocket) \
+    if (nx::network::SocketGlobals::debugConfig().multipleServerSocket) \
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
@@ -280,11 +280,8 @@ void MultipleServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler
     post(
         [this, handler = std::move(handler)]() mutable
         {
-            for (auto& socketContext: m_serverSockets)
-                socketContext.stopAccepting();
-
+            cancelIoFromAioThread();
             NX_LOGX(lm("Async IO is canceled asynchronously"), cl_logDEBUG1);
-            m_acceptHandler = nullptr;
             handler();
         });
 }
@@ -293,35 +290,32 @@ void MultipleServerSocket::cancelIOSync()
 {
     DEBUG_LOG(lm("Canceling async IO synchronously..."));
     nx::utils::promise<void> ioCancelledPromise;
-    //TODO #ak deal with copy-paste
     dispatch(
         [this, &ioCancelledPromise]() mutable
         {
-            for (auto& socketContext: m_serverSockets)
-                socketContext.stopAccepting();
-
+            cancelIoFromAioThread();
             NX_LOGX(lm("Async IO is canceled synchronously"), cl_logDEBUG1);
-            m_acceptHandler = nullptr;
             ioCancelledPromise.set_value();
         });
 
     ioCancelledPromise.get_future().wait();
 }
 
-MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
-        std::unique_ptr<AbstractStreamServerSocket> socket_)
-    : socket(std::move(socket_))
-    , isAccepting(false)
+MultipleServerSocket::ServerSocketContext::ServerSocketContext(
+    std::unique_ptr<AbstractStreamServerSocket> socket_)
+    :
+    socket(std::move(socket_)),
+    isAccepting(false)
 {
 }
 
 AbstractStreamServerSocket*
-    MultipleServerSocket::ServerSocketHandle::operator->() const
+    MultipleServerSocket::ServerSocketContext::operator->() const
 {
     return socket.get();
 }
 
-void MultipleServerSocket::ServerSocketHandle::stopAccepting()
+void MultipleServerSocket::ServerSocketContext::stopAccepting()
 {
     if (!isAccepting)
         return;
@@ -347,12 +341,12 @@ bool MultipleServerSocket::addSocket(
             // interface allows both
 
             socket->bindToAioThread(m_timerSocket.getAioThread());
-            m_serverSockets.push_back(ServerSocketHandle(std::move(socket)));
+            m_serverSockets.push_back(ServerSocketContext(std::move(socket)));
             if (m_acceptHandler)
             {
-                ServerSocketHandle& source = m_serverSockets.back();
+                ServerSocketContext& source = m_serverSockets.back();
                 source.isAccepting = true;
-                DEBUG_LOG(lm("Accept on source(%1) when added").arg(&source));
+                NX_LOGX(lm("Accept on source(%1) when added").arg(&source), cl_logDEBUG1);
 
                 using namespace std::placeholders;
                 source->acceptAsync(std::bind(
@@ -373,8 +367,16 @@ void MultipleServerSocket::removeSocket(size_t pos)
     dispatch(
         [this, &socketRemovedPromise, pos]()
         {
-            auto serverSocketContext = std::move(m_serverSockets[pos]);
-            m_serverSockets.erase(m_serverSockets.begin()+pos);
+            if (pos >= m_serverSockets.size())
+            {
+                NX_ASSERT(false, lm("pos = %1, m_serverSockets.size() = %2")
+                    .arg(pos).arg(m_serverSockets.size()));
+                return;
+            }
+
+            auto itemToRemoveIter = std::next(m_serverSockets.begin(), pos);
+            auto serverSocketContext = std::move(*itemToRemoveIter);
+            m_serverSockets.erase(itemToRemoveIter);
             serverSocketContext.socket->pleaseStopSync();
 
             NX_LOGX(lm("Socket(%1) is removed").arg(serverSocketContext.socket), cl_logDEBUG1);
@@ -390,7 +392,7 @@ size_t MultipleServerSocket::count() const
 }
 
 void MultipleServerSocket::accepted(
-    ServerSocketHandle* source,
+    ServerSocketContext* source,
     SystemError::ErrorCode code,
     AbstractStreamSocket* rawSocket)
 {
@@ -400,6 +402,12 @@ void MultipleServerSocket::accepted(
 
     if (source)
     {
+        NX_CRITICAL(
+            std::find_if(
+                m_serverSockets.begin(), m_serverSockets.end(),
+                [source](ServerSocketContext& item) { return source == &item; }) != 
+            m_serverSockets.end());
+
         source->isAccepting = false;
         m_timerSocket.cancelSync(); // will not block, we are in IO thread
     }
@@ -419,6 +427,14 @@ void MultipleServerSocket::accepted(
         socketContext.stopAccepting();
 
     handler(code, socket.release());
+}
+
+void MultipleServerSocket::cancelIoFromAioThread()
+{
+    m_acceptHandler = nullptr;
+    m_timerSocket.cancelSync();
+    for (auto& socketContext: m_serverSockets)
+        socketContext.stopAccepting();
 }
 
 } // namespace network

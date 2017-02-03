@@ -8,11 +8,11 @@
 
 #ifdef ENABLE_THIRD_PARTY
 
-#include "core/dataprovider/abstract_media_stream_provider.h"
-#include "core/dataprovider/spush_media_stream_provider.h"
-#include "core/resource/resource_media_layout.h"
-#include "third_party_resource.h"
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include <core/dataprovider/spush_media_stream_provider.h>
+#include <core/resource/resource_media_layout.h>
 
+#include "third_party_resource.h"
 
 //!Stream reader for resource, implemented in external plugin
 class ThirdPartyStreamReader
@@ -69,7 +69,6 @@ private:
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 
-    QnAbstractMediaDataPtr readLiveStreamReader();
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
 

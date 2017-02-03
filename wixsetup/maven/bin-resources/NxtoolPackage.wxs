@@ -7,7 +7,6 @@
                 Name="$(var.NxtoolMsiName)"
                 SourceFile="bin/msi/$(var.NxtoolMsiName)"
                 Vital="yes"
-                Cache="no"
                 Compressed="yes">
                 <MsiProperty Name="LICENSE_ALREADY_ACCEPTED" Value="1" />
             </MsiPackage>

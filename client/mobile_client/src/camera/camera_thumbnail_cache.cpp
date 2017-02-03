@@ -42,6 +42,9 @@ QnCameraThumbnailCache::~QnCameraThumbnailCache()
 
 void QnCameraThumbnailCache::start()
 {
+    if (m_elapsedTimer.isValid())
+        return;
+
     for (const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 
@@ -53,10 +56,14 @@ void QnCameraThumbnailCache::start()
 
 void QnCameraThumbnailCache::stop()
 {
+    if (!m_elapsedTimer.isValid())
+        return;
+
     disconnect(qnResPool, 0, this, 0);
 
     m_thumbnailByResourceId.clear();
     m_pixmaps.clear();
+    m_elapsedTimer.invalidate();
 }
 
 QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const

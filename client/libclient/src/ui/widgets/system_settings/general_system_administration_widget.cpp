@@ -103,7 +103,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         buttonLayout->addWidget(button, 1);
     }
 
-    m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/alarm-event_rules.png"));
+    m_buttons[kBusinessRulesButton]->setIcon(qnSkin->icon("system_settings/event_rules.png"));
     m_buttons[kEventLogButton     ]->setIcon(qnSkin->icon("system_settings/event_log.png"));
     m_buttons[kCameraListButton   ]->setIcon(qnSkin->icon("system_settings/cameras_list.png"));
     m_buttons[kAuditLogButton     ]->setIcon(qnSkin->icon("system_settings/audit_trail.png"));

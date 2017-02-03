@@ -19,7 +19,6 @@
 #include <media_server/settings.h>
 #include <streaming/hls/hls_types.h>
 
-
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
 static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
@@ -151,7 +150,7 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
 
 int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq, bool iFramesOnly)
 {
-    auto addData = 
+    auto addData =
         [&](const QnConstAbstractDataPacketPtr& data)
         {
             const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.get());
@@ -167,7 +166,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQ
                 dstQueue.push(std::const_pointer_cast<QnAbstractDataPacket>(data)); //TODO: #ak remove const_cast
             }
         };
-    
+
     int rez = 0;
     if (iFramesOnly)
     {
@@ -280,6 +279,8 @@ void QnVideoCameraGopKeeper::clearVideoData()
 QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
 :
     m_resource(resource),
+    m_primaryGopKeeper(nullptr),
+    m_secondaryGopKeeper(nullptr),
     m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
@@ -287,9 +288,6 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
-    m_primaryGopKeeper = 0;
-    m_secondaryGopKeeper = 0;
-
     //ensuring that vectors will not take much memory
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
@@ -452,16 +450,17 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
 }
 
 int QnVideoCamera::copyLastGop(
-    bool primaryLiveStream, 
-    qint64 skipTime, 
-    QnDataPacketQueue& dstQueue, 
+    bool primaryLiveStream,
+    qint64 skipTime,
+    QnDataPacketQueue& dstQueue,
     int cseq,
     bool iFramesOnly)
 {
-    if (primaryLiveStream)
+    if (primaryLiveStream && m_primaryGopKeeper)
         return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
-    else
+    else if (m_secondaryGopKeeper)
         return m_secondaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq, iFramesOnly);
+    return 0;
 }
 
 /*
@@ -695,10 +694,17 @@ bool QnVideoCamera::ensureLiveCacheStarted(
         m_liveCache[streamQuality].reset( new MediaStreamCache(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
+
+        int removedChunksToKeepCount = MSSettings::roSettings()->value(
+            nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
+            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
+
+
         m_hlsLivePlaylistManager[streamQuality] =
             std::make_shared<nx_hls::HLSLivePlaylistManager>(
                 m_liveCache[streamQuality].get(),
-                targetDurationUSec );
+                targetDurationUSec,
+                removedChunksToKeepCount);
     }
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache[streamQuality].get() );

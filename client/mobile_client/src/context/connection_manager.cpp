@@ -22,6 +22,10 @@
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
 #include <helpers/system_weight_helper.h>
+#include <helpers/url_helper.h>
+#include <helpers/system_helpers.h>
+#include <settings/last_connection.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 
@@ -41,14 +45,15 @@ namespace {
 
 } // namespace
 
-class QnConnectionManagerPrivate : public Connective<QObject> {
-    QnConnectionManager *q_ptr;
+class QnConnectionManagerPrivate : public Connective<QObject>
+{
+    QnConnectionManager* q_ptr;
     Q_DECLARE_PUBLIC(QnConnectionManager)
 
     typedef Connective<QObject> base_type;
 
 public:
-    QnConnectionManagerPrivate(QnConnectionManager *parent);
+    QnConnectionManagerPrivate(QnConnectionManager* parent);
 
     void at_applicationStateChanged(Qt::ApplicationState state);
 
@@ -56,26 +61,24 @@ public:
     void resume();
 
     void doConnect();
-    void doDisconnect(bool force = false);
+    void doDisconnect();
 
     void updateConnectionState();
 
     void setUrl(const QUrl& url);
 
-    void setInitialResourcesReceived(bool received);
-
 public:
     QUrl url;
     bool suspended = false;
-    QTimer *suspendTimer = nullptr;
+    bool wasConnected = false;
+    QTimer* suspendTimer = nullptr;
     int connectionHandle = kInvalidHandle;
     QnConnectionManager::State connectionState = QnConnectionManager::Disconnected;
     QnSoftwareVersion connectionVersion;
     QnConnectionManager::ConnectionType connectionType = QnConnectionManager::NormalConnection;
-    bool initialResourcesReceived = false;
 };
 
-QnConnectionManager::QnConnectionManager(QObject *parent) :
+QnConnectionManager::QnConnectionManager(QObject* parent):
     QObject(parent),
     d_ptr(new QnConnectionManagerPrivate(this))
 {
@@ -88,10 +91,13 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
         });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived,
-        d, [d](){ d->setInitialResourcesReceived(true); });
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
-        d, &QnConnectionManagerPrivate::updateConnectionState);
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed,
+        d,
+        [d]()
+        {
+            d->wasConnected = true;
+            d->updateConnectionState();
+        });
+    connect(qnClientMessageProcessor->connectionStatus(), &QnClientConnectionStatus::stateChanged,
         d, &QnConnectionManagerPrivate::updateConnectionState);
 
     connect(this, &QnConnectionManager::currentUrlChanged, this, &QnConnectionManager::currentHostChanged);
@@ -100,10 +106,12 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(this, &QnConnectionManager::connectionStateChanged, this, &QnConnectionManager::isOnlineChanged);
 }
 
-QnConnectionManager::~QnConnectionManager() {
+QnConnectionManager::~QnConnectionManager()
+{
 }
 
-QString QnConnectionManager::systemName() const {
+QString QnConnectionManager::systemName() const
+{
     return qnGlobalSettings->systemName();
 }
 
@@ -116,7 +124,7 @@ QnConnectionManager::State QnConnectionManager::connectionState() const
 bool QnConnectionManager::isOnline() const
 {
     Q_D(const QnConnectionManager);
-    return d->connectionState == Connected || d->connectionState == Suspended;
+    return d->connectionState >= Connected && d->wasConnected;
 }
 
 QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
@@ -125,13 +133,8 @@ QnConnectionManager::ConnectionType QnConnectionManager::connectionType() const
     return d->connectionType;
 }
 
-bool QnConnectionManager::initialResourcesReceived() const
+int QnConnectionManager::defaultServerPort() const
 {
-    Q_D(const QnConnectionManager);
-    return d->initialResourcesReceived;
-}
-
-int QnConnectionManager::defaultServerPort() const {
     return DEFAULT_APPSERVER_PORT;
 }
 
@@ -170,7 +173,7 @@ void QnConnectionManager::connectToServer(const QUrl& url)
     Q_D(QnConnectionManager);
 
     if (connectionState() != QnConnectionManager::Disconnected)
-        disconnectFromServer(false);
+        disconnectFromServer();
 
     QUrl actualUrl = url;
     if (actualUrl.port() == -1)
@@ -191,7 +194,22 @@ void QnConnectionManager::connectToServer(
     connectToServer(urlWithAuth);
 }
 
-void QnConnectionManager::disconnectFromServer(bool force) {
+void QnConnectionManager::connectByUserInput(
+    const QString& address,
+    const QString& userName,
+    const QString& password)
+{
+    QUrl url = QUrl::fromUserInput(address);
+    if (url.port() <= 0)
+        url.setPort(DEFAULT_APPSERVER_PORT);
+
+    url.setUserName(userName);
+    url.setPassword(password);
+    connectToServer(url);
+}
+
+void QnConnectionManager::disconnectFromServer()
+{
     Q_D(QnConnectionManager);
 
     if (d->connectionHandle != kInvalidHandle)
@@ -205,7 +223,8 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     if (d->connectionState == Disconnected || d->connectionState == Connecting)
         return;
 
-    d->doDisconnect(force);
+    d->wasConnected = false;
+    d->doDisconnect();
 
     d->setUrl(QUrl());
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
@@ -215,7 +234,7 @@ void QnConnectionManager::disconnectFromServer(bool force) {
     qnResPool->removeResources(remoteResources);
 }
 
-QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager *parent):
+QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager* parent):
     base_type(parent),
     q_ptr(parent),
     suspendTimer(new QTimer(this))
@@ -228,21 +247,24 @@ QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager *pare
     connect(qApp, &QGuiApplication::applicationStateChanged, this, &QnConnectionManagerPrivate::at_applicationStateChanged);
 }
 
-void QnConnectionManagerPrivate::at_applicationStateChanged(Qt::ApplicationState state) {
-    switch (state) {
-    case Qt::ApplicationActive:
-        resume();
-        break;
-    case Qt::ApplicationSuspended:
-        if (!suspended)
-            suspendTimer->start();
-        break;
-    default:
-        break;
+void QnConnectionManagerPrivate::at_applicationStateChanged(Qt::ApplicationState state)
+{
+    switch (state)
+    {
+        case Qt::ApplicationActive:
+            resume();
+            break;
+        case Qt::ApplicationSuspended:
+            if (!suspended)
+                suspendTimer->start();
+            break;
+        default:
+            break;
     }
 }
 
-void QnConnectionManagerPrivate::suspend() {
+void QnConnectionManagerPrivate::suspend()
+{
     if (suspended)
         return;
 
@@ -251,7 +273,8 @@ void QnConnectionManagerPrivate::suspend() {
     doDisconnect();
 }
 
-void QnConnectionManagerPrivate::resume() {
+void QnConnectionManagerPrivate::resume()
+{
     suspendTimer->stop();
 
     if (!suspended)
@@ -264,11 +287,13 @@ void QnConnectionManagerPrivate::resume() {
 
 void QnConnectionManagerPrivate::doConnect()
 {
+    NX_LOG(lm("doConnect() BEGIN: url: %1").arg(url.toString()), cl_logDEBUG1);
     if (!url.isValid() || url.host().isEmpty())
     {
         Q_Q(QnConnectionManager);
         updateConnectionState();
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
+        NX_LOG(lm("doConnect() END: Invalid URL"), cl_logDEBUG1);
         return;
     }
 
@@ -292,7 +317,10 @@ void QnConnectionManagerPrivate::doConnect()
             result->deleteLater();
 
             if (connectionHandle != result->handle())
+            {
+                NX_LOG(lm("doConnect() Invalid handle"), cl_logDEBUG1);
                 return;
+            }
 
             connectionHandle = kInvalidHandle;
 
@@ -311,6 +339,7 @@ void QnConnectionManagerPrivate::doConnect()
             {
                 updateConnectionState();
                 emit q->connectionFailed(status, infoParameter);
+                NX_LOG(lm("doConnect() END: Bad status"), cl_logDEBUG1);
                 return;
             }
 
@@ -318,6 +347,7 @@ void QnConnectionManagerPrivate::doConnect()
 
             QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+            QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
             QnMobileClientMessageProcessor::instance()->init(ec2Connection);
 
@@ -345,33 +375,40 @@ void QnConnectionManagerPrivate::doConnect()
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
-            const auto connectionData =
-                helpers::storeLocalSystemConnection(connectionInfo.systemName, localId, url);
-            helpers::updateWeightData(localId);
+            using namespace nx::client::core::helpers;
+            storeConnection(localId, connectionInfo.systemName, url);
+            storeCredentials(localId, QnCredentials(url));
+            updateWeightData(localId);
             qnClientCoreSettings->save();
 
+            LastConnectionData connectionData{
+                connectionInfo.systemName,
+                QnUrlHelper(url).cleanUrl(),
+                QnCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 
             connectionVersion = connectionInfo.version;
             emit q->connectionVersionChanged();
         });
+
+    NX_LOG(lm("doConnect() END"), cl_logDEBUG1);
 }
 
-void QnConnectionManagerPrivate::doDisconnect(bool force) {
+void QnConnectionManagerPrivate::doDisconnect()
+{
     Q_Q(QnConnectionManager);
 
-    if (!force)
-        qnGlobalSettings->synchronizeNow();
+    qnGlobalSettings->synchronizeNow();
 
     disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
 
-    QnMobileClientMessageProcessor::instance()->init(NULL);
+    QnMobileClientMessageProcessor::instance()->init(nullptr);
     QnAppServerConnectionFactory::setUrl(QUrl());
-    QnAppServerConnectionFactory::setEc2Connection(NULL);
+    QnAppServerConnectionFactory::setEc2Connection(nullptr);
+    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
     QnSessionManager::instance()->stop();
 
-    setInitialResourcesReceived(false);
     connectionVersion = QnSoftwareVersion();
     emit q->connectionVersionChanged();
 
@@ -388,24 +425,14 @@ void QnConnectionManagerPrivate::updateConnectionState()
     }
     else if (connectionHandle != kInvalidHandle)
     {
-        newState = QnConnectionManager::Connecting;
+        newState = wasConnected
+            ? QnConnectionManager::Reconnecting
+            : QnConnectionManager::Connecting;
     }
     else
     {
-        switch (qnClientMessageProcessor->connectionStatus()->state())
-        {
-            case QnConnectionState::Connecting:
-            case QnConnectionState::Reconnecting:
-                newState = QnConnectionManager::Connecting;
-                break;
-            case QnConnectionState::Connected:
-            case QnConnectionState::Ready:
-                newState = QnConnectionManager::Connected;
-                break;
-            default:
-                newState = QnConnectionManager::Disconnected;
-                break;
-        }
+        newState = static_cast<QnConnectionManager::State>(
+            qnClientMessageProcessor->connectionStatus()->state());
     }
 
     if (newState == connectionState)
@@ -423,6 +450,7 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
         return;
 
     Q_Q(QnConnectionManager);
+
     this->url = url;
     emit q->currentUrlChanged();
 
@@ -432,15 +460,4 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
         connectionType = newConnectionType;
         emit q->connectionTypeChanged();
     }
-}
-
-void QnConnectionManagerPrivate::setInitialResourcesReceived(bool received)
-{
-    if (initialResourcesReceived == received)
-        return;
-
-    initialResourcesReceived = received;
-
-    Q_Q(QnConnectionManager);
-    emit q->initialResourcesReceivedChanged();
 }

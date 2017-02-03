@@ -79,7 +79,7 @@ private:
 private:
     mutable QnMutex m_mutex;
     typedef std::unique_ptr<HttpConnection> HttpConnectionPtr;
-    std::multimap<SocketAddress, HttpConnectionPtr> m_connectionPool;
+    std::multimap<QString /*endpointWithProtocol*/, HttpConnectionPtr> m_connectionPool;
     std::map<int, Request> m_awaitingRequests;
     //std::map<AsyncHttpClientPtr, RequestInternal> m_requestInProgress;
     int m_maxPoolSize;

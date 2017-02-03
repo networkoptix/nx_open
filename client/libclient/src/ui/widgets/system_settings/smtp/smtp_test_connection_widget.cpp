@@ -57,16 +57,35 @@ void QnSmtpTestConnectionWidget::at_timer_timeout() {
     stopTesting(tr("Timed Out"));
 }
 
-bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
+QString QnSmtpTestConnectionWidget::errorString(const QnTestEmailSettingsReply& result) const
+{
+    switch (result.errorCode)
+    {
+        case SmtpError::Success:
+            return tr("Success");
+        case SmtpError::ConnectionTimeoutError:
+        case SmtpError::ResponseTimeoutError:
+        case SmtpError::SendDataTimeoutError:
+            return tr("Connection timed out");
+        case SmtpError::AuthenticationFailedError:
+            return tr("Authentication failed");
+        default:
+            // ServerError,    // 4xx SMTP error
+            // ClientError     // 5xx SMTP error
+            break;
+    }
+    return tr("SMTP Error %1").arg((int)result.smtpReplyCode);
+}
+
+bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
+{
 
     QnEmailSettings result = value;
     result.timeout = testSmtpTimeoutMSec / 1000;
 
-    if (!result.isValid()) {
-        QnMessageBox::warning(
-                this,
-                tr("Invalid data"),
-                tr("The provided parameters are not valid. Could not perform a test."));
+    if (!result.isValid())
+    {
+        QnMessageBox::warning(this, tr("Invalid parameters"), tr("Can't perform the test."));
         return false;
     }
 
@@ -81,11 +100,10 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
         break;
     }
 
-    if (!serverConnection) {
-        QnMessageBox::warning(
-                this,
-                tr("Network Error"),
-                tr("Could not perform a test. None of your servers are connected to the Internet."));
+    if (!serverConnection)
+    {
+        QnMessageBox::warning(this,
+            tr("No Servers connected to internet"), tr("Can't perform the test."));
         return false;
     }
 
@@ -118,8 +136,11 @@ void QnSmtpTestConnectionWidget::at_testEmailSettingsFinished( int status, const
     if (handle != m_testHandle)
         return;
 
-    stopTesting(status != 0 || reply.errorCode != 0
-        ? tr("Failed")
-        : tr("Success") );
+    QString result;
+    if (status == 0)
+        result = errorString(reply);
+    else
+        result = tr("Network error");
+    stopTesting(result);
 }
 

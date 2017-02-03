@@ -2,6 +2,8 @@
 #include <QtCore/QDateTime>
 #include <utils/common/warnings.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 FpsCountingInstrument::FpsCountingInstrument(int updateIntervalMSec, QObject *parent):
     Instrument(Viewport, makeSet(QEvent::Paint), parent),
     m_fps(0.0)
@@ -45,7 +47,7 @@ bool FpsCountingInstrument::paintEvent(QWidget *, QPaintEvent *) {
 }
 
 void FpsCountingInstrument::updateFps(qreal fps) {
-    if(qFuzzyCompare(fps, m_fps))
+    if (qFuzzyEquals(fps, m_fps))
         return;
 
     m_fps = fps;

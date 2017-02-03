@@ -108,7 +108,7 @@ QSharedPointer<AbstractStreamSocket> QnHttpConnectionListener::getProxySocket(
             {
                 serverPool.requested = PROXY_CONNECTIONS_TO_REQUEST;
                 serverPool.timer.restart();
-                socketRequest(serverPool.requested);
+                socketRequest((int) serverPool.requested);
             }
 
             m_proxyCondition.wait(&m_proxyMutex, timeout - elapsed);

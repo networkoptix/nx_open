@@ -2,6 +2,8 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Dialogs 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 import "private"
@@ -14,7 +16,8 @@ Pane
     implicitWidth: parent ? parent.width : 400
     background: null
 
-    property alias hostsModel: hostSelectionDialog.hostsModel
+    property alias hostsModel: hostSelectionDialog.model
+    property alias authenticationDataModel: userSelectionDialog.model
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
@@ -22,6 +25,7 @@ Pane
     property bool displayAddressError: false
     property bool displayUserCredentialsError: false
     property alias addressErrorText: addressErrorPanel.text
+    property alias credentialsErrorText: credentialsErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -85,6 +89,18 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
             activeFocusOnTab: true
+            rightPadding: chooseUserButton.visible ? chooseUserButton.width : 8
+
+            IconButton
+            {
+                id: chooseUserButton
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                icon: lp("/images/expand.png")
+                onClicked: userSelectionDialog.open()
+                visible: authenticationDataAccessor.count > 1
+            }
+
             onAccepted: KeyNavigation.tab.forceActiveFocus()
             onActiveFocusChanged:
             {
@@ -120,18 +136,37 @@ Pane
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            id: credentialsErrorPanel;
             width: parent.width
             opened: displayUserCredentialsError
         }
     }
 
-    HostSelectionDialog
+    ItemSelectionDialog
     {
         id: hostSelectionDialog
-        deleteOnClose: false
-        activeHost: address
-        onActiveHostChanged: addressField.text = activeHost
+        title: qsTr("Hosts")
+        currentItem: address
+        onCurrentItemChanged: addressField.text = currentItem
+    }
+
+    ItemSelectionDialog
+    {
+        id: userSelectionDialog
+        title: qsTr("Users")
+        currentItem: login
+        onItemActivated:
+        {
+            loginField.text = currentItem
+            passwordField.text =
+                authenticationDataAccessor.getData(currentIndex, "credentials").password
+        }
+    }
+
+    ModelDataAccessor
+    {
+        id: authenticationDataAccessor
+        model: authenticationDataModel
     }
 
     function focusAddressField()

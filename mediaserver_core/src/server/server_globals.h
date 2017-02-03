@@ -35,7 +35,6 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
     }
     static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
 
-    static const QString kDefaultAdminPassword = "admin";
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 
 } // namespace QnServer

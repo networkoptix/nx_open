@@ -65,7 +65,7 @@ TEST_F(SystemSharing, get_users)
     system1ToAccount2SharingData.systemId = system1.id;
     system1ToAccount2SharingData.accountEmail = account2.email;
     system1ToAccount2SharingData.accessRole = api::SystemAccessRole::viewer;
-    system1ToAccount2SharingData.groupId = "customGroupID";
+    system1ToAccount2SharingData.userRoleId = "customUserRoleId";
     system1ToAccount2SharingData.customPermissions = "customPermissions123123";
     system1ToAccount2SharingData.isEnabled = false;
     ASSERT_EQ(
@@ -75,7 +75,7 @@ TEST_F(SystemSharing, get_users)
             account1Password,
             std::move(system1ToAccount2SharingData)));
     // vmsUserId will be filled by cloud_db
-    system1ToAccount2SharingData.vmsUserId = 
+    system1ToAccount2SharingData.vmsUserId =
         guidFromArbitraryData(system1ToAccount2SharingData.accountEmail)
             .toSimpleString().toStdString();
 
@@ -95,42 +95,42 @@ TEST_F(SystemSharing, get_users)
     {
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(2, systems.size());
+        ASSERT_EQ(2U, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system2) != systems.end());
 
         ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, systems[0].accessRole);
-        ASSERT_EQ(6, systems[0].sharingPermissions.size());
+        ASSERT_EQ(6U, systems[0].sharingPermissions.size());
 
         ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, systems[1].accessRole);
-        ASSERT_EQ(6, systems[1].sharingPermissions.size());
+        ASSERT_EQ(6U, systems[1].sharingPermissions.size());
     }
 
     //checking account2 system list
     {
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(getSystems(account2.email, account2Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 3);
-        const auto system1Iter = std::find(systems.begin(), systems.end(), system1);
+        ASSERT_EQ(2U, systems.size());
+        //const auto system1Iter = std::find(systems.begin(), systems.end(), system1);
         const auto system2Iter = std::find(systems.begin(), systems.end(), system2);
         const auto system3Iter = std::find(systems.begin(), systems.end(), system3);
-        ASSERT_TRUE(system1Iter != systems.end());
+        //ASSERT_TRUE(system1Iter != systems.end());
         ASSERT_TRUE(system2Iter != systems.end());
         ASSERT_TRUE(system3Iter != systems.end());
 
-        ASSERT_EQ(account1.email, system1Iter->ownerAccountEmail);
-        ASSERT_EQ(api::SystemAccessRole::viewer, system1Iter->accessRole);
-        ASSERT_TRUE(system1Iter->sharingPermissions.empty());
+        //ASSERT_EQ(account1.email, system1Iter->ownerAccountEmail);
+        //ASSERT_EQ(api::SystemAccessRole::viewer, system1Iter->accessRole);
+        //ASSERT_TRUE(system1Iter->sharingPermissions.empty());
 
         ASSERT_EQ(account1.email, system2Iter->ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::cloudAdmin, system2Iter->accessRole);
-        ASSERT_EQ(5, system2Iter->sharingPermissions.size());
+        ASSERT_EQ(5U, system2Iter->sharingPermissions.size());
 
         ASSERT_EQ(account2.email, system3Iter->ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, system3Iter->accessRole);
-        ASSERT_EQ(6, system3Iter->sharingPermissions.size());
+        ASSERT_EQ(6U, system3Iter->sharingPermissions.size());
     }
 
     //checking sharings from account1 view
@@ -139,7 +139,7 @@ TEST_F(SystemSharing, get_users)
         ASSERT_EQ(
             getSystemSharings(account1.email, account1Password, &sharings),
             api::ResultCode::ok);
-        ASSERT_EQ(sharings.size(), 4);
+        ASSERT_EQ(sharings.size(), 4U);
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system1.id),
@@ -190,7 +190,7 @@ TEST_F(SystemSharing, get_users)
         ASSERT_EQ(
             getSystemSharings(account2.email, account2Password, &sharings),
             api::ResultCode::ok);
-        ASSERT_EQ(sharings.size(), 3);
+        ASSERT_EQ(sharings.size(), 3U);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
@@ -216,7 +216,7 @@ TEST_F(SystemSharing, get_users)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, system2.id, &sharings));
-        ASSERT_EQ(sharings.size(), 2);
+        ASSERT_EQ(sharings.size(), 2U);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
@@ -231,7 +231,7 @@ TEST_F(SystemSharing, get_users)
         ASSERT_EQ(
             getSystemSharings(system1.id, system1.authKey, &sharings),
             api::ResultCode::ok);
-        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(2U, sharings.size());
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system1.id),
@@ -282,7 +282,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(2U, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -296,7 +296,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(2U, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -385,7 +385,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(1, sharings.size());
+        ASSERT_EQ(1U, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -396,7 +396,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(0, sharings.size());
+        ASSERT_EQ(0U, sharings.size());
     }
 
     ASSERT_TRUE(restart());
@@ -407,7 +407,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(1, sharings.size());
+        ASSERT_EQ(1U, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -418,7 +418,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
-        ASSERT_EQ(0, sharings.size());
+        ASSERT_EQ(0U, sharings.size());
     }
 
     //adding "maintenance" sharing
@@ -454,7 +454,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &ownerSharings));
-        ASSERT_EQ(3, ownerSharings.size());
+        ASSERT_EQ(3U, ownerSharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));
@@ -532,7 +532,7 @@ TEST_F(SystemSharing, maintenance)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &ownerSharings));
-        ASSERT_EQ(2, ownerSharings.size());
+        ASSERT_EQ(2U, ownerSharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(ownerSharings, account1.email, system1.id));
@@ -702,7 +702,7 @@ TEST_F(SystemSharing, owner)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(sharings.size(), 2);
+        ASSERT_EQ(sharings.size(), 2U);
         ASSERT_EQ(
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
@@ -752,7 +752,7 @@ TEST_F(SystemSharing, remove_system)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
-        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(2U, sharings.size());
         ASSERT_EQ(
             api::SystemAccessRole::cloudAdmin,
             accountAccessRoleForSystem(sharings, account2.email, system1.id));
@@ -764,7 +764,7 @@ TEST_F(SystemSharing, remove_system)
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystems(account2.email, account2Password, &systems));
-        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(1U, systems.size());
         ASSERT_EQ(system1.name, systems[0].name);
         ASSERT_EQ(system1.ownerAccountEmail, systems[0].ownerAccountEmail);
     }
@@ -895,7 +895,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getAccessRoleList(account1.email, account1Password, system1.id, &accessRoles));
-            ASSERT_EQ(6, accessRoles.size());
+            ASSERT_EQ(6U, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::liveViewer) != accessRoles.end());
@@ -916,7 +916,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getSystemSharings(account1.email, account1Password, system1.id, &sharings));
-            ASSERT_EQ(5, sharings.size());
+            ASSERT_EQ(5U, sharings.size());
         }
 
         {
@@ -924,7 +924,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getAccessRoleList(account2.email, account2Password, system1.id, &accessRoles));
-            ASSERT_EQ(5, accessRoles.size());
+            ASSERT_EQ(5U, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::liveViewer) != accessRoles.end());
@@ -937,7 +937,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getSystemSharings(account2.email, account2Password, system1.id, &sharings));
-            ASSERT_EQ(5, sharings.size());
+            ASSERT_EQ(5U, sharings.size());
         }
 
         {
@@ -945,7 +945,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getAccessRoleList(account3.email, account3Password, system1.id, &accessRoles));
-            ASSERT_EQ(1, accessRoles.size());
+            ASSERT_EQ(1U, accessRoles.size());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
         }
 
@@ -954,7 +954,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getSystemSharings(account3.email, account3Password, system1.id, &sharings));
-            ASSERT_EQ(5, sharings.size());
+            ASSERT_EQ(5U, sharings.size());
         }
 
         {
@@ -969,7 +969,7 @@ TEST_F(SystemSharing, get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getSystemSharings(account4.email, account4Password, system1.id, &sharings));
-            ASSERT_EQ(5, sharings.size());
+            ASSERT_EQ(5U, sharings.size());
         }
 
         {
@@ -1114,12 +1114,12 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     TestEmailManager testEmailManager(
         [&inviteNotification](const AbstractNotification& notification)
         {
-            const auto* inviteNotificationPtr = 
+            const auto* inviteNotificationPtr =
                 dynamic_cast<const InviteUserNotification*>(&notification);
             if (inviteNotificationPtr)
                 inviteNotification = *inviteNotificationPtr;
         });
-    
+
     EMailManagerFactory::setFactory(
         [&testEmailManager](const conf::Settings& /*settings*/)
         {
@@ -1144,7 +1144,7 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_EQ(
         getSystemSharings(account1.email, account1.password, &sharings),
         api::ResultCode::ok);
-    ASSERT_EQ(sharings.size(), 2);
+    ASSERT_EQ(sharings.size(), 2U);
 
     ASSERT_EQ(
         api::SystemAccessRole::owner,
@@ -1156,11 +1156,11 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_TRUE(inviteNotification);
 
     // Confirmation code has format: base64(tmp_password:email).
-    const auto tmpPasswordAndEmail = 
+    const auto tmpPasswordAndEmail =
         QByteArray::fromBase64(QByteArray::fromRawData(
             inviteNotification->message.code.data(),
             inviteNotification->message.code.size()));
-    const std::string tmpPassword = 
+    const std::string tmpPassword =
         tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
 
     // Setting new password.
@@ -1184,7 +1184,7 @@ TEST_F(SystemSharing, share_with_email_not_registered_as_account)
     ASSERT_EQ(
         api::ResultCode::ok,
         getSystems(newAccountEmail, newAccountPassword, &systems));
-    ASSERT_EQ(1, systems.size());
+    ASSERT_EQ(1U, systems.size());
     ASSERT_EQ(system1.id, systems[0].id);
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
@@ -1241,6 +1241,73 @@ TEST_F(SystemSharing, remove_sharing)
     ASSERT_EQ(
         api::ResultCode::forbidden,
         getSystem(account2.email, account2.password, system1.id, &systemData));
+}
+
+class SystemSharingDisabledUser:
+    public SystemSharing
+{
+public:
+    SystemSharingDisabledUser():
+        m_previousResultCode(api::ResultCode::ok)
+    {
+        NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_ownerAccount = addActivatedAccount2();
+        m_system = addRandomSystemToAccount(m_ownerAccount);
+        m_userAccount = addActivatedAccount2();
+    }
+
+protected:
+    void givenUserDisabledInCloudSystem()
+    {
+        shareSystemEx(m_ownerAccount, m_system, m_userAccount, api::SystemAccessRole::cloudAdmin);
+        disableUser(m_ownerAccount, m_system, m_userAccount);
+    }
+
+    void whenUserRequestedThatSystemDetails()
+    {
+        api::SystemDataEx systemData;
+        m_previousResultCode = 
+            getSystem(m_userAccount.email, m_userAccount.password, m_system.id, &systemData);
+    }
+
+    void thenResponseCodeShouldBeForbidden()
+    {
+        ASSERT_EQ(api::ResultCode::forbidden, m_previousResultCode);
+    }
+
+    void whenUserRequestedSystemList()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(m_userAccount.email, m_userAccount.password, &m_allSystems));
+    }
+
+    void thenResponseShouldBeEmpty()
+    {
+        ASSERT_TRUE(m_allSystems.empty());
+    }
+
+private:
+    AccountWithPassword m_ownerAccount;
+    api::SystemData m_system;
+    AccountWithPassword m_userAccount;
+    api::ResultCode m_previousResultCode;
+    std::vector<api::SystemDataEx> m_allSystems;
+};
+
+TEST_F(SystemSharingDisabledUser, get_particular_system_returns_forbidden_error)
+{
+    givenUserDisabledInCloudSystem();
+    whenUserRequestedThatSystemDetails();
+    thenResponseCodeShouldBeForbidden();
+}
+
+TEST_F(SystemSharingDisabledUser, user_get_empty_list_if_he_is_disabled_in_the_only_system)
+{
+    givenUserDisabledInCloudSystem();
+    whenUserRequestedSystemList();
+    thenResponseShouldBeEmpty();
 }
 
 } // namespace cdb

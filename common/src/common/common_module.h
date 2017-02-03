@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
 
@@ -16,11 +17,14 @@
 #include <utils/common/value_cache.h>
 
 class QSettings;
-struct AdminPasswordData
+struct BeforeRestoreDbData
 {
     void saveToSettings(QSettings* settings);
     void loadFromSettings(const QSettings* settings);
     bool isEmpty() const;
+
+    bool hasInfoForStorage(const QString& url) const;
+    qint64 getSpaceLimitForStorage(const QString& url) const;
 
     static void clearSettings(QSettings* settings);
 
@@ -28,6 +32,10 @@ struct AdminPasswordData
     QByteArray hash;
     QByteArray cryptSha512Hash;
     QByteArray realm;
+    QByteArray localSystemId;
+    QByteArray localSystemName;
+    QByteArray serverName;
+    QByteArray storageInfo;
 };
 
 
@@ -90,11 +98,11 @@ public:
     * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
     * we have to insert new transaction with low priority
     */
-    void setUseLowPriorityAdminPasswordHach(bool value);
-    bool useLowPriorityAdminPasswordHach() const;
+    void setUseLowPriorityAdminPasswordHack(bool value);
+    bool useLowPriorityAdminPasswordHack() const;
 
-    void setAdminPasswordData(const AdminPasswordData& data);
-    AdminPasswordData adminPasswordData() const;
+    void setBeforeRestoreData(const BeforeRestoreDbData& data);
+    BeforeRestoreDbData beforeRestoreDbData() const;
 
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -113,7 +121,7 @@ public:
 
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
-
+    QDateTime startupTime() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -141,9 +149,10 @@ private:
     QSet<QnUuid> m_allowedPeers;
     qint64 m_systemIdentityTime;
 
-    AdminPasswordData m_adminPasswordData;
+    BeforeRestoreDbData m_beforeRestoreDbData;
     bool m_lowPriorityAdminPassword;
     Qn::PeerType m_localPeerType;
+    QDateTime m_startupTime;
 };
 
 #define qnCommon (QnCommonModule::instance())

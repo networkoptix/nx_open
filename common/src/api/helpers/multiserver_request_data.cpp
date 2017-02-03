@@ -8,20 +8,13 @@ static const QString kLocalParam(lit("local"));
 static const QString kFormatParam(lit("format"));
 static const QString kExtraFormattingParam(lit("extraFormatting"));
 
-static Qn::SerializationFormat defaultFormat()
-{
-    #if defined(_DEBUG_PROTOCOL)
-        return Qn::JsonFormat;
-    #else
-        return Qn::UbjsonFormat;
-    #endif
-}
+static const Qn::SerializationFormat kDefaultFormat = Qn::SerializationFormat::JsonFormat;
 
 } // namespace
 
 QnMultiserverRequestData::QnMultiserverRequestData():
     isLocal(false),
-    format(defaultFormat()),
+    format(kDefaultFormat),
     extraFormatting(false)
 {
 }
@@ -43,7 +36,7 @@ void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params)
 {
     isLocal = params.contains(kLocalParam);
     extraFormatting = params.contains(kExtraFormattingParam);
-    QnLexical::deserialize(params.value(kFormatParam), &format);
+    format = QnLexical::deserialized(params.value(kFormatParam), kDefaultFormat);
 }
 
 void QnMultiserverRequestData::loadFromParams(const QnRequestParams& params)

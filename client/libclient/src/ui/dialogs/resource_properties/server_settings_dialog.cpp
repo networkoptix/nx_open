@@ -3,8 +3,9 @@
 
 #include <core/resource/media_server_resource.h>
 
+#include <network/cloud_url_validator.h>
+
 #include <nx/network/http/httptypes.h>
-#include <nx/network/socket_global.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
@@ -27,7 +28,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     m_generalPage(new QnServerSettingsWidget(this)),
     m_statisticsPage(new QnStorageAnalyticsWidget(this)),
     m_storagesPage(new QnStorageConfigWidget(this)),
-    m_webPageButton(new QPushButton(tr("Open Web Page..."), this))
+    m_webPageButton(new QPushButton(action(QnActions::WebAdminAction)->text(), this))
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
@@ -36,10 +37,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
-    connect(m_webPageButton, &QPushButton::clicked, this, [this]()
-    {
-        menu()->trigger(QnActions::WebClientAction, m_server);
-    });
+    connect(m_webPageButton, &QPushButton::clicked, this,
+        [this]
+        {
+            menu()->trigger(QnActions::WebAdminAction, m_server);
+        });
 
     //TODO: #GDM #access connect to resource pool to check if server was deleted
 
@@ -134,20 +136,23 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
 {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    return QnMessageBox::question(
-        this,
-        tr("Server not saved"),
-        tr("Apply changes to server %1?")
-        .arg(m_server ? m_server->getName() : QString()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    const auto result = QnMessageBox::question(this,
+        tr("Apply changes before switching to another server?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+
+    if (result == QDialogButtonBox::Apply)
+        return QDialogButtonBox::Yes;
+    if (result == QDialogButtonBox::Discard)
+        return QDialogButtonBox::No;
+
+    return QDialogButtonBox::Cancel;
 }
 
 void QnServerSettingsDialog::updateWebPageButton()
 {
-    bool allowed = m_server
-        && !nx::network::SocketGlobals::addressResolver()
-            .isCloudHostName(m_server->getApiUrl().host());
+    bool allowed = m_server && !nx::network::isCloudServer(m_server);
 
     m_webPageButton->setVisible(allowed);
     m_webPageButton->setEnabled(allowed && m_server->getStatus() == Qn::Online);

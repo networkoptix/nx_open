@@ -230,9 +230,6 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
 void TestConnection::startIO()
 {
-    //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
-        //Should note that aio::AIOService provides such functionality
-
     switch (m_transmissionMode)
     {
         case TestTransmissionMode::spam: return startSpamIO();
@@ -658,6 +655,7 @@ ConnectionsGenerator::ConnectionsGenerator(
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
     m_totalIncompleteTasks( 0 ),
+    m_results( &SystemError::toString, true ),
     m_totalConnectionsEstablished( 0 ),
     m_randomEngine(m_randomDevice()),
     m_errorEmulationDistribution(1, 100),
@@ -788,10 +786,9 @@ size_t ConnectionsGenerator::totalIncompleteTasks() const
     return m_totalIncompleteTasks;
 }
 
-const std::map<SystemError::ErrorCode, size_t>&
-    ConnectionsGenerator::returnCodes() const
+const utils::ResultCounter<SystemError::ErrorCode>& ConnectionsGenerator::results()
 {
-    return m_returnCodes;
+    return m_results;
 }
 
 const SocketAddress& ConnectionsGenerator::nextAddress()
@@ -808,12 +805,11 @@ void ConnectionsGenerator::onConnectionFinished(
     int id,
     SystemError::ErrorCode code)
 {
+    m_results.addResult(code);
     NX_LOGX(lm("Connection %1 has finished: %2")
         .arg(id).arg(SystemError::toString(code)), cl_logDEBUG1);
 
     std::unique_lock<std::mutex> lk(m_mutex);
-    m_returnCodes.emplace(code, 0).first->second++;
-
     {
         std::unique_lock<std::mutex> lk(terminatedSocketsIDsMutex);
         NX_ASSERT(terminatedSocketsIDs.find(id) == terminatedSocketsIDs.end());

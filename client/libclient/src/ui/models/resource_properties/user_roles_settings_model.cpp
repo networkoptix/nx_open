@@ -11,32 +11,32 @@
 
 #include <nx/utils/string.h>
 
-
-QnUserRolesSettingsModel::RoleReplacement::RoleReplacement() :
-    RoleReplacement(QnUuid(), Qn::NoGlobalPermissions)
+QnUserRolesSettingsModel::UserRoleReplacement::UserRoleReplacement():
+    UserRoleReplacement(QnUuid(), Qn::NoGlobalPermissions)
 {
 }
 
-QnUserRolesSettingsModel::RoleReplacement::RoleReplacement(
-            const QnUuid& role,
-            Qn::GlobalPermissions permissions) :
-    role(role),
+QnUserRolesSettingsModel::UserRoleReplacement::UserRoleReplacement(
+    const QnUuid& userRoleId,
+    Qn::GlobalPermissions permissions)
+    :
+    userRoleId(userRoleId),
     permissions(permissions)
 {
 }
 
-bool QnUserRolesSettingsModel::RoleReplacement::isEmpty() const
+bool QnUserRolesSettingsModel::UserRoleReplacement::isEmpty() const
 {
-    return role.isNull() && permissions == Qn::NoGlobalPermissions;
+    return userRoleId.isNull() && permissions == Qn::NoGlobalPermissions;
 }
 
-QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/) :
+QnUserRolesSettingsModel::QnUserRolesSettingsModel(QObject* parent /*= nullptr*/):
     base_type(parent),
-    m_currentRoleId(),
-    m_roles()
+    m_currentUserRoleId(),
+    m_userRoles()
 {
     auto predefinedRoles = qnUserRolesManager->predefinedRoles();
-    predefinedRoles << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserGroup;
+    predefinedRoles << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
     for (auto role : predefinedRoles)
         m_predefinedNames << qnUserRolesManager->userRoleName(role).trimmed().toLower();
 }
@@ -45,25 +45,25 @@ QnUserRolesSettingsModel::~QnUserRolesSettingsModel()
 {
 }
 
-ec2::ApiUserGroupDataList QnUserRolesSettingsModel::roles() const
+ec2::ApiUserRoleDataList QnUserRolesSettingsModel::userRoles() const
 {
-    return m_roles;
+    return m_userRoles;
 }
 
-void QnUserRolesSettingsModel::setRoles(const ec2::ApiUserGroupDataList& value)
+void QnUserRolesSettingsModel::setUserRoles(const ec2::ApiUserRoleDataList& value)
 {
     beginResetModel();
 
-    m_roles = value;
-    std::sort(m_roles.begin(), m_roles.end(),
-        [](const ec2::ApiUserGroupData& l, const ec2::ApiUserGroupData& r)
+    m_userRoles = value;
+    std::sort(m_userRoles.begin(), m_userRoles.end(),
+        [](const ec2::ApiUserRoleData& l, const ec2::ApiUserRoleData& r)
         {
-            /* Case Insensitive sort. */
+            // Case Insensitive sort.
             return nx::utils::naturalStringCompare(l.name, r.name, Qt::CaseInsensitive) < 0;
         });
 
     m_accessibleResources.clear();
-    for (const auto& role : m_roles)
+    for (const auto& role : m_userRoles)
         m_accessibleResources[role.id] = qnSharedResourcesManager->sharedResources(role);
 
     m_replacements.clear();
@@ -71,65 +71,67 @@ void QnUserRolesSettingsModel::setRoles(const ec2::ApiUserGroupDataList& value)
     endResetModel();
 }
 
-int QnUserRolesSettingsModel::addRole(const ec2::ApiUserGroupData& role)
+int QnUserRolesSettingsModel::addUserRole(const ec2::ApiUserRoleData& userRole)
 {
-    NX_ASSERT(!role.id.isNull());
-    int row = static_cast<int>(m_roles.size());
+    NX_ASSERT(!userRole.id.isNull());
+    int row = static_cast<int>(m_userRoles.size());
 
     beginInsertRows(QModelIndex(), row, row);
-    m_roles.push_back(role);
+    m_userRoles.push_back(userRole);
     endInsertRows();
 
     return row;
 }
 
-void QnUserRolesSettingsModel::removeRole(const QnUuid& id, const RoleReplacement& replacement)
+void QnUserRolesSettingsModel::removeUserRole(
+    const QnUuid& userRoleId, const UserRoleReplacement& replacement)
 {
-    auto iter = std::find_if(m_roles.begin(), m_roles.end(), [id](const ec2::ApiUserGroupData& elem) { return elem.id == id; });
-    int row = std::distance(m_roles.begin(), iter);
+    auto iter = std::find_if(m_userRoles.begin(), m_userRoles.end(),
+        [userRoleId](const ec2::ApiUserRoleData& elem) { return elem.id == userRoleId; });
+    int row = std::distance(m_userRoles.begin(), iter);
 
     beginRemoveRows(QModelIndex(), row, row);
-    m_roles.erase(iter);
-    m_replacements[id] = replacement;
+    m_userRoles.erase(iter);
+    m_replacements[userRoleId] = replacement;
     endRemoveRows();
 
-    if (id == m_currentRoleId)
-        m_currentRoleId = QnUuid();
+    if (userRoleId == m_currentUserRoleId)
+        m_currentUserRoleId = QnUuid();
 }
 
-void QnUserRolesSettingsModel::selectRole(const QnUuid& value)
+void QnUserRolesSettingsModel::selectUserRoleId(const QnUuid& value)
 {
-    m_currentRoleId = value;
+    m_currentUserRoleId = value;
 }
 
-QnUuid QnUserRolesSettingsModel::selectedRole() const
+QnUuid QnUserRolesSettingsModel::selectedUserRoleId() const
 {
-    return m_currentRoleId;
+    return m_currentUserRoleId;
 }
 
-QString QnUserRolesSettingsModel::roleName() const
+QString QnUserRolesSettingsModel::userRoleName() const
 {
     auto iter = currentRole();
-    if (iter == m_roles.cend())
+    if (iter == m_userRoles.cend())
         return QString();
     return iter->name;
 }
 
-void QnUserRolesSettingsModel::setRoleName(const QString& value)
+void QnUserRolesSettingsModel::setUserRoleName(const QString& value)
 {
     auto iter = currentRole();
-    if (iter == m_roles.end())
+    if (iter == m_userRoles.end())
         return;
 
-    int row = std::distance(m_roles.begin(), iter);
+    int row = std::distance(m_userRoles.begin(), iter);
     QModelIndex idx = index(row);
     iter->name = value;
     emit dataChanged(idx, idx);
 }
 
-bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) const
+bool QnUserRolesSettingsModel::isUserRoleValid(const ec2::ApiUserRoleData& userRole) const
 {
-    const auto name = role.name.trimmed().toLower();
+    const auto name = userRole.name.trimmed().toLower();
     if (name.isEmpty())
         return false;
 
@@ -137,10 +139,10 @@ bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) co
         return false;
 
     using boost::algorithm::any_of;
-    return !any_of(m_roles,
-        [&](const ec2::ApiUserGroupData& other)
+    return !any_of(m_userRoles,
+        [&](const ec2::ApiUserRoleData& other)
         {
-            return other.id != role.id
+            return other.id != userRole.id
                 && other.name.trimmed().toLower() == name;
         });
 }
@@ -148,13 +150,14 @@ bool QnUserRolesSettingsModel::isRoleValid(const ec2::ApiUserGroupData& role) co
 bool QnUserRolesSettingsModel::isValid() const
 {
     using boost::algorithm::all_of;
-    return all_of(m_roles, [this](const ec2::ApiUserGroupData& role){return isRoleValid(role);});
+    return all_of(m_userRoles,
+        [this](const ec2::ApiUserRoleData& role) { return isUserRoleValid(role); });
 }
 
 Qn::GlobalPermissions QnUserRolesSettingsModel::rawPermissions() const
 {
     auto iter = currentRole();
-    if (iter == m_roles.cend())
+    if (iter == m_userRoles.cend())
         return Qn::NoGlobalPermissions;
     return iter->permissions;
 }
@@ -162,33 +165,34 @@ Qn::GlobalPermissions QnUserRolesSettingsModel::rawPermissions() const
 void QnUserRolesSettingsModel::setRawPermissions(Qn::GlobalPermissions value)
 {
     auto iter = currentRole();
-    if (iter == m_roles.end())
+    if (iter == m_userRoles.end())
         return;
     iter->permissions = value;
 }
 
 QSet<QnUuid> QnUserRolesSettingsModel::accessibleResources() const
 {
-    return m_accessibleResources.value(m_currentRoleId);
+    return m_accessibleResources.value(m_currentUserRoleId);
 }
 
-QSet<QnUuid> QnUserRolesSettingsModel::accessibleResources(const ec2::ApiUserGroupData& role) const
+QSet<QnUuid> QnUserRolesSettingsModel::accessibleResources(
+    const ec2::ApiUserRoleData& userRole) const
 {
-    return m_accessibleResources.value(role.id);
+    return m_accessibleResources.value(userRole.id);
 }
 
 int QnUserRolesSettingsModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
-    return static_cast<int>(m_roles.size());
+    return static_cast<int>(m_userRoles.size());
 }
 
 QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || index.row() >= m_roles.size())
+    if (!index.isValid() || (size_t) index.row() >= m_userRoles.size())
         return QVariant();
 
-    auto userRole = m_roles[index.row()];
+    auto userRole = m_userRoles[index.row()];
 
     switch (role)
     {
@@ -201,12 +205,12 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
         return userRole.name;
 
     case Qt::TextColorRole:
-        return isRoleValid(userRole)
+        return isUserRoleValid(userRole)
             ? QVariant()
             : QBrush(qnGlobals->errorTextColor());
 
     case Qt::DecorationRole:
-        return isRoleValid(userRole)
+        return isUserRoleValid(userRole)
             ? qnResIconCache->icon(QnResourceIconCache::Users)
             : qnSkin->icon("tree/role_error.png");
 
@@ -221,62 +225,67 @@ QVariant QnUserRolesSettingsModel::data(const QModelIndex& index, int role) cons
 
 void QnUserRolesSettingsModel::setAccessibleResources(const QSet<QnUuid>& value)
 {
-    if (m_currentRoleId.isNull())
+    if (m_currentUserRoleId.isNull())
         return;
 
-    m_accessibleResources[m_currentRoleId] = value;
+    m_accessibleResources[m_currentUserRoleId] = value;
 }
 
 QnResourceAccessSubject QnUserRolesSettingsModel::subject() const
 {
-    return qnUserRolesManager->userRole(m_currentRoleId);
+    return qnUserRolesManager->userRole(m_currentUserRoleId);
 }
 
-ec2::ApiUserGroupDataList::iterator QnUserRolesSettingsModel::currentRole()
+ec2::ApiUserRoleDataList::iterator QnUserRolesSettingsModel::currentRole()
 {
-    if (m_currentRoleId.isNull())
-        return m_roles.end();
+    if (m_currentUserRoleId.isNull())
+        return m_userRoles.end();
 
-    return std::find_if(m_roles.begin(), m_roles.end(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentRoleId; });
+    return std::find_if(m_userRoles.begin(), m_userRoles.end(),
+        [this](const ec2::ApiUserRoleData& elem) { return elem.id == m_currentUserRoleId; });
 }
 
-ec2::ApiUserGroupDataList::const_iterator QnUserRolesSettingsModel::currentRole() const
+ec2::ApiUserRoleDataList::const_iterator QnUserRolesSettingsModel::currentRole() const
 {
-    if (m_currentRoleId.isNull())
-        return m_roles.cend();
+    if (m_currentUserRoleId.isNull())
+        return m_userRoles.cend();
 
-    return std::find_if(m_roles.cbegin(), m_roles.cend(), [this](const ec2::ApiUserGroupData& elem) { return elem.id == m_currentRoleId; });
+    return std::find_if(m_userRoles.cbegin(), m_userRoles.cend(),
+        [this](const ec2::ApiUserRoleData& elem) { return elem.id == m_currentUserRoleId; });
 }
 
-QnUserResourceList QnUserRolesSettingsModel::users(const QnUuid& roleId, bool withCandidates) const
+QnUserResourceList QnUserRolesSettingsModel::users(
+    const QnUuid& userRoleId, bool withCandidates) const
 {
-    if (roleId.isNull())
+    if (userRoleId.isNull())
         return QnUserResourceList();
 
-    return qnResPool->getResources<QnUserResource>().filtered([this, roleId, withCandidates](const QnUserResourcePtr& user)
-    {
-        QnUuid userRole = user->userGroup();
-        if (userRole == roleId)
-            return true;
+    return qnResPool->getResources<QnUserResource>().filtered(
+        [this, userRoleId, withCandidates](const QnUserResourcePtr& user)
+        {
+            QnUuid id = user->userRoleId();
+            if (id == userRoleId)
+                return true;
 
-        if (!withCandidates)
-            return false;
+            if (!withCandidates)
+                return false;
 
-        return replacement(userRole).role == roleId;
-    });
+            return replacement(id).userRoleId == userRoleId;
+        });
 }
 
 QnUserResourceList QnUserRolesSettingsModel::users(bool withCandidates) const
 {
-    return users(m_currentRoleId, withCandidates);
+    return users(m_currentUserRoleId, withCandidates);
 }
 
-QnUserRolesSettingsModel::RoleReplacement QnUserRolesSettingsModel::replacement(const QnUuid& source) const
+QnUserRolesSettingsModel::UserRoleReplacement QnUserRolesSettingsModel::replacement(
+    const QnUuid& sourceUserRoleId) const
 {
-    RoleReplacement replacement = directReplacement(source);
-    while (!replacement.role.isNull())
+    UserRoleReplacement replacement = directReplacement(sourceUserRoleId);
+    while (!replacement.userRoleId.isNull())
     {
-        auto iterator = m_replacements.find(replacement.role);
+        auto iterator = m_replacements.find(replacement.userRoleId);
         if (iterator != m_replacements.end())
             replacement = *iterator;
         else
@@ -286,7 +295,8 @@ QnUserRolesSettingsModel::RoleReplacement QnUserRolesSettingsModel::replacement(
     return replacement;
 }
 
-QnUserRolesSettingsModel::RoleReplacement QnUserRolesSettingsModel::directReplacement(const QnUuid& source) const
+QnUserRolesSettingsModel::UserRoleReplacement QnUserRolesSettingsModel::directReplacement(
+    const QnUuid& sourceUserRoleId) const
 {
-    return m_replacements[source];
+    return m_replacements[sourceUserRoleId];
 }

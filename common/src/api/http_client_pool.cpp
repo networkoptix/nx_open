@@ -27,7 +27,7 @@ ClientPool::ClientPool(QObject *parent):
 
 ClientPool::~ClientPool()
 {
-    std::multimap<SocketAddress, HttpConnectionPtr> dataCopy;
+    decltype(m_connectionPool) dataCopy;
     {
         QnMutexLocker lock(&m_mutex);
         std::swap(dataCopy, m_connectionPool);
@@ -168,8 +168,7 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
     cleanupDisconnectedUnsafe();
 
     HttpConnection* result = nullptr;
-    QUrl clientUrl;
-    SocketAddress requestAddress = toSocketAddress(url);
+    const auto requestAddress = AsyncHttpClient::endpointWithProtocol(url);
 
     auto range = m_connectionPool.equal_range(requestAddress);
     int count = 0;
@@ -232,7 +231,6 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
             if (connection->client == clientPtr)
             {
                 requestId = connection->handle;
-                connection->handle = 0;
                 break;
             }
         }
@@ -242,6 +240,20 @@ void ClientPool::at_HttpClientDone(nx_http::AsyncHttpClientPtr clientPtr)
         emit done(requestId, clientPtr);
 
     QnMutexLocker lock(&m_mutex);
+    // free connection
+    if (requestId > 0)
+    {
+        for (auto itr = m_connectionPool.begin(); itr != m_connectionPool.end(); ++itr)
+        {
+            HttpConnection* connection = itr->second.get();
+            if (connection->handle == requestId)
+            {
+                connection->handle = 0;
+                break;
+            }
+        }
+    }
+
     sendNextRequestUnsafe();
     cleanupDisconnectedUnsafe();
 }

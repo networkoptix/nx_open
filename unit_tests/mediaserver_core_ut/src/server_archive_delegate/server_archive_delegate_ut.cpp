@@ -328,14 +328,14 @@ private:
                 qnNormalStorageMan->addStorage(storage);
             else
                 qnBackupStorageMan->addStorage(storage);
-            storage->setStatus(Qn::Online, true);
+            storage->setStatus(Qn::Online);
             m_storages.push_back(storage);
         }
     }
 
     void loadMedia()
     {
-        QnStorageManager::ArchiveCameraDataList archiveCameras;
+        nx::caminfo::ArchiveCameraDataList archiveCameras;
         for (int i = 0; i < m_storageUrls.size(); ++i)
         {
             QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : qnBackupStorageMan;
@@ -429,6 +429,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    MSSettings::initializeROSettings();
 
     std::unique_ptr<QnStorageManager> normalStorageManager;
     if (!qnNormalStorageMan) {

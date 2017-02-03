@@ -1,13 +1,34 @@
 #include <gtest/gtest.h>
 #include <nx/utils/log/assert.h>
 
-// Current version of google test doesn't support it for WIN32
+namespace nx {
+namespace utils {
+namespace test {
+
+struct AssertFailureTest: ::testing::Test
+{
+    AssertFailureTest() { logAssert("Constructor"); }
+    ~AssertFailureTest() { logAssert("Destructor"); }
+
+    virtual void SetUp() override { logAssert("SetUp"); }
+    virtual void TearDown() override { logAssert("TearDown"); }
+
+    static void SetUpTestCase() { logAssert("SetUpTestCase"); }
+    static void TearDownTestCase() { logAssert("TearDownTestCase"); }
+};
+
+TEST_F(AssertFailureTest, DISABLED_Failure)
+{
+    logAssert("Internal");
+}
+
+// Current version of google test doesn't support crash tests on WIN32.
 #ifndef Q_OS_WIN32
 
 #ifdef _DEBUG
-TEST(NxExpect, All3)
+    TEST(NxExpect, All3)
 #else
-TEST(NxExpect, DISABLED_All3)
+    TEST(NxExpect, DISABLED_All3)
 #endif
 {
     EXPECT_DEATH(NX_EXPECT(false), "");
@@ -16,9 +37,9 @@ TEST(NxExpect, DISABLED_All3)
 }
 
 #ifdef _DEBUG
-TEST(NxAssert, All3)
+    TEST(NxAssert, All3)
 #else
-TEST(NxAssert, DISABLED_All3)
+    TEST(NxAssert, DISABLED_All3)
 #endif
 {
     EXPECT_DEATH(NX_ASSERT(false), "");
@@ -34,3 +55,7 @@ TEST(NxCritical, All3)
 }
 
 #endif // Q_OS_WIN32
+
+} // namespace test
+} // namespace utils
+} // namespace nx

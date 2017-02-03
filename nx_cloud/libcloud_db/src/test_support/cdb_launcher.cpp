@@ -1,4 +1,3 @@
-
 #include "cdb_launcher.h"
 
 #include <chrono>
@@ -16,78 +15,69 @@
 #include <utils/common/app_info.h>
 #include <utils/common/sync_call.h>
 
-#include "managers/email_manager.h"
+#include "business_data_generator.h"
 #include "cloud_db_process.h"
-
+#include "managers/email_manager.h"
 
 namespace nx {
 namespace cdb {
 
-namespace {
-QString sTemporaryDirectoryPath;
-nx::db::ConnectionOptions sConnectionOptions;
-}
+//-------------------------------------------------------------------------------------------------
+// CdbLauncher
 
-CdbLauncher::CdbLauncher(QString tmpDir)
-    :
-    m_tmpDir(tmpDir),
+CdbLauncher::CdbLauncher(QString tmpDir):
+    db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
-    if (m_tmpDir.isEmpty())
-        m_tmpDir =
-            (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
-            "/cdb_ut.data";
-    QDir(m_tmpDir).removeRecursively();
-
     addArg("/path/to/bin");
     addArg("-e");
     addArg("-listenOn"); addArg(lit("127.0.0.1:0").toLatin1().constData());
-    addArg("-log/level"); addArg("DEBUG2");
-    addArg("-dataDir"); addArg(m_tmpDir.toLatin1().constData());
-    addArg("-syncroLog/level"); addArg("DEBUG2");
+    addArg("-log/logLevel"); addArg("DEBUG2");
+    addArg("-dataDir"); addArg(testDataDir().toLatin1().constData());
+    addArg("-syncroLog/logLevel"); addArg("DEBUG2");
+
+    const auto dbConnectionOptionsToUse = dbConnectionOptions();
 
     addArg("-db/driverName");
     addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
-        sConnectionOptions.driverType).toLatin1().constData());
+        dbConnectionOptionsToUse.driverType).toLatin1().constData());
 
-    if (!sConnectionOptions.hostName.isEmpty())
+    if (!dbConnectionOptionsToUse.hostName.isEmpty())
     {
         addArg("-db/hostName");
-        addArg(sConnectionOptions.hostName.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.hostName.toUtf8().constData());
     }
 
-    if (sConnectionOptions.port != 0)
+    if (dbConnectionOptionsToUse.port != 0)
     {
         addArg("-db/port");
-        addArg(QByteArray::number(sConnectionOptions.port).constData());
+        addArg(QByteArray::number(dbConnectionOptionsToUse.port).constData());
     }
 
     addArg("-db/name");
-    if (!sConnectionOptions.dbName.isEmpty())
-        addArg(sConnectionOptions.dbName.toUtf8().constData());
-    else
-        addArg(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
+    addArg(dbConnectionOptionsToUse.dbName.toUtf8().constData());
 
-    if (!sConnectionOptions.userName.isEmpty())
+    if (!dbConnectionOptionsToUse.userName.isEmpty())
     {
         addArg("-db/userName");
-        addArg(sConnectionOptions.userName.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.userName.toUtf8().constData());
     }
 
-    if (!sConnectionOptions.password.isEmpty())
+    if (!dbConnectionOptionsToUse.password.isEmpty())
     {
         addArg("-db/password");
-        addArg(sConnectionOptions.password.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.password.toUtf8().constData());
     }
 
-    if (!sConnectionOptions.connectOptions.isEmpty())
+    if (!dbConnectionOptionsToUse.connectOptions.isEmpty())
     {
         addArg("-db/connectOptions");
-        addArg(sConnectionOptions.connectOptions.toUtf8().constData());
+        addArg(dbConnectionOptionsToUse.connectOptions.toUtf8().constData());
     }
 
-    addArg("-db/maxConnections"); addArg("3");
+    addArg("-db/maxConnections");
+    addArg(QByteArray::number(dbConnectionOptionsToUse.maxConnectionCount).constData());
 
     EMailManagerFactory::setFactory(
         [](const conf::Settings& /*settings*/){
@@ -98,8 +88,6 @@ CdbLauncher::CdbLauncher(QString tmpDir)
 CdbLauncher::~CdbLauncher()
 {
     stop();
-
-    QDir(m_tmpDir).removeRecursively();
 }
 
 bool CdbLauncher::waitUntilStarted()
@@ -112,7 +100,7 @@ bool CdbLauncher::waitUntilStarted()
         return false;
     m_port = httpEndpoints.front().port;
 
-    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+    m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
     //retrieving module info
     auto connection = m_connectionFactory->createConnection();
@@ -147,11 +135,6 @@ std::unique_ptr<nx::cdb::api::Connection> CdbLauncher::connection(
 api::ModuleInfo CdbLauncher::moduleInfo() const
 {
     return m_moduleInfo;
-}
-
-QString CdbLauncher::testDataDir() const
-{
-    return m_tmpDir;
 }
 
 api::ResultCode CdbLauncher::addAccount(
@@ -203,9 +186,7 @@ api::ResultCode CdbLauncher::addAccount(
 
 std::string CdbLauncher::generateRandomEmailAddress() const
 {
-    std::ostringstream ss;
-    ss << "test_" << nx::utils::random::number<unsigned int>() << "@networkoptix.com";
-    return ss.str();
+    return test::BusinessDataGenerator::generateRandomEmailAddress();
 }
 
 api::ResultCode CdbLauncher::activateAccount(
@@ -379,6 +360,8 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
     sysRegData.opaque = opaque;
+    if (!systemData->customization.empty())
+        sysRegData.customization = systemData->customization;
 
     api::ResultCode resCode = api::ResultCode::ok;
 
@@ -466,6 +449,29 @@ api::ResultCode CdbLauncher::getSystems(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getSystemsFiltered(
+    const std::string& email,
+    const std::string& password,
+    const api::Filter& filter,
+    std::vector<api::SystemDataEx>* const systems)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemDataExList systemDataList;
+    std::tie(resCode, systemDataList) =
+        makeSyncCall<api::ResultCode, api::SystemDataExList>(
+            std::bind(
+                &nx::cdb::api::SystemManager::getSystemsFiltered,
+                connection->systemManager(),
+                filter,
+                std::placeholders::_1));
+    *systems = std::move(systemDataList.systems);
+
+    return resCode;
+}
+
 api::ResultCode CdbLauncher::getSystem(
     const std::string& email,
     const std::string& password,
@@ -542,6 +548,15 @@ api::ResultCode CdbLauncher::shareSystem(
     systemSharing.accessRole = accessRole;
 
     return shareSystem(email, password, std::move(systemSharing));
+}
+
+api::ResultCode CdbLauncher::shareSystem(
+    const AccountWithPassword& grantor,
+    const std::string& systemId,
+    const std::string& accountEmail,
+    api::SystemAccessRole accessRole)
+{
+    return shareSystem(grantor.email, grantor.password, systemId, accountEmail, accessRole);
 }
 
 api::ResultCode CdbLauncher::updateSystemSharing(
@@ -698,6 +713,31 @@ api::ResultCode CdbLauncher::getSystemSharings(
 
     *sharings = std::move(data.sharing);
     return resCode;
+}
+
+api::ResultCode CdbLauncher::getSystemSharing(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemId,
+    const std::string& userOfInterestEmail,
+    api::SystemSharingEx* sharing)
+{
+    std::vector<api::SystemSharingEx> sharings;
+    const auto resultCode = getSystemSharings(email, password, systemId, &sharings);
+    if (resultCode != api::ResultCode::ok)
+        return resultCode;
+    const auto it = std::find_if(
+        sharings.cbegin(), sharings.cend(),
+        [&userOfInterestEmail](const api::SystemSharingEx& value)
+        {
+            return value.accountEmail == userOfInterestEmail;
+        });
+
+    if (it == sharings.cend())
+        return api::ResultCode::notFound;
+
+    *sharing = *it;
+    return api::ResultCode::ok;
 }
 
 api::ResultCode CdbLauncher::getCdbNonce(
@@ -864,28 +904,8 @@ bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
         QFileDevice::ReadUser | QFileDevice::WriteUser);
 }
 
-void CdbLauncher::setTemporaryDirectoryPath(const QString& path)
-{
-    sTemporaryDirectoryPath = path;
-}
-
-QString CdbLauncher::temporaryDirectoryPath()
-{
-    return sTemporaryDirectoryPath;
-}
-
-void CdbLauncher::setDbConnectionOptions(
-    const nx::db::ConnectionOptions& connectionOptions)
-{
-    sConnectionOptions = connectionOptions;
-}
-
-nx::db::ConnectionOptions CdbLauncher::dbConnectionOptions()
-{
-    return sConnectionOptions;
-}
-
 namespace api {
+
 bool operator==(const api::AccountData& left, const api::AccountData& right)
 {
     return
@@ -896,8 +916,27 @@ bool operator==(const api::AccountData& left, const api::AccountData& right)
         left.customization == right.customization &&
         left.statusCode == right.statusCode;
 }
+
+} // namespace api
+
+//-------------------------------------------------------------------------------------------------
+// EmailManagerStub
+
+EmailManagerStub::EmailManagerStub(nx::cdb::AbstractEmailManager* const target):
+    m_target(target)
+{
 }
 
-}   //cdb
-}   //nx
+void EmailManagerStub::sendAsync(
+    const AbstractNotification& notification,
+    std::function<void(bool)> completionHandler)
+{
+    if (!m_target)
+        return;
+    m_target->sendAsync(
+        notification,
+        std::move(completionHandler));
+}
 
+} // namespace cdb
+} // namespace nx

@@ -399,10 +399,13 @@ bool ApplauncherProcess::startApplication(
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
 
     NX_LOG(QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG2);
+
+    const QFileInfo info(binPath);
     if (ProcessUtils::startProcessDetached(
-        binPath,
+        QnAppInfo::applicationPlatform() == "linux"
+            ? "./" + info.fileName() : info.absoluteFilePath(),
         arguments,
-        QString(),
+        info.absolutePath(),
         environment))
     {
         NX_LOG(QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1);
@@ -589,9 +592,9 @@ void ApplauncherProcess::onTimer(const quint64& timerID)
         m_killProcessTasks.erase(it);
     }
 
-    //stopping process if needed
-    SystemError::ErrorCode code = nx::killProcessByPid(task.processID);
-    code = 0;
+    // Stopping process if needed.
+    const auto code = nx::killProcessByPid(task.processID);
+    static_cast<void>(code);
 }
 
 void ApplauncherProcess::onInstallationDone(InstallationProcess* installationProcess)

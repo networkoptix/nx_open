@@ -8,6 +8,7 @@
 
 #include "onvif_resource.h"
 #include "onvif/soapDeviceBindingProxy.h"
+#include "onvif_searcher_hooks.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../archive_camera/archive_camera.h"
 #include "../sony/sony_resource.h"
@@ -18,9 +19,12 @@
 #include <plugins/resource/pelco/optera/optera_resource.h>
 #include "plugins/resource/flir/flir_onvif_resource.h"
 #include "../vista/vista_resource.h"
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
-#include "common/common_module.h"
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <common/common_module.h>
+#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
+
+using namespace nx::plugins::onvif;
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -91,6 +95,9 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
     } else {
         qCritical() << "Can't find " << ONVIF_ANALOG_RT << " resource type in resource type pool";
     }
+
+    m_hookChain.registerHook(searcher_hooks::commonHooks);
+    m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
 }
 
 static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
@@ -138,12 +145,15 @@ bool OnvifResourceInformationFetcher::isModelSupported(const QString& manufactur
     return NameHelper::instance().isManufacturerSupported(manufacturer) && NameHelper::instance().isSupported(modelName);
 }
 
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const
+void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& originalInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
         return;
     }
+
+    auto info = originalInfo;
+    m_hookChain.applyHooks(&info);
 
     QString mac = info.mac;
     if (isMacAlreadyExists(info.uniqId, result) || isMacAlreadyExists(mac, result)) {
@@ -175,7 +185,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
-    if (existResource) {
+    if (existResource && existResource->getStatus() >= Qn::Online) {
         QAuthenticator auth = existResource->getAuth();
 
         if (!auth.isNull())
@@ -405,6 +415,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());
 #endif
+    else if (manufacture.toLower().contains(QLatin1String("hikvision")))
+        resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new QnFlirOnvifResource());
     else

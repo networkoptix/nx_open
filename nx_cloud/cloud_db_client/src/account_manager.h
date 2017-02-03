@@ -16,21 +16,15 @@
 
 
 namespace nx {
-
-namespace cc {
-class CloudModuleEndPointFetcher;
-}
-
 namespace cdb {
-namespace cl {
+namespace client {
 
-class AccountManager
-:
+class AccountManager:
     public api::AccountManager,
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AccountManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
@@ -63,7 +57,7 @@ public:
         std::function<void(api::ResultCode, api::TemporaryCredentials)> completionHandler) override;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

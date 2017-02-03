@@ -159,8 +159,11 @@ void ConnectionManager::pushTransaction(
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
-    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath))
+    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath) &&
+        !request.requestLine.url.path().startsWith(kPushEc2TransactionDeprecatedPath)) // TODO: #ak remove after 3.0 release
+    {
         return completionHandler(nx_http::StatusCode::notFound);
+    }
 
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())

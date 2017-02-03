@@ -31,7 +31,7 @@ class NX_NETWORK_API OutgoingTunnel:
     typedef aio::BasicPollable BaseType;
 
 public:
-    typedef std::function<void(SystemError::ErrorCode,
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
 
     enum class State
@@ -42,7 +42,7 @@ public:
         closed
     };
 
-    typedef std::function<void(
+    typedef nx::utils::MoveOnlyFunc<void(
         SystemError::ErrorCode,
         std::unique_ptr<AbstractStreamSocket>)> NewConnectionHandler;
 

@@ -4,6 +4,8 @@
 
 #include <ui/common/palette.h>
 
+#include <nx/utils/math/fuzzy.h>
+
 // -------------------------------------------------------------------------- //
 // FramedBase
 // -------------------------------------------------------------------------- //
@@ -33,7 +35,7 @@ qreal FramedBase::frameWidth() const
 
 void FramedBase::setFrameWidth(qreal frameWidth)
 {
-    if (qFuzzyCompare(m_frameWidth, frameWidth))
+    if (qFuzzyEquals(m_frameWidth, frameWidth))
         return;
 
     m_frameWidth = frameWidth;
@@ -118,7 +120,7 @@ qreal FramedBase::roundingRadius() const
 }
 void FramedBase::setRoundingRadius(qreal roundingRadius)
 {
-    if (qFuzzyCompare(m_roundingRadius, roundingRadius))
+    if (qFuzzyEquals(m_roundingRadius, roundingRadius))
         return;
 
     m_roundingRadius = roundingRadius;

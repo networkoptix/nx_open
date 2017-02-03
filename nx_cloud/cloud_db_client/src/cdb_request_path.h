@@ -3,9 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_CDB_CL_REQUEST_PATH_H
-#define NX_CDB_CL_REQUEST_PATH_H
-
+#pragma once
 
 namespace nx {
 namespace cdb {
@@ -35,6 +33,9 @@ extern const char* kSubscribeToSystemEventsPath;
 
 extern const char* kPingPath;
 
+extern const char* kEstablishEc2TransactionConnectionDeprecatedPath;
+extern const char* kPushEc2TransactionDeprecatedPath;
+
 extern const char* kEstablishEc2TransactionConnectionPath;
 extern const char* kPushEc2TransactionPath;
 
@@ -42,7 +43,5 @@ extern const char* kPushEc2TransactionPath;
 extern const char* kMaintenanceGetVmsConnections;
 extern const char* kMaintenanceGetTransactionLog;
 
-}   //cdb
-}   //nx
-
-#endif //NX_CDB_CL_REQUEST_PATH_H
+} // namespace cdb
+} // namespace nx

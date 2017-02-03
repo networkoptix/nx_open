@@ -35,7 +35,7 @@ angular.module('webadminApp')
                     $scope.authorizing = false;
                     dialogs.alert(L.login.incorrectPassword);
                 }).then(function(){
-                    nativeClient.updateCredentials(login,password,false);
+                    nativeClient.updateCredentials(login,password,false,false);
                 });
             }
         };

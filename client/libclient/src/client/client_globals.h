@@ -21,9 +21,9 @@ namespace Qn
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
+        OtherSystemsNode,       /**< Root node for remote systems. */
         LocalResourcesNode,     /**< Root node for local resources. */
         LocalSeparatorNode,     /**< Root node for spacing between local resources header and resources. */
-        OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
@@ -37,8 +37,8 @@ namespace Qn
         // Repeating nodes
         RoleNode,               /**< Node that represents custom role. */
         SharedLayoutNode,       /**< Node that represents shared layout link, displayed under user. Has only resource - shared layout. */
-        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
+        SharedResourceNode,     /**< Node that represents accessible resource link, displayed under user. Has only resource - camera or web page. */
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
@@ -46,12 +46,13 @@ namespace Qn
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
+        CloudSystemNode,        /**< Node that represents available cloud system. */
         SystemNode,             /**< Node that represents systems but the current. */
 
         NodeTypeCount
     };
 
-    inline bool isSeparatorNode(NodeType t) { return t == SeparatorNode || t == LocalSeparatorNode;  }
+    bool isSeparatorNode(NodeType t);
 
     /**
      * Role of an item on the scene.
@@ -202,6 +203,7 @@ namespace Qn
                                                          (or to the last system) automatically next time */
         StorePasswordRole,                          /**< Role for flag that shows if password of successful connection should be stored.
                                                          Used in QnActions::ConnectAction. */
+        CloudSystemIdRole,                          /**< Role for cloud system id (QString). Used in cloud system nodes and ConnectToCloudAction. */
 
         ForceRole,                                  /**< Role for 'forced' flag. Used in ConnectAction/DisconnectAction. */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
@@ -327,6 +329,15 @@ namespace Qn
         OverlayCount
     };
 
+    enum class ResourceOverlayButton
+    {
+        Empty,
+        Diagnostics,
+        IoEnable,
+        MoreLicenses,
+        Settings,
+    };
+
     /**
      * Result of a frame rendering operation.
      *
@@ -422,24 +433,6 @@ namespace Qn
         Thumbnails      /**< thumbnails pane    */
     };
 
-    /**
-     * Flags for messages that should be displayed to user only once
-     * (usually with 'Do not show anymore' checkbox).
-     */
-    enum class ShowOnceMessage
-    {
-        PtzPresetInUse              = 0x001,    /**< Delete ptz preset which is used in the tour. */
-        SharedLayoutEdit            = 0x002,    /**< Edit shared layout. */
-        ChangeUserLocalLayout       = 0x004,    /**< Items are removed from user's layout, but access still persist. */
-        AddToRoleLocalLayout        = 0x008,    /**< Items are added to roled user's layout. */
-        RemoveFromRoleLocalLayout   = 0x010,    /**< Items are removed from roled user's layout, but access still persist. */
-        DeleteResources             = 0x020,    /**< Batch delete resources (but layouts). */
-        DeleteLocalLayouts          = 0x040     /**< Batch delete user's or group's local layouts. */
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ShowOnceMessage)
-    Q_DECLARE_FLAGS(ShowOnceMessages, ShowOnceMessage)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ShowOnceMessages)
-
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -458,6 +451,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::LightModeFlags)(Qn::ShowOnceMessages),
+    (Qn::LightModeFlags),
     (metatype)(numeric)
     )

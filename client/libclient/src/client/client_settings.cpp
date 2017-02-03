@@ -163,13 +163,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
             return baseValue;
         }
 
-
-        case SHOW_ONCE_MESSAGES:
-        {
-            QVariant baseValue = base_type::readValueFromSettings(settings, id, defaultValue);
-            return qVariantFromValue(static_cast<Qn::ShowOnceMessages>(baseValue.toInt()));
-        }
-
         case WORKBENCH_PANES:
         {
             QByteArray asJson = base_type::readValueFromSettings(settings, id, QVariant())
@@ -264,9 +257,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             break;
         }
 
-        case SHOW_ONCE_MESSAGES:
-            base_type::writeValueToSettings(settings, id, static_cast<int>(value.value<Qn::ShowOnceMessages>()));
-
         case UPDATE_FEED_URL:
         case SETTINGS_URL:
         case GL_VSYNC:
@@ -326,16 +316,24 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
     return status;
 }
 
-void QnClientSettings::load() {
+void QnClientSettings::load()
+{
+    m_settings->sync();
     updateFromSettings(m_settings);
 }
 
-void QnClientSettings::save() {
+void QnClientSettings::save()
+{
     submitToSettings(m_settings);
+    if (!isWritable())
+        return;
+
     m_settings->sync();
+    emit saved();
 }
 
-bool QnClientSettings::isWritable() const {
+bool QnClientSettings::isWritable() const
+{
     return m_settings->isWritable();
 }
 

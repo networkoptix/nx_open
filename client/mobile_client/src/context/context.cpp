@@ -7,7 +7,6 @@
 #include <utils/mobile_app_info.h>
 #include <common/common_module.h>
 #include <context/connection_manager.h>
-#include <context/context_settings.h>
 #include <ui/window_utils.h>
 #include <ui/texture_size_helper.h>
 #include <client_core/client_core_settings.h>
@@ -19,6 +18,10 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <helpers/system_helpers.h>
+#include <settings/last_connection.h>
+#include <settings/qml_settings_adaptor.h>
+#include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
 
@@ -32,26 +35,27 @@ QnContext::QnContext(QObject* parent) :
     base_type(parent),
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
+    m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
-    m_settings(new QnContextSettings(this)),
     m_uiController(new QnMobileClientUiController(this)),
     m_cloudUrlHelper(new QnCloudUrlHelper(
         SystemUri::ReferralSource::MobileClient,
         SystemUri::ReferralContext::WelcomePage,
-        this))
+        this)),
+    m_localPrefix(lit("qrc:///"))
 {
-    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged,
-            this, [this]()
-    {
-        auto thumbnailCache = QnCameraThumbnailCache::instance();
-        if (!thumbnailCache)
-            return;
+    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this,
+        [this]()
+        {
+            auto thumbnailCache = QnCameraThumbnailCache::instance();
+            if (!thumbnailCache)
+                return;
 
-        if (m_connectionManager->connectionState() == QnConnectionManager::Connected)
-            thumbnailCache->start();
-        else
-            thumbnailCache->stop();
-    });
+            if (m_connectionManager->isOnline())
+                thumbnailCache->start();
+            else
+                thumbnailCache->stop();
+        });
 
     connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
             this, [this]()
@@ -60,6 +64,24 @@ QnContext::QnContext(QObject* parent) :
         auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
         camerasWatcher->setUseLayouts(useLayouts);
     });
+
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
+        [this](int id)
+        {
+            switch (id)
+            {
+                case QnMobileClientSettings::AutoLogin:
+                    emit autoLoginEnabledChanged();
+                    break;
+
+                case QnMobileClientSettings::ShowCameraInfo:
+                    emit showCameraInfoChanged();
+                    break;
+
+                default:
+                    break;
+            }
+        });
 }
 
 QnContext::~QnContext() {}
@@ -72,6 +94,11 @@ QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 QnUserWatcher* QnContext::userWatcher() const
 {
     return qnCommon->instance<QnUserWatcher>();
+}
+
+QmlSettingsAdaptor* QnContext::settings() const
+{
+    return m_settings;
 }
 
 void QnContext::quitApplication()
@@ -123,6 +150,37 @@ bool QnContext::liteMode() const
     return qnSettings->isLiteClientModeEnabled();
 }
 
+bool QnContext::autoLoginEnabled() const
+{
+    return qnSettings->isAutoLoginEnabled();
+}
+
+void QnContext::setAutoLoginEnabled(bool enabled)
+{
+    auto mode = AutoLoginMode::Auto;
+    if (liteMode())
+        mode = enabled ? AutoLoginMode::Enabled : AutoLoginMode::Disabled;
+
+    const auto intMode = (int) mode;
+    if (intMode == qnSettings->autoLoginMode())
+        return;
+
+    qnSettings->setAutoLoginMode(intMode);
+}
+
+bool QnContext::showCameraInfo() const
+{
+    return qnSettings->showCameraInfo();
+}
+
+void QnContext::setShowCameraInfo(bool showCameraInfo)
+{
+    if (showCameraInfo == qnSettings->showCameraInfo())
+        return;
+
+    qnSettings->setShowCameraInfo(showCameraInfo);
+}
+
 bool QnContext::testMode() const
 {
     return qnSettings->testMode();
@@ -133,24 +191,27 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& systemName)
+void QnContext::removeSavedConnection(const QString& localSystemId, const QString& userName)
 {
-    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
+    using namespace nx::client::core::helpers;
 
-    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
-    {
-        return connection.systemName == systemName;
-    };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
+    const auto localId = QnUuid::fromStringSafe(localSystemId);
 
-    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
+    NX_ASSERT(!localId.isNull());
+    if (localId.isNull())
+        return;
+
+    removeCredentials(localId, userName);
+
+    if (userName.isEmpty() || !hasCredentials(localId))
+        removeConnection(localId);
+
     qnClientCoreSettings->save();
 }
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedConnection(QnLocalConnectionData());
+    qnSettings->setLastUsedConnection(LastConnectionData());
 }
 
 QString QnContext::getLastUsedSystemName() const
@@ -160,12 +221,24 @@ QString QnContext::getLastUsedSystemName() const
 
 QUrl QnContext::getLastUsedUrl() const
 {
-    return qnSettings->lastUsedConnection().urlWithPassword();
+    return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
 QUrl QnContext::getInitialUrl() const
 {
     return qnSettings->startupParameters().url;
+}
+
+QUrl QnContext::getWebSocketUrl() const
+{
+    const auto port = qnSettings->webSocketPort();
+    if (port == 0)
+        return QUrl();
+
+    return nx::utils::UrlBuilder()
+        .setScheme(lit("ws"))
+        .setHost(lit("localhost"))
+        .setPort(port);
 }
 
 void QnContext::setCloudCredentials(const QString& login, const QString& password)

@@ -1,34 +1,19 @@
-#ifndef IOPORT_ITEM_DELEGATE_H
-#define IOPORT_ITEM_DELEGATE_H
+#pragma once
 
-#include <QtWidgets/QStyledItemDelegate>
-#include <QtWidgets/QPushButton>
+#include <ui/widgets/common/widget_table_delegate.h>
 
-#include <core/resource/resource_fwd.h>
 
-#include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/workbench/workbench_context_aware.h>
-
-typedef QVector<QnUuid> IDList;
-
-class QnIOPortItemDelegate: public QStyledItemDelegate
+class QnIoPortItemDelegate: public QnWidgetTableDelegate
 {
-    Q_OBJECT
+    using base_type = QnWidgetTableDelegate;
 
-    typedef QStyledItemDelegate base_type;
 public:
-    explicit QnIOPortItemDelegate(QObject *parent = 0);
-    ~QnIOPortItemDelegate();
-protected:
-    virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;
-    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const override;
-    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    using base_type::QnWidgetTableDelegate; //< forward constructor
 
-    virtual bool eventFilter(QObject *object, QEvent *event) override;
-private slots:
-    void at_editor_commit();
+    virtual QWidget* createWidget(QAbstractItemModel* model,
+        const QModelIndex& index, QWidget* parent) const override;
+
+    virtual bool updateWidget(QWidget* widget, const QModelIndex& index) const override;
+
+    virtual QSize sizeHint(QWidget* widget, const QModelIndex& index) const override;
 };
-
-#endif // IOPORT

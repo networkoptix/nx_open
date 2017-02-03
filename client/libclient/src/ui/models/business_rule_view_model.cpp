@@ -32,6 +32,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
+#include <utils/common/qtimespan.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
@@ -229,7 +230,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                         case QnBusiness::SendMailAction:
                             return m_actionParams.emailAddress;
                         case QnBusiness::ShowPopupAction:
-                            return (int)m_actionParams.userGroup;
+                            return (int) m_actionParams.userGroup;
                         default:
                             break;
                     }
@@ -248,8 +249,8 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                 break;
 
             if (!isValid(column))
-                return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
-            return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
+                return qnGlobals->businessRuleInvalidColumnBackgroundColor();
+            return qnGlobals->businessRuleInvalidBackgroundColor();
 
         case Qn::UuidRole:
             return qVariantFromValue(m_id);
@@ -312,7 +313,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
 
                     // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
                     // This code will fail silently if someone changes the header. Please write it properly.
-                    params.userGroup = (QnBusiness::UserGroup)value.toInt();
+                    params.userGroup = (QnBusiness::UserGroup) value.toInt();
                     setActionParams(params);
                     break;
                 }
@@ -769,7 +770,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             auto resources = qnResPool->getResources(eventResources());
             if (!QnBusiness::isResourceRequired(m_eventType))
             {
-                return qnResIconCache->icon(QnResourceIconCache::Servers);
+                return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
             }
             else if (resources.size() == 1)
             {
@@ -828,7 +829,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             }
             else if (resources.isEmpty())
             {
-                return qnResIconCache->icon(QnResourceIconCache::Offline, true);
+                return qnSkin->icon(lit("tree/buggy.png"));
             }
             else
             {
@@ -884,7 +885,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             switch (m_actionType)
             {
                 case QnBusiness::SendMailAction:
-                    return QnSendEmailActionDelegate::isValidList(filtered);
+                    return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case QnBusiness::CameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
                         QnBusiness::toResources<QnCameraRecordingPolicy::resource_type>(filtered));
@@ -1029,7 +1030,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             if (m_actionParams.userGroup == QnBusiness::AdminOnly)
                 return tr("Administrators Only");
             else
-                return tr("All Users");
+                return tr("Users");
         }
         case QnBusiness::BookmarkAction:
         case QnBusiness::CameraRecordingAction:
@@ -1090,26 +1091,24 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getAggregationText() const
 {
-    const int MINUTE = 60;
-    const int HOUR = MINUTE * 60;
-    const int DAY = HOUR * 24;
-
     if (!QnBusiness::allowsAggregation(m_actionType))
         return tr("N/A");
 
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");
 
-    if (m_aggregationPeriodSec >= DAY && m_aggregationPeriodSec % DAY == 0)
-        return tr("Every %n days", "", m_aggregationPeriodSec / DAY);
+    const qint64 kMsecPerSec = 1000;
+    static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
+    static const int kDoNotSuppress = -1;
+    static const QString kSeparator(L' ');
 
-    if (m_aggregationPeriodSec >= HOUR && m_aggregationPeriodSec % HOUR == 0)
-        return tr("Every %n hours", "", m_aggregationPeriodSec / HOUR);
+    const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
+    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(kDoNotSuppress,
+        kFormat,
+        QTimeSpan::SuffixFormat::Full,
+        kSeparator);
 
-    if (m_aggregationPeriodSec >= MINUTE && m_aggregationPeriodSec % MINUTE == 0)
-        return tr("Every %n minutes", "", m_aggregationPeriodSec / MINUTE);
-
-    return tr("Every %n seconds", "", m_aggregationPeriodSec);
+    return tr("Every %1").arg(timespan);
 }
 
 QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState value)

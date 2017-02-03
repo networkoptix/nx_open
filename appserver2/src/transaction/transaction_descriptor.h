@@ -76,7 +76,7 @@ enum class RemotePeerAccess
 
 namespace access_helpers {
 
-enum class Mode 
+enum class Mode
 {
     read,
     write
@@ -153,6 +153,7 @@ struct NotificationParams
     QnUpdatesNotificationManager* updatesNotificationManager;
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
+    NotificationSource source;
 };
 
 template<typename ParamType>
@@ -270,13 +271,19 @@ detail::TransactionDescriptorBase* getTransactionDescriptorByValue(ApiCommand::V
 detail::TransactionDescriptorBase* getTransactionDescriptorByName(const QString& name);
 
 template<typename Param>
-detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(const QnTransaction<Param>& tran)
+detail::TransactionDescriptor<Param>* getActualTransactionDescriptorByValue(ApiCommand::Value command)
 {
-    auto tdBase = ec2::getTransactionDescriptorByValue(tran.command);
+    auto tdBase = ec2::getTransactionDescriptorByValue(command);
     NX_ASSERT(tdBase);
     auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
     NX_ASSERT(td);
     return td;
+}
+
+template<typename Param>
+detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(const QnTransaction<Param>& tran)
+{
+    return getActualTransactionDescriptorByValue<Param>(tran.command);
 }
 
 template<typename Param>

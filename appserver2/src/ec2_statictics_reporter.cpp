@@ -8,6 +8,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/utils/random.h>
+#include <nx/utils/app_info.h>
 
 #include <utils/common/synctime.h>
 #include <utils/common/app_info.h>
@@ -16,7 +17,6 @@
 #include "ec2_connection.h"
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
-static const bool DEFAULT_SERVER_AUTH = true;
 
 static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
@@ -128,13 +128,11 @@ namespace ec2
 
     void Ec2StaticticsReporter::removeTimer()
     {
-        boost::optional<quint64> timerId;
+        decltype(m_timerId) timerId;
         {
             QnMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
-
-            if (timerId = m_timerId)
-                m_timerId = boost::none;
+            m_timerId.swap(timerId);
         }
 
         if (timerId)
@@ -185,7 +183,7 @@ namespace ec2
         {
             m_firstTime = false;
             const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
-            const auto currentVersion = QnAppInfo::applicationFullVersion();
+            const auto currentVersion = nx::utils::AppInfo::applicationFullVersion();
 
             QCollator collator;
             collator.setNumericMode(true);
@@ -275,7 +273,7 @@ namespace ec2
             const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
             qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
             qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->setStatisticsReportLastVersion(QnAppInfo::applicationFullVersion());
+            qnGlobalSettings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
             qnGlobalSettings->synchronizeNow();
         }
         else

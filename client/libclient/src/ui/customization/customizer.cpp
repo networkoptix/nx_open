@@ -312,37 +312,57 @@ namespace {
 static const QString kCorePattern = lit("_core");
 static const QString kDarkerPattern = lit("_d%1");
 static const QString kLighterPattern = lit("_l%1");
+static const QString kContrastPattern = lit("_contrast");
 
 QnColorList extractCoreBasedColors(const QString &group, const QnCustomizationSerializer &serializer)
 {
     QnColorList colors;
-    QString coreKey = group + kCorePattern;
-    QColor coreColor = serializer.globalConstant(coreKey).value<QColor>();
-    NX_ASSERT(coreColor.isValid());
-    colors.append(coreColor);
 
+    enum class ColorType
     {
-        int idx = 1;
-        QString darkKey = group + kDarkerPattern.arg(idx);
-        while (serializer.globals().contains(darkKey))
+        NonMandatory,
+        Mandatory,
+    };
+
+    const auto extractColor =
+        [&serializer, group](const QString& suffix, ColorType type, QColor& result) -> bool
         {
-            QColor darkColor = serializer.globalConstant(darkKey).value<QColor>();
-            NX_ASSERT(darkColor.isValid());
-            colors.prepend(darkColor);
-            darkKey = group + kDarkerPattern.arg(++idx);
-        }
+            const auto key = lit("%1%2").arg(group, suffix);
+            if (!serializer.globals().contains(key))
+                return false;
+
+            const auto color = serializer.globalConstant(key).value<QColor>();
+            if ((type == ColorType::Mandatory) && !color.isValid())
+                NX_ASSERT(false, "Can't deserialize color");
+
+            result = color;
+            return true;
+        };
+
+    QColor resultColor;
+    if (extractColor(kCorePattern, ColorType::NonMandatory, resultColor))
+        colors.setCoreColor(resultColor);
+
+    if (extractColor(kContrastPattern, ColorType::NonMandatory, resultColor))
+        colors.setContrastColor(resultColor);
+
+    // For Compatibility. TODO: #ynikitenkov remove color with this index from everywhere in future
+    colors.append(colors.coreColor());
+
+    for (int idx = 1;; ++idx)
+    {
+        if (extractColor(kDarkerPattern.arg(idx), ColorType::Mandatory, resultColor))
+            colors.prepend(resultColor);
+        else
+            break;
     }
 
+    for (int idx = 1;; ++idx)
     {
-        int idx = 1;
-        QString lightKey = group + kLighterPattern.arg(idx);
-        while (serializer.globals().contains(lightKey))
-        {
-            QColor lightColor = serializer.globalConstant(lightKey).value<QColor>();
-            NX_ASSERT(lightColor.isValid());
-            colors.append(lightColor);
-            lightKey = group + kLighterPattern.arg(++idx);
-        }
+        if (extractColor(kLighterPattern.arg(idx), ColorType::Mandatory, resultColor))
+            colors.append(resultColor);
+        else
+            break;
     }
 
     return colors;

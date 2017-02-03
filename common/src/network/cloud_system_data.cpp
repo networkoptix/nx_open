@@ -12,7 +12,8 @@ bool QnCloudSystem::operator==(const QnCloudSystem &other) const
         && (name == other.name)
         && (authKey == other.authKey)
         && (lastLoginTimeUtcMs == other.lastLoginTimeUtcMs)
-        && qFuzzyEquals(weight, other.weight));
+        && qFuzzyEquals(weight, other.weight)
+        && online == other.online);
 }
 
 bool QnCloudSystem::visuallyEqual(const QnCloudSystem& other) const

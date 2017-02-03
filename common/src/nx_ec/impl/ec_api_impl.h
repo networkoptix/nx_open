@@ -114,6 +114,12 @@ namespace ec2
 
     QString toString(ErrorCode errorCode);
 
+    enum class NotificationSource
+    {
+        Local,
+        Remote
+    };
+
     namespace impl
     {
         template<class Param1>
@@ -174,7 +180,7 @@ namespace ec2
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiCameraAttributesDataList&);
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
-            void onGetUserGroupsDone            (int reqID, const ec2::ErrorCode, const ec2::ApiUserGroupDataList&);
+            void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
@@ -245,7 +251,7 @@ namespace ec2
         ///////// Handlers for AbstractUserManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetUsers,                   ec2::ErrorCode, ec2::ApiUserDataList)
-        DEFINE_TWO_ARG_HANDLER(GetUserGroups,              ec2::ErrorCode, ec2::ApiUserGroupDataList)
+        DEFINE_TWO_ARG_HANDLER(GetUserRoles,               ec2::ErrorCode, ec2::ApiUserRoleDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractAccessRightsManager

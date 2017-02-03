@@ -2,8 +2,6 @@
 
 #include <nx/utils/log/assert.h>
 
-int QnTimelineZoomLevel::maxMonthLength = 0;
-
 bool QnTimelineZoomLevel::testTick(qint64 tick) const {
     if (isMonotonic())
         return tick % interval == 0;
@@ -54,6 +52,23 @@ qint64 QnTimelineZoomLevel::nextTick(qint64 tick) const {
         return QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC).addYears(interval).toMSecsSinceEpoch();
     default:
         return tick + interval;
+    }
+}
+
+qint64 QnTimelineZoomLevel::averageTickLength() const
+{
+    static constexpr auto kDayMsecs = 1000ll * 60 * 60 * 24;
+
+    switch (type)
+    {
+        case Days:
+            return kDayMsecs * interval;
+        case Months:
+            return kDayMsecs * 30 * interval;
+        case Years:
+            return kDayMsecs * 30 * 12 * interval;
+        default:
+            return interval;
     }
 }
 
@@ -162,9 +177,9 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Days:
-        return QLocale().monthName(dateTime.date().month());
+        return QLocale().monthName(dateTime.date().month(), QLocale::ShortFormat);
     case Months:
-        return QLocale().standaloneMonthName(dateTime.date().month());
+        return QLocale().standaloneMonthName(dateTime.date().month(), QLocale::ShortFormat);
     case Milliseconds:
         return lit("ms");
     case Seconds:
@@ -177,22 +192,25 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
     }
 }
 
-int QnTimelineZoomLevel::maxTextWidth() const {
-    switch (type) {
-    case Milliseconds:
-        return 6;
-    case Seconds:
-        return 4;
-    case Minutes:
-        return 5;
-    case Hours:
-        return 5;
-    case Days:
-        return 3 + maxMonthLength;
-    case Months:
-        return maxMonthLength;
-    case Years:
-        return 4;
+QString QnTimelineZoomLevel::longestText() const
+{
+    switch (type)
+    {
+        case Milliseconds:
+            return lit("000 ms");
+        case Seconds:
+            return lit("00 s");
+        case Minutes:
+        case Hours:
+            return lit("00:00");
+        case Years:
+            return lit("0000");
+        case Days:
+        case Months:
+            // Cannot be evaluated accurately.
+            // The caller should measure text strings by itself.
+            return QString();
+        default:
+            return QString();
     }
-    return 0;
 }

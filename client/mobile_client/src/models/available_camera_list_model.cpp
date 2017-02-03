@@ -131,7 +131,7 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& reso
     if (!resource->hasFlags(Qn::live_cam))
         return false;
 
-    if (resource->hasFlags(Qn::desktop_camera) || resource->hasFlags(Qn::io_module))
+    if (resource->hasFlags(Qn::desktop_camera))
         return false;
 
     return true;
@@ -211,6 +211,9 @@ void QnAvailableCameraListModelPrivate::resetResources()
 
 void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource, bool silent)
 {
+    if (resources.contains(resource))
+        return;
+
     Q_Q(QnAvailableCameraListModel);
 
     if (!q->filterAcceptsResource(resource))

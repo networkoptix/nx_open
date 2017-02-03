@@ -1,6 +1,6 @@
 import QtQuick 2.6;
 import QtQuick.Controls 1.2;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 import com.networkoptix.qml 1.0;
 
 import "."
@@ -39,13 +39,13 @@ Rectangle
             id: searchEdit;
 
             visible: grid.totalItemsCount > grid.itemsPerPage
-            visualParent: screenHolder
 
             anchors.bottom: gridHolder.top
-            anchors.bottomMargin: 8
+            anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
 
             onQueryChanged: { grid.model.setFilterWildcard(query); }
+            z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 
         Item
@@ -87,7 +87,7 @@ Rectangle
                 readonly property int rowsCount: (grid.count < 3 ? 1 : 2)
                 readonly property int itemsPerPage: colsCount * rowsCount
                 readonly property int pagesCount: Math.ceil(grid.count / itemsPerPage)
-                readonly property int totalItemsCount: model.sourceRowsCount;
+                readonly property int totalItemsCount: (model ? model.sourceRowsCount : 0);
 
                 opacity: 0;
                 snapMode: GridView.SnapOneRow;
@@ -186,10 +186,28 @@ Rectangle
                     }
                 }
 
-                model: QnFilteringSystemsModel
+                Loader
                 {
-                    filterCaseSensitivity: Qt.CaseInsensitive;
-                    filterRole: 257;    // Search text role
+                    id: modelLoader;
+
+                    active: (context.isVisible && screenHolder.visible);
+
+                    sourceComponent: Component
+                    {
+                        FilteringSystemsModel
+                        {
+                            filterCaseSensitivity: Qt.CaseInsensitive;
+                            filterRole: 257;    // Search text role
+                        }
+                    }
+
+                    onItemChanged:
+                    {
+                        if (grid.model)
+                            grid.setPage(0);
+
+                        grid.model = item;
+                    }
                 }
 
                 delegate: Item
@@ -218,7 +236,10 @@ Rectangle
                         wrongVersion: model.wrongVersion
                         isCompatibleInternal: model.isCompatibleInternal
                         compatibleVersion: model.compatibleVersion
-                        isOnline: model.isOnline;
+
+                        isRunning: model.isRunning;
+                        isReachable: model.isReachable;
+                        isConnectable: model.isConnectable;
 
                         Component.onCompleted:
                         {
@@ -268,7 +289,7 @@ Rectangle
                 visible: (pagesCount > 1);
                 anchors.horizontalCenter: gridHolder.horizontalCenter;
                 anchors.top: gridHolder.bottom;
-                anchors.topMargin: 8;
+                anchors.topMargin: 22;
 
                 pagesCount: Math.min(grid.pagesCount, 10); //< 10 pages maximum
 
@@ -286,7 +307,7 @@ Rectangle
 
             anchors.centerIn: parent;
             foundServersCount: grid.count;
-            visible: (grid.model.sourceRowsCount == 0);
+            visible: (!grid.model || (grid.model.sourceRowsCount == 0));
         }
 
         Item
@@ -318,15 +339,15 @@ Rectangle
             anchors.horizontalCenter: parent.horizontalCenter;
 
             text: grid.totalItemsCount > 0
-                ? qsTr("Connect to Another System")
-                : qsTr("Connect to System")
+                ? qsTr("Connect to Another Server...")
+                : qsTr("Connect to Server...")
 
             onClicked: context.connectToAnotherSystem();
         }
 
         NxBanner
         {
-            visible: !context.isCloudEnabled;
+            visible: !context.isCloudEnabled && context.isLoggedInToCloud;
 
             anchors.top: parent.top;
             anchors.topMargin: 16;
@@ -438,8 +459,6 @@ Rectangle
         {
             if (grid.watcher.currentItem)
                 grid.watcher.currentItem.forceCollapsedState();
-
-            pageSwitcher.setPage(0);
         }
     }
 }

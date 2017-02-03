@@ -36,8 +36,14 @@ AccountWithPassword CdbFunctionalTest::addActivatedAccount2()
 api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
     const AccountWithPassword& account)
 {
-    //adding system to account
-    api::SystemData system1;
+    return addRandomSystemToAccount(account, api::SystemData());
+}
+
+api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
+    const AccountWithPassword& account,
+    const api::SystemData& systemPrototype)
+{
+    api::SystemData system1 = systemPrototype;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::bindRandomSystem(account.email, account.password, &system1));
@@ -74,6 +80,40 @@ void CdbFunctionalTest::shareSystemEx(
             what.id,
             emailToShareWith,
             targetRole));
+}
+
+void CdbFunctionalTest::enableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, true);
+}
+
+void CdbFunctionalTest::disableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, false);
+}
+
+void CdbFunctionalTest::setUserEnabledFlag(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom,
+    bool isEnabled)
+{
+    api::SystemSharingEx userData;
+    NX_GTEST_ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystemSharing(who.email, who.password, what.id, whom.email, &userData));
+
+    userData.isEnabled = isEnabled;
+
+    NX_GTEST_ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(who.email, who.password, userData));
 }
 
 } // namespace cdb

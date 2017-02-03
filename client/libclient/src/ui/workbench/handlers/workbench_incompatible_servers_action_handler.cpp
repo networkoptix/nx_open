@@ -4,6 +4,7 @@
 #include <QtCore/QUrl>
 
 #include <core/resource/resource.h>
+#include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -19,9 +20,10 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-
 #include <update/connect_to_current_system_tool.h>
 #include <utils/merge_systems_tool.h>
+#include <utils/merge_systems_common.h>
+#include <network/system_helpers.h>
 
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(
     QObject* parent)
@@ -45,61 +47,63 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 {
     if (m_connectTool)
     {
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Error"),
-            tr("Please wait. Requested servers will be added to your system."));
+        QnMessageBox::information(mainWindow(),
+            tr("Systems will be merged shortly"),
+            tr("Servers from the other System will appear in the resource tree."));
         return;
     }
 
-    for (const auto& resource: menu()->currentParameters(sender()).resources())
-    {
-        const auto status = resource->getStatus();
+    const auto resources = menu()->currentParameters(sender()).resources();
+    NX_ASSERT(resources.size() == 1, "We can't connect/merge more then one server");
+    if (resources.isEmpty())
+        return;
 
-        if (status == Qn::Incompatible || status == Qn::Unauthorized)
-        {
-            connectToCurrentSystem(resource->getId());
-            return;
-        }
+    const auto resource = resources.first();
+    const auto status = resource->getStatus();
+    if (status != Qn::Incompatible && status != Qn::Unauthorized)
+        return;
+
+    const auto serverResource = resource.dynamicCast<QnFakeMediaServerResource>();
+    NX_ASSERT(serverResource);
+    if (!serverResource)
+        return;
+
+    const auto moduleInformation = serverResource->getModuleInformation();
+
+    if (helpers::isCloudSystem(moduleInformation))
+    {
+        static const auto kStatus = utils::MergeSystemsStatus::dependentSystemBoundToCloud;
+
+        const auto message = utils::MergeSystemsStatus::getErrorMessage(
+             kStatus, moduleInformation).prepend(lit("\n"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to merge Systems"), message);
+        return;
     }
+
+    connectToCurrentSystem(serverResource);
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
-    const QnUuid& target,
-    const QString& initialPassword)
+    const QnFakeMediaServerResourcePtr& server)
 {
-    if (m_connectTool)
+    NX_ASSERT(server);
+    NX_ASSERT(!m_connectTool);
+    if (m_connectTool || !server)
         return;
 
+    const auto moduleInformation = server->getModuleInformation();
+    QnUuid target = server->getId();
     if (target.isNull())
         return;
 
-    auto password = initialPassword;
+    const QString password = helpers::isNewSystem(moduleInformation)
+        ? helpers::kFactorySystemPassword
+        : requestPassword();
 
-    for (;;)
-    {
-        QInputDialog dialog(mainWindow());
-        dialog.setWindowTitle(tr("Enter Password..."));
-        dialog.setLabelText(tr("Administrator Password"));
-        dialog.setTextEchoMode(QLineEdit::Password);
-        dialog.setTextValue(password);
-        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+    if (password.isEmpty())
+        return;
 
-        if (dialog.exec() != QDialog::Accepted)
-            return;
-
-        password = dialog.textValue();
-
-        if (password.isEmpty())
-        {
-            QnMessageBox::critical(mainWindow(), tr("Error"), tr("Password cannot be empty!"));
-            continue;
-        }
-
-        break;
-    }
-
-    if (!validateStartLicenses(target, password))
+    if (!validateStartLicenses(server, password))
         return;
 
     m_connectTool = new QnConnectToCurrentSystemTool(this);
@@ -133,8 +137,8 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
     }
 
     m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
-    m_mergeDialog->exec();
-    delete m_mergeDialog;
+    m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
+    m_mergeDialog->open();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode)
@@ -145,26 +149,19 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::information(
-                mainWindow(),
-                tr("Information"),
-                tr("Rejoice! The selected server has been successfully connected to your system!"));
+            QnMessageBox::success(mainWindow(), tr("Server connected to the System"));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Error"),
-                tr("Could not update the selected server.")
-                    + L'\n'
-                    + m_connectTool->updateResult().errorMessage());
+            QnMessageBox::critical(mainWindow(),
+                tr("Failed to update Server"),
+                m_connectTool->updateResult().errorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::MergeFailed:
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Error"),
-                tr("Merge failed.") + L'\n' + m_connectTool->mergeErrorMessage());
+            QnMessageBox::critical(mainWindow(),
+                tr("Failed to merge Systems"),
+                m_connectTool->mergeErrorMessage());
             break;
 
         case QnConnectToCurrentSystemTool::Canceled:
@@ -173,22 +170,16 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
-    const QnUuid& target,
+    const QnFakeMediaServerResourcePtr& server,
     const QString& adminPassword)
 {
+    NX_ASSERT(server);
+    if (!server)
+        return true;
 
     const auto licenseHelper = QnLicenseListHelper(qnLicensePool->getLicenses());
     if (licenseHelper.totalLicenseByType(Qn::LC_Start) == 0)
         return true; /* We have no start licenses so all is OK. */
-
-    QnMediaServerResourceList aliveServers;
-
-    const auto server =
-        qnResPool->getIncompatibleResourceById(target, true).dynamicCast<QnMediaServerResource>();
-
-    /* Handle this error elsewhere */
-    if (!server)
-        return true;
 
     if (!serverHasStartLicenses(server, adminPassword))
         return true;
@@ -196,13 +187,11 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     const auto message = utils::MergeSystemsStatus::getErrorMessage(
         utils::MergeSystemsStatus::starterLicense, server->getModuleInformation());
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning, Qn::Empty_Help,
-        tr("Warning!"), message,
-        QDialogButtonBox::Cancel);
-    messageBox.addButton(tr("Merge"), QDialogButtonBox::AcceptRole);
+    const auto result = QnMessageBox::warning(mainWindow(),
+        tr("Total amount of licenses will decrease"), message,
+        QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
-    return messageBox.exec() != QDialogButtonBox::Cancel;
+    return (result != QDialogButtonBox::Cancel);
 }
 
 bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
@@ -210,7 +199,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
     const QString& adminPassword)
 {
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(helpers::kFactorySystemUser);
     auth.setPassword(adminPassword);
 
     /* Check if there is a valid starter license in the remote system. */
@@ -218,4 +207,33 @@ bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
 
     /* Warn that some of the licenses will be deactivated. */
     return QnLicenseListHelper(remoteLicensesList).totalLicenseByType(Qn::LC_Start, true) > 0;
+}
+
+QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
+{
+    QString password;
+    for (;;)
+    {
+        QInputDialog dialog(mainWindow());
+        dialog.setWindowTitle(tr("Enter Password..."));
+        dialog.setLabelText(tr("Administrator Password"));
+        dialog.setTextEchoMode(QLineEdit::Password);
+        dialog.setTextValue(password);
+        setHelpTopic(&dialog, Qn::Systems_ConnectToCurrentSystem_Help);
+
+        if (dialog.exec() != QDialog::Accepted)
+            return QString();
+
+        password = dialog.textValue();
+
+        if (password.isEmpty())
+        {
+            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty!"));
+            continue;
+        }
+
+        break;
+    }
+
+    return password;
 }

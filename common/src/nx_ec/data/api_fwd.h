@@ -4,9 +4,9 @@
 #include <vector>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/uuid.h>
 
 class QString;
-class QnUuid;
 
 namespace ec2 {
     struct ApiData;
@@ -55,7 +55,7 @@ namespace ec2 {
     struct ApiStoredFileData;
     struct ApiStoredFilePath;
     struct ApiUserData;
-    struct ApiUserGroupData;
+    struct ApiUserRoleData;
     struct ApiPredefinedRoleData;
     struct ApiAccessRightsData;
     struct ApiVideowallControlMessageData;
@@ -113,7 +113,7 @@ namespace ec2 {
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
-    typedef std::vector<ApiUserGroupData> ApiUserGroupDataList;
+    typedef std::vector<ApiUserRoleData> ApiUserRoleDataList;
     typedef std::vector<ApiPredefinedRoleData> ApiPredefinedRoleDataList;
     typedef std::vector<ApiAccessRightsData> ApiAccessRightsDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
@@ -129,6 +129,16 @@ namespace ec2 {
     typedef std::vector<ApiWebPageData> ApiWebPageDataList;
     typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
     typedef std::vector<ApiUpdateUploadResponceData> ApiUpdateUploadResponceDataList;
+
+    /**
+     * Wrapper to be used for overloading as a distinct type for ApiStorageData api requests.
+     */
+    struct ParentId
+    {
+        QnUuid id;
+        ParentId() = default;
+        ParentId(const QnUuid& id): id(id) {}
+    };
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -176,7 +186,7 @@ namespace ec2 {
     (ApiStorageData)\
     (ApiStoredFileData)\
     (ApiUserData)\
-    (ApiUserGroupData)\
+    (ApiUserRoleData)\
     (ApiPredefinedRoleData)\
     (ApiAccessRightsData)\
     (ApiVideowallControlMessageData)\

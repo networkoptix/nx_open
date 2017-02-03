@@ -72,6 +72,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::LdapTemporaryUnauthorizedConnectionResult;
     else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
         return Qn::CloudTemporaryUnauthorizedConnectionResult;
+    else if (networkError == ec2::ErrorCode::forbidden)
+        return Qn::ForbiddenConnectionResult;
 
     if (networkError != ec2::ErrorCode::ok)
         return Qn::NetworkErrorConnectionResult;
@@ -98,9 +100,6 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost)
 {
-    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return Qn::IncompatibleCloudHostConnectionResult;
-
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
 
@@ -109,6 +108,9 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
 
     if (!compatibleCustomization(customization, localInfo.customization, isMobile))
         return Qn::IncompatibleInternalConnectionResult;
+
+    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
+        return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
         return Qn::IncompatibleVersionConnectionResult;

@@ -96,6 +96,20 @@ void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
     }
 }
 
+QnConnectionInfo QnAppServerConnectionFactory::connectionInfo()
+{
+    if (auto factory = qn_appServerConnectionFactory_instance())
+        return factory->m_connectionInfo;
+
+    return QnConnectionInfo();
+}
+
+void QnAppServerConnectionFactory::setConnectionInfo(const QnConnectionInfo& connectionInfo)
+{
+    if (auto factory = qn_appServerConnectionFactory_instance())
+        factory->m_connectionInfo = connectionInfo;
+}
+
 static ec2::AbstractECConnectionFactory* ec2ConnectionFactoryInstance = nullptr;
 
 void QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* _ec2ConnectionFactory )

@@ -151,14 +151,9 @@ protected:
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
+
+    void at_webAdminAction_triggered();
     void at_webClientAction_triggered();
-    void at_systemAdministrationAction_triggered();
-    void at_systemUpdateAction_triggered();
-    void at_userManagementAction_triggered();
-    void at_preferencesGeneralTabAction_triggered();
-    void at_preferencesLicensesTabAction_triggered();
-    void at_preferencesSmtpTabAction_triggered();
-    void at_preferencesNotificationTabAction_triggered();
 
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
@@ -215,6 +210,8 @@ private:
 
     void openFailoverPriorityDialog();
     void openBackupCamerasDialog();
+    void openSystemAdministrationDialog(int page);
+    void openLocalSettingsDialog(int page);
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -230,9 +227,10 @@ private:
 
     qint64 getFirstBookmarkTimeMs();
 
-    bool confirmResourcesDelete(const QnResourceList& resources);
-
-    void openInBrowser(const QnMediaServerResourcePtr& server, const QString& path);
+    void openInBrowserDirectly(const QnMediaServerResourcePtr& server,
+        const QString& path, const QString& fragment = QString());
+    void openInBrowser(const QnMediaServerResourcePtr& server,
+        const QString& path, const QString& fragment = QString());
     void at_nonceReceived(QnAsyncHttpClientReply* client);
 
 private:
