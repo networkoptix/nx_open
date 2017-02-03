@@ -40,7 +40,9 @@ protected:
     virtual QDialogButtonBox::StandardButton showConfirmationDialog() override;
 
 private:
-    void updateWebPageButton();
+    void updateWebPageLink();
+
+    void setupShowWebServerLink();
 
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
@@ -48,10 +50,10 @@ private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
 
-    QnServerSettingsWidget* m_generalPage;
-    QnStorageAnalyticsWidget* m_statisticsPage;
-    QnStorageConfigWidget* m_storagesPage;
-    QPushButton* m_webPageButton;
+    QnServerSettingsWidget* const m_generalPage;
+    QnStorageAnalyticsWidget* const m_statisticsPage;
+    QnStorageConfigWidget* const m_storagesPage;
+    QLabel* const m_webPageLink;
 };
 
 Q_DECLARE_METATYPE(QnServerSettingsDialog::DialogPage)
