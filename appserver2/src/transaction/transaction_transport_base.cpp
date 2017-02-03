@@ -1558,11 +1558,9 @@ void QnTransactionTransportBase::startListeningNonSafe()
             m_incomingDataSocket->setSendTimeout(
                 duration_cast<milliseconds>(kSocketSendTimeout).count());
             m_incomingDataSocket->setNonBlockingMode(true);
-            m_lastReceiveTimer.restart();
             m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-            m_incomingDataSocket->readSomeAsync(
-                &m_readBuffer,
-                std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
+
+            scheduleAsyncRead();
         });
 }
 
