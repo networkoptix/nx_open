@@ -14,6 +14,13 @@ Rectangle
 
     color: Style.colors.window;
 
+    Rectangle
+    {
+        width: parent.width;
+        height: 2;
+        color: Style.colors.custom.titleBar.shadow;
+    }
+
     Item
     {
         id: screenHolder;
@@ -204,7 +211,10 @@ Rectangle
                     onItemChanged:
                     {
                         if (grid.model)
+                        {
                             grid.setPage(0);
+                            searchEdit.clear();
+                        }
 
                         grid.model = item;
                     }
@@ -375,7 +385,8 @@ Rectangle
             text: qsTr("Loading...");
             color: Style.colors.mid;
             font: Style.fonts.preloader;
-            x: (parent.width - width) / 2 + 4;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.horizontalCenterOffset: 4;
         }
     }
 

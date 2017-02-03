@@ -6,6 +6,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif

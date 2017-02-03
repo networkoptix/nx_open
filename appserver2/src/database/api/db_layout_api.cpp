@@ -187,6 +187,7 @@ bool updateLayoutItems(
 
     for (const ApiLayoutItemData& item: layout.items)
     {
+        NX_ASSERT(!item.id.isNull(), "Invalid null id item inserting");
         QnSql::bind(item, &query);
         query.bindValue(":layoutId", internalId);
         if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))

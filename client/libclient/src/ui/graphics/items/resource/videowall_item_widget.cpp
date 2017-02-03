@@ -80,8 +80,7 @@ QnVideowallItemWidget::QnVideowallItemWidget(
     m_videowall(videowall),
     m_itemUuid(itemUuid),
     m_indices(QnVideoWallItemIndexList() << QnVideoWallItemIndex(m_videowall, m_itemUuid)),
-    m_hoverProgress(0.0),
-    m_infoVisible(false)
+    m_hoverProgress(0.0)
 {
     setAcceptDrops(true);
     setAcceptedMouseButtons(Qt::LeftButton | Qt::RightButton);
@@ -150,24 +149,11 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerLabel->setAcceptedMouseButtons(0);
     m_headerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
-    m_infoButton = new QnImageButtonWidget();
-    context()->statisticsModule()->registerButton(lit("videowall_info"), m_infoButton);
-    m_infoButton->setIcon(qnSkin->icon("item/info.png"));
-    m_infoButton->setCheckable(true);
-    m_infoButton->setToolTip(tr("Information"));
-    m_infoButton->setFixedSize(24);
-    connect(m_infoButton, &QnImageButtonWidget::toggled, this,
-        [this](bool toggled)
-        {
-            setInfoVisible(toggled);
-        });
-
     m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
     m_headerLayout->setSpacing(0.2);
     m_headerLayout->addItem(m_headerLabel);
-    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    m_headerLayout->addItem(m_infoButton);
+//    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
     m_headerWidget = new GraphicsWidget();
     m_headerWidget->setLayout(m_headerLayout);
@@ -188,36 +174,6 @@ void QnVideowallItemWidget::initInfoOverlay()
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     addOverlayWidget(m_headerOverlayWidget, UserVisible);
-
-    /* Footer overlay. */
-    m_footerLabel = new GraphicsLabel();
-    m_footerLabel->setAcceptedMouseButtons(0);
-    m_footerLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
-
-    QGraphicsLinearLayout *footerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    footerLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
-    footerLayout->addItem(m_footerLabel);
-    footerLayout->addStretch(0x1000);
-
-    m_footerWidget = new GraphicsWidget();
-    m_footerWidget->setLayout(footerLayout);
-    m_footerWidget->setAcceptedMouseButtons(0);
-    m_footerWidget->setAutoFillBackground(true);
-    setPaletteColor(m_footerWidget, QPalette::Window, overlayBackgroundColor);
-
-    QGraphicsWidget* footerStretch = new QGraphicsWidget();
-    footerStretch->setMinimumHeight(300);
-
-    QGraphicsLinearLayout *footerOverlayLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    footerOverlayLayout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
-    footerOverlayLayout->addItem(footerStretch);
-    footerOverlayLayout->addStretch(0x1000);
-    footerOverlayLayout->addItem(m_footerWidget);
-
-    m_footerOverlayWidget = new QnViewportBoundWidget(this);
-    m_footerOverlayWidget->setLayout(footerOverlayLayout);
-    m_footerOverlayWidget->setAcceptedMouseButtons(0);
-    addOverlayWidget(m_footerOverlayWidget, UserVisible);
 
     updateHud(false);
 }
@@ -521,8 +477,6 @@ void QnVideowallItemWidget::updateLayout()
             &QnVideowallItemWidget::updateView);
         connect(m_layout, &QnLayoutResource::backgroundOpacityChanged, this,
             &QnVideowallItemWidget::updateView);
-
-        connect(m_layout, &QnResource::nameChanged, this, &QnVideowallItemWidget::updateInfo);
     }
 }
 
@@ -533,10 +487,6 @@ void QnVideowallItemWidget::updateView()
 
 void QnVideowallItemWidget::updateInfo()
 {
-    if (m_layout)
-        m_footerLabel->setText(m_layout->getName());
-    else
-        m_footerLabel->setText(QString());
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
     updateHud(false);
     //TODO: #GDM #VW update layout in case of transition "long name -> short name"
@@ -545,10 +495,6 @@ void QnVideowallItemWidget::updateInfo()
 void QnVideowallItemWidget::updateHud(bool animate)
 {
     bool headerVisible = m_hoverProcessor->isHovered();
-    bool footerVisible = (headerVisible || m_infoVisible)
-        && !m_footerLabel->text().isEmpty();
-
-    setOverlayWidgetVisible(m_footerOverlayWidget, footerVisible, animate);
     setOverlayWidgetVisible(m_headerOverlayWidget, headerVisible, animate);
 
     qreal frameColorValue = headerVisible ? 1.0 : 0.0;
@@ -622,21 +568,4 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
     }
 
     return true;
-}
-
-bool QnVideowallItemWidget::isInfoVisible() const
-{
-    return m_infoVisible;
-}
-
-void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate)
-{
-    if (m_infoVisible == visible)
-        return;
-
-    m_infoVisible = visible;
-    updateHud(animate);
-
-    m_infoButton->setChecked(visible);
-    emit infoVisibleChanged(visible);
 }
