@@ -571,6 +571,7 @@ void socketSyncAsyncSwitch(
     ASSERT_FALSE((bool) server->accept()) << lastError();
 
     auto client = clientMaker();
+    const auto clientGuard = makeScopedGuard([&client]() { client->pleaseStopSync(); });
     ASSERT_TRUE(client->setNonBlockingMode(true));
     ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
@@ -587,6 +588,7 @@ void socketSyncAsyncSwitch(
     connectPromise.get_future().wait();
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
     ASSERT_TRUE((bool) accepted);
+    const auto acceptedGuard = makeScopedGuard([&accepted]() { accepted->pleaseStopSync(); });
 
     ASSERT_TRUE(accepted->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(accepted->setRecvTimeout(kTestTimeout.count()));
