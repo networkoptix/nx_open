@@ -48,7 +48,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
-    m_emptyPacketCounter(0)
+    m_emptyPacketCounter(0),
+    m_audioEnabled(true)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
@@ -76,10 +77,13 @@ void PlayerDataConsumer::pleaseStop()
 
 bool PlayerDataConsumer::canAcceptData() const
 {
-    if (m_audioOutput && !m_audioOutput->canAcceptData())
-        return false;
-    else
-        return base_type::canAcceptData();
+    {
+        QnMutexLocker lock(&m_decoderMutex);
+        if (m_audioOutput && !m_audioOutput->canAcceptData())
+            return false;
+    }
+
+    return base_type::canAcceptData();
 }
 
 int PlayerDataConsumer::getBufferingMask() const
@@ -111,13 +115,22 @@ qint64 PlayerDataConsumer::queueVideoDurationUsec() const
     return std::max(0ll, maxTime - minTime);
 }
 
-const AudioOutput* PlayerDataConsumer::audioOutput() const
+ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
 {
-    return m_audioOutput.get();
+    QnMutexLocker lock(&m_decoderMutex);
+    return m_audioOutput;
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
+    {
+        if (!m_audioEnabled && m_audioOutput)
+        {
+            QnMutexLocker lock(&m_decoderMutex);
+            m_audioOutput.reset();
+        }
+    }
+
     auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
     if (emptyFrame)
         return processEmptyFrame(emptyFrame);
@@ -128,7 +141,7 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
         return processVideoFrame(videoFrame);
 
     auto audioFrame = std::dynamic_pointer_cast<QnCompressedAudioData>(data);
-    if (audioFrame)
+    if (audioFrame && m_audioEnabled)
         return processAudioFrame(audioFrame);
 
     return true; //< Just ignore unknown frame type.
@@ -356,7 +369,10 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
         return true; //< decoder is buffering. true means input frame processed
 
     if (!m_audioOutput)
+    {
+        QnMutexLocker lock(&m_decoderMutex);
         m_audioOutput.reset(new AudioOutput(kInitialBufferMs * 1000, kMaxLiveBufferMs * 1000));
+    }
     m_audioOutput->write(decodedFrame);
     return true;
 }
@@ -465,6 +481,11 @@ qint64 PlayerDataConsumer::getNextTime() const
 qint64 PlayerDataConsumer::getExternalTime() const
 {
     return m_lastDisplayedTimeUs;
+}
+
+void PlayerDataConsumer::setAudioEnabled(bool value)
+{
+    m_audioEnabled = value;
 }
 
 } // namespace media

@@ -2,7 +2,10 @@
 
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include "../abstract_socket.h"
+#include "../aio/event_type.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
 #include "../aio/event_type.h"
@@ -22,6 +25,7 @@ template<class SocketType> class AsyncServerSocketHelper;
 // we want binary compatible of our source code. Anyway, this is not a bad thing
 // but some sacrifice on inline function.
 namespace detail {
+
 class UdtSocketImpl;
 enum class SocketState
 {
@@ -29,9 +33,9 @@ enum class SocketState
     open,
     connected
 };
-}// namespace detail
 
-// Adding a level indirection to make C++ type system happy.
+} // namespace detail
+
 template<class InterfaceToImplement>
 class UdtSocket:
     public Pollable,
@@ -41,10 +45,11 @@ public:
     UdtSocket();
     virtual ~UdtSocket();
 
-    /** Binds UDT socket to an existing UDP socket.
-        \note This method can be called just after \a UdtSocket creation.
-        \note if method have failed \a UdtSocket instance MUST be destroyed!
-    */
+    /**
+     * Binds UDT socket to an existing UDP socket.
+     * @note This method can be called just after UdtSocket creation.
+     * @note if method have failed UdtSocket instance MUST be destroyed!
+     */
     bool bindToUdpSocket(UDPSocket&& udpSocket);
 
     // AbstractSocket --------------- interface
@@ -143,6 +148,12 @@ public:
 
 private:
     bool connectToIp(const SocketAddress& remoteAddress, unsigned int timeoutMillis);
+    /**
+     * @return false if failed to read socket options.
+     */
+    bool checkIfRecvModeSwitchIsRequired(int flags, boost::optional<bool>* requiredRecvMode);
+    bool setRecvMode(bool isRecvSync);
+    int handleRecvResult(int recvResult);
 
     std::unique_ptr<aio::AsyncSocketImplHelper<UdtStreamSocket>> m_aioHelper;
     bool m_noDelay;
@@ -168,9 +179,7 @@ public:
         nx::utils::MoveOnlyFunc<void(
             SystemError::ErrorCode,
             AbstractStreamSocket*)> handler);
-    //!Implementation of AbstractStreamServerSocket::cancelIOAsync
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
-    //!Implementation of AbstractStreamServerSocket::cancelIOSync
     virtual void cancelIOSync() override;
 
     /** This method is for use by \a AsyncServerSocketHelper only. It just calls system call \a accept */

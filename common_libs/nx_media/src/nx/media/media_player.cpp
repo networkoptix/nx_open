@@ -188,6 +188,9 @@ public:
     // Interval since last time player got some data
     QElapsedTimer gotDataTimer;
 
+    // Turn on / turn off audio
+    bool isAudioEnabled;
+
     void applyVideoQuality();
 
 private:
@@ -199,7 +202,9 @@ private:
     void presentNextFrameDelayed();
 
     void presentNextFrame();
-    qint64 getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame);
+    qint64 getDelayForNextFrameWithAudioMs(
+        const QVideoFramePtr& frame,
+        const ConstAudioOutputPtr& audioOutput);
     qint64 getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& frame);
     bool createArchiveReader();
     bool initDataProvider();
@@ -242,7 +247,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
     overflowCounter(0),
-    videoQuality(Player::HighVideoQuality)
+    videoQuality(Player::HighVideoQuality),
+    isAudioEnabled(true)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -269,12 +275,14 @@ void PlayerPrivate::doPeriodicTasks()
 
     if (state == Player::State::Playing)
     {
-        if (dataConsumer &&
-            dataConsumer->audioOutput() &&
-            dataConsumer->audioOutput()->currentBufferSizeUsec() > 0)
+        if (dataConsumer)
         {
-            gotDataTimer.restart();
-            return;
+            auto audio = dataConsumer->audioOutput();
+            if (audio && audio->currentBufferSizeUsec() > 0)
+            {
+                gotDataTimer.restart();
+                return;
+            }
         }
 
         if (gotDataTimer.hasExpired(kGotDataTimeoutMs))
@@ -398,9 +406,10 @@ void PlayerPrivate::presentNextFrameDelayed()
         return;
 
     qint64 delayToRenderMs = 0;
-    if (dataConsumer->audioOutput())
+    auto audioOutput = dataConsumer->audioOutput();
+    if (audioOutput)
     {
-        if (dataConsumer->audioOutput()->isBufferUnderflow())
+        if (audioOutput->isBufferUnderflow())
         {
             // If audio buffer is empty we have to display current video frame to unblock data stream
             // and allow audio data to fill the buffer.
@@ -408,11 +417,11 @@ void PlayerPrivate::presentNextFrameDelayed()
             return;
         }
 
-        delayToRenderMs = getDelayForNextFrameWithAudioMs(videoFrameToRender);
+        delayToRenderMs = getDelayForNextFrameWithAudioMs(videoFrameToRender, audioOutput);
 
         // If video delay interval is bigger then audio buffer, it'll block audio playing.
         // At this case calculate time again after a delay.
-        if (delayToRenderMs > dataConsumer->audioOutput()->currentBufferSizeUsec() / 1000)
+        if (delayToRenderMs > audioOutput->currentBufferSizeUsec() / 1000)
         {
             QTimer::singleShot(kTryLaterIntervalMs, this, &PlayerPrivate::presentNextFrameDelayed); //< calculate next time to render later
             return;
@@ -540,9 +549,10 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
     }
 }
 
-qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(const QVideoFramePtr& frame)
+qint64 PlayerPrivate::getDelayForNextFrameWithAudioMs(
+    const QVideoFramePtr& frame,
+    const ConstAudioOutputPtr& audioOutput)
 {
-    const AudioOutput* audioOutput = dataConsumer->audioOutput();
     const qint64 currentPosUsec = audioOutput->playbackPositionUsec();
     if (currentPosUsec == AudioOutput::kUnknownPosition)
         return 0; //< Position isn't known yet. Play video without delay.
@@ -676,6 +686,8 @@ bool PlayerPrivate::initDataProvider()
 
     applyVideoQuality();
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+    dataConsumer->setAudioEnabled(isAudioEnabled);
+
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
         {
@@ -921,6 +933,24 @@ void Player::setVideoSurface(QAbstractVideoSurface* videoSurface, int channel)
     d->videoSurfaces[channel] = videoSurface;
 
     emit videoSurfaceChanged();
+}
+
+bool Player::isAudioEnabled() const
+{
+    Q_D(const Player);
+    return d->isAudioEnabled;
+}
+
+void Player::setAudioEnabled(bool value)
+{
+    Q_D(Player);
+    if (d->isAudioEnabled != value)
+    {
+        d->isAudioEnabled = value;
+        if (d->dataConsumer)
+            d->dataConsumer->setAudioEnabled(value);
+        emit audioEnabledChanged();
+    }
 }
 
 bool Player::liveMode() const

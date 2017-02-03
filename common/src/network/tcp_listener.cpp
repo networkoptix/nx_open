@@ -329,7 +329,9 @@ void QnTcpListener::run()
                 {
                     if (!d->ddosWarned)
                     {
-                        qWarning() << "Too many TCP connections. Possible ddos attack! Ignore connection";
+                        qWarning() << "Amount of TCP connections reached"
+                            << d->connections.size() << "of" << d->maxConnections
+                            << "Possible ddos attack! Reject incoming TCP connection";
                         d->ddosWarned = true;
                     }
                     delete clientSocket;

@@ -39,6 +39,8 @@ target/*
 target-bpi/*
 packages.config
 .vs
+.git
+TAGS
 
 .DS_Store
 Debug
