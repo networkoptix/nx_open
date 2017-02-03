@@ -28,7 +28,6 @@ public:
      */
     const QnVideoWallResourcePtr &videowall() const;
 
-    typedef QHash<QnUuid, quint64> ReviewButtons;
 protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 
