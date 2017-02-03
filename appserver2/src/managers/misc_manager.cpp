@@ -13,6 +13,11 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSyste
                                    transaction.params.tranLogTime);
 }
 
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiMiscData> &transaction)
+{
+    emit miscDataChanged(transaction.params.name, transaction.params.value);
+}
+
 template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor,
                                                  const Qn::UserAccessData &userAccessData) :
@@ -55,7 +60,7 @@ namespace {
 void updateRuntimeInfoAfterLicenseOverflowTransaction(const ApiLicenseOverflowData& params)
 {
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != params.time) 
+    if (localInfo.data.prematureLicenseExperationDate != params.time)
     {
         localInfo.data.prematureLicenseExperationDate = params.time;
         QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
@@ -110,6 +115,37 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
 
     return reqId;
 }
+
+template<class T>
+int QnMiscManager<T>::saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::saveMiscParam, param,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
+    return reqID;
+}
+
+template<class T>
+int QnMiscManager<T>::getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+
+    auto queryDoneHandler = [reqID, handler, paramName](ErrorCode errorCode, const ApiMiscData& param)
+    {
+        ApiMiscData outData;
+        if (errorCode == ErrorCode::ok)
+            outData = param;
+        handler->done(reqID, errorCode, outData);
+    };
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QByteArray, ApiMiscData, decltype(queryDoneHandler)>
+        (ApiCommand::getMiscParam, paramName, queryDoneHandler);
+    return reqID;
+}
+
 
 template class QnMiscManager<ServerQueryProcessorAccess>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;

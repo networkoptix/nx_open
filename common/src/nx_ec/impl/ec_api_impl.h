@@ -211,6 +211,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager

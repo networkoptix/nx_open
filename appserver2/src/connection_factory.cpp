@@ -49,8 +49,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 {
     // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
     // order.
-    m_timeSynchronizationManager->start();
-
     // TODO: #Elric #EC2 register in a proper place!
     // Registering ec2 types with Qt meta-type system.
     qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
@@ -1346,11 +1344,16 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
         {
             m_directConnection.reset(
                 new Ec2DirectConnection(&m_serverQueryProcessor, connectionInfo, url));
-            if (!m_directConnection->initialized())
+            if (m_directConnection->initialized())
+            {
+                m_timeSynchronizationManager->start(m_directConnection);
+            }
+            else
             {
                 connectionInitializationResult = ErrorCode::dbError;
                 m_directConnection.reset();
             }
+
         }
     }
     QnConcurrent::run(

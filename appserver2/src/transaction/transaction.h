@@ -1269,7 +1269,30 @@ APPLY(10000, getTransactionLog, ApiTransactionDataList, \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter save func */ \
                        FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
                        ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */
+                       RegularTransactionType()) /* regular transaction type */ \
+APPLY(10100, saveMiscParam, ApiMiscData, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
+                       InvalidGetHashHelper(), \
+                       [] (const QnTransaction<ApiMiscData> &tran, const NotificationParams &notificationParams) \
+                        { return notificationParams.miscNotificationManager->triggerNotification(tran); }, \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* local transaction type */ \
+APPLY(10101, getMiscParam, ApiMiscData, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
+                       InvalidGetHashHelper(), \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       AdminOnlyAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       LocalTransactionType()) /* regular transaction type */ \
 
 #define TRANSACTION_ENUM_APPLY(value, name, ...) name = value,
 

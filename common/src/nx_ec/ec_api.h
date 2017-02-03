@@ -34,6 +34,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
+#include <nx_ec/data/api_misc_data.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
@@ -575,6 +576,7 @@ class ECConnectionNotificationManager;
     public:
     signals:
         void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
+        void miscDataChanged(const QString& name, const QString& value);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
@@ -610,11 +612,33 @@ class ECConnectionNotificationManager;
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, value, time, std::placeholders::_1));
         }
 
+        ErrorCode saveMiscParamSync(const ec2::ApiMiscData& param)
+        {
+            int(AbstractMiscManager::*fn)(const ec2::ApiMiscData&, impl::SimpleHandlerPtr) = &AbstractMiscManager::saveMiscParam;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
+        }
+
+        template<class TargetType, class HandlerType>
+        int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
+        {
+            return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getMiscParamSync(const QByteArray& paramName, ApiMiscData* const outData)
+        {
+            return impl::doSyncCall<impl::GetMiscParamHandler>(
+                [=](const impl::GetMiscParamHandlerPtr &handler) {
+                    return this->getMiscParam(paramName, handler);
+                },
+                outData);
+        }
 
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

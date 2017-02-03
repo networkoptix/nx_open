@@ -83,6 +83,7 @@ namespace ec2 {
 
     struct ApiTimeData;
     struct ApiMiscData;
+    typedef std::vector<ApiMiscData> ApiMiscDataList;
     struct ApiPeerSystemTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 

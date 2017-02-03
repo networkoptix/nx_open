@@ -57,6 +57,8 @@
 
 namespace ec2
 {
+    class Ec2DirectConnection;
+
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */
@@ -131,7 +133,7 @@ namespace ec2
             \note Cannot do it in constructor to keep valid object destruction order
             TODO #ak look like incapsulation failure. Better remove this method
         */
-        void start();
+        void start(const std::shared_ptr<Ec2DirectConnection>& connection);
 
         //!Returns synchronized time (millis from epoch, UTC)
         qint64 getSyncTime() const;
@@ -244,6 +246,7 @@ namespace ec2
         boost::optional<qint64> m_prevSysTime;
         boost::optional<qint64> m_prevMonotonicClock;
         bool m_terminated;
+        std::shared_ptr<Ec2DirectConnection> m_connection;
         /*!
             \a TimeSyncInfo::syncTime stores local time on specified server
         */

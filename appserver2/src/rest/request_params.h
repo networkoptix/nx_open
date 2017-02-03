@@ -34,6 +34,9 @@ namespace ec2
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, std::nullptr_t *);
     void toUrlParams(const std::nullptr_t &, QUrlQuery *query);
+
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QByteArray *value);
+    void toUrlParams(const QByteArray &filter, QUrlQuery *query);
 }
 
 #endif  //EC2_REST_REQUEST_PARAMS_H
