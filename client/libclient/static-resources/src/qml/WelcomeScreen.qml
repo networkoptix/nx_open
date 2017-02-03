@@ -211,7 +211,10 @@ Rectangle
                     onItemChanged:
                     {
                         if (grid.model)
+                        {
                             grid.setPage(0);
+                            searchEdit.clear();
+                        }
 
                         grid.model = item;
                     }
