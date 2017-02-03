@@ -359,7 +359,12 @@ QSet<QnUuid> QnLayoutResource::layoutResourceIds() const
 {
     QSet<QnUuid> result;
     for (const auto& item: m_items->getItems())
+    {
+        if (item.uuid.isNull())
+            continue;
+
         result << item.resource.id;
+    }
     return result;
 }
 
@@ -373,6 +378,9 @@ QSet<QnResourcePtr> QnLayoutResource::layoutResources(const QnLayoutItemDataMap&
     QSet<QnResourcePtr> result;
     for (const auto& item : items)
     {
+        if (item.uuid.isNull())
+            continue;
+
         if (auto resource = qnResPool->getResourceByDescriptor(item.resource))
             result << resource;
     }
