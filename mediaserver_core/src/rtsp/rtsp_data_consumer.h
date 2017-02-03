@@ -87,7 +87,7 @@ protected:
         qint64& lastVTime,
         bool checkLQ) const;
     QByteArray getRangeHeaderIfChanged();
-    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, int ch);
+    void cleanupQueueToPos(QnDataPacketQueue::RandomAccess& unsafeQueue, int lastIndex, quint32 ch);
     void setNeedKeyData();
 private:
     //QMap<AVCodecID, QnMediaContextPtr> m_generatedContext;
@@ -140,7 +140,7 @@ private:
     int m_framesSinceRangeCheck;
     qint64 m_prevStartTime;
     qint64 m_prevEndTime;
-    int m_videoChannels;
+    quint32 m_videoChannels;
     std::array<bool, CL_MAX_CHANNELS> m_needKeyData;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

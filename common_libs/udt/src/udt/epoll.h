@@ -45,10 +45,12 @@ written by
 #include <map>
 #include <memory>
 #include <set>
+
+#include "common.h"
 #include "udt.h"
 
 
-class CEPollDesc;
+class EpollImpl;
 
 class CEPoll
 {
@@ -130,6 +132,16 @@ public: // for CUDTUnited API
        std::map<SYSSOCKET, int>* lrfds, std::map<SYSSOCKET, int>* lwfds);
 
       // Functionality:
+      //    Interrupt one wait call: the one running simultaneously 
+      //    in another thread or the next one to be made.
+      // Parameters:
+      //    0) [in] eid: EPoll ID.
+      // Returned value:
+      //    0 if success, otherwise an error number.
+
+   int interruptWait(const int eid);
+
+      // Functionality:
       //    close and release an EPoll.
       // Parameters:
       //    0) [in] eid: EPoll ID.
@@ -152,24 +164,22 @@ public: // for CUDT to acknowledge IO status
       // Returned value:
       //    0 if success, otherwise an error number
 
-   int update_events(const UDTSOCKET& uid, const std::set<int>& eids, int events, bool enable);
+   int update_events(
+       const UDTSOCKET& socketId,
+       const std::set<int>& epollToTriggerIDs,
+       int events,
+       bool enable);
 
 private:
-   typedef std::map<int, std::unique_ptr<CEPollDesc>> CEPollDescMap;
+   typedef std::map<int, std::unique_ptr<EpollImpl>> CEPollDescMap;
 
    int m_iIDSeed;                            // seed to generate a new ID
    pthread_mutex_t m_SeedLock;
 
    CEPollDescMap m_mPolls;       // all epolls
-   pthread_mutex_t m_EPollLock;
+   mutable pthread_mutex_t m_EPollLock;
 
-   /**
-        @return number of events triggered. -1 in case of error
-   */
-   int doSystemPoll(
-       CEPollDesc* epollContext,
-       std::map<SYSSOCKET, int>* lrfds,
-       std::map<SYSSOCKET, int>* lwfds);
+   EpollImpl* getEpollById(int eid) const;
 };
 
 #endif

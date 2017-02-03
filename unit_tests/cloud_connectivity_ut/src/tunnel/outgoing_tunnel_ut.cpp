@@ -10,6 +10,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel.h>
+#include <nx/network/cloud/tunnel/outgoing_tunnel_connection_watcher.h>
 #include <nx/network/cloud/tunnel/outgoing_tunnel_pool.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -28,6 +29,8 @@ class DummyConnection:
 {
 public:
     static std::atomic<size_t> instanceCount;
+    static std::set<DummyConnection*> instances;
+    static QnMutex instanceSetMutex;
 
     DummyConnection(
         const String& /*remotePeerId*/,
@@ -37,19 +40,30 @@ public:
     :
         m_connectionShouldWorkFine(connectionShouldWorkFine),
         m_singleShot(singleShot),
-        m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise)
+        m_tunnelConnectionInvokedPromise(tunnelConnectionInvokedPromise),
+        m_ignoreConnectRequest(false)
     {
         ++instanceCount;
         bindToAioThread(SocketGlobals::aioService().getCurrentAioThread());
+
+        QnMutexLocker lock(&instanceSetMutex);
+        instances.insert(this);
     }
 
     ~DummyConnection()
     {
         stopWhileInAioThread();
         --instanceCount;
+
+        QnMutexLocker lock(&instanceSetMutex);
+        instances.erase(this);
     }
 
     virtual void stopWhileInAioThread() override
+    {
+    }
+
+    virtual void start() override
     {
     }
 
@@ -58,6 +72,9 @@ public:
         SocketAttributes /*socketAttributes*/,
         OnNewConnectionHandler handler) override
     {
+        if (m_ignoreConnectRequest)
+            return;
+
         if (m_tunnelConnectionInvokedPromise)
         {
             m_tunnelConnectionInvokedPromise->set_value(timeout);
@@ -85,17 +102,32 @@ public:
     }
 
     virtual void setControlConnectionClosedHandler(
-        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*errorCode*/) override
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
+        m_onClosedHandler = std::move(handler);
+    }
+
+    void ignoreConnectRequests()
+    {
+        m_ignoreConnectRequest = true;
+    }
+
+    void reportClosure(SystemError::ErrorCode sysErrorCode)
+    {
+        post([this, sysErrorCode](){ m_onClosedHandler(sysErrorCode); });
     }
 
 private:
     bool m_connectionShouldWorkFine;
     const bool m_singleShot;
     nx::utils::promise<std::chrono::milliseconds>* m_tunnelConnectionInvokedPromise;
+    bool m_ignoreConnectRequest;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onClosedHandler;
 };
 
 std::atomic<size_t> DummyConnection::instanceCount(0);
+std::set<DummyConnection*> DummyConnection::instances;
+QnMutex DummyConnection::instanceSetMutex;
 
 
 class DummyConnector:
@@ -232,17 +264,29 @@ private:
                     m_canSucceedEvent->get_future().wait();
 
                 if (m_connectSuccessfully)
+                {
+                    auto dummyConnection = std::make_unique<DummyConnection>(
+                        m_targetPeerAddress.host.toString().toLatin1(),
+                        m_connectionShouldWorkFine,
+                        m_singleShotConnection,
+                        m_tunnelConnectionInvokedPromise);
+
+                    auto tunnelWatcher = std::make_unique<OutgoingTunnelConnectionWatcher>(
+                        std::move(nx::hpm::api::ConnectionParameters()),
+                        std::move(dummyConnection));
+                    tunnelWatcher->bindToAioThread(getAioThread());
+                    tunnelWatcher->start();
+
                     handler(
                         SystemError::noError,
-                        std::make_unique<DummyConnection>(
-                            m_targetPeerAddress.host.toString().toLatin1(),
-                            m_connectionShouldWorkFine,
-                            m_singleShotConnection,
-                            m_tunnelConnectionInvokedPromise));
+                        std::move(tunnelWatcher));
+                }
                 else
+                {
                     handler(
                         SystemError::connectionRefused,
                         std::unique_ptr<DummyConnection>());
+                }
             });
     }
 };
@@ -688,6 +732,94 @@ TEST_F(OutgoingTunnel, pool)
     }
 
     tunnelPool.pleaseStopSync();
+}
+
+class OutgoingTunnelCancellation:
+    public OutgoingTunnel
+{
+public:
+    OutgoingTunnelCancellation():
+        m_connection(nullptr)
+    {
+        setConnectorFactoryFunc(
+            [](const AddressEntry& targetAddress) -> std::unique_ptr<AbstractCrossNatConnector>
+            {
+                auto connector = std::make_unique<DummyConnector>(
+                    targetAddress,
+                    true,
+                    true,
+                    false);
+                return std::move(connector);
+            });
+    }
+
+protected:
+    void givenOpenedTunnel()
+    {
+        m_tunnel = openTunnel();
+
+        {
+            QnMutexLocker lock(&DummyConnection::instanceSetMutex);
+            ASSERT_EQ(1U, DummyConnection::instances.size());
+            m_connection = *DummyConnection::instances.begin();
+        }
+
+        m_connection->ignoreConnectRequests();
+
+        m_tunnel->setOnClosedHandler(
+            [this]()
+            {
+                // Tunnel supports removal within "on close" handler, so doing it.
+                m_tunnel.reset();
+                m_tunnelHasBeenClosed.set_value();
+            });
+    }
+
+    void requestNewConnectionFromTunnel()
+    {
+        m_tunnel->establishNewConnection(
+            SocketAttributes(),
+            [](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>) {});
+    }
+
+    void whenTunnelConnectionHasBeenClosed()
+    {
+        m_connection->reportClosure(SystemError::connectionReset);
+    }
+
+    void thenTunnelShouldStopCorrectly()
+    {
+        m_tunnelHasBeenClosed.get_future().wait();
+        ASSERT_EQ(nullptr, m_tunnel.get());
+    }
+
+private:
+    std::unique_ptr<cloud::OutgoingTunnel> m_tunnel;
+    nx::utils::promise<void> m_tunnelHasBeenClosed;
+    DummyConnection* m_connection;
+
+    std::unique_ptr<cloud::OutgoingTunnel> openTunnel()
+    {
+        auto tunnel = std::make_unique<cloud::OutgoingTunnel>(AddressEntry("example.com:80"));
+        nx::utils::promise<void> tunnelOpened;
+        tunnel->establishNewConnection(
+            SocketAttributes(),
+            [&tunnelOpened](SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)
+            {
+                tunnelOpened.set_value();
+            });
+        tunnelOpened.get_future().wait();
+
+        return tunnel;
+    }
+};
+
+TEST_F(OutgoingTunnelCancellation, cancellation2)
+{
+    givenOpenedTunnel();
+    requestNewConnectionFromTunnel();
+    whenTunnelConnectionHasBeenClosed();
+    thenTunnelShouldStopCorrectly();
 }
 
 } // namespace test

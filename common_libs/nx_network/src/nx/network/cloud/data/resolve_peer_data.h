@@ -18,8 +18,8 @@ class NX_NETWORK_API ResolvePeerRequest
     public StunRequestData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::resolvePeer;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::resolvePeer;
 
     nx::String hostName;
 
@@ -33,8 +33,8 @@ class NX_NETWORK_API ResolvePeerResponse
     public StunResponseData
 {
 public:
-    constexpr static const stun::cc::methods::Value kMethod =
-        stun::cc::methods::resolvePeer;
+    constexpr static const stun::extension::methods::Value kMethod =
+        stun::extension::methods::resolvePeer;
 
     std::list<SocketAddress> endpoints;
     ConnectionMethods connectionMethods;

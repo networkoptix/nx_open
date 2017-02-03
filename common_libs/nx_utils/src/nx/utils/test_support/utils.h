@@ -10,13 +10,13 @@
  */
 #define NX_GTEST_ASSERT_EQ(expected, actual) do \
 { \
-    bool result = false; \
+    bool resultE31cf27915b242999a4e22c7757d94de = false; \
     [&]() -> void \
     { \
         ASSERT_EQ(expected, actual); \
-        result = true; \
+        resultE31cf27915b242999a4e22c7757d94de = true; \
     }(); \
-    if (!result) \
+    if (!resultE31cf27915b242999a4e22c7757d94de) \
     { \
         throw std::runtime_error( \
             "This is work around ASSERT_* inability to be used " \

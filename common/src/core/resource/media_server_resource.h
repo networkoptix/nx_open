@@ -33,6 +33,8 @@ public:
     //!Overrides \a QnResource::getName. Returns camera name from \a QnMediaServerUserAttributes
     virtual QString getName() const override;
 
+    virtual QString toSearchString() const override;
+
     //!Overrides \a QnResource::setName. Writes name to \a QnMediaServerUserAttributes
     virtual void setName( const QString& name ) override;
 
@@ -109,7 +111,7 @@ public:
     static bool isEdgeServer(const QnResourcePtr &resource);
     static bool isHiddenServer(const QnResourcePtr &resource);
 
-    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
     qint64 currentStatusTime() const;
 
     void beforeDestroy();

@@ -15,6 +15,7 @@
 
 #include <QDir>
 
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
@@ -29,7 +30,11 @@
 #undef min
 #endif
 
-//#define DEBUG_SSL
+#define DEBUG_LOG(MESSAGE) do \
+{ \
+    if (nx::network::SocketGlobals::debugConfig().sslSocketWrappers) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
 static const nx::String kSslSessionId("Network Optix SSL socket");
@@ -120,7 +125,10 @@ public:
 
     void decreasePendingIOCount()
     {
-        NX_ASSERT(m_pendingIoCount !=0);
+        if (m_pendingIoCount == 0)
+            return;
+
+        NX_ASSERT(m_pendingIoCount > 0);
         --m_pendingIoCount;
         if (m_pendingIoCount == 0) {
             // Check if we can invoke the IO operations, if the IO
@@ -183,10 +191,8 @@ public:
             m_readBuffer->resize(old_size+*sslReturn);
             m_readBytes += *sslReturn;
         }
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG2);
-        #endif
+
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -206,20 +212,23 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
-        #endif
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(m_errorCode, -1);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError, m_readBytes);
-        case SslAsyncOperation::END_OF_STREAM:
-            NX_ASSERT(m_readBytes == 0);
-            return handler(SystemError::noError, 0);
-        default:
-            NX_ASSERT(false);
+        if (handler == nullptr)
+            return;
+        NX_ASSERT(handler != nullptr);
+
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(m_errorCode, -1);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError, m_readBytes);
+            case SslAsyncOperation::END_OF_STREAM:
+                NX_ASSERT(m_readBytes == 0);
+                return handler(SystemError::noError, 0);
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -239,10 +248,7 @@ public:
             m_ssl,m_writeBuffer->constData(),m_writeBuffer->size());
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG1);
-        #endif
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(
@@ -261,19 +267,18 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
-        #endif
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(SystemError::connectionAbort, -1);
-        case SslAsyncOperation::END_OF_STREAM:
-            return handler(SystemError::noError, 0);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError, m_writeBuffer->size());
-        default:
-            NX_ASSERT(false);
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(SystemError::connectionAbort, -1);
+            case SslAsyncOperation::END_OF_STREAM:
+                return handler(SystemError::noError, 0);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError, m_writeBuffer->size());
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -290,10 +295,7 @@ public:
         *sslReturn = SSL_do_handshake(m_ssl);
         *sslError = SSL_get_error(m_ssl,*sslReturn);
 
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("return %1, error %2").arg(*sslReturn).arg(*sslError),
-                (*sslReturn == 1) ? cl_logDEBUG2 : cl_logDEBUG1);
-        #endif
+        DEBUG_LOG(lm("return %1, error %2").arg(*sslReturn).arg(*sslError));
     }
 
     void reset(std::function<void(SystemError::ErrorCode)>&& handler)
@@ -309,19 +311,18 @@ protected:
     {
         const auto handler = std::move(m_handler);
         m_handler = nullptr;
-        #ifdef DEBUG_SSL
-            NX_LOGX(lm("invokeUserCallback, status: %1").arg(m_errorCode), cl_logDEBUG2);
-        #endif
 
-        switch(m_exitStatus) {
-        case SslAsyncOperation::EXCEPTION:
-            return handler(SystemError::connectionAbort);
-        case SslAsyncOperation::END_OF_STREAM:
-            return handler(SystemError::connectionReset);
-        case SslAsyncOperation::SUCCESS:
-            return handler(SystemError::noError);
-        default:
-            NX_ASSERT(false);
+        DEBUG_LOG(lm("invokeUserCallback, status: %1").arg(m_errorCode));
+        switch(m_exitStatus)
+        {
+            case SslAsyncOperation::EXCEPTION:
+                return handler(SystemError::connectionAbort);
+            case SslAsyncOperation::END_OF_STREAM:
+                return handler(SystemError::connectionReset);
+            case SslAsyncOperation::SUCCESS:
+                return handler(SystemError::noError);
+            default:
+                NX_ASSERT(false);
         }
     }
 
@@ -620,9 +621,8 @@ void SslAsyncBioHelper::handleSslError(int sslReturn, int sslError)
         errorStack << QLatin1String(err_str);
     }
 
-    NX_LOGX(lm("SSL returns %1, error %2, stack: %3")
-        .arg(sslReturn).arg(sslError)
-        .arg(errorStack.join(QLatin1String(", "))), cl_logDEBUG1);
+    DEBUG_LOG(lm("SSL returns %1, error %2, stack: %3")
+        .strs(sslReturn, sslError).container(errorStack));
 }
 
 void SslAsyncBioHelper::onRecv(
@@ -1537,13 +1537,13 @@ bool SslSocket::doHandshake()
     {
         QByteArray e(1024, '\0');
         ERR_error_string_n(SSL_get_error(d->ssl.get(), ret), e.data(), e.size());
-        NX_LOGX(lm("handshake (isServer=%1) failed %2: %3")
-            .arg(d->isServerSide).arg(ret).arg(e), cl_logDEBUG1);
+        NX_LOGX(lm("Handshake on %1 failed %2: %3")
+            .strs(d->isServerSide ? "server" : "client").arg(ret).arg(e), cl_logDEBUG1);
     }
     else
     {
-        NX_LOGX(lm("handshake (isServer=%1) success %2")
-            .arg(d->isServerSide).arg(ret), cl_logDEBUG2);
+        NX_LOGX(lm("Handshake on %1 success %2")
+            .strs(d->isServerSide ? "server" : "client", ret), cl_logDEBUG2);
     }
 
     return ret == 1;
@@ -1877,9 +1877,7 @@ int SslSocket::asyncRecvInternal(void* buffer, unsigned int bufferLen)
     };
 
     int ret = d->asyncSslHelper->eof() ? 0 : bioRead();
-    #ifdef DEBUG_SSL
-        NX_LOGX(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
-    #endif
+    DEBUG_LOG(lm("BIO read %1 returned %2").arg(bufferLen).arg(ret));
     return ret;
 }
 
@@ -1892,9 +1890,7 @@ int SslSocket::asyncSendInternal(
     NX_ASSERT(d->asyncSslHelper != NULL);
 
     auto ret = static_cast<int>(d->asyncSslHelper->bioWrite(buffer, bufferLen));
-    #ifdef DEBUG_SSL
-        NX_LOGX(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret), cl_logDEBUG2);
-    #endif
+    DEBUG_LOG(lm("BIO write %1 returned %2").arg(bufferLen).arg(ret));
     return ret;
 }
 

@@ -1,4 +1,4 @@
-<h1>{{event}}{{#source}} on <b>{{source}}</b>{{/source}}</h1>
+<h1>{{event}}{{#source}} <b>{{source}}</b>{{/source}}</h1>
 
 {{#screenshot}}
     <div class="description">

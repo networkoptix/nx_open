@@ -170,7 +170,7 @@ bool CLH264RtpParser::isBufferOverflow() const
         addHeaderSize = getSpsPpsSize();
 
     int totalSize = m_videoFrameSize + addHeaderSize;
-    return totalSize > MAX_ALLOWED_FRAME_SIZE;
+    return totalSize > (int) MAX_ALLOWED_FRAME_SIZE;
 }
 
 QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
@@ -306,10 +306,11 @@ bool CLH264RtpParser::isFirstSliceNal(
         return false;
 
     BitStreamReader bitReader;
-    bitReader.setBuffer(data+1, data + dataLen);
     int macroNum = -1;
+
     try
     {
+        bitReader.setBuffer(data+1, data + dataLen);
         macroNum = NALUnit::extractUEGolombCode(bitReader);
     }
     catch(BitStreamException &e)
@@ -438,7 +439,7 @@ bool CLH264RtpParser::processData(
     bool isPacketLost = m_prevSequenceNum != -1
         && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
 
-    if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
+    if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
     {
         NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
         clearInternalBuffer();

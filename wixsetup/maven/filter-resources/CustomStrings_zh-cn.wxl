@@ -34,8 +34,6 @@
     <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
     <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安装</String>
 
-
-
     <!-- Associations -->
     <String Id="Associations_PlayWith"                              Overridable="yes">运行 ${display.product.name}</String>
 
@@ -96,4 +94,12 @@
     <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">正在安装windows防火墙配置</String>
     <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">正在回滚到windows防火墙配置</String>
     <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">不能安装windows防火墙配置</String>
+
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
+    <String Id="Product_ServerIsTooOld"                             Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>    
 </WixLocalization>

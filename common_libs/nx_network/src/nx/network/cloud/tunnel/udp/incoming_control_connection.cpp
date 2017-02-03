@@ -126,7 +126,7 @@ void IncomingControlConnection::processRequest()
         // TODO: #mux Provide better error handling
         response.header.messageClass = stun::MessageClass::errorResponse;
         response.header.method = m_message.header.method;
-        response.newAttribute<stun::attrs::ErrorDescription>(
+        response.newAttribute<stun::attrs::ErrorCode>(
             stun::error::badRequest, String("Unsupported"));
     }
 

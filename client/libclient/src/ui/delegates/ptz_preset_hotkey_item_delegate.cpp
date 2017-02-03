@@ -78,39 +78,46 @@ void QnPtzPresetHotkeyItemDelegate::setEditorData(QWidget *editor, const QModelI
     comboBox->setCurrentIndex(comboBox->findData(hotkey));
 }
 
-void QnPtzPresetHotkeyItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
+void QnPtzPresetHotkeyItemDelegate::setModelData(
+    QWidget* editor,
+    QAbstractItemModel* model,
+    const QModelIndex& index) const
+{
     if(!model)
         return;
 
-    QnCharComboBox *comboBox = qobject_cast<QnCharComboBox *>(editor);
+    QnCharComboBox* const comboBox = qobject_cast<QnCharComboBox*>(editor);
     if(!comboBox)
         return;
 
-    int hotkey = comboBox->itemData(comboBox->currentIndex()).toInt();
+    const int hotkey = comboBox->itemData(comboBox->currentIndex()).toInt();
+    if (model->setData(index, hotkey, Qt::EditRole))
+        return;
 
-    if (!model->setData(index, hotkey, Qt::EditRole)) {
-        QnPtzManageModel *ptzModel = qobject_cast<QnPtzManageModel*>(model);
-        if (ptzModel) {
-            QString existingId = ptzModel->hotkeys().value(hotkey);
-            NX_ASSERT(!existingId.isEmpty(), Q_FUNC_INFO, "we should get here only if the selected hotkey is in use");
-            if (existingId.isEmpty())
-                return;
+    const QnPtzManageModel * const ptzModel = qobject_cast<QnPtzManageModel*>(model);
+    if (!ptzModel)
+        return;
 
-            QnPtzManageModel::RowData existing = ptzModel->rowData(existingId);
-            QString message = (existing.rowType == QnPtzManageModel::PresetRow)
-                              ? tr("This hotkey is used by preset \"%1\".").arg(existing.presetModel.preset.name)
-                              : tr("This hotkey is used by tour \"%1\".").arg(existing.tourModel.tour.name);
+    const QString existingId = ptzModel->hotkeys().value(hotkey);
+    NX_ASSERT(!existingId.isEmpty(), Q_FUNC_INFO,
+        "we should get here only if the selected hotkey is in use");
+    if (existingId.isEmpty())
+        return;
 
-            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QDialogButtonBox::Cancel);
-            messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole);
+    const QnPtzManageModel::RowData existing = ptzModel->rowData(existingId);
+    const QString message = (existing.rowType == QnPtzManageModel::PresetRow
+        ? tr("Hotkey used by preset \"%1\"").arg(existing.presetModel.preset.name)
+        : tr("Hotkey used by tour \"%1\"").arg(existing.tourModel.tour.name));
 
-            if (messageBox.exec() == QDialogButtonBox::Cancel)
-                return;
+    QnMessageBox messageBox(QnMessageBoxIcon::Warning, message,
+        QString(), QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Reassign"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
+        return;
 
-            QModelIndex existingIndex = ptzModel->index(ptzModel->rowNumber(existing), QnPtzManageModel::HotkeyColumn);
-            model->setData(existingIndex, QnPtzHotkey::NoHotkey, Qt::EditRole);
-            model->setData(index, hotkey, Qt::EditRole);
-        }
-    }
+    const auto rowNumber = ptzModel->rowNumber(existing);
+    const auto existingIndex = ptzModel->index(rowNumber, QnPtzManageModel::HotkeyColumn);
+    model->setData(existingIndex, QnPtzHotkey::NoHotkey, Qt::EditRole);
+    model->setData(index, hotkey, Qt::EditRole);
 }
 

@@ -11,6 +11,9 @@
 
 #include <nx/utils/string.h>
 
+#include <utils/common/synctime.h>
+#include <utils/common/qtimespan.h>
+
 namespace {
 
 //TODO: #vkutin #common Refactor all this to use some common formatting
@@ -134,11 +137,15 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            static const auto kNDash = QString::fromWCharArray(L"\x2013");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Total %n devices",      "", cameras.size()),
-                    tr("Total %n cameras",      "", cameras.size()),
-                    tr("Total %n I/O modules",  "", cameras.size())
+                    tr("Total %1 %n devices", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n cameras", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash),
+                    tr("Total %1 %n I/O modules", "%1 is long dash, do not replace",
+                        cameras.size()).arg(kNDash)
                 ), cameras
             );
         }
@@ -286,7 +293,7 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
             case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
-            case BitrateColumn:    return tr("Bitrate for");
+            case BitrateColumn:    return tr("Bitrate");
             default:               break;
         }
     }
@@ -358,34 +365,17 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     if (data.archiveDurationSecs == 0)
         return tr("empty");
 
-    qint64 tmpVal = data.archiveDurationSecs;
-    int years = tmpVal / kSecondsPerYear;
-    tmpVal -= years * kSecondsPerYear;
-    int months = tmpVal / kSecondsPerMonth;
-    tmpVal -= months * kSecondsPerMonth;
-    int days = tmpVal / kSecondsPerDay;
-    tmpVal -= days * kSecondsPerDay;
-    int hours = tmpVal / kSecondsPerHour;
-    QString result;
-    static const QString kDelimiter(lit(" "));
-    if (years > 0)
-        result += tr("%n years", "", years);
-    if (months > 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n months", "", months);
-    }
-    if (days > 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n days", "", days);
-    }
-    if (hours > 0 && years == 0) {
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += tr("%n hours", "", hours);
-    }
-    if (result.isEmpty())
-        result = tr("less than an hour");
-    return result;
+    if (data.archiveDurationSecs < kSecondsPerHour)
+        return tr("less than an hour");
+
+    static const int kMsecPerSec = 1000;
+    static const QString kSeparator(L' ');
+    static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
+    static const int kDoNotSuppress = -1;
+
+    qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
+    qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
+
+    return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
+        .toApproximateString(kDoNotSuppress, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
 }

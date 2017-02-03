@@ -39,10 +39,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
     if (result != CameraDiagnostics::NoErrorResult())
         return result;
 
-    result = initialize2WayAudio();
-    if (result != CameraDiagnostics::NoErrorResult())
-        return result;
-
+    initialize2WayAudio();    
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

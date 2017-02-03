@@ -19,8 +19,11 @@ namespace utils {
 
 using MediaServerTestFuncTypeList = std::vector<std::function<void()>>;
 
-// starts whole mediaserver for you
-// supply list of what you want to test as a constructor parameter
+/**
+ * This class is deprecated!
+ * Please use MediaServerLauncher instead.
+ */
+
 class MediaServerHelper
 {
 public:
@@ -32,7 +35,6 @@ private:
     std::unique_ptr<MediaServerProcess> m_serverProcess;
     MediaServerTestFuncTypeList m_testList;
     nx::ut::utils::WorkDirResource m_workDirResource;
-    std::unique_ptr<QnPlatformAbstraction> m_platform;
     std::thread m_thread;
     std::promise<void> m_testReadyPromise;
     std::future<void> m_testsReadyFuture;

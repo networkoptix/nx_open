@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
@@ -10,21 +5,20 @@
 #include "abstract_server_connection.h"
 #include "nx/network/socket_common.h"
 
-
 namespace nx {
 namespace stun {
 
-class UDPServer;
+class UdpServer;
 
-/** Provides ability to send response to a request message received via UDP
+/**
+ * Provides ability to send response to a request message received via UDP.
  */
-class UDPMessageResponseSender
-:
+class UDPMessageResponseSender:
     public nx::stun::AbstractServerConnection
 {
 public:
     UDPMessageResponseSender(
-        UDPServer* udpServer,
+        UdpServer* udpServer,
         SocketAddress sourceAddress);
     virtual ~UDPMessageResponseSender();
 
@@ -35,11 +29,12 @@ public:
     virtual SocketAddress getSourceAddress() const override;
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual AbstractCommunicatingSocket* socket() override;
+    virtual void close() override;
 
 private:
-    UDPServer* m_udpServer;
+    UdpServer* m_udpServer;
     SocketAddress m_sourceAddress;
 };
 
-}   //stun
-}   //nx
+} // namespace stun
+} // namespace nx

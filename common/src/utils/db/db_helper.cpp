@@ -201,6 +201,9 @@ bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
     if (!file.open(QFile::ReadOnly))
         return false;
     QByteArray data = file.readAll();
+    if (data.isEmpty())
+        return true;
+
     if( !execSQLScript( data, database ) )
     {
         NX_LOG(lit("Error while executing SQL file %1").arg(fileName), cl_logERROR);
@@ -271,6 +274,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
         QString fileName = entry.absoluteFilePath();
         if (!existUpdates.contains(fileName))
         {
+            NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
             if (!execSQLFile(fileName, m_sdb))

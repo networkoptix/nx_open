@@ -65,6 +65,11 @@ enum IDType
     PreferencesNotificationTabAction,
 
     /**
+    * Opens notifications settings preferences tab.
+    */
+    PreferencesCloudTabAction,
+
+    /**
      * Shows / hides FPS display.
      */
     ShowFpsAction,
@@ -1054,11 +1059,6 @@ enum IDType
     DebugDecrementCounterAction,
 
     /**
-     * Shows resource pool.
-     */
-    DebugShowResourcePoolAction,
-
-    /**
      * Generates PTZ calibration screenshots.
      */
     DebugCalibratePtzAction,
@@ -1099,6 +1099,9 @@ enum IDType
      * Opens cloud account management page in the browser.
      */
     OpenCloudManagementUrl,
+
+    /** Hide cloud promo */
+    HideCloudPromoAction,
 
     ActionCount,
 

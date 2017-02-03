@@ -3,6 +3,8 @@
 #include "globals.h"
 #include "skin.h"
 
+#include <cmath>
+
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
 #include <QtWidgets/QApplication>
@@ -11,6 +13,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QCalendarWidget>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QCheckBox>
@@ -24,8 +27,9 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QInputDialog>
-#include <private/qfont_p.h>
-#include <private/qabstractitemview_p.h>
+
+#include <QtGui/private/qfont_p.h>
+#include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
@@ -33,12 +37,15 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/object_companion.h>
 #include <utils/common/property_backup.h>
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <utils/math/color_transformations.h>
 
 
 using namespace style;
@@ -64,6 +71,8 @@ namespace
     const char* kPopupShadowCompanion = "popupShadow";
 
     const char* kLinkHoverProcessorCompanion = "linkHoverProcessor";
+
+    const char* kCalendarDelegateCompanion = "calendarDelegateReplacement";
 
     const int kQtHeaderIconMargin = 2; // a margin between item view header's icon and label used by Qt
 
@@ -153,36 +162,14 @@ namespace
         return static_cast<TabShape>(widget->property(Properties::kTabShape).toInt());
     }
 
-    bool isCheckableButton(const QStyleOption* option)
-    {
-        if (qstyleoption_cast<const QStyleOptionButton*>(option))
-        {
-            if (option->state.testFlag(QStyle::State_On) ||
-                option->state.testFlag(QStyle::State_Off) ||
-                option->state.testFlag(QStyle::State_NoChange))
-            {
-                return true;
-            }
-
-            const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
-            if (buttonWidget && buttonWidget->isCheckable())
-                return true;
-        }
-
-        return false;
-    }
-
-    bool isTextButton(const QStyleOption* option)
-    {
-        if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
-            return button->features.testFlag(QStyleOptionButton::Flat);
-
-        return false;
-    }
-
     bool isAccented(const QWidget* widget)
     {
         return widget && widget->property(Properties::kAccentStyleProperty).toBool();
+    }
+
+    bool isWarningStyle(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kWarningStyleProperty).toBool();
     }
 
     bool isSwitchButtonCheckbox(const QWidget* widget)
@@ -351,18 +338,18 @@ namespace
     }
 
     template <class T>
-    bool isWidgetOwnedBy(const QWidget* widget)
+    T* isWidgetOwnedBy(const QWidget* widget)
     {
         if (!widget)
-            return false;
+            return nullptr;
 
         for (QWidget* parent = widget->parentWidget(); parent != nullptr; parent = parent->parentWidget())
         {
-            if (qobject_cast<const T*>(parent))
-                return true;
+            if (auto desiredParent = qobject_cast<T*>(parent))
+                return desiredParent;
         }
 
-        return false;
+        return nullptr;
     }
 
     enum ScrollBarStyle
@@ -391,6 +378,104 @@ namespace
     public:
         QMargins viewportMargins() const { return QAbstractScrollArea::viewportMargins(); }
         void setViewportMargins(const QMargins& margins) { QAbstractScrollArea::setViewportMargins(margins); }
+    };
+
+    /*
+     * Replacement for standard QCalendarWidget item delegate.
+     * Installs itself in constructor, restores previous delegate in destructor.
+     */
+    class CalendarDelegateReplacement: public QItemDelegate
+    {
+    public:
+        CalendarDelegateReplacement(QAbstractItemView* view, QCalendarWidget* parent):
+            QItemDelegate(parent),
+            m_view(view),
+            m_previous(view ? view->itemDelegate() : nullptr)
+        {
+            m_view->setItemDelegate(this);
+        }
+
+        virtual ~CalendarDelegateReplacement()
+        {
+            if (m_view && m_previous)
+                m_view->setItemDelegate(m_previous);
+        }
+
+        virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
+            const QModelIndex& index) const override
+        {
+            QStyleOptionViewItem viewOption(option);
+            viewOption.state &= ~QStyle::State_HasFocus; //< don't draw focus rect
+            viewOption.palette.setColor(QPalette::Highlight, Qt::transparent);
+
+            const bool selected = option.showDecorationSelected
+                && (option.state.testFlag(QStyle::State_Selected));
+
+            const bool inaccessible = index.flags() == 0;
+
+            const bool hovered = option.state.testFlag(QStyle::State_MouseOver)
+                && !inaccessible && m_view && m_view->isEnabled();
+
+            /*
+            * Standard QCalendarWidget does not support hover.
+            * So we draw cells background here ourselves and don't forget to customize
+            * calendar view's QPalette::Base and QPalette::Window as fully transparent
+            * to prevent standard delegate from overpainting our background.
+            */
+            painter->fillRect(option.rect, option.palette.color(hovered
+                ? QPalette::Midlight
+                : QPalette::Mid));
+
+            if (selected)
+            {
+                static const qreal kSelectionBackgroundOpacity = 0.2;
+                static const qreal kFrameWidth = 2.0;
+
+                const auto color = option.palette.color(QPalette::Highlight);
+
+                QnScopedPainterPenRollback penRollback(painter,
+                    QPen(color, kFrameWidth, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+
+                QnScopedPainterBrushRollback brushRollback(painter,
+                    toTransparent(color, kSelectionBackgroundOpacity));
+
+                static const auto kShift = kFrameWidth / 2.0;
+                painter->drawRect(QRectF(option.rect).adjusted(
+                    kShift, kShift, -kShift - 1, -kShift - 1));
+            }
+
+            QnScopedPainterOpacityRollback opacityRollback(painter);
+            if (inaccessible)
+            {
+                /* Paint semi-transparent highlighted foreground: */
+                painter->setOpacity(Hints::kDisabledItemOpacity);
+                viewOption.state |= QStyle::State_Selected;
+                viewOption.showDecorationSelected = true;
+            }
+
+            if (m_previous)
+                m_previous->paint(painter, viewOption, index);
+
+            opacityRollback.rollback();
+
+            /* Paint shadow under header, if needed: */
+            if (auto calendar = qobject_cast<QCalendarWidget*>(parent()))
+            {
+                static const int kHeaderRow = 0;
+                if (calendar->horizontalHeaderFormat() != QCalendarWidget::NoHorizontalHeader
+                    && index.row() == kHeaderRow)
+                {
+                    QnScopedPainterPenRollback penRollback(painter,
+                        option.palette.color(QPalette::Shadow));
+
+                    painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+                }
+            }
+        }
+
+    private:
+        QPointer<QAbstractItemView> m_view;
+        QPointer<QAbstractItemDelegate> m_previous;
     };
 
 } // unnamed namespace
@@ -518,8 +603,8 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = isAccented(widget)
-                ? option->palette.color(QPalette::HighlightedText)
+            QColor color = isAccented(widget) || isWarningStyle(widget)
+                ? option->palette.color(QPalette::BrightText)
                 : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
@@ -539,11 +624,17 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
-                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -612,7 +703,13 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
@@ -1460,7 +1557,7 @@ void QnNxStyle::drawComplexControl(
                                 groupBox->state.testFlag(QStyle::State_Enabled),
                                 text, QPalette::Text);
 
-                            rect.setLeft(rect.left() + QFontMetrics(font).width(text, -1, kTextFlags) + Metrics::kStandardPadding);
+                            rect.setLeft(rect.left() + QFontMetrics(font).size(kTextFlags, text).width() + Metrics::kStandardPadding);
                         }
 
                         if (!detailText.isEmpty())
@@ -1507,24 +1604,18 @@ void QnNxStyle::drawComplexControl(
             {
                 auto drawArrowButton = [&](QStyle::SubControl subControl)
                 {
-                    QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
-
-                    QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Button));
-                    QColor buttonColor;
+                    const QRect buttonRect = subControlRect(control, spinBox, subControl, widget);
+                    const QnPaletteColor mainColor = findColor(spinBox->palette.color(QPalette::Base));
 
                     bool up = (subControl == SC_SpinBoxUp);
                     bool enabled = spinBox->state.testFlag(QStyle::State_Enabled) && spinBox->stepEnabled.testFlag(up ? QSpinBox::StepUpEnabled : QSpinBox::StepDownEnabled);
 
                     if (enabled && spinBox->activeSubControls.testFlag(subControl))
                     {
-                        if (spinBox->state.testFlag(State_Sunken))
-                            buttonColor = mainColor.darker(1);
-                        else
-                            buttonColor = mainColor;
+                        painter->fillRect(buttonRect, spinBox->state.testFlag(State_Sunken)
+                            ? mainColor
+                            : mainColor.lighter(1));
                     }
-
-                    if (buttonColor.isValid())
-                        painter->fillRect(buttonRect, buttonColor);
 
                     drawArrow(up ? Up : Down,
                         painter,
@@ -2258,7 +2349,7 @@ void QnNxStyle::drawControl(
 
         case CE_PushButtonBevel:
         {
-            if (isTextButton(option))
+            if (QnNxStylePrivate::isTextButton(option))
                 return;
 
             break;
@@ -2275,7 +2366,7 @@ void QnNxStyle::drawControl(
                 const bool isDefaultForegroundRole = (foregroundRole == QPalette::ButtonText);
 
                 /* Draw text button: */
-                if (isTextButton(option))
+                if (QnNxStylePrivate::isTextButton(option))
                 {
                     /* Foreground role override: */
                     if (isDefaultForegroundRole)
@@ -2285,7 +2376,9 @@ void QnNxStyle::drawControl(
                     return;
                 }
 
-                if (isDefaultForegroundRole && isAccented(widget))
+                if (isDefaultForegroundRole && isWarningStyle(widget))
+                    foregroundRole = QPalette::BrightText;
+                else if (isDefaultForegroundRole && isAccented(widget))
                     foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
@@ -2325,7 +2418,7 @@ void QnNxStyle::drawControl(
                 }
 
                 /* Draw switch right-aligned: */
-                if (isCheckableButton(option))
+                if (QnNxStylePrivate::isCheckableButton(option))
                 {
                     QStyleOptionButton newOpt(*buttonOption);
                     newOpt.rect.setWidth(Metrics::kButtonSwitchSize.width());
@@ -2334,12 +2427,12 @@ void QnNxStyle::drawControl(
                     if (buttonOption->direction == Qt::RightToLeft)
                     {
                         newOpt.rect.moveLeft(option->rect.left() + Metrics::kSwitchMargin);
-                        textRect.setLeft(newOpt.rect.right() + Metrics::kSwitchMargin + 1);
+                        textRect.setLeft(newOpt.rect.right() + Metrics::kStandardPadding + 1);
                     }
                     else
                     {
                         newOpt.rect.moveRight(option->rect.right() - Metrics::kSwitchMargin);
-                        textRect.setRight(newOpt.rect.left() - Metrics::kSwitchMargin - 1);
+                        textRect.setRight(newOpt.rect.left() - Metrics::kStandardPadding - 1);
                     }
 
                     drawSwitch(painter, &newOpt, widget);
@@ -2583,11 +2676,11 @@ QRect QnNxStyle::subControlRect(
                             font.setPixelSize(font.pixelSize() + 2);
                             font.setWeight(QFont::DemiBold);
 
-                            int textWidth = QFontMetrics(font).width(text, -1, kTextFlags);
+                            int textWidth = QFontMetrics(font).size(kTextFlags, text).width();
 
                             if (!detailText.isEmpty())
                             {
-                                int detailWidth = groupBox->fontMetrics.width(detailText, -1, kTextFlags);
+                                int detailWidth = groupBox->fontMetrics.size(kTextFlags, detailText).width();
                                 textWidth += Metrics::kStandardPadding + detailWidth;
                             }
 
@@ -2732,6 +2825,9 @@ QRect QnNxStyle::subControlRect(
                                 else
                                     rect = QRect(rect.left(), rect.top(), pos, rect.height());
                                 break;
+
+                            default:
+                                break;
                         }
 
                         break;
@@ -2773,10 +2869,18 @@ QRect QnNxStyle::subElementRect(
 
         case SE_LineEditContents:
         {
-            if (!widget || !widget->parent() || !qobject_cast<const QAbstractItemView*>(widget->parent()->parent()))
-                //TODO #vkutin See why this ugly "6" is here and not somewhere else
-                return base_type::subElementRect(subElement, option, widget).adjusted(6, 0, 0, 0);
-            break;
+            const auto standardRect = base_type::subElementRect(subElement, option, widget);
+
+            if (isItemViewEdit(widget))
+                return standardRect;
+
+            static const int kLineEditIndent = 6;
+            static const int kCalendarYearEditIndent = 4;
+
+            if (isWidgetOwnedBy<QCalendarWidget>(widget))
+                return standardRect.adjusted(kCalendarYearEditIndent, 0, 0, 0);
+
+            return standardRect.adjusted(kLineEditIndent, 0, 0, 0);
         }
 
         case SE_PushButtonLayoutItem:
@@ -2794,7 +2898,7 @@ QRect QnNxStyle::subElementRect(
 
         case SE_PushButtonFocusRect:
         {
-            return isTextButton(option)
+            return QnNxStylePrivate::isTextButton(option)
                 ? option->rect
                 : QnGeometry::eroded(option->rect, 1);
         }
@@ -3023,23 +3127,30 @@ QSize QnNxStyle::sizeFromContents(
             QSize result(size.width(), qMax(size.height(), Metrics::kButtonHeight));
             result.rwidth() += pixelMetric(PM_ButtonMargin, option, widget) * 2;
 
+            bool hasIcon = false;
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
             {
-                if (!button->icon.isNull())
+                hasIcon = !button->icon.isNull();
+                if (hasIcon)
                     result.rwidth() -= 4; // Compensate for QPushButton::sizeHint magic
             }
 
-            if (isTextButton(option))
-                result.rwidth() += Metrics::kTextButtonIconMargin;
+            const bool textButton = QnNxStylePrivate::isTextButton(option);
+            if (textButton)
+                result.rwidth() += (hasIcon ? Metrics::kTextButtonIconMargin : 0);
             else
                 result.rwidth() = qMax(result.rwidth(), Metrics::kMinimumButtonWidth);
 
-            if (isCheckableButton(option))
+            if (QnNxStylePrivate::isCheckableButton(option))
             {
-                result.rwidth() += Metrics::kButtonSwitchSize.width() +
-                    Metrics::kStandardPadding * 2 - Metrics::kSwitchMargin;
+                const QSize switchSize = textButton
+                    ? Metrics::kStandaloneSwitchSize
+                    : Metrics::kButtonSwitchSize;
 
-                result.rheight() = qMax(result.rheight(), Metrics::kButtonSwitchSize.height());
+                result.rwidth() += switchSize.width() + Metrics::kStandardPadding * 2
+                    - Metrics::kSwitchMargin;
+
+                result.rheight() = qMax(result.rheight(), switchSize.height());
             }
 
             return result;
@@ -3231,10 +3342,10 @@ int QnNxStyle::pixelMetric(
             if (qobject_cast<const QAbstractItemView*>(widget))
                 return 0;
 
-            if (isCheckableButton(option))
+            if (QnNxStylePrivate::isCheckableButton(option))
                 return Metrics::kSwitchMargin * 2;
 
-            if (isTextButton(option))
+            if (QnNxStylePrivate::isTextButton(option))
                 return 0;
 
             if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
@@ -3497,6 +3608,22 @@ void QnNxStyle::polish(QWidget *widget)
             widget->installEventFilter(this);
     }
 
+    if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
+    {
+        if (!calendar->property(Properties::kDontPolishFontProperty).toBool())
+        {
+            QTextCharFormat header = calendar->headerTextFormat();
+            QFont font = header.font();
+            font.setWeight(QFont::Bold);
+            font.setPixelSize(Metrics::kCalendarHeaderFontPixelSize);
+            header.setFont(font);
+            calendar->setHeaderTextFormat(header);
+
+            /* To update text formats when palette changes: */
+            calendar->installEventFilter(this);
+        }
+    }
+
     if (qobject_cast<QPushButton*>(widget) ||
         qobject_cast<QToolButton*>(widget))
     {
@@ -3514,7 +3641,7 @@ void QnNxStyle::polish(QWidget *widget)
         {
             QFont font = widget->font();
             font.setWeight(QFont::DemiBold);
-            font.setPixelSize(14);
+            font.setPixelSize(Metrics::kHeaderViewFontPixelSize);
             widget->setFont(font);
         }
         widget->setAttribute(Qt::WA_Hover);
@@ -3527,13 +3654,27 @@ void QnNxStyle::polish(QWidget *widget)
         widget->installEventFilter(this);
     }
 
-    if (qobject_cast<QLineEdit*>(widget))
+    if (auto lineEdit = qobject_cast<QLineEdit*>(widget))
     {
-        if (!widget->property(Properties::kDontPolishFontProperty).toBool() && !isItemViewEdit(widget))
+        if (!lineEdit->property(Properties::kDontPolishFontProperty).toBool()
+            && !isItemViewEdit(lineEdit))
         {
-            QFont font = widget->font();
-            font.setPixelSize(14);
-            widget->setFont(font);
+            QFont font = lineEdit->font();
+
+            if (isWidgetOwnedBy<QCalendarWidget>(lineEdit))
+            {
+                QPalette palette = lineEdit->palette();
+                palette.setBrush(QPalette::Highlight, qApp->palette().highlight());
+                palette.setBrush(QPalette::HighlightedText, qApp->palette().highlightedText());
+                lineEdit->setPalette(palette);
+                font.setBold(true);
+            }
+            else
+            {
+                font.setPixelSize(Metrics::kTextEditFontPixelSize);
+            }
+
+            lineEdit->setFont(font);
         }
     }
 
@@ -3562,7 +3703,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(14);
+            font.setPixelSize(Metrics::kTextEditFontPixelSize);
             widget->setFont(font);
         }
     }
@@ -3633,7 +3774,7 @@ void QnNxStyle::polish(QWidget *widget)
         if (!widget->property(Properties::kDontPolishFontProperty).toBool())
         {
             QFont font = widget->font();
-            font.setPixelSize(12);
+            font.setPixelSize(Metrics::kTabBarFontPixelSize);
             if (tabShape(widget) == TabShape::Rectangular)
                 font.setWeight(QFont::DemiBold);
             widget->setFont(font);
@@ -3691,6 +3832,25 @@ void QnNxStyle::polish(QWidget *widget)
         }
         else
         {
+            /* Modify calendar item view: */
+            if (auto calendar = isWidgetOwnedBy<QCalendarWidget>(widget))
+            {
+                if (!calendar->property(Properties::kDontPolishFontProperty).toBool())
+                {
+                    QFont font = widget->font();
+                    font.setPixelSize(Metrics::kCalendarItemFontPixelSize);
+                    widget->setFont(font);
+                }
+
+                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                    && !qobject_cast<QnCalendarWidget*>(calendar))
+                {
+                    QnObjectCompanionManager::attach(calendar,
+                        new CalendarDelegateReplacement(view, calendar),
+                        kCalendarDelegateCompanion);
+                }
+            }
+
             /* Fix for Qt 5.6 bug: item views don't reset their dropIndicatorRect: */
             connect(view, &QAbstractItemView::pressed, this,
                 [view]()
@@ -3788,6 +3948,9 @@ void QnNxStyle::unpolish(QWidget* widget)
             popupWithCustomizedShadow = parentWidget;
         }
     }
+
+    if (auto calendar = qobject_cast<QCalendarWidget*>(widget))
+        QnObjectCompanionManager::uninstall(calendar, kCalendarDelegateCompanion);
 
     if (kCustomizePopupShadows && popupWithCustomizedShadow)
         QnObjectCompanionManager::uninstall(popupWithCustomizedShadow, kPopupShadowCompanion);
@@ -3983,5 +4146,99 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
         }
     }
 
+    if (auto calendar = qobject_cast<QCalendarWidget*>(object))
+    {
+        if (event->type() == QEvent::PaletteChange)
+        {
+            QTextCharFormat header = calendar->headerTextFormat();
+            header.setForeground(calendar->palette().windowText());
+            calendar->setHeaderTextFormat(header);
+
+            QTextCharFormat sunday = calendar->weekdayTextFormat(Qt::Sunday);
+            sunday.setForeground(calendar->palette().brightText());
+            calendar->setWeekdayTextFormat(Qt::Sunday, sunday);
+
+            QTextCharFormat saturday = calendar->weekdayTextFormat(Qt::Saturday);
+            saturday.setForeground(calendar->palette().brightText());
+            calendar->setWeekdayTextFormat(Qt::Saturday, saturday);
+        }
+    }
+
     return base_type::eventFilter(object, event);
+}
+
+namespace {
+
+template<class Rect>
+void paintRectFrame(QPainter* painter, const Rect& rect,
+    const QColor& color, int width, int shift)
+{
+    Rect outerRect = rect.adjusted(shift, shift, -shift, -shift);
+    Rect innerRect = outerRect.adjusted(width, width, -width, -width);
+
+    if (width < 0) //< if outer frame
+    {
+        qSwap(outerRect, innerRect);
+        width = -width;
+    }
+
+    const Rect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
+    const Rect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
+    const Rect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
+    const Rect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+
+    const QBrush brush(color);
+    painter->fillRect(topRect, brush);
+    painter->fillRect(leftRect, brush);
+    painter->fillRect(rightRect, brush);
+    painter->fillRect(bottomRect, brush);
+}
+
+} // namespace
+
+void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
+    const QColor& color, int width, int shift)
+{
+    if (width == 0)
+        return;
+
+    const auto& transform = painter->transform();
+    const auto type = transform.type();
+
+    /* 1. The simplest case: only translate & scale. */
+    if (type <= QTransform::TxScale)
+    {
+        const QRect deviceRect = transform.mapRect(rect).toAlignedRect();
+        const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+        const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+        paintRectFrame(painter, deviceRect, color, width, shift);
+        return;
+    }
+
+    /* 2. More complicated case: with possible rotation. */
+    if (type <= QTransform::TxRotate)
+    {
+        const auto sx = std::hypot(transform.m11(), transform.m12());
+        const auto sy = std::hypot(transform.m21(), transform.m22());
+
+        if (qFuzzyIsNull(sx - sy)) //< uniform scale, no shear
+        {
+            if (qFuzzyIsNull(sx)) //< just in case
+                return;
+
+            /* Strip transformation of scale: */
+            const QnScopedPainterTransformRollback transformRollback(painter, QTransform(
+                transform.m11() / sx, transform.m12() / sx,
+                transform.m21() / sy, transform.m22() / sy,
+                transform.dx(), transform.dy()));
+
+            const QRectF scaledRect = QTransform::fromScale(sx, sy).mapRect(rect);
+            const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+            paintRectFrame(painter, scaledRect, color, width, shift);
+            return;
+        }
+    }
+
+    /* 3. The most complicated case: non-conformal mapping. */
+    NX_ASSERT(false, Q_FUNC_INFO, "Non-conformal mapping is not supported.");
 }

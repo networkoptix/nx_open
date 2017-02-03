@@ -7,7 +7,10 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/test_support/test_outgoing_tunnel.h>
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx {
 namespace network {
@@ -88,6 +91,10 @@ class CloudStreamSocketTest:
     public ::testing::Test
 {
 public:
+    CloudStreamSocketTest()
+    {
+    }
+
     ~CloudStreamSocketTest()
     {
         if (m_oldCreateStreamSocketFunc)
@@ -293,28 +300,62 @@ TEST_F(CloudStreamSocketTest, cancellation)
     }
 }
 
-TEST_F(CloudStreamSocketTest, syncModeCancellation)
+class CloudStreamSocketCancellation:
+    public CloudStreamSocketTest
+{
+public:
+    enum class SocketState
+    {
+        init,
+        connected,
+        closed,
+    };
+
+    CloudStreamSocketCancellation()
+    {
+        init();
+    }
+
+    ~CloudStreamSocketCancellation()
+    {
+        m_tcpServer->pleaseStopSync();
+    }
+
+protected:
+    SocketAddress serverAddress() const
+    {
+        return m_tcpServer->addressBeingListened();
+    }
+
+private:
+    std::unique_ptr<network::test::RandomDataTcpServer> m_tcpServer;
+
+    void init()
+    {
+        m_tcpServer = std::make_unique<network::test::RandomDataTcpServer>(
+            network::test::TestTrafficLimitType::none,
+            0,
+            network::test::TestTransmissionMode::spam);
+        m_tcpServer->setLocalAddress(SocketAddress(HostAddress::localhost, 0));
+        ASSERT_TRUE(m_tcpServer->start());
+    }
+};
+
+TEST_F(CloudStreamSocketCancellation, syncModeCancellation)
 {
     constexpr const std::chrono::milliseconds kTestDuration =
         std::chrono::milliseconds(2000);
     constexpr const int kTestRuns = 10;
 
     //launching some server
-    network::test::RandomDataTcpServer tcpServer(
-        network::test::TestTrafficLimitType::none,
-        0,
-        network::test::TestTransmissionMode::spam);
-    tcpServer.setLocalAddress(SocketAddress(HostAddress::localhost, 0));
-    ASSERT_TRUE(tcpServer.start());
 
     for (int i = 0; i < kTestRuns; ++i)
     {
-        auto socket = SocketFactory::createStreamSocket();
-        enum class SocketState {init, connected, closed};
+        auto socket = std::make_unique<CloudStreamSocket>(SocketFactory::tcpServerIpVersion());
         std::atomic<SocketState> socketState(SocketState::init);
 
         nx::utils::thread sendThread(
-            [&socket, targetAddress = tcpServer.addressBeingListened(), &socketState]
+            [&socket, targetAddress = serverAddress(), &socketState]
             {
                 char testBuffer[16*1024];
 
@@ -367,8 +408,156 @@ TEST_F(CloudStreamSocketTest, syncModeCancellation)
 
         socket.reset();
     }
+}
 
-    tcpServer.pleaseStopSync();
+namespace {
+
+class TestSocket:
+    public TCPSocket
+{
+public:
+    TestSocket(std::tuple<SocketAddress, nx::utils::promise<void>*, nx::utils::promise<bool>*> args):
+        TCPSocket(SocketFactory::tcpClientIpVersion())
+    {
+        m_socketInRecv = std::get<1>(args);
+        m_continueReadingSocket = std::get<2>(args);
+    }
+
+    ~TestSocket()
+    {
+    }
+
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override
+    {
+        nx::utils::ObjectDestructionFlag::Watcher objectDestructionFlag(&m_destructionFlag);
+        m_socketInRecv->set_value();
+        m_continueReadingSocket->get_future().wait();
+
+        const auto result = TCPSocket::recv(buffer, bufferLen, flags);
+
+        assertIfThisHasBeenDestroyed(objectDestructionFlag);
+
+        return result;
+    }
+
+private:
+    nx::utils::promise<void>* m_socketInRecv;
+    nx::utils::promise<bool>* m_continueReadingSocket;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
+
+    void assertIfThisHasBeenDestroyed(
+        const nx::utils::ObjectDestructionFlag::Watcher& objectDestructionFlag)
+    {
+        ASSERT_FALSE(objectDestructionFlag.objectDestroyed());
+    }
+};
+
+using TestOutgoingTunnelConnection = test::OutgoingTunnelConnection<
+    TestSocket,
+    SocketAddress,
+    nx::utils::promise<void>*,
+    nx::utils::promise<bool>*>;
+
+using TestCrossNatConnector = test::CrossNatConnector<
+    TestOutgoingTunnelConnection,
+    SocketAddress,
+    nx::utils::promise<void>*,
+    nx::utils::promise<bool>*>;
+
+} // namespace
+
+class CloudStreamSocketShutdown:
+    public CloudStreamSocketCancellation
+{
+public:
+    CloudStreamSocketShutdown():
+        m_terminated(false)
+    {
+        if (!SocketGlobals::mediatorConnector().mediatorAddress())
+            SocketGlobals::mediatorConnector().mockupAddress(serverAddress());
+
+        m_oldFactory =
+            ConnectorFactory::setFactoryFunc(
+                std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, 
+                    std::placeholders::_1));
+    }
+
+    ~CloudStreamSocketShutdown()
+    {
+        ConnectorFactory::setFactoryFunc(m_oldFactory);
+        if (m_clientSocket)
+        {
+            m_clientSocket->pleaseStopSync();
+            m_clientSocket.reset();
+        }
+    }
+
+protected:
+    void givenSocketConnectedToATcpServer()
+    {
+        m_clientSocket = std::make_unique<CloudStreamSocket>(
+            SocketFactory::tcpServerIpVersion());
+        ASSERT_TRUE(m_clientSocket->connect(QnUuid::createUuid().toSimpleString(), -1));
+    }
+
+    void startSocketReadThread()
+    {
+        nx::utils::promise<void> threadStarted;
+        m_socketReadThread = nx::utils::thread(
+            [this, &threadStarted]
+            {
+                ASSERT_TRUE(m_clientSocket->setNonBlockingMode(true));
+
+                threadStarted.set_value();
+                char readBuffer[16 * 1024];
+                while (!m_terminated)
+                    m_clientSocket->recv(readBuffer, sizeof(readBuffer));
+            });
+
+        threadStarted.get_future().wait();
+    }
+
+    void waitForEnterSocketRecv()
+    {
+        m_socketInRecv.get_future().wait();
+    }
+
+    void shutdownSocket()
+    {
+        m_clientSocket->shutdown();
+    }
+
+    void assertThatSocketHasBeenShutdownCorrectly()
+    {
+        m_continueReadingSocket.set_value(true);
+
+        m_terminated = true;
+        m_socketReadThread.join();
+    }
+
+private:
+    std::unique_ptr<CloudStreamSocket> m_clientSocket;
+    nx::utils::thread m_socketReadThread;
+    bool m_terminated;
+    ConnectorFactory::FactoryFunc m_oldFactory;
+    nx::utils::promise<void> m_socketInRecv;
+    nx::utils::promise<bool> m_continueReadingSocket;
+
+    std::unique_ptr<AbstractCrossNatConnector> connectorFactoryFunc(
+        const AddressEntry& /*targetAddress*/)
+    {
+        return std::make_unique<TestCrossNatConnector>(
+            serverAddress(), &m_socketInRecv, &m_continueReadingSocket);
+    }
+};
+
+TEST_F(CloudStreamSocketShutdown, test)
+{
+    givenSocketConnectedToATcpServer();
+    startSocketReadThread();
+    waitForEnterSocketRecv();
+    shutdownSocket();
+    assertThatSocketHasBeenShutdownCorrectly();
 }
 
 } // namespace test

@@ -17,7 +17,7 @@
       <item>
        <widget class="QnSearchLineEdit" name="filterLineEdit" native="true">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -94,6 +94,39 @@
      </widget>
     </widget>
    </item>
+   <item>
+    <widget class="Line" name="bottomLine">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QWidget" name="extrasWidget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="addDeviceButton">
+        <property name="text">
+         <string>Add Device...</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -103,15 +136,15 @@
    <header location="global">ui/widgets/common/table_view.h</header>
   </customwidget>
   <customwidget>
-   <class>QnSearchLineEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/common/search_line_edit.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QnPanel</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/panel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnSearchLineEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/common/search_line_edit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

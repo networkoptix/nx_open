@@ -11,9 +11,9 @@ namespace ec2
     class QnLayoutNotificationManager : public AbstractLayoutNotificationManager
     {
     public:
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnLayoutNotificationManager> QnLayoutNotificationManagerPtr;

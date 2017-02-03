@@ -22,8 +22,8 @@
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
+#include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
-#include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -83,7 +83,6 @@ QnMobileClientModule::QnMobileClientModule(
     common->store(new QnCameraHistoryPool());
     common->store(new QnRuntimeInfoManager());
     common->store(new QnMobileClientCameraFactory());
-    common->store(new QnClientRecentConnectionsManager());
 
     common->store(new QnResourcesChangesManager());
 
@@ -115,6 +114,7 @@ QnMobileClientModule::QnMobileClientModule(
     moduleFinder->start();
 
     common->store(new QnRouter(moduleFinder));
+    common->store(new QnServerAddressWatcher());
 
     common->store(new QnSystemsFinder());
     common->store(new QnSystemsWeightsManager());

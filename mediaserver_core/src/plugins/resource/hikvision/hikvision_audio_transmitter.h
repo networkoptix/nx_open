@@ -11,6 +11,7 @@ class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
 
 public:
     HikvisionAudioTransmitter(QnSecurityCamResource* resource);
+    virtual ~HikvisionAudioTransmitter();
     virtual bool isCompatible(const QnAudioFormat& format) const override;
     void setChannelId(QString channelId);
 

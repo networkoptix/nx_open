@@ -19,6 +19,7 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     m_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     m_label->setText(QString());
     m_label->setHidden(true);
+    m_label->setOpenExternalLinks(true);
 
     m_label->setContentsMargins(
         style::Metrics::kDefaultTopLevelMargin, 0,
@@ -27,6 +28,8 @@ QnAlertBar::QnAlertBar(QWidget* parent):
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_label);
+
+    setHidden(!m_reservedSpace);
 }
 
 QString QnAlertBar::text() const

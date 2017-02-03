@@ -6,7 +6,7 @@
 #include "../abstract_socket.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
-#include "../aio/pollset.h"
+#include "../aio/event_type.h"
 
 
 namespace nx {
@@ -98,7 +98,7 @@ class NX_NETWORK_API UdtStreamSocket
     public UdtSocket<AbstractStreamSocket>
 {
 public:
-    explicit UdtStreamSocket(int ipVersion);
+    explicit UdtStreamSocket(int ipVersion = AF_INET);
     UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
@@ -160,7 +160,7 @@ class NX_NETWORK_API UdtStreamServerSocket
     public UdtSocket<AbstractStreamServerSocket>
 {
 public:
-    UdtStreamServerSocket(int ipVersion);
+    explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
 
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;

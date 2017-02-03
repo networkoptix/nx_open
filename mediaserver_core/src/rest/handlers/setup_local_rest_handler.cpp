@@ -4,41 +4,17 @@
 
 #include <common/common_module.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
+
+#include <api/model/setup_local_system_data.h>
+#include <api/resource_property_adaptor.h>
+#include <core/resource_management/resource_pool.h>
 #include <media_server/serverutil.h>
 
-#include <nx/fusion/model_functions.h>
 #include "rest/server/rest_connection_processor.h"
-#include <api/resource_property_adaptor.h>
-#include <rest/helpers/permissions_helper.h>
-#include <core/resource_management/resource_pool.h>
+#include "rest/helpers/permissions_helper.h"
 #include "system_settings_handler.h"
-
-namespace
-{
-    static const QString kSystemNameParamName(QLatin1String("systemName"));
-}
-
-struct SetupLocalSystemData: public PasswordData
-{
-    SetupLocalSystemData() : PasswordData() {}
-
-    SetupLocalSystemData(const QnRequestParams& params):
-        PasswordData(params),
-        systemName(params.value(kSystemNameParamName))
-    {
-    }
-
-    QString systemName;
-    QHash<QString, QString> systemSettings;
-};
-
-#define SetupLocalSystemData_Fields PasswordData_Fields (systemName)(systemSettings)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SetupLocalSystemData),
-    (json),
-    _Fields)
 
 int QnSetupLocalSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
 {

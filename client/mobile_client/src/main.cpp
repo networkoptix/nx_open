@@ -105,7 +105,6 @@ int runUi(QtSingleGuiApplication* application)
     auto basePath = qnSettings->basePath();
     if (!basePath.startsWith(lit("qrc:")))
         basePath = lit("file://") + QDir(basePath).absolutePath() + lit("/");
-    context.setLocalPrefix(basePath);
     engine.setBaseUrl(QUrl(basePath + lit("qml/")));
     engine.addImportPath(basePath + lit("qml"));
     QQmlFileSelector qmlFileSelector(&engine);
@@ -176,7 +175,7 @@ int runUi(QtSingleGuiApplication* application)
         if (initialIntentData.isValid())
             QDesktopServices::openUrl(initialIntentData);
     #endif
-
+    
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
         [&context, mainWindow](const QString& message)
         {
@@ -225,14 +224,14 @@ void initLog(const QString& logLevel)
 
         QnLog::instance(QnLog::EC2_TRAN_LOG)->create(
             logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }
 
     if (conf.enableLog)
     {
-        const auto logFileBaseName = 
+        const auto logFileBaseName =
             conf.logFile && conf.logFile[0]
                 ? QLatin1String(conf.logFile)
                 : QnAppInfo::isAndroid()
@@ -241,7 +240,7 @@ void initLog(const QString& logLevel)
 
         QnLog::instance(QnLog::MAIN_LOG_ID)->create(
             logFileBaseName,
-            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10*1024*1024,
+            /*DEFAULT_MAX_LOG_FILE_SIZE*/ 10 * 1024 * 1024,
             /*DEFAULT_MSG_LOG_ARCHIVE_SIZE*/ 5,
             cl_logDEBUG2);
     }

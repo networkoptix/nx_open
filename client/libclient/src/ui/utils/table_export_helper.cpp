@@ -8,6 +8,7 @@
 #include <client/client_settings.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 
 #include <utils/common/html.h>
 
@@ -37,28 +38,20 @@ void QnTableExportHelper::exportToFile(QAbstractItemView* grid, bool onlySelecte
         {
             fileName += selectedExtension;
 
-            if (QFile::exists(fileName))
+            if (QFile::exists(fileName)
+                && !QnFileMessages::confirmOverwrite(
+                    parent, QFileInfo(fileName).completeBaseName()))
             {
-                QDialogButtonBox::StandardButton button = QnMessageBox::information(
-                    parent,
-                    tr("Save As"),
-                    tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).completeBaseName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-                );
-
-                if (button == QDialogButtonBox::Cancel || button == QDialogButtonBox::No)
-                    return;
+                return;
             }
         }
 
         if (QFile::exists(fileName) && !QFile::remove(fileName))
         {
-            QnMessageBox::critical(
-                parent,
-                tr("Could not overwrite file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).completeBaseName()),
-                QDialogButtonBox::Ok
-            );
+            const auto extras = QFileInfo(fileName).completeBaseName() + L'\n'
+                + tr("Close all programs which may use this file and try again");
+
+            QnMessageBox::warning(parent, tr("File used by another process"), extras);
             continue;
         }
 

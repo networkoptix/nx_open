@@ -43,6 +43,8 @@ PageBase
     {
         id: d
 
+        property alias controller: videoScreenController
+
         property var videoNavigation: navigationLoader.item
 
         property bool showOfflineStatus: false
@@ -148,6 +150,9 @@ PageBase
         MenuItem
         {
             text: qsTr("Information")
+            checkable: true
+            checked: showCameraInfo
+            onCheckedChanged: showCameraInfo = checked
         }
     }
 
@@ -174,6 +179,19 @@ PageBase
         height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
         visible: status == Image.Ready
+    }
+
+    Loader
+    {
+        id: informationLabelLoader
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        y: header.y
+        active: showCameraInfo
+        sourceComponent: InformationLabel
+        {
+            videoScreenController: d.controller
+        }
     }
 
     Loader
@@ -271,7 +289,7 @@ PageBase
 
         VideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 
@@ -281,7 +299,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 

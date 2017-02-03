@@ -17,8 +17,8 @@ struct FrameMetadata
 {
     FrameMetadata();
     FrameMetadata(const QnConstCompressedVideoDataPtr& frame);
+    FrameMetadata(const QnEmptyMediaDataPtr& frame);
 
-    bool isNull() const;
     void serialize(const QVideoFramePtr& frame) const;
     static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
 
@@ -28,6 +28,9 @@ struct FrameMetadata
     double sar; /**< square(pixel) aspect ratio. */
     int videoChannel; /**< For multi-sensor cameras. */
     int sequence; /**< Number of playback request. */
+    QnAbstractMediaData::DataType dataType;
+private:
+    bool isNull() const;
 };
 
 } // namespace media

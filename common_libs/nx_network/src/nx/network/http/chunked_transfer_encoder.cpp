@@ -10,22 +10,7 @@
 #include <nx/network/socket.h>
 #include <nx/fusion/serialization/binary_stream.h>
 
-
 namespace nx_http {
-
-namespace {
-/** Writes hex representation of \a payloadSize to \a dst. 
-    \a dst is a pointer to right-most digit, so there MUST be enough space before \a dst
-*/
-static void toFormattedHex(quint8* dst, quint32 payloadSize)
-{
-    for (; payloadSize; payloadSize >>= 4)
-    {
-        quint8 digit = payloadSize & 0x0f;
-        *dst-- = digit < 10 ? digit + '0' : digit + 'A' - 10;
-    }
-}
-}
 
 QByteArray QnChunkedTransferEncoder::serializeSingleChunk(
     const QByteArray& data,

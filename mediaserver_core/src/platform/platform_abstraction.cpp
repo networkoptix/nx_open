@@ -27,6 +27,7 @@ QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
 }
 
-QnPlatformAbstraction::~QnPlatformAbstraction() {
+QnPlatformAbstraction::~QnPlatformAbstraction()
+{
     return;
 }

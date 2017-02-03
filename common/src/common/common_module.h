@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
 
@@ -120,7 +121,7 @@ public:
 
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
-
+    QDateTime startupTime() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -151,6 +152,7 @@ private:
     BeforeRestoreDbData m_beforeRestoreDbData;
     bool m_lowPriorityAdminPassword;
     Qn::PeerType m_localPeerType;
+    QDateTime m_startupTime;
 };
 
 #define qnCommon (QnCommonModule::instance())

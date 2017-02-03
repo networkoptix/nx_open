@@ -112,7 +112,7 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler );
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler);
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,

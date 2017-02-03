@@ -38,7 +38,6 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
     if (result.isEmpty())
         result
         << Qn::OtherSystemsNode
-        << Qn::WebPagesNode
         << Qn::ServersNode
         << Qn::UserResourcesNode
         << Qn::RecorderNode
@@ -1031,10 +1030,10 @@ void QnResourceTreeModelNode::setModified(bool modified)
 
 void QnResourceTreeModelNode::setName(const QString& name)
 {
-    if (m_name == name)
-        return;
+    bool changed = m_name != name;
 
     setNameInternal(name);
+
     if (m_displayName.isEmpty())
     {
         switch (m_type)
@@ -1042,12 +1041,15 @@ void QnResourceTreeModelNode::setName(const QString& name)
             case Qn::SystemNode:
             case Qn::CloudSystemNode:
                 m_displayName = tr("<Unnamed system>");
+                changed = true;
                 break;
             default:
                 break;
         }
     }
-    changeInternal();
+
+    if (changed)
+        changeInternal();
 }
 
 void QnResourceTreeModelNode::setIcon(const QIcon& icon)
@@ -1133,9 +1135,12 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             if (!m_resource)
                 return QIcon();
 
-            return m_resource->hasFlags(Qn::server)
-                ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor)
-                : qnResIconCache->icon(m_resource);
+            if (!m_resource->hasFlags(Qn::server))
+                return qnResIconCache->icon(m_resource);
+
+            return m_resource->getStatus() == Qn::Offline
+                ? qnResIconCache->icon(QnResourceIconCache::HealthMonitor | QnResourceIconCache::Offline)
+                : qnResIconCache->icon(QnResourceIconCache::HealthMonitor);
         }
 
         case Qn::SharedLayoutsNode:

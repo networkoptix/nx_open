@@ -152,10 +152,10 @@ const CloudConnect& Settings::cloudConnect() const
     return m_cloudConnect;
 }
 
-void Settings::load( int argc, char **argv )
+void Settings::load( int argc, const char **argv )
 {
     m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, (const char**)argv);
+    m_settings.parseArgs(argc, argv);
 
     loadConfiguration();
 }
@@ -274,7 +274,7 @@ void Settings::loadConfiguration()
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
         m_cloudConnect.preferedSslMode = SslMode::disabled;
     else
-        m_cloudConnect.preferedSslMode = SslMode::undefined;
+        m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 }
 
 }   //namespace conf

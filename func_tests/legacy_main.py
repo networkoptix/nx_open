@@ -257,7 +257,9 @@ class ResourceRemoveTest(_pvt.LegacyFuncTestBase):
         testMaster.unittestRollback.takeOff(d)
 
     def _generateModifySeq(self):
-        return self._defaultModifySeq(self._gen.generateRemoveResourceIds(self._testCase))
+        removeIds = list(set(self._gen.generateRemoveResourceIds(self._testCase)))
+        log(LOGLEVEL.DEBUG, "Remove GUIDs: '%s'" % removeIds)
+        return self._defaultModifySeq(removeIds)
 
     def _getMethodName(self):
         return "removeResource"

@@ -24,6 +24,10 @@ public:
         stopWhileInAioThread();
     }
 
+    virtual void start() override
+    {
+    }
+
     virtual void stopWhileInAioThread() override
     {
         auto onClosedHandler = std::move(m_onClosedHandler);

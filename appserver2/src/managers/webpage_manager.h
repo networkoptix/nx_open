@@ -11,8 +11,8 @@ namespace ec2
     public:
         QnWebPageNotificationManager();
 
-        void triggerNotification( const QnTransaction<ApiWebPageData>& tran );
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification( const QnTransaction<ApiWebPageData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnWebPageNotificationManager> QnWebPageNotificationManagerPtr;

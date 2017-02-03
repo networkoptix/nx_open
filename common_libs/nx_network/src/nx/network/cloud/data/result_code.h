@@ -21,13 +21,14 @@ enum class ResultCode
     timedOut,
     serverConnectionBroken,
     noReplyFromServer,
-    badTransport
+    badTransport,
+    interrupted,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)
 
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorDescription& errorDescription);
+    const nx::stun::attrs::ErrorCode& errorCode);
 int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 QString NX_NETWORK_API toString(ResultCode code);

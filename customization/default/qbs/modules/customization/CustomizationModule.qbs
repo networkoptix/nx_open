@@ -18,6 +18,8 @@ Module
     property string cloudHost: "cloud-test.hdw.mx"
     property string cloudName: "Nx Cloud"
 
+    property string liteDeviceName: "Nx1"
+
     property string helpUrl: "http://networkoptix.com/files/help"
     property string settingsUrl: "http://networkoptix.com/files/settings"
     property string showcaseUrl: "http://networkoptix.com/files/showcase"
@@ -47,6 +49,9 @@ Module
 
     property string backgroundImage:
         '{"enabled": true, "name": ":/skin/background.png", "mode": "Crop", "opacity": "0.03"}'
+
+    property string defaultWebPages:
+        '{"Home Page": "http://networkoptix.com", "Support": "http://support.networkoptix.com"}'
 
     property string macBundleIdentifier: "com.networkoptix.HDWitness2"
 

@@ -40,12 +40,13 @@ function openNewSessionScreen()
     item.focusHostField()
 }
 
-function openDiscoveredSession(systemId, systemName, address)
+function openDiscoveredSession(systemId, localSystemId, systemName, address)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
+                "localSystemId": localSystemId,
                 "systemName": systemName,
                 "address": address
             }
@@ -53,12 +54,13 @@ function openDiscoveredSession(systemId, systemName, address)
     item.focusLoginField()
 }
 
-function openSavedSession(systemId, systemName, address, login, password)
+function openSavedSession(systemId, localSystemId, systemName, address, login, password)
 {
     var item = stackView.push(
             Qt.resolvedUrl("Screens/CustomConnectionScreen.qml"),
             {
                 "systemId": systemId,
+                "localSystemId": localSystemId,
                 "systemName": systemName,
                 "address": address,
                 "login": login,
@@ -104,9 +106,15 @@ function openVideoScreen(resourceId, screenshotUrl, xHint, yHint)
     return item
 }
 
-function openSettingsScreen(systemName)
+function openSettingsScreen()
 {
     var item = stackView.push(Qt.resolvedUrl("Screens/SettingsScreen.qml"))
+    item.forceActiveFocus()
+}
+
+function openDeveloperSettingsScreen()
+{
+    var item = stackView.push(Qt.resolvedUrl("Screens/DeveloperSettingsScreen.qml"))
     item.forceActiveFocus()
 }
 
@@ -170,13 +178,14 @@ function openDialog(path, properties)
     return dialog
 }
 
-function openInformationDialog(title, message)
+function openStandardDialog(title, message, buttonsModel)
 {
-    openDialog(
-        "Dialogs/InformationDialog.qml",
+    return openDialog(
+        "Dialogs/StandardDialog.qml",
         {
             "title": title,
-            "message": message
+            "message": message,
+            "buttonsModel": buttonsModel ? buttonsModel : ["OK"]
         }
     )
 }

@@ -11,7 +11,6 @@
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/std/cpp14.h>
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -27,24 +26,19 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
     m_connectionId(std::move(connectionId)),
     m_localPunchedAddress(udtConnection->getLocalAddress()),
     m_remoteHostAddress(udtConnection->getForeignAddress()),
-    m_controlConnection(
-        std::make_unique<ConnectionType>(this, std::move(udtConnection))),
+    m_controlConnection(std::make_unique<ConnectionType>(this, std::move(udtConnection))),
     m_timeouts(timeouts),
     m_pleaseStopHasBeenCalled(false),
     m_pleaseStopCompleted(false)
 {
     m_controlConnection->bindToAioThread(getAioThread());
     std::chrono::milliseconds timeout = m_timeouts.maxConnectionInactivityPeriod();
+
+    m_controlConnection->socket()->setNonBlockingMode(true);
     m_controlConnection->socket()->setRecvTimeout(timeout.count());
     m_controlConnection->setMessageHandler(
         std::bind(&OutgoingTunnelConnection::onStunMessageReceived,
             this, std::placeholders::_1));
-    m_controlConnection->startReadingConnection();
-
-    hpm::api::UdpHolePunchingSynRequest syn;
-    stun::Message message;
-    syn.serialize(&message);
-    m_controlConnection->sendMessage(std::move(message));
 }
 
 OutgoingTunnelConnection::OutgoingTunnelConnection(
@@ -74,19 +68,7 @@ void OutgoingTunnelConnection::stopWhileInAioThread()
     m_pleaseStopHasBeenCalled = true;
 
     //cancelling ongoing connects
-    QnMutexLocker lk(&m_mutex);
-    std::map<UdtStreamSocket*, ConnectionContext> ongoingConnections;
-    ongoingConnections.swap(m_ongoingConnections);
-    lk.unlock();
-
-    for (auto& connectionContext: ongoingConnections)
-    {
-        connectionContext.second.completionHandler(
-            SystemError::interrupted,
-            nullptr,
-            true);
-    }
-    ongoingConnections.clear();
+    m_ongoingConnections.clear();
     m_controlConnection.reset();
 
     m_pleaseStopCompleted = true;
@@ -96,6 +78,16 @@ void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread
 {
     AbstractOutgoingTunnelConnection::bindToAioThread(aioThread);
     m_controlConnection->bindToAioThread(aioThread);
+}
+
+void OutgoingTunnelConnection::start()
+{
+    hpm::api::UdpHolePunchingSynRequest syn;
+    stun::Message message;
+    syn.serialize(&message);
+    m_controlConnection->sendMessage(std::move(message));
+
+    m_controlConnection->startReadingConnection();
 }
 
 void OutgoingTunnelConnection::establishNewConnection(

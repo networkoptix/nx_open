@@ -23,8 +23,11 @@ GenericProduct
 
     Depends { name: "openssl" }
     Depends { name: "ffmpeg" }
-    Depends { name: "quazip" }
-    Depends { name: "sigarInfo" }
+    Depends
+    {
+        name: "quazip"
+        condition: project.withDesktopClient || project.withMediaServer
+    }
     Depends { name: "boost" }
 
     Depends { name: "nx_fusion" }
@@ -38,6 +41,18 @@ GenericProduct
 
     cpp.allowUnresolvedSymbols: true
     cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
+
+    Properties
+    {
+        condition: qbs.targetOS.contains("macos")
+        cpp.frameworks: ["Foundation", "AppKit"]
+    }
+
+    Group
+    {
+        condition: qbs.targetOS.contains("macos")
+        files: ["src/utils/mac_utils.mm"]
+    }
 
     Group
     {
@@ -56,10 +71,10 @@ GenericProduct
             "platform": vms.platform,
             "arch": vms.arch,
             "modification": vms.modification,
-            "ffmpeg.version": ffmpeg.version,
-            "sigar.version": sigarInfo.version,
-            "boost.version": boost.version,
-            "box": vms.box,
+            "ffmpeg.version": project.ffmpegVersion,
+            "sigar.version": project.sigarVersion,
+            "boost.version": project.boostVersion,
+            "box": project.box || "none",
             "beta": project.beta,
             "product.name": customization.productName,
             "product.appName": customization.productNameShort,
@@ -82,7 +97,8 @@ GenericProduct
             "cloudName": customization.cloudName,
             "freeLicenseCount": customization.freeLicenseCount,
             "freeLicenseKey": customization.freeLicenseKey,
-            "freeLicenseIsTrial": customization.freeLicenseIsTrial
+            "freeLicenseIsTrial": customization.freeLicenseIsTrial,
+            "defaultWebPages": customization.defaultWebPages
         })
     }
     Group
@@ -131,10 +147,20 @@ GenericProduct
         }
         Depends { name: "openssl" }
         Depends { name: "ffmpeg" }
-        Depends { name: "quazip" }
+        Depends
+        {
+            name: "quazip"
+            condition: project.withDesktopClient || project.withMediaServer
+        }
         Depends { name: "nx_fusion" }
 
         cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
         cpp.includePaths: base.concat([project.sourceDirectory + "/common_libs/nx_network/src"])
+
+        Properties
+        {
+            condition: qbs.targetOS.contains("android")
+            cpp.dynamicLibraries: ["nx_streaming", "nx_network"]
+        }
     }
 }

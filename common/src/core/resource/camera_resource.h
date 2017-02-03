@@ -36,13 +36,13 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    QString toSearchString() const override;
+    virtual QString toSearchString() const override;
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-    void saveParams();
-    void saveParamsAsync();
-    int saveAsync();
+    virtual void saveParams();
+    virtual void saveParamsAsync();
+    virtual int saveAsync();
     void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
 
     //! Camera source URL, commonly - rtsp link.

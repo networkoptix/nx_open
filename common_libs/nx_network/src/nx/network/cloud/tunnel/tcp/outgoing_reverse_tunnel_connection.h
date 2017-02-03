@@ -25,12 +25,14 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
-    void establishNewConnection(
+    virtual void start() override;
+    
+    virtual void establishNewConnection(
         std::chrono::milliseconds timeout,
         SocketAttributes socketAttributes,
         OnNewConnectionHandler handler) override;
 
-    void setControlConnectionClosedHandler(
+    virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:

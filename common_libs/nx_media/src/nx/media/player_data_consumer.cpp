@@ -134,10 +134,22 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     return true; //< Just ignore unknown frame type.
 }
 
-bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/)
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& data)
 {
-    if(++m_emptyPacketCounter > kEmptyPacketThreshold)
-        emit onEOF();
+    if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer))
+        return true; //< Ignore locally generated packets. It occurs when TCP connection is closed.
+
+    if (m_awaitJumpCounter > 0)
+        return true; //< ignore EOF due to we are going set new position
+
+    ++m_emptyPacketCounter;
+    if (m_emptyPacketCounter > kEmptyPacketThreshold)
+    {
+        QVideoFramePtr eofPacket(new QVideoFrame());
+        FrameMetadata metadata = FrameMetadata(data);
+        metadata.serialize(eofPacket);
+        enqueueVideoFrame(eofPacket);
+    }
     return true;
 }
 
@@ -354,6 +366,7 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
     // This function is called directly from an archiveReader thread. Should be thread safe.
     QnMutexLocker lock(&m_dataProviderMutex);
     ++m_awaitJumpCounter;
+    m_emptyPacketCounter = 0; //< ignore EOF due to we are going to set new position
     m_buffering = getBufferingMask();
 
     // The purpose of this variable is prevent doing delay between frames while they are displayed.

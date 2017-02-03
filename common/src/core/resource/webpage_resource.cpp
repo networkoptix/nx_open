@@ -11,7 +11,7 @@ QnWebPageResource::QnWebPageResource(const QUrl& url)
     : QnWebPageResource()
 {
     setId(guidFromArbitraryData(url.toString().toUtf8()));
-    setName(url.host());
+    setName(nameForUrl(url));
     setUrl(url.toString());
 }
 
@@ -28,4 +28,12 @@ void QnWebPageResource::setUrl(const QString& url)
 {
     base_type::setUrl(url);
     setStatus(Qn::Online);
+}
+
+QString QnWebPageResource::nameForUrl(const QUrl& url)
+{
+    QString name = url.host();
+    if (!url.path().isEmpty())
+        name += L'/' + url.path();
+    return name;
 }

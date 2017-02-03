@@ -79,6 +79,12 @@ public:
         m_cond.wakeAll();
     }
 
+    std::size_t connectionCount() const
+    {
+        QnMutexLocker lk(&m_mutex);
+        return m_connections.size();
+    }
+
 protected:
     void saveConnection(std::shared_ptr<ConnectionType> connection)
     {
@@ -87,22 +93,21 @@ protected:
     }
 
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_cond;
     int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
-//!Listens local tcp address, accepts incoming connections and forwards them to the specified handler
-/*!
-    \uses \a aio::AIOService
-*/
+/**
+ * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
+ */
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
     public StreamServerConnectionHolder<ConnectionType>,
-    public QnStoppable
+    public QnStoppableAsync
 {
     typedef StreamServerConnectionHolder<ConnectionType> BaseType;
     typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
@@ -121,12 +126,17 @@ public:
 
     ~StreamSocketServer()
     {
-        pleaseStop();
+        pleaseStopSync(false);
     }
 
-    virtual void pleaseStop()
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
     {
-        m_socket->pleaseStopSync(false);
+        m_socket->pleaseStop(std::move(completionHandler));
+    }
+
+    virtual void pleaseStopSync(bool assertIfCalledUnderMutex = true) override
+    {
+        m_socket->pleaseStopSync(assertIfCalledUnderMutex);
     }
 
     //!Binds to specified addresses

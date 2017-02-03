@@ -32,8 +32,6 @@
 namespace {
 
 static const int kMaxSystemNameLength = 20;
-static const QString kFactorySystemUser = lit("admin");
-static const QString kFactorySystemPassword = lit("admin");
 
 }
 
@@ -140,7 +138,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
         const auto moduleInformation = server->getModuleInformation();
 
         QString systemName = helpers::isNewSystem(moduleInformation)
-            ? tr("New System")
+            ? tr("New Server")
             : moduleInformation.systemName;
 
         if (!systemName.isEmpty())
@@ -219,7 +217,9 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
 
     m_url = url;
     m_remoteOwnerCredentials.setUser(login);
-    m_remoteOwnerCredentials.setPassword(password.isEmpty() ? kFactorySystemPassword : password);
+    m_remoteOwnerCredentials.setPassword(password.isEmpty()
+        ? helpers::kFactorySystemPassword
+        : password);
     m_mergeTool->pingSystem(m_url, m_remoteOwnerCredentials);
     ui->credentialsGroupBox->setEnabled(false);
     ui->buttonBox->showProgress(tr("Testing..."));
@@ -250,6 +250,13 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
 {
     ui->buttonBox->hideProgress();
     ui->credentialsGroupBox->setEnabled(true);
+
+    if ((mergeStatus == utils::MergeSystemsStatus::ok)
+        && helpers::isCloudSystem(moduleInformation)
+        && helpers::isCloudSystem(discoverer->getModuleInformation()))
+    {
+        mergeStatus = utils::MergeSystemsStatus::bothSystemBoundToCloud;
+    }
 
     if (mergeStatus != utils::MergeSystemsStatus::ok
         && mergeStatus != utils::MergeSystemsStatus::starterLicense)
@@ -284,7 +291,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     if (isNewSystem)
     {
         ui->currentSystemRadioButton->setChecked(true);
-        ui->loginEdit->setText(kFactorySystemUser);
+        ui->loginEdit->setText(helpers::kFactorySystemUser);
         ui->passwordEdit->clear();
     }
 
@@ -292,7 +299,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     ui->loginEdit->setEnabled(!isNewSystem);
     ui->passwordEdit->setEnabled(!isNewSystem);
     const QString systemName = isNewSystem
-        ? tr("New System")
+        ? tr("New Server")
         : moduleInformation.systemName;
 
     ui->remoteSystemLabel->setText(systemName);
@@ -340,7 +347,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
     if (!message.isEmpty())
         message.prepend(lit("\n"));
 
-    QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+    QnMessageBox::critical(this, tr("Failed to merge Systems"), message);
 
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 

@@ -2,7 +2,7 @@
 #include "widget_table_delegate.h"
 
 #include <QtCore/QVarLengthArray>
-#include <private/qabstractitemmodel_p.h>
+#include <QtCore/private/qabstractitemmodel_p.h>
 
 #include <utils/common/event_processors.h>
 
@@ -319,6 +319,9 @@ void QnWidgetTablePrivate::layoutChanged(
 {
     if (!parents.empty() && !parents.contains(m_rootIndex))
         return; //< nothing to do
+
+    if (rowCount() == 0 || columnCount() == 0)
+        return; //< nothing to do as well
 
     QVector<QWidget*> buffer; //< buffer for widgets relocation
 

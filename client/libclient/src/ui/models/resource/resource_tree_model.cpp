@@ -106,10 +106,13 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
     {
-        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this);
+        const auto node = QnResourceTreeModelNodeFactory::createNode(t, this, false);
         m_rootNodes[t] = node;
         if (node)
+        {
             m_allNodes.append(node);
+            node->initialize();
+        }
     }
 
     if (scope != CamerasScope)
@@ -133,10 +136,13 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     connect(qnSettings->notifier(QnClientSettings::EXTRA_INFO_IN_TREE),
         &QnPropertyNotifier::valueChanged,
         this,
-        [this](int value)
+        [this]
         {
-            Q_UNUSED(value);
-            m_rootNodes[rootNodeTypeForScope()]->updateRecursive();
+            const auto root = m_rootNodes[rootNodeTypeForScope()];
+            NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
+                .arg(m_scope).arg(rootNodeTypeForScope()));
+            if (root)
+                root->updateRecursive();
         });
 
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
@@ -166,7 +172,12 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::node(const QModelIndex &index) c
 {
     /* Root node. */
     if (!index.isValid())
-        return m_rootNodes[rootNodeTypeForScope()];
+    {
+        const auto root = m_rootNodes[rootNodeTypeForScope()];
+        NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
+            .arg(m_scope).arg(rootNodeTypeForScope()));
+        return root;
+    }
 
     return static_cast<QnResourceTreeModelNode *>(index.internalPointer())->toSharedPointer();
 }
@@ -525,15 +536,20 @@ void QnResourceTreeModel::setCustomColumnDelegate(QnResourceTreeModelCustomColum
     m_customColumnDelegate = columnDelegate;
 
     auto notifyCustomColumnChanged = [this]()
-    {
-        //TODO: #GDM update only custom column and changed rows
-        Qn::NodeType rootNodeType = rootNodeTypeForScope();
-        m_rootNodes[rootNodeType]->updateRecursive();
-    };
+        {
+            //TODO: #GDM update only custom column and changed rows
+            const auto root = m_rootNodes[rootNodeTypeForScope()];
+            NX_ASSERT(root, lit("Absent root for scope %1: type of %2")
+                .arg(m_scope).arg(rootNodeTypeForScope()));
+            if (root)
+                root->updateRecursive();
+        };
 
     if (m_customColumnDelegate)
+    {
         connect(m_customColumnDelegate, &QnResourceTreeModelCustomColumnDelegate::notifyDataChanged,
                 this, notifyCustomColumnChanged);
+    }
 
     notifyCustomColumnChanged();
 

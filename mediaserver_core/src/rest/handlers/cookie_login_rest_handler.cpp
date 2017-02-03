@@ -11,15 +11,7 @@
 #include <http/custom_headers.h>
 #include <network/client_authenticate_helper.h>
 #include "current_user_rest_handler.h"
-
-struct QnCookieData
-{
-    QnLatin1Array auth;
-};
-#define QnCookieData_Fields (auth)
-
-QN_FUSION_DECLARE_FUNCTIONS(QnCookieData, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCookieData), (json), _Fields)
+#include <api/model/cookie_login_data.h>
 
 int QnCookieLoginRestHandler::executePost(
     const QString &/*path*/,
@@ -43,7 +35,17 @@ int QnCookieLoginRestHandler::executePost(
         *owner->response(),
         &accessRights);
     const_cast<QnRestConnectionProcessor*>(owner)->setAccessRights(accessRights);
-    if (authResult != Qn::Auth_OK)
+    if (authResult == Qn::Auth_CloudConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult == Qn::Auth_LDAPConnectError)
+    {
+        result.setError(QnRestResult::CantProcessRequest, "LDAP server is not accessible yet. Please try again later.");
+        return nx_http::StatusCode::ok;
+    }
+    else if (authResult != Qn::Auth_OK)
     {
         result.setError(QnRestResult::InvalidParameter, "Invalid login or password");
         return nx_http::StatusCode::ok;

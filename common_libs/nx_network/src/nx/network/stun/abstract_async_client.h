@@ -18,8 +18,7 @@ public:
         std::chrono::milliseconds recvTimeout;
         nx::network::RetryPolicy reconnectPolicy;
 
-        Settings() /* Defaults */
-        :
+        Settings():
             sendTimeout(3000),
             recvTimeout(3000),
             reconnectPolicy(
@@ -30,14 +29,13 @@ public:
         {}
     };
 
-    static const Settings kDefaultSettings;
-
     virtual ~AbstractAsyncClient() = default;
 
     typedef std::function<void(Message)> IndicationHandler;
     typedef std::function<void()> ReconnectHandler;
     typedef utils::MoveOnlyFunc<void(
         SystemError::ErrorCode, Message)> RequestHandler;
+    typedef std::function<void()> TimerHandler;
 
     /** Asynchronously openes connection to the server
      *
@@ -78,6 +76,10 @@ public:
      */
     virtual void sendRequest(
         Message request, RequestHandler handler, void* client = 0) = 0;
+
+    /** Schedules repetable timer until disconnect */
+    virtual void addConnectionTimer(
+        std::chrono::milliseconds period, TimerHandler handler, void* client) = 0;
 
     /** Returns local address if client is connected to the server */
     virtual SocketAddress localAddress() const = 0;

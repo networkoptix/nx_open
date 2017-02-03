@@ -32,6 +32,12 @@ namespace
     /* Margin at the top and bottom of each detail line in description: */
     const int kDetailLineVerticalMargin = 1;
 
+    /* Measure text width the right way: */
+    int textWidth(const QFont& font, const QString& text)
+    {
+        return QFontMetrics(font).size(Qt::TextSingleLine, text).width();
+    }
+
     /* Get description button text from audit record: */
     QString itemButtonText(const QnAuditRecord* record)
     {
@@ -66,8 +72,8 @@ namespace
         if (buttonText.isEmpty())
             return QRect();
 
-        QSize buttonSize = QSize(
-            option.fontMetrics.width(buttonText) + style::Metrics::kStandardPadding * 2,
+        QSize buttonSize = QSize(option.fontMetrics.size(Qt::TextSingleLine, buttonText).width()
+                               + style::Metrics::kStandardPadding * 2,
             kRowHeight - kItemButtonMargin * 2);
 
         QRect rect(option.rect);
@@ -101,7 +107,7 @@ QnAuditItemDelegate::QnAuditItemDelegate(QObject* parent) :
 }
 
 /* Cached text width: */
-int QnAuditItemDelegate::textWidth(const QFont& font, const QString& textData, bool isBold) const
+int QnAuditItemDelegate::cachedTextWidth(const QFont& font, const QString& textData, bool isBold) const
 {
     int width = 0;
     auto& hash = (isBold || font.bold()) ? m_boldSizeHintHash : m_sizeHintHash;
@@ -117,8 +123,7 @@ int QnAuditItemDelegate::textWidth(const QFont& font, const QString& textData, b
         if (isBold)
             localFont.setBold(true);
 
-        QFontMetrics fm(localFont);
-        width = fm.width(textData);
+        width = textWidth(localFont, textData);
         hash.insert(textData, width);
     }
 
@@ -128,7 +133,7 @@ int QnAuditItemDelegate::textWidth(const QFont& font, const QString& textData, b
 /* Default computation of optimal item size: */
 QSize QnAuditItemDelegate::defaultSizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    return QSize(textWidth(option.font, index.data().toString(), false), kRowHeight);
+    return QSize(cachedTextWidth(option.font, index.data().toString(), false), kRowHeight);
 }
 
 /* Overridden function to compute optimal item size: */
@@ -150,21 +155,23 @@ QSize QnAuditItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QM
             break;
 
         case QnAuditLogModel::TimestampColumn:
-            result.setWidth(textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true));
+            result.setWidth(cachedTextWidth(option.font, dateStrWithSpace)
+                          + cachedTextWidth(option.font, timeStr, true));
             break;
 
         case QnAuditLogModel::EndTimestampColumn:
-            result.setWidth(qMax(
-                textWidth(option.font, dateStrWithSpace) + textWidth(option.font, timeStr, true),
-                textWidth(option.font, QnAuditLogModel::eventTypeToString(Qn::AR_UnauthorizedLogin))));
+            result.setWidth(qMax(cachedTextWidth(option.font, dateStrWithSpace)
+                               + cachedTextWidth(option.font, timeStr, true),
+                cachedTextWidth(option.font, QnAuditLogModel::eventTypeToString(
+                    Qn::AR_UnauthorizedLogin))));
             break;
 
         case QnAuditLogModel::TimeColumn:
-            result.setWidth(textWidth(option.font, timeStr));
+            result.setWidth(cachedTextWidth(option.font, timeStr));
             break;
 
         case QnAuditLogModel::DateColumn:
-            result.setWidth(textWidth(option.font, dateStr, true));
+            result.setWidth(cachedTextWidth(option.font, dateStr, true));
             break;
 
         case QnAuditLogModel::UserActivityColumn:
@@ -421,8 +428,7 @@ void QnAuditItemDelegate::paintDateTime(const QStyle* style, QPainter* painter, 
     QString timeStr = dateTime.time().toString(Qt::DefaultLocaleShortDate);
 
     /* Calculate time offset: */
-    QFontMetrics fm(option.font);
-    int timeXOffset = fm.size(0, dateStr).width();
+    int timeXOffset = textWidth(option.font, dateStr);
 
     /* Draw date: */
     QRect rect = style->subElementRect(QStyle::SE_ItemViewItemText, &option, option.widget);
@@ -526,12 +532,11 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
             linkRect.setLeft(actualRect.right());
 
         QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width());
-
-        QPalette::ColorGroup group = option.state.testFlag(QStyle::State_MouseOver) ? QPalette::Normal : QPalette::Inactive;
+        QColor linkColor = style::linkColor(option.palette, option.state.testFlag(QStyle::State_MouseOver));
 
         QFont font(option.font);
         painter->setFont(font);
-        painter->setPen(option.palette.color(group, QPalette::Link));
+        painter->setPen(linkColor);
         painter->drawText(linkRect, kTextFlags, elidedLinkText);
     }
 

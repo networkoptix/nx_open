@@ -15,15 +15,6 @@ class QnStatusOverlayController: public Connective<QObject>
     typedef QPointer<QnStatusOverlayWidget> StatusOverlayWidgetPtr;
     using base_type = Connective<QObject>;
 public:
-    enum class Button
-    {
-        kNoButton,
-        kDiagnostics,
-        kIoEnable,
-        kMoreLicenses,
-        kSettings
-    };
-
     QnStatusOverlayController(const QnResourcePtr& resource,
         const StatusOverlayWidgetPtr& widget, QObject* parent = nullptr);
 
@@ -32,10 +23,8 @@ public:
     Qn::ResourceStatusOverlay statusOverlay() const;
     void setStatusOverlay(Qn::ResourceStatusOverlay statusOverlay, bool animated);
 
-    Button currentButton() const;
-    void setCurrentButton(Button button);
-
-    QString caption() const;
+    Qn::ResourceOverlayButton currentButton() const;
+    void setCurrentButton(Qn::ResourceOverlayButton button);
 
     bool isErrorOverlay() const;
 
@@ -55,7 +44,7 @@ signals:
 
     void isErrorOverlayChanged();
 
-    void buttonClicked();
+    void buttonClicked(Qn::ResourceOverlayButton button);
 
     void visibleItemsChanged();
 
@@ -80,6 +69,6 @@ private:
 
     QnStatusOverlayWidget::Controls m_visibleItems;
     Qn::ResourceStatusOverlay m_statusOverlay;
-    Button m_currentButton;
+    Qn::ResourceOverlayButton m_currentButton;
     bool m_isErrorOverlay;
 };

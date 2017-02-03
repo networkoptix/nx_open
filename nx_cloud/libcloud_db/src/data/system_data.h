@@ -44,8 +44,7 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class SystemRegistrationDataWithAccount
-    :
+class SystemRegistrationDataWithAccount:
     public SystemRegistrationData
 {
 public:
@@ -58,8 +57,7 @@ public:
     }
 };
 
-class SystemData
-    :
+class SystemData:
     public api::SystemData,
     public stree::AbstractResourceReader
 {
@@ -76,15 +74,13 @@ public:
 #define SystemData_FieldsEx SystemData_Fields (expirationTimeUtc)
 
 
-class SystemDataList
-    :
+class SystemDataList:
     public api::SystemDataList
 {
 public:
 };
 
-class SystemSharing
-    :
+class SystemSharing:
     public api::SystemSharing,
     public stree::AbstractResourceReader
 {
@@ -95,8 +91,7 @@ public:
 
 #define SystemSharing_FieldsEx SystemSharing_Fields (vmsUserId)
 
-class SystemSharingList
-    :
+class SystemSharingList:
     public stree::AbstractResourceReader
 {
 public:
@@ -108,8 +103,7 @@ public:
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const systemSharing);
 
 //!for requests passing just system id
-class SystemId
-    :
+class SystemId:
     public api::SystemId,
     public stree::AbstractResourceReader
 {
@@ -118,8 +112,7 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class SystemAttributesUpdate
-    :
+class SystemAttributesUpdate:
     public api::SystemAttributesUpdate,
     public stree::AbstractResourceReader
 {
@@ -128,8 +121,7 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
-class UserSessionDescriptor
-    :
+class UserSessionDescriptor:
     public api::UserSessionDescriptor,
     public stree::AbstractResourceReader
 {

@@ -1,4 +1,5 @@
 import qbs
+import VmsUtils
 
 Module
 {
@@ -15,7 +16,7 @@ Module
     property string clientBinaryName: {
         if (qbs.targetOS.contains("windows"))
             return customization.productName + ".exe"
-        if (qbs.targetOS.contains("macosx"))
+        if (qbs.targetOS.contains("macos"))
             return customization.productDisplayName
         return "client-bin"
     }
@@ -38,7 +39,7 @@ Module
                 + "/"
                 + customization.productDisplayName
                 + "/"
-        if (qbs.targetOS.contains("macosx"))
+        if (qbs.targetOS.contains("macos"))
             return "/Applications/"
         return "/opt/" + customization.depCompanyName
     }
@@ -47,37 +48,22 @@ Module
         ? customization.testUpdateFeedUrl
         : customization.prodUpdateFeedUrl
 
-    property string box: "none"
-    property string arch:
-    {
-        if (qbs.architecture == "x86_64")
-            return "x64"
-        else
-            return qbs.architecture
-    }
-    property string platform:
-    {
-        if (qbs.targetOS.contains("windows"))
-            return "windows"
-        else if (qbs.targetOS.contains("android"))
-            return "android"
-        else if (qbs.targetOS.contains("ios"))
-            return "ios"
-        else if (qbs.targetOS.contains("linux"))
-            return "linux"
-        else if (qbs.targetOS.contains("osx"))
-            return "macosx"
-        return "unknown_platform"
-    }
+    property string arch: VmsUtils.currentArch()
+    property string platform: VmsUtils.currentPlatform()
     property string modification:
     {
-        if (box != "none")
-            return box
+        if (project.box)
+            return project.box
 
         if (platform == "windows")
             return "winxp"
-        else if (platform == "linux")
+        if (platform == "linux")
             return "ubuntu"
-        return "unknown_box"
+        if (platform == "macosx")
+            return "none"
+        if (platform == "android" || platform == "ios")
+            return "none"
+
+        throw "Cannot detect modification for platform " + platform
     }
 }

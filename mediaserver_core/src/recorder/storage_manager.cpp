@@ -71,7 +71,6 @@ const QString kArchiveCameraModelKey = lit("cameraModel");
 const QString kArchiveCameraGroupIdKey = lit("groupId");
 const QString kArchiveCameraGroupNameKey = lit("groupName");
 
-const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 const std::chrono::minutes kWriteInfoFilesInterval(5);
 
 struct TasksQueueInfo {
@@ -266,7 +265,7 @@ public:
     {
         bool fullscanProcessed = false;
         bool partialScanProcessed = false;
-        QnStorageManager::ArchiveCameraDataList archiveCameras;
+        nx::caminfo::ArchiveCameraDataList archiveCameras;
 
         TasksQueueInfo currentQueueInfo;
 
@@ -451,7 +450,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
     m_gen(m_rd()),
-    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt())
+    m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
+    m_camInfoWriterHandler(this),
+    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_camInfoReader(&m_camInfoReadHandler)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -493,9 +495,9 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_removeEmtyDirTimer.invalidate();
 }
 
-void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archiveCameras)
+void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
 {
-    QnStorageManager::ArchiveCameraDataList camerasToAdd;
+    nx::caminfo::ArchiveCameraDataList camerasToAdd;
     for (const auto &camera : archiveCameras)
     {
         auto cameraLowCatalog = getFileCatalog(camera.coreData.physicalId, QnServer::LowQualityCatalog);
@@ -510,15 +512,8 @@ void QnStorageManager::createArchiveCameras(const ArchiveCameraDataList& archive
     {
         ec2::ErrorCode errCode =
             QnAppserverResourceProcessor::addAndPropagateCamResource(
-                camera.coreData
+                camera.coreData, camera.properties
             );
-        if (errCode == ec2::ErrorCode::ok)
-        {   // Camera has successfully been added to the resource pool and propagated
-            // to other peers. Adding properties.
-            for (const auto &prop : camera.properties)
-                propertyDictionary->setValue(prop.resourceId, prop.name, prop.value);
-            propertyDictionary->saveParams(camera.coreData.id);
-        }
     }
 
     updateCameraHistory();
@@ -799,6 +794,9 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     QFile::rename(fileName, fileName + lit("_deprecated"));
 
     auto sdb = qnStorageDbPool->getSDB(storage);
+    if (!sdb)
+      return;
+
     auto newCatalogs = sdb->loadFullFileCatalog();
     QVector<DeviceFileCatalogPtr> catalogsToWrite;
 
@@ -936,102 +934,18 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     m_archiveRebuildInfo = data;
 }
 
-void QnStorageManager::loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo,
-                                      ArchiveCameraDataList &archiveCameraList,
-                                      const QnStorageResourcePtr &storage) const
+QStringList QnStorageManager::getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const
 {
-    ArchiveCameraData newCamera;
-    newCamera.coreData.physicalId = fileInfo.fileName();
-    auto cameraGuid = QnSecurityCamResource::makeCameraIdFromUniqueId(
-        newCamera.coreData.physicalId.toUtf8());
-    newCamera.coreData.id = cameraGuid;
-    newCamera.coreData.parentId = qnCommon->moduleGUID();
+    QStringList result;
+    QnMutexLocker lock(&m_mutexCatalog);
+    for (auto it = m_devFileCatalog[catalog].cbegin(); it != m_devFileCatalog[catalog].cend(); ++it)
+        result.push_back(it.key());
 
-    auto cameraIt = std::find_if( archiveCameraList.cbegin(), archiveCameraList.cend(),
-                                 [&cameraGuid] (const ArchiveCameraData &cam)
-                                 {
-                                     return cam.coreData.id == cameraGuid;
-                                 });
-    if (cameraIt != archiveCameraList.cend() || qnResPool->getResourceById(cameraGuid))
-        return;
-
-    auto camTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
-    if (camTypeId.isNull())
-        return;
-    newCamera.coreData.typeId = camTypeId;
-
-    const QString infoPath = closeDirPath(fileInfo.absoluteFilePath()) + lit("info.txt");
-    auto infoFile = std::unique_ptr<QIODevice>(storage->open(infoPath, QIODevice::ReadOnly));
-    if (!infoFile)
-        return;
-
-    QString line;
-    int lineNumber= 1;
-
-    while (1)
-    {
-        if (infoFile->atEnd())
-            break;
-        line = QString(infoFile->readLine()).trimmed();
-
-        auto parseLine = [&infoPath](const QString& line, std::pair<QString, QString>& keyValue, int lineNumber)
-        {
-            if (line.isEmpty())
-                return false;
-
-            thread_local QRegExp keyValueRegExp("^\"(.*)\"=\"(.*)\"$");
-            int reIndex = keyValueRegExp.indexIn(line);
-            if (reIndex == -1)
-            {
-                NX_LOG(lit("%1: Couldn't parse info.txt entry. File name: %2. Line number: %3. Line data: %4")
-                           .arg(Q_FUNC_INFO)
-                           .arg(infoPath)
-                           .arg(lineNumber)
-                           .arg(line),
-                       cl_logDEBUG1);
-                return false;
-            }
-            NX_ASSERT(keyValueRegExp.captureCount() == 2);
-            if (keyValueRegExp.captureCount() != 2)
-            {
-                NX_LOG(lit("%1: Expected capture count is 2. Got: %2. File: %3. Line number: %4. Line data: %5")
-                           .arg(Q_FUNC_INFO)
-                           .arg(keyValueRegExp.captureCount())
-                           .arg(infoPath)
-                           .arg(lineNumber)
-                           .arg(line),
-                       cl_logDEBUG1);
-                return false;
-            }
-            auto captureList = keyValueRegExp.capturedTexts();
-            keyValue.first = captureList[1];
-            keyValue.second = captureList[2];
-            return true;
-        };
-
-        std::pair<QString, QString> keyValue;
-        if (!parseLine(line, keyValue, lineNumber++) && line.size() > 0)
-            return;
-
-        if (keyValue.first.contains(kArchiveCameraNameKey))
-            newCamera.coreData.name = keyValue.second;
-        else if (keyValue.first.contains(kArchiveCameraModelKey))
-            newCamera.coreData.model = keyValue.second;
-        else if (keyValue.first.contains(kArchiveCameraGroupIdKey))
-            newCamera.coreData.groupId= keyValue.second;
-        else if (keyValue.first.contains(kArchiveCameraGroupNameKey))
-            newCamera.coreData.groupName = keyValue.second;
-        else if (keyValue.first.contains(kArchiveCameraUrlKey))
-            newCamera.coreData.url = keyValue.second;
-        else
-            newCamera.properties.emplace_back(cameraGuid, keyValue.first, keyValue.second);
-    }
-
-    archiveCameraList.push_back(newCamera);
+    return result;
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                                    ArchiveCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
+                                                    nx::caminfo::ArchiveCameraDataList &archiveCameraList, std::function<void(int current, int total)> progressCallback)
 {
     ArchiveScanPosition scanPos(m_role);
     scanPos.load(); // load from persistent storage
@@ -1043,20 +957,21 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             ) + DeviceFileCatalog::prefixByCatalog(catalog)
         );
 
-    FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
-    for (auto it = catalogMap.cbegin(); it != catalogMap.cend(); ++it)
+    auto camerasIds = getAllCameraIdsUnderLock(catalog);
+
+    for (const auto& cameraId: camerasIds)
     {
         QString cameraDir =
             closeDirPath(
                 closeDirPath(storage->getUrl()) +
                 DeviceFileCatalog::prefixByCatalog(catalog)
-            ) + it.key();
+            ) + cameraId;
 
         if (!storage->isDirExists(cameraDir))
         {
             DeviceFileCatalogPtr newCatalog(
                 new DeviceFileCatalog(
-                    it.key(),
+                    cameraId,
                     catalog,
                     m_role
                 )
@@ -1066,7 +981,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
                 QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()),
                 storage,
                 newCatalog,
-                it.key(),
+                cameraId,
                 catalog
             );
         }
@@ -1082,7 +997,16 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildCancelled)
             return; // cancel rebuild
 
-        loadCameraInfo(fi, archiveCameraList, storage);
+        m_camInfoReader.loadCameraInfo(
+            fi,
+            archiveCameraList,
+            [&storage](const QString& filePath)
+            {
+                auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
+                if (!file)
+                   return QByteArray();
+                return file->readAll();
+            });
 
         QString cameraUniqueId = fi.fileName();
         ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);
@@ -1132,7 +1056,6 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
         }
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
-        qnStorageDbPool->getSDB(storage);
     }
 }
 
@@ -1611,7 +1534,8 @@ void QnStorageManager::clearSpace(bool forced)
 
     if (m_firstStoragesTestDone)
         testOfflineStorages();
-    writeCameraInfoFiles();
+
+    m_camInfoWriter.write();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
@@ -1940,7 +1864,14 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     qint64 freeSpace = storage->getFreeSpace();
     if (freeSpace == -1)
         return true; // nothing to delete
+
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
+
+    if (toDelete > 0)
+      NX_LOG(lit("Cleanup. Starting for storage %1. %2 Mb to clean")
+              .arg(storage->getUrl())
+              .arg(toDelete / (1024 * 1024)), cl_logINFO);
+
     DeviceFileCatalog::Chunk deletedChunk;
 
     while (toDelete > 0)
@@ -2104,105 +2035,6 @@ void QnStorageManager::testStoragesDone()
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
         rebuildCatalogAsync(); // continue to rebuild
-}
-
-void QnStorageManager::writeCameraInfoFiles()
-{
-    if (m_cameraInfoWriteTimer.isValid() &&
-        m_cameraInfoWriteTimer.hasExpired(
-            std::chrono::duration_cast<std::chrono::milliseconds>(kWriteInfoFilesInterval).count()))
-    {
-        return;
-    }
-    else
-        m_cameraInfoWriteTimer.restart();
-
-    for (auto &storage : getUsedWritableStorages())
-    {
-        auto storageUrl = storage->getUrl();
-        auto separator  = getPathSeparator(storageUrl);
-
-        std::array<QString, QnServer::ChunksCatalogCount> paths = {
-            closeDirPath(storageUrl) +
-            DeviceFileCatalog::prefixByCatalog(
-                QnServer::ChunksCatalog::LowQualityCatalog
-            ) + separator
-            ,
-            closeDirPath(storageUrl) +
-            DeviceFileCatalog::prefixByCatalog(
-                QnServer::ChunksCatalog::HiQualityCatalog
-            ) + separator
-        };
-
-        auto makeFullPathForInfoFile = [&separator] (const QString& basePath, const QString& cameraUniqueId)
-        {
-            return basePath + cameraUniqueId + separator + lit("info.txt");
-        };
-
-        auto composeInfoFileData  = [] (const QnSecurityCamResourcePtr& camResource)
-        {
-            auto makeQuotedString = [](const QString& s) { return lit("\"") + s + lit("\""); };
-
-            QByteArray result;
-            QTextStream outStream(&result);
-
-            outStream << makeQuotedString(kArchiveCameraNameKey) << "=" << makeQuotedString(camResource->getUserDefinedName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraModelKey) << "=" << makeQuotedString(camResource->getModel()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupIdKey) << "=" << makeQuotedString(camResource->getGroupId()) << endl;
-            outStream << makeQuotedString(kArchiveCameraGroupNameKey) << "=" << makeQuotedString(camResource->getGroupName()) << endl;
-            outStream << makeQuotedString(kArchiveCameraUrlKey) << "=" << makeQuotedString(camResource->getUrl()) << endl;
-
-            for (const auto &prop : camResource->getAllProperties())
-                outStream << makeQuotedString(prop.name) << "=" << makeQuotedString(prop.value) << endl;
-
-            return result;
-        };
-
-        auto writeFile = [] (const QnStorageResourcePtr& storage, const QString& filePath, const QByteArray& infoFileData)
-        {
-
-            if (!storage->removeFile(filePath))
-            {
-                NX_LOG(lit("%1. Remove camera info file failed for this path: %2").arg(Q_FUNC_INFO).arg(filePath), cl_logDEBUG1);
-                return;
-            }
-            auto outFile = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::WriteOnly));
-            if (!outFile)
-            {
-                NX_LOG(lit("%1. Create file failed for this path: %2").arg(Q_FUNC_INFO).arg(filePath), cl_logDEBUG1);
-                return;
-            }
-            outFile->write(infoFileData);
-        };
-
-
-        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-        {
-            for (auto cameraIt = m_devFileCatalog[i].cbegin(); cameraIt != m_devFileCatalog[i].cend(); ++cameraIt)
-            {
-                if (QnResource::isStopping())
-                    return;
-
-                QString cameraUniqueId = cameraIt.key();
-                auto camResource = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraUniqueId);
-                if (!camResource)
-                    continue;
-
-                auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId("", QnArchiveCamResource::cameraName());
-                if (camResource->getTypeId() == archiveCamTypeId)
-                    continue;
-
-                QString infoFilePath = makeFullPathForInfoFile(paths[i], cameraUniqueId);
-                QByteArray infoFileData = composeInfoFileData(camResource);
-                if (!m_storageUrlToCameraInfo.contains(infoFilePath) ||
-                    m_storageUrlToCameraInfo[infoFilePath] != infoFileData)
-                {
-                    writeFile(storage, infoFilePath, infoFileData);
-                    m_storageUrlToCameraInfo[infoFilePath] = infoFileData;
-                }
-            }
-        }
-    } // for storages
 }
 
 void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status)
@@ -2709,7 +2541,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalogType, 
 
     QString base = closeDirPath(getDataDirectory());
     QString separator = getPathSeparator(base);
-    backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
+    //backupFolderRecursive(base + lit("record_catalog"), base + lit("record_catalog_backup"));
     QDir dir(base + QString("record_catalog") + separator + QString("media") + separator + DeviceFileCatalog::prefixByCatalog(catalogType));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     for(QFileInfo fi: list)

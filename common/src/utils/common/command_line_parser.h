@@ -117,8 +117,8 @@ public:
 
     void clear();
 
-    bool parse(int &argc, char **argv, FILE *errorFile);
-    bool parse(int &argc, char **argv, QTextStream *errorStream);
+    bool parse(int &argc, const char **argv, FILE *errorFile);
+    bool parse(int &argc, const char **argv, QTextStream *errorStream);
 
 private:
     void addName(int index, const QString &name);

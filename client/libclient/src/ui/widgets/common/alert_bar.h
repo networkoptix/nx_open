@@ -17,6 +17,11 @@ public:
     QString text() const;
     void setText(const QString& text);
 
+    /**
+     * This property controls how the bar should behave when no text is set.
+     * If reservedSpace is set, bar will be displayed without text and color - just take space.
+     * It is used when we don't want to change the dialog size.
+     */
     bool reservedSpace() const;
     void setReservedSpace(bool reservedSpace);
 
@@ -26,4 +31,12 @@ private:
 private:
     QLabel* m_label;
     bool m_reservedSpace;
+};
+
+/* This class is a helper for the easy customization option. */
+class QnPromoBar: public QnAlertBar
+{
+    Q_OBJECT
+public:
+    QnPromoBar(QWidget* parent = nullptr): QnAlertBar(parent) {}
 };

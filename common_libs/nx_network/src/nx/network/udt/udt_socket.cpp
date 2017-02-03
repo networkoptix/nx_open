@@ -51,8 +51,7 @@ void AddressFrom( const SocketAddress& local_addr , sockaddr_in* out ) {
 
 //TODO #ak we have UdtSocketImpl and UDTSocketImpl! refactor!
 // Implementator to keep the layout of class clean and achieve binary compatible
-class UdtSocketImpl
-:
+class UdtSocketImpl:
     public UDTSocketImpl
 {
 public:
@@ -75,14 +74,17 @@ private:
     UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
-struct UdtEpollHandlerHelper {
+struct UdtEpollHandlerHelper
+{
     UdtEpollHandlerHelper(int fd,UDTSOCKET udt_handler):
-        epoll_fd(fd){
+        epoll_fd(fd)
+    {
 #ifndef TRACE_UDT_SOCKET
             Q_UNUSED(udt_handler);
 #endif
     }
-    ~UdtEpollHandlerHelper() {
+    ~UdtEpollHandlerHelper()
+    {
         if(epoll_fd >=0) {
             int ret = UDT::epoll_release(epoll_fd);
 #ifndef TRACE_UDT_SOCKET
@@ -90,6 +92,7 @@ struct UdtEpollHandlerHelper {
 #endif
         }
     }
+    
     int epoll_fd;
     UDTSOCKET udt_handler;
 };
@@ -102,8 +105,7 @@ struct UdtEpollHandlerHelper {
 // =====================================================================
 
 template<typename InterfaceToImplement>
-UdtSocket<InterfaceToImplement>::UdtSocket()
-:
+UdtSocket<InterfaceToImplement>::UdtSocket():
     UdtSocket(new detail::UdtSocketImpl(), detail::SocketState::closed)
 {
     SocketGlobals::customInit(
@@ -117,6 +119,7 @@ UdtSocket<InterfaceToImplement>::~UdtSocket()
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
     NX_CRITICAL(
+        !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
             .isSocketBeingWatched(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
@@ -134,6 +137,8 @@ UdtSocket<InterfaceToImplement>::UdtSocket(
     Pollable(-1, std::unique_ptr<detail::UdtSocketImpl>(impl)),
     m_state(state)
 {
+    NX_CRITICAL((SocketGlobals::initializationFlags() & InitializationFlags::disableUdt) == 0);
+
     this->m_impl = static_cast<detail::UdtSocketImpl*>(this->Pollable::m_impl.get());
 }
 
@@ -740,12 +745,10 @@ bool UdtStreamSocket::setKeepAlive(boost::optional< KeepAliveOptions > /*info*/)
 
 bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 {
-    //udt has keep-alives but provides no way to modify it...
-    KeepAliveOptions options;
-    options.probeCount = 10;    //TODO #ak find real value in udt
-    options.timeSec = 5;
-    options.intervalSec = 5;
-    *result = options;
+    // UDT has keep-alives but provides no way to modify it...
+    (*result)->probeCount = 10; // TODO: #ak find real value in udt.
+    (*result)->time = std::chrono::seconds(5);
+    (*result)->interval = std::chrono::seconds(5);
     return true;
 }
 

@@ -1,7 +1,5 @@
 #include "time_rest_handler.h"
 
-#include <QTimeZone>
-
 #include <api/model/time_reply.h>
 
 #include <network/authenticate_helper.h>
@@ -9,17 +7,25 @@
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <nx/utils/time.h>
 
-
-int QnTimeRestHandler::executeGet(const QString &, const QnRequestParams & params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnTimeRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* /*owner*/)
 {
     QnTimeReply reply;
-    reply.timeZoneOffset = currentTimeZone() * 1000ll;
+    reply.timeZoneOffset = currentTimeZone() * 1000LL;
+
+    // TODO: Remove parameter "local", making its behavior the default. Check nxtool.
     if (params.contains("local"))
         reply.utcTime =  QDateTime::currentDateTime().toMSecsSinceEpoch();
     else
         reply.utcTime = qnSyncTime->currentMSecsSinceEpoch();
-    reply.timezoneId = QDateTime::currentDateTime().timeZone().id();
+
+    reply.timezoneId = nx::utils::getCurrentTimeZoneId();
+
     reply.realm = QnAppInfo::realm();
 
     result.setReply(reply);

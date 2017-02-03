@@ -312,6 +312,8 @@ QnServerDb::QnServerDb():
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum mserver database" << Q_FUNC_INFO;
 
+    if (!tuneDBAfterOpen(&m_sdb))
+        qWarning() << "failed to turn on journal mode for mserver database" << Q_FUNC_INFO;
 }
 
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
@@ -685,7 +687,7 @@ bool QnServerDb::cleanupAuditLog()
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM audit_log where createdTimeSec < :createdTimeSec");
         int utc = currentTime / 1000000ll - qnGlobalSettings->auditTrailPeriodDays() * 3600 * 24;
-        delQuery.bindValue(":timestamp", utc);
+        delQuery.bindValue(":createdTimeSec", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
     }
     return rez;

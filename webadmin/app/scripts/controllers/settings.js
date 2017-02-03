@@ -28,6 +28,11 @@ angular.module('webadminApp')
             });
         }
 
+        nativeClient.init().then(function(result){
+            $scope.mode={liteClient: result.lite};
+        });
+
+
         mediaserver.getModuleInformation().then(function (r) {
             var data = r.data.reply;
 
@@ -44,6 +49,12 @@ angular.module('webadminApp')
             if(data.flags.brokenSystem){
                 $poll(pingModule,1000);
                 return;
+            }
+            
+            if(data.flags.canSetupNetwork){
+                mediaserver.networkSettings().then(function(r){
+                    $scope.networkSettings = r.data.reply;
+                });
             }
             checkUserRights();
         });
@@ -133,7 +144,10 @@ angular.module('webadminApp')
             });
         }
 
-        function errorHandler(){
+        function errorHandler(result){
+            if(result == 'cancel'){ // That's fine, dialog was cancelled
+                return false;
+            }
             dialogs.alert (L.settings.connnetionError);
             return false;
         }
@@ -166,11 +180,7 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            if($scope.settingsForm.$valid) {
-                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
-            }else{
-                dialogs.alert('form is not valid');
-            }
+            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
         };
 
 // execute/scryptname&mode
@@ -271,7 +281,7 @@ angular.module('webadminApp')
                     }
                 }
             }).result.then(function(){
-                dialogs.alert(L.settings.connectedSuccess).then(function(){
+                dialogs.alert(L.settings.connectedSuccess).finally(function(){
                     window.location.reload();
                 });
             },errorHandler);
@@ -297,7 +307,7 @@ angular.module('webadminApp')
             function doDisconnect(localLogin,localPassword){
                 // 2. Send request to the system only
                 return mediaserver.disconnectFromCloud(localLogin, localPassword).then(function(){
-                    dialogs.alert(L.settings.disconnectedSuccess).then(function(){
+                    dialogs.alert(L.settings.disconnectedSuccess).finally(function(){
                         window.location.reload();
                     });
                 }, function(error){
@@ -346,9 +356,6 @@ angular.module('webadminApp')
         $scope.connectToCloud = function() { // Connect to Cloud
             openCloudDialog(); //Open Connect Dialog
         };
-        mediaserver.networkSettings().then(function(r){
-            $scope.networkSettings = r.data.reply;
-        });
         $scope.saveNetworkSettings = function(){
             mediaserver.networkSettings($scope.networkSettings).then(restartServer, errorHandler);
         };
@@ -357,7 +364,26 @@ angular.module('webadminApp')
 
             var zones = reply.data.reply;
             zones = _.sortBy(zones,function(zone){
-                return zone.comment;
+
+                var offsetString = '(UTC)';
+                if(zone.offsetFromUtc != 0){
+                    offsetString = zone.offsetFromUtc > 0?'(UTC +':'(UTC -';
+
+                    var absOffset = Math.abs(zone.offsetFromUtc);
+                    var zoneHours = Math.floor(absOffset/3600);
+                    var zoneMinutes = Math.floor( (absOffset % 3600) / 60);
+
+                    if(zoneHours<10){
+                        zoneHours = '0' + zoneHours;
+                    }
+                    if(zoneMinutes<10){
+                        zoneMinutes = '0' + zoneMinutes;
+                    }
+                    offsetString += zoneHours  + ":" + zoneMinutes +")";
+                }
+
+                zone.name = offsetString +' ' + zone.id;
+                return zone.offsetFromUtc;
             });
             /*$scope.alltimeZones = _.indexBy(zones,function(zone){
                 return zone.id;
@@ -392,11 +418,5 @@ angular.module('webadminApp')
         $scope.saveDateTime = function(){
             mediaserver.timeSettings($scope.dateTimeSettings.dateTime.getTime(), $scope.dateTimeSettings.timeZone).
                 then(resultHandler,errorHandler);
-        };
-
-        $scope.openLink = function($event){
-            nativeClient.openUrlInBrowser($event.target.baseURI, $event.target.title, true);
-            $event.stopPropagation();
-            $event.preventDefault();
         };
     });

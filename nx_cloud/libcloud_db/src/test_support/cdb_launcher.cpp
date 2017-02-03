@@ -100,7 +100,7 @@ bool CdbLauncher::waitUntilStarted()
         return false;
     m_port = httpEndpoints.front().port;
 
-    m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+    m_connectionFactory->setCloudUrl(lit("http://127.0.0.1:%1").arg(m_port).toStdString());
 
     //retrieving module info
     auto connection = m_connectionFactory->createConnection();
@@ -360,6 +360,8 @@ api::ResultCode CdbLauncher::bindRandomNotActivatedSystem(
     ss << "test_sys_" << nx::utils::random::number();
     sysRegData.name = ss.str();
     sysRegData.opaque = opaque;
+    if (!systemData->customization.empty())
+        sysRegData.customization = systemData->customization;
 
     api::ResultCode resCode = api::ResultCode::ok;
 
@@ -441,6 +443,29 @@ api::ResultCode CdbLauncher::getSystems(
             std::bind(
                 &nx::cdb::api::SystemManager::getSystems,
                 connection->systemManager(),
+                std::placeholders::_1));
+    *systems = std::move(systemDataList.systems);
+
+    return resCode;
+}
+
+api::ResultCode CdbLauncher::getSystemsFiltered(
+    const std::string& email,
+    const std::string& password,
+    const api::Filter& filter,
+    std::vector<api::SystemDataEx>* const systems)
+{
+    auto connection = connectionFactory()->createConnection();
+    connection->setCredentials(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemDataExList systemDataList;
+    std::tie(resCode, systemDataList) =
+        makeSyncCall<api::ResultCode, api::SystemDataExList>(
+            std::bind(
+                &nx::cdb::api::SystemManager::getSystemsFiltered,
+                connection->systemManager(),
+                filter,
                 std::placeholders::_1));
     *systems = std::move(systemDataList.systems);
 

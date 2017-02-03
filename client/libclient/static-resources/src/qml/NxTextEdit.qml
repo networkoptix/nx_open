@@ -52,8 +52,10 @@ FocusScope
         id: textField;
 
         height: 28;
-        anchors.left: (leftControlDelegate ? leftControlLoader.right : parent.left);
-        anchors.right: (rightControlLoader ? rightControlLoader.left : parent.right);
+        anchors.left: (leftControl && leftControl.visible
+            ? leftControlLoader.right : parent.left);
+        anchors.right: (rightControl && rightControl.visible
+            ? rightControlLoader.left : parent.right);
 
         activeFocusOnPress: true;
         property bool error: false; // TODO: improve logic: autoreset error when text changing
@@ -63,6 +65,9 @@ FocusScope
         style: nxTextEditStyle;
 
         onAccepted: control.accepted();
+        Keys.enabled: false;
+        KeyNavigation.tab: control.KeyNavigation.tab;
+        KeyNavigation.backtab: control.KeyNavigation.backtab;
 
         Component
         {
@@ -74,8 +79,10 @@ FocusScope
                 {
                     anchors.left: parent.left;
                     anchors.right: parent.right;
-                    anchors.leftMargin: (leftControlLoader.item ? -leftControlLoader.width : 0);
-                    anchors.rightMargin: (rightControlLoader.item ? -rightControlLoader.width : 0);
+                    anchors.leftMargin: (leftControl && leftControl.visible
+                        ? -leftControlLoader.width : 0);
+                    anchors.rightMargin: (rightControl && rightControl.visible
+                        ? -rightControlLoader.width : 0);
 
                     color:
                     {

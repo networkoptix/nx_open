@@ -1,7 +1,7 @@
 #ifndef REQUEST_PROCESSOR_H
 #define REQUEST_PROCESSOR_H
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/stun/message_dispatcher.h>
 
 #include "cloud_data_provider.h"

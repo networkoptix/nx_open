@@ -5,6 +5,8 @@ GenericProduct
     name: "libcloud_db"
     targetName: "cloud_db"
 
+    condition: project.withCloud
+
     Depends { name: "cloud_db_client" }
     Depends { name: "appserver2" }
     Depends { name: "nx_email" }

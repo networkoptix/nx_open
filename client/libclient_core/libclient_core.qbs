@@ -20,7 +20,7 @@ GenericProduct
         Depends
         {
             name: "Qt"
-            submodules: ["quick", "quick-private"]
+            submodules: ["quick", "quick-private", "qtmultimediaquicktools-private"]
         }
         Depends { name: "appserver2" }
         Depends { name: "nx_vms_utils" }

@@ -76,21 +76,28 @@ namespace ec2
 
     struct ApiMediaServerUserAttributesData: ApiData
     {
+        QnUuid serverId;
+        QString serverName;
+        int maxCameras;
+        bool allowAutoRedundancy; //< Server can take cameras from offline server automatically.
+
+        // Redundant storage settings.
+        Qn::BackupType backupType;
+        int backupDaysOfTheWeek; //< Days of the week mask. See backup::DayOfWeek enum.
+        int backupStart; //< Seconds from 00:00:00. Error if bDOW set and this is not set.
+        int backupDuration; //< Duration of synchronization period in seconds. -1 if not set.
+        int backupBitrate; //< Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
+
         ApiMediaServerUserAttributesData();
         QnUuid getIdForMerging() const { return serverId; } //< See ApiIdData::getIdForMerging().
 
-        QnUuid          serverId;
-        QString         serverName;
-        int             maxCameras;
-        bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
-
-        // redundant storage settings
-        Qn::BackupType      backupType;
-        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum
-        int                 backupStart;         // Seconds from 00:00:00. Error if bDOW set and this is not set
-        int                 backupDuration;      // Duration of synchronization period in seconds. -1 if not set.
-        int                 backupBitrate;       // Bitrate cap in bytes per second. Negative value if not capped.
-                                                 // Not capped by default
+        static DeprecatedFieldNames* getDeprecatedFieldNames()
+        {
+            static DeprecatedFieldNames kDeprecatedFieldNames{
+                {lit("serverId"), lit("serverID")}, //< up to v2.6
+            };
+            return &kDeprecatedFieldNames;
+        }
     };
 
 #define ApiMediaServerUserAttributesData_Fields_Short   \

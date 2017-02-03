@@ -60,6 +60,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 namespace
 {
@@ -191,10 +192,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
     qnSettings->save();
 
+    // Wait while deleteLater objects will be freed
+    WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed(QThread::currentThread(), 3);
+    waitingForObjectsToBeFreed.join();
+
     return result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
@@ -203,10 +208,6 @@ int main(int argc, char **argv)
 #ifdef Q_OS_WIN
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::installGlobalUnhandledExceptionHandler();
-#endif
-
-#ifdef Q_OS_LINUX
-    linux_exception::installCrashSignalHandler();
 #endif
 
 #ifdef Q_OS_MAC

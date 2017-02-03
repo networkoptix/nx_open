@@ -281,7 +281,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         {
             NX_ASSERT(server, Q_FUNC_INFO, "Event has occurred without its server");
             /* Only admins should see notifications with servers. */
-            if (!server || !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
+            if (!server || !accessController()->hasPermissions(server, Qn::ViewContentPermission))
                 return;
         }
     }
@@ -308,7 +308,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     {
         item->addActionButton(
             icon,
-            tr("Open in Alarm Layout"),
             QnActions::OpenInAlarmLayoutAction,
             QnActionParameters(alarmCameras));
 
@@ -322,7 +321,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    tr("Browse Archive"),
                     QnActions::OpenInNewLayoutAction,
                     QnActionParameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
@@ -334,12 +332,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnDeviceDependentStrings::getNameFromSet(
-                        QnCameraDeviceStringSet(
-                            tr("Open Device"),
-                            tr("Open Camera"),
-                            tr("Open I/O Module")),
-                        camera),
                     QnActions::OpenInNewLayoutAction,
                     QnActionParameters(camera));
 
@@ -352,12 +344,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    QnDeviceDependentStrings::getNameFromSet(
-                        QnCameraDeviceStringSet(
-                            tr("Device Settings..."),
-                            tr("Camera Settings..."),
-                            tr("I/O Module Settings...")),
-                        camera),
                     QnActions::CameraSettingsAction,
                     QnActionParameters(camera));
 
@@ -372,7 +358,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    tr("Server Settings..."),
                     QnActions::ServerSettingsAction,
                     QnActionParameters(server));
                 break;
@@ -383,12 +368,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 QString webPageAddress = params.caption;
                 item->addActionButton(
                     icon,
-                    QnDeviceDependentStrings::getNameFromSet(
-                        QnCameraDeviceStringSet(
-                            tr("Open Device Web Page..."),
-                            tr("Open Camera Web Page..."),
-                            tr("Open I/O Module Web Page...")),
-                        camera),
                     QnActions::BrowseUrlAction,
                     QnActionParameters().withArgument(Qn::UrlRole, webPageAddress));
                 break;
@@ -404,7 +383,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    tr("Licenses..."),
                     QnActions::PreferencesLicensesTabAction);
                 break;
             }
@@ -417,7 +395,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 {
                     item->addActionButton(
                         icon,
-                        tr("Browse Archive"),
                         QnActions::OpenInNewLayoutAction,
                         QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
@@ -549,11 +526,6 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
 void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params)
 {
-    QString messageText = QnSystemHealthStringsHelper::messageName(message);
-    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
-    if (messageText.isEmpty())
-        return;
-
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
@@ -573,6 +545,12 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
     if (item)
         return;
 
+    const QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
+    const QString messageText = QnSystemHealthStringsHelper::messageText(message, resourceName);
+    NX_ASSERT(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
+
     item = new QnNotificationWidget(m_list);
 
     QnActionParameters actionParams;
@@ -584,7 +562,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::EmailIsEmpty:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                tr("User Settings..."),
                 QnActions::UserSettingsAction,
                 QnActionParameters(context()->user())
                     .withArgument(Qn::FocusElementRole, lit("email"))
@@ -595,21 +572,18 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::NoLicenses:
             item->addActionButton(
                 qnSkin->icon("events/license.png"),
-                tr("Licenses..."),
                 QnActions::PreferencesLicensesTabAction);
             break;
 
         case QnSystemHealth::SmtpIsNotSet:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                tr("SMTP Settings..."),
                 QnActions::PreferencesSmtpTabAction);
             break;
 
         case QnSystemHealth::UsersEmailIsEmpty:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                tr("User Settings..."),
                 QnActions::UserSettingsAction,
                 QnActionParameters(resource)
                     .withArgument(Qn::FocusElementRole, lit("email"))
@@ -620,14 +594,12 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::ConnectionLost:
             item->addActionButton(
                 qnSkin->icon("events/connection.png"),
-                tr("Connect to server..."),
                 QnActions::OpenLoginDialogAction);
             break;
 
         case QnSystemHealth::NoPrimaryTimeServer:
             item->addActionButton(
                 qnSkin->icon("events/settings.png"),
-                tr("Time Synchronization..."),
                 QnActions::SelectTimeServerAction,
                 actionParams);
             break;
@@ -638,7 +610,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::EmailSendError:
             item->addActionButton(
                 qnSkin->icon("events/email.png"),
-                tr("SMTP Settings..."),
                 QnActions::PreferencesSmtpTabAction);
             break;
 
@@ -648,29 +619,56 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::ArchiveRebuildCanceled:
             item->addActionButton(
                 qnSkin->icon("events/storage.png"),
-                tr("Server settings..."),
                 QnActions::ServerSettingsAction,
                 QnActionParameters(resource)
                 .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage)
             );
             break;
 
+        case QnSystemHealth::CloudPromo:
+        {
+            item->addActionButton(
+                qnSkin->icon("cloud/cloud_20.png"),
+                QnActions::PreferencesCloudTabAction);
+
+            const auto hideCloudPromoNextRun =
+                [this]
+                {
+                    menu()->trigger(QnActions::HideCloudPromoAction);
+                };
+
+            connect(item, &QnNotificationWidget::actionTriggered, this, hideCloudPromoNextRun);
+            connect(item, &QnNotificationWidget::closeTriggered, this, hideCloudPromoNextRun);
+
+            connect(item, &QnNotificationWidget::linkActivated, this,
+                [item](const QString& link)
+                {
+                    if (link.contains(lit("://"))) //< currently unused
+                        QDesktopServices::openUrl(link);
+                    else
+                        item->triggerDefaultAction();
+                });
+
+            break;
+        }
+
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Undefined system health message ");
             break;
     }
 
-    QString resourceName = QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree());
-    item->setText(QnSystemHealthStringsHelper::messageName(message, resourceName));
-    item->setTooltipText(QnSystemHealthStringsHelper::messageDescription(message, resourceName));
+
+    item->setText(messageText);
+    item->setTooltipText(QnSystemHealthStringsHelper::messageTooltip(message, resourceName));
     item->setNotificationLevel(QnNotificationLevel::valueOf(message));
     item->setProperty(kItemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
     setHelpTopic(item, QnBusiness::healthHelpId(message));
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this,
+        &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
 
-    m_list->addItem(item, message != QnSystemHealth::ConnectionLost);
+    m_list->addItem(item, QnSystemHealth::isMessageLocked(message));
     m_itemsByMessageType.insert(message, item);
 }
 

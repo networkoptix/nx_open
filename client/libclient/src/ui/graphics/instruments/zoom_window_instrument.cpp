@@ -23,7 +23,6 @@
 #include <ui/workbench/workbench.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/graphics/painters/cosmetic_frame_painter.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
@@ -33,7 +32,7 @@ namespace {
 
     const qreal kZoomWindowMinSize = 0.1;
     const qreal kZoomWindowMaxSize = 0.9;
-    const qreal kZoomLineWidth = 1;
+    const int kZoomLineWidth = 2;
 
     const auto isZoomAllowed = [](QGraphicsItem* item)
         {
@@ -94,7 +93,8 @@ public:
     ZoomWindowWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
         base_type(parent, windowFlags),
         m_interactive(true),
-        m_framePainter()
+        m_frameColor(Qt::yellow),
+        m_frameWidth(1)
     {
         setWindowFlags(this->windowFlags() | Qt::Window);
         setFlag(ItemIsPanel, false); /* See comment in workbench_display.cpp. */
@@ -124,12 +124,22 @@ public:
 
     QColor frameColor() const
     {
-        return m_framePainter.color();
+        return m_frameColor;
     }
 
     void setFrameColor(const QColor &frameColor)
     {
-        m_framePainter.setColor(frameColor);
+        m_frameColor = frameColor;
+    }
+
+    int frameWidth() const
+    {
+        return m_frameWidth;
+    }
+
+    void setFrameWidth(int frameWidth) //< width is in logical device units
+    {
+        m_frameWidth = frameWidth;
     }
 
     bool isInteractive() const {
@@ -143,11 +153,6 @@ public:
         m_interactive = interactive;
 
         updateInteractivity();
-    }
-
-    void setFrameWidth(qreal frameWidth)
-    {
-        m_framePainter.setFrameWidth(frameWidth);
     }
 
 protected:
@@ -181,11 +186,8 @@ protected:
 
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override
     {
-        const auto offset = QPointF(kZoomLineWidth, kZoomLineWidth);
-        const auto targetSize = (size() + QSizeF(offset.x(), offset.y()) * 2);
-        const auto targetRect = QRectF(-offset, targetSize);
-        m_framePainter.setBoundingRect(targetRect);
-        m_framePainter.paint(*painter);
+        QnNxStyle::paintCosmeticFrame(painter, rect(), m_frameColor,
+            -m_frameWidth, m_frameWidth / 2); //< negative means outside
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {
@@ -217,7 +219,8 @@ private:
     bool m_interactive;
     QPointer<ZoomOverlayWidget> m_overlay;
     QPointer<QnMediaResourceWidget> m_zoomWidget;
-    QnCosmeticFramePainter m_framePainter;
+    QColor m_frameColor;
+    int m_frameWidth;
 };
 
 

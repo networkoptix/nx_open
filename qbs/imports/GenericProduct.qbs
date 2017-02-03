@@ -20,9 +20,19 @@ Product
 
     Properties
     {
+        condition: qbs.targetOS.contains("android")
+        qbs.optimization: qbs.buildVariant == "release" ? "fast" : "none"
+    }
+    Properties
+    {
         condition: product.type.contains("application") && qbs.targetOS.contains("linux")
         overrideListProperties: !project.developerBuild // Leaving Qt RPATH for developer builds.
         cpp.rpaths: ["$ORIGIN/../lib"]
+    }
+    Properties
+    {
+        condition: qbs.targetOS.contains("macos")
+        cpp.minimumMacosVersion: "10.8"
     }
 
     configure.outputTags: ["cpp", "hpp", "resources.resource_data"]
@@ -88,7 +98,7 @@ Product
         name: "macx"
         files: ["*_macx.cpp", "*_macx.h", "*_macx/*.cpp", "*_macx/*.h"]
         prefix: product.sourceDirectory + "/src/**/"
-        condition: qbs.targetOS.contains("osx")
+        condition: qbs.targetOS.contains("macos")
     }
 
     Group

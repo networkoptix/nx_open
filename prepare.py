@@ -52,6 +52,9 @@ def get_qmake_path(target, version):
     return path
 
 def create_qbs_wrapper(project_dir, profile):
+    if os.path.samefile(project_dir, os.getcwd()):
+        return
+
     file_name = "qbs.ini"
     config = ConfigParser.ConfigParser()
     if os.path.isfile(file_name):
@@ -72,6 +75,8 @@ def create_qbs_wrapper(project_dir, profile):
 
 def prepare(target, reconfigure, project_dir):
     qt_version = "5.6.2"
+    if target.startswith("macosx"):
+        qt_version = "5.6.1"
     qt_profile = profile_name(target, "qt", qt_version)
     gcc_version = gcc_version_for_target.get(target)
 
@@ -90,7 +95,7 @@ def prepare(target, reconfigure, project_dir):
     elif target.startswith("linux"):
         compiler_profile = "gcc"
     elif target.startswith("macosx"):
-        compiler_profile = "clang"
+        compiler_profile = "xcode-macosx-x86_64"
     elif gcc_version:
         compiler_profile = profile_name(target, "gcc", gcc_version)
         compiler_path = get_compiler_path(target, gcc_version)

@@ -5,13 +5,15 @@
 
 #include "event_connection.h"
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/fusion/serialization/lexical.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+
 #include <http/custom_headers.h>
 #include <utils/math/math.h>
 #include <utils/media/custom_output_stream.h>
-#include <nx/fusion/serialization/lexical.h>
 
 #include "cdb_request_path.h"
 #include "data/types.h"
@@ -19,13 +21,13 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
 EventConnection::EventConnection(
-    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher)
+    network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
     m_cdbEndPointFetcher(
-        std::make_unique<network::cloud::CloudModuleEndPointFetcher::ScopedOperation>(
+        std::make_unique<network::cloud::CloudModuleUrlFetcher::ScopedOperation>(
             endPointFetcher)),
     m_reconnectTimer(network::RetryPolicy(
         network::RetryPolicy::kInfiniteRetries,
@@ -83,7 +85,7 @@ void EventConnection::start(
 
 void EventConnection::cdbEndpointResolved(
     nx_http::StatusCode::Value resCode,
-    SocketAddress endpoint)
+    QUrl url)
 {
     if (resCode != nx_http::StatusCode::ok)
     {
@@ -91,7 +93,7 @@ void EventConnection::cdbEndpointResolved(
         return;
     }
 
-    m_cdbEndpoint = std::move(endpoint);
+    m_cdbUrl = std::move(url);
     initiateConnection();
 }
 
@@ -117,11 +119,8 @@ void EventConnection::initiateConnection()
     }
 
     //connecting with Http client to cloud_db
-    QUrl url;
-    url.setScheme("http");
-    url.setHost(m_cdbEndpoint.address.toString());
-    url.setPort(m_cdbEndpoint.port);
-    url.setPath(url.path() + kSubscribeToSystemEventsPath);
+    QUrl url = m_cdbUrl;
+    url.setPath(network::url::normalizePath(m_cdbUrl.path() + kSubscribeToSystemEventsPath));
     m_httpClient->setAuth(m_auth);
     m_httpClient->doGet(url);
 }
@@ -284,6 +283,6 @@ void EventConnection::onReceivingSerializedEvent(QByteArray serializedEvent)
     //TODO #ak reporting event
 }
 
-}   //namespace cl
+}   //namespace client
 }   //namespace cdb
 }   //namespace nx

@@ -172,10 +172,10 @@ bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
     if (!m_warningLabel)
         return true;
 
-    bool valid = isValidList(selected);
+    bool valid = isValidList(selected, QString());
     m_warningLabel->setVisible(!valid);
     if (!valid)
-        m_warningLabel->setText(getText(selected));
+        m_warningLabel->setText(getText(selected, true, QString()));
     return true;
 }
 
@@ -194,7 +194,11 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     using boost::algorithm::all_of;
 
     /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = qnResPool->getResources<QnUserResource>(ids);
+    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isEnabled();
+        });
 
     if (!all_of(users, &isValidUser))
         return false;
@@ -213,7 +217,11 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     const QString& additionalList)
 {
     auto roles = qnUserRolesManager->userRoles(ids);
-    auto users = qnResPool->getResources<QnUserResource>(ids);
+    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isEnabled();
+        });
     auto additional = parseAdditional(additionalList);
 
     if (users.isEmpty() && roles.empty() && additional.isEmpty())
@@ -286,5 +294,9 @@ QStringList QnSendEmailActionDelegate::parseAdditional(const QString& additional
 
 bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 {
+    // Disabled users are just not displayed
+    if (!user->isEnabled())
+        return true;
+
     return nx::email::isValidAddress(user->getEmail());
 }

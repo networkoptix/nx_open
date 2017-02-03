@@ -39,6 +39,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
+#include <nx/utils/log/log.h>
+
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
 
@@ -321,6 +323,8 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
 
     if (httpStatus == 0 && events && !events->empty())
         m_allEvents << events;
+    else if (httpStatus != 0)
+        NX_LOG(lit("Error %1 while requesting even log").arg(httpStatus), cl_logDEBUG1);
 
     if (m_requests.isEmpty())
         requestFinished();
@@ -363,9 +367,14 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 
     if (!resources.isEmpty())
     {
-        qint64 pos = m_model->eventTimestamp(idx.row())/1000;
         QnActionParameters params(resources);
-        params.setArgument(Qn::ItemTimeRole, pos);
+
+        const auto timePos = m_model->eventTimestamp(idx.row());
+        if (timePos != AV_NOPTS_VALUE)
+        {
+            qint64 pos = timePos / 1000;
+            params.setArgument(Qn::ItemTimeRole, pos);
+        }
 
         context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
 

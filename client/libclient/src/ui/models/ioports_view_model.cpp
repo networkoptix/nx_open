@@ -82,7 +82,7 @@ QVariant QnIOPortsViewModel::editData(const QModelIndex &index) const
         return actionFor(value);
     case DurationColumn:
         if (actionFor(value) == Impulse)
-            return value.autoResetTimeoutMs / 1000;
+            return value.autoResetTimeoutMs;
         return QVariant();
     default:
         return QVariant();
@@ -183,7 +183,8 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
         const auto newAction = static_cast<Action>(value.toInt());
         if (ioPort.portType != Qn::PT_Output || actionFor(ioPort) == newAction)
             return false;
-        ioPort.autoResetTimeoutMs = (newAction == Impulse ? 1000 : 0);
+        static const int kDefaultDurationMs = 1000;
+        ioPort.autoResetTimeoutMs = (newAction == Impulse ? kDefaultDurationMs : 0);
         const auto durationIndex = index.sibling(index.row(), DurationColumn);
         emit dataChanged(durationIndex, durationIndex);
         break;
@@ -194,7 +195,7 @@ bool QnIOPortsViewModel::setData(const QModelIndex &index, const QVariant &value
         if (ioPort.portType != Qn::PT_Output)
             return false;
         const auto oldAction = actionFor(ioPort);
-        ioPort.autoResetTimeoutMs = value.toInt() * 1000;
+        ioPort.autoResetTimeoutMs = value.toInt();
         if (actionFor(ioPort) == oldAction)
             break;
         const auto actionIndex = index.sibling(index.row(), ActionColumn);
@@ -214,7 +215,7 @@ QVariant QnIOPortsViewModel::headerData(int section, Qt::Orientation orientation
 {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole && section < ColumnCount) {
         switch(section) {
-        case NumberColumn:       return tr("#");
+        case NumberColumn:       return lit("#");
         case IdColumn:           return tr("ID");
         case TypeColumn:         return tr("Type");
         case DefaultStateColumn: return tr("Default state");

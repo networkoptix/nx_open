@@ -230,6 +230,30 @@
         },
         {
             "keys": [
+                "Network Optix|Nx-Cube",
+                "Network Optix|E12A"
+            ],
+            "nxDeviceModel": "Nx-Cube-0512A",
+            "nxDeviceName": "Nx-Cube"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome",
+                "Network Optix|E924"
+            ],
+            "nxDeviceModel": "Nx-Dome-05924",
+            "nxDeviceName": "Nx-Dome"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Fisheye",
+                "Network Optix|E925"
+            ],
+            "nxDeviceModel": "Nx-Fisheye-05925",
+            "nxDeviceName": "Nx-Fisheye"
+        },
+        {
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
@@ -356,7 +380,12 @@
                 "VS8801|*",
                 "*|VS8801",
                 "VS8401|*",
-                "*|VS8401"
+                "*|VS8401",
+                "DW|DW-CPUHDE04",
+                "DW|DW-CPUHDE08",
+                "DW|DW-CPUHDE16",
+                "DW|VMAX A1",
+                "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
         },
@@ -454,7 +483,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -466,8 +496,7 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98", 
-                "UNIVIEW|IPC6242SR-X22",
-                "TRUEN Co., Ltd.|TN-P4230CSLXIR"
+                "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -514,7 +543,10 @@
         },
         {
             "keys": [
-                "General|IP Camera"
+                "General|IP Camera",
+                "H264|N51820L",
+                "TRUEN Co., Ltd.|TN-P4230CSLXIR",
+                "TRUEN Co. Ltd.|*"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -525,7 +557,9 @@
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
                 "Cellinx|STH795",
-                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
+                "H264|N51820L",
+                "onvif|v047-1"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -1308,7 +1342,7 @@
         },
         {
             "keys": [
-                "Sony|SNC-WR630", "Sony|SNC-WR630|2.1.2"
+                "Sony|SNC-WR630", "Sony|SNC-WR600"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -1671,6 +1705,51 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            },
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
         }
     ]
 }

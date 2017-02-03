@@ -130,12 +130,11 @@ Item
 
         onErrorChanged:
         {
-            if (cloudStatusWatcher.error == QnCloudStatusWatcher.NoError)
+            if (error == QnCloudStatusWatcher.NoError)
                 return
 
-            setCloudCredentials(d.initialLogin, "")
             d.connecting = false
-            if (cloudStatusWatcher.error == QnCloudStatusWatcher.InvalidCredentials)
+            if (error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
                 showWarning(qsTr("Invalid email or password"))
@@ -144,6 +143,7 @@ Item
             {
                 showWarning(qsTr("Cannot connect to %1").arg(applicationInfo.cloudName()))
             }
+            setCloudCredentials(d.initialLogin, "")
         }
 
         onStatusChanged:

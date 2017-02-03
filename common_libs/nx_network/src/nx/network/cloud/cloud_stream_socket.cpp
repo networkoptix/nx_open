@@ -492,7 +492,11 @@ void CloudStreamSocket::onCloudConnectDone(
     NX_LOGX(lm("onCloudConnectDone. %1").str(errorCode), cl_logDEBUG2);
     
     if (errorCode == SystemError::noError)
+    {
         errorCode = applyRealNonBlockingMode(cloudConnection.get());
+        if (errorCode != SystemError::noError)
+            cloudConnection.reset();
+    }
 
     if (errorCode == SystemError::noError)
     {
@@ -540,8 +544,11 @@ void CloudStreamSocket::stopWhileInAioThread()
     m_timer.pleaseStopSync();
     m_readIoBinder.pleaseStopSync();
     m_writeIoBinder.pleaseStopSync();
-    m_socketDelegate.reset();
-    setDelegate(nullptr);
+    if (m_socketDelegate)
+    {
+        m_socketDelegate->pleaseStopSync();
+        setDelegate(nullptr);
+    }
 }
 
 } // namespace cloud

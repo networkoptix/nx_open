@@ -51,7 +51,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 QString QnVirtualCameraResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    QTextStream(&result)
+        << QnNetworkResource::toSearchString()
+        << " "
+        << getModel()
+        << " "
+        << getFirmware()
+        << " "
+        << getVendor(); //TODO: #Elric evil!
     return result;
 }
 
@@ -487,7 +494,7 @@ void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::Connection
     if (cachedUrlExists && cachedUrl->second == url)
         return;
 
-    auto urlUpdater = 
+    auto urlUpdater =
         [url, role](QString oldValue)
         {
             const auto roleStr = QString::number(role);
