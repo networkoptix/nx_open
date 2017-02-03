@@ -46,6 +46,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
+#include <nx/utils/math/fuzzy.h>
 
 
 using namespace style;
@@ -4221,7 +4222,7 @@ void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
         const auto sx = std::hypot(transform.m11(), transform.m12());
         const auto sy = std::hypot(transform.m21(), transform.m22());
 
-        if (qFuzzyIsNull(sx - sy)) //< uniform scale, no shear
+        if (qFuzzyEquals(qAbs(sx), qAbs(sy))) //< uniform scale, no shear; possible mirroring
         {
             if (qFuzzyIsNull(sx)) //< just in case
                 return;
