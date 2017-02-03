@@ -110,6 +110,8 @@ def downloads(request):
             customization = 'default'
         updates_record = updates_json[customization]
         latest_release = updates_record['current_release']
+        if not latest_release:  # Hack for new customizations
+            latest_release = '3.0'
         latest_version = updates_record['releases'][latest_release]
 
         build_number = latest_version.split('.')[-1]
