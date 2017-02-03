@@ -3477,6 +3477,9 @@ int QnNxStyle::pixelMetric(
             return 1;
 
         case PM_SmallIconSize:
+            if (qobject_cast<const QMenu*>(widget))
+                return 0; //< we don't show icons in menus
+            /* FALL THROUGH */
         case PM_ListViewIconSize:
         case PM_TabBarIconSize:
         case PM_ButtonIconSize:
