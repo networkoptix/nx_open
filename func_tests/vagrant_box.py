@@ -7,10 +7,6 @@ import contextlib
 import pytz
 import jinja2
 import vagrant
-from server import (
-    MEDIASERVER_CONFIG_PATH,
-    MEDIASERVER_CONFIG_PATH_INITIAL,
-    )
 
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -82,7 +78,6 @@ class Vagrant(object):
             self._wrap_vagrant_call(self._vagrant.up, vm_name=box_name)
             self._write_ssh_config(box_name)
             self.run_ssh_command(box_name, 'vagrant', ['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
-            self.run_ssh_command(box_name, 'root', ['cp', MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL])
 
     def _load_box_ip_address(self, box_name):
         output = self.run_ssh_command(box_name, 'root', ['ifconfig', 'eth1'])  # eth0 is nat required by vagrant

@@ -76,6 +76,7 @@ class EnvironmentBuilder(object):
         box = boxes[config.box_name]
         server = Server(config.name, box, box.ip_address)
         server.wait_until_server_is_up()
+        server.store_initial_config()
         server.load_system_settings()
         server.get_storage().cleanup()
         if self._reset_server:

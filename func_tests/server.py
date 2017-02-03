@@ -99,6 +99,9 @@ class Server(object):
         new_config = change_mediaserver_config(old_config, **kw)
         self.box.put_file(MEDIASERVER_CONFIG_PATH, new_config)
 
+    def store_initial_config(self):
+        self.box.run_ssh_command(['cp', MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL])
+
     def wait_until_server_is_up(self):
         wait_time_sec = 30
         start_time = time.time()
