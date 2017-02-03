@@ -224,7 +224,7 @@ QString applicationFilePath(const QString& defaultFilePath)
 #if defined(Q_OS_WIN)
     return QFileInfo(applicationFileNameInternal(defaultFilePath)).filePath();
 #elif defined(Q_OS_MAC)
-    auto bundleUrl = CFBundleCopyExecutableURL(CFBundleGetMainBundle);
+    auto bundleUrl = CFBundleCopyExecutableURL(CFBundleGetMainBundle());
     if (bundleUrl)
     {
         auto path = CFURLCopyFileSystemPath(bundleUrl, kCFURLPOSIXPathStyle);
