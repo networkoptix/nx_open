@@ -1079,7 +1079,7 @@ int QnMediaServerConnection::getBookmarksAsync(
     const QnGetBookmarksRequestData& request, QObject* target, const char* slot)
 {
     return sendAsyncGetRequestLogged(ec2BookmarksObject,
-        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList) ,target, slot);
+        request.toParams(), QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
 int QnMediaServerConnection::getBookmarkTagsAsync(

@@ -9,26 +9,27 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API CheckOwnStateRequest:
+class NX_NETWORK_API GetConnectionStateRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::checkOwnState;
+    constexpr static const auto kMethod = stun::extension::methods::getConnectionState;
 
-    CheckOwnStateRequest();
+    GetConnectionStateRequest();
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };
 
-class NX_NETWORK_API CheckOwnStateResponse:
+class NX_NETWORK_API GetConnectionStateResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::extension::methods::checkOwnState;
+    constexpr static const auto kMethod = stun::extension::methods::getConnectionState;
 
-    bool isListening = false;
+    enum State: int { connected = 0, listening = 1 };
+    State state = State::connected;
 
-    CheckOwnStateResponse();
+    GetConnectionStateResponse();
     virtual void serializeAttributes(nx::stun::Message* const message) override;
     virtual bool parseAttributes(const nx::stun::Message& message) override;
 };

@@ -11,12 +11,14 @@
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/algorithm/cxx11/copy_if.hpp>
 
 #include <common/common_module.h>
 
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_app_info.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -97,7 +99,6 @@
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
 #include <utils/unity_launcher_workaround.h>
-#include <utils/common/app_info.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -305,6 +306,16 @@ public:
     }
 };
 
+auto offlineItemOnThisPc = []
+    {
+        QnUuid pcUuid = qnSettings->pcUuid();
+        NX_ASSERT(!pcUuid.isNull(), "Invalid pc state.");
+        return [pcUuid](const QnVideoWallItem& item)
+            {
+                return !pcUuid.isNull() && item.pcUuid == pcUuid && !item.runtimeStatus.online;
+            };
+    };
+
 } /* anonymous namespace */
 
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
@@ -410,6 +421,9 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
+    const auto clientMessageProcessor = QnClientMessageProcessor::instance();
+    connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
 
     if (m_videoWallMode.active)
     {
@@ -417,7 +431,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
         connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
             [this]
             {
@@ -618,55 +631,28 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     if (!videowall)
         return false;
 
-    QnUuid pcUuid = qnSettings->pcUuid();
-    if (pcUuid.isNull())
-    {
-        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
-            .arg(videowall->getId().toString()), cl_logERROR);
-
-        return false;
-    }
-
-    foreach(const QnVideoWallItem &item, videowall->items()->getItems())
-    {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-        return true;
-    }
-    return false;
+    return boost::algorithm::any_of(videowall->items()->getItems().values(), offlineItemOnThisPc());
 }
 
-void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall)
+void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
-    if (!canStartVideowall(videoWall))
-    {
-        NX_ASSERT(false, "Can't reach here because of action condition");
-        return;
-    }
+    QList<QnVideoWallItem> items;
+    boost::algorithm::copy_if(videoWall->items()->getItems().values(), std::back_inserter(items),
+        offlineItemOnThisPc());
 
-    QnMessageBox dialog(QnMessageBoxIcon::Question,
-        tr("Close %1 Client before starting Video Wall?").arg(QnAppInfo::productNameLong()),
-        QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
-        mainWindow());
-
-    const auto closeButton =
-        dialog.addButton(tr("Close"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    dialog.addButton(tr("Keep"), QDialogButtonBox::RejectRole, QnButtonAccent::NoAccent);
-
-    const auto result = dialog.exec();
-    if (result == QDialogButtonBox::Cancel)
+    NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
+    if (items.isEmpty())
         return;
 
-    if (dialog.clickedButton() == closeButton)
+    bool closeCurrentInstance = false;
+    if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+        return;
+
+    if (closeCurrentInstance)
         closeInstanceDelayed();
 
-    QnUuid pcUuid = qnSettings->pcUuid();
-    foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
+    for (const auto& item: items)
     {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-
         QStringList arguments;
         arguments << lit("--videowall");
         arguments << videoWall->getId().toString();
@@ -699,8 +685,8 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     {
         NX_LOG("Warning: videowall not exists anymore, cannot open videowall item", cl_logERROR);
         closeInstanceDelayed();
-    }
         return;
+    }
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
     updateMainWindowGeometry(item.screenSnaps); //TODO: #GDM check if it is needed at all
@@ -1548,7 +1534,8 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         tr("Delete %n items?", "", resources.size()), QString(),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
     auto result = messageBox.exec();
 
@@ -1577,7 +1564,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (!validateLicenses(tr("Activate one more license to start the Video Wall.")))
         return;
 
-    startVideowallAndExit(videoWall);
+    switchToVideoWallMode(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered()
@@ -1932,10 +1919,16 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
     {
         case Action::AddAction:
         case Action::SetAction:
-            resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            if (checkLocalFiles(targetIndex, targetLayout))
+                resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         case Action::SwapAction:
-            swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
+                swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+            else
+                cleanupUnusedLayouts();
             break;
         default:
             break;
@@ -2070,13 +2063,14 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n matrices?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
-    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources));
-    const auto result = messageBox.exec();
-    if (result != QDialogButtonBox::Yes)
+
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
@@ -2989,6 +2983,16 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
     }
 
+}
+
+bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& index,
+    const QnLayoutResourcePtr& layout)
+{
+    if (!layout)
+        return true;
+
+    return nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+        layout->layoutResources().toList());
 }
 
 bool QnWorkbenchVideoWallHandler::validateLicenses(const QString &detail) const

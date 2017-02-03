@@ -55,7 +55,7 @@ private:
 
     bool canStartVideowall(const QnVideoWallResourcePtr &videowall) const;
 
-    void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
+    void switchToVideoWallMode(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
@@ -82,6 +82,12 @@ private:
 
     void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
     void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
+
+    /**
+     * Check if layout contains local files, which cannot be placed on the given screen.
+     * Displays an error message if there are local files, and screen belongs to other pc.
+     */
+    bool checkLocalFiles(const QnVideoWallItemIndex& index, const QnLayoutResourcePtr& layout);
 
     bool validateLicenses(const QString &detail) const;
 

@@ -5,13 +5,13 @@
 #include <QtCore/QCoreApplication>
 #include <QtOpenGL/QGLWidget>
 
-#include <utils/common/app_info.h>
 #include <utils/common/performance.h>
 #include <nx/utils/log/log.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_app_info.h>
 
 #ifdef Q_OS_LINUX
 #include <X11/X.h>
@@ -59,11 +59,11 @@ void QnPerformanceTest::detectLightMode() {
         qnSettings->setLightMode(Qn::LightModeFull);
 
         const auto text = QCoreApplication::translate("QnPerformanceTest",
-            "%1 Client can work in configuration mode only").arg(QnAppInfo::productNameLong());
+            "%1 can work in configuration mode only").arg(QnClientAppInfo::applicationDisplayName());
 
         QString extras = QCoreApplication::translate("QnPerformanceTest",
             "Performance of this computer allows running %1"
-            " Client in configuration mode only.").arg(QnAppInfo::productNameLong());
+            " in configuration mode only.").arg(QnClientAppInfo::applicationDisplayName());
         extras += L'\n' + QCoreApplication::translate("QnPerformanceTest",
             "For full - featured mode, please use another computer");
 

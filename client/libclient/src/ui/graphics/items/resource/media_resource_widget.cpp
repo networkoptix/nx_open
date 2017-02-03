@@ -1647,11 +1647,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
+    if (m_display->camDisplay()->isEOFReached())
+        return Qn::NoDataOverlay;
+
     if (resource->hasFlags(Qn::local_image))
     {
         if (resource->getStatus() == Qn::Offline)
-            return Qn::NoDataOverlay;
-        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
     }
@@ -1678,9 +1679,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
@@ -1690,9 +1688,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->isPaused())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         if (!states.hasVideo)
             return Qn::NoVideoDataOverlay;
 

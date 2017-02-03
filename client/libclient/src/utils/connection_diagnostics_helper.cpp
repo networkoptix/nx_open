@@ -7,6 +7,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/self_updater.h>
+#include <client/client_app_info.h>
 
 #include <nx_ec/ec_api.h>
 
@@ -180,8 +181,8 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
             QnMessageBox::warning(parentWidget,
                 QString(),
                 getDiffVersionsFullText(qnCommon->engineVersion().toString(), serverVersion)
-                    + L'\n' + tr("Restart %1 Client in compatibility mode "
-                        "will be required.").arg(QnAppInfo::productNameLong()));
+                    + L'\n' + tr("Restart %1 in compatibility mode "
+                        "will be required.").arg(QnClientAppInfo::applicationDisplayName()));
             break;
         default:
             break;
@@ -231,10 +232,10 @@ bool QnConnectionDiagnosticsHelper::getInstalledVersions(
 Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleApplauncherError(QWidget* parentWidget)
 {
     QnMessageBox::critical(parentWidget,
-        tr("Failed to restart %1 Client in compatibility mode")
-            .arg(QnAppInfo::productNameLong()),
-        tr("Please close %1 Client and start it again using the shortcut in the start menu.")
-            .arg(QnAppInfo::productNameLong()));
+        tr("Failed to restart %1 in compatibility mode")
+            .arg(QnClientAppInfo::applicationDisplayName()),
+        tr("Please close %1 and start it again using the shortcut in the start menu.")
+            .arg(QnClientAppInfo::applicationDisplayName()));
 
     return Qn::IncompatibleVersionConnectionResult;
 }
@@ -291,8 +292,8 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
 
             const auto extras =
                 getDiffVersionFullExtras(qnCommon->engineVersion().toString(), versionString,
-                    tr("You have to download another version of %1 Client to "
-                        "connect to this Server.").arg(QnAppInfo::productNameLong()));
+                    tr("You have to download another version of %1 to "
+                        "connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 
             QnMessageBox dialog(QnMessageBoxIcon::Question,
                 tr("Download Client version %1?").arg(versionString), extras,
@@ -317,12 +318,12 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         //version is installed, trying to run
         const auto extras = getDiffVersionFullExtras(
             qnCommon->engineVersion().toString(), connectionInfo.version.toString(),
-            tr("You have to restart %1 Client in compatibility"
-                " mode to connect to this Server.").arg(QnAppInfo::productNameLong()));
+            tr("You have to restart %1 in compatibility"
+                " mode to connect to this Server.").arg(QnClientAppInfo::applicationDisplayName()));
 
         QnMessageBox dialog(QnMessageBoxIcon::Question,
-            tr("Restart %1 Client in compatibility mode?").arg(QnAppInfo::productNameLong()),
-            extras, QDialogButtonBox::Cancel, QDialogButtonBox::No, parentWidget);
+            tr("Restart %1 in compatibility mode?").arg(QnClientAppInfo::applicationDisplayName()),
+            extras, QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parentWidget);
 
         dialog.addButton(tr("Restart"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 
@@ -387,6 +388,6 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
 void QnConnectionDiagnosticsHelper::failedRestartClientMessage(QWidget* parent)
 {
     QnMessageBox::critical(parent,
-        tr("Failed to restart %1 Client").arg(QnAppInfo::productNameLong()),
+        tr("Failed to restart %1").arg(QnClientAppInfo::applicationDisplayName()),
         tr("Please close the application and start it again using the shortcut in the start menu."));
 }

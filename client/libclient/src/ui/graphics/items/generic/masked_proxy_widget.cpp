@@ -6,8 +6,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEngine>
 #include <QtWidgets/QStyleOptionGraphicsItem>
-#include <private/qgraphicsitem_p.h>
-#include <private/qwidget_p.h>
+#include <QtWidgets/private/qgraphicsitem_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 
 #include <nx/utils/math/fuzzy.h>
 #include <ui/common/geometry.h>

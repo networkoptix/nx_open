@@ -172,6 +172,7 @@ QnCommonModule::QnCommonModule(QObject *parent):
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
+    m_startupTime = QDateTime::currentDateTime();
 }
 
 QnCommonModule::~QnCommonModule()
@@ -368,4 +369,9 @@ void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)
 Qn::PeerType QnCommonModule::localPeerType() const
 {
     return m_localPeerType;
+}
+
+QDateTime QnCommonModule::startupTime() const
+{
+    return m_startupTime;
 }

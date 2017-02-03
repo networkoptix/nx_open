@@ -839,8 +839,6 @@ QnMediaServerResourcePtr MediaServerProcess::findServer(ec2::AbstractECConnectio
 
 QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connection, const QnMediaServerResourcePtr &server, bool isNewServerInstance)
 {
-    server->setStatus(Qn::Online, Qn::StatusChangeReason::CreateInitialData);
-
     ec2::ApiMediaServerData apiServer;
     fromResourceToApi(server, apiServer);
 
@@ -2192,6 +2190,8 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
+    // TODO: #3.1 Enable authentication for /api/installUpdates when offline cloud authentication is implemented.
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2634,6 +2634,7 @@ void MediaServerProcess::run()
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
+    serverUpdateTool->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     // ===========================================================================
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
@@ -2676,6 +2677,7 @@ void MediaServerProcess::run()
     qnResourceAccessManager->beginUpdate();
     qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    m_mediaServer->setStatus(Qn::Online);
     qDebug() << "resources loaded for" << tt.elapsed();
     qnResourceAccessProvider->endUpdate();
     qDebug() << "access ready" << tt.elapsed();
@@ -3003,7 +3005,7 @@ protected:
         if (QCoreApplication::applicationVersion().isEmpty())
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-        if (application->isRunning() && 
+        if (application->isRunning() &&
             MSSettings::roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
             NX_LOG("Server already started", cl_logERROR);

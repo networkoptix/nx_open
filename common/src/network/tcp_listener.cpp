@@ -321,6 +321,7 @@ void QnTcpListener::run()
             if (d->localPort == 0 && d->serverSocket)
                 d->localPort = d->serverSocket->getLocalAddress().port;
 
+            doPeriodicTasks();
             AbstractStreamSocket* clientSocket = d->serverSocket->accept();
             if(clientSocket)
             {
@@ -361,7 +362,6 @@ void QnTcpListener::run()
                     d->newPort.compare_exchange_strong(zero, d->localPort); //< reopen tcp socket
                 }
             }
-            doPeriodicTasks();
         }
     }
     catch (const std::exception& e)

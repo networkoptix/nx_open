@@ -47,9 +47,6 @@ signals:
     void closeTriggered();
     void buttonClicked(const QString& alias);
 
-protected:
-    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
-
 private slots:
     void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
@@ -116,7 +113,6 @@ private slots:
     void updateToolTipVisibility();
     void updateToolTipPosition();
 
-    void at_thumbnail_clicked();
     void at_loop_sound();
 
 private:

@@ -30,7 +30,7 @@ TEST(AutodetectHttpContentType, main)
     result = autoDetectHttpContentType(kHTMLText);
     ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
     QByteArray kHTMLText2 =
-        "<\"some string with <html>\ tag\" <html lang=\"en_US\"> <body> test </body> </html>";
+        "<\"some string with <html> tag\" <html lang=\"en_US\"> <body> test </body> </html>";
     result = autoDetectHttpContentType(kHTMLText2);
     ASSERT_EQ(result, QByteArray("text/html; charset=utf-8"));
 

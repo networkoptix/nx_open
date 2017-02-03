@@ -3,7 +3,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtMultimedia/QVideoSurfaceFormat>
 
-#include <private/qsgvideonode_p.h>
+#include <QtMultimedia/private/qsgvideonode_p.h>
 
 #include "video_output_backend.h"
 

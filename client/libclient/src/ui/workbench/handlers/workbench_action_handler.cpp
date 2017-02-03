@@ -51,6 +51,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource/videowall_item_index.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -211,8 +212,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
     // local settings
-    connect(action(QnActions::PreferencesGeneralTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesGeneralTabAction_triggered()));
-    connect(action(QnActions::PreferencesNotificationTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesNotificationTabAction_triggered()));
+    connect(action(QnActions::PreferencesGeneralTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
+        Qt::QueuedConnection);
+    connect(action(QnActions::PreferencesNotificationTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
+        Qt::QueuedConnection);
 
     // system administration
     connect(action(QnActions::SystemAdministrationAction), &QAction::triggered, this,
@@ -714,9 +719,24 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
     }
 }
 
-void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered() {
+void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
-    parameters.setArgument(Qn::LayoutResourceRole, workbench()->currentLayout()->resource());
+    const auto currentLayout = workbench()->currentLayout();
+
+    // Check if we are in videowall control mode
+    QnUuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
+    if (!videoWallItemGuid.isNull())
+    {
+        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(videoWallItemGuid);
+        const auto resources = parameters.resources();
+
+        // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
+        if (!nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index, resources, true))
+            return;
+    }
+
+    parameters.setArgument(Qn::LayoutResourceRole, currentLayout->resource());
     menu()->trigger(QnActions::OpenInLayoutAction, parameters);
 }
 
@@ -833,14 +853,17 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
             mainWindow());
 
-        messageBox.addButton(tr("Move"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip);
+        messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+        const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
+            QDialogButtonBox::NoRole);
         messageBox.addCustomWidget(new QnResourceListView(errorResources));
 
         const auto result = messageBox.exec();
+        if (result == QDialogButtonBox::Cancel)
+            return;
 
         /* If user is sure, return invalid cameras back to list. */
-        if ((result != QDialogButtonBox::Cancel) && (skipButton != messageBox.clickedButton()))
+        if (skipButton != messageBox.clickedButton())
             modifiedResources << errorResources;
     }
 
@@ -1008,6 +1031,13 @@ void QnWorkbenchActionHandler::openSystemAdministrationDialog(int page)
     systemAdministrationDialog()->setCurrentPage(page);
 }
 
+void QnWorkbenchActionHandler::openLocalSettingsDialog(int page)
+{
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(page);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_showcaseAction_triggered()
 {
     QDesktopServices::openUrl(qnSettings->showcaseUrl());
@@ -1015,20 +1045,6 @@ void QnWorkbenchActionHandler::at_showcaseAction_triggered()
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     QScopedPointer<QnAboutDialog> dialog(new QnAboutDialog(mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -2021,18 +2037,19 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     messageBox->setIcon(QnMessageBoxIcon::Warning);
     messageBox->setText(tr("Components of the System have different versions:"));
     messageBox->setInformativeText(extras);
+    messageBox->setCheckBoxEnabled();
 
-    messageBox->addCustomButton(QnMessageBoxCustomButton::Skip);
     const auto updateButton = messageBox->addButton(
         tr("Update..."), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+    messageBox->addButton(
+        tr("Skip"), QDialogButtonBox::RejectRole);
 
-    const bool confirmed = ((messageBox->exec() != QDialogButtonBox::Cancel)
-        && (messageBox->clickedButton() == updateButton));
+    messageBox->exec();
 
     if (messageBox->isChecked())
         qnClientShowOnce->setFlag(kVersionMismatchShowOnceKey);
 
-    if (confirmed)
+    if (messageBox->clickedButton() == updateButton)
         menu()->trigger(QnActions::SystemUpdateAction);
 }
 
@@ -2087,7 +2104,6 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();
 }
-
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered()
 {

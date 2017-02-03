@@ -39,6 +39,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 namespace {
 
@@ -163,9 +164,6 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 
     connect(ui->licenseWidget, &QnLicenseWidget::stateChanged, this,
         &QnLicenseManagerWidget::at_licenseWidget_stateChanged);
-
-    connect(this, &QnLicenseManagerWidget::showMessageLater,
-        this, &QnLicenseManagerWidget::showMessage, Qt::QueuedConnection);
 
     auto updateLicensesIfNeeded = [this]
     {
@@ -298,6 +296,21 @@ void QnLicenseManagerWidget::updateLicenses()
     updateButtons();
 }
 
+void QnLicenseManagerWidget::showMessageLater(
+    QnMessageBoxIcon icon,
+    const QString& text,
+    const QString& extras,
+    CopyToClipboardButton button)
+{
+    const auto showThisMessage =
+        [this, icon, text, extras, button]()
+        {
+            showMessage(icon, text, extras, button);
+        };
+
+    executeDelayedParented(showThisMessage, 0, this);
+}
+
 void QnLicenseManagerWidget::showMessage(
     QnMessageBoxIcon icon,
     const QString& text,
@@ -307,14 +320,16 @@ void QnLicenseManagerWidget::showMessage(
     QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
     messageBox->setIcon(icon);
     messageBox->setText(text);
+    messageBox->setInformativeText(extras);
 
     if (button == CopyToClipboardButton::Show)
     {
         const auto button = messageBox->addButton(
-            tr("Copy To Clipboard"), QDialogButtonBox::HelpRole, QnButtonAccent::NoAccent);
+            tr("Copy To Clipboard"), QDialogButtonBox::HelpRole);
         connect(button, &QPushButton::clicked, this,
             [this, extras] { qApp->clipboard()->setText(extras); });
     }
+
     messageBox->setStandardButtons(QDialogButtonBox::Ok);
     messageBox->setEscapeButton(QDialogButtonBox::Ok);
     messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -327,7 +342,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull())
     {
-        emit showMessageLater(QnMessageBoxIcon::Critical,
+        showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(), CopyToClipboardButton::Hide);
 
         ui->licenseWidget->setOnline(false);
@@ -402,7 +417,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
 void QnLicenseManagerWidget::showIncompatibleLicenceMessageLater()
 {
-    emit showMessageLater(QnMessageBoxIcon::Warning,
+    showMessageLater(QnMessageBoxIcon::Warning,
         tr("Incompatible license"),
         tr("License you are trying to activate is incompatible with your software.")
             + L'\n' + tr("Please contact Customer Support to get a valid license key."),
@@ -448,7 +463,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
     else if (licenseListHelper.getLicenseByKey(licenseKey))
     {
-        emit showMessageLater(QnMessageBoxIcon::Information,
+        showMessageLater(QnMessageBoxIcon::Information,
             tr("You already activated this license"), QString(),
             CopyToClipboardButton::Hide);
     }
@@ -554,7 +569,7 @@ void QnLicenseManagerWidget::at_downloadError()
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(QnMessageBoxIcon::Critical,
+        showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(),
             CopyToClipboardButton::Hide);
 
@@ -667,7 +682,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
             switch (errCode)
             {
                 case QnLicense::InvalidSignature:
-                    emit showMessageLater(QnMessageBoxIcon::Warning,
+                    showMessageLater(QnMessageBoxIcon::Warning,
                         tr("Invalid activation key file"),
                         tr("Select a valid activation key file to continue.")
                             + L'\n' +  getProblemPersistMessage(),
@@ -681,7 +696,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     showIncompatibleLicenceMessageLater();
                     break;
                 case QnLicense::TooManyLicensesPerDevice:
-                    emit showMessageLater(QnMessageBoxIcon::Warning,
+                    showMessageLater(QnMessageBoxIcon::Warning,
                         tr("This device accepts single channel license only"),
                         getContactSupportMessage(), CopyToClipboardButton::Hide);
                     break;
@@ -710,7 +725,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     }
     else if (messageId == lit("InvalidKey"))
     {
-        emit showMessageLater(QnMessageBoxIcon::Critical,
+        showMessageLater(QnMessageBoxIcon::Warning,
             tr("Invalid license key"),
             tr("Please make sure it is entered correctly. ")
             + L'\n' + getProblemPersistMessage(),
@@ -731,7 +746,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
 
 void QnLicenseManagerWidget::showFailedToActivateLicenseLater(const QString& extras)
 {
-    emit showMessageLater(QnMessageBoxIcon::Critical,
+    showMessageLater(QnMessageBoxIcon::Critical,
         tr("Failed to activate license"), extras,
         CopyToClipboardButton::Hide);
 }
@@ -766,7 +781,7 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();
-    emit showMessageLater(QnMessageBoxIcon::Warning,
+    showMessageLater(QnMessageBoxIcon::Warning,
         tr("License already activated on another server"),
         extras, CopyToClipboardButton::Show);
 }

@@ -367,6 +367,9 @@ void QnSingleCameraSettingsWidget::submitToResource()
             m_camera->setName(name);  //TODO: #GDM warning message should be displayed on nameEdit textChanged, Ok/Apply buttons should be blocked.
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
+        if (ui->passwordEdit->hasFocus() && ui->passwordEdit->echoMode() == QLineEdit::PasswordEchoOnEdit)
+            setFocus();
+
         QAuthenticator loginEditAuth;
         loginEditAuth.setUser(ui->loginEdit->text().trimmed());
         loginEditAuth.setPassword(ui->passwordEdit->text().trimmed());
@@ -773,10 +776,11 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
-        tr("Set Recording to \"Always\""), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+        tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
     dialog.addButton(
-        tr("Enable Secondary Stream"), QDialogButtonBox::AcceptRole, QnButtonAccent::NoAccent);
+        tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
 
+    dialog.setButtonAutoDetection(QnButtonDetection::EscapeButton);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return  false;
 
@@ -911,7 +915,8 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomButton(QnMessageBoxCustomButton::Reset);
+    dialog.addCustomButton(QnMessageBoxCustomButton::Reset,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 

@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Settings 1.0
 
 Page
 {
@@ -28,13 +29,19 @@ Page
 
             LabeledSwitch
             {
+                id: livePreviews
+
                 width: parent.width
                 text: qsTr("Live previews in the cameras list")
+                checked: settings.liveVideoPreviews
+                onCheckedChanged: settings.liveVideoPreviews = checked
             }
+
             LabeledSwitch
             {
                 width: parent.width
                 text: qsTr("Save passwords for servers")
+                visible: false
             }
         }
     }

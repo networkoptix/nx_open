@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_client_connections.h>
 
 #include "reverse_acceptor.h"
 

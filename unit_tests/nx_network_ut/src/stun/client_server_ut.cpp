@@ -141,21 +141,35 @@ TEST_F(StunClientServerTest, Connectivity)
     startServer(address);
     reconnectEvents.pop(); //< Automatic reconnect is expected.
 
+    std::atomic<size_t> timerTicks;
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ(1, server->connectionCount());
 
+    std::this_thread::sleep_for(timerPeriod * 5);
+    EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
+
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError);
+    timerTicks = 0;
 
     // Wait some time so client will retry to connect again and again.
     std::this_thread::sleep_for(defaultSettings().reconnectPolicy.initialDelay * 5);
+    EXPECT_EQ(0, timerTicks); //< Timer does not tick while connection is brocken;
 
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ(1, server->connectionCount());
+
+    std::this_thread::sleep_for(timerPeriod * 5);
+    EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
