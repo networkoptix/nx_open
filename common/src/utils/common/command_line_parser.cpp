@@ -116,7 +116,7 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile)
+bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
 {
     if (errorFile)
     {
@@ -129,7 +129,7 @@ bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile)
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream)
+bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *errorStream)
 {
     bool result = true;
     int pos = 0;

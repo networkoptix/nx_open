@@ -274,6 +274,17 @@ public:
     boost::optional<std::string> systemId;
 };
 
+enum class FilterField
+{
+    customization,
+};
+
+class Filter
+{
+public:
+    std::map<FilterField, std::string> nameToValue;
+};
+
 } // namespace api
 } // namespace cdb
 } // namespace nx

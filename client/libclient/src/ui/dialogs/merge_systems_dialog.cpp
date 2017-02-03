@@ -138,7 +138,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
         const auto moduleInformation = server->getModuleInformation();
 
         QString systemName = helpers::isNewSystem(moduleInformation)
-            ? tr("New System")
+            ? tr("New Server")
             : moduleInformation.systemName;
 
         if (!systemName.isEmpty())
@@ -299,7 +299,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     ui->loginEdit->setEnabled(!isNewSystem);
     ui->passwordEdit->setEnabled(!isNewSystem);
     const QString systemName = isNewSystem
-        ? tr("New System")
+        ? tr("New Server")
         : moduleInformation.systemName;
 
     ui->remoteSystemLabel->setText(systemName);
@@ -347,7 +347,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
     if (!message.isEmpty())
         message.prepend(lit("\n"));
 
-    QnMessageBox::critical(this, tr("Error"), tr("Cannot merge systems.") + message);
+    QnMessageBox::critical(this, tr("Failed to merge Systems"), message);
 
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 

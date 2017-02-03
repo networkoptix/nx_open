@@ -2,6 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
 
 class QnMediaResourceHelperPrivate : public QObject
@@ -11,10 +12,12 @@ class QnMediaResourceHelperPrivate : public QObject
 
 public:
     QnVirtualCameraResourcePtr camera;
+    QnMediaServerResourcePtr server;
 
     QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent);
 
     void at_propertyChanged(const QnResourcePtr& resource, const QString& key);
+    void updateServer();
 };
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject* parent):
@@ -42,7 +45,9 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
         return;
 
     if (d->camera)
-        disconnect(d->camera, nullptr, this, nullptr);
+        d->camera->disconnect(this);
+
+    d->updateServer();
 
     d->camera = camera;
 
@@ -56,6 +61,10 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
             d, &QnMediaResourceHelperPrivate::at_propertyChanged);
         connect(d->camera, &QnResource::videoLayoutChanged,
             this, &QnMediaResourceHelper::videoLayoutChanged);
+        connect(d->camera, &QnResource::parentIdChanged,
+            d, &QnMediaResourceHelperPrivate::updateServer);
+
+        d->updateServer();
     }
 
     emit resourceIdChanged();
@@ -76,6 +85,12 @@ QString QnMediaResourceHelper::resourceName() const
 {
     Q_D(const QnMediaResourceHelper);
     return d->camera ? d->camera->getName() : QString();
+}
+
+QString QnMediaResourceHelper::serverName() const
+{
+    Q_D(const QnMediaResourceHelper);
+    return d->server ? d->server->getName() : QString();
 }
 
 qreal QnMediaResourceHelper::customAspectRatio() const
@@ -125,4 +140,28 @@ void QnMediaResourceHelperPrivate::at_propertyChanged(
         emit q->customAspectRatioChanged();
     else if (key == QnMediaResource::rotationKey())
         emit q->customRotationChanged();
+}
+
+void QnMediaResourceHelperPrivate::updateServer()
+{
+    Q_Q(QnMediaResourceHelper);
+
+    if (server)
+    {
+        server->disconnect(this);
+        server.clear();
+    }
+
+    if (camera)
+    {
+        server = camera->getParentServer();
+
+        if (server)
+        {
+            connect(server.data(), &QnMediaServerResource::nameChanged,
+                q, &QnMediaResourceHelper::serverNameChanged);
+        }
+    }
+
+    emit q->serverNameChanged();
 }

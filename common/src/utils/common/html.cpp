@@ -123,7 +123,7 @@ QString htmlBold(const QString &source)
 
 QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /*= false */, bool isItalic /*= false*/)
 {
-    static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
+    static const auto kPTag = lit("<p style=\" text-indent: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
 
     if (text.isEmpty())
         return QString();

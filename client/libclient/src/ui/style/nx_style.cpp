@@ -25,8 +25,9 @@
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QInputDialog>
-#include <private/qfont_p.h>
-#include <private/qabstractitemview_p.h>
+
+#include <QtGui/private/qfont_p.h>
+#include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>
 #include <ui/common/popup_shadow.h>
@@ -34,6 +35,7 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -161,6 +163,11 @@ namespace
     bool isAccented(const QWidget* widget)
     {
         return widget && widget->property(Properties::kAccentStyleProperty).toBool();
+    }
+
+    bool isWarningStyle(const QWidget* widget)
+    {
+        return widget && widget->property(Properties::kWarningStyleProperty).toBool();
     }
 
     bool isSwitchButtonCheckbox(const QWidget* widget)
@@ -594,8 +601,8 @@ void QnNxStyle::drawPrimitive(
             if (qobject_cast<QAbstractItemView*>(option->styleObject))
                 return;
 
-            QColor color = isAccented(widget)
-                ? option->palette.color(QPalette::HighlightedText)
+            QColor color = isAccented(widget) || isWarningStyle(widget)
+                ? option->palette.color(QPalette::BrightText)
                 : option->palette.color(QPalette::Highlight);
             color.setAlphaF(0.5);
 
@@ -615,11 +622,17 @@ void QnNxStyle::drawPrimitive(
 
             QnPaletteColor mainColor = findColor(option->palette.button().color());
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
-                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+                    mainColor.setAlphaF(style::Hints::kDisabledBrandedButtonOpacity);
             }
 
             QColor buttonColor = mainColor;
@@ -688,7 +701,13 @@ void QnNxStyle::drawPrimitive(
                 }
             }
 
-            if (isAccented(widget))
+            if (isWarningStyle(widget))
+            {
+                mainColor = this->mainColor(Colors::kRed);
+                if (!enabled)
+                    mainColor.setAlphaF(style::Hints::kDisabledItemOpacity);
+            }
+            else if (isAccented(widget))
             {
                 mainColor = this->mainColor(Colors::kBrand);
                 if (!enabled)
@@ -2355,7 +2374,9 @@ void QnNxStyle::drawControl(
                     return;
                 }
 
-                if (isDefaultForegroundRole && isAccented(widget))
+                if (isDefaultForegroundRole && isWarningStyle(widget))
+                    foregroundRole = QPalette::BrightText;
+                else if (isDefaultForegroundRole && isAccented(widget))
                     foregroundRole = QPalette::HighlightedText;
 
                 int margin = pixelMetric(PM_ButtonMargin, option, widget);
@@ -2801,6 +2822,9 @@ QRect QnNxStyle::subControlRect(
                                     rect = QRect(rect.left(), rect.top(), rect.width(), pos);
                                 else
                                     rect = QRect(rect.left(), rect.top(), pos, rect.height());
+                                break;
+
+                            default:
                                 break;
                         }
 
@@ -3816,7 +3840,8 @@ void QnNxStyle::polish(QWidget *widget)
                     widget->setFont(font);
                 }
 
-                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion))
+                if (!QnObjectCompanionManager::companion(calendar, kCalendarDelegateCompanion)
+                    && !qobject_cast<QnCalendarWidget*>(calendar))
                 {
                     QnObjectCompanionManager::attach(calendar,
                         new CalendarDelegateReplacement(view, calendar),
@@ -4138,4 +4163,36 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     }
 
     return base_type::eventFilter(object, event);
+}
+
+void QnNxStyle::paintCosmeticFrame(QPainter* painter, const QRectF& rect,
+    const QColor& color, int width, int shift)
+{
+    if (width == 0)
+        return;
+
+    const QRect deviceRect = painter->transform().mapRect(rect).toAlignedRect();
+
+    QRect outerRect = deviceRect.adjusted(shift, shift, -shift, -shift);
+    QRect innerRect = outerRect.adjusted(width, width, -width, -width);
+
+    if (width < 0) //< if outer frame
+    {
+        qSwap(outerRect, innerRect);
+        width = -width;
+    }
+
+    const QRect topRect(outerRect.left(), outerRect.top(), outerRect.width(), width);
+    const QRect leftRect(outerRect.left(), innerRect.top(), width, innerRect.height());
+    const QRect rightRect(innerRect.right() + 1, innerRect.top(), width, innerRect.height());
+    const QRect bottomRect(outerRect.left(), innerRect.bottom() + 1, outerRect.width(), width);
+
+    const QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+    const QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+
+    const QBrush brush(color);
+    painter->fillRect(topRect, brush);
+    painter->fillRect(leftRect, brush);
+    painter->fillRect(rightRect, brush);
+    painter->fillRect(bottomRect, brush);
 }

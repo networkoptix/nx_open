@@ -11,12 +11,14 @@
 
 #include <QtCore/QUrl>
 
-#include <http/custom_headers.h>
-#include <nx/utils/std/cpp14.h>
-#include <utils/common/stoppable.h>
-#include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
+#include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/std/cpp14.h>
+
+#include <http/custom_headers.h>
+#include <utils/common/stoppable.h>
 
 #include "data/account_data.h"
 #include "data/types.h"
@@ -79,6 +81,8 @@ public:
 
     void setProxyVia(const SocketAddress& proxyEndpoint)
     {
+        NX_ASSERT(proxyEndpoint.port > 0);
+
         QnMutexLocker lk(&m_mutex);
         m_auth.proxyEndpoint = proxyEndpoint;
     }
@@ -105,18 +109,14 @@ protected:
             auth,
             [this, auth, path, input, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
-                SocketAddress endpoint) mutable
+                QUrl cdbUrl) mutable
             {
                 if (resCode != nx_http::StatusCode::ok)
                     return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-                QUrl url;
-                url.setScheme("http");
-                url.setHost(endpoint.address.toString());
-                url.setPort(endpoint.port);
-                url.setPath(url.path() + path);
+                cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
                 execute(
-                    std::move(url),
+                    std::move(cdbUrl),
                     std::move(auth),
                     input,
                     std::move(handler));
@@ -139,18 +139,14 @@ protected:
             auth,
             [this, auth, path, handler, errHandler](
                 nx_http::StatusCode::Value resCode,
-                SocketAddress endpoint) mutable
+                QUrl cdbUrl) mutable
             {
                 if (resCode != nx_http::StatusCode::ok)
                     return errHandler(api::httpStatusCodeToResultCode(resCode));
 
-                QUrl url;
-                url.setScheme("http");
-                url.setHost(endpoint.address.toString());
-                url.setPort(endpoint.port);
-                url.setPath(url.path() + path);
+                cdbUrl.setPath(network::url::normalizePath(cdbUrl.path() + path));
                 execute(
-                    std::move(url),
+                    std::move(cdbUrl),
                     std::move(auth),
                     std::move(handler));
             });

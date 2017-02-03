@@ -11,5 +11,8 @@ public:
     explicit QnServerAddressWatcher(QObject* parent = nullptr);
 
 private:
+    void shrinkUrlsList();
+
+private:
     QList<QUrl> m_urls;
 };

@@ -16,8 +16,8 @@
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" /> 
             <Payload SourceFile="installer_bg.png" /> 
-            <Payload SourceFile="logo_big.png" />
-            <Payload SourceFile="logo_small.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication
                 SuppressOptionsUI="yes"
@@ -27,8 +27,10 @@
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleServerTool)" />
+
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeNxtool.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Chain DisableSystemRestore="yes">
             <PackageGroupRef Id="NxtoolPackageGroup"/>

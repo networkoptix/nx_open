@@ -321,12 +321,12 @@ void QnIoModuleOverlayWidgetPrivate::at_timerTimeout()
 
             item.stateChangeTimer.invalidate();
 
-            QString portName = item.config.getName();
-            QString message = item.state.isActive
-                ? tr("Failed to turn off I/O port \"%1\"")
-                : tr("Failed to turn on I/O port \"%1\"");
+            const auto portName = item.config.getName();
+            const auto message = item.state.isActive
+                ? tr("Failed to turn off I/O port %1")
+                : tr("Failed to turn on I/O port %1");
 
-            QnMessageBox::warning(nullptr, tr("I/O port error"), message.arg(portName));
+            QnMessageBox::warning(nullptr, message.arg(portName));
         }
     }
 }

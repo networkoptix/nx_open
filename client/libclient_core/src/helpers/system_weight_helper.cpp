@@ -3,21 +3,28 @@
 #include <nx/utils/system_utils.h>
 #include <client_core/client_core_settings.h>
 
-qreal helpers::calculateSystemWeight(qreal baseWeight, qint64 lastConnectedUtcMs)
+namespace nx {
+namespace client {
+namespace core {
+namespace helpers {
+
+qreal calculateSystemWeight(qreal baseWeight, qint64 lastConnectedUtcMs)
 {
     const std::chrono::milliseconds ms(lastConnectedUtcMs);
     const std::chrono::time_point<std::chrono::system_clock> timePoint(ms);
     return nx::utils::calculateSystemUsageFrequency(timePoint, baseWeight);
 }
 
-void helpers::updateWeightData(const QnUuid& localId)
+void updateWeightData(const QnUuid& localId)
 {
+    using nx::client::core::WeightData;
+
     auto weightData = qnClientCoreSettings->localSystemWeightsData();
     const auto itWeightData = std::find_if(weightData.begin(), weightData.end(),
-        [localId](const QnWeightData& data) { return data.localId == localId; });
+        [localId](const WeightData& data) { return data.localId == localId; });
 
     auto currentWeightData = (itWeightData == weightData.end()
-        ? QnWeightData{localId, 0, QDateTime::currentMSecsSinceEpoch(), true}
+        ? WeightData{localId, 0, QDateTime::currentMSecsSinceEpoch(), true}
         : *itWeightData);
 
     currentWeightData.weight = helpers::calculateSystemWeight(
@@ -32,3 +39,8 @@ void helpers::updateWeightData(const QnUuid& localId)
 
     qnClientCoreSettings->setLocalSystemWeightsData(weightData);
 }
+
+} // namespace helpers
+} // namespace core
+} // namespace client
+} // namespace nx

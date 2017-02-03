@@ -11,9 +11,9 @@ namespace ec2
     {
     public:
         QnVideowallNotificationManager();
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
-        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran);
+        void triggerNotification( const QnTransaction<ApiVideowallData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnVideowallNotificationManager> QnVideowallNotificationManagerPtr;

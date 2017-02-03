@@ -719,14 +719,14 @@ TEST(MediaDbTest, ReadWrite_MT)
     std::vector<std::thread> threads;
     for (size_t i = 0; i < threadsNum; ++i)
     {
-            threads.emplace_back(
-                std::thread([&dbHelper, &tdm, i, recordsCount]
-                            {
-                                size_t j = i * recordsCount + 1;
-                                for (; j < (i + 1) * recordsCount + 1; ++j)
-                                    boost::apply_visitor(RecordWriteVisitor(&dbHelper),
-                                                         tdm.dataVector[j].data);
-                            }));
+        threads.emplace_back(
+            std::thread([&dbHelper, &tdm, i, recordsCount]
+                        {
+                            size_t j = i * recordsCount + 1;
+                            for (; j < (i + 1) * recordsCount + 1; ++j)
+                                boost::apply_visitor(RecordWriteVisitor(&dbHelper),
+                                                     tdm.dataVector[j].data);
+                        }));
     }
 
     for (size_t i = 0; i < threadsNum; ++i)

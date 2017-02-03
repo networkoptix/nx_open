@@ -2,6 +2,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_instance_manager.h>
+#include <client/client_show_once_settings.h>
 
 namespace {
 
@@ -22,14 +23,14 @@ QnClientSettingsWatcher::QnClientSettingsWatcher(QObject* parent):
                 return;
 
             qnSettings->load();
+            qnClientShowOnce->sync();
             qnClientInstanceManager->markOwnSettingsDirty(false);
         });
 
     timer->start();
 
-    connect(qnSettings, &QnClientSettings::saved, this,
-        [this]
-        {
-            qnClientInstanceManager->markOtherSettingsDirty(true);
-        });
+    auto invalidateOther = [this] { qnClientInstanceManager->markOtherSettingsDirty(true); };
+
+    connect(qnSettings, &QnClientSettings::saved, this, invalidateOther);
+    connect(qnClientShowOnce, &nx::settings::ShowOnce::changed, this, invalidateOther);
 }

@@ -36,8 +36,14 @@ AccountWithPassword CdbFunctionalTest::addActivatedAccount2()
 api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
     const AccountWithPassword& account)
 {
-    //adding system to account
-    api::SystemData system1;
+    return addRandomSystemToAccount(account, api::SystemData());
+}
+
+api::SystemData CdbFunctionalTest::addRandomSystemToAccount(
+    const AccountWithPassword& account,
+    const api::SystemData& systemPrototype)
+{
+    api::SystemData system1 = systemPrototype;
     NX_GTEST_ASSERT_EQ(
         api::ResultCode::ok,
         CdbLauncher::bindRandomSystem(account.email, account.password, &system1));

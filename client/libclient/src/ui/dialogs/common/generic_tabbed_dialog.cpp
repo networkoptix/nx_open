@@ -88,7 +88,8 @@ void QnGenericTabbedDialog::accept()
     if (!canApplyChanges())
         return;
 
-    applyChanges();
+    if (hasChanges())
+        applyChanges();
     base_type::accept();
     emit dialogClosed();
 }
@@ -329,7 +330,7 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     switch (button)
     {
     case QDialogButtonBox::Apply:
-        if (canApplyChanges())
+        if (canApplyChanges() && hasChanges())
             applyChanges();
         break;
     default:

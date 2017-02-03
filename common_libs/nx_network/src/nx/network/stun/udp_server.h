@@ -40,6 +40,8 @@ public:
      */
     bool listen();
 
+    void stopReceivingMessagesSync();
+
     /**
      * Returns local address occupied by server.
      */

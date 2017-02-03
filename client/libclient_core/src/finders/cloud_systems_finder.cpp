@@ -220,7 +220,7 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
             if (cloudSystemId != moduleInformation.cloudSystemId)
                 return;
 
-            clearServersTask = QnRaiiGuardPtr();
+            clearServersTask->disableDestructionHandler();
 
             const auto serverId = moduleInformation.id;
             if (systemDescription->containsServer(serverId))

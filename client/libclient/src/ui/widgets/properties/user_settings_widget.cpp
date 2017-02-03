@@ -136,6 +136,8 @@ QnUserSettingsWidget::QnUserSettingsWidget(QnUserSettingsModel* model, QWidget* 
     setupInputFields();
 
     m_aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());
+    m_aligner->registerTypeAccessor<QnCloudUserPanelWidget>(
+        QnCloudUserPanelWidget::createIconWidthAccessor());
     m_aligner->setSkipInvisible(false);
 }
 
@@ -172,21 +174,25 @@ bool QnUserSettingsWidget::hasChanges() const
 
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
-        QnUuid userRoleId = selectedUserRoleId();
-        if (m_model->user()->userRoleId() != userRoleId)
-            return true;
-
-        if (userRoleId.isNull() && selectedRole() != m_model->user()->userRole())
+        const auto selectedRole = this->selectedRole();
+        const bool changed = selectedRole == Qn::UserRole::CustomUserRole
+            ? m_model->user()->userRoleId() != selectedUserRoleId()
+            : m_model->user()->userRole() != selectedRole;
+        if (changed)
             return true;
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
+    {
         if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
+    }
 
     if (permissions.testFlag(Qn::WriteFullNamePermission))
+    {
         if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
             return true;
+    }
 
     return false;
 }
@@ -242,6 +248,8 @@ void QnUserSettingsWidget::loadDataToUi()
 
     if (m_model->mode() == QnUserSettingsModel::NewUser)
         m_aligner->addWidget(ui->userTypeLabel);
+    else if (m_model->user()->isCloud())
+        m_aligner->addWidget(ui->cloudPanelWidget);
 }
 
 QString QnUserSettingsWidget::passwordPlaceholder() const

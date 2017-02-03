@@ -186,14 +186,13 @@ void QnQuickTextInput::emitPressAndHold()
     if (m_contextMenuPos.isNull())
         return;
 
-    const auto textLen = text().length();
     if (m_selectionStart != m_selectionEnd)
         select(m_selectionStart, m_selectionEnd);
     else
         setCursorPosition(m_cursorPosition);
-    emit pressAndHold(m_contextMenuPos);
-};
 
+    emit pressAndHold(m_contextMenuPos);
+}
 
 void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {

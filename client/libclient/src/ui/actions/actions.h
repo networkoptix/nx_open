@@ -65,6 +65,11 @@ enum IDType
     PreferencesNotificationTabAction,
 
     /**
+    * Opens notifications settings preferences tab.
+    */
+    PreferencesCloudTabAction,
+
+    /**
      * Shows / hides FPS display.
      */
     ShowFpsAction,
@@ -1094,6 +1099,9 @@ enum IDType
      * Opens cloud account management page in the browser.
      */
     OpenCloudManagementUrl,
+
+    /** Hide cloud promo */
+    HideCloudPromoAction,
 
     ActionCount,
 

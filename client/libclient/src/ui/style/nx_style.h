@@ -57,6 +57,19 @@ public:
     virtual void polish(QWidget *widget) override;
     virtual void unpolish(QWidget *widget) override;
 
+    /**
+     * Paints cosmetic rectangular frame.
+     *     painter - a painter to paint with
+     *     rect - a rectangle to paint frame around
+     *     color - frame color
+     *     frameWidth - frame width, will not be transformed by painter transformation
+     *                  positive width produces inner frame, negative - outer frame
+     *     frameShift - frame shift from rect, will not be transformed by painter transformation
+     *                  positive value produces inward shift, negative - outward shift
+     */
+    static void paintCosmeticFrame(QPainter* painter, const QRectF& rect,
+        const QColor& color, int frameWidth, int frameShift);
+
     static QnNxStyle *instance();
 
 protected:

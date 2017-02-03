@@ -6,7 +6,7 @@ Item
 {
     id: videoNavigation
 
-    property var mediaPlayer
+    property var videoScreenController
 
     implicitWidth: parent.width
     implicitHeight: content.height
@@ -34,7 +34,7 @@ Item
             lineWidth: 2
             color: ColorTheme.windowText
 
-            running: mediaPlayer && mediaPlayer.loading
+            running: videoScreenController && videoScreenController.mediaPlayer.loading
             opacity: running ? 1.0 : 0.0
 
             Behavior on opacity
@@ -57,7 +57,8 @@ Item
             text: qsTr("LIVE")
             height: 64
             verticalAlignment: Text.AlignVCenter
-            opacity: mediaPlayer && mediaPlayer.loading ? 0.2 : 1.0
+            opacity: videoScreenController
+                && videoScreenController.mediaPlayer.loading ? 0.2 : 1.0
 
             Behavior on opacity
             {

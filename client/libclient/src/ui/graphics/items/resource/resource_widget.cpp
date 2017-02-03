@@ -133,8 +133,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_renderStatus(Qn::NothingRendered),
     m_lastNewFrameTimeMSec(0),
     m_selectionState(SelectionState::invalid),
-    m_scaleWatcher(),
-    m_framePainter()
+    m_scaleWatcher()
 {
     updateSelectedState();
 
@@ -184,7 +183,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aspectRatio = defaultAspectRatio();
 
     connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
-        this, [this, itemId = item->uuid()](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        this, [this, itemId = item->uuid()](
+            const QnUuid& id, Qn::ItemDataRole role, const QVariant& /*data*/)
         {
             if (id != itemId)
                 return;
@@ -210,15 +210,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
-
-    connect(&m_scaleWatcher, &QnViewportScaleWatcher::scaleChanged,
-        this, &QnResourceWidget::updateFrameWidth);
-
-    connect(this, &QnResourceWidget::geometryChanged,
-        this, &QnResourceWidget::updateFrameGeometry);
-
-    connect(this, &QnResourceWidget::frameDistinctionColorChanged, this,
-        [this]() { m_framePainter.setColor(calculateFrameColor()); });
 }
 
 QnResourceWidget::~QnResourceWidget()
@@ -836,6 +827,7 @@ void QnResourceWidget::updateStatusOverlay(bool animate)
 Qn::ResourceOverlayButton QnResourceWidget::calculateOverlayButton(
     Qn::ResourceStatusOverlay statusOverlay) const
 {
+    Q_UNUSED(statusOverlay);
     return Qn::ResourceOverlayButton::Empty;
 }
 
@@ -986,22 +978,6 @@ void QnResourceWidget::updateSelectedState()
         return;
 
     m_selectionState = selectionState;
-    m_framePainter.setColor(calculateFrameColor());
-    updateFrameWidth();
-}
-
-void QnResourceWidget::updateFrameWidth()
-{
-    m_framePainter.setFrameWidth(calculateFrameWidth());
-    updateFrameGeometry();
-}
-
-void QnResourceWidget::updateFrameGeometry()
-{
-    const auto offsetValue = (0.9 + m_framePainter.frameWidth()) * m_scaleWatcher.scale();
-    const auto offset = QPointF(offsetValue, offsetValue);
-    const auto targetRect = QRectF(-offset, size() + QSizeF(offsetValue, offsetValue) * 2);
-    m_framePainter.setBoundingRect(targetRect);
 }
 
 qreal QnResourceWidget::calculateFrameWidth() const
@@ -1047,7 +1023,9 @@ void QnResourceWidget::paintWindowFrame(
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
-    m_framePainter.paint(*painter);
+    static const int kFramePadding = 1;
+    QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
+        -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
 }
 
 Qn::RenderStatus QnResourceWidget::paintChannelBackground(QPainter* painter, int /*channel*/,

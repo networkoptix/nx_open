@@ -104,6 +104,11 @@ public:
         const std::string& email,
         const std::string& password,
         std::vector<api::SystemDataEx>* const systems);
+    api::ResultCode getSystemsFiltered(
+        const std::string& email,
+        const std::string& password,
+        const api::Filter& filter,
+        std::vector<api::SystemDataEx>* const systems);
     api::ResultCode getSystem(
         const std::string& email,
         const std::string& password,

@@ -204,10 +204,10 @@ QString Settings::dataDir() const
 #endif
 }
 
-void Settings::load( int argc, char **argv )
+void Settings::load( int argc, const char **argv )
 {
     m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, (const char**)argv);
+    m_settings.parseArgs(argc, argv);
 
     loadConfiguration();
 }

@@ -399,26 +399,30 @@
                         </param>
                         <param>
                             <name>startTime</name>
-                            <description>Start time of the interval (in milliseconds since epoch,
-                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
-                                auto-detected).</description>
+                            <description>Start time of the interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>endTime</name>
-                            <description>End time of the interval (in milliseconds since epoch,
-                                or formatted like "YYYY-MM-DDThh24:mi:ss.zzz" - the format is
-                                auto-detected).</description>
+                            <description>End time of the interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>filter</name>
                             <description>This parameter is used for motion search ("periodsType" must be 1).
                                 Match motion on a video by specified rectangle.
-                                <br/>Format: <code>&lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;</code>
-                                <br/>Each "rectI" format: <code>&lt;x,y,width,height&gt;</code>
+                                <br/>Format: string with a JSON list of <i>sensors</i>,
+                                each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+                                <br/><code>{"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>, "height": <i>height</i>}</code>
                                 <br/>All values are measured in relative portions of a video frame,
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
+                                <i>x</i> and <i>width</i> in range [0..43], <i>y</i> and <i>height</i> in range [0..31],
+                                zero is the left-top corner.
+                                <br/>Example of a full-frame rectangle for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
+                                <br/>Example of two rectangles for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
                             </description>
                             <optional>true</optional>
                         </param>
@@ -459,7 +463,7 @@
                                 </value>
                                 <value>
                                     <name>1</name>
-                                    <description>Only chunks with motion (parameter "motionRegions" is required).</description>
+                                    <description>Only chunks with motion (parameter "filter" is required).</description>
                                 </value>
                             </values>
                         </param>
@@ -526,13 +530,12 @@
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start of time period at ms since 1.1.1970 (UTC
-                                format).</description>
+                            <description>Start of time period (in milliseconds since epoch).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End of time period at ms since 1.1.1970 (UTC format).</description>
+                            <description>End of time period (in milliseconds since epoch).</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -750,23 +753,22 @@
                         </param>
                         <param>
                             <name>time</name>
-                            <description>required image time. Microseconds since 1970 UTC or string
-                                in format "YYYY-MM-DDThh24:mi:ss.zzz". Date format is auto detected.
+                            <description>Required image time (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
                                 Also, additional special values are allowed.</description>
                             <optional>false</optional>
                             <values>
                                 <value>
-                                    <name>YYYY-MM-DDThh24:mi:ss.zzz</name>
-                                    <description>Human readable date format</description>
+                                    <name><i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i></name>
+                                    <description>Human-readable date format/</description>
                                 </value>
                                 <value>
-                                    <name>[0..9]*</name>
-                                    <description>Microseconds since 1970 UTC</description>
+                                    <name>number (in a string)</name>
+                                    <description>Milliseconds since epoch.</description>
                                 </value>
                                 <value>
                                     <name>NOW</name>
-                                    <description>Live position (no frame is returned if camera is
-                                        offline</description>
+                                    <description>Live position (no frame is returned if camera is offline</description>
                                 </value>
                                 <value>
                                     <name>LATEST</name>
@@ -881,16 +883,15 @@
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>Start time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>
+                                End time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -929,16 +930,14 @@
                     <params>
                         <param>
                             <name>from</name>
-                            <description>Start time of a time interval. Microseconds since 1970 UTC
-                                or string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>Start time of a time interval (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>false</optional>
                         </param>
                         <param>
                             <name>to</name>
-                            <description>End time of a time interval. Microseconds since 1970 UTC or
-                                string in format "YYYY-MM-DDThh24:mi:ss.zzz". format is auto
-                                detected.</description>
+                            <description>End time of a time interval(as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                     </params>
@@ -1728,10 +1727,9 @@ http://127.0.0.1:7001/api/createEvent?timestamp=2016-09-16T16:02:41Z&caption=Cre
                         <param>
                             <name>timestamp</name>
                             <description>
-                                Event date and time. It can be either a number of milliseconds
-                                since epoch (1970-01-01 00:00, UTC), or a human-readable date and
-                                time in ISO 8601 format. If "timestamp" is absent, current server
-                                date and time is used.
+                              Event date and time (as a string containing time in milliseconds since epoch,
+                              or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                              If "timestamp" is absent, the current server date and time is used.
                             </description>
                             <optional>true</optional>
                         </param>
@@ -1949,7 +1947,8 @@ the respective JSON fields can be empty.</description>
                       </param>
                       <param>
                         <name>datetime</name>
-                        <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                        <description>System date and time (as a string containing time in milliseconds since epoch,
+                            or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                         <optional>false</optional>
                       </param>
                     </params>
@@ -1981,7 +1980,8 @@ the respective JSON fields can be empty.</description>
                   </param>
                   <param>
                     <name>dateTime</name>
-                    <description>Time in milliseconds since UNIX epoch, or a local time formatted like "yyyy-MM-ddThh:mm:ss".</description>
+                    <description>Date and time (as string containing time in milliseconds since epoch,
+                         or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                     <optional>false</optional>
                   </param>
                 </params>
@@ -2068,9 +2068,11 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default server opens camera from live position. This parameter defines position in an archive in
-                                                        milliseconds since epoch, microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                                        Position can be passed via standard RTSP attribute as well as via URL parameter</description>
+                            <description>By default, the server opens a camera at the live position.
+                                This parameter defines position in an archive
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2156,16 +2158,18 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions
-                                         milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                         Otherwise, LIVE stream is provided</description>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                Otherwise, LIVE stream is provided</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>endPos</name>
-                            <description>If present then specifies archive stream end positions. It used only if "pos" parameter is present.
-                                         Milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
-                                         </description>
+                            <description>If present, specifies archive stream end position
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).
+                                It is used only if "pos" parameter is present.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2204,7 +2208,9 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>Camera archive position to open. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
+                            <description>Camera archive position to open
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -2240,7 +2246,9 @@ the respective JSON fields can be empty.</description>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>Fragment start time. Can be: date/time in ISO format, server time zone (example: 2015-02-20T19:00), milliseconds since epoch (1970-01-01 00:00, UTC) or microseconds since epoch</description>
+                            <description>Fragment start time
+                                (as a string containing time in milliseconds since epoch,
+                                or a local time formatted like <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> - the format is auto-detected).</description>
                             <optional>true</optional>
                         </param>
                         <param>

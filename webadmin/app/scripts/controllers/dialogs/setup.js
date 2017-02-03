@@ -185,7 +185,7 @@ angular.module('webadminApp')
 
         }
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials: " + login + ":" + password + " cloud:" + isCloud);
+            $log.log("Apply credentials: " + login + " cloud:" + isCloud);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
@@ -207,14 +207,19 @@ angular.module('webadminApp')
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
-                var systems = _.map(r.data.reply, function(module)
+                var systems  = _.filter(r.data.reply, function(module){
+                    return !module.serverFlags.indexOf(Config.newServerFlag)>=0 && module.cloudHost == Config.cloud.host;
+                });
+
+                systems = _.map(systems, function(module)
                 {
                     var system = {
                         url: module.remoteAddresses[0] + ':' + module.port,
                         systemName: module.systemName,
                         ip: module.remoteAddresses[0],
                         name: module.name,
-                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0
+                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0,
+                        compatibleCloudHost: module.cloudHost == Config.cloud.host
                     };
 
                     system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';
@@ -501,10 +506,14 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
+                window.location.href = window.location.origin;
+
+                /*
                 $location.path('/');
                 setTimeout(function(){
-                    window.location.reload();
+                    window.location.reload(true);
                 });
+                */
             });
         };
 
@@ -613,12 +622,14 @@ angular.module('webadminApp')
                 0: {},
                 start: {
                     cancel: $scope.settings.thickClient,
+                    noFooter: true, // Here we disable next button
+                    skip: 'merge',
                     next: 'systemName'
                 },
                 systemName: {
                     back: 'start',
                     skip: 'merge',
-                    next: 'chooseCloudOrLocal',
+                    next: 'localLogin',
                     valid: function () {
                         return checkForm($scope.forms.systemNameForm);
                     }
@@ -716,7 +727,7 @@ angular.module('webadminApp')
                     }
                 },
                 merge: {
-                    back: 'systemName',
+                    back: 'start',
                     // onShow: discoverSystems,
                     next: 'mergeProcess',
                     valid: function () {
@@ -728,7 +739,7 @@ angular.module('webadminApp')
                 },
                 mergeFailure: {
                     back: 'merge',
-                    skip: 'systemName',
+                    skip: 'start',
                     retry: function () {
                         $scope.next('merge');
                     }
@@ -738,7 +749,7 @@ angular.module('webadminApp')
                     back: function () {
                         $scope.settings.localPassword = '';
                         $scope.settings.localPasswordConfirmation = '';
-                        $scope.next('chooseCloudOrLocal', true);
+                        $scope.next('systemName', true);
                     },
                     next: initOfflineSystem,
                     valid: function () {

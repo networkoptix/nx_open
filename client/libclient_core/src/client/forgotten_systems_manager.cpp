@@ -4,6 +4,8 @@
 #include <finders/systems_finder.h>
 #include <client_core/client_core_settings.h>
 
+using nx::client::core::WeightData;
+
 QnForgottenSystemsManager::QnForgottenSystemsManager():
     base_type(),
     m_systems()
@@ -21,14 +23,14 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
             const auto checkOnlineSystem =
                 [this, id = system->id(), localId = system->localId(), rawSystem = system.data()]()
                 {
-                    if (rawSystem->isConnectible())
+                    if (rawSystem->isConnectable())
                     {
                         rememberSystem(id);
                         rememberSystem(localId.toString());
                     }
                 };
 
-            connect(system.data(), &QnBaseSystemDescription::connectibleStateChanged,
+            connect(system.data(), &QnBaseSystemDescription::connectableStateChanged,
                 this, checkOnlineSystem);
             checkOnlineSystem();
         };
@@ -55,7 +57,7 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 
             auto localWeights = qnClientCoreSettings->localSystemWeightsData();
             const auto itWeight = std::find_if(localWeights.begin(), localWeights.end(),
-                [localId](const QnWeightData& data) { return (localId == data.localId); });
+                [localId](const WeightData& data) { return (localId == data.localId); });
 
             if (itWeight == localWeights.end())
                 return;
@@ -85,7 +87,7 @@ void QnForgottenSystemsManager::forgetSystem(const QString& id)
     const auto system = qnSystemsFinder->getSystem(id);
 
     // Do not hide online reachable systems and do not clear its weights
-    if (system && system->isConnectible())
+    if (system && system->isConnectable())
         return;
 
     const bool contains = m_systems.contains(id);

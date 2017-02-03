@@ -3,6 +3,7 @@ import Qt.labs.controls 1.0
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Dialogs 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 import "private"
@@ -16,7 +17,7 @@ Pane
     background: null
 
     property alias hostsModel: hostSelectionDialog.model
-    property alias recentLocalConnectionsModel: userSelectionDialog.model;
+    property alias authenticationDataModel: userSelectionDialog.model
     property alias address: addressField.text
     property alias login: loginField.text
     property alias password: passwordField.text
@@ -24,6 +25,7 @@ Pane
     property bool displayAddressError: false
     property bool displayUserCredentialsError: false
     property alias addressErrorText: addressErrorPanel.text
+    property alias credentialsErrorText: credentialsErrorPanel.text
 
     signal accepted()
     signal changed()
@@ -96,7 +98,7 @@ Pane
                 anchors.verticalCenter: parent.verticalCenter
                 icon: lp("/images/expand.png")
                 onClicked: userSelectionDialog.open()
-                visible: recentLocalConnectionsModel.count > 1
+                visible: authenticationDataAccessor.count > 1
             }
 
             onAccepted: KeyNavigation.tab.forceActiveFocus()
@@ -134,7 +136,7 @@ Pane
         }
         FieldWarning
         {
-            text: LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
+            id: credentialsErrorPanel;
             width: parent.width
             opened: displayUserCredentialsError
         }
@@ -156,9 +158,15 @@ Pane
         onItemActivated:
         {
             loginField.text = currentItem
-            passwordField.text = model.getData("password", currentIndex)
-            passwordField.forceActiveFocus()
+            passwordField.text =
+                authenticationDataAccessor.getData(currentIndex, "credentials").password
         }
+    }
+
+    ModelDataAccessor
+    {
+        id: authenticationDataAccessor
+        model: authenticationDataModel
     }
 
     function focusAddressField()

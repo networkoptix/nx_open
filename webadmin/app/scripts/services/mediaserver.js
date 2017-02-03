@@ -28,7 +28,10 @@ angular.module('webadminApp')
             return $http.get(proxy + '/web/api/moduleInformation?showAddresses=true&salt=' + salt).then(function(r){
                 var data = r.data.reply;
                 if(!Config.cloud.portalUrl) {
+                    Config.cloud.host = data.cloudHost;
                     Config.cloud.portalUrl = 'https://' + data.cloudHost;
+                    Config.cloud.systemId = data.cloudSystemId;
+                    Config.protoVersion = data.protoVersion;
                 }
 
                 var ips = _.filter(data.remoteAddresses,function(address){
@@ -388,6 +391,9 @@ angular.module('webadminApp')
                 // 1. get remote nonce
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data){
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     // 2. calculate digest
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
@@ -405,17 +411,16 @@ angular.module('webadminApp')
                         takeRemoteSettings: !keepMySystem
                     });
                 },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
+                    return $q.reject(error);
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
                 var self = this;
                 return self.getNonce(remoteLogin, url).then(function(data) {
+
+                    if(data.data.error && data.data.error!="0"){
+                        return $q.reject(data);
+                    }
                     var realm = data.data.reply.realm;
                     var nonce = data.data.reply.nonce;
                     var getKey = self.digest(remoteLogin, remotePassword, realm, nonce, 'GET');
@@ -430,12 +435,7 @@ angular.module('webadminApp')
                         url: url
                     }));
                 },function(error){
-                    return $q.reject({
-                        data:{
-                            error:3,
-                            errorString:'INCOMPATIBLE'
-                        }
-                    });
+                    return $q.reject(error);
                 });
             },
             restart: function() { return wrapPost(proxy + '/web/api/restart'); },
@@ -467,7 +467,7 @@ angular.module('webadminApp')
                 return cacheCurrentUser;
             },
             getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime');
+                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
@@ -600,7 +600,7 @@ angular.module('webadminApp')
 
             timeSettings:function(dateTime, timeZone){
                 if(!dateTime || !timeZone) {
-                    return wrapGet(proxy + '/web/api/gettime');
+                    return wrapGet(proxy + '/web/api/gettime?local');
                 }
                 return wrapPost(proxy + '/web/api/setTime', stringifyValues({
                     timeZoneId: timeZone,

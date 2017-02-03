@@ -1,7 +1,6 @@
 pragma Singleton
 
 import QtQuick 2.5;
-import NetworkOptix.Qml 1.0;
 
 QtObject
 {
@@ -55,14 +54,15 @@ QtObject
         readonly property font font: Qt.font({ pixelSize: 14, weight: Font.Normal });
         readonly property font fontReadOnly: Qt.font({ pixelSize: 14, weight: Font.Medium });
         readonly property color color: colors.text;
+        readonly property color selectionColor: colors.highlight;
     }
 
     property QtObject dropDown: QtObject
     {
-        readonly property color bkgColor: colors.text;
+        readonly property color bkgColor: colors.midlight;
         readonly property color hoveredBkgColor: colors.brand;
 
-        readonly property color textColor: context.getPaletteColor("dark", 3)
+        readonly property color textColor: colors.text;
         readonly property color hoveredTextColor: colors.brandContrast;
     }
 
@@ -104,6 +104,7 @@ QtObject
         readonly property color brand: context.getPaletteColor("brand", 7);
 
         readonly property color brandContrast: context.getContrastColor("brand");
+        readonly property color highlight: brand;
         readonly property color red_main: context.getPaletteColor("red", 4);
         readonly property color yellow_main: context.getPaletteColor("yellow", 0);
 

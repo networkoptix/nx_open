@@ -67,12 +67,14 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         MediaFlags_HWDecodingUsed       = 0x04000, /**< hardware decoding is used */
         MediaFlags_PlayUnsync           = 0x08000, /**< ignore syncplay mode */
         MediaFlags_Skip                 = 0x10000, /**< ignore packet at all */
+        MediaFlags_GotFromRemotePeer    = 0x20000, /**< packet has been delivered via network */
     };
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
     // TODO: #Elric #enum
     enum DataType {
-        VIDEO,
+        UNKNOWN = -1,
+        VIDEO = 0,
         AUDIO,
         CONTAINER,
         META_V1,

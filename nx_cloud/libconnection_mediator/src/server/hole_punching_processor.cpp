@@ -72,6 +72,11 @@ HolePunchingProcessor::HolePunchingProcessor(
 
 HolePunchingProcessor::~HolePunchingProcessor()
 {
+    stop();
+}
+
+void HolePunchingProcessor::stop()
+{
     ConnectSessionsDictionary localSessions;
     {
         QnMutexLocker lk(&m_mutex);
@@ -85,7 +90,7 @@ HolePunchingProcessor::~HolePunchingProcessor()
     {
         nx::utils::BarrierHandler barrier(
             [&allSessionsStoppedPromise]() { allSessionsStoppedPromise.set_value(); });
-        for (const auto& connectSession: localSessions)
+        for (const auto& connectSession : localSessions)
             connectSession.second->pleaseStop(barrier.fork());
     }
 

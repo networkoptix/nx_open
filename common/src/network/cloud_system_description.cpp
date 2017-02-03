@@ -1,4 +1,3 @@
-
 #include "cloud_system_description.h"
 
 QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(

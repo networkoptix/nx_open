@@ -34,6 +34,7 @@ public:
 private:
     QSqlDatabase m_dbConnection;
     const ConnectionOptions m_connectionOptions;
+    QString m_connectionName;
 
     bool tuneConnection();
     bool tuneMySqlConnection();

@@ -33,9 +33,20 @@ QString setWarningStyleHtml( const QString &source )
     return lit("<font color=\"%1\">%2</font>").arg(qnGlobals->errorTextColor().name(), source);
 }
 
-void setAccentStyle(QAbstractButton *button, bool accent)
+void resetButtonStyle(QAbstractButton* button)
 {
-    button->setProperty(style::Properties::kAccentStyleProperty, accent);
+    button->setProperty(style::Properties::kAccentStyleProperty, false);
+    button->setProperty(style::Properties::kWarningStyleProperty, false);
+}
+
+void setAccentStyle(QAbstractButton *button)
+{
+    button->setProperty(style::Properties::kAccentStyleProperty, true);
+}
+
+void setWarningButtonStyle(QAbstractButton* button)
+{
+    button->setProperty(style::Properties::kWarningStyleProperty, true);
 }
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape)

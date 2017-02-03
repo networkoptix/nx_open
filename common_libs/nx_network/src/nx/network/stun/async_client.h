@@ -30,7 +30,7 @@ public:
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectCompletionHandler;
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
-    AsyncClient(Settings timeouts = kDefaultSettings);
+    AsyncClient(Settings timeouts = Settings());
     virtual ~AsyncClient() override;
 
     virtual void bindToAioThread(network::aio::AbstractAioThread* aioThread) override;
@@ -42,6 +42,8 @@ public:
         int method, IndicationHandler handler, void* client = 0) override;
     virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
     virtual void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
+    virtual void addConnectionTimer(
+        std::chrono::milliseconds period, TimerHandler handler, void* client) override;
     virtual SocketAddress localAddress() const override;
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
@@ -60,7 +62,6 @@ private:
         disconnected,
         connecting,
         connected,
-        terminated,
     };
 
     virtual void closeConnection(
@@ -73,6 +74,9 @@ private:
     void onConnectionComplete(SystemError::ErrorCode code);
     void processMessage(Message message );
 
+    typedef std::map<void*, std::unique_ptr<network::aio::Timer>> ConnectionTimers;
+    void startTimer(ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler);
+
     virtual void stopWhileInAioThread() override;
 
 private:
@@ -83,7 +87,7 @@ private:
     bool m_useSsl;
     State m_state;
 
-    std::unique_ptr<nx::network::RetryTimer> m_timer;
+    std::unique_ptr<nx::network::RetryTimer> m_reconnectTimer;
     std::unique_ptr<BaseConnectionType> m_baseConnection;
     std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
 
@@ -91,9 +95,12 @@ private:
     std::map<int, std::pair<void*, IndicationHandler>> m_indicationHandlers;
     std::multimap<void*, ReconnectHandler> m_reconnectHandlers;
     std::map<Buffer, std::pair<void*, RequestHandler>> m_requestsInProgress;
+    ConnectionTimers m_connectionTimers;
 
     OnConnectionClosedHandler m_onConnectionClosedHandler;
     ConnectCompletionHandler m_connectCompletionHandler;
+
+    const char* toString(State state) const;
 };
 
 } // namespase stun

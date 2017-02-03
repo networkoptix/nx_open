@@ -101,7 +101,6 @@
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
         "successTextColor": "green_l2",
-        "notificationColorSystem": "red_l2",
         "notificationColorCritical": "red_l2",
         "notificationColorImportant": "yellow_core",
         "notificationColorCommon": "green_l2"
@@ -127,7 +126,7 @@
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast",
                 "link":             "brand_d2",
-                "linkVisited":      "brand_d1",
+                "linkVisited":      "brand_core",
                 "alternateBase":    "dark7",
                 "toolTipBase":      "light4",
                 "toolTipText":      "dark4"
@@ -148,18 +147,10 @@
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast.setAlpha(77)",
                 "link":             "brand_d2.setAlpha(77)",
-                "linkVisited":      "brand_d1.setAlpha(77)",
+                "linkVisited":      "brand_core.setAlpha(77)",
                 "alternateBase":    "dark7.setAlpha(77)",
                 "toolTipBase":      "light4",
                 "toolTipText":      "dark4"
-            }
-        }
-    },
-
-    "QWidget": {
-        "palette": {
-            "default": {
-                "link":             "brand_core"
             }
         }
     },
@@ -258,6 +249,16 @@
             }
         }
     },
+    
+    "QnPromoBar": {
+        "palette": { 
+            "default": {
+                "window": "brand_d5",
+                "link": "light4",
+                "linkVisited": "light1"
+            }
+        }
+    },    
 
     "QHeaderView": {
         "palette": {
@@ -626,7 +627,10 @@
 
     "QnCalendarWidget": {
         "palette": { "default": {
-            "highlight": "dark4"
+            "highlight": "dark4",
+            "base":  "dark7",
+            "alternateBase": "dark7",
+            "window": "dark7"
         }}
     },
 

@@ -36,6 +36,9 @@ public:
     static QnUuid instanceGuid();
     static void setInstanceGuid(const QnUuid &uuid);
 
+    static QnConnectionInfo connectionInfo();
+    static void setConnectionInfo(const QnConnectionInfo& connectionInfo);
+
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
     static void setEc2Connection(const ec2::AbstractECConnectionPtr &connection );
@@ -48,6 +51,8 @@ private:
     /** Videowall-related fields */
     QnUuid m_videowallGuid;
     QnUuid m_instanceGuid;
+
+    QnConnectionInfo m_connectionInfo;
 
     QnResourceFactory *m_resourceFactory;
 };

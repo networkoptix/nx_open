@@ -76,7 +76,6 @@ private:
     bool saveHomePosition();
     void enableDewarping();
     void clear();
-    void showSetPositionWarning();
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;

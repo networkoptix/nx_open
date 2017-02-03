@@ -23,6 +23,6 @@ enum TestFlag
 Q_DECLARE_FLAGS(TestFlags, TestFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(TestFlags)
 
-}
+} // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::TestFlag)(nx::TestFlags), (lexical))

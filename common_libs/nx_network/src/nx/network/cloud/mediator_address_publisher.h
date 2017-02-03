@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/utils/timer_manager.h>
 
@@ -38,7 +38,7 @@ private:
     std::list<SocketAddress> m_serverAddresses;
     std::list<SocketAddress> m_publishedAddresses;
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
-    utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)> m_updateHandler;
+    std::list<utils::MoveOnlyFunc<void(nx::hpm::api::ResultCode)>> m_updateHandlers;
 
     virtual void stopWhileInAioThread() override;
 

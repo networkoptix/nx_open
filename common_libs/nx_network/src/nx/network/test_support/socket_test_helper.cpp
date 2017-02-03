@@ -230,9 +230,6 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
 void TestConnection::startIO()
 {
-    //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
-        //Should note that aio::AIOService provides such functionality
-
     switch (m_transmissionMode)
     {
         case TestTransmissionMode::spam: return startSpamIO();

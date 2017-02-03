@@ -885,7 +885,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             switch (m_actionType)
             {
                 case QnBusiness::SendMailAction:
-                    return QnSendEmailActionDelegate::isValidList(filtered);
+                    return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case QnBusiness::CameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
                         QnBusiness::toResources<QnCameraRecordingPolicy::resource_type>(filtered));
@@ -1091,10 +1091,6 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getAggregationText() const
 {
-    const int MINUTE = 60;
-    const int HOUR = MINUTE * 60;
-    const int DAY = HOUR * 24;
-
     if (!QnBusiness::allowsAggregation(m_actionType))
         return tr("N/A");
 

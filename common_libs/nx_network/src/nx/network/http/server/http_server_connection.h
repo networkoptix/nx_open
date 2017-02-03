@@ -84,7 +84,7 @@ namespace nx_http {
 
         HttpServerConnection(
             StreamConnectionHolder<HttpServerConnection>* socketServer,
-            std::unique_ptr<AbstractCommunicatingSocket> sock,
+            std::unique_ptr<AbstractStreamSocket> sock,
             nx_http::server::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher);
         virtual ~HttpServerConnection();

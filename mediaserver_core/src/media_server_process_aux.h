@@ -9,14 +9,15 @@ void saveStoragesInfoToBeforeRestoreData(
     BeforeRestoreDbData* beforeRestoreDbData,
     const QnStorageResourceList& storages);
 
-class UnmountedStoragesFilter
+class UnmountedLocalStoragesFilter
 {
 public:
-    UnmountedStoragesFilter(const QString& mediaFolderName);
+    UnmountedLocalStoragesFilter(const QString& mediaFolderName);
     QnStorageResourceList getUnmountedStorages(const QnStorageResourceList& allStorages, const QStringList& paths);
 
 private:
-    QString getStorageUrlWithoutMediaFolder(const QString& url);
+    QString stripMediaFolderFromPath(const QString& path);
+    QStringList stripMediaFolderFromPaths(const QStringList& paths);
 
     QString m_mediaFolderName;
 };

@@ -6,6 +6,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPaintEngine>
 #include <QtWidgets/QStyleOptionGraphicsItem>
+#include <QtWidgets/private/qgraphicsitem_p.h>
+#include <QtWidgets/private/qwidget_p.h>
 
 #include <nx/utils/math/fuzzy.h>
 #include <ui/common/geometry.h>
@@ -22,17 +24,35 @@ void blitPixmap(const QPixmap& source, QPixmap& destination, const QPoint& locat
     blitter.drawPixmap(location, source);
 }
 
+int sceneDevicePixelRatio(const QGraphicsScene* scene)
+{
+    int ratio = 1;
+    if (!scene)
+        return ratio;
+
+    for (const auto view: scene->views())
+        ratio = qMax(ratio, view->devicePixelRatio());
+
+    return ratio;
+}
+
 } // namespace
 
 
 QnMaskedProxyWidget::QnMaskedProxyWidget(QGraphicsItem* parent, Qt::WindowFlags windowFlags):
     QGraphicsProxyWidget(parent, windowFlags),
     m_updatesEnabled(true),
-    m_pixmap()
+    m_pixmap(),
+    m_itemCached(true),
+    m_fullRepaintPending(false)
 {
-    /*
-    * Caching must be enabled, otherwise full render of embedded widget occurs at each paint.
-    */
+    /* In ItemCoordinateCache mode we cannot enforce sharp painting,
+     * but can achieve accelerated scroll. Therefore it's better used for
+     * big scrolling items with fixed position, like resource tree widget. */
+
+    /* NoCache mode works only with patched Qt that ensures
+     * full update of embedded widget when it's scrolled. */
+
     setCacheMode(ItemCoordinateCache);
 }
 
@@ -49,60 +69,111 @@ void QnMaskedProxyWidget::paint(QPainter* painter,
     if (!widget() || !widget()->isVisible())
         return;
 
+    const bool itemCached = cacheMode() != NoCache;
+    if (m_itemCached != itemCached)
+    {
+        m_itemCached = itemCached;
+        m_fullRepaintPending = true;
+        m_dirtyRect = QRect();
+    }
+
     const QRect widgetRect = rect().toAlignedRect();
-    QRect updateRect = option->exposedRect.toAlignedRect() & widgetRect;
+    QRect updateRect = widgetRect;
+
+    if (!m_fullRepaintPending)
+    {
+        /* In cached modes we obtain dirty rects from paint requests.
+         * We accumulate them in case updates are disabled: */
+        if (m_itemCached)
+            m_dirtyRect |= option->exposedRect.toAlignedRect();
+
+        updateRect &= m_dirtyRect;
+    }
 
     if (m_updatesEnabled)
     {
-        const int pixelRatio = painter->device()->devicePixelRatio();
-        const QSize targetSize = widgetRect.size() * pixelRatio;
+        const int devicePixelRatio = scene()
+            ? sceneDevicePixelRatio(scene())
+            : painter->device()->devicePixelRatio();
 
-        if (m_pixmap.devicePixelRatio() != pixelRatio
-            || targetSize.width() > m_pixmap.size().width()
-            || targetSize.height() > m_pixmap.size().height())
-        {
-            m_pixmap = QPixmap(targetSize);
-            m_pixmap.setDevicePixelRatio(pixelRatio);
-            m_pixmapRect = widgetRect;
-            updateRect = widgetRect;
-        }
+        renderWidgetRect(updateRect, devicePixelRatio);
 
-        if (!updateRect.isEmpty())
-        {
-            if (updateRect != widgetRect)
-            {
-                /* Paint into sub-cache: */
-                QPixmap subPixmap(updateRect.size() * pixelRatio);
-                subPixmap.setDevicePixelRatio(pixelRatio);
-                subPixmap.fill(Qt::transparent);
-                widget()->render(&subPixmap, QPoint(), updateRect);
-
-                /* Blit sub-cache into main cache: */
-                blitPixmap(subPixmap, m_pixmap, updateRect.topLeft());
-            }
-            else
-            {
-                /* Paint directly into cache: */
-                m_pixmap.fill(Qt::transparent);
-                widget()->render(&m_pixmap, updateRect.topLeft(), updateRect);
-            }
-        }
+        m_fullRepaintPending = false;
+        m_dirtyRect = QRect();
     }
 
     if (m_pixmap.isNull())
         return;
 
+    const QRect blitRect = m_itemCached
+        ? updateRect
+        : option->exposedRect.toAlignedRect();
+
     /* Rectangle to render, in logical coordinates: */
     const QRect renderRect = m_pixmapRect & (m_paintRect.isNull()
-        ? widgetRect
-        : widgetRect & m_paintRect.toAlignedRect());
+        ? blitRect
+        : blitRect & m_paintRect.toAlignedRect());
 
     /* Source rectangle within pixmap, in device coordinates: */
     const QRect sourceRect {
         renderRect.topLeft() * m_pixmap.devicePixelRatio(),
         renderRect.size() * m_pixmap.devicePixelRatio() };
 
-    paintPixmapSharp(painter, m_pixmap, renderRect, sourceRect);
+    if (cacheMode() != ItemCoordinateCache)
+        paintPixmapSharp(painter, m_pixmap, renderRect, sourceRect);
+    else
+        painter->drawPixmap(renderRect, m_pixmap, sourceRect);
+}
+
+bool QnMaskedProxyWidget::ensurePixmap(const QSize& logicalSize, int devicePixelRatio)
+{
+    const QSize targetSize = logicalSize * devicePixelRatio;
+
+    if (targetSize.width() > m_pixmap.size().width()
+        || targetSize.height() > m_pixmap.size().height())
+    {
+        m_pixmap = QPixmap(targetSize);
+        m_pixmap.setDevicePixelRatio(devicePixelRatio);
+        m_pixmapRect = QRect(QPoint(), logicalSize);
+        return true;
+    }
+    else if (m_pixmap.devicePixelRatio() != devicePixelRatio)
+    {
+        m_pixmap.setDevicePixelRatio(devicePixelRatio);
+        return true;
+    }
+
+    return false;
+}
+
+void QnMaskedProxyWidget::renderWidgetRect(const QRect& logicalRect, int devicePixelRatio)
+{
+    const QRect widgetRect = rect().toAlignedRect();
+    QRect updateRect = logicalRect;
+
+    if (ensurePixmap(widgetRect.size(), devicePixelRatio))
+        updateRect = widgetRect;
+
+    if (!updateRect.isEmpty())
+    {
+        if (updateRect != widgetRect)
+        {
+            /* Paint into sub-cache: */
+            QPixmap subPixmap(updateRect.size() * devicePixelRatio);
+            subPixmap.setDevicePixelRatio(devicePixelRatio);
+            subPixmap.fill(Qt::transparent);
+            widget()->render(&subPixmap, QPoint(), updateRect);
+
+            /* Blit sub-cache into main cache: */
+            blitPixmap(subPixmap, m_pixmap, updateRect.topLeft());
+        }
+        else
+        {
+            /* Paint directly into cache: */
+            m_pixmap.fill(Qt::transparent);
+            widget()->render(&m_pixmap, updateRect.topLeft(), updateRect);
+        }
+    }
 }
 
 QRectF QnMaskedProxyWidget::paintRect() const
@@ -160,6 +231,46 @@ void QnMaskedProxyWidget::setUpdatesEnabled(bool updatesEnabled)
 
     m_updatesEnabled = updatesEnabled;
 
-    if (m_updatesEnabled)
-        update();
+    if (m_updatesEnabled && !m_dirtyRect.isEmpty())
+        update(m_dirtyRect);
+}
+
+bool QnMaskedProxyWidget::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == widget())
+    {
+        switch (event->type())
+        {
+            case QEvent::UpdateRequest:
+                if (cacheMode() != NoCache)
+                    break;
+                /* In not cached mode we obtain dirty rects from embedded widget updates: */
+                syncDirtyRect();
+                break;
+
+            case QEvent::CursorChange:
+                setCursor(widget()->cursor());
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    return base_type::eventFilter(watched, event);
+}
+
+void QnMaskedProxyWidget::syncDirtyRect()
+{
+    if (m_fullRepaintPending || !widget())
+        return;
+
+    QWidgetPrivate::get(widget())->syncBackingStore();
+
+    const auto d = QGraphicsItemPrivate::get(this);
+    m_fullRepaintPending = d->fullUpdatePending;
+    if (m_fullRepaintPending)
+        m_dirtyRect = QRect();
+    else
+        m_dirtyRect |= d->needsRepaint.toAlignedRect();
 }

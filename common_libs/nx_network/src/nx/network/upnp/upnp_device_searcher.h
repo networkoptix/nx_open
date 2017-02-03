@@ -18,7 +18,7 @@
 
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/network/aio/aioeventhandler.h>
+#include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>

@@ -14,6 +14,12 @@
 
 #define MAX_RESPONSE_LEN (4*1024)
 
+namespace {
+
+const int kDefaultChannelCount = 4;
+
+} // namespace
+
 
 QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
@@ -78,7 +84,9 @@ bool QnArecontPanoramicResource::setParamPhysical(const QString &id, const QStri
     if (setSpecialParam(id, value))
         return true;
     QUrl devUrl(getUrl());
-    for (int i = 1; i <=4 ; ++i)
+    auto channelCount = getChannelCount();
+
+    for (int i = 1; i <= channelCount; ++i)
     {
         CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
 
@@ -179,6 +187,15 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
     else
         m_defaultVideoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
     return m_defaultVideoLayout;
+}
+
+int QnArecontPanoramicResource::getChannelCount() const
+{
+    auto layout = getVideoLayout(nullptr);
+    if (!layout)
+        return kDefaultChannelCount;
+
+    return layout->channelCount();
 }
 
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const

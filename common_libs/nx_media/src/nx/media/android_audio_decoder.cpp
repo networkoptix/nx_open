@@ -139,7 +139,7 @@ AndroidAudioDecoder::~AndroidAudioDecoder()
 
 bool AndroidAudioDecoder::isDecoderCompatibleToPlatform()
 {
-    return  QAndroidJniObject::callStaticMethod<jboolean>(
+    return QAndroidJniObject::callStaticMethod<jboolean>(
         "com/networkoptix/nxwitness/media/QnAudioDecoder",
         "isDecoderCompatibleToPlatform");
 }
@@ -199,7 +199,7 @@ bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Aud
         d->audioFrame->context = frame->context;
         *outFrame = std::move(d->audioFrame);
     }
-    
+
     return true;
 }
 
