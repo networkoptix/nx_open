@@ -2,5 +2,5 @@
 # if somebody also updates the protocol version.
 # Prefer to use issue number and title as a comment.
 
-# Changed localSystem
-set(nxec.ec2ProtoVersion "3022")
+#vms-4742. ecs sqlite database was significally increased (twice) on servers update
+set(nxec.ec2ProtoVersion "3024")
