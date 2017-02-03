@@ -224,7 +224,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         {
             NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
-            return false;
+            break;
         }
         case SystemUri::ClientCommand::Client:
         {
@@ -249,13 +249,13 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
             menu()->trigger(QnActions::ConnectAction, parameters);
+            return true;
 
-            break;
         }
         default:
             break;
     }
-    return true;
+    return false;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
@@ -314,10 +314,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()
-        && !haveInputFiles)
+        && !haveInputFiles
+        && !connectUsingCommandLineAuth(startupParams)
+        )
     {
-        if (!connectUsingCommandLineAuth(startupParams))
-            return false;
+        return false;
     }
 
     if (!startupParams.videoWallGuid.isNull())

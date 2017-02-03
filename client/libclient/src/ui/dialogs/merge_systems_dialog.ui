@@ -7,11 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>268</height>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Merge Systems...</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">

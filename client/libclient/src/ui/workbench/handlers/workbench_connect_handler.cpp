@@ -332,7 +332,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
     connect(action(QnActions::OpenLoginDialogAction), &QAction::triggered, this,
-        &QnWorkbenchConnectHandler::showLoginDialog);
+        &QnWorkbenchConnectHandler::showLoginDialog, Qt::QueuedConnection);
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
         [this]
         {

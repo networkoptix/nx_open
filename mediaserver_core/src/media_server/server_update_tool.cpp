@@ -329,6 +329,13 @@ void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
     executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
+void QnServerUpdateTool::removeUpdateFiles(const QString& updateId)
+{
+    auto dir = getUpdatesDir();
+    if (dir.cd(updateId))
+        dir.removeRecursively();
+}
+
 void QnServerUpdateTool::clearUpdatesLocation(const QString &idToLeave) {
     QDir dir = getUpdatesDir();
 

@@ -338,6 +338,17 @@
     </p>
 </div>
 
+<div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>System was successfully merged, but is not ready yet.</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
+    </p>
+</div>
+
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
     <h2>Connecting to {{Config.cloud.productName}} ...</h2>
@@ -347,7 +358,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>System is ready for use</h2>
-    <p>Log in</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Sharing and account settings</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"

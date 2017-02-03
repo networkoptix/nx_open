@@ -154,5 +154,12 @@ var Config = {
             'Inactive',
             'Active'
         ]
+    },
+
+    setup:{
+        firstPollingRequest: 5000,
+        slowPollingTimeout: 5000,
+        pollingTimeout: 1000,
+        retriesForMergeCredentialsToApply: 15
     }
 };

@@ -112,7 +112,7 @@ GenericProduct
             project.sourceDirectory,
             "customization",
             project.customization,
-            "client",
+            "libclient",
             "resources")
     }
 
