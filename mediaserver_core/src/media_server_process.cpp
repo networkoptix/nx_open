@@ -2640,7 +2640,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     auto upnpPortMapper = initializeUpnpPortMapper();
-    updateAddressesList();
 
     qDebug() << "start loading resources";
     QElapsedTimer tt;
@@ -2656,6 +2655,8 @@ void MediaServerProcess::run()
     qDebug() << "permissions ready" << tt.elapsed();
 
     qnGlobalSettings->initialize();
+
+    updateAddressesList();
 
     auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
