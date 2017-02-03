@@ -61,6 +61,6 @@ Qt::ItemFlags QnResourceTreeModelCloudSystemNode::flags(int column) const
 QIcon QnResourceTreeModelCloudSystemNode::calculateIcon() const
 {
     return m_system->isConnectable()
-        ? qnSkin->icon("tree/system_cloud.png")
-        : qnSkin->icon("tree/system_cloud_disabled.png");
+        ? qnSkin->icon("cloud/cloud_20.png")
+        : qnSkin->icon("cloud/cloud_20_disabled.png");
 }
