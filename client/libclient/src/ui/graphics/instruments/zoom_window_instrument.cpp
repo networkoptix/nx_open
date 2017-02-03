@@ -768,19 +768,32 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {
-    if(target()) {
+    if(target())
+    {
         ensureSelectionItem();
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
         QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
-        if(zoomRect.width() <= kZoomWindowMinSize || zoomRect.height() <= kZoomWindowMinSize) {
+        if (qFuzzyIsNull(zoomRect.width()))
+            zoomRect.setWidth(kZoomWindowMinSize);
+        if (qFuzzyIsNull(zoomRect.height()))
+            zoomRect.setHeight(kZoomWindowMinSize);
+
+        if (zoomRect.width() <= kZoomWindowMinSize || zoomRect.height() <= kZoomWindowMinSize)
+        {
             zoomRect = movedInto(
-                expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMinSize, kZoomWindowMinSize), zoomRect.center(), Qt::KeepAspectRatioByExpanding),
-                QRectF(0.0, 0.0, 1.0, 1.0)
-            );
+                expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMinSize, kZoomWindowMinSize),
+                    zoomRect.center(), Qt::KeepAspectRatioByExpanding),
+                QRectF(0.0, 0.0, 1.0, 1.0));
         }
-        if(zoomRect.width() >= kZoomWindowMaxSize || zoomRect.height() >= kZoomWindowMaxSize)
-            zoomRect = expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMaxSize, kZoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
+
+        if (zoomRect.width() >= kZoomWindowMaxSize || zoomRect.height() >= kZoomWindowMaxSize)
+        {
+            zoomRect = movedInto(
+                expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMaxSize, kZoomWindowMaxSize),
+                    zoomRect.center(), Qt::KeepAspectRatio),
+                QRectF(0.0, 0.0, 1.0, 1.0));
+        }
 
         emit zoomRectCreated(target(), m_zoomWindowColor, zoomRect);
     }
