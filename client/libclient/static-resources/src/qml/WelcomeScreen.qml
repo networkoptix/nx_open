@@ -14,6 +14,13 @@ Rectangle
 
     color: Style.colors.window;
 
+    Rectangle
+    {
+        width: parent.width;
+        height: 2;
+        color: Style.colors.custom.titleBar.shadow;
+    }
+
     Item
     {
         id: screenHolder;
