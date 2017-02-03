@@ -394,7 +394,7 @@ angular.module('webadminApp')
                 // Show error
                 return remoteErrorHandler(error);
             }
-            return $timeout(updateCredentialsAfterMerge, Config.setup.waitForMergeCredentialsToApply);
+            return $timeout(updateCredentialsAfterMerge, Config.setup.pollingTimeout);
         }
         function logMediaserverError(error, message){
             if(message){
@@ -638,7 +638,7 @@ angular.module('webadminApp')
 
         function waitForReboot(){
             $scope.next(0); // Go to loading
-            var poll = $poll(pingServer, 1000, 5000);
+            var poll = $poll(pingServer, Config.setup.pollingTimeout, Config.setup.firstPollingRequest);
 
             function pingServer(){
                 return mediaserver.getModuleInformation(true).then(function(){
@@ -648,6 +648,21 @@ angular.module('webadminApp')
                 });
             }
         }
+
+
+        function checkIfSystemIsReady(){
+            var poll = $poll(reCheckSystem, Config.setup.slowPollingTimeout, Config.setup.firstPollingRequest);
+            function reCheckSystem(){
+                return mediaserver.getModuleInformation(true).then(function(result){
+                    console.log(result);
+                    if(!result.data.reply.flags.newSystem){
+                        window.location.reload();
+                        $poll.cancel(poll);
+                    }
+                });
+            }
+        }
+
 
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
@@ -873,8 +888,9 @@ angular.module('webadminApp')
                 readCloudHost();
                 getAdvancedSettings();
                 discoverSystems();
+                checkIfSystemIsReady();
             },function(error){
-                checkMySystem().catch(function(){
+                checkMySystem().then(checkIfSystemIsReady, function(){
                     $log.log("Couldn't run setup wizard: auth failed");
                     $log.error(error);
                     if( $location.search().retry) {
