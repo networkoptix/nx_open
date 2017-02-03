@@ -2,7 +2,7 @@
 
 #include <core/resource/camera_bookmark.h>
 
-#include "test_api_request.h"
+#include "test_api_requests.h"
 
 namespace nx {
 namespace test {
@@ -22,13 +22,13 @@ TEST(BookmarksGet, noBookmarks)
     cameraData.physicalId = "test physicalId";
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
 
-    // Create a camera.
-    testApiPost(launcher, "/ec2/saveCamera", cameraData);
+    NX_LOG("[TEST] Create a camera.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher, "/ec2/saveCamera", cameraData));
 
-    // Check that there are no bookmarks for the camera.
+    NX_LOG("[TEST] Check that there are no bookmarks for the camera.", cl_logINFO);
     QnCameraBookmarkList bookmarks;
-    testApiGet(launcher,
-        lit("/ec2/bookmarks?cameraId=%1").arg(cameraData.id.toString()), &bookmarks);
+    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher,
+        lit("/ec2/bookmarks?cameraId=%1").arg(cameraData.id.toString()), &bookmarks));
     ASSERT_TRUE(bookmarks.isEmpty());
 }
 

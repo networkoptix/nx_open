@@ -30,6 +30,9 @@ namespace {
 
     bool restrictNewManualCameraByIP(const QnSecurityCamResourcePtr& netRes)
     {
+        if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
+            return false; //< don't block
+
         QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
         existResList = existResList.filtered(
             [&netRes](const QnNetworkResourcePtr& existRes)
@@ -44,9 +47,8 @@ namespace {
             if (!existCam)
                 continue;
 
-            bool newIsRtsp = (netRes->getVendor() == lit("GENERIC_RTSP"));  //TODO #ak remove this!
-            if (newIsRtsp)
-                return false; //< allow to stack RTSP cameras with any resource with same IP:port
+            if (existCam->hasCameraCapabilities(Qn::ShareIpCapability))
+                return false; //< don't block
 
             if (!existCam->isManuallyAdded())
                 return true; //< block manual and auto camera at same IP

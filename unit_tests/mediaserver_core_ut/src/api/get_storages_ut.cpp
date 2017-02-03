@@ -2,15 +2,7 @@
 
 #include <common/common_module.h>
 
-// Config for debugging the tests.
-static const struct
-{
-    const bool enableHangOnFinish = false;
-    const bool forceLog = true;
-} conf{};
-#include <nx/utils/test_support/test_utils.h>
-
-#include "test_api_request.h"
+#include "test_api_requests.h"
 
 namespace nx {
 namespace test {
@@ -39,6 +31,7 @@ static void findStorageByName(
 
     if (!id.isNull())
         ASSERT_EQ(id, outStorage->id);
+
     if (!parentId.isNull())
         ASSERT_EQ(parentId, outStorage->parentId);
 }
@@ -48,42 +41,49 @@ static void findStorageByName(
 TEST(GetStorages, saveAndMerge)
 {
     MediaServerLauncher launcher;
+    launcher.addSetting(QnServer::kNoInitStoragesOnStartup, "1");
     ASSERT_TRUE(launcher.start());
 
     ec2::ApiStorageDataList storages;
     ec2::ApiStorageData storage;
     ec2::ApiStorageDataList::const_iterator foundStorage;
 
-    LOG("Create a new storage with auto-generated id:");
+    NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";
     storage.parentId = qnCommon->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
-    testApiPost(launcher, lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher,
+        lit("/ec2/saveStorage"), storage, removeJsonFields({"id"})));
 
-    LOG("Retrieve the created storage:");
-    testApiGet(launcher, lit("/ec2/getStorages"), &storages);
-    findStorageByName(storages, &storage, storage.name, storage.parentId);
+    NX_LOG("[TEST] Retrieve the created storage.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher, lit("/ec2/getStorages"), &storages));
+    ASSERT_NO_FATAL_FAILURE(findStorageByName(
+        storages, &storage, storage.name, storage.parentId));
+    ASSERT_EQ(1, storages.size());
 
-    LOG("Rename the storage via Merge:");
+    NX_LOG("[TEST] Rename the storage via Merge.", cl_logINFO);
     storage.name = "new name";
-    testApiPost(launcher, lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"}));
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher,
+        lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"})));
 
-    LOG("Check that the storage is renamed:");
-    testApiGet(launcher, lit("/ec2/getStorages"), &storages);
-    findStorageByName(storages, &storage, storage.name, storage.parentId, storage.id);
+    NX_LOG("[TEST] Check that the storage is renamed.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher, lit("/ec2/getStorages"), &storages));
+    ASSERT_NO_FATAL_FAILURE(findStorageByName(
+        storages, &storage, storage.name, storage.parentId, storage.id));
+    ASSERT_EQ(1, storages.size());
 
-    LOG("Check the storage can be found by its parent server id:");
-    testApiGet(launcher, lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()),
-        &storages);
-    findStorageByName(storages, &storage, storage.name, storage.parentId, storage.id);
+    NX_LOG("[TEST] Check the storage can be found by its parent server id.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher,
+        lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages));
+    ASSERT_NO_FATAL_FAILURE(findStorageByName(
+        storages, &storage, storage.name, storage.parentId, storage.id));
+    ASSERT_EQ(1, storages.size());
 
-    LOG("Check that no storages are found by another (non-existing) parent server id:");
-    testApiGet(launcher, lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()),
-        &storages);
+    NX_LOG("[TEST] Check that no storages are found by another (non-existing) parent server id.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher,
+        lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()), &storages));
     ASSERT_TRUE(storages.empty());
-
-    finishTest(HasFailure());
 }
 
 } // namespace test

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "test_api_request.h"
+#include "test_api_requests.h"
 
 namespace nx {
 namespace test {
@@ -19,27 +19,27 @@ TEST(SaveCamera, invalidData)
     cameraData.physicalId = "matching physicalId";
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
 
-    // Both id and physicalId fields correctly defined.
+    NX_LOG("[TEST] Both id and physicalId fields correctly defined.", cl_logINFO);
     testApiPost(launcher, "/ec2/saveCamera", cameraData);
 
-    // Error: id doesn't match physicalId.
+    NX_LOG("[TEST] Error case: id doesn't match physicalId.", cl_logINFO);
     cameraData.physicalId = "non-matching physicalId";
-    testApiPost(launcher, "/ec2/saveCamera", cameraData,
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({"id", "physicalId", "parentId", "typeId", "vendor"}),
-        nx_http::StatusCode::forbidden);
+        nx_http::StatusCode::forbidden));
 
-    // Create another camera with auto-generated id.
-    testApiPost(launcher, "/ec2/saveCamera", cameraData,
-        keepOnlyJsonFields({/*"id",*/ "physicalId", "parentId", "typeId", "vendor"}));
+    NX_LOG("[TEST] Create another camera with auto-generated id.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher, "/ec2/saveCamera", cameraData,
+        keepOnlyJsonFields({/*"id",*/ "physicalId", "parentId", "typeId", "vendor"})));
 
-    // Merged by id with the existing object.
-    testApiPost(launcher, "/ec2/saveCamera", cameraData,
-        keepOnlyJsonFields({"id", /*"physicalId",*/ "parentId", "typeId", "vendor"}));
+    NX_LOG("[TEST] Merge by id with the existing object.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher, "/ec2/saveCamera", cameraData,
+        keepOnlyJsonFields({"id", /*"physicalId",*/ "parentId", "typeId", "vendor"})));
 
-    // Error: both id and physicalId are missing.
-    testApiPost(launcher, "/ec2/saveCamera", cameraData,
+    NX_LOG("[TEST] Error case: both id and physicalId are missing.", cl_logINFO);
+    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher, "/ec2/saveCamera", cameraData,
         keepOnlyJsonFields({/*"id",*/ /*"physicalId",*/ "parentId", "typeId", "vendor"}),
-        nx_http::StatusCode::forbidden);
+        nx_http::StatusCode::forbidden));
 }
 
 } // namespace test

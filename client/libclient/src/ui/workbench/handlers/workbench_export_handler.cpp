@@ -417,11 +417,11 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             if (loader && archive)
             {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
-                if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0)
+                if (periods.size() > 1)
                 {
                     const auto confirmed = confirmExport(QnMessageBoxIcon::Warning,
-                        tr("AVI format not recommended"),
-                        tr("For exporting a non-continuous recording with audio track,"
+                        tr("AVI format is not recommended"),
+                        tr("For exporting a non-continuous recording"
                             " MKV or some other format is recommended.")
                             + L'\n' + tr("Export to AVI anyway?"));
 
