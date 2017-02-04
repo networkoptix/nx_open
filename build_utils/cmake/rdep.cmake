@@ -39,5 +39,9 @@ function(rdep_add_package package)
     endif()
 
     set(package_dir ${PACKAGES_DIR}/${package})
-    include(${package_dir}/package.cmake OPTIONAL)
+
+    file(GLOB CMAKE_FILES ${package_dir}/*.cmake)
+    foreach(file ${CMAKE_FILES})
+        include(${file})
+    endforeach()
 endfunction()
