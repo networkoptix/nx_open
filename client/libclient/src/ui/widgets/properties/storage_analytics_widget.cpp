@@ -224,6 +224,9 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
         this, [this]() { currentTable()->selectAll(); });
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
+
+    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
+        , qRound(ui->extraSizeSpinBox->maximum())));
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
