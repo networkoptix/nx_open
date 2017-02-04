@@ -4,9 +4,10 @@ function(generate_qrc qrc_file)
             ${PYTHON_EXECUTABLE}
             ${PYTHON_MODULES_DIR}/gen_qrc.py
             ${ARGN}
-            -o ${qrc_file}
+            -o ${qrc_file}.copy
         RESULT_VARIABLE result)
     if(NOT result EQUAL 0)
         message(FATAL_ERROR "QRC generation script has failed.")
     endif()
+    nx_update_if_different(${qrc_file}.copy ${qrc_file})
 endfunction()

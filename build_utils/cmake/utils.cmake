@@ -70,20 +70,21 @@ function(nx_files_differ file1 file2 var)
     set(${var} ${result} PARENT_SCOPE)
 endfunction()
 
-function(nx_configure_file input output)
-    if(IS_DIRECTORY ${output})
-        get_filename_component(file_name ${input} NAME)
-        set(output "${output}/${file_name}")
-    endif()
-
-    set(copy "${output}.copy")
-
-    configure_file(${input} ${copy})
-
+function(nx_update_if_different copy output)
     nx_files_differ(${copy} ${output} result)
     if(result)
         file(RENAME ${copy} ${output})
     else()
         file(REMOVE ${copy})
     endif()
+endfunction()
+
+function(nx_configure_file input output)
+    if(IS_DIRECTORY ${output})
+        get_filename_component(file_name ${input} NAME)
+        set(output "${output}/${file_name}")
+    endif()
+
+    configure_file(${input} ${output}.copy)
+    nx_update_if_different(${output}.copy ${output})
 endfunction()
