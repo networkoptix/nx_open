@@ -1,5 +1,5 @@
 find_sources(src CPP_FILES HPP_FILES)
-qt5_wrap_cpp(MOC_FILES ${CPP_FILES})
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
 nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
