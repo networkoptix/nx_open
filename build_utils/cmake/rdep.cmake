@@ -34,11 +34,18 @@ endfunction()
 
 function(rdep_add_package package)
     get_full_package_name(${package} package)
-    if(rdepSync)
-        rdep_sync_package(${package})
-    endif()
 
     set(package_dir ${PACKAGES_DIR}/${package})
+
+    if(rdepSync)
+        rdep_sync_package(${package})
+    else()
+        message("Using existing package ${package}")
+    endif()
+
+    if(NOT IS_DIRECTORY ${package_dir})
+        message(FATAL_ERROR "Package ${package} not found")
+    endif()
 
     file(GLOB CMAKE_FILES ${package_dir}/*.cmake)
     foreach(file ${CMAKE_FILES})
