@@ -90,3 +90,5 @@ add_subdirectory(common)
 add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
 add_subdirectory(client)
+
+cmake_policy(SET CMP0058 NEW)
