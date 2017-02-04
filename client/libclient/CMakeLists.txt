@@ -4,7 +4,7 @@ qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 find_files(src "ui" UI_FILES)
 qt5_wrap_ui(UIC_FILES ${UI_FILES})
 
-configure_file(
+nx_configure_file(
     maven/filter-resources/resources/globals.json
     ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -13,13 +13,13 @@ generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/libclient.qrc
     "${customization_dir}/libclient/resources"
     "${CMAKE_CURRENT_BINARY_DIR}/globals.json")
 
-configure_file(
+nx_configure_file(
     maven/filter-resources/client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
-configure_file(
+nx_configure_file(
     maven/filter-resources/version.h
     ${CMAKE_CURRENT_BINARY_DIR})
-configure_file(
+nx_configure_file(
     ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
     ${CMAKE_CURRENT_BINARY_DIR})
 

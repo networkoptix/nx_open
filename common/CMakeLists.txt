@@ -1,7 +1,7 @@
 find_sources(src CPP_FILES HPP_FILES)
 qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qt.conf
+nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/qt.conf
     ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
 
 generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/common.qrc
@@ -9,9 +9,9 @@ generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/common.qrc
     "${customization_dir}/common/resources"
     "${CMAKE_CURRENT_BINARY_DIR}/resources")
 
-configure_file(
+nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
-    ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp)
+    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(common
     ${CPP_FILES} ${MOC_FILES}

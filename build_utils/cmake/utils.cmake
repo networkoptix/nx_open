@@ -57,3 +57,17 @@ function(detect_platform)
     set(modification ${detected_modification} CACHE INTERNAL "")
     set(rdep_target ${detected_target} CACHE INTERNAL "")
 endfunction()
+
+function(nx_copy_if_different file destination)
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${file} ${destination})
+endfunction()
+
+function(nx_configure_file input output)
+    if(IS_DIRECTORY ${output})
+        get_filename_component(file_name ${input} NAME)
+        set(output "${output}/${file_name}")
+    endif()
+
+    configure_file(${input} ${output}.copy)
+    nx_copy_if_different(${output}.copy ${output})
+endfunction()
