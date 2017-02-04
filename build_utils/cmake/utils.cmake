@@ -62,12 +62,28 @@ function(nx_copy_if_different file destination)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${file} ${destination})
 endfunction()
 
+function(nx_files_differ file1 file2 var)
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E compare_files ${file1} ${file2}
+        OUTPUT_QUIET ERROR_QUIET
+        RESULT_VARIABLE result)
+    set(${var} ${result} PARENT_SCOPE)
+endfunction()
+
 function(nx_configure_file input output)
     if(IS_DIRECTORY ${output})
         get_filename_component(file_name ${input} NAME)
         set(output "${output}/${file_name}")
     endif()
 
-    configure_file(${input} ${output}.copy)
-    nx_copy_if_different(${output}.copy ${output})
+    set(copy "${output}.copy")
+
+    configure_file(${input} ${copy})
+
+    nx_files_differ(${copy} ${output} result)
+    if(result)
+        file(RENAME ${copy} ${output})
+    else()
+        file(REMOVE ${copy})
+    endif()
 endfunction()
