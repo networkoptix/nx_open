@@ -42,7 +42,7 @@ target_link_libraries(client
     PUBLIC
         Qt5::Widgets Qt5::OpenGL Qt5::WebKit Qt5::WebKitWidgets
         Qt5::Qml Qt5::QuickWidgets
-        client_core nx_speech_synthesizer nx_audio vms_gateway)
+        client_core nx_speech_synthesizer nx_audio libvms_gateway)
 
 if(LINUX)
     target_link_libraries(client PRIVATE Qt5::X11Extras Xss Xfixes X11)

@@ -8,14 +8,14 @@ nx_configure_file(
     maven/filter-resources/libvms_gateway_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(vms_gateway
+add_library(libvms_gateway
     ${CPP_FILES} ${MOC_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_app_info_impl.cpp
     src/StdAfx.cpp src/StdAfx.h
     ${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway.qrc)
 
-add_precompiled_header(vms_gateway src/StdAfx.h FORCEINCLUDE)
+add_precompiled_header(libvms_gateway src/StdAfx.h FORCEINCLUDE)
 
-target_include_directories(vms_gateway PUBLIC src)
+target_include_directories(libvms_gateway PUBLIC src)
 
-target_link_libraries(vms_gateway PUBLIC cloud_db_client nx_network)
+target_link_libraries(libvms_gateway PUBLIC cloud_db_client nx_network)

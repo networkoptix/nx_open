@@ -5,16 +5,18 @@ nx_configure_file(
     maven/filter-resources/libconnection_mediator_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(connection_mediator
+add_library(libconnection_mediator
     ${CPP_FILES} ${MOC_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/libconnection_mediator_app_info_impl.cpp
     src/StdAfx.cpp src/StdAfx.h)
 
-add_precompiled_header(connection_mediator src/StdAfx.h FORCEINCLUDE)
+set_target_properties(libconnection_mediator PROPERTIES PREFIX "")
 
-target_include_directories(connection_mediator PUBLIC src)
+add_precompiled_header(libconnection_mediator src/StdAfx.h FORCEINCLUDE)
 
-target_link_libraries(connection_mediator
+target_include_directories(libconnection_mediator PUBLIC src)
+
+target_link_libraries(libconnection_mediator
     PRIVATE
         qtservice qtsinglecoreapplication
     PUBLIC
