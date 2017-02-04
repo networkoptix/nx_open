@@ -11,3 +11,5 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 
 set(client.mediafolder.name "${product.name} Media")
+
+set(liteMode "false")

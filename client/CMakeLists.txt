@@ -1,3 +1,6 @@
+rdep_add_package(any/qtsingleguiapplication)
+
 add_subdirectory(libclient_core)
 add_subdirectory(libclient)
 add_subdirectory(desktop_client)
+add_subdirectory(mobile_client)
