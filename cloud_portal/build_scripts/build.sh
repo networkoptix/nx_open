@@ -45,6 +45,9 @@ do
     echo "Overwrite images"
     cp -rf $dir/front_end/images/* $TARGET_DIR/$CUSTOMIZATION/static/images
 
+    echo "Overwrite static"
+    cp -rf $dir/front_end/views/* $TARGET_DIR/$CUSTOMIZATION/static/views
+
     echo "Building front_end finished"
 
 
