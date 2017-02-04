@@ -2,11 +2,16 @@ cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 set(box "none" CACHE STRING "Target box")
-option(beta ON "Is this build is beta build")
+option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
-option(analyzeMutexLocksForDeadlock OFF
-    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!")
+option(analyzeMutexLocksForDeadlock
+    "Analyze mutex locks for deadlock. WARNING: this can significantly reduce performance!"
+    OFF)
+
+option(rdepSync
+    "Whether rdep should sync packages or use only existing copies"
+    ON)
 
 project(vms VERSION 3.0.0)
 

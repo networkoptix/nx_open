@@ -34,7 +34,9 @@ endfunction()
 
 function(rdep_add_package package)
     get_full_package_name(${package} package)
-    rdep_sync_package(${package})
+    if(rdepSync)
+        rdep_sync_package(${package})
+    endif()
 
     set(package_dir ${PACKAGES_DIR}/${package})
     include(${package_dir}/package.cmake OPTIONAL)
