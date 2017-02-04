@@ -1,28 +1,24 @@
-project(nx_utils)
-set(PROJECT_SHORTNAME "nx_utils")
-set(PROJECT_LONGNAME "${short.company.name} Utilities Library")
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
+generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/nx_utils.qrc
+    "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
 
-remove_definitions(-D_CONSOLE
-                -DNX_UTILS_API=__declspec\(dllimport\)
-                )
-add_definitions(-D_CONSOLE
-                -DNX_UTILS_API=__declspec\(dllexport\)
-                )
+configure_file(
+    maven/filter-resources/app_info_impl.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp)
 
-find_sources(src)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
+add_library(nx_utils
+    ${CPP_FILES} ${MOC_FILES}
+    src/StdAfx.cpp src/StdAfx.h
+    ${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp
+    ${CMAKE_CURRENT_BINARY_DIR}/nx_utils.qrc)
 
-add_library(${PROJECT_SHORTNAME} SHARED
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
-)
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core DbgHelp.lib Iphlpapi.lib Ole32.lib Secur32.lib winmm.lib
-)
-#set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-#cotire(${PROJECT_SHORTNAME})
+add_precompiled_header(nx_utils src/StdAfx.h FORCEINCLUDE)
+
+target_include_directories(nx_utils PUBLIC src)
+
+target_compile_definitions(nx_utils
+    PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
+    INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
+
+target_link_libraries(nx_utils PUBLIC boost Qt5::Core)

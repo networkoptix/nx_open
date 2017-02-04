@@ -1,0 +1,3 @@
+add_subdirectory(libclient_core)
+add_subdirectory(libclient)
+add_subdirectory(desktop_client)
