@@ -1,3 +1,6 @@
+set(product.title "${company.name} libvms_gateway")
+set(product.display.title "${company.name} VMS Gateway")
+
 find_sources(src CPP_FILES HPP_FILES)
 qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 

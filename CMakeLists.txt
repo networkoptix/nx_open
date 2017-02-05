@@ -37,6 +37,7 @@ include(qrc_utils)
 include(precompiled_header)
 include(python_exec)
 include(rdep)
+include(mercurial)
 
 detect_platform()
 rdep_configure()

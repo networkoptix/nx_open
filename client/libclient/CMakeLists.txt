@@ -1,3 +1,6 @@
+set(product.title "${client.name}")
+set(product.display.title "${client.display.name}")
+
 find_sources(src CPP_FILES HPP_FILES)
 qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 

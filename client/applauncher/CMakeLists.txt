@@ -1,3 +1,5 @@
+set(product.title "${applauncher.name}")
+
 find_sources(src CPP_FILES HPP_FILES)
 qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
