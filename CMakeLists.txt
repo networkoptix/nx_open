@@ -91,6 +91,7 @@ add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
 add_subdirectory(mediaserver_core)
 add_subdirectory(mediaserver)
+add_subdirectory(plugins)
 add_subdirectory(client)
 
 cmake_policy(SET CMP0058 NEW)
