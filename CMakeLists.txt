@@ -51,6 +51,10 @@ include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 include(properties)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 rdep_add_package(qt)
 get_full_package_name(qt QT_DIR)
 set(QT_DIR ${PACKAGES_DIR}/${QT_DIR})
