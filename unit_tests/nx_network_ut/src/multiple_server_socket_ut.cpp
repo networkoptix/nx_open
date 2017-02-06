@@ -348,7 +348,7 @@ private:
     nx::utils::promise<void> m_testDone;
 
     void onConnectionAccepted(
-        SystemError::ErrorCode sysErrorCode,
+        SystemError::ErrorCode /*sysErrorCode*/,
         AbstractStreamSocket* clientSocket)
     {
         using namespace std::chrono;
