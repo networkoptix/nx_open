@@ -31,6 +31,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake
 )
 
+include(CMakeParseArguments)
 include(utils)
 include(find_sources)
 include(qrc_utils)
