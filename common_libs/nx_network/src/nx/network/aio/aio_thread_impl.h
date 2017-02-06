@@ -13,7 +13,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "aioeventhandler.h"
+#include "abstract_pollset.h" 
+#include "aio_event_handler.h"
 #include "unified_pollset.h"
 #include "../detail/socket_sequence.h"
 
@@ -106,7 +107,7 @@ public:
         :
             type(_type),
             socket(_socket),
-            socketSequence(0),
+            socketSequence(_socket ? _socket->impl()->socketSequence : 0),
             eventType(_eventType),
             eventHandler(_eventHandler),
             timeout(_timeout),
@@ -190,7 +191,7 @@ public:
 
     //TODO #ak too many mutexes here. Refactoring required
 
-    UnifiedPollSet pollSet;
+    std::unique_ptr<AbstractPollSet> pollSet;
     std::deque<SocketAddRemoveTask> pollSetModificationQueue;
     unsigned int newReadMonitorTaskCount;
     unsigned int newWriteMonitorTaskCount;
@@ -206,7 +207,7 @@ public:
     std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
 
-    AIOThreadImpl();
+    AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSet);
 
     //!used as clock for periodic events. Function introduced since implementation can be changed
     qint64 getSystemTimerVal() const;

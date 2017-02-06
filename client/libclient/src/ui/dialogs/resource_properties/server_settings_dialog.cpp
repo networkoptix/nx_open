@@ -136,13 +136,18 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
 {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    return QnMessageBox::question(
-        this,
-        tr("Server not saved"),
-        tr("Apply changes to server %1?")
-        .arg(m_server ? m_server->getName() : QString()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    const auto result = QnMessageBox::question(this,
+        tr("Apply changes before switching to another server?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+
+    if (result == QDialogButtonBox::Apply)
+        return QDialogButtonBox::Yes;
+    if (result == QDialogButtonBox::Discard)
+        return QDialogButtonBox::No;
+
+    return QDialogButtonBox::Cancel;
 }
 
 void QnServerSettingsDialog::updateWebPageButton()

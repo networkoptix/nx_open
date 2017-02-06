@@ -8,16 +8,14 @@
 
 #include "include/cdb/connection.h"
 
-#include <nx/network/cloud/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cloud_module_url_fetcher.h>
 
 
 namespace nx {
 namespace cdb {
-//! "cl" stands for "client"
-namespace cl {
+namespace client {
 
-class ConnectionFactory
-:
+class ConnectionFactory:
     public api::ConnectionFactory
 {
 public:
@@ -38,16 +36,14 @@ public:
     //!Implementation of \a api::ConnectionFactory::createConnection
     virtual std::string toString(api::ResultCode resultCode) const override;
 
-    //!Implementation of \a api::ConnectionFactory::setCloudEndpoint
-    virtual void setCloudEndpoint(
-        const std::string& host,
-        unsigned short port) override;
+    //!Implementation of \a api::ConnectionFactory::setCloudUrl
+    virtual void setCloudUrl(const std::string& url) override;
 
 private:
-    network::cloud::CloudModuleEndPointFetcher m_endPointFetcher;
+    network::cloud::CloudDbUrlFetcher m_endPointFetcher;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

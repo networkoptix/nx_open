@@ -16,6 +16,9 @@ Page
     leftPadding: 8
     rightPadding: 8
 
+    screenOrientation: (d.minimumHeight > width || d.minimumHeight > height)
+        ? Qt.PortraitOrientation : Qt.PrimaryOrientation
+
     leftButtonIcon: lp("/images/menu.png")
     onLeftButtonClicked: sideNavigation.open()
 
@@ -25,7 +28,7 @@ Page
         {
             id: enabledSwitch
 
-            onCheckedChanged:
+            onClicked:
             {
                 if (checked)
                     liteClientController.startLiteClient()
@@ -38,6 +41,8 @@ Page
     QtObject
     {
         id: d
+
+        readonly property real minimumHeight: 300 + bottomLoader.height + header.height
 
         property int activeItemIndex: 0
 
@@ -62,14 +67,15 @@ Page
 
         onClientStartError:
         {
-            Workflow.openInformationDialog(
+            Workflow.openStandardDialog(
                 qsTr("Cannot start client"),
-                qsTr("Please make sure that display is connected to Nx1."))
+                qsTr("Please make sure that display is connected to %1.")
+                    .arg(applicationInfo.liteDeviceName()))
         }
 
         onClientStopError:
         {
-            Workflow.openInformationDialog(qsTr("Cannot stop client"))
+            Workflow.openStandardDialog(qsTr("Cannot stop client"))
         }
 
     }
@@ -136,8 +142,8 @@ Page
     {
         id: offlineDummy
         anchors.fill: parent
-        title: qsTr("Nx1 is offline")
-        image: lp("images/alert_nx1_offline.png")
+        title: qsTr("%1 is offline").arg(applicationInfo.liteDeviceName())
+        image: lp("/images/alert_nx1_offline.png")
         visible: !liteClientController.serverOnline
     }
 

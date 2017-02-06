@@ -6,10 +6,14 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/fake_media_server.h>
 #include <common/common_module.h>
+
+#include <network/system_helpers.h>
+
 #include <utils/merge_systems_tool.h>
 #include <utils/common/software_version.h>
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
+
 #include <update/media_server_update_tool.h>
 
 namespace {
@@ -62,7 +66,7 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     if (auto fakeServer = server.dynamicCast<QnFakeMediaServerResource>())
     {
         QAuthenticator authenticator;
-        authenticator.setUser(lit("admin"));
+        authenticator.setUser(helpers::kFactorySystemUser);
         authenticator.setPassword(m_adminPassword);
         fakeServer->setAuthenticator(authenticator);
     }
@@ -134,7 +138,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
         return;
 
     QAuthenticator auth;
-    auth.setUser(lit("admin"));
+    auth.setUser(helpers::kFactorySystemUser);
     auth.setPassword(m_adminPassword);
 
     emit progressChanged(0);

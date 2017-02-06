@@ -1,6 +1,5 @@
-
 import QtQuick 2.6;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 
 import "."
 
@@ -15,6 +14,9 @@ BaseTile
     property bool isCompatibleInternal: false;
     property bool safeMode: false;
     property bool isFactoryTile: impl.isFactoryTile;
+
+    property bool isRunning: false;
+    property bool isReachable: false;
 
     property string wrongVersion;
     property string compatibleVersion;
@@ -40,7 +42,7 @@ BaseTile
         if (offlineCloudConnectionsDisabled && isCloudTile && !context.isCloudEnabled)
             return false;
 
-        return control.isOnline;
+        return control.isConnectable;
     }
 
     tileColor:
@@ -74,7 +76,7 @@ BaseTile
                 return false;    //< We don't have indicator for new systems
 
             return (wrongVersion.length || compatibleVersion.length
-                || !control.isOnline || !isCompatibleInternal);
+                || !control.isConnectable || !isCompatibleInternal);
         }
 
         text:
@@ -85,8 +87,10 @@ BaseTile
                 return wrongVersion;
             if (compatibleVersion.length)
                 return compatibleVersion;
-            if (!control.isOnline)
+            if (!control.isRunning)
                 return qsTr("OFFLINE");
+            if (!control.isReachable)
+                return qsTr("UNREACHABLE");
 
             return "";
         }
@@ -113,10 +117,34 @@ BaseTile
         }
     }
 
+    NxPopupMenu
+    {
+        id: tileMenu;
+        NxMenuItem
+        {
+            text: "Edit";
+            leftPadding: 16;
+            rightPadding: 16;
+
+            onTriggered: control.toggle();
+        }
+    }
+
     onCollapsedTileClicked:
     {
         if (!control.isAvailable)
             return;
+
+        if (buttons == Qt.RightButton)
+        {
+            if (control.menuButton.visible)
+            {
+                tileMenu.x = x;
+                tileMenu.y = y;
+                tileMenu.open();
+            }
+            return;
+        }
 
         switch(control.impl.tileType)
         {
@@ -147,23 +175,13 @@ BaseTile
     }
 
     titleLabel.text: (control.impl.tileType == control.impl.kFactorySystemTileType
-        ? qsTr("New System") : systemName);
+        ? qsTr("New Server") : systemName);
 
     menuButton
     {
         visible: impl.hasSavedConnection && control.isAvailable;
 
-        menu: NxPopupMenu
-        {
-            NxMenuItem
-            {
-                text: "Edit";
-                leftPadding: 16;
-                rightPadding: 16;
-
-                onTriggered: control.toggle();
-            }
-        }
+        menu: tileMenu;
     }
 
     areaLoader.source:
@@ -201,7 +219,7 @@ BaseTile
                 currentAreaItem.isExpandedTile = Qt.binding( function() { return control.isExpanded; });
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
-                currentAreaItem.recentLocalConnectionsModel = control.impl.recentConnectionsModel;
+                currentAreaItem.authenticationDataModel = control.impl.authenticationDataModel;
                 currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
@@ -210,21 +228,14 @@ BaseTile
             }
             else if (control.impl.tileType === control.impl.kFactorySystemTileType)
             {
-                currentAreaItem.host = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("url", 0): "");
-                });
-                currentAreaItem.displayHost = Qt.binding( function()
-                {
-                    return (control.impl.hostsModel ?
-                        control.impl.hostsModel.getData("display", 0): "");
-                });
+                currentAreaItem.host = control.impl.hostsModelAccessor.getData(0, "url") || "";
+                currentAreaItem.displayHost =
+                    control.impl.hostsModelAccessor.getData(0, "display") || "";
             }
             else // Cloud system
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
-                currentAreaItem.isOnline = Qt.binding( function() { return control.isOnline; });
+                currentAreaItem.isConnectable = Qt.binding( function() { return control.isConnectable; });
                 currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
             }
         }
@@ -250,8 +261,12 @@ BaseTile
 
     property QtObject impl: QtObject
     {
-        property var hostsModel: QnSystemHostsModel { systemId: control.systemId; }
-        property var recentConnectionsModel: QnRecentLocalConnectionsModel { systemId: control.localId; }
+        property var hostsModel: SystemHostsModel { systemId: control.systemId; }
+        property var hostsModelAccessor: ModelDataAccessor { model: control.impl.hostsModel; }
+        property var authenticationDataModel: AuthenticationDataModel
+        {
+            systemId: control.localId;
+        }
 
         // TODO: add enum to c++ code, add type info to model
         readonly property int kFactorySystemTileType: 0;
@@ -303,6 +318,7 @@ BaseTile
                   * Discussed with R. Vasilenko - we can rely on admin/admin
                   * credentials for factory (new) systems. Otherwise it is error
                   * situation  on server side
+                  * TODO: ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
                   */
                 var kFactorySystemUser = "admin";
                 var kFactorySystemPassword = "admin";

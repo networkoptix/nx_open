@@ -447,10 +447,17 @@ void QnResourceTreeModelUserNodes::rebuildSubjectTree(const QnResourceAccessSubj
     if (!m_valid)
         return;
 
-    if (subject.user() && !subject.user()->isEnabled())
+    if (auto user = subject.user())
     {
-        removeUserNode(subject.user());
-        return;
+        bool skipUser = !user->isEnabled()
+            || (m_model->scope() != QnResourceTreeModel::FullScope
+                && user->userRole() == Qn::UserRole::CustomUserRole);
+
+        if (skipUser)
+        {
+            removeUserNode(subject.user());
+            return;
+        }
     }
 
     ensureSubjectNode(subject);
@@ -526,13 +533,14 @@ void QnResourceTreeModelUserNodes::removeNode(const QnResourceTreeModelNodePtr& 
 
 void QnResourceTreeModelUserNodes::clean()
 {
-    for (auto node : m_allNodes)
+    for (auto node: m_allNodes)
         node->deinitialize();
     m_recorders.clear();
     m_shared.clear();
     m_placeholders.clear();
     m_users.clear();
     m_roles.clear();
+    m_allNodes.clear();
 }
 
 void QnResourceTreeModelUserNodes::cleanupRecorders()
@@ -560,10 +568,10 @@ void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& reso
 
         connect(user, &QnUserResource::userRoleChanged, this,
             [this](const QnUserResourcePtr& user)
-        {
-            removeUserNode(user);
-            rebuildSubjectTree(user);
-        });
+            {
+                removeUserNode(user);
+                rebuildSubjectTree(user);
+            });
 
         rebuildSubjectTree(user);
     }

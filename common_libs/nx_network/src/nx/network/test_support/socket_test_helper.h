@@ -1,10 +1,4 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef SOCKET_TEST_HELPER_H
-#define SOCKET_TEST_HELPER_H
+#pragma once
 
 #include <list>
 #include <memory>
@@ -17,7 +11,7 @@
 #include <nx/network/socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/thread/mutex.h>
-
+#include <nx/utils/result_counter.h>
 
 namespace nx {
 namespace network {
@@ -243,7 +237,7 @@ public:
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
     size_t totalIncompleteTasks() const;
-    const std::map<SystemError::ErrorCode, size_t>& returnCodes() const;
+    const utils::ResultCounter<SystemError::ErrorCode>& results();
 
 private:
     const SocketAddress& nextAddress();
@@ -264,7 +258,7 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     size_t m_totalIncompleteTasks;
-    std::map<SystemError::ErrorCode, size_t> m_returnCodes;
+    utils::ResultCounter<SystemError::ErrorCode> m_results;
     size_t m_totalConnectionsEstablished;
     std::set<int> m_finishedConnectionsIDs;
     std::random_device m_randomDevice;
@@ -336,5 +330,3 @@ private:
 } // namespace test
 } // namespace network
 } // namespace nx
-
-#endif  //SOCKET_TEST_HELPER_H

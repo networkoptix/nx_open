@@ -149,6 +149,9 @@ protected:
     virtual int calculateButtonsVisibility() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
+    virtual Qn::ResourceOverlayButton calculateOverlayButton(
+        Qn::ResourceStatusOverlay statusOverlay) const override;
+
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) override;
@@ -215,7 +218,6 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateOverlayButton(Qn::ResourceStatusOverlay statusOverlay);
 
     void updateCompositeOverlayMode();
 

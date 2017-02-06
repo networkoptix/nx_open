@@ -52,15 +52,20 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            QnMutexLocker lk( &m_mutex );
-            while( !m_runningHttpRequests.empty() )
+            pleaseStopSync();
+        }
+
+        void pleaseStopSync(bool checkForLocks = true)
+        {
+            QnMutexLocker lk(&m_mutex);
+            while (!m_runningHttpRequests.empty())
             {
                 nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
                 lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
-                httpClient->pleaseStopSync();
+                httpClient->pleaseStopSync(checkForLocks);
                 //it is garanteed that no http event handler is running currently and no handler will be called
                 lk.relock();
-                m_runningHttpRequests.erase( m_runningHttpRequests.begin() );
+                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
             }
         }
 
@@ -188,6 +193,8 @@ namespace ec2
                 }
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported, OutputData() );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden, OutputData());
                 default:
                     return handler( ErrorCode::serverError, OutputData() );
             }
@@ -235,6 +242,8 @@ namespace ec2
                     return handler( ErrorCode::ok );
                 case nx_http::StatusCode::unauthorized:
                     return handler( ErrorCode::unauthorized );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden);
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported );
                 default:

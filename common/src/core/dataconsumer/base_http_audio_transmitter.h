@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "audio_data_transmitter.h"
 #include <nx/network/http/asynchttpclient.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
@@ -64,3 +66,5 @@ protected:
     mutable QnMutex m_mutex;
     mutable QnWaitCondition m_wait;
 };
+
+#endif //ENABLE_DATA_PROVIDERS

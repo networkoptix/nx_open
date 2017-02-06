@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QCommonStyle>
 #include <QtWidgets/QStyleOption>
-#include <private/qcommonstyle_p.h>
+#include <QtWidgets/private/qcommonstyle_p.h>
 
 #include <ui/common/geometry.h>
 
@@ -53,6 +53,9 @@ public:
             const QStyleOptionButton* option,
             QPalette::ColorRole foregroundRole,
             const QWidget* widget = nullptr) const;
+
+    static bool isCheckableButton(const QStyleOption* option);
+    static bool isTextButton(const QStyleOption* option);
 
     /* Insert horizontal separator line into QInputDialog above its button box. */
     bool polishInputDialog(QInputDialog* inputDialog) const;

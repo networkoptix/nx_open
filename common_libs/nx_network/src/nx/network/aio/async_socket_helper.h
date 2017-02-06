@@ -119,6 +119,9 @@ public:
         }
         else
         {
+            if (!nx::network::SocketGlobals::isInitialized())
+                return;
+
             static const char* kFailureMessage =
                 "You MUST cancel running async socket operation before "
                 "deleting socket if you delete socket from non-aio thread";

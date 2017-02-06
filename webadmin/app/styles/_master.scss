@@ -13,9 +13,33 @@
   width: 520px;
   margin: 0 auto;
 
+
+  .horisontal-line-text{
+    padding: 10px 0;
+
+    .line{
+
+      display: inline-block;
+      width:150px;
+      height: 1px;
+      line-height: 0;
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: .4em 0;
+      padding: 0;
+    }
+
+    .text{
+      display: inline-block;
+      padding: 0 10px;
+    }
+  }
   .panel-body {
     height: 365px;
     position: relative;
+  }
+  .panel-body-big{
+    height: 420px;
   }
 
   .vertical-center {
@@ -188,6 +212,10 @@
     width: 20px;
     height: 12px;
     background-position:  0 -188px;
+  }
+
+  .lite-client-instruction{
+    margin-top: -140px;
   }
 }
 

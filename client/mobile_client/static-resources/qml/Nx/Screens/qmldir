@@ -6,3 +6,4 @@ SessionsScreen 1.0 SessionsScreen.qml
 ResourcesScreen 1.0 ResourcesScreen.qml
 VideoScreen 1.0 VideoScreen.qml
 SettingsScreen 1.0 SettingsScreen.qml
+DeveloperSettingsScreen 1.0 DeveloperSettingsScreen.qml

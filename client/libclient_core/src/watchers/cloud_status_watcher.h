@@ -88,7 +88,7 @@ signals:
     void cloudSystemsChanged(const QnCloudSystemList &currectCloudSystems);
     void recentCloudSystemsChanged();
     void currentSystemChanged(const QnCloudSystem& system);
-    void errorChanged();
+    void errorChanged(ErrorCode error);
     void stayConnectedChanged();
     void isCloudEnabledChanged();
 

@@ -59,7 +59,7 @@ namespace nx_http
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
     */
     int NX_NETWORK_API strcasecmp( const StringType& one, const StringType& two );
-    
+
     int NX_NETWORK_API defaultPortForScheme( const StringType& scheme );
 
     /************************************************************************/
@@ -235,7 +235,8 @@ namespace nx_http
             lastSuccessCode = 299,
             multipleChoices = 300,
             movedPermanently = 301,
-            moved = 302,
+            found = 302,
+            seeOther = 303,
             notModified = 304,
 
             badRequest = 400,
@@ -323,6 +324,7 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        StringType toString() const;
     };
 
     class NX_NETWORK_API StatusLine
@@ -341,6 +343,7 @@ namespace nx_http
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
+        StringType toString() const;
     };
 
     void NX_NETWORK_API serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
@@ -365,7 +368,7 @@ namespace nx_http
         */
         void serialize( BufferType* const dstBuffer ) const;
         BufferType serialized() const;
-
+        StringType toString() const;
         BufferType getCookieValue(const BufferType& name) const;
     };
 
@@ -374,7 +377,7 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        BufferType messageBody;
+        BufferType messageBody; //< ATTENTION: Not used on client side.
 
         Response() = default;
         Response(Response&&) = default;
@@ -387,8 +390,8 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
         //!Appends serialized multipart data block to \a dstBuffer
         void serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary ) const;
-        BufferType toString() const;
-        BufferType toMultipartString(const ConstBufferRefType& boundary) const;
+        StringType toString() const;
+        StringType toMultipartString(const ConstBufferRefType& boundary) const;
     };
 
     class NX_NETWORK_API RtspResponse
@@ -434,7 +437,7 @@ namespace nx_http
         void clear();
         HttpHeaders& headers() { return type == MessageType::request ? request->headers : response->headers; };
         const HttpHeaders& headers() const { return type == MessageType::request ? request->headers : response->headers; };
-        BufferType toString() const;
+        StringType toString() const;
     };
 
     //!Contains http header structures

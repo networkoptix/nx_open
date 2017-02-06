@@ -1,6 +1,6 @@
 #include "result_code.h"
 
-#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
@@ -8,15 +8,15 @@ namespace hpm {
 namespace api {
 
 ResultCode fromStunErrorToResultCode(
-    const nx::stun::attrs::ErrorDescription& errorDescription)
+    const nx::stun::attrs::ErrorCode& errorCode)
 {
-    switch (errorDescription.getCode())
+    switch (errorCode.getCode())
     {
         case nx::stun::error::badRequest:
             return ResultCode::badRequest;
         case nx::stun::error::unauthtorized:
             return ResultCode::notAuthorized;
-        case nx::stun::cc::error::notFound:
+        case nx::stun::extension::error::notFound:
             return ResultCode::notFound;
         default:
             return ResultCode::otherLogicError;
@@ -32,7 +32,7 @@ int resultCodeToStunErrorCode(ResultCode resultCode)
         case ResultCode::notAuthorized:
             return nx::stun::error::unauthtorized;
         case ResultCode::notFound:
-            return nx::stun::cc::error::notFound;
+            return nx::stun::extension::error::notFound;
         default:
             return nx::stun::error::serverError;
     }
@@ -63,4 +63,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::hpm::api, ResultCode,
     (nx::hpm::api::ResultCode::serverConnectionBroken, "serverConnectionBroken")
     (nx::hpm::api::ResultCode::noReplyFromServer, "noReplyFromServer")
     (nx::hpm::api::ResultCode::badTransport, "badTransport")
+    (nx::hpm::api::ResultCode::interrupted, "interrupted")
 )

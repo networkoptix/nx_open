@@ -47,6 +47,7 @@ namespace nx_hls
             const nx_http::Request& request,
             nx_http::Response* const response);
 
+        static void setMinPlayListSizeToStartStreaming(size_t value);
     protected:
         virtual void run() override;
         const char* mimeTypeByExtension(const QString& extension) const;
@@ -71,7 +72,7 @@ namespace nx_hls
         bool m_useChunkedTransfer;
         QString m_currentFileName;
         size_t m_bytesSent;
-        const size_t m_minPlaylistSizeToStartStreaming;
+        static size_t m_minPlaylistSizeToStartStreaming;
 
         //!
         /*!

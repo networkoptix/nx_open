@@ -44,7 +44,7 @@
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
                     <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Refresh</a>
-                    <a ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
+                    <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Open in new window</a>
                 </tab>
             </tabset>
         </div>

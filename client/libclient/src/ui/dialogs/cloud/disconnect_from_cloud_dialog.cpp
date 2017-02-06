@@ -18,8 +18,8 @@
 #include <ui/common/aligner.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
-#include <ui/style/helper.h>
 #include <ui/widgets/common/busy_indicator_button.h>
 #include <ui/widgets/common/input_field.h>
 #include <ui/workbench/workbench_context.h>
@@ -56,12 +56,21 @@ public:
     void showFailure(const QString &message = QString());
 
     void setupUi();
+    enum class VisibleButton
+    {
+        Ok,
+        Next
+    };
+
+    void setVisibleButton(VisibleButton button);
+
     bool validateAuth();
 private:
     Scenario calculateScenario() const;
     void createAuthorizeWidget();
     void createResetPasswordWidget();
 
+    QString disconnectQuestionMessage() const;
     QString allUsersDisabledMessage() const;
     QString enterPasswordMessage() const;
     QString disconnectWarnMessage() const;
@@ -214,61 +223,62 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnDisconnectFromCloudDialog);
 
-    QnMessageBox messageBox(QnMessageBox::NoIcon,
-                            helpTopic(q),
-                            tr("Error"),
-                            tr("Can not disconnect the system from %1").arg(QnAppInfo::cloudName()),
-                            QDialogButtonBox::Ok,
-                            q);
-
-    if (!message.isEmpty())
-        messageBox.setInformativeText(message);
-
-    messageBox.exec();
+    QnMessageBox::critical(q,
+        tr("Failed to disconnect the System from %1", "%1 is name of cloud (like 'Nx Cloud')")
+            .arg(QnAppInfo::cloudName()),
+        message);
 
     lockUi(false);
+}
+
+void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
+{
+    const bool okButtonVisible = (button == VisibleButton::Ok);
+    const auto style = static_cast<QnButtonAccent>(okButtonVisible
+        ? QnButtonAccent::Warning
+        : QnButtonAccent::Standard);
+    const auto defaultButton = (okButtonVisible ? okButton : nextButton);
+
+    okButton->setVisible(okButtonVisible);
+    nextButton->setVisible(!okButtonVisible);
+
+    Q_Q(QnDisconnectFromCloudDialog);
+    q->setDefaultButton(defaultButton, style);
 }
 
 void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
-    q->setWindowTitle(tr("Disconnect from %1").arg(QnAppInfo::cloudName()));
     q->setFixedWidth(kDialogWidth);
 
-    /* We replace standard button instead of simply adding our one to keep OS theme values: */
-    QScopedPointer<QAbstractButton> baseOkButton(q->button(QDialogButtonBox::Ok));
     okButton = new QnBusyIndicatorButton(q);
-    okButton->setText(baseOkButton->text()); // Title from OS theme
-    okButton->setIcon(baseOkButton->icon()); // Icon from OS theme
-    okButton->setProperty(style::Properties::kAccentStyleProperty, true);
-    q->removeButton(baseOkButton.data());
+    okButton->setText(tr("Disconnect"));
     q->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     nextButton = new QnBusyIndicatorButton(q);
     nextButton->setText(tr("Next")); // Title from OS theme
-    nextButton->setProperty(style::Properties::kAccentStyleProperty, true);
     q->addButton(nextButton, QDialogButtonBox::ActionRole);
-    nextButton->setVisible(false);
+
+    setVisibleButton(VisibleButton::Ok);
 
     switch (scenario)
     {
         case Scenario::LocalOwner:
         {
-            q->setIcon(QnMessageBox::Question);
-            q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+            q->setIcon(QnMessageBoxIcon::Question);
+            q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
-                + enterPasswordMessage(),
-                false);
+                + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            q->setDefaultButton(okButton);
+            setVisibleButton(VisibleButton::Ok);
             break;
         }
         case Scenario::CloudOwner:
         {
-            q->setIcon(QnMessageBox::Question);
-            q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+            q->setIcon(QnMessageBoxIcon::Question);
+            q->setText(disconnectQuestionMessage());
             q->setInformativeText(allUsersDisabledMessage()
                 + L'\n'
                 + disconnectWarnMessage()
@@ -276,7 +286,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
                 + enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            q->setDefaultButton(okButton);
+            setVisibleButton(VisibleButton::Ok);
             break;
         }
         case Scenario::CloudOwnerOnly:
@@ -284,9 +294,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
             q->setText(enterPasswordMessage());
             q->addCustomWidget(authorizeWidget, QnMessageBox::Layout::Main,
                 0, Qt::Alignment(), true);
-            okButton->setVisible(false);
-            nextButton->setVisible(true);
-            q->setDefaultButton(nextButton);
+            setVisibleButton(VisibleButton::Next);
             nextButton->disconnect(this);
             connect(nextButton, &QPushButton::clicked, this,
                 &QnDisconnectFromCloudDialogPrivate::validateCloudPassword);
@@ -294,10 +302,10 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         }
         default:
             NX_ASSERT(false, "Invalid scenario");
-            q->setIcon(QnMessageBox::Warning);
+            q->setIcon(QnMessageBoxIcon::Warning);
             q->setText(tr("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
-            q->setDefaultButton(okButton);
+            q->setDefaultButton(okButton, QnButtonAccent::Warning);
             break;
     }
 
@@ -309,9 +317,15 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
     return authorizePasswordField->validate();
 }
 
+QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
+{
+    return tr("Disconnect the System from %1?",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+}
+
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All %1 users and features will be disabled.").arg(QnAppInfo::cloudName());
+    return tr("All cloud features will be disabled, cloud users will be deleted from the System.");
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
@@ -382,7 +396,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
         tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.",
-            "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
+            "%1 is name of cloud (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
@@ -412,16 +426,15 @@ void QnDisconnectFromCloudDialogPrivate::setupConfirmationPage()
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly);
     Q_Q(QnDisconnectFromCloudDialog);
 
-    q->setIcon(QnMessageBox::Question);
-    q->setText(tr("Disconnect system from %1").arg(QnAppInfo::cloudName()));
+    q->setIcon(QnMessageBoxIcon::Question);
+    q->setText(disconnectQuestionMessage());
     q->setInformativeText(allUsersDisabledMessage()
         + L'\n'
         + disconnectWarnMessage());
     q->removeCustomWidget(resetPasswordWidget);
     resetPasswordWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */
-    nextButton->setVisible(false);
-    okButton->setVisible(true);
-    q->setDefaultButton(okButton);
+
+    setVisibleButton(VisibleButton::Ok);
 }
 
 void QnDisconnectFromCloudDialogPrivate::createAuthorizeWidget()

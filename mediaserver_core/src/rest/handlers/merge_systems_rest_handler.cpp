@@ -365,7 +365,7 @@ int QnMergeSystemsRestHandler::execute(
 
 bool QnMergeSystemsRestHandler::applyCurrentSettings(
     const QUrl &remoteUrl,
-    const QString& getKey,
+    const QString& /*getKey*/,
     const QString& postKey,
     bool oneServer,
     const QnRestConnectionProcessor* owner)
@@ -524,10 +524,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.wholeSystem = true;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
-
-    //for (auto itr = settings.settings.begin(); itr != settings.settings.end(); ++itr)
-    //    data.foreignSettings.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
-    data.foreignUsers = users;
 
     for (const auto& userData: users)
     {

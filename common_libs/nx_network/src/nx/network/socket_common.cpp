@@ -254,12 +254,6 @@ SocketAddress::SocketAddress(const char* utf8Str):
 {
 }
 
-SocketAddress::SocketAddress(const QUrl& url):
-    address(url.host()),
-    port((quint16)url.port(0))
-{
-}
-
 bool SocketAddress::operator==(const SocketAddress& rhs) const
 {
     return address == rhs.address && port == rhs.port;
@@ -288,6 +282,11 @@ QString SocketAddress::toString() const
         host = QString(QLatin1String("[%1]")).arg(host);
 
     return host + (port > 0 ? QString::fromLatin1(":%1").arg(port) : QString());
+}
+
+std::string SocketAddress::toStdString() const
+{
+    return toString().toStdString();
 }
 
 QUrl SocketAddress::toUrl(const QString& scheme) const

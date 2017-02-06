@@ -14,7 +14,7 @@ namespace ec2
     namespace detail { class QnDbManager; }
 
 
-    class QnTransactionLog
+    class QnTransactionLog: public Singleton<QnTransactionLog>
     {
     public:
 
@@ -26,8 +26,6 @@ namespace ec2
 
         QnTransactionLog(detail::QnDbManager* db);
         virtual ~QnTransactionLog();
-
-        static QnTransactionLog* instance();
 
         /**
          * Return transactions from the log

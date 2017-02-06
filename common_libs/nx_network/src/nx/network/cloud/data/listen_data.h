@@ -14,8 +14,11 @@ class NX_NETWORK_API ListenRequest:
     public StunRequestData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::listen;
+    constexpr static const auto kMethod = stun::extension::methods::listen;
 
+    // TODO: #mux Remove systemId and serverId as redandant.
+    // Every server message is signed up with system id, server id and message integrity based on
+    // authentification key by MediatorServerConnection.
     nx::String systemId;
     nx::String serverId;
     CloudConnectVersion cloudConnectVersion;
@@ -29,9 +32,10 @@ class NX_NETWORK_API ListenResponse:
     public StunResponseData
 {
 public:
-    constexpr static const auto kMethod = stun::cc::methods::listen;
+    constexpr static const auto kMethod = stun::extension::methods::listen;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
+    CloudConnectVersion cloudConnectVersion;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);

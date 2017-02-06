@@ -19,3 +19,14 @@ void PrintTo(const QByteArray& val, ::std::ostream* os) {
 void PrintTo(const QString& val, ::std::ostream* os) {
     *os << val.toStdString();
 }
+
+namespace std {
+namespace chrono {
+
+void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
+{
+    *os << val.time_since_epoch().count() << "ns";
+}
+
+} // namespace chrono
+} // namespace std

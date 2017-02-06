@@ -148,8 +148,8 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
         if (!server || server->getStatus() != Qn::Online)
         {
             QnMessageBox::warning(mainWindow(),
-                tr("Error"),
-                tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+                tr("Server offline"),
+                tr("Bookmarks can only be added to an online server."));
             return;
         }
     }
@@ -190,8 +190,8 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
     if (!server || server->getStatus() != Qn::Online)
     {
         QnMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Server offline"),
+            tr("Bookmarks can only be edited on an online Server."));
         return;
     }
 
@@ -215,14 +215,14 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered()
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    const auto message = (bookmark.name.trimmed().isEmpty()
-        ? tr("Are you sure you want to delete this bookmark?")
-        : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete bookmark?"), bookmark.name.trimmed(),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        mainWindow());
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
-    if (QnMessageBox::information(mainWindow(),
-        tr("Confirm Deletion"), message,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
@@ -236,12 +236,14 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
-    const auto message = tr("Are you sure you want to delete these %n bookmarks?", "", bookmarks.size());
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete %n bookmarks?", "", bookmarks.size()), QString(),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        mainWindow());
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
-    if (QnMessageBox::information(mainWindow(),
-        tr("Confirm Deletion"), message,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     for (const auto bookmark : bookmarks)

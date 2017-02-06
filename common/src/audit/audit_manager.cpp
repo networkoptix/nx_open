@@ -9,6 +9,9 @@ namespace
     const qint64 GROUP_TIME_THRESHOLD = 1000ll * 30;
     static const qint64 SESSION_KEEP_PERIOD_SECS      = 3600ll * 24;
     static const qint64 SESSION_CLEANUP_INTERVAL_MS = 1000;
+
+    static const int kRecentlyRecordsCacheSize = 100;
+    static const int kRecentlyRecordsTimeGapSec = 5;
 }
 
 QnAuditRecord QnAuditManager::CameraPlaybackInfo::toAuditRecord() const
@@ -290,6 +293,22 @@ void QnAuditManager::processDelayedRecords(QVector<T>& recordsToAggregate)
     }
 }
 
+bool QnAuditManager::hasSimilarRecentlyRecord(const QnAuditRecord& data) const
+{
+    for (const auto& record: m_recentlyAddedRecords)
+    {
+        if (record.eventType == data.eventType &&
+            record.resources == data.resources &&
+            record.params == data.params &&
+            record.authSession == data.authSession)
+        {
+            if (qAbs(record.createdTimeSec - data.createdTimeSec) < kRecentlyRecordsTimeGapSec)
+                return true;
+        }
+    }
+    return false;
+}
+
 int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
 {
     if (!enabled())
@@ -301,6 +320,13 @@ int QnAuditManager::addAuditRecord(const QnAuditRecord& record)
         m_sessionCleanupTimer.restart();
         cleanupExpiredSessions();
     }
+
+    if (hasSimilarRecentlyRecord(record))
+        return -1; //< ignore if same record has been added recently
+
+    m_recentlyAddedRecords.push_back(record);
+    if (m_recentlyAddedRecords.size() > kRecentlyRecordsCacheSize)
+        m_recentlyAddedRecords.pop_front();
 
     if (record.eventType == Qn::AR_UnauthorizedLogin)
         return addAuditRecordInternal(record);

@@ -521,11 +521,17 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("events/filter.png")).
         text(tr("Filter..."));
 
+    factory(QnActions::PreferencesCloudTabAction).
+        flags(Qn::NoTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission);
+
     factory(QnActions::ConnectAction).
         flags(Qn::NoTarget);
 
     factory(QnActions::ConnectToCloudSystemAction).
-        flags(Qn::NoTarget);
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Connect to System")).
+        condition(new QnTreeNodeTypeCondition(Qn::CloudSystemNode, this));
 
     factory(QnActions::ReconnectAction).
         flags(Qn::NoTarget);
@@ -986,6 +992,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Account Settings..."));
 
+    factory(QnActions::HideCloudPromoAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
         text(tr("Create Account..."));
@@ -1223,9 +1232,9 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnRunningVideowallActionCondition(this));
 
     factory(QnActions::DetachFromVideoWallAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        text(tr("Detach Layout")).
+        text(tr("Clear Screen")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
 
@@ -1600,7 +1609,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
+        text(tr("Add Device...")).   //intentionally hardcode devices here
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
@@ -1862,11 +1871,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey | Qn::DevMode).
         shortcut(lit("Ctrl+Alt+Shift+-")).
         text(lit("Decrement Debug Counter"));
-
-    factory(QnActions::DebugShowResourcePoolAction).
-        flags(Qn::GlobalHotkey | Qn::DevMode).
-        shortcut(lit("Ctrl+Alt+Shift+R")).
-        text(lit("Show Resource Pool"));
 
     factory(QnActions::DebugCalibratePtzAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::DevMode).

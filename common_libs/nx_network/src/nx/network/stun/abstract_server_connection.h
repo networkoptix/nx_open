@@ -1,20 +1,14 @@
-/**********************************************************
-* Dec 28, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <functional>
 
+#include <nx/network/abstract_socket.h>
+#include <nx/network/socket_common.h>
 #include <nx/utils/move_only_func.h>
 
 #include <utils/common/systemerror.h>
 
 #include "message.h"
-#include "nx/network/socket_common.h"
-#include "nx/network/abstract_socket.h"
-
 
 namespace nx {
 namespace stun {
@@ -22,27 +16,28 @@ namespace stun {
 class AbstractServerConnection
 {
 public:
-    AbstractServerConnection() {}
-    virtual ~AbstractServerConnection() {}
+    AbstractServerConnection() = default;
+    virtual ~AbstractServerConnection() = default;
 
     /**
-        \param handler Triggered to report send result. Can be \a NULL
-    */
+     * @param handler Triggered to report send result. Can be NULL.
+     */
     virtual void sendMessage(
         nx::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler = nullptr) = 0;
     virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
     /**
-        \note \a AbstractServerConnection::sendMessage does nothing after \a handler has been invoked
-    */
+     * @note AbstractServerConnection::sendMessage does nothing after handler has been invoked.
+     */
     virtual void addOnConnectionCloseHandler(nx::utils::MoveOnlyFunc<void()> handler) = 0;
     virtual AbstractCommunicatingSocket* socket() = 0;
+    virtual void close() = 0;
 
 private:
     AbstractServerConnection(const AbstractServerConnection&);
     AbstractServerConnection& operator=(const AbstractServerConnection&);
 };
 
-}   //stun
-}   //nx
+} // namespace stun
+} // namespace nx

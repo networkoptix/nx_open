@@ -16,7 +16,7 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0">
+  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
    <property name="leftMargin">
     <number>16</number>
    </property>
@@ -29,35 +29,16 @@
    <property name="bottomMargin">
     <number>16</number>
    </property>
-   <property name="spacing">
+   <property name="horizontalSpacing">
     <number>8</number>
    </property>
-   <item row="0" column="2" rowspan="3">
-    <widget class="QPushButton" name="enabledButton">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::TabFocus</enum>
-     </property>
-     <property name="text">
-      <string>Enabled</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="emailLabel">
-     <property name="text">
-      <string notr="true">&lt;cloud user email&gt;</string>
+   <property name="verticalSpacing">
+    <number>0</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QLabel" name="iconLabel">
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>
@@ -65,6 +46,13 @@
     <widget class="QLabel" name="nameLabel">
      <property name="text">
       <string notr="true">&lt;cloud user full name&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="emailLabel">
+     <property name="text">
+      <string notr="true">&lt;cloud user email&gt;</string>
      </property>
     </widget>
    </item>
@@ -78,12 +66,18 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="iconLabel">
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+   <item row="0" column="2" rowspan="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

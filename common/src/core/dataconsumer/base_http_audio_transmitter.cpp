@@ -1,3 +1,5 @@
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "base_http_audio_transmitter.h"
 
 #include <core/resource/security_cam_resource.h>
@@ -253,3 +255,4 @@ void BaseHttpAudioTransmitter::at_httpDone(nx_http::AsyncHttpClientPtr httpClien
     }
 }
 
+#endif // ENABLE_DATA_PROVIDERS

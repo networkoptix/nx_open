@@ -15,8 +15,6 @@ struct QnTimelineZoomLevel {
         Years
     };
 
-    static int maxMonthLength;
-
     LevelType type;
     qint64 interval;
     QString suffixOverride;
@@ -31,13 +29,14 @@ struct QnTimelineZoomLevel {
 
     bool testTick(qint64 tick) const;
     qint64 nextTick(qint64 tick) const;
+    qint64 averageTickLength() const;
     qint64 alignTick(qint64 tick) const;
     QString suffix(qint64 tick) const;
     int tickCount(qint64 start, qint64 end) const;
     bool isMonotonic() const;
     QString baseValue(qint64 tick) const;
     QString subValue(qint64 tick) const;
-    int maxTextWidth() const;
+    QString longestText() const;
 };
 
 #endif // QNTIMELINEZOOMLEVEL_H

@@ -115,6 +115,11 @@ struct ConfigureSystemData : public PasswordData
 bool changeLocalSystemId(const ConfigureSystemData& data);
 
 /**
+ * Auto detect HTTP content type based on message body
+ */
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
+
+/**
  * @return false if failed to save some data.
  */
 bool resetSystemToStateNew();

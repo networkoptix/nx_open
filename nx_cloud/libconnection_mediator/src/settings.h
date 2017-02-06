@@ -4,6 +4,10 @@
 #include <list>
 #include <map>
 
+#include <boost/optional.hpp>
+
+#include <QtCore/QUrl> 
+
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
@@ -27,7 +31,7 @@ struct General
 struct CloudDB
 {
     bool runWithCloud;
-    QString endpoint;
+    boost::optional<QUrl> url;
     QString user;
     QString password;
     std::chrono::seconds updateInterval;
@@ -42,12 +46,14 @@ struct Stun
 {
     std::list<SocketAddress> addrToListenList;
     boost::optional<KeepAliveOptions> keepAliveOptions;
+    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Http
 {
     std::list<SocketAddress> addrToListenList;
     boost::optional<KeepAliveOptions> keepAliveOptions;
+    boost::optional<std::chrono::milliseconds> connectionInactivityTimeout;
 };
 
 struct Statistics
@@ -58,6 +64,18 @@ struct Statistics
         enabled(true)
     {
     }
+};
+
+/**
+ * Extends api::ConnectionParameters with mediator-only parameters.
+ */
+struct ConnectionParameters:
+    api::ConnectionParameters
+{
+    std::chrono::milliseconds connectionAckAwaitTimeout;
+    std::chrono::milliseconds connectionResultWaitTimeout;
+
+    ConnectionParameters();
 };
 
 /**
@@ -75,14 +93,14 @@ public:
     const CloudDB& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
-    /** Properties for cloud connections */
-    const api::ConnectionParameters& connectionParameters() const;
+    const ConnectionParameters& connectionParameters() const;
     const nx::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
 
-    //!Loads settings from both command line and conf file (or win32 registry)
-    void load(int argc, char **argv);
-    //!Prints to std out
+    /**
+     * Loads settings from both command line and conf file (or win32 registry).
+     */
+    void load(int argc, const char **argv);
     void printCmdLineArgsHelp();
 
 private:
@@ -95,7 +113,7 @@ private:
     CloudDB m_cloudDB;
     Stun m_stun;
     Http m_http;
-    api::ConnectionParameters m_connectionParameters;
+    ConnectionParameters m_connectionParameters;
     nx::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
 

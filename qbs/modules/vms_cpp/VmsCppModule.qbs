@@ -3,6 +3,7 @@ import qbs
 Module
 {
     Depends { name: "cpp" }
+    Depends { name: "Android.ndk"; condition: qbs.targetOS.contains("android") }
 
     property bool enableAllVendors: true
     property bool enableSsl: true
@@ -21,14 +22,13 @@ Module
 
     // YOU MUST FIX THE LINES BELOW to make sure it will generate merge conflict
     // if somebody also updates the protocol version
-    // Changed localSystem
-    property int ec2ProtoVersion: 3022
+    // vms-4742. ecs sqlite database was significally increased (twice) on servers update
+    property int ec2ProtoVersion: 3024
 
     Properties
     {
         condition: qbs.targetOS.contains("ios")
         enableAllVendors: false
-        enableSsl: false
         enableThirdParty: false
         enableMdns: false
         enableArchive: false
@@ -40,7 +40,6 @@ Module
     {
         condition: qbs.targetOS.contains("android")
         enableAllVendors: false
-        enableSsl: false
         enableThirdParty: false
         enableMdns: false
         enableArchive: false
@@ -50,10 +49,16 @@ Module
     }
     Properties
     {
-        condition: project.target == "isd" || project.target == "isd_s2"
+        condition: project.box == "isd" || project.box == "isd_s2"
         enableAllVendors: false
         enableSoftwareMotionDetection: false
         enableDesktopCamera: false
+    }
+    Properties
+    {
+        condition: qbs.targetOS.contains("macos") &&
+            (product.type.contains("staticlibrary") || product.type.contains("dynamiclibrary"))
+        cpp.linkerFlags: outer.concat(["-undefined", "dynamic_lookup"])
     }
 
     cpp.defines:
@@ -93,8 +98,7 @@ Module
                 "ENABLE_STARDOT",
                 "ENABLE_IQE",
                 "ENABLE_ISD",
-                "ENABLE_PULSE_CAMERA"
-            )
+                "ENABLE_PULSE_CAMERA")
         }
 
         if (qbs.targetOS.contains("windows"))
@@ -103,7 +107,7 @@ Module
         if (qbs.targetOS.contains("unix"))
             defines.push("QN_EXPORT=")
 
-        if (project.target == "isd" || project.target == "isd_s2")
+        if (project.box == "isd" || project.box == "isd_s2")
             defines.push("EDGE_SERVER")
 
         return defines
@@ -119,21 +123,25 @@ Module
                 "-W",
                 "-Werror=enum-compare",
                 "-Werror=reorder",
+                "-Wno-unused-local-typedefs",
                 "-Werror=delete-non-virtual-dtor",
                 "-Werror=return-type",
                 "-Werror=conversion-null",
-                "-Wuninitialized"
-            )
+                "-Wuninitialized")
         }
 
         if (qbs.targetOS.contains("linux"))
         {
+            if (!qbs.targetOS.contains("android"))
+                flags.push("-msse2")
+
             flags.push(
-                "-msse2",
-                "-Wno-unused-local-typedefs",
                 "-Wno-unknown-pragmas",
-                "-Wno-ignored-qualifiers"
-            )
+                "-Wno-ignored-qualifiers")
+        }
+        else if (qbs.targetOS.contains("macos"))
+        {
+            flags.push("-msse4.1")
         }
 
         return flags

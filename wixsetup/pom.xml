@@ -23,8 +23,7 @@
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
-        <VC12RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2012</VC12RedistPath>
-        <rdep.packages>vcredist-2015 vcredist-2012 vmaxproxy-2.1</rdep.packages>
+        <rdep.packages>vcredist-2015 vmaxproxy-2.1</rdep.packages>
     </properties>
 
     <dependencies>
@@ -230,7 +229,24 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>
+                            
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_update}</finalName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>testcamera-package</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/assembly-testcamera.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                           
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.testcamera}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -244,7 +260,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>server-update</finalName>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_update}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -258,6 +276,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.client_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -271,6 +292,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.server_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -284,6 +308,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-misc.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.misc_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -297,6 +324,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-libs.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.libs_debug}</finalName>
                         </configuration>
                     </execution>
                     <execution>
@@ -310,6 +340,9 @@
                                 <descriptor>${project.build.directory}/assembly-debug-cloud.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
+
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${artifact.name.cloud_debug}</finalName>
                         </configuration>
                     </execution>
                 </executions>

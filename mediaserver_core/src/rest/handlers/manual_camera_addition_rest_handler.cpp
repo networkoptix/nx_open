@@ -225,7 +225,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         for (const QnManualCameraInfo& info: infoMap)
         {
             if (!info.uniqueId.isEmpty())
-                auditRecord.resources.push_back(QnNetworkResource::uniqueIdToId(info.uniqueId));
+                auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));
         }
         qnAuditManager->addAuditRecord(auditRecord);
     }

@@ -42,7 +42,7 @@ Module
                         alias = FileInfo.joinPaths(prefix, alias)
 
                     var entry = map[alias]
-                    if (entry && entry.priority <= priority)
+                    if (entry && entry.priority > priority)
                         continue
 
                     map[alias] = { "path": input.filePath, "priority": priority }

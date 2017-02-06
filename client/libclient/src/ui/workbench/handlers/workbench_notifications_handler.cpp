@@ -7,6 +7,7 @@
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
+#include <client/client_show_once_settings.h>
 
 #include <business/business_strings_helper.h>
 
@@ -26,6 +27,12 @@
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
+namespace {
+
+static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
+
+}
+
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -36,9 +43,16 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     m_userEmailWatcher = context()->instance<QnWorkbenchUserEmailWatcher>();
 
     auto sessionDelegate = new QnBasicWorkbenchStateDelegate<QnWorkbenchNotificationsHandler>(this);
+    static_cast<void>(sessionDelegate); //< Debug?
 
+    //TODO: #GDM #future
+    /*
+     * Some messages must be displayed before bunch of 'user email is invalid'.
+     * Correct approach is to extend QnNotificationListWidget functionality with reordering.
+     * Postponed to the future.
+     */
     connect(m_userEmailWatcher, &QnWorkbenchUserEmailWatcher::userEmailValidityChanged,
-        this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged);
+        this, &QnWorkbenchNotificationsHandler::at_userEmailValidityChanged, Qt::QueuedConnection);
 
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
@@ -75,6 +89,12 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             setSystemHealthEventVisible(QnSystemHealth::NoPrimaryTimeServer, false);
         });
 
+    connect(action(QnActions::HideCloudPromoAction), &QAction::triggered, this,
+        [this]
+        {
+            qnClientShowOnce->setFlag(kCloudPromoShowOnceKey);
+        });
+
     connect(qnSettings->notifier(QnClientSettings::POPUP_SYSTEM_HEALTH),
         &QnPropertyNotifier::valueChanged, this,
         &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
@@ -98,9 +118,16 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    if (businessAction->getParams().userGroup == QnBusiness::AdminOnly
-        && !accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-        return;
+    const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+
+    if (!isAdmin)
+    {
+        if (eventType == QnBusiness::LicenseIssueEvent || eventType == QnBusiness::NetworkIssueEvent)
+            return;
+
+        if (businessAction->getParams().userGroup == QnBusiness::AdminOnly)
+            return;
+    }
 
     if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent)
     {
@@ -174,7 +201,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
 }
 
-bool QnWorkbenchNotificationsHandler::tryClose(bool force)
+bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
 {
     clear();
     return true;
@@ -182,6 +209,7 @@ bool QnWorkbenchNotificationsHandler::tryClose(bool force)
 
 void QnWorkbenchNotificationsHandler::forcedUpdate()
 {
+    checkAndAddSystemHealthMessage(QnSystemHealth::CloudPromo); //must be displayed first
     checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
     checkAndAddSystemHealthMessage(QnSystemHealth::SmtpIsNotSet);
     checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
@@ -192,7 +220,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
 {
     switch (message)
     {
-
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::ConnectionLost:
             return false;
@@ -208,6 +235,7 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
         case QnSystemHealth::ArchiveFastScanFinished:
         case QnSystemHealth::NoPrimaryTimeServer:
         case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::CloudPromo:
             return true;
 
         default:
@@ -278,17 +306,19 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 
 void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message)
 {
-
     switch (message)
     {
         case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::NoPrimaryTimeServer:
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::ArchiveRebuildFinished:
+        case QnSystemHealth::ArchiveRebuildCanceled:
             return;
 
         case QnSystemHealth::SystemIsReadOnly:
-            setSystemHealthEventVisible(QnSystemHealth::SystemIsReadOnly, context()->user() && qnCommon->isReadOnly());
+            setSystemHealthEventVisible(message, context()->user() && qnCommon->isReadOnly());
             return;
 
         case QnSystemHealth::EmailIsEmpty:
@@ -301,18 +331,25 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::NoLicenses:
-            setSystemHealthEventVisible(QnSystemHealth::NoLicenses, context()->user() && qnLicensePool->isEmpty());
+            setSystemHealthEventVisible(message, context()->user() && qnLicensePool->isEmpty());
             return;
 
         case QnSystemHealth::SmtpIsNotSet:
             at_emailSettingsChanged();
             return;
 
-        case QnSystemHealth::StoragesNotConfigured:
-        case QnSystemHealth::ArchiveRebuildFinished:
-        case QnSystemHealth::ArchiveRebuildCanceled:
+        case QnSystemHealth::CloudPromo:
+        {
+            const bool canShow =
+                // show only to admins and owners
+                accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+                // only if system is not connected to the cloud
+                && qnGlobalSettings->cloudSystemId().isNull()
+                // and if user did not close notification manually at least once
+                && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+            setSystemHealthEventVisible(message, canShow);
             return;
-
+        }
         default:
             break;
 
@@ -320,8 +357,13 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
     qnWarning("Unknown system health message");
 }
 
-void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid)
+void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserResourcePtr &user,
+    bool isValid)
 {
+    /* Some checks are required as we making this call via queued connection. */
+    if (!context()->user())
+        return;
+
     /* Checking that we are allowed to see this message */
     bool visible = !isValid && accessController()->hasPermissions(user, Qn::WriteEmailPermission);
     auto message = context()->user() == user
@@ -397,7 +439,7 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
     for (int i = 0; i < QnSystemHealth::Count; i++)
     {
         QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
-        if (!QnSystemHealth::isMessageVisible(messageType))
+        if (!QnSystemHealth::isMessageOptional(messageType))
             continue;
 
         bool oldVisible = (m_popupSystemHealthFilter &  (1ull << i));

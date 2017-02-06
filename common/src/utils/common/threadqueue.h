@@ -86,7 +86,7 @@ public:
 
     ~QnSafeQueue()
     {
-        clear();
+        clearUnsafe();
     }
 
     const RandomAccess lock() const
@@ -174,15 +174,7 @@ public:
     void clear()
     {
         QnMutexLocker lock(&m_mutex);
-
-        int index = m_headIndex;
-        for (int i = 0; i < m_bufferLen; ++i)
-        {
-            m_buffer[index] = T();
-            index = (index + 1) % m_buffer.size();
-        }
-        m_bufferLen = 0;
-        m_headIndex = 0;
+        clearUnsafe();
         m_waitCond.wakeOne();
     }
 
@@ -253,6 +245,18 @@ private:
             for (;i < tailIndex; ++i)
                 m_buffer[i] = T();
         }
+    }
+
+    void clearUnsafe()
+    {
+        int index = m_headIndex;
+        for (int i = 0; i < m_bufferLen; ++i)
+        {
+            m_buffer[index] = T();
+            index = (index + 1) % m_buffer.size();
+        }
+        m_bufferLen = 0;
+        m_headIndex = 0;
     }
 
 protected:

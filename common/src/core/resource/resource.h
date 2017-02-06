@@ -72,7 +72,7 @@ public:
     void setTypeByName(const QString& resTypeName);
 
     virtual Qn::ResourceStatus getStatus() const;
-    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Default);
+    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local);
     QDateTime getLastStatusUpdateTime() const;
 
     //!this function is called if resource changes state from offline to online or so
@@ -93,8 +93,6 @@ public:
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
     int initializationAttemptCount() const;
-
-    void flushProperties();
 
     // flags like network media and so on
     virtual Qn::ResourceFlags flags() const;
@@ -325,6 +323,8 @@ private:
 
     void emitPropertyChanged(const QString& key);
     void doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason);
+
+    bool useLocalProperties() const;
 
     friend class InitAsyncTask;
 

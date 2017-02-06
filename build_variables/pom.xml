@@ -49,7 +49,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
@@ -86,7 +85,7 @@
                         <configuration>
                             <executable>${init.python.dir}/${python.executable}</executable>
                             <arguments>
-                                <argument>${environment.dir}/dev_tools/validate_jsons.py</argument>
+                                <argument>${root.dir}/build_utils/python/validate_jsons.py</argument>
                             </arguments>
                             <workingDirectory>${root.dir}</workingDirectory>
                         </configuration>
@@ -107,6 +106,7 @@
                                 <argument>compile</argument>
                                 <argument>-Dhelp.customization=${help.customization}</argument>
                                 <argument>-Dcustomization=${customization}</argument>
+                                <argument>-DbuildNumber=${buildNumber}</argument>
                                 <argument>-Darch=${arch}</argument>
                                 <argument>-Dbox=${box}</argument>
                                 <argument>-Dplatform=${platform}</argument>
@@ -148,12 +148,26 @@
                 <version>2.0</version>
                 <executions>
                     <execution>
+                        <id>generate_pro_file</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
                         <configuration>
                             <source>${project.basedir}/generate_pro_file.groovy</source>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get_cloud_host</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <targetPropertiesFile>${root.dir}/.cloudHost.properties</targetPropertiesFile>
+                            </properties>
+                            <source>${project.basedir}/get_cloud_host.groovy</source>
                         </configuration>
                     </execution>
                 </executions>
@@ -183,50 +197,5 @@
                 <path>${env.PATH}</path>
             </properties>
         </profile>
-        <profile>
-            <id>get-cloud-url</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>cloud.group</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>get-cloud-url</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>${init.python.dir}/${python.executable}</executable>
-                                    <arguments>
-                                        <argument>${project.build.directory}/get_cloud_url.py</argument>
-                                    </arguments>
-                                    <workingDirectory>${project.build.directory}</workingDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>              
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>properties-maven-plugin</artifactId>
-                        <version>1.0-alpha-2</version>
-                        <executions>
-                            <execution>
-                                <id>get-cloud-url-property</id>
-                                <phase>none</phase>
-                            </execution>
-                        </executions>
-                    </plugin>                     
-                </plugins>
-            </build> 
-        </profile>                 
     </profiles>
 </project>

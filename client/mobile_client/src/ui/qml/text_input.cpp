@@ -2,8 +2,6 @@
 
 #include <QtQuick/private/qquicktextinput_p_p.h>
 #include <QtQuick/private/qquickclipnode_p.h>
-#include <QtLabsTemplates/private/qquickmenu_p.h>
-#include <QtLabsTemplates/private/qquickmenuitem_p.h>
 
 class QnQuickTextInputPrivate : public QQuickTextInputPrivate
 {
@@ -91,7 +89,6 @@ QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     m_pressAndHoldTimer->setInterval(QGuiApplication::styleHints()->mousePressAndHoldInterval());
     m_pressAndHoldTimer->setSingleShot(true);
     connect(m_pressAndHoldTimer, &QTimer::timeout, this, &QnQuickTextInput::emitPressAndHold);
-    setPersistentSelection(true);
 }
 
 QnQuickTextInput::~QnQuickTextInput()
@@ -189,14 +186,13 @@ void QnQuickTextInput::emitPressAndHold()
     if (m_contextMenuPos.isNull())
         return;
 
-    const auto textLen = text().length();
     if (m_selectionStart != m_selectionEnd)
         select(m_selectionStart, m_selectionEnd);
     else
         setCursorPosition(m_cursorPosition);
-    emit pressAndHold(m_contextMenuPos);
-};
 
+    emit pressAndHold(m_contextMenuPos);
+}
 
 void QnQuickTextInput::mousePressEvent(QMouseEvent* event)
 {

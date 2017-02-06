@@ -34,8 +34,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
     static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
+    static const QByteArray kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
 
-    static const QString kDefaultAdminPassword = "admin";
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 
 } // namespace QnServer

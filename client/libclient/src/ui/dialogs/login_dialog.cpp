@@ -20,6 +20,7 @@
 
 #include <network/module_finder.h>
 #include <network/networkoptixmodulerevealcommon.h>
+#include <network/system_helpers.h>
 
 #include <nx/utils/raii_guard.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -50,7 +51,7 @@
 #include <ui/workaround/gl_widget_factory.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-
+#include <helpers/system_helpers.h>
 
 namespace {
 
@@ -97,14 +98,10 @@ bool haveToStorePassword(const QnUuid& localId, const QUrl& url)
      * At first we check if we have stored connection to same system
      * with specified user and it stores password.
      */
-    const auto recent = qnClientCoreSettings->recentLocalConnections();
-    const auto itConnection = std::find_if(recent.begin(), recent.end(),
-        [localId, userName = url.userName()](const QnLocalConnectionData& data)
-        {
-            return ((data.localId == localId) && (userName == data.url.userName()));
-        });
 
-    if ((itConnection != recent.end()) && (itConnection->isStoredPassword()))
+    using namespace nx::client::core::helpers;
+
+    if (getCredentials(localId, url.userName()).isValid())
         return true;
 
     /**
@@ -297,10 +294,13 @@ void QnLoginDialog::accept()
         return;
 
     QUrl url = currentUrl();
+	const auto guard = QPointer<QnLoginDialog>(this);
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
-        [this, url](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+        [this, url, guard](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
         {
+            if (!guard)
+                return;
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
@@ -310,6 +310,8 @@ void QnLoginDialog::accept()
             auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
+            if (!guard)
+                return;
             switch (status)
             {
                 case Qn::SuccessConnectionResult:
@@ -326,6 +328,7 @@ void QnLoginDialog::accept()
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
+                case Qn::IncompatibleCloudHostConnectionResult:
                     menu()->trigger(QnActions::DelayedForcedExitAction);
                     break; // to avoid cycle
                 default:    //error
@@ -420,7 +423,7 @@ void QnLoginDialog::resetSavedSessionsModel()
         QUrl url;
         url.setPort(DEFAULT_APPSERVER_PORT);
         url.setHost(QLatin1Literal(DEFAULT_APPSERVER_HOST));
-        url.setUserName(lit("admin"));
+        url.setUserName(helpers::kFactorySystemUser);
 
         customConnections.append(QnConnectionData(lit("default"), url, kCustomConnectionLocalId));
     }
@@ -460,8 +463,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         /* Do not show servers with incompatible customization or cloud host */
         if (!qnRuntime->isDevMode()
-            && (compatibilityCode == Qn::IncompatibleInternalConnectionResult
-                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult))
+            && compatibilityCode == Qn::IncompatibleInternalConnectionResult)
         {
             continue;
         }
@@ -539,7 +541,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
     ui->loginLineEdit->setText(url.userName().isEmpty()
-        ? lit("admin")  // 99% of users have only one login - admin
+        ? helpers::kFactorySystemUser  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
 
@@ -614,26 +616,17 @@ void QnLoginDialog::at_saveButton_clicked()
     auto connections = qnSettings->customConnections();
     if (connections.contains(name))
     {
-        const auto button = QnMessageBox::question(
-            this,
+        QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
             tr("There is an another connection with the same name."),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
+            QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
-        switch (button)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::No:
-                name = connections.generateUniqueName(name);
-                break;
-            case QDialogButtonBox::Yes:
-                connections.removeOne(name);
-                break;
-            default:
-                break;
-        }
+        dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+            QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        connections.removeOne(name);
     }
 
     const QUrl url = currentUrl();
@@ -680,16 +673,14 @@ void QnLoginDialog::at_deleteButton_clicked()
     if (!connections.contains(connection.name))
         return;
 
-    const auto result = QnMessageBox::question(
-        this,
-        tr("Delete connection?"),
-//         tr("Are you sure you want to delete this connection: %1?")
-//         + L'\n' + connection.name,
-        connection.name,
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Delete connection?"), connection.name,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
 
-    if (result != QDialogButtonBox::Yes)
+    dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     connections.removeOne(connection.name);

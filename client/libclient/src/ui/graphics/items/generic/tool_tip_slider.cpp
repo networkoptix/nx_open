@@ -56,7 +56,8 @@ QnToolTipSlider::QnToolTipSlider(QGraphicsItem* parent):
     m_toolTipUnderMouse(false),
     m_pendingPositionUpdate(false),
     m_instantPositionUpdate(false),
-    m_tooltipMargin(0)
+    m_tooltipMargin(0),
+    m_toolTipEnabled(true)
 {
     setOrientation(Qt::Horizontal);
 
@@ -149,21 +150,32 @@ void QnToolTipSlider::hideToolTip(bool animated)
     }
 }
 
+void QnToolTipSlider::setToolTipEnabled(bool enabled)
+{
+    if (enabled == m_toolTipEnabled)
+        return;
+
+    m_toolTipEnabled = enabled;
+
+    if (!enabled)
+        hideToolTip(false);
+}
+
 void QnToolTipSlider::showToolTip(bool animated)
 {
     using namespace nx::client::ui::workbench;
     qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
         Animations::Id::TimelineTooltipShow);
 
-    const qreal kOpaque = 1.0;
+    const qreal opacity = (m_toolTipEnabled ? 1.0 : 0.0);
     if (animated)
     {
-        m_tooltipWidgetVisibilityAnimator->animateTo(kOpaque);
+        m_tooltipWidgetVisibilityAnimator->animateTo(opacity);
     }
     else
     {
         m_tooltipWidgetVisibilityAnimator->stop();
-        m_tooltipWidgetVisibility = kOpaque;
+        m_tooltipWidgetVisibility = opacity;
     }
 }
 

@@ -65,6 +65,10 @@ public:
 
     static void setIpVersion(const QString& ipVersion);
 
+    static int udpIpVersion();
+    static int tcpClientIpVersion();
+    static int tcpServerIpVersion();
+
 private:
     SocketFactory();
     SocketFactory(const SocketFactory&);

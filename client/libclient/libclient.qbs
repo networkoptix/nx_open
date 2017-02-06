@@ -6,6 +6,8 @@ GenericProduct
     name: "libclient"
     targetName: "client"
 
+    condition: project.withDesktopClient
+
     Depends { name: "libclient_core" }
     Depends { name: "nx_speech_synthesizer" }
     Depends { name: "libvms_gateway" }
@@ -44,8 +46,19 @@ GenericProduct
         condition: qbs.targetOS.contains("linux")
         cpp.dynamicLibraries: base.concat(["GL", "Xfixes", "Xss", "X11"])
     }
+    Properties
+    {
+        condition: qbs.targetOS.contains("macos")
+        cpp.frameworks: ["Foundation", "AudioUnit", "AppKit"]
+    }
 
     cpp.includePaths: ["src", project.sourceDirectory + "/cpp/maven/bin-resources"]
+
+    Group
+    {
+        condition: qbs.targetOS.contains("macos")
+        files: ["src/ui/workaround/mac_utils.mm"]
+    }
 
     configure.replacements: ({
         "product.title": vms.clientName,
@@ -99,7 +112,7 @@ GenericProduct
             project.sourceDirectory,
             "customization",
             project.customization,
-            "client",
+            "libclient",
             "resources")
     }
 

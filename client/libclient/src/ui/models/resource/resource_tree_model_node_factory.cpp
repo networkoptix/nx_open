@@ -15,7 +15,8 @@
 
 QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
     Qn::NodeType nodeType,
-    QnResourceTreeModel* model)
+    QnResourceTreeModel* model,
+    bool initialize)
 {
     QnResourceTreeModelNodePtr result;
     switch (nodeType)
@@ -35,7 +36,8 @@ QnResourceTreeModelNodePtr QnResourceTreeModelNodeFactory::createNode(
             result.reset(new QnResourceTreeModelNode(model, nodeType));
             break;
     }
-    result->initialize();
+    if (result && initialize)
+        result->initialize();
     return result;
 }
 

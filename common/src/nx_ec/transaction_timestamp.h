@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include <QtCore/QObject>
+
 #include <nx/fusion/model_functions_fwd.h>
 
 namespace ec2 {
@@ -164,4 +166,6 @@ QString toString(const Timestamp& val);
 
 QN_FUSION_DECLARE_FUNCTIONS(Timestamp, (json)(ubjson)(xml)(csv_record))
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::Timestamp);
 

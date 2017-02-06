@@ -5,6 +5,7 @@
 #include <client_core/local_connection_data.h>
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
+#include <utils/common/credentials.h>
 
 class QSettings;
 
@@ -19,6 +20,7 @@ public:
     enum PropertyIdentifier
     {
         RecentLocalConnections,
+        SystemAuthenticationData,
         LocalSystemWeightsData,
         CdbEndpoint,
         CloudLogin,
@@ -27,9 +29,14 @@ public:
         ForgottenSystems,
         SkipStartupTilesManagement,
         StartupDiscoveryPeriodMs,
+        KnownServerUrls,    //< A list of the urls that were discovered by QnDirectModuleFinder.
 
         PropertiesCount
     };
+
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnCredentials>>;
+    using RecentLocalConnectionsHash = QHash<QnUuid, nx::client::core::LocalConnectionData>;
+    using WeightDataList = QList<nx::client::core::WeightData>;
 
 public:
     QnClientCoreSettings(QObject* parent = nullptr);
@@ -50,12 +57,15 @@ public:
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
-        QN_DECLARE_RW_PROPERTY(QnLocalConnectionDataList,
-            recentLocalConnections, setRecentLocalConnections,
-            RecentLocalConnections, QnLocalConnectionDataList())
-        QN_DECLARE_RW_PROPERTY(QnWeightDataList,
+        QN_DECLARE_RW_PROPERTY(SystemAuthenticationDataHash,
+            systemAuthenticationData, setSystemAuthenticationData,
+            SystemAuthenticationData, SystemAuthenticationDataHash())
+        QN_DECLARE_RW_PROPERTY(RecentLocalConnectionsHash,
+           recentLocalConnections, setRecentLocalConnections,
+           RecentLocalConnections, RecentLocalConnectionsHash())
+        QN_DECLARE_RW_PROPERTY(WeightDataList,
             localSystemWeightsData, setLocalSystemWeightsData,
-            LocalSystemWeightsData, QnWeightDataList())
+            LocalSystemWeightsData, WeightDataList())
         QN_DECLARE_RW_PROPERTY(QString,
             cdbEndpoint, setCdbEndpoint,
             CdbEndpoint, QString())
@@ -68,19 +78,20 @@ private:
         QN_DECLARE_RW_PROPERTY(QnCloudSystemList,
             recentCloudSystems, setRecentCloudSystems,
             RecentCloudSystems, QnCloudSystemList())
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(QnStringSet,
             forgottenSystems, setForgottenSystems,
             ForgottenSystems, QnStringSet())
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(int,
             startupDiscoveryPeriodMs, setStartupDiscoveryPeriodMs,
             StartupDiscoveryPeriodMs, 2000)
-        QN_END_PROPERTY_STORAGE()
         QN_DECLARE_RW_PROPERTY(bool,
             skipStartupTilesManagement, setSkipStartupTilesManagement,
             SkipStartupTilesManagement, false)
-        QN_END_PROPERTY_STORAGE()
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,
+            knownServerUrls, setKnownServerUrls,
+            KnownServerUrls, QList<QUrl>())
+    QN_END_PROPERTY_STORAGE()
+
 
 private:
     QSettings* m_settings;

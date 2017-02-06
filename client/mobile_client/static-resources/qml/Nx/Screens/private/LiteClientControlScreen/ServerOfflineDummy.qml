@@ -11,13 +11,13 @@ Item
 
         Image
         {
-            source: lp("images/nx1_offline.png")
+            source: lp("/images/alert_nx1_offline.png")
             anchors.horizontalCenter: parent.horizontalCenter
         }
 
         Text
         {
-            text: qsTr("Nx1 is offline")
+            text: qsTr("%1 is offline").arg(applicationInfo.liteDeviceName())
             anchors.horizontalCenter: parent.horizontalCenter
             color: ColorTheme.base13
             font.pixelSize: 24

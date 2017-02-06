@@ -472,6 +472,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
     other.d_ptr->response = d->response;
     other.d_ptr->protocol = d->protocol;
     other.d_ptr->accessRights = d->accessRights;
+    other.d_ptr->authenticatedOnce = d->authenticatedOnce;
 }
 
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const

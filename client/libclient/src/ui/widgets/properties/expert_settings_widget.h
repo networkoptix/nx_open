@@ -36,6 +36,7 @@ private:
     int qualityToSliderPos(Qn::SecondStreamQuality quality);
 
     bool isArecontCamera(const QnVirtualCameraResourcePtr &camera) const;
+    bool isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const;
 
     QScopedPointer<Ui::CameraExpertSettingsWidget> ui;
     bool m_updating;

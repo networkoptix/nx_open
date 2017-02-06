@@ -13,15 +13,24 @@ namespace nx {
 namespace hpm {
 namespace stats {
 
-class Collector
+class AbstractCollector
+{
+public:
+    virtual ~AbstractCollector() = default;
+
+    virtual void saveConnectSessionStatistics(ConnectSession data) = 0;
+};
+
+class Collector:
+    public AbstractCollector
 {
 public:
     Collector(
         const conf::Statistics& settings,
         nx::db::AsyncSqlQueryExecutor* sqlQueryExecutor);
-    ~Collector();
+    virtual ~Collector() override;
 
-    void saveConnectSessionStatistics(ConnectSession data);
+    virtual void saveConnectSessionStatistics(ConnectSession data) override;
 
 private:
     const conf::Statistics m_settings;

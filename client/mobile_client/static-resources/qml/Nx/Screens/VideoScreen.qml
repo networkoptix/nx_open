@@ -13,6 +13,7 @@ PageBase
 
     property alias resourceId: videoScreenController.resourceId
     property alias initialScreenshot: screenshot.source
+    property QnCameraListModel camerasModel: null
 
     VideoScreenController
     {
@@ -41,6 +42,8 @@ PageBase
     Object
     {
         id: d
+
+        property alias controller: videoScreenController
 
         property var videoNavigation: navigationLoader.item
 
@@ -147,6 +150,9 @@ PageBase
         MenuItem
         {
             text: qsTr("Information")
+            checkable: true
+            checked: showCameraInfo
+            onCheckedChanged: showCameraInfo = checked
         }
     }
 
@@ -177,6 +183,19 @@ PageBase
 
     Loader
     {
+        id: informationLabelLoader
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        y: header.y
+        active: showCameraInfo
+        sourceComponent: InformationLabel
+        {
+            videoScreenController: d.controller
+        }
+    }
+
+    Loader
+    {
         id: dummyLoader
         anchors.fill: parent
         visible: active
@@ -192,14 +211,13 @@ PageBase
         {
             width: videoScreen.width
             state: videoScreenController.dummyState
-        }
-    }
 
-    MouseArea
-    {
-        enabled: dummyLoader.visible
-        anchors.fill: parent
-        onClicked: toggleUi()
+            MouseArea
+            {
+                anchors.fill: parent
+                onClicked: toggleUi()
+            }
+        }
     }
 
     Loader
@@ -214,6 +232,55 @@ PageBase
 
         sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
             ? navigationComponent : liveNavigationComponent)
+
+        Button
+        {
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -150 - 64
+            x: 8
+            padding: 0
+            leftPadding: 0
+            rightPadding: 0
+            width: 40
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+            icon: lp("/images/previous.png")
+            radius: width / 2
+            z: 1
+            onClicked:
+            {
+                if (!camerasModel)
+                    return
+
+                videoScreen.resourceId = camerasModel.previousResourceId(videoScreen.resourceId)
+                    || camerasModel.previousResourceId("")
+            }
+        }
+
+        Button
+        {
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -150 - 64
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+            padding: 0
+            leftPadding: 0
+            rightPadding: 0
+            width: 40
+            height: width
+            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+            icon: lp("/images/next.png")
+            radius: width / 2
+            z: 1
+            onClicked:
+            {
+                if (!camerasModel)
+                    return
+
+                videoScreen.resourceId = camerasModel.nextResourceId(videoScreen.resourceId)
+                    || camerasModel.nextResourceId("")
+            }
+        }
     }
 
     Component
@@ -222,7 +289,7 @@ PageBase
 
         VideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 
@@ -232,7 +299,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 

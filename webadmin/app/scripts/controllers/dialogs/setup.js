@@ -19,6 +19,7 @@ angular.module('webadminApp')
         // Common model
         $scope.settings = {
             chooseCloudSystem: false,
+            savePassword: true,
             systemName: '',
 
             cloudEmail: '',
@@ -69,7 +70,8 @@ angular.module('webadminApp')
 
         function sendCredentialsToNativeClient(){
             $log.log("Send credentials to client app: " + $scope.activeLogin);
-            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword, $scope.cloudCreds);
+            return nativeClient.updateCredentials($scope.activeLogin, $scope.activePassword,
+                $scope.cloudCreds, $scope.settings.savePassword);
         }
 
         function checkInternetOnServer(reload){
@@ -140,9 +142,22 @@ angular.module('webadminApp')
                     }
 
                     checkInternet(false);
+                    $log.log("media server flags");
+                    $log.log($scope.serverInfo.flags);
+
+                    if($scope.serverInfo.flags.brokenSystem){
+                        if($scope.serverInfo.flags.noHDD){
+                            $scope.settings.localError = L.setup.errorNoHDD;
+                        }else{
+                            //$scope.serverInfo.flags.wrongNetwork && !data.flags.canSetupNetwork;
+                            //$scope.serverInfo.flags.noNetwork
+                            $scope.settings.localError = L.setup.errorNoNetwork;
+                        }
+                        $scope.next('brokenSystem');
+                        return $q.reject();
+                    }
 
                     if($scope.serverInfo.flags.newSystem) {
-
                         if($scope.serverInfo.flags.canSetupNetwork) {
                             mediaserver.networkSettings().then(function (r) {
                                 $scope.networkSettings = r.data.reply;
@@ -159,17 +174,18 @@ angular.module('webadminApp')
                         $log.log("System is new - go to master");
                         $scope.next('start');// go to start
                         return $q.reject();
-                    }else{
-                        sendCredentialsToNativeClient();
-                        $log.log("System is local - go to local success");
-                        $scope.next('localSuccess');
                     }
+
+                    sendCredentialsToNativeClient();
+                    $log.log("System is local - go to local success");
+                    $scope.next('localSuccess');
+                    return true;
                 });
             });
 
         }
         function updateCredentials(login, password, isCloud){
-            $log.log("Apply credentials: " + login + ":" + password + " cloud:" + isCloud);
+            $log.log("Apply credentials: " + login + " cloud:" + isCloud);
             $scope.activeLogin = login;
             $scope.activePassword = password;
             $scope.cloudCreds = isCloud;
@@ -191,14 +207,19 @@ angular.module('webadminApp')
         /* Connect to another server section */
         function discoverSystems() {
             mediaserver.discoveredPeers().then(function (r) {
-                var systems = _.map(r.data.reply, function(module)
+                var systems  = _.filter(r.data.reply, function(module){
+                    return !module.serverFlags.indexOf(Config.newServerFlag)>=0 && module.cloudHost == Config.cloud.host;
+                });
+
+                systems = _.map(systems, function(module)
                 {
                     var system = {
                         url: module.remoteAddresses[0] + ':' + module.port,
                         systemName: module.systemName,
                         ip: module.remoteAddresses[0],
                         name: module.name,
-                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0
+                        isNew: module.serverFlags.indexOf(Config.newServerFlag)>=0,
+                        compatibleCloudHost: module.cloudHost == Config.cloud.host
                     };
 
                     system.visibleName = system.systemName + ' (' + system.url + ' - ' + system.name + ')';
@@ -280,7 +301,9 @@ angular.module('webadminApp')
         };
         function remoteErrorHandler(error){
             logMediaserverError(error);
-
+            if(!error.data){
+                error.data = error;
+            }
             var errorMessage = 'Connection error (' + error.status + ')';
             if(error.data && error.data.errorString && error.data.errorString!='') {
                 errorMessage = formatError(error.data.errorString);
@@ -302,6 +325,12 @@ angular.module('webadminApp')
                         break;
 
                     default:
+
+                        $scope.settings.remoteError = errorMessage;
+                        if(error.data.error == 3){
+                            $scope.next('mergeTemporaryFailure');
+                            break;
+                        }
                         $scope.next('mergeFailure');
                         break;
                 }
@@ -319,7 +348,7 @@ angular.module('webadminApp')
             $scope.settings.remoteError = false;
 
             $log.log("Request /api/mergeSystems ...");
-            mediaserver.mergeSystems(
+            return mediaserver.mergeSystems(
                 systemUrl,
                 $scope.settings.remoteLogin,
                 $scope.settings.remotePassword,
@@ -331,12 +360,42 @@ angular.module('webadminApp')
                 }
 
                 $log.log("Mediaserver connected system to another");
-                $log.log("Apply new credentials ... ");
-                updateCredentials($scope.settings.remoteLogin, $scope.settings.remotePassword, false).catch(remoteErrorHandler);
+                return updateCredentialsAfterMerge();
             },remoteErrorHandler);
         }
 
+        function updateCredentialsAfterMerge(){
+            $log.log("Apply new credentials ... ");
+            return updateCredentials($scope.settings.remoteLogin, $scope.settings.remotePassword, false).catch(mergeLoginErrorHandler);
+        }
 
+
+        var retries = 0;
+        function mergeLoginErrorHandler(error){
+            /*
+            From https://networkoptix.atlassian.net/browse/VMS-5057
+
+             You need to check temporary unavailable error code and retry perform request:
+             delay between requests 1 second
+             total time 15 seconds
+             if very last request still contains code "temporary unauthorized" you need to show separate error message. something "System is still being merged. please try again later".
+
+
+             Serverside related changes:
+
+             result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+             +        return nx_http::StatusCode::ok;
+
+             */
+
+            retries++;
+            if(retries > Config.setup.retriesForMergeCredentialsToApply){ // Several attempts
+                retries = 0;
+                // Show error
+                return remoteErrorHandler(error);
+            }
+            return $timeout(updateCredentialsAfterMerge, Config.setup.pollingTimeout);
+        }
         function logMediaserverError(error, message){
             if(message){
                 $log.log(message);
@@ -485,10 +544,14 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
+                window.location.href = window.location.origin;
+
+                /*
                 $location.path('/');
                 setTimeout(function(){
-                    window.location.reload();
+                    window.location.reload(true);
                 });
+                */
             });
         };
 
@@ -575,7 +638,7 @@ angular.module('webadminApp')
 
         function waitForReboot(){
             $scope.next(0); // Go to loading
-            var poll = $poll(pingServer, 1000, 5000);
+            var poll = $poll(pingServer, Config.setup.pollingTimeout, Config.setup.firstPollingRequest);
 
             function pingServer(){
                 return mediaserver.getModuleInformation(true).then(function(){
@@ -585,6 +648,21 @@ angular.module('webadminApp')
                 });
             }
         }
+
+
+        function checkIfSystemIsReady(){
+            var poll = $poll(reCheckSystem, Config.setup.slowPollingTimeout, Config.setup.firstPollingRequest);
+            function reCheckSystem(){
+                return mediaserver.getModuleInformation(true).then(function(result){
+                    console.log(result);
+                    if(!result.data.reply.flags.newSystem){
+                        window.location.reload();
+                        $poll.cancel(poll);
+                    }
+                });
+            }
+        }
+
 
         function required(val){
             return !!val && (!val.trim || val.trim() != '');
@@ -596,13 +674,15 @@ angular.module('webadminApp')
             $scope.wizardFlow = {
                 0: {},
                 start: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
+                    noFooter: true, // Here we disable next button
+                    skip: 'merge',
                     next: 'systemName'
                 },
                 systemName: {
                     back: 'start',
                     skip: 'merge',
-                    next: 'chooseCloudOrLocal',
+                    next: 'localLogin',
                     valid: function () {
                         return checkForm($scope.forms.systemNameForm);
                     }
@@ -661,7 +741,7 @@ angular.module('webadminApp')
                             $scope.next('noInternetOnClient');
                             return;
                         }
-                        $scope.next($scope.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
+                        $scope.next($scope.settings.liteClient? 'cloudLogin' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'));
                     }
                 },
 
@@ -680,7 +760,7 @@ angular.module('webadminApp')
                     }
                 },
                 cloudLogin: {
-                    back: $scope.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
+                    back: $scope.settings.liteClient? 'chooseCloudOrLocal' : (cloudAuthorized ? 'cloudAuthorizedIntro' : 'cloudIntro'),
                     next: 'cloudProcess',
                     valid: function () {
                         return checkForm($scope.forms.cloudForm);
@@ -700,7 +780,7 @@ angular.module('webadminApp')
                     }
                 },
                 merge: {
-                    back: 'systemName',
+                    back: 'start',
                     // onShow: discoverSystems,
                     next: 'mergeProcess',
                     valid: function () {
@@ -712,17 +792,24 @@ angular.module('webadminApp')
                 },
                 mergeFailure: {
                     back: 'merge',
-                    skip: 'systemName',
+                    skip: 'start',
                     retry: function () {
                         $scope.next('merge');
                     }
                 },
+                mergeTemporaryFailure:{
+                    retry: function () {
+                        window.location.reload();
+                    },
+                    finish: true
+                },
+
 
                 localLogin: {
                     back: function () {
                         $scope.settings.localPassword = '';
                         $scope.settings.localPasswordConfirmation = '';
-                        $scope.next('chooseCloudOrLocal', true);
+                        $scope.next('systemName', true);
                     },
                     next: initOfflineSystem,
                     valid: function () {
@@ -741,12 +828,17 @@ angular.module('webadminApp')
                     }
                 },
                 initFailure: {
-                    cancel: $scope.thickClient,
+                    cancel: $scope.settings.thickClient,
+                    retry: function () {
+                        initWizard();
+                    }
+                },
+                brokenSystem:{
+                    cancel: $scope.settings.thickClient,
                     retry: function () {
                         initWizard();
                     }
                 }
-
             };
         }
 
@@ -796,8 +888,9 @@ angular.module('webadminApp')
                 readCloudHost();
                 getAdvancedSettings();
                 discoverSystems();
+                checkIfSystemIsReady();
             },function(error){
-                checkMySystem().catch(function(){
+                checkMySystem().then(checkIfSystemIsReady, function(){
                     $log.log("Couldn't run setup wizard: auth failed");
                     $log.error(error);
                     if( $location.search().retry) {
@@ -813,11 +906,10 @@ angular.module('webadminApp')
                 });
             });
         }
-        //$scope.liteClient = true;// TODO: remove this hardcode
         nativeClient.init().then(function(result){
-            $scope.thickClient = result.thick;
-            $scope.liteClient = result.lite;
-            if($scope.liteClient) {
+            $scope.settings.thickClient = result.thick;
+            $scope.settings.liteClient = result.lite;
+            if($scope.settings.liteClient) {
                 $('body').addClass('lite-client-mode');
             }
             $log.log("check client Thick:" + result.thick);

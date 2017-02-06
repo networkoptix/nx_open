@@ -1,7 +1,10 @@
 #ifndef QN_SERIALIZATION_JSON_MACROS_H
 #define QN_SERIALIZATION_JSON_MACROS_H
 
+#include <typeinfo>
+
 #include <nx/fusion/fusion/fusion_serialization.h>
+#include <nx/utils/unused.h>
 
 #include "json.h"
 #include "lexical.h"
@@ -40,35 +43,73 @@ namespace QJsonDetail {
         QJsonObject m_object;
     };
 
-    struct DeserializationVisitor {
+    struct DeserializationVisitor
+    {
     public:
-        DeserializationVisitor(QnJsonContext *ctx, const QJsonValue &value):
+        DeserializationVisitor(QnJsonContext* ctx, const QJsonValue& value):
             m_ctx(ctx),
             m_value(value),
             m_object(value.toObject())
-        {}
+        {
+        }
 
         template<class T, class Access>
-        bool operator()(const T &, const Access &, const QnFusion::start_tag &) {
+        bool operator()(const T&, const Access&, const QnFusion::start_tag&)
+        {
             return m_value.isObject();
         }
 
         template<class T, class Access>
-        bool operator()(T &target, const Access &access) {
+        bool operator()(T& target, const Access& access)
+        {
             using namespace QnFusion;
 
             return operator()(target, access, access(setter_tag));
         }
 
     private:
+        /**
+         * Retrieve map of deprecated field names, if it is available. If T provides
+         * getDeprecatedFields(), return its result, otherwise, return null.
+         * Sfinae wrapper.
+         */
+        template<class T>
+        static DeprecatedFieldNames* getDeprecatedFieldNames(const T& target)
+        {
+            return getDeprecatedFieldNamesSfinae(target, /*enable_if_member_exists*/ nullptr);
+        }
+
+        /**
+         * Sfinae: Called when T provides getDeprecatedFields().
+         */
+        template<class T>
+        static DeprecatedFieldNames* getDeprecatedFieldNamesSfinae(const T& target,
+            decltype(&T::getDeprecatedFieldNames) /*enable_if_member_exists*/)
+        {
+            QN_UNUSED(target); //< Suppress inappropriate MSVC warning C4100.
+            return target.getDeprecatedFieldNames();
+        }
+
+        /**
+         * Sfinae: Called when T does not provide getDeprecatedFields().
+         */
+        template<class T>
+        static DeprecatedFieldNames* getDeprecatedFieldNamesSfinae(const T& /*target*/,
+            ... /*enable_if_member_exists*/)
+        {
+            return nullptr;
+        }
+
         template<class T, class Access>
-        bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
+        bool operator()(T& target, const Access& access,
+            const QnFusion::member_setter_tag&)
+        {
             using namespace QnFusion;
 
             bool found = false;
             if (!QJson::deserialize(
                 m_ctx, m_object, access(name), &(target.*access(setter)), access(optional, true),
-                &found))
+                &found, getDeprecatedFieldNames(target), typeid(target)))
             {
                 return false;
             }
@@ -78,14 +119,20 @@ namespace QJsonDetail {
         }
 
         template<class T, class Access, class Member>
-        bool operator()(T &target, const Access &access, const QnFusion::typed_function_setter_tag<Member> &) {
+        bool operator()(T& target, const Access& access,
+            const QnFusion::typed_function_setter_tag<Member>&)
+        {
             using namespace QnFusion;
 
             bool found = false;
             Member member;
-            if(!QJson::deserialize(m_ctx, m_object, access(name), &member, access(optional, true), &found))
+            if (!QJson::deserialize(
+                m_ctx, m_object, access(name), &member, access(optional, true),
+                &found, getDeprecatedFieldNames(target), typeid(target)))
+            {
                 return false;
-            if(found)
+            }
+            if (found)
                 invoke(access(setter), target, std::move(member));
             else
                 m_ctx->setSomeFieldsNotFound(true);
@@ -93,8 +140,8 @@ namespace QJsonDetail {
         }
 
     private:
-        QnJsonContext *m_ctx;
-        const QJsonValue &m_value;
+        QnJsonContext* m_ctx;
+        const QJsonValue& m_value;
         QJsonObject m_object;
     };
 

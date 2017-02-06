@@ -19,6 +19,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/business_action_parameters.h>
 #include <health/system_health.h>
+#include <nx/utils/log/log.h>
 
 
 namespace {
@@ -99,6 +100,13 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
     {
+
+        NX_LOG(lit("%1 statusChanged signal received for resource %2, %3, %4")
+                .arg(QString::fromLatin1(Q_FUNC_INFO))
+                .arg(resource->getId().toString())
+                .arg(resource->getName())
+                .arg(resource->getUrl()), cl_logDEBUG2);
+
         QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
         if (cam)
             checkCameraHistoryDelayed(cam);

@@ -52,7 +52,7 @@ namespace nx_api
 
         BaseStreamProtocolConnection(
             StreamConnectionHolder<CustomConnectionType>* connectionManager,
-            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+            std::unique_ptr<AbstractStreamSocket> streamSocket )
         :
             BaseType( connectionManager, std::move(streamSocket) ),
             m_serializerState( SerializerState::done )
@@ -374,7 +374,7 @@ namespace nx_api
     public:
         BaseStreamProtocolConnectionEmbeddable(
             StreamConnectionHolder<self_type>* connectionManager,
-            std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
+            std::unique_ptr<AbstractStreamSocket> streamSocket )
         :
             base_type(
                 connectionManager,

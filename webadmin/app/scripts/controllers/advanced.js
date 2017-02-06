@@ -183,12 +183,12 @@ angular.module('webadminApp')
         });
 
         function errorLogLevel(/*error*/){
-            dialogs.alert('Error while saving').then(function(){
+            dialogs.alert('Error while saving').finally(function(){
                 window.location.reload();
             });
         }
         function successLogLevel(){
-            dialogs.alert('Settings saved').then(function(){
+            dialogs.alert('Settings saved').finally(function(){
                 window.location.reload();
             });
         }

@@ -14,15 +14,14 @@
 
 namespace nx {
 namespace cdb {
-namespace cl {
+namespace client {
 
-class SystemManager
-:
+class SystemManager:
     public api::SystemManager,
     public AsyncRequestsExecutor
 {
 public:
-    SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher);
 
     virtual void bindSystem(
         api::SystemRegistrationData registrationData,
@@ -32,6 +31,9 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
     virtual void getSystems(
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler ) override;
+    virtual void getSystemsFiltered(
+        const api::Filter& filter,
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
     virtual void getSystem(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
@@ -58,7 +60,7 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
 };
 
-}   //cl
+}   //client
 }   //cdb
 }   //nx
 

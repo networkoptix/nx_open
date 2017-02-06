@@ -28,9 +28,9 @@ bool QnMobileClientMessageProcessor::isConnected() const
 
 void QnMobileClientMessageProcessor::updateResource(
     const QnResourcePtr &resource,
-    const QnUuid& peerId)
+    ec2::NotificationSource source)
 {
-    base_type::updateResource(resource, peerId);
+    base_type::updateResource(resource, source);
 
     if (resource->getId() == qnCommon->remoteGUID())
         updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());

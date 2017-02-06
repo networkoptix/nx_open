@@ -95,6 +95,7 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
+#include <nx_ec/transaction_timestamp.h>
 
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
@@ -129,6 +130,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
+    qRegisterMetaType<HostAddress>();
     qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
@@ -283,6 +285,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QList<QnResourceChannelMapping>>();
 
     qRegisterMetaType<Qn::ConnectionResult>();
+
+    qRegisterMetaType<ec2::Timestamp>("Timestamp");
 
     qRegisterMetaType<ec2::ErrorCode>( "ErrorCode" );
     qRegisterMetaType<ec2::AbstractECConnectionPtr>( "AbstractECConnectionPtr" );

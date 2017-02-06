@@ -30,6 +30,7 @@ private:
     bool setResolution(bool full);
     bool setCamQuality(int q);
     QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;
+    int getChannelCount() const;
 protected:
     QnResourceVideoLayoutPtr m_vrl;
     bool m_isRotated;    

@@ -30,8 +30,8 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-PACKAGE_NAME=${final.artifact.name}-server.tar.gz
-UPDATE_NAME=server-update-${box}-${arch}-$VERSION
+PACKAGE_NAME=${artifact.name.server}.tar.gz
+UPDATE_NAME=${artifact.name.server_update}.zip
 
 TEMP_DIR="`mktemp -d`"
 BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
@@ -88,14 +88,16 @@ libnx_network \
 libnx_streaming \
 libnx_utils \
 libpostproc \
-libudt )
+libudt \
+libGLESv2 \
+libMali \
+libUMP )
 
 #additional libs for nx1 client
 if [[ "${box}" == "bpi" ]]; then
     LIBS_TO_COPY+=(
-        libGLESv2 \
-        libMali \
-        libUMP )
+    # Put nx1(bpi) specific server libs here
+    )
     if [[ ! -z "$WITH_CLIENT" ]]; then
         LIBS_TO_COPY+=( \
             ldpreloadhook \
@@ -300,7 +302,7 @@ if [ ! -f $PACKAGE_NAME ]; then
   echo "Distribution is not created! Exiting"
   exit 1
 fi
-zip ./$UPDATE_NAME.zip ./*
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip

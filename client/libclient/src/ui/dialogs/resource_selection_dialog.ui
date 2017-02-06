@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>834</width>
+    <width>600</width>
     <height>400</height>
    </rect>
   </property>
@@ -51,7 +51,7 @@
           <number>0</number>
          </property>
          <property name="bottomMargin">
-          <number>16</number>
+          <number>0</number>
          </property>
          <item>
           <widget class="QnResourceTreeWidget" name="resourcesWidget" native="true"/>

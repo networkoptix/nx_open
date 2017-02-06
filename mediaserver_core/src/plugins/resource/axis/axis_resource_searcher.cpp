@@ -1,15 +1,14 @@
 #ifdef ENABLE_AXIS
 
+#include "axis_resource.h"
 #include "axis_resource_searcher.h"
 
 #include <nx/utils/log/log.h>
-
 #include <core/resource/camera_resource.h>
-
-#include "axis_resource.h"
-#include "core/resource/resource_data.h"
-#include "core/resource_management/resource_data_pool.h"
-#include "common/common_module.h"
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 #include <utils/common/credentials.h>
 
@@ -292,6 +291,10 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(const QnSe
 {
     if (!resource)
         return QAuthenticator();
+
+    auto existingResource = qnResPool->getNetResourceByPhysicalId(resource->getPhysicalId());
+    if (existingResource && existingResource->getStatus() >= Qn::Online)
+        return existingResource->getAuth();
 
     auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<QnCredentials>>(

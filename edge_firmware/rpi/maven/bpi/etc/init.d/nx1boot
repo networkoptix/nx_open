@@ -28,11 +28,8 @@ exec 2>&1
 
 echo `date` "++++++++++++++++++++++ Starting Boot Process ++++++++++++++++++++++++"
 
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
 export CUSTOMIZATION=${deb.customization.company.name}
-export DISTRIB=$CUSTOMIZATION-mediaserver-${box}-${release.version}.${buildNumber}$BETA
+export DISTRIB=${artifact.name.server}.tar.gz
 
 export CHECKBOOTHDDPART=
 export CHECKDATAHDDPART=
@@ -373,7 +370,7 @@ upgrade() {
 
 #only if boot from SD Card for the first time after upgrading 2.5 to 3.0
 upgrade_sd() {
-    tar xfv /root/$DISTRIB.tar.gz -C / --exclude "./etc/init.d/nx1*"
+    tar xfv /root/$DISTRIB -C / --exclude "./etc/init.d/nx1*"
     touch /dev/cedar_dev
     chmod 777 /dev/disp
     chmod 777 /dev/cedar_dev

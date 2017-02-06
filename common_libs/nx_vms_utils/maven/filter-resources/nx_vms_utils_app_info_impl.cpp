@@ -12,7 +12,7 @@ QString AppInfo::nativeUriProtocol()
 
 QString AppInfo::nativeUriProtocolDescription()
 {
-    return QStringLiteral("${display.product.name} Client Protocol");
+    return QStringLiteral("${client.display.name}");
 }
 
 QString AppInfo::iconFileName()

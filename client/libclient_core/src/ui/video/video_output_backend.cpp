@@ -2,8 +2,8 @@
 
 #include <QtCore/QPointer>
 #include <QtGui/QOpenGLContext>
-#include <private/qmediapluginloader_p.h>
-#include <private/qsgvideonode_p.h>
+#include <QtMultimedia/private/qmediapluginloader_p.h>
+#include <QtMultimedia/private/qsgvideonode_p.h>
 
 #include <nx/media/media_player.h>
 

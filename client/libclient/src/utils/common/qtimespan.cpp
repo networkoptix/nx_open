@@ -49,6 +49,10 @@
 #include "qtimespan.h"
 #include "qdebug.h"
 #include "qcoreapplication.h"
+
+#include <text/time_strings.h>
+
+
 #if defined(Q_OS_WIN32) || defined(Q_OS_WINCE)
 #include <qt_windows.h>
 #endif
@@ -202,7 +206,7 @@ namespace {
     The same goes for years.
 
     QTimeSpan stores the length of time intervals as a 64 bits integer representing milliseconds.
-    That means that arithmatic with time periods set as months or years may not always yield what you
+    That means that arithmetic with time periods set as months or years may not always yield what you
     expect. A time period set as the year describing the whole of 2007 that you multiply by two or
     add to itself, will not end up having a length of two years, but of 1 year, 11 months and 30
     days, as 2008 is one day longer than 2007. When months and years are used, they are
@@ -307,28 +311,57 @@ public:
     };
 
     //returns a string representation of time in a single time unit
-    QString unitString(Qt::TimeSpanUnit unit, int num) const
+    QString unitString(Qt::TimeSpanUnit unit, QTimeSpan::SuffixFormat suffixFormat, int num) const
     {
-        switch (unit) {
-        case::Qt::Milliseconds:
-            return tr("%n millisecond(s)", "", num);
-        case::Qt::Seconds:
-            return tr("%n second(s)", "", num);
-        case::Qt::Minutes:
-            return tr("%n minute(s)", "", num);
-        case::Qt::Hours:
-            return tr("%n hour(s)", "", num);
-        case::Qt::Days:
-            return tr("%n day(s)", "", num);
-        case::Qt::Weeks:
-            return tr("%n week(s)", "", num);
-        case::Qt::Months:
-            return tr("%n month(s)", "", num);
-        case::Qt::Years:
-            return tr("%n year(s)", "", num);
-        default:
-            return QString();
+        QnTimeStrings::Suffix suffixType = QnTimeStrings::Suffix::Milliseconds;
+
+        switch (unit)
+        {
+            case::Qt::Seconds:
+                suffixType = QnTimeStrings::Suffix::Seconds;
+                break;
+            case::Qt::Minutes:
+                suffixType = QnTimeStrings::Suffix::Minutes;
+                break;
+            case::Qt::Hours:
+                suffixType = QnTimeStrings::Suffix::Hours;
+                break;
+            case::Qt::Days:
+                suffixType = QnTimeStrings::Suffix::Days;
+                break;
+            case::Qt::Weeks:
+                suffixType = QnTimeStrings::Suffix::Weeks;
+                break;
+            case::Qt::Months:
+                suffixType = QnTimeStrings::Suffix::Months;
+                break;
+            case::Qt::Years:
+                suffixType = QnTimeStrings::Suffix::Years;
+                break;
+            default:
+                break;
         }
+
+        QString suffix;
+        switch (suffixFormat)
+        {
+            case QTimeSpan::SuffixFormat::Short:
+                // short suffix attached to number: 1m 15s
+                suffix = QnTimeStrings::suffix(suffixType);
+                break;
+            case QTimeSpan::SuffixFormat::Long:
+                // long suffix separated by space: 1 min 15 sec
+                suffix = L' ' + QnTimeStrings::longSuffix(suffixType);
+                break;
+            case QTimeSpan::SuffixFormat::Full:
+                // full suffix separated by space: 1 minute 15 seconds
+                suffix = L' ' + QnTimeStrings::fullSuffix(suffixType, num);
+                break;
+            default:
+                break;
+        }
+
+        return QString::number(num) + suffix;
     }
 
 #ifndef QT_NO_DATESTRING
@@ -2044,22 +2077,22 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
 /*!
   \returns an approximate representation of the time span length
 
-  When representing the lenght of a time span, it is often not nessecairy to be
-  completely accurate. For instance, when dispaying the age of a person, it is
+  When representing the length of a time span, it is often not necessary to be
+  completely accurate. For instance, when displaying the age of a person, it is
   often enough to just state the number of years, or possibly the number of years
-  and the number of months. Similary, when displaying how long a certain operation
+  and the number of months. Similarly, when displaying how long a certain operation
   the user of your application started will run, it is useless to display the
   number of seconds left if the operation will run for hours more.
 
   toApproximateString() provides functionality to display the length of the
   QTimeSpan in such an approximate way. It will format the time using one or two
-  neighbouring time units. The first time unit that will be used is the unit
+  neighboring time units. The first time unit that will be used is the unit
   that represents the biggest portion of time in the span. The second time unit
   will be the time unit directly under that. The second unit will only be used
   if it is not 0, and if the first number is smaller than the indicated
   suppresSecondUnitLimit.
 
-  The suppressSecondUnitLimit argument can be used to suppres, for instance,
+  The suppressSecondUnitLimit argument can be used to suppress, for instance,
   the number of seconds when the operation will run for more than five minutes
   more. The idea is that for an approximate representation of the time length,
   it is no longer relevant to display the second unit if the first represents
@@ -2068,17 +2101,22 @@ QDebug operator<<(QDebug debug, const QTimeSpan &ts)
   If you set suppressSecondUnitLimit to a negative number, the second unit will
   always be displayed, unless no valid unit for it could be found.
 */
-QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format, unitStringFunction unitStringConverter, QString unitsSeparator)
+QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanFormat format,
+    SuffixFormat suffixFormat, QString unitsSeparator)
 {
     if (format == Qt::NoUnit)
         return QString();
 
-    auto toUnitString = [this, unitStringConverter](Qt::TimeSpanUnit unit, int num)
+    if (format & (Qt::Months | Qt::Years))
     {
-        if (unitStringConverter)
-            return unitStringConverter(unit, num);
-        return d->unitString(unit, num);
-    };
+        Q_ASSERT_X(hasValidReference(), Q_FUNC_INFO,
+            "Reference date is required to calculate correct months/years value");
+    }
+
+    auto toUnitString = [this, suffixFormat](Qt::TimeSpanUnit unit, int num)
+        {
+            return d->unitString(unit, suffixFormat, num);
+        };
 
     Qt::TimeSpanUnit primairyUnit = magnitude();
     Qt::TimeSpanUnit smallest = smallestUnit(format);
@@ -2092,7 +2130,7 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
     {
         QTimeSpan positive = this->normalized();
         QString positiveResult = positive.toApproximateString(suppresSecondUnitLimit, format,
-            unitStringConverter, unitsSeparator);
+            suffixFormat, unitsSeparator);
 
         /* Handle error scenario or zero returned. */
         if (positiveResult.isEmpty())
@@ -2164,7 +2202,9 @@ QString QTimeSpan::toApproximateString(int suppresSecondUnitLimit, Qt::TimeSpanF
 
     //we will display with two units
     if (showSecondary)
-        return toUnitString(primairyUnit, primairy) + unitsSeparator + toUnitString(secondairyUnit, secondairy);
+        return toUnitString(primairyUnit, primairy)
+            + unitsSeparator
+            + toUnitString(secondairyUnit, secondairy);
 
     //we will display with only the primairy unit
     return toUnitString(primairyUnit, primairy);

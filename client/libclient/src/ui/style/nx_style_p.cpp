@@ -133,6 +133,33 @@ QColor QnNxStylePrivate::checkBoxColor(const QStyleOption *option, bool radio) c
     return color;
 }
 
+bool QnNxStylePrivate::isCheckableButton(const QStyleOption* option)
+{
+    if (qstyleoption_cast<const QStyleOptionButton*>(option))
+    {
+        if (option->state.testFlag(QStyle::State_On) ||
+            option->state.testFlag(QStyle::State_Off) ||
+            option->state.testFlag(QStyle::State_NoChange))
+        {
+            return true;
+        }
+
+        const QAbstractButton* buttonWidget = qobject_cast<const QAbstractButton*>(option->styleObject);
+        if (buttonWidget && buttonWidget->isCheckable())
+            return true;
+    }
+
+    return false;
+}
+
+bool QnNxStylePrivate::isTextButton(const QStyleOption* option)
+{
+    if (auto button = qstyleoption_cast<const QStyleOptionButton*>(option))
+        return button->features.testFlag(QStyleOptionButton::Flat);
+
+    return false;
+}
+
 void QnNxStylePrivate::drawSwitch(
     QPainter *painter,
     const QStyleOption *option,
@@ -397,9 +424,13 @@ void QnNxStylePrivate::drawTextButton(
 {
     Q_UNUSED(widget);
 
-    bool enabled = option->state.testFlag(QStyle::State_Enabled);
-    bool hovered = option->state.testFlag(QStyle::State_MouseOver);
-    bool pressed = option->state.testFlag(QStyle::State_Sunken);
+    const bool enabled = option->state.testFlag(QStyle::State_Enabled);
+    const bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+    const bool pressed = option->state.testFlag(QStyle::State_Sunken);
+
+    const bool checkable = isCheckableButton(option);
+    const bool hasIcon = !option->icon.isNull();
+    const bool hasMenu = option->features.testFlag(QStyleOptionButton::HasMenu);
 
     QBrush brush = option->palette.brush(foregroundRole);
     QIcon::Mode iconMode = enabled ? QIcon::Normal : QIcon::Disabled;
@@ -413,7 +444,20 @@ void QnNxStylePrivate::drawTextButton(
 
     QRect textRect(option->rect);
 
-    if (!option->icon.isNull())
+    if (checkable)
+    {
+        QStyleOption switchOption(*option); //< not QStyleOptionButton for standalone switch
+        switchOption.rect.setWidth(Metrics::kStandaloneSwitchSize.width());
+
+        if (option->direction == Qt::LeftToRight)
+            textRect.setLeft(switchOption.rect.right() + Metrics::kStandardPadding + 1);
+        else
+            textRect.setRight(switchOption.rect.left() - Metrics::kStandardPadding - 1);
+
+        drawSwitch(painter, &switchOption, widget);
+    }
+
+    if (hasIcon)
     {
         paintLabelIcon(
             &textRect,
@@ -425,9 +469,9 @@ void QnNxStylePrivate::drawTextButton(
             iconMode);
     }
 
-    if (option->features.testFlag(QStyleOptionButton::HasMenu))
+    if (hasMenu)
     {
-        QIcon icon = pressed
+        const auto icon = pressed
             ? qnSkin->icon(lit("buttons/collapse.png"))
             : qnSkin->icon(lit("buttons/expand.png"));
 
@@ -441,12 +485,16 @@ void QnNxStylePrivate::drawTextButton(
             iconMode);
     }
 
+    const auto horizontalAlignment = hasMenu && !(checkable || hasIcon)
+        ? Qt::AlignRight
+        : Qt::AlignLeft;
+
     static const int kTextFlags = Qt::TextSingleLine
                                 | Qt::TextHideMnemonic
-                                | Qt::AlignLeft
-                                | Qt::AlignVCenter;
+                                | Qt::AlignVCenter
+                                | horizontalAlignment;
 
-    QString text = option->fontMetrics.elidedText(
+    const auto text = option->fontMetrics.elidedText(
         option->text,
         Qt::ElideRight,
         textRect.width(),

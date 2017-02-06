@@ -75,9 +75,14 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider)
     connect(m_thumbnailLabel, SIGNAL(clicked(Qt::MouseButton)), this, SLOT(at_thumbnailLabel_clicked(Qt::MouseButton)));
 
     if (!provider->image().isNull())
+    {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
+    }
     else
-        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
+    {
+        m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png",
+            QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    }
 
     connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage& image)
     {
@@ -140,17 +145,9 @@ void QnNotificationToolTipWidget::pointTo(const QPointF& pos)
     updateTailPos();
 }
 
-void QnNotificationToolTipWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
-{
-    if (event->button() == Qt::RightButton)
-        emit closeTriggered();
-}
-
 void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton button)
 {
-    if (button == Qt::RightButton)
-        emit closeTriggered();
-    else
+    if (button == Qt::LeftButton)
         emit thumbnailClicked();
 }
 
@@ -178,11 +175,12 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
     m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
     m_closeButton->setVisible(false);
-    connect(m_closeButton, SIGNAL(clicked()), this, SIGNAL(closeTriggered()));
+    connect(m_closeButton, &QnImageButtonWidget::clicked, this, &QnNotificationWidget::closeTriggered);
 
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+    connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
     m_layout->addItem(m_textLabel);
@@ -196,7 +194,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_tooltipWidget->installEventFilter(this);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::buttonClicked,    this, &QnNotificationWidget::buttonClicked);
-    connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::at_thumbnail_clicked);
+    connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::triggerDefaultAction);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::closeTriggered,   this, &QnNotificationWidget::closeTriggered);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::tailPosChanged,   this, &QnNotificationWidget::updateToolTipPosition);
     connect(this,            &QnNotificationWidget::geometryChanged,         this, &QnNotificationWidget::updateToolTipPosition);
@@ -286,8 +284,9 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
     m_closeButton->setGeometry(buttonGeometry);
 }
 
-void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& tooltip, QnActions::IDType actionId,
-                                         const QnActionParameters& parameters, bool defaultAction)
+void QnNotificationWidget::addActionButton(
+    const QIcon& icon, QnActions::IDType actionId,
+    const QnActionParameters& parameters, bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);
@@ -313,6 +312,17 @@ void QnNotificationWidget::addActionButton(const QIcon& icon, const QString& too
         emit actionTriggered(actionId, parameters);
     });
     m_actions << ActionData(actionId, parameters); //still required for thumbnails click and base notification click
+}
+
+void QnNotificationWidget::triggerDefaultAction()
+{
+    if (m_defaultActionIdx < 0)
+        return;
+
+    NX_ASSERT(m_defaultActionIdx < m_actions.size());
+    const auto actionData = m_actions[m_defaultActionIdx];
+
+    emit actionTriggered(actionData.action, actionData.params);
 }
 
 void QnNotificationWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -375,30 +385,8 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
 {
     Qt::MouseButton button = event->button();
 
-    if (button == Qt::RightButton)
-    {
-        emit closeTriggered();
-    }
-    else if (button == Qt::LeftButton)
-    {
-        if (!m_actions.isEmpty())
-        {
-            ActionData data = m_actions[0]; // TODO: #Elric
-            emit actionTriggered(data.action, data.params);
-        }
-    }
-}
-
-void QnNotificationWidget::at_thumbnail_clicked()
-{
-    if (m_defaultActionIdx < 0)
-        return;
-
-    if (m_actions.size() <= m_defaultActionIdx)
-        return;
-
-    ActionData data = m_actions[m_defaultActionIdx];
-    emit actionTriggered(data.action, data.params);
+    if (button == Qt::LeftButton)
+        triggerDefaultAction();
 }
 
 void QnNotificationWidget::at_loop_sound()

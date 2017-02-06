@@ -21,10 +21,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,43 +29,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot create database backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: You are about to merge Systems with START licenses.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If you understand this and would like to proceed please click Merge to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System being merged cannot be connected to %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -78,6 +38,53 @@
     </message>
     <message>
         <source>Unknown error.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of the system, %2 is version information</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of the system</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of the system</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this version you can only merge systems which are not connected to %1.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to merge Systems with Starter licenses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge anyway?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -150,10 +157,6 @@
     <message>
         <source>Speak</source>
         <translation>Falar</translation>
-    </message>
-    <message>
-        <source>Unknown (%1)</source>
-        <translation>Desconhecido (%1)</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -282,10 +285,6 @@
     </message>
     <message>
         <source>Generic Event</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -423,55 +422,6 @@
         <source>Do HTTP request</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Motion on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Input Signal on Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Device(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Camera(s) IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
@@ -504,6 +454,55 @@
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Motion on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Devices</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Input Signal on Cameras</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras Disconnected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Devices IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cameras IP Conflict</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -912,6 +911,14 @@
         <source>Invalid type</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseUsageHelper</name>
@@ -961,6 +968,13 @@
     </message>
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnLocalSystemDescription</name>
+    <message>
+        <source>New Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1199,10 +1213,6 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>New system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1232,6 +1242,153 @@
     <message>
         <source>Not Implemented</source>
         <translation>Não implementado</translation>
+    </message>
+</context>
+<context>
+    <name>QnTimeStrings</name>
+    <message>
+        <source>ms</source>
+        <comment>Suffix for displaying milliseconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>s</source>
+        <comment>Suffix for displaying seconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>m</source>
+        <comment>Suffix for displaying minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h</source>
+        <comment>Suffix for displaying hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>Suffix for displaying days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>Suffix for displaying weeks</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>Suffix for displaying months</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>y</source>
+        <comment>Suffix for displaying years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>msec</source>
+        <comment>Long suffix for displaying milliseconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>sec</source>
+        <comment>Long suffix for displaying seconds</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>min</source>
+        <comment>Long suffix for displaying minutes</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hrs</source>
+        <comment>Long suffix for displaying hours</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>days</source>
+        <comment>Long suffix for displaying days</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wks</source>
+        <comment>Long suffix for displaying weeks</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>mos</source>
+        <comment>Long suffix for displaying months</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yrs</source>
+        <comment>Long suffix for displaying years</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>milliseconds</source>
+        <comment>Full suffix for displaying milliseconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>seconds</source>
+        <comment>Full suffix for displaying seconds</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>minutes</source>
+        <comment>Full suffix for displaying minutes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>hours</source>
+        <comment>Full suffix for displaying hours</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>days</source>
+        <comment>Full suffix for displaying days</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>weeks</source>
+        <comment>Full suffix for displaying weeks</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>months</source>
+        <comment>Full suffix for displaying months</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>years</source>
+        <comment>Full suffix for displaying years</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

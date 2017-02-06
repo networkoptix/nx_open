@@ -33,7 +33,9 @@ static SocketAddress findFreeTcpAndUdpLocalAddress()
 {
     for (size_t attempt = 0; attempt < kMaxBindRetryCount; ++attempt)
     {
-        const SocketAddress address("127.0.0.1", nx::utils::random::number<uint16_t>(5000, 50000));
+        const SocketAddress address(
+            HostAddress::localhost,
+            nx::utils::random::number<uint16_t>(5000, 50000));
 
         network::TCPServerSocket tcpSocket(AF_INET);
         if (!tcpSocket.bind(address))
@@ -46,7 +48,7 @@ static SocketAddress findFreeTcpAndUdpLocalAddress()
         return address;
     }
 
-    return SocketAddress("127.0.0.1:0");
+    return SocketAddress::anyPrivateAddress;
 }
 
 MediatorFunctionalTest::MediatorFunctionalTest():
@@ -60,13 +62,13 @@ MediatorFunctionalTest::MediatorFunctionalTest():
     QDir(m_tmpDir).removeRecursively();
     QDir().mkpath(m_tmpDir);
 
-    const auto stunAddress = findFreeTcpAndUdpLocalAddress().toString().toStdString();
+    const auto stunAddress = findFreeTcpAndUdpLocalAddress();
     NX_LOGX(lm("STUN TCP & UDP endpoint: %1").str(stunAddress), cl_logINFO);
 
     addArg("/path/to/bin");
     addArg("-e");
-    addArg("-stun/addrToListenList", stunAddress.c_str());
-    addArg("-http/addrToListenList", "127.0.0.1:0");
+    addArg("-stun/addrToListenList", stunAddress.toStdString().c_str());
+    addArg("-http/addrToListenList", SocketAddress::anyPrivateAddress.toStdString().c_str());
     addArg("-log/logLevel", "DEBUG2");
     addArg("-general/dataDir", m_tmpDir.toLatin1().constData());
 
@@ -128,13 +130,13 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 {
     AbstractCloudDataProviderFactory::setFactoryFunc(
         [cloudDataProvider](
-            const std::string& /*address*/,
+            const boost::optional<QUrl>& /*cdbUrl*/,
             const std::string& /*user*/,
             const std::string& /*password*/,
             std::chrono::milliseconds /*updateInterval*/)
-    {
-        return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
-    });
+        {
+            return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
+        });
 }
 
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()

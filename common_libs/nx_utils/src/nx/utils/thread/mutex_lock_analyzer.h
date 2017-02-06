@@ -175,13 +175,30 @@ public:
 private:
     struct ThreadContext
     {
-        uintptr_t threadId;
         std::deque<MutexLockKey> currentLockPath;
+    };
 
-        ThreadContext(uintptr_t id): threadId(id) {}
+    class ThreadContextGuard
+    {
+    public:
+        ThreadContextGuard(MutexLockAnalyzer*);
+        ~ThreadContextGuard();
+
+        ThreadContextGuard(const ThreadContextGuard&) = delete;
+        ThreadContextGuard& operator=(const ThreadContextGuard&) = delete;
+        ThreadContextGuard(ThreadContextGuard&&) = default;
+        ThreadContextGuard& operator=(ThreadContextGuard&&) = default;
+
+        ThreadContext* operator->();
+        const ThreadContext* operator->() const;
+
+    private:
+        MutexLockAnalyzer* m_analyzer;
+        ThreadContext& m_threadContext;
     };
 
     ThreadContext& currentThreadContext();
+    void removeCurrentThreadContext();
 
     typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
 

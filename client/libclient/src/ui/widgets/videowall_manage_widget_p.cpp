@@ -8,6 +8,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/widgets/videowall_manage_widget.h>
+#include <ui/dialogs/common/message_box.h>
 
 #include <nx/utils/string.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -731,12 +732,16 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (!item->editable || !item->deleteButtonRect().contains(pos))
             continue;;
 
-        if (item->itemType == ItemType::Existing) {
-            if (QnMessageBox::question(
-                q_ptr,
-                tr("Delete Screen"),
-                tr("Are you sure you want to delete %1?").arg(item->name),
-                QDialogButtonBox::Ok | QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+        if (item->itemType == ItemType::Existing)
+        {
+            QnMessageBox dialog(QnMessageBoxIcon::Question,
+                tr("Delete \"%1\"?").arg(item->name), QString(),
+                QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+                q_ptr);
+
+            dialog.addCustomButton(QnMessageBoxCustomButton::Delete,
+                QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+            if (dialog.exec() == QDialogButtonBox::Cancel)
                 return;
         }
 

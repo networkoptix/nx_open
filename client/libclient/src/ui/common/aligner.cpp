@@ -61,6 +61,11 @@ void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
     align();
 }
 
+void QnAligner::clear()
+{
+    m_widgets.clear();
+}
+
 void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor)
 {
     NX_ASSERT(!m_accessorByClassName.contains(className));

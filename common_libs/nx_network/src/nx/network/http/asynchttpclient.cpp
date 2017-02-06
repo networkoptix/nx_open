@@ -28,6 +28,15 @@ static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 
 using std::make_pair;
 
+namespace {
+
+static bool logTraffic()
+{
+    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+}
+
+} // namespace
+
 namespace nx_http
 {
     static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
@@ -189,9 +198,10 @@ namespace nx_http
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
         composeRequest(nx_http::Method::GET);
-        initiateHttpMessageDelivery(url);
+        initiateHttpMessageDelivery();
     }
 
     void AsyncHttpClient::doGet(
@@ -213,7 +223,8 @@ namespace nx_http
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
         composeRequest(nx_http::Method::POST);
         m_request.headers.insert(make_pair("Content-Type", contentType));
         if (includeContentLength)
@@ -221,7 +232,7 @@ namespace nx_http
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert(make_pair("Content-Encoding", "identity"));
         m_request.messageBody = std::move(messageBody);
-        initiateHttpMessageDelivery(url);
+        initiateHttpMessageDelivery();
     }
 
     void AsyncHttpClient::doPost(
@@ -254,13 +265,14 @@ namespace nx_http
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
         composeRequest(nx_http::Method::PUT);
         m_request.headers.insert(make_pair("Content-Type", contentType));
         m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
         //TODO #ak support chunked encoding & compression
         m_request.messageBody = std::move(messageBody);
-        initiateHttpMessageDelivery(url);
+        initiateHttpMessageDelivery();
     }
 
     void AsyncHttpClient::doPut(
@@ -287,10 +299,11 @@ namespace nx_http
         NX_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
-        m_url = url;
-        m_url.setPath(QLatin1String("*"));
+        m_requestUrl = url;
+        m_contentLocationUrl = url;
+        m_contentLocationUrl.setPath(QLatin1String("*"));
         composeRequest(nx_http::Method::OPTIONS);
-        initiateHttpMessageDelivery(url);
+        initiateHttpMessageDelivery();
     }
 
     void AsyncHttpClient::doOptions(
@@ -346,12 +359,21 @@ namespace nx_http
     //!Returns current message body buffer, clearing it
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
-        return m_httpStreamReader.fetchMessageBody();
+        const auto buffer = m_httpStreamReader.fetchMessageBody();
+        if (logTraffic())
+            NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+
+        return buffer;
     }
 
     const QUrl& AsyncHttpClient::url() const
     {
-        return m_url;
+        return m_requestUrl;
+    }
+
+    const QUrl& AsyncHttpClient::contentLocationUrl() const
+    {
+        return m_contentLocationUrl;
     }
 
     quint64 AsyncHttpClient::bytesRead() const
@@ -411,9 +433,14 @@ namespace nx_http
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         if (proxyEndpoint.isNull())
+        {
             m_proxyEndpoint.reset();
+        }
         else
+        {
+            NX_ASSERT(proxyEndpoint.port > 0);
             m_proxyEndpoint = proxyEndpoint;
+        }
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -439,7 +466,7 @@ namespace nx_http
     void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     {
         NX_LOGX(lm("Opened connection to url %1. Result code %2")
-            .str(m_url).str(errorCode), cl_logDEBUG2);
+            .str(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
 
         std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
@@ -455,19 +482,19 @@ namespace nx_http
         if (errorCode == SystemError::noError)
         {
             //connect successful
-            m_remoteEndpointWithProtocol = endpointWithProtocol(m_url);
+            m_remoteEndpointWithProtocol = endpointWithProtocol(m_contentLocationUrl);
             serializeRequest();
             m_state = sSendingRequest;
             emit tcpConnectionEstablished(sharedThis);
             using namespace std::placeholders;
-            NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
+            NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
 
             m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
 
         NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
-            arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
 
         m_state = sFailed;
@@ -494,7 +521,7 @@ namespace nx_http
         {
             if (reconnectIfAppropriate())
                 return;
-            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -515,7 +542,9 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_url.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+        NX_LOGX(lm("Request has been successfully sent to %1: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -529,7 +558,7 @@ namespace nx_http
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
             const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
@@ -571,7 +600,7 @@ namespace nx_http
             }
 
             NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
-                .arg(stateBak).arg(m_url.toString(QUrl::RemovePassword))
+                .arg(stateBak).arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
                 .arg(SystemError::toString(errorCode)),
                 cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
@@ -581,8 +610,6 @@ namespace nx_http
                 m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
-
-        NX_LOGX(lm("======   %1").arg(m_responseBuffer.mid(0, bytesRead)), cl_logDEBUG2);
 
         processReceivedBytes(std::move(sharedThis), bytesRead);
     }
@@ -596,7 +623,7 @@ namespace nx_http
         m_request = nx_http::Request();
     }
 
-    void AsyncHttpClient::initiateHttpMessageDelivery(const QUrl& url)
+    void AsyncHttpClient::initiateHttpMessageDelivery()
     {
         using namespace std::placeholders;
         bool canUseExistingConnection = false;
@@ -607,12 +634,11 @@ namespace nx_http
                 (nx_http::getHeaderValue(m_httpStreamReader.message().response->headers, "Connection") != "close");
         }
 
-        m_url = url;
         canUseExistingConnection =
             m_socket &&
             !m_connectionClosed &&
             canUseExistingConnection &&
-            (m_remoteEndpointWithProtocol == endpointWithProtocol(url)) &&
+            (m_remoteEndpointWithProtocol == endpointWithProtocol(m_contentLocationUrl)) &&
             m_lastSysErrorCode == SystemError::noError;
 
         if (!canUseExistingConnection)
@@ -638,7 +664,7 @@ namespace nx_http
 
                     serializeRequest();
                     m_state = sSendingRequest;
-                    NX_LOGX(lm("Sending request to url %1").str(m_url), cl_logDEBUG2);
+                    NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
                     m_socket->sendAsync(
                         m_requestBuffer,
                         std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
@@ -657,14 +683,14 @@ namespace nx_http
             m_proxyEndpoint
             ? m_proxyEndpoint.get()
             : SocketAddress(
-                m_url.host(),
-                m_url.port(nx_http::defaultPortForScheme(m_url.scheme().toLatin1())));
+                m_contentLocationUrl.host(),
+                m_contentLocationUrl.port(nx_http::defaultPortForScheme(m_contentLocationUrl.scheme().toLatin1())));
 
         m_state = sInit;
 
-        m_socket = SocketFactory::createStreamSocket(m_url.scheme() == lit("https"));
+        m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lit("https"));
 
-        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_url).arg(m_socket->handle()), cl_logDEBUG2);
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
@@ -721,7 +747,7 @@ namespace nx_http
         if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
         {
             NX_LOGX(lit("Error parsing http response from %1. %2").
-                arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+                arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
             m_state = sFailed;
             return -1;
         }
@@ -831,7 +857,7 @@ namespace nx_http
                     return;
 
                 NX_LOGX(lit("Failed to read (1) response from %1. %2").
-                    arg(m_url.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
+                    arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
                 m_state = sFailed;
                 emit done(sharedThis);
                 return;
@@ -844,16 +870,16 @@ namespace nx_http
         if (m_httpStreamReader.message().type != nx_http::MessageType::response)
         {
             NX_LOGX(lit("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
-                arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1);
+                arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()), cl_logDEBUG1);
             m_state = sFailed;
             emit done(sharedThis);
             return;
         }
 
-        //response read
-        NX_LOGX(lit("Http response from %1 has been successfully read. Status line: %2(%3)").
-            arg(m_url.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
-            arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
+        NX_LOGX(lm("Response from %1 has been successfully read: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? response()->toString() : response()->statusLine.toString()),
+            cl_logDEBUG2);
 
         if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
             return;
@@ -906,7 +932,7 @@ namespace nx_http
             if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
             {
                 NX_LOGX(lit("Failed to read (1) response from %1. %2")
-                    .arg(m_url.toString(QUrl::RemovePassword))
+                    .arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
                     .arg(SystemError::getLastOSErrorText()),
                     cl_logDEBUG1);
 
@@ -961,6 +987,7 @@ namespace nx_http
                 break;
             }
             
+            case StatusCode::found:
             case StatusCode::movedPermanently:
                 return sendRequestToNewLocation(response);
 
@@ -985,7 +1012,9 @@ namespace nx_http
         m_authorizationTried = false;
         m_ha1RecalcTried = false;
 
-        initiateHttpMessageDelivery(QUrl(QLatin1String(locationIter->second)));
+        m_contentLocationUrl = QUrl(QLatin1String(locationIter->second));
+
+        initiateHttpMessageDelivery();
         return true;
     }
 
@@ -1025,9 +1054,9 @@ namespace nx_http
 
         m_request.requestLine.method = httpMethod;
         if (m_proxyEndpoint)
-            m_request.requestLine.url = m_url;
+            m_request.requestLine.url = m_contentLocationUrl;
         else    //if no proxy specified then erasing http://host:port from request url
-            m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
+            m_request.requestLine.url = m_contentLocationUrl.path() + (m_contentLocationUrl.hasQuery() ? (QLatin1String("?") + m_contentLocationUrl.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
         nx_http::insertOrReplaceHeader(
@@ -1052,18 +1081,18 @@ namespace nx_http
                 m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
 
             if (m_additionalHeaders.count("Host") == 0)
-                m_request.headers.insert(std::make_pair("Host", m_url.host().toLatin1()));
+                m_request.headers.insert(std::make_pair("Host", m_contentLocationUrl.host().toLatin1()));
         }
 
         m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());
 
         //adding user credentials
-        if (!m_url.userName().isEmpty())
-            m_userName = m_url.userName();
-        if (!m_url.password().isEmpty())
-            m_userPassword = m_url.password();
-        m_url.setUserName(m_userName);
-        m_url.setPassword(m_userPassword);
+        if (!m_contentLocationUrl.userName().isEmpty())
+            m_userName = m_contentLocationUrl.userName();
+        if (!m_contentLocationUrl.password().isEmpty())
+            m_userPassword = m_contentLocationUrl.password();
+        m_contentLocationUrl.setUserName(m_userName);
+        m_contentLocationUrl.setPassword(m_userPassword);
 
         //adding X-Nx-User-Name to help server to port data from 2.1 to 2.3 and from 2.3 to 2.4 (generate user's digest)
         //TODO #ak remove it after 2.3 support is over
@@ -1083,7 +1112,7 @@ namespace nx_http
         //    This is done due to limited AuthInfoCache implementation
         if (m_authCacheItem.url.isEmpty() ||
             !AuthInfoCache::instance()->addAuthorizationHeader(
-                m_url,
+                m_contentLocationUrl,
                 &m_request,
                 &m_authCacheItem))
         {
@@ -1101,7 +1130,6 @@ namespace nx_http
                 //not using Basic authentication by default, since it is not secure
                 nx_http::removeHeader(&m_request.headers, header::Authorization::NAME);
             }
-            
         }
     }
 
@@ -1136,7 +1164,7 @@ namespace nx_http
         {
             //< Reconnect if TCP timeout for keep-alive connections
             m_connectionClosed = true;
-            initiateHttpMessageDelivery(m_url);
+            initiateHttpMessageDelivery();
             return true;
         }
 
@@ -1186,7 +1214,7 @@ namespace nx_http
                     basicAuthorization.serialized()));
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-                m_url,
+                m_contentLocationUrl,
                 m_request.requestLine.method,
                 userName.toLatin1(),
                 userPassword.toLatin1(),
@@ -1207,7 +1235,7 @@ namespace nx_http
                     m_authType == authDigestWithPasswordHash
                         ? userPassword.toLatin1()
                         : boost::optional<nx_http::BufferType>(),
-                    m_url.path().toUtf8(),
+                    m_contentLocationUrl.path().toUtf8(),
                     wwwAuthenticateHeader,
                     &digestAuthorizationHeader))
             {
@@ -1221,7 +1249,7 @@ namespace nx_http
                 nx_http::HttpHeader(authorizationHeaderName, authorizationStr));
             //TODO #ak MUST add to cache only after OK response
             m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-                m_url,
+                m_contentLocationUrl,
                 m_request.requestLine.method,
                 userName.toLatin1(),
                 m_authType == authDigestWithPasswordHash
@@ -1245,7 +1273,7 @@ namespace nx_http
             m_proxyAuthorizationTried = true;
         else
             m_authorizationTried = true;
-        initiateHttpMessageDelivery(m_url);
+        initiateHttpMessageDelivery();
         return true;
     }
 

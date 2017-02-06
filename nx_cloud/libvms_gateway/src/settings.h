@@ -60,7 +60,7 @@ public:
 
 enum class SslMode
 {
-    undefined,
+    followIncomingConnection,
     enabled,
     disabled,
 };
@@ -80,7 +80,7 @@ public:
     QString fetchPublicIpUrl;
     QString publicIpAddress;
     TcpReverseOptions tcpReverse;
-    SslMode preferedSslMode = SslMode::undefined;
+    SslMode preferedSslMode = SslMode::followIncomingConnection;
 };
 
 /*!
@@ -104,7 +104,7 @@ public:
     const CloudConnect& cloudConnect() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
-    void load( int argc, char **argv );
+    void load( int argc, const char **argv );
     //!Prints to std out
     void printCmdLineArgsHelp();
 
