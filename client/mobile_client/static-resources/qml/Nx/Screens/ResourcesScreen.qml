@@ -34,6 +34,13 @@ Page
         }
     ]
 
+    Binding
+    {
+        target: resourcesScreen
+        property: "title"
+        value: connectionManager.systemName
+    }
+
     QtObject
     {
         id: d

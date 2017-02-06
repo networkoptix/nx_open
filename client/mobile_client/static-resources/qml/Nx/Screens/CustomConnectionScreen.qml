@@ -138,7 +138,7 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
-                Workflow.openResourcesScreen(connectionManager.systemName)
+                Workflow.openResourcesScreen(connectionManager.systemName || systemName)
         }
 
         onConnectionFailed:
