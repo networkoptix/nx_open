@@ -169,6 +169,11 @@ class PerformanceMultipleServerSocket:
     public ::testing::Test
 {
 public:
+    PerformanceMultipleServerSocket():
+        m_socketsAccepted(0)
+    {
+    }
+
     ~PerformanceMultipleServerSocket()
     {
         m_serverSocket->pleaseStopSync();
@@ -210,7 +215,7 @@ protected:
 
         const seconds testDurationLimit(5);
         // Limiting number of connections to limit number of allocated ports.
-        const int maxConnectionsToEstablish = 1000;
+        const int maxConnectionsToEstablish = 3000;
 
         TestResult testResult;
 
@@ -229,25 +234,16 @@ protected:
                 }
             });
 
-        int socketsAccepted = 0;
-        const auto startTime = system_clock::now();
-        while ((system_clock::now() < (startTime + testDurationLimit)) && !connectorDone)
-        {
-            auto clientSocket = m_serverSocket->accept();
-            if (clientSocket)
-                ++socketsAccepted;
-            delete clientSocket;
-        }
-        const auto endTime = system_clock::now();
+        runAcceptLoop(testDurationLimit, &connectorDone);
 
         terminated = true;
         establishConnectionThread.join();
 
-        testResult.duration = duration_cast<milliseconds>(endTime - startTime);
-        testResult.totalConnectionsAccepted = socketsAccepted;
+        testResult.duration = m_testRunDuration;
+        testResult.totalConnectionsAccepted = m_socketsAccepted;
         testResult.connectionsAcceptedPerSecond =
-            (socketsAccepted * millisInSecond) /
-            (duration_cast<milliseconds>(endTime - startTime).count());
+            (m_socketsAccepted * millisInSecond) /
+            (m_testRunDuration.count());
 
         return testResult;
     }
@@ -258,6 +254,33 @@ protected:
             "accepted " << testResult.totalConnectionsAccepted << " connections, "
             "speed " << testResult.connectionsAcceptedPerSecond << " connections per second"
             << std::endl;
+    }
+
+protected:
+    int m_socketsAccepted;
+    std::chrono::milliseconds m_testRunDuration;
+
+    virtual void runAcceptLoop(
+        std::chrono::milliseconds testDurationLimit,
+        bool* isCancelled)
+    {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::now();
+        while ((system_clock::now() < (startTime + testDurationLimit)) && !*isCancelled)
+        {
+            auto clientSocket = m_serverSocket->accept();
+            if (clientSocket)
+                ++m_socketsAccepted;
+            delete clientSocket;
+        }
+        const auto endTime = system_clock::now();
+        m_testRunDuration = duration_cast<milliseconds>(endTime - startTime);
+    }
+
+    const std::unique_ptr<AbstractStreamServerSocket>& serverSocket()
+    {
+        return m_serverSocket;
     }
 
 private:
@@ -282,6 +305,80 @@ TEST_F(PerformanceMultipleServerSocket, single_tcp_socket_blocking_accept)
 }
 
 TEST_F(PerformanceMultipleServerSocket, regular_tcp_server_socket)
+{
+    givenTcpServerSocket();
+    const auto testResult = measurePerformance();
+    printResults(testResult);
+}
+
+//-------------------------------------------------------------------------------------------------
+// PerformanceMultipleServerSocketAsyncAccept
+
+class PerformanceMultipleServerSocketAsyncAccept:
+    public PerformanceMultipleServerSocket
+{
+public:
+    PerformanceMultipleServerSocketAsyncAccept():
+        m_isCancelled(nullptr),
+        m_testDurationLimit(0)
+    {
+    }
+
+protected:
+    void runAcceptLoop(
+        std::chrono::milliseconds testDurationLimit,
+        bool* isCancelled) override
+    {
+        using namespace std::chrono;
+        using namespace std::placeholders;
+        
+        m_startTime = steady_clock::now();
+        m_isCancelled = isCancelled;
+        m_testDurationLimit = testDurationLimit;
+        serverSocket()->acceptAsync(
+            std::bind(&PerformanceMultipleServerSocketAsyncAccept::onConnectionAccepted, this, _1, _2));
+
+        m_testDone.get_future().wait();
+    }
+
+private:
+    bool* m_isCancelled;
+    std::chrono::milliseconds m_testDurationLimit;
+    std::chrono::steady_clock::time_point m_startTime;
+    nx::utils::promise<void> m_testDone;
+
+    void onConnectionAccepted(
+        SystemError::ErrorCode sysErrorCode,
+        AbstractStreamSocket* clientSocket)
+    {
+        using namespace std::chrono;
+        using namespace std::placeholders;
+
+        if ((steady_clock::now() >= (m_startTime + m_testDurationLimit)) ||
+            *m_isCancelled)
+        {
+            m_testRunDuration = duration_cast<milliseconds>(steady_clock::now() - m_startTime);
+            m_testDone.set_value();
+            return;
+        }
+
+        if (clientSocket)
+            ++m_socketsAccepted;
+        delete clientSocket;
+
+        serverSocket()->acceptAsync(
+            std::bind(&PerformanceMultipleServerSocketAsyncAccept::onConnectionAccepted, this, _1, _2));
+    }
+};
+
+TEST_F(PerformanceMultipleServerSocketAsyncAccept, single_tcp_socket)
+{
+    givenMultipleServerSocketWithATcpServerSocket();
+    const auto testResult = measurePerformance();
+    printResults(testResult);
+}
+
+TEST_F(PerformanceMultipleServerSocketAsyncAccept, regular_tcp_server_socket)
 {
     givenTcpServerSocket();
     const auto testResult = measurePerformance();
