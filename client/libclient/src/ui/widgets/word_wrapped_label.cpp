@@ -1,6 +1,6 @@
 #include "word_wrapped_label.h"
 
-QnWordWrappedLabel::QnWordWrappedLabel(QWidget *parent /* = 0*/):
+QnWordWrappedLabel::QnWordWrappedLabel(QWidget* parent):
     QWidget(parent),
     m_label(new QLabel(this))
 {
@@ -9,43 +9,53 @@ QnWordWrappedLabel::QnWordWrappedLabel(QWidget *parent /* = 0*/):
     connect(m_label, &QLabel::linkActivated, this, &QnWordWrappedLabel::linkActivated);
 }
 
-QLabel* QnWordWrappedLabel::label() const {
+QLabel* QnWordWrappedLabel::label() const
+{
     return m_label;
 }
 
-void QnWordWrappedLabel::resizeEvent(QResizeEvent * event) {
+void QnWordWrappedLabel::resizeEvent(QResizeEvent* event)
+{
     m_label->setGeometry(0, 0, event->size().width(), event->size().height());
     updateGeometry();
 }
 
-QSize QnWordWrappedLabel::sizeHint() const {
+QSize QnWordWrappedLabel::sizeHint() const
+{
     return QSize(
         m_label->sizeHint().width(),
         m_label->heightForWidth(this->geometry().width()));
 }
 
-QSize QnWordWrappedLabel::minimumSizeHint() const {
+QSize QnWordWrappedLabel::minimumSizeHint() const
+{
     return sizeHint();
 }
 
-QString QnWordWrappedLabel::text() const {
+QString QnWordWrappedLabel::text() const
+{
     return m_label->text();
 }
 
-void QnWordWrappedLabel::setText(const QString &value) {
+void QnWordWrappedLabel::setText(const QString& value)
+{
     if (text() == value)
         return;
+
     m_label->setText(value);
     updateGeometry();
 }
 
-Qt::TextFormat QnWordWrappedLabel::textFormat() const {
+Qt::TextFormat QnWordWrappedLabel::textFormat() const
+{
     return m_label->textFormat();
 }
 
-void QnWordWrappedLabel::setTextFormat( Qt::TextFormat value ) {
+void QnWordWrappedLabel::setTextFormat(Qt::TextFormat value)
+{
     if (textFormat() == value)
         return;
+
     m_label->setTextFormat(value);
     updateGeometry();
 }
