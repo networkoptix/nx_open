@@ -48,7 +48,7 @@ Pane
             selectionAllowed: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
             activeFocusOnTab: true
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             rightPadding: chooseHostButton.visible ? chooseHostButton.width : 8
 
             IconButton
@@ -103,7 +103,7 @@ Pane
                 visible: authenticationDataAccessor.count > 1
             }
 
-            onAccepted: KeyNavigation.tab.forceActiveFocus()
+            onAccepted: nextItemInFocusChain(true).forceActiveFocus()
             onActiveFocusChanged:
             {
                 if (activeFocus)
