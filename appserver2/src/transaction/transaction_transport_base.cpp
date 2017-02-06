@@ -784,22 +784,26 @@ void QnTransactionTransportBase::receivedTransaction(
 
 void QnTransactionTransportBase::transactionProcessed()
 {
-    QnMutexLocker lock( &m_mutex );
+    post(
+        [this]()
+        {
+            QnMutexLocker lock(&m_mutex);
 
-    --m_postedTranCount;
-    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
-        m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
-    if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
-        m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
-        m_state > ReadyForStreaming )
-    {
-        return;
-    }
+            --m_postedTranCount;
+            if (m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME)
+                m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
+            if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
+                m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
+                m_state > ReadyForStreaming)
+            {
+                return;
+            }
 
-    NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
+            NX_ASSERT(m_incomingDataSocket || m_outgoingDataSocket);
 
-    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-    scheduleAsyncRead();
+            m_readBuffer.reserve(m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE);
+            scheduleAsyncRead();
+        });
 }
 
 QnUuid QnTransactionTransportBase::connectionGuid() const
@@ -1522,13 +1526,16 @@ bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Valu
 
 void QnTransactionTransportBase::scheduleAsyncRead()
 {
-    if( !m_incomingDataSocket )
+    if (!m_incomingDataSocket)
         return;
+
+    NX_ASSERT(isInSelfAioThread());
+    NX_ASSERT(!m_asyncReadScheduled);
 
     using namespace std::placeholders;
     m_incomingDataSocket->readSomeAsync(
         &m_readBuffer,
-        std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
+        std::bind(&QnTransactionTransportBase::onSomeBytesRead, this, _1, _2));
     m_asyncReadScheduled = true;
     m_lastReceiveTimer.restart();
 }
@@ -1538,20 +1545,23 @@ void QnTransactionTransportBase::startListeningNonSafe()
     NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
     m_httpStreamReader.resetState();
 
-    if( m_incomingDataSocket )
-    {
-        using namespace std::chrono;
-        m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(
-            duration_cast<milliseconds>(kSocketSendTimeout).count());
-        m_incomingDataSocket->setNonBlockingMode(true);
-        using namespace std::placeholders;
-        m_lastReceiveTimer.restart();
-        m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-        m_incomingDataSocket->readSomeAsync(
-            &m_readBuffer,
-            std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
-    }
+    post(
+        [this]()
+        {
+            using namespace std::chrono;
+            using namespace std::placeholders;
+
+            if (!m_incomingDataSocket)
+                return;
+
+            m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_incomingDataSocket->setSendTimeout(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());
+            m_incomingDataSocket->setNonBlockingMode(true);
+            m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
+
+            scheduleAsyncRead();
+        });
 }
 
 void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )

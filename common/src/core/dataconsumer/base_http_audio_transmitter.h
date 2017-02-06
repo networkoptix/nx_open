@@ -47,7 +47,7 @@ protected:
 
     bool startTransmission();
 
-private slots:
+private:
     void at_requestHeadersHasBeenSent(
         nx_http::AsyncHttpClientPtr httpClient,
         bool isRetryAfterUnauthorizedResponse);

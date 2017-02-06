@@ -98,7 +98,15 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_exportLicensesButton = new QPushButton(ui->groupBox);
+    QString alertText = tr("You do not have a valid license installed.") + L' ';
+    alertText += QnAppInfo::freeLicenseCount() > 0
+        ? tr("Please activate your commercial or trial license.")
+        : tr("Please activate your commercial license.");
+    ui->alertBar->setText(alertText);
+    ui->alertBar->setReservedSpace(false);
+    ui->alertBar->setVisible(false);
+
+    m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
     auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
@@ -230,6 +238,8 @@ void QnLicenseManagerWidget::updateLicenses()
 
     /* Update grid. */
     m_model->updateLicenses(m_licenses);
+    ui->licensesGroupBox->setVisible(!m_licenses.isEmpty());
+    ui->alertBar->setVisible(m_licenses.isEmpty());
 
     /* Update info label. */
     if (!m_licenses.isEmpty())
@@ -277,20 +287,6 @@ void QnLicenseManagerWidget::updateLicenses()
             }
         }
         ui->infoLabel->setText(messages.join(lit("<br/>")));
-    }
-    else
-    {
-        if (qnLicensePool->currentHardwareId().isEmpty())
-        {
-            ui->infoLabel->setText(tr("Obtaining licenses from server..."));
-        }
-        else
-        {
-            QString text = (QnAppInfo::freeLicenseCount() > 0)
-                ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
-                : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
-            ui->infoLabel->setText(setWarningStyleHtml(text));
-        }
     }
 
     updateButtons();
