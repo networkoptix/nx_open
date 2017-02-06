@@ -84,7 +84,12 @@ void AsyncClient::addConnectionTimer(
 {
     QnMutexLocker lock(&m_mutex);
     if (m_state != State::connected)
+    {
+        NX_LOGX(lm("Ignore timer from client(%1), state is %2")
+            .strs(client, static_cast<int>(m_state)), cl_logDEBUG1);
+     
         return;
+    }
 
     const auto timer = m_connectionTimers.emplace(
         client, std::make_unique<network::aio::Timer>(getAioThread())).first;
@@ -432,6 +437,9 @@ void AsyncClient::processMessage(Message message)
 void AsyncClient::startTimer(
     ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler)
 {
+    NX_LOGX(lm("Set timer(%1) for client(%2) after %3")
+        .strs(timer->second, timer->first, period), cl_logDEBUG2);
+    
     timer->second->start(
         period,
         [this, client = timer->first, period, handler = std::move(handler)]() mutable

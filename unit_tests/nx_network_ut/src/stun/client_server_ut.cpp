@@ -144,12 +144,12 @@ TEST_F(StunClientServerTest, Connectivity)
     std::atomic<size_t> timerTicks;
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ(1, server->connectionCount());
 
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
     std::this_thread::sleep_for(timerPeriod * 5);
     EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
 
@@ -163,11 +163,11 @@ TEST_F(StunClientServerTest, Connectivity)
 
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     EXPECT_EQ(1, server->connectionCount());
 
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
     std::this_thread::sleep_for(timerPeriod * 5);
     EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
 }

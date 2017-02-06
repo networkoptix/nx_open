@@ -1,8 +1,7 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/test_support/sync_queue.h>
+#include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
-
 #include <nx/utils/std/cpp14.h>
 
 #include <rest/ec2_update_http_handler.h>
@@ -11,15 +10,6 @@
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
-
-// Config for debugging the tests.
-static const struct
-{
-    const bool enableHangOnFinish = false;
-    const bool forceLog = false;
-    const bool logRequestJson = false;
-} conf{};
-#include <nx/utils/test_support/test_utils.h>
 
 namespace ec2 {
 namespace test {
@@ -135,8 +125,8 @@ public:
     MockConnection(QueryCallback queryCallback, UpdateCallback updateCallback):
         m_queryCallback(queryCallback), m_updateCallback(updateCallback)
     {
-        ASSERT(queryCallback);
-        ASSERT(updateCallback);
+        NX_CRITICAL(queryCallback, "[TEST]");
+        NX_CRITICAL(updateCallback, "[TEST]");
     }
 
     template<class InputData, class OutputData, class HandlerType>
@@ -146,7 +136,8 @@ public:
     }
 
     template<class HandlerType>
-    void processUpdateAsync(ApiCommand::Value cmdCode, const ApiMockData& tranData, HandlerType handler)
+    void processUpdateAsync(
+        ApiCommand::Value cmdCode, const ApiMockData& tranData, HandlerType handler)
     {
         m_updateCallback(cmdCode, tranData, handler);
     }
@@ -181,11 +172,11 @@ public:
         const ApiMockData& existingData,
         const ApiMockData& expectedData)
     {
-        LOG(lit("=============================================================================="));
-        LOG(lit("line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
-
-        if (conf.logRequestJson)
-            LOG(lit("JSON: %1").arg(requestJson.json.constData()));
+        NX_LOG(lit("[TEST] ====================================================================="),
+            cl_logINFO);
+        NX_LOG(lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
+            cl_logINFO);
+        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
 
         m_requestJson = requestJson;
         m_existingData = existingData;
@@ -223,12 +214,13 @@ public:
         const ApiMockDataJson& requestJson,
         const ApiMockData& existingData)
     {
-        LOG(lit("=============================================================================="));
-        LOG(lit("line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString));
-        if (conf.logRequestJson)
-            LOG(lit("JSON: %1").arg(requestJson.json.constData()));
+        NX_LOG(lit("[TEST] ====================================================================="),
+            cl_logINFO);
+        NX_LOG(lit("[TEST] line %1: %2").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
+            cl_logINFO);
+        NX_LOG(lit("[TEST] JSON: %1").arg(requestJson.json.constData()), cl_logDEBUG1);
 
-        ASSERT(requestJson.isIncomplete);
+        NX_CRITICAL(requestJson.isIncomplete, "[TEST]");
 
         m_requestJson = requestJson;
         m_existingData = existingData;
@@ -254,10 +246,9 @@ public:
     }
 
 private:
-    void handleQuery(ApiCommand::Value cmdCode, QnUuid input, MockConnection::QueryHandler handler)
+    void handleQuery(
+        ApiCommand::Value /*command*/, QnUuid input, MockConnection::QueryHandler handler)
     {
-        QN_UNUSED(cmdCode);
-
         ASSERT_FALSE(m_wasHandleQueryCalled) << "handleQuery() called twice";
         m_wasHandleQueryCalled = true;
         ASSERT_TRUE((bool) m_requestJson.id) << "handleQuery() called but Id omitted from json";
@@ -276,20 +267,21 @@ private:
         handler(ErrorCode::ok, list);
     }
 
-    void handleUpdate(ec2::ApiCommand::Value command, const ApiMockData& tranData, MockConnection::UpdateHandler handler)
+    void handleUpdate(
+        ApiCommand::Value command, const ApiMockData& data, MockConnection::UpdateHandler handler)
     {
         ASSERT_FALSE(m_wasHandleUpdateCalled) << "handleUpdate() called twice";
         m_wasHandleUpdateCalled = true;
-        ASSERT(command == kMockApiCommand);
+        NX_CRITICAL(command == kMockApiCommand, "[TEST]");
 
-        LOG(lit("Transaction: %1").arg(tranData.toJsonString().c_str()));
+        NX_LOG(lit("[TEST] Transaction: %1").arg(data.toJsonString().c_str()), cl_logINFO);
 
-        if (m_expectedData != tranData)
+        if (m_expectedData != data)
         {
             ADD_FAILURE() << "Expected ApiMockData:\n"
                 << m_expectedData.toJsonString() << "\n"
                 << "Actual ApiMockData:\n"
-                << tranData.toJsonString();
+                << data.toJsonString();
         }
 
         handler(ErrorCode::ok);
@@ -299,8 +291,16 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket{new MockStreamSocket()};
 
     std::shared_ptr<MockConnection> m_connection{new MockConnection(
-        std::bind(&StructMergingTest::handleQuery, this, _1, _2, _3),
-        std::bind(&StructMergingTest::handleUpdate, this, _1, _2, _3))};
+        [this](ApiCommand::Value command, QnUuid input, MockConnection::QueryHandler handler)
+        {
+            handleQuery(command, input, handler);
+        },
+        [this](ApiCommand::Value command, const ApiMockData& data,
+            MockConnection::UpdateHandler handler)
+        {
+            handleUpdate(command, data, handler);
+        }
+    )};
 
     QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ nullptr};
 
@@ -374,7 +374,6 @@ TEST_F(RestApiTest, StructMerging)
 
     #undef E
     #undef T
-    finishTest(HasFailure());
 }
 
 } // namespace test

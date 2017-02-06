@@ -512,40 +512,14 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    //QString maxFreeSpaceDrive;
-    //int maxFreeSpace = 0;
-
-    for (const QFileInfo& drive: QDir::drives()) {
-        if (!drive.isWritable())
+    for (const WinDriveInfo& drive: getWinDrivesInfo()) 
+    {
+        if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
             continue;
-
-
-        QString path = drive.absolutePath();
-
-        if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
-            continue;
-
-        folderPaths.append(QDir::toNativeSeparators(path) + QnAppInfo::mediaFolderName());
-        /*
-        int freeSpace = freeGB(path);
-
-        if (maxFreeSpaceDrive.isEmpty() || freeSpace > maxFreeSpace) {
-            maxFreeSpaceDrive = path;
-            maxFreeSpace = freeSpace;
-        }
-
-        if (freeSpace >= 100) {
-            NX_LOG(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
-            folderPaths.append(path + QnAppInfo::mediaFolderName());
-        }
-        */
-    }
-    /*
-    if (folderPaths.isEmpty()) {
-        NX_LOG(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
-        folderPaths.append(maxFreeSpaceDrive + QnAppInfo::mediaFolderName());
-    }
-    */
+        
+        folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
+     }
+ 
 #endif
 
 #ifdef Q_OS_LINUX
@@ -2669,7 +2643,6 @@ void MediaServerProcess::run()
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     auto upnpPortMapper = initializeUpnpPortMapper();
-    updateAddressesList();
 
     qDebug() << "start loading resources";
     QElapsedTimer tt;
@@ -2686,6 +2659,8 @@ void MediaServerProcess::run()
 
     qnGlobalSettings->initialize();
 
+    updateAddressesList();
+
     auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
 
@@ -2694,7 +2669,9 @@ void MediaServerProcess::run()
     BeforeRestoreDbData::clearSettings(settings);
 
     addFakeVideowallUser();
-    initStoragesAsync(messageProcessor.data());
+
+    if (!MSSettings::roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
+        initStoragesAsync(messageProcessor.data());
 
     if (!QnPermissionsHelper::isSafeMode())
     {
