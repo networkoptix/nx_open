@@ -26,11 +26,14 @@ nx_configure_file(
     ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
     ${CMAKE_CURRENT_BINARY_DIR})
 
+file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
+
 add_library(client
     ${CPP_FILES} ${MOC_FILES} ${UIC_FILES}
     ${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp
     src/StdAfx.cpp src/StdAfx.h
-    ${CMAKE_CURRENT_BINARY_DIR}/libclient.qrc)
+    ${CMAKE_CURRENT_BINARY_DIR}/libclient.qrc
+    ${QML_FILES})
 
 add_precompiled_header(client src/StdAfx.h FORCEINCLUDE)
 
