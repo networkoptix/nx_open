@@ -739,7 +739,9 @@
                 "Honeywell|H4D2S2",
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
-                "Honeywell|HDZ302LIW"
+                "Honeywell|HDZ302LIW",
+
+                "Dahua|DH-SD6AL240-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },
