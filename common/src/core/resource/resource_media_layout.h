@@ -3,13 +3,14 @@
 
 #include <memory>
 
+#include <boost/optional/optional.hpp>
+
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
 #include <core/datapacket/abstract_media_context.h>
-
 #include <common/common_globals.h>
 
 class QnResourceLayout {
@@ -144,7 +145,7 @@ public:
 protected:
     QVector<int> m_channels;
     QSize m_size;
-    mutable int m_cachedChannelCount;
+    mutable boost::optional<int> m_cachedChannelCount;
 };
 
 #endif // QN_RESOURCE_LAYOUT_H

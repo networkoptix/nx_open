@@ -1,15 +1,8 @@
 #include "resource_media_layout.h"
 
-namespace {
-
-const int kInvalidChannelCount = -1;
-
-} // namespace
-
-
 QnCustomResourceVideoLayout::QnCustomResourceVideoLayout(const QSize &size) :
     m_size(size),
-    m_cachedChannelCount(kInvalidChannelCount)
+    m_cachedChannelCount(boost::none)
 {
     m_channels.resize(m_size.width() * m_size.height());
 }
@@ -55,8 +48,8 @@ QString QnCustomResourceVideoLayout::toString() const
 
 int QnCustomResourceVideoLayout::channelCount() const 
 {
-    if (m_cachedChannelCount != kInvalidChannelCount)
-        return m_cachedChannelCount;
+    if (m_cachedChannelCount)
+        return m_cachedChannelCount.get();
     
     int count = 0;
     for (const auto& channel: m_channels)
@@ -87,7 +80,7 @@ void QnCustomResourceVideoLayout::setChannel(int x, int y, int channel)
 
 void QnCustomResourceVideoLayout::setChannel(int index, int channel)
 {
-    m_cachedChannelCount = kInvalidChannelCount;
+    m_cachedChannelCount = boost::none;
     if (index >= m_size.width() * m_size.height())
         return;
     m_channels[index] = channel;
