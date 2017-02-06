@@ -6,10 +6,10 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <QtCore/QMutexLocker>
+#include <nx/utils/thread/mutex.h>
 
 #include "decoders/abstractvideodecoderplugin.h"
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 
 VideoDecoderSwitcher::VideoDecoderSwitcher(
@@ -25,7 +25,7 @@ VideoDecoderSwitcher::VideoDecoderSwitcher(
 }
 
 //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
-PixelFormat VideoDecoderSwitcher::GetPixelFormat() const
+AVPixelFormat VideoDecoderSwitcher::GetPixelFormat() const
 {
     return m_decoder->GetPixelFormat();
 }
@@ -37,9 +37,9 @@ QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType(
 }
 
 //!Implementation of QnAbstractVideoDecoder::decode
-bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
+bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     bool res = false;
     for( int i = 0; i < 2; ++i )
@@ -47,7 +47,7 @@ bool VideoDecoderSwitcher::decode( const QnConstCompressedVideoDataPtr data, QSh
         //performing following condition check before and after m_decoder->decode call
         if( m_switchToSWDecoding && data && (data->flags & AV_PKT_FLAG_KEY) )
         {
-            m_decoder.reset( new CLFFmpegVideoDecoder( data->compressionType, data, true, NULL ) ); //TODO/IMPL 3rd and 4th params
+            m_decoder.reset( new QnFfmpegVideoDecoder( data->compressionType, data, true, NULL ) ); //TODO/IMPL 3rd and 4th params
             m_switchToSWDecoding = false;
         }
 
@@ -114,7 +114,7 @@ const AVFrame* VideoDecoderSwitcher::lastFrame() const
 }
 
 //!Implementation of QnAbstractVideoDecoder::resetDecoder
-void VideoDecoderSwitcher::resetDecoder( QnConstCompressedVideoDataPtr data )
+void VideoDecoderSwitcher::resetDecoder( const QnConstCompressedVideoDataPtr& data )
 {
     return m_decoder->resetDecoder( data );
 }
@@ -132,7 +132,7 @@ unsigned int VideoDecoderSwitcher::getDecoderCaps() const
 
 void VideoDecoderSwitcher::setSpeed( float newValue )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( m_decoder.get() )
         m_decoder->setSpeed( newValue );
@@ -162,7 +162,7 @@ void VideoDecoderSwitcher::setHWDecoder( QnAbstractVideoDecoder* hwDecoder )
 //!Switches to ffmpeg decoder, destroys hardware decoder object
 void VideoDecoderSwitcher::switchToSoftwareDecoding()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_switchToSWDecoding = true;
 }
 

@@ -9,14 +9,16 @@
 #include <QtCore/QSize>
 #include <QtCore/QStringList>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "camera_manager.h"
+#include "plugin.h"
+#include "settings.h"
 #include "stream_reader.h"
 
 
 static const QLatin1String localhost( "127.0.0.1" );
-static const int DEFAULT_ISD_PORT = 80;
+static const int DEFAULT_ISD_PORT = 8127;
 static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
@@ -37,13 +39,21 @@ static QStringList getValues(const QString& line)
 }
 
 
+
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
-    unsigned int encoderNum )
+    unsigned int encoderNum
+#ifndef NO_ISD_AUDIO
+    , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+    )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
+#ifndef NO_ISD_AUDIO
+    m_audioStreamReader( audioStreamReader ),
+#endif
     m_motionMask( nullptr ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
@@ -190,8 +200,34 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
         bitrateKbps = (int64_t)bitrateKbps * MAX_FPS / m_currentFps;
     }
 #endif
+
+    float vbrMinCoeff = 0.0;
+    float vbrMaxCoeff = 0.0;
+    if( m_encoderNum == 0 )
+    {
+        //hi quality
+        vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::hiVbrMinPercent, isd_edge_settings::hiVbrMinPercentDefault ) / 100.0;
+        vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::hiVbrMaxPercent, isd_edge_settings::hiVbrMaxPercentDefault ) / 100.0;
+    }
+    else
+    {
+        //lo quality
+        vbrMinCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::loVbrMinPercent, isd_edge_settings::loVbrMinPercentDefault ) / 100.0;
+        vbrMaxCoeff = IsdNativePlugin::instance()->getSetting<int>(
+            isd_edge_settings::loVbrMaxPercent, isd_edge_settings::loVbrMaxPercentDefault ) / 100.0;
+    }
+
     //std::cout<<"MediaEncoder::setBitrate "<<bitrateKbps<<" Kbps"<<std::endl;
-    return setCameraParam( QString::fromLatin1("VideoInput.1.h264.%1.BitRate=%2\r\n").arg(m_encoderNum+1).arg(bitrateKbps) );
+    QString result;
+    QTextStream t(&result);
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateControl=vbr\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMin=" << (int)(bitrateKbps * vbrMinCoeff) << "\r\n";
+    t << "VideoInput.1.h264."<<(m_encoderNum+1)<<".BitrateVariableMax=" << (int)(bitrateKbps * vbrMaxCoeff) << "\r\n";    //*1.2
+    t.flush();
+    return setCameraParam( result );
 }
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
@@ -200,6 +236,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
         m_streamReader.reset( new StreamReader(
             &m_refManager,
             m_encoderNum,
+#ifndef NO_ISD_AUDIO
+            m_audioStreamReader,
+#endif
             m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
@@ -211,17 +250,26 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 
 int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
 {
-    if( !m_streamReader.get() ) {
-        m_streamReader.reset( new StreamReader(
-            &m_refManager,
-            m_encoderNum,
-            m_cameraManager->info().uid ) );
-        if (m_motionMask)
-            m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
-        m_streamReader->setAudioEnabled( m_audioEnabled );
-    }
+#ifndef NO_ISD_AUDIO
+    if( !m_audioStreamReader->isAudioAvailable() )
+        return nxcip::NX_IO_ERROR;
+    *audioFormat = m_audioStreamReader->getAudioFormat();
+    return nxcip::NX_NO_ERROR;
+#else
+    return nxcip::NX_NOT_IMPLEMENTED;
+#endif
+    //if( !m_streamReader.get() ) {
+    //    m_streamReader.reset( new StreamReader(
+    //        &m_refManager,
+    //        m_encoderNum,
+    //        m_audioStreamBridge,
+    //        m_cameraManager->info().uid ) );
+    //    if (m_motionMask)
+    //        m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
+    //    m_streamReader->setAudioEnabled( m_audioEnabled );
+    //}
 
-    return m_streamReader->getAudioFormat( audioFormat );
+    //return m_streamReader->getAudioFormat( audioFormat );
 }
 
 void MediaEncoder::setMotionMask( nxcip::Picture* motionMask )
@@ -278,7 +326,7 @@ int MediaEncoder::getSupportedFps() const
         m_supportedFpsList.push_back(fpsS.trimmed().toFloat());
     m_fpsListRead = true;
 
-    qSort( m_supportedFpsList.begin(), m_supportedFpsList.end(), qGreater<float>() );
+    std::sort( m_supportedFpsList.begin(), m_supportedFpsList.end(), std::greater<float>() );
     return nxcip::NX_NO_ERROR;
 }
 

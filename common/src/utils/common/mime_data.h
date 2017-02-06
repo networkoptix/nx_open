@@ -13,15 +13,15 @@ public:
     QnMimeData() {}
 
     explicit QnMimeData(const QMimeData *data) {
-        foreach(const QString &format, data->formats())
+        for(const QString &format: data->formats())
             setData(format, data->data(format));
     }
 
     void toMimeData(QMimeData *data) const {
-        foreach(const QString &format, data->formats())
+        for(const QString &format: data->formats())
             data->removeFormat(format);
 
-        foreach(const QString &format, this->formats())
+        for(const QString &format: this->formats())
             data->setData(format, this->data(format));
     }
     

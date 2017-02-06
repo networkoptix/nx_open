@@ -1,0 +1,12 @@
+#pragma once
+
+struct QnMultiserverRequestData;
+struct QnChunksRequestData;
+struct QnGetBookmarksRequestData;
+struct QnGetBookmarkTagsRequestData;
+struct QnUpdateBookmarkRequestData;
+struct QnDeleteBookmarkRequestData;
+struct QnThumbnailRequestData;
+struct QnSendStatisticsRequestData;
+struct QnUpdateFreeSpaceReply;
+struct QnCloudHostCheckReply;

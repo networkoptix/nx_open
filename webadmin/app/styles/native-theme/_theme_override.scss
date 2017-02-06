@@ -1,0 +1,254 @@
+/* Here we override some default bootstrap styles and behavior for our purposes */
+
+
+@import '_theme_variables';
+
+/*
+These hacks are to make header and dialog have a bit different colors
+
+.panel-heading{
+  border:1px solid $dark12;
+}
+.panel-body{
+  border:1px solid $dark14;
+  border-top-color:transparent;
+}
+
+.panel-footer{
+  border:1px solid $dark14;
+}
+*/
+
+.panel-heading{
+  border-top-left-radius: $panel-border-radius;
+  border-top-right-radius: $panel-border-radius;
+  font-weight:bold;
+
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+.panel-body{
+  border-bottom: 1px solid $shadow;
+}
+.panel-footer{
+  padding-top: 14px;
+  padding-bottom: 16px;
+  min-height:59px;
+
+  border-top:1px solid $dark;
+  border-bottom-left-radius: $panel-border-radius;
+  border-bottom-right-radius: $panel-border-radius;
+}
+
+.form-control:focus{
+  border-color: $brand_d4;
+  box-shadow: none;
+}
+
+
+.help-block {
+  color: $windowText; // lighten the text some for contrast
+  font-size: 90%;
+  margin-top:4px;
+  margin-bottom:16px;
+}
+
+h4{
+  font-weight: 500;
+  margin-top:8px;
+  margin-bottom:16px;
+}
+
+
+button, select{
+  &,
+  &:focus,
+  &:hover,
+  &:active,
+  &.active,
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly]{
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+  }
+}
+
+
+button, select, .form-control{
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-color: $input-border;
+    box-shadow: none;
+  }
+}
+
+.btn{
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.btn-default{
+
+  border-bottom: 1px solid $button_d2;
+
+  &:focus{
+    background-color: $button;
+    border-color: $brand_d4;
+  }
+
+  &:hover{
+    background-color: $button_l1;
+    border-color: $button_l1;
+    border-bottom-color:$button_d1;
+  }
+
+  &:active,
+  &.active {
+    background-color: $button_d1;
+    border-color: $button_d1;
+    border-top-color: $button_d3;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.3;
+    }
+  }
+}
+.btn-primary{ /* $color, $background, $border */
+
+  border-bottom: 1px solid $brand_d3;
+
+  &:focus{
+    background-color: $brand_core;
+    border-color: $brand_l4;
+  }
+
+  &:hover{
+    background-color: $brand_l1;
+    border-color: $brand_l1;
+    border-bottom-color:$brand_d2;
+  }
+
+  &:active,
+  &.active {
+    background-color: $brand_d1;
+    border-color: $brand_d1;
+    border-top-color:$brand_d3;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  &.disabled,
+  &[disabled],
+  fieldset[disabled] & {
+    &,
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+      opacity: 0.2;
+    }
+  }
+}
+
+.form-control {
+
+  font-size: 14px;
+
+  &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    opacity: 0.5;
+    color: $text;
+  }
+  &::-moz-placeholder { /* Firefox 19+ */
+    opacity: 0.5;
+    color: $text;
+  }
+  &:-ms-input-placeholder { /* IE 10+ */
+    opacity: 0.5;
+    color: $text;
+  }
+  &:-moz-placeholder { /* Firefox 18- */
+    opacity: 0.5;
+    color: $text;
+  }
+
+
+
+  fieldset[disabled] &,
+  &[disabled],
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  &:focus{
+    border-color: $shadow_d3 !important;
+    background-color: $shadow_d1;
+    box-shadow: inset 0px 1px 0px 0px $shadow_d3;
+  }
+
+  &[readonly]
+  {
+    border-color: transparentize($shadow,0.6);
+    cursor: default;
+  }
+}
+
+input[type="radio"], input[type="checkbox"] {
+  margin-top: 3px;
+}
+.radio, .checkbox {
+  padding-left: 22px;
+  label{
+    color: $light;
+
+    input:checked + span {
+      color: $text;
+    }
+
+    &:hover,
+    input:hover + span
+    {
+      color:$light_l2
+    }
+
+    &:hover input:checked + span,
+    input:checked:hover + span {
+      color: $brightText;
+    }
+
+  }
+}
+.radio input[type="radio"], .radio-inline input[type="radio"],
+.checkbox input[type="checkbox"], .checkbox-inline input[type="checkbox"] {
+   margin-left: -22px;
+
+}
+.dropdown-menu {
+  padding: 2px 0;
+  border:none;
+  @include box-shadow(0 10px 20px transparentize($dark4,0.5));
+  &> li > a {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}

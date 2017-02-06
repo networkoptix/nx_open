@@ -10,17 +10,9 @@
 QnRemotePtzController::QnRemotePtzController(const QnNetworkResourcePtr &resource):
     base_type(resource),
     m_resource(resource),
-    m_sequenceId(QUuid::createUuid()),
+    m_sequenceId(QnUuid::createUuid()),
     m_sequenceNumber(1)
 {
-    m_server = m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
-    if(!m_server) {
-        /* Apparently this really does happen... */
-        qnWarning("No parent server for network resource '%1'.", resource->getName());
-        return;
-    }
-
-    connect(resource.data(), &QnResource::ptzCapabilitiesChanged, this, [this]{ emit changed(Qn::CapabilitiesPtzField); });
 }
 
 QnRemotePtzController::~QnRemotePtzController() {
@@ -40,8 +32,12 @@ Qn::PtzCapabilities QnRemotePtzController::getCapabilities() {
     return result;
 }
 
+QnMediaServerResourcePtr QnRemotePtzController::getMediaServer() const {
+    return m_resource->getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
 bool QnRemotePtzController::isPointless(Qn::PtzCommand command) {
-    if(!m_server)
+    if(!getMediaServer())
         return true;
 
     Qn::ResourceStatus status = m_resource->getStatus();
@@ -62,9 +58,13 @@ int QnRemotePtzController::nextSequenceNumber() {
         if(isPointless(command))                                                \
             return false;                                                       \
                                                                                 \
-        int handle = m_server->apiConnection()->FUNCTION(m_resource, ##__VA_ARGS__, this, SLOT(at_replyReceived(int, const QVariant &, int))); \
+        auto server = getMediaServer();                                         \
+        if (!server)                                                            \
+            return false;                                                       \
                                                                                 \
-        QMutexLocker locker(&m_mutex);                                          \
+        int handle = server->apiConnection()->FUNCTION(m_resource, ##__VA_ARGS__, this, SLOT(at_replyReceived(int, const QVariant &, int))); \
+                                                                                \
+        QnMutexLocker locker( &m_mutex );                                       \
         m_dataByHandle[handle] = PtzCommandData(command, QVariant::fromValue(RETURN_VALUE)); \
         return true;                                                            \
     }
@@ -147,6 +147,7 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
 }
 
 bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+    Q_UNUSED(auxilaryTraits)
     RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QVariant(), ptzGetAuxilaryTraitsAsync);
 }
 
@@ -164,7 +165,7 @@ bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
 void QnRemotePtzController::at_replyReceived(int status, const QVariant &reply, int handle) {
     PtzCommandData data;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         auto pos = m_dataByHandle.find(handle);
         if(pos == m_dataByHandle.end())

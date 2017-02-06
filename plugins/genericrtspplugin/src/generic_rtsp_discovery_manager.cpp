@@ -5,6 +5,7 @@
 
 #include "generic_rtsp_discovery_manager.h"
 
+#include <atomic>
 #include <cstring>
 
 #include <QCryptographicHash>
@@ -25,7 +26,7 @@ void* GenericRTSPDiscoveryManager::queryInterface( const nxpl::NX_GUID& interfac
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
     {
         addRef();
-        return this;
+        return static_cast<nxcip::CameraDiscoveryManager*>(this);
     }
     if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
     {
@@ -52,9 +53,25 @@ void GenericRTSPDiscoveryManager::getVendorName( char* buf ) const
     strcpy( buf, VENDOR_NAME );
 }
 
-int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* /*cameras*/, const char* /*localInterfaceIPAddr*/ )
+int GenericRTSPDiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
+#if 0
+    static const char* rtspUrl = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+
+    memset( &cameras[0], 0, sizeof(cameras[0]) );
+    const QByteArray& uidStr = QCryptographicHash::hash( QByteArray::fromRawData(rtspUrl, strlen(rtspUrl)), QCryptographicHash::Md5 ).toHex();
+    strncpy( cameras[0].uid, uidStr.constData(), sizeof(cameras[0].uid)-1 );
+    strncpy( cameras[0].url, rtspUrl, sizeof(cameras[0].url)-1 );
+
+    static std::atomic<int> seq( 0 );
+    QByteArray auxData = QByteArray("test_aux_data_") + QByteArray::number(++seq);
+    strcpy( cameras[0].auxiliaryData, auxData.constData() );
+    strcpy( cameras[0].modelName, "rtsp_model_name" );
+    
+    return 1;
+#else
     return 0;
+#endif
 }
 
 int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* login, const char* password )

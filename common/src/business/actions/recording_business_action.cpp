@@ -8,21 +8,17 @@ QnRecordingBusinessAction::QnRecordingBusinessAction(const QnBusinessEventParame
 }
 
 int QnRecordingBusinessAction::getFps() const {
-    return m_params.getFps();
+    return m_params.fps;
 }
 
 Qn::StreamQuality QnRecordingBusinessAction::getStreamQuality() const {
-    return m_params.getStreamQuality();
+    return m_params.streamQuality;
 }
 
 int QnRecordingBusinessAction::getRecordDuration() const {
-    return m_params.getRecordDuration();
-}
-
-int QnRecordingBusinessAction::getRecordBefore() const {
-    return m_params.getRecordBefore();
+    return m_params.recordingDuration;
 }
 
 int QnRecordingBusinessAction::getRecordAfter() const {
-    return m_params.getRecordAfter();
+    return m_params.recordAfter;
 }

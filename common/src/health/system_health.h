@@ -1,44 +1,47 @@
-#ifndef SYSTEM_HEALTH_H
-#define SYSTEM_HEALTH_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
+#include "business/business_fwd.h"
+
 namespace QnSystemHealth {
-    enum MessageType {
-        // These messages are generated on the client
-        EmailIsEmpty,
-        NoLicenses,
-        SmtpIsNotSet,
-        UsersEmailIsEmpty,
-        ConnectionLost,
-        NoPrimaryTimeServer,
 
-        // These messages are sent from mediaserver
-        EmailSendError,
-        StoragesNotConfigured,
-        StoragesAreFull,
-        ArchiveRebuildFinished,
+// enum order change is forbidden as leads to stored settings failure.
+//TODO: #GDM refactor settings storage
+enum MessageType
+{
+    // These messages are generated on the client
+    EmailIsEmpty,
+    NoLicenses,
+    SmtpIsNotSet,
+    UsersEmailIsEmpty,  /*< Other user's email is empty. */
+    ConnectionLost,     /*< Current user email is empty. */
+    NoPrimaryTimeServer,
+    SystemIsReadOnly,
 
-        NotDefined,
+    /* These messages are sent from server */
+    EmailSendError,
+    StoragesNotConfigured,
+    StoragesAreFull,
+    ArchiveRebuildFinished,
+    ArchiveRebuildCanceled,
+    ArchiveFastScanFinished,
 
-        MessageTypeCount = ArchiveRebuildFinished
-    };
-}
+    CloudPromo, //local promo message
 
-
-class QnSystemHealthStringsHelper: public QObject {
-    Q_OBJECT
-public:
-    /** Text that is used where the most short common title is required, e.g. in settings. */
-    static QString messageTitle(QnSystemHealth::MessageType messageType);
-
-    /** Text that is used where the short title is required, e.g. in notifications. */
-    static QString messageName(QnSystemHealth::MessageType messageType, QString resourceName = QString());
-
-    /** Text that is used where the full description is required, e.g. in notification hints. */
-    static QString messageDescription(QnSystemHealth::MessageType messageType, QString resourceName = QString());
+    Count
 };
 
+/** Some messages are not to be displayed in any case. */
+bool isMessageVisible(MessageType message);
 
-#endif // SYSTEM_HEALTH_H
+/** Some messages must not be displayed in settings dialog, so user cannot disable them. */
+bool isMessageOptional(MessageType message);
+
+/** Some messages must not be auto-hidden by timeout. */
+bool isMessageLocked(MessageType message);
+
+}
+
+Q_DECLARE_METATYPE(QnSystemHealth::MessageType);

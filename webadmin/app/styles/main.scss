@@ -1,6 +1,63 @@
-$icon-font-path: "/bower_components/sass-bootstrap/fonts/";
+$icon-font-path: "../fonts/";
 
-@import 'sass-bootstrap/lib/bootstrap';
+@import '../bower_components/sass-bootstrap/lib/_variables.scss';
+
+
+@mixin icon{
+  display: inline-block;
+  background-size: 352px 224px;
+  background-image: url('../images/icons/web_wizard_sprite.png');
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/web_wizard_sprite@2x.png');
+  }
+}
+
+@mixin kill-glyphicon{
+  @include icon;
+  &:before{
+    content:none;
+  }
+}
+
+
+.master-icon .preloader{
+  background-image: url('../images/icons/preloader.gif');
+
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('../images/icons/preloader@2x.gif');
+  }
+}
+
+
+$radio-panels-hover-border: transparent;
+$radio-panels-hover-bg: $gray-lighter;
+
+$radio-panels-selected-bg: $gray-lighter;
+$radio-panels-selected-border: $gray-light;
+
+@import 'master';
+
+*{
+  font-family: "Roboto";
+}
+
+/* Space out content a bit */
+body {
+  padding-bottom: 20px;
+  height:100%;
+}
+
+@media only screen and (device-width: 768px) {
+  /*Kill bounce effect*/
+  body,
+  html {
+    position: fixed;
+    width: 100%;
+    overflow:auto;
+    padding-bottom: 0px;
+  }
+}
+
 
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
@@ -9,12 +66,6 @@ $icon-font-path: "/bower_components/sass-bootstrap/fonts/";
     background: #ccc;
     color: #000;
     padding: 0.2em 0;
-}
-
-/* Space out content a bit */
-body {
-    padding-top: 60px;
-    padding-bottom: 60px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -71,9 +122,9 @@ body {
 
 /* Responsive: Portrait tablets and up */
 @media screen and (min-width: 768px) {
-    .container {
-        max-width: 730px;
-    }
+    /* .container {
+        max-width: 800px;
+    } */
 
     /* Remove the padding we set earlier */
     .header,
@@ -106,12 +157,34 @@ body {
 .fixed {
   position: fixed;
 }
+@media screen and (min-height: 1024px) {
+  .fixed-lg {
+    position: fixed;
+  }
+}
 
-/* sidebar */
-.bs-docs-sidebar {
-  padding-left: 20px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+/* help section*/
+.scroll-wrapper{
+  height:100%;
+  position:absolute;
+  top:0;
+  padding-top:57px;
+}
+
+@media screen and (min-height: $screen-sm-min) {
+  body.api-xml{
+    overflow: hidden;
+  }
+
+  .scroll-container {
+    height: 100%;
+    overflow: auto;
+  }
+}
+
+code{
+  display:inline-block;
+  white-space: normal;
 }
 
 /* all links */
@@ -158,13 +231,374 @@ body {
   display: none;
 }
 /* show active nested list */
-.bs-docs-sidebar .nav>.active>ul.nav {
+.bs-docs-sidebar .nav>.active>ul.nav,
+.bs-docs-sidebar .nav>.pinned>ul.nav {
   display: block;
 }
 
-/*Iframe with logs on info page*/
+.bs-docs-sidebar .nav>.active.pinned-hidden>ul.nav{
+  display: none !important;
+}
+
+
+.bs-docs-sidebar .nav .glyphicon:before{
+  content: "\2b";
+  font-size: 70%;
+}
+
+.bs-docs-sidebar .nav>.active .glyphicon:before,
+.bs-docs-sidebar .nav>.pinned .glyphicon:before {
+  content: "\2212";
+}
+
+.bs-docs-sidebar .nav>.active.pinned-hidden .glyphicon:before{
+  content: "\2b" !important;
+}
+
+/* Iframe with logs on info page */
 .log-frame{
-  border: 1px solid silver;
+  border:1px solid silver;
   width: 100%;
-height:300px;
+  height:600px;
+  border-radius:5px;
+}
+
+/* inactive icon for settings */
+.icon-inactive{
+  color:silver;
+}
+
+.read-container{
+  padding-top:7px;
+  padding-left:13px;
+  padding-bottom:7px;
+  white-space: nowrap;
+  display:inline-block;
+}
+
+.inplace-btn{
+  cursor:pointer;
+}
+
+/* show label for free storage*/
+.progress{
+  position:relative;
+  margin-bottom:0px;
+}
+.progress .progress-label{
+  position:absolute;
+  z-index:100;
+  width:100%;
+  text-align: center;
+}
+
+.progress .progress-overlay{
+  position:absolute;
+  z-index:100;
+  opacity: 0.7;
+}
+/*Column for url in storages table*/
+.url-column{
+  max-width: 200px;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+
+.tc-chart-js-legend {
+  list-style-type: none;
+  padding-left: 0px;
+}
+.tc-chart-js-legend li {
+  display: block;
+  float: left;
+  clear:both;
+}
+.tc-chart-js-legend li span {
+  width:22px;
+  height:22px;
+  display:block;
+  text-align:center;
+  vertical-align: middle;
+  float:left;
+  margin-right:15px;
+}
+
+
+/* SQUARED FOUR */
+.legend-checkbox {
+  width: 20px;
+  position: relative;
+}
+.legend-checkbox input{
+  display:none;
+}
+
+.legend-checkbox label {
+  cursor: pointer;
+  color: black;
+}
+
+
+.legend-checkbox:hover label:before {
+  content: "\e013";
+  opacity: 0.5;
+}
+
+.legend-checkbox input[type=checkbox]:checked + label:before {
+  content: "\e013";
+  opacity: 1;
+}
+
+
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px;
+  direction: ltr;
+  cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+  .fileinput-button input {
+    filter: alpha(opacity=0);
+    font-size: 100%;
+    height: 100%;
+  }
+}
+
+
+
+.navbar-brand
+{
+  padding: 0 15px;
+  white-space: nowrap;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 786px) {
+  .navbar-brand {
+    max-width: 270px;
+  }
+}
+@media (min-width: 992px) {
+
+  .navbar-brand {
+    max-width: 320px;
+  }
+}
+
+.serversList .active{
+  font-weight: bold;
+}
+
+.checkbox-wrapper{
+  display: inline-block;
+  padding:0px 0px 0px 5px;
+  width:24px;
+  height:24px;
+  border-radius: 3px;
+}
+.checkbox-wrapper input{
+  margin:0px;
+}
+
+/*
+$state-danger-text:              #b94a48 !default;
+$state-danger-bg:                #f2dede !default;
+$state-danger-border:            darken(adjust-hue($state-danger-bg, -10), 5%) !default;
+*/
+
+.has-error .checkbox-wrapper{
+  background-color: $state-danger-border;
+  border: 1px solid $state-danger-text;
+}
+
+
+.offline {
+  color:silver;
+}
+
+html, body {height: 100%;}
+
+
+span.danger{
+  color:$alert-danger-text;
+}
+
+.btn.appstore{
+  width:130px;
+  height:40px;
+  background: url('../images/appstore.png');
+  background-size:130px 40px;
+  margin:5px;
+  color:transparent;
+  font-size:0;
+  border:none;
+}
+.btn.googleplay{
+  width:130px;
+  height:40px;
+  background: url('../images/googleplay.png');
+  background-size:130px 40px;
+  margin:5px;
+  color:transparent;
+  font-size:0;
+  border:none;
+}
+
+.navbar-header h3{
+  color:white;
+  float:left;
+}
+.label>a{
+  color:white;
+  text-decoration: underline;
+}
+.navbar-default{
+  border:none;
+}
+
+.cloud-dialog-frame{
+  border: none;
+  width: 100%;
+  height: 400px;
+}
+
+
+.master .panel-footer {
+  min-height: 55px;
+}
+
+
+.modal-dialog.modal-sm{
+  width:450px;
+}
+
+
+
+.form-group.CameraMotionEvent,
+.form-group.CameraInputEvent,
+.form-group.CameraDisconnectEvent,
+.form-group.StorageFailureEvent,
+.form-group.NetworkIssueEvent,
+.form-group.CameraIpConflictEvent,
+.form-group.ServerFailureEvent,
+.form-group.ServerConflictEvent,
+.form-group.ServerStartEvent,
+.form-group.LicenseIssueEvent,
+.form-group.BackupFinishedEvent,
+.form-group.UserDefinedEvent{
+  display:none;
+}
+
+.AnyEvent,
+.CameraMotionEvent .CameraMotionEvent,
+.CameraInputEvent .CameraInputEvent,
+.CameraDisconnectEvent .CameraDisconnectEvent,
+.StorageFailureEvent .StorageFailureEvent,
+.NetworkIssueEvent .NetworkIssueEvent,
+.CameraIpConflictEvent .CameraIpConflictEvent,
+.ServerFailureEvent .ServerFailureEvent,
+.ServerConflictEvent .ServerConflictEvent,
+.ServerStartEvent .ServerStartEvent,
+.LicenseIssueEvent .LicenseIssueEvent,
+.BackupFinishedEvent .BackupFinishedEvent,
+.UserDefinedEvent .UserDefinedEvent{
+  display:block;
+}
+
+.system-info{
+  background-color: $gray-lighter;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  .panel-title{
+    font-size: 20px;
+  }
+
+  td{
+    vertical-align: top;
+    &:first-child{
+      white-space:nowrap;
+      padding-right:5px;
+    }
+  }
+
+  .table-spacer td{
+    &,td {
+      max-height: 8px;
+      line-height: 8px;
+    }
+  }
+}
+
+.container{
+  margin: 0;
+}
+
+h3 {
+  margin-top: 30px;
+}
+
+.table-fixed{
+  table-layout: fixed;
+  width:100%;
+  td:first-child{
+    width: 85px;
+  }
+  td{
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.panel-inline{
+  display:inline-block;
+  text-align: left;
+  margin: 30px 10px;
+
+  img {
+    vertical-align: bottom;
+    margin: 0 5px;
+  }
+
+  h3{
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  table>tbody>tr>td{
+    vertical-align: bottom;
+    height: 42px;
+  }
+
+}
+
+.grey-text{
+  color: #698796;
+}
+
+
+/* Kill visual effects for nx1 */
+.lite-client-mode{
+  * {
+    outline: none !important;
+    text-shadow:none !important;
+    box-shadow:none !important;
+    transition-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-timing-function: linear !important;
+    opacity: 1 !important;
+  }
 }

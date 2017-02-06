@@ -4,9 +4,9 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <api/model/statistics_reply.h>
+#include <nx/utils/uuid.h>
 
 class QnMediaServerStatisticsStorage;
 
@@ -52,11 +52,11 @@ public:
     int pointsLimit() const;
 
     /** Filter statistics items of some deviceType by flags (ignore all replies that do not contain flags provided). */
-    void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
+    void setFlagsFilter(Qn::StatisticsDeviceType deviceType, int flags);
 
 private:
-    QHash<QUuid, QnMediaServerStatisticsStorage *> m_statistics;
-    QHash<QnStatisticsDeviceType, int> m_flagsFilter;
+    QHash<QnUuid, QnMediaServerStatisticsStorage *> m_statistics;
+    QHash<Qn::StatisticsDeviceType, int> m_flagsFilter;
 };
 
 #endif // QN_STATISTICS_MANAGER

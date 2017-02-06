@@ -8,290 +8,282 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <utils/network/http/qnbytearrayref.h>
+#include <nx/utils/qnbytearrayref.h>
 #include <utils/common/software_version.h>
 
 
-namespace applauncher
+namespace applauncher {
+namespace api {
+namespace TaskType {
+enum Value
 {
-    namespace api
-    {
-        namespace TaskType
-        {
-            enum Value
-            {
-                startApplication,
-                quit,
-                install,
-                installZip,
-                getInstallationStatus,
-                isVersionInstalled,
-                getInstalledVersions,
-                cancelInstallation,
-                addProcessKillTimer,
-                invalidTaskType
-            };
+    startApplication,
+    quit,
+    install,
+    installZip,
+    getInstallationStatus,
+    isVersionInstalled,
+    getInstalledVersions,
+    cancelInstallation,
+    addProcessKillTimer,
+    invalidTaskType
+};
 
-            Value fromString( const QnByteArrayConstRef& str );
-            QByteArray toString( Value val );
-        }
+Value fromString(const QnByteArrayConstRef& str);
+QByteArray toString(Value val);
+}
 
-        class BaseTask
-        {
-        public:
-            const TaskType::Value type;
+class BaseTask
+{
+public:
+    const TaskType::Value type;
 
-            BaseTask( TaskType::Value _type );
-            virtual ~BaseTask();
-        
-            virtual QByteArray serialize() const = 0;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) = 0;
-        };
+    BaseTask(TaskType::Value _type);
+    virtual ~BaseTask();
 
-        //!Parses \a serializedTask header, creates corresponding object (\a *ptr) and calls deserialize
-        bool deserializeTask( const QByteArray& serializedTask, BaseTask** ptr );
+    virtual QByteArray serialize() const = 0;
+    virtual bool deserialize(const QnByteArrayConstRef& data) = 0;
+};
 
-        //!Task, sent by application, to start specified application version
-        class StartApplicationTask
-        :
-            public BaseTask
-        {
-        public:
-            QnSoftwareVersion version;
-            //!Command-line params to pass to application instance
-            QString appArgs;
-            bool autoRestore;
+//!Parses \a serializedTask header, creates corresponding object (\a *ptr) and calls deserialize
+bool deserializeTask(const QByteArray& serializedTask, BaseTask** ptr);
 
-            StartApplicationTask();
-            StartApplicationTask(
-                const QnSoftwareVersion& _version,
-                const QString& _appParams );
-            StartApplicationTask(
-                const QnSoftwareVersion& _version,
-                const QStringList& _appParams );
+//!Task, sent by application, to start specified application version
+class StartApplicationTask
+    :
+    public BaseTask
+{
+public:
+    QnSoftwareVersion version;
+    //!Command-line params to pass to application instance
+    QString appArgs;
+    bool autoRestore;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    StartApplicationTask();
+    StartApplicationTask(const QnSoftwareVersion& _version, const QString& _appParams = QString());
+    StartApplicationTask(const QnSoftwareVersion& _version, const QStringList& _appParams);
 
-        class StartInstallationTask
-        :
-            public BaseTask
-        {
-        public:
-            QnSoftwareVersion version;
-            //!Module name for install. By default, "client". For future use
-            QString module;
-            bool autoStart;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            StartInstallationTask();
-            StartInstallationTask( const QnSoftwareVersion& _version, bool _autoStart = false );
+class StartInstallationTask
+    :
+    public BaseTask
+{
+public:
+    QnSoftwareVersion version;
+    //!Module name for install. By default, "client". For future use
+    QString module;
+    bool autoStart;
 
-            //!Implementation of \a BaseTask::serialize()
-            virtual QByteArray serialize() const override;
-            //!Implementation of \a BaseTask::deserialize()
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    StartInstallationTask();
+    StartInstallationTask(const QnSoftwareVersion& _version, bool _autoStart = false);
 
-        //!Applauncher process quits running on receiving this task
-        class QuitTask
-        :
-            public BaseTask
-        {
-        public:
-            QuitTask();
+    //!Implementation of \a BaseTask::serialize()
+    virtual QByteArray serialize() const override;
+    //!Implementation of \a BaseTask::deserialize()
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+//!Applauncher process quits running on receiving this task
+class QuitTask
+    :
+    public BaseTask
+{
+public:
+    QuitTask();
 
-        class InstallZipTask
-        :
-            public BaseTask
-        {
-        public:
-            QnSoftwareVersion version;
-            QString zipFileName;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            InstallZipTask();
-            InstallZipTask( const QnSoftwareVersion &version, const QString &zipFileName );
+class InstallZipTask
+    :
+    public BaseTask
+{
+public:
+    QnSoftwareVersion version;
+    QString zipFileName;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    InstallZipTask();
+    InstallZipTask(const QnSoftwareVersion &version, const QString &zipFileName);
 
-        class IsVersionInstalledRequest
-        :
-            public BaseTask
-        {
-        public:
-            QnSoftwareVersion version;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            IsVersionInstalledRequest();
+class IsVersionInstalledRequest
+    :
+    public BaseTask
+{
+public:
+    QnSoftwareVersion version;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    IsVersionInstalledRequest();
 
-        class GetInstalledVersionsRequest
-        :
-            public BaseTask {
-        public:
-            GetInstalledVersionsRequest();
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize(const QnByteArrayConstRef &data) override;
-        };
+class GetInstalledVersionsRequest
+    :
+    public BaseTask
+{
+public:
+    GetInstalledVersionsRequest();
 
-        namespace ResultType
-        {
-            enum Value
-            {
-                ok,
-                //!Failed to connect to applauncher
-                connectError,
-                versionNotInstalled,
-                alreadyInstalled,
-                invalidVersionFormat,
-                notFound,
-                badResponse,
-                ioError,
-                otherError
-            };
-            Value fromString( const QnByteArrayConstRef& str );
-            QByteArray toString( Value val );
-        }
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef &data) override;
+};
 
-        class Response
-        {
-        public:
-            ResultType::Value result;
+namespace ResultType {
+enum Value
+{
+    ok,
+    //!Failed to connect to applauncher
+    connectError,
+    versionNotInstalled,
+    alreadyInstalled,
+    invalidVersionFormat,
+    notFound,
+    badResponse,
+    ioError,
+    otherError
+};
+Value fromString(const QnByteArrayConstRef& str);
+QByteArray toString(Value val);
+}
 
-            Response();
+class Response
+{
+public:
+    ResultType::Value result;
 
-            virtual QByteArray serialize() const;
-            virtual bool deserialize( const QnByteArrayConstRef& data );
-        };
+    Response();
 
-        class StartInstallationResponse
-        :
-            public Response
-        {
-        public:
-            //!Valid if \a result == \a ResultType::ok
-            unsigned int installationID;
+    virtual QByteArray serialize() const;
+    virtual bool deserialize(const QnByteArrayConstRef& data);
+};
 
-            StartInstallationResponse();
+class StartInstallationResponse
+    :
+    public Response
+{
+public:
+    //!Valid if \a result == \a ResultType::ok
+    unsigned int installationID;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    StartInstallationResponse();
 
-        class GetInstallationStatusRequest
-        :
-            public BaseTask
-        {
-        public:
-            unsigned int installationID;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            GetInstallationStatusRequest();
-            GetInstallationStatusRequest( unsigned int installationID );
+class GetInstallationStatusRequest
+    :
+    public BaseTask
+{
+public:
+    unsigned int installationID;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    GetInstallationStatusRequest();
+    GetInstallationStatusRequest(unsigned int installationID);
 
-        namespace InstallationStatus
-        {
-            enum Value
-            {
-                init,
-                inProgress,
-                //!installation is being cancelled (removing already installed files)
-                cancelInProgress,
-                success,
-                failed,
-                cancelled,
-                unknown
-            };
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            Value fromString( const QnByteArrayConstRef& str );
-            QByteArray toString( Value val );
-        }
+namespace InstallationStatus {
+enum Value
+{
+    init,
+    inProgress,
+    //!installation is being cancelled (removing already installed files)
+    cancelInProgress,
+    success,
+    failed,
+    cancelled,
+    unknown
+};
 
-        class InstallationStatusResponse
-        :
-            public Response
-        {
-        public:
-            InstallationStatus::Value status;
-            //!Installation progress (percent)
-            float progress;
+Value fromString(const QnByteArrayConstRef& str);
+QByteArray toString(Value val);
+}
 
-            InstallationStatusResponse();
+class InstallationStatusResponse
+    :
+    public Response
+{
+public:
+    InstallationStatus::Value status;
+    //!Installation progress (percent)
+    float progress;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    InstallationStatusResponse();
 
-        class IsVersionInstalledResponse
-        :
-            public Response
-        {
-        public:
-            bool installed;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            IsVersionInstalledResponse();
+class IsVersionInstalledResponse
+    :
+    public Response
+{
+public:
+    bool installed;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    IsVersionInstalledResponse();
 
-        class GetInstalledVersionsResponse
-        :
-            public Response
-        {
-        public:
-            QList<QnSoftwareVersion> versions;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-            GetInstalledVersionsResponse();
+class GetInstalledVersionsResponse
+    :
+    public Response
+{
+public:
+    QList<QnSoftwareVersion> versions;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize(const QnByteArrayConstRef &data) override;
-        };
+    GetInstalledVersionsResponse();
 
-        class CancelInstallationRequest
-        :
-            public BaseTask
-        {
-        public:
-            unsigned int installationID;
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef &data) override;
+};
 
-            CancelInstallationRequest();
+class CancelInstallationRequest
+    :
+    public BaseTask
+{
+public:
+    unsigned int installationID;
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    CancelInstallationRequest();
 
-        class CancelInstallationResponse : public Response {};
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
+
+class CancelInstallationResponse : public Response {};
 
 
-        class AddProcessKillTimerRequest
-        :
-            public BaseTask
-        {
-        public:
-            qint64 processID;
-            quint32 timeoutMillis;
+class AddProcessKillTimerRequest
+    :
+    public BaseTask
+{
+public:
+    qint64 processID;
+    quint32 timeoutMillis;
 
-            AddProcessKillTimerRequest();
+    AddProcessKillTimerRequest();
 
-            virtual QByteArray serialize() const override;
-            virtual bool deserialize( const QnByteArrayConstRef& data ) override;
-        };
+    virtual QByteArray serialize() const override;
+    virtual bool deserialize(const QnByteArrayConstRef& data) override;
+};
 
-        class AddProcessKillTimerResponse : public Response {};
-    }
+class AddProcessKillTimerResponse : public Response {};
+}
 }
 
 #endif  //APPLICATION_TASK_H

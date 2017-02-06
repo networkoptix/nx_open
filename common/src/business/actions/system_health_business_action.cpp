@@ -6,17 +6,17 @@
 #include <utils/common/synctime.h>
 
 
-QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QUuid& eventResourceId):
+QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QnUuid& eventResourceId):
     base_type(QnBusiness::ShowPopupAction, QnBusinessEventParameters())
 {
     QnBusinessEventParameters runtimeParams;
-    runtimeParams.setEventType(QnBusiness::EventType(QnBusiness::SystemHealthEvent + message));
-    runtimeParams.setEventTimestamp(qnSyncTime->currentUSecsSinceEpoch());
-    runtimeParams.setEventResourceId(eventResourceId);
+    runtimeParams.eventType = QnBusiness::EventType(QnBusiness::SystemHealthEvent + message);
+    runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
+    runtimeParams.eventResourceId = eventResourceId;
     setRuntimeParams(runtimeParams);
 
     QnBusinessActionParameters actionParams;
-    actionParams.setUserGroup(QnBusinessActionParameters::AdminOnly);
+    actionParams.userGroup = QnBusiness::AdminOnly;
     setParams(actionParams);
 
 }

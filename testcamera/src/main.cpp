@@ -1,14 +1,25 @@
-#include "version.h"
-
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QCoreApplication>
 
-#include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource/resource_fwd.h"
+#include "core/resource/camera_user_attribute_pool.h"
+#include "api/global_settings.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource/storage_plugin_factory.h"
 
+#include "camera_pool.h"
+
+extern "C"
+{
+#include <libavformat/avformat.h>
+}
+
+#include <utils/common/app_info.h>
 
 QString doUnquote(const QString& fileName)
 {
@@ -25,45 +36,62 @@ void ffmpegInit()
     av_register_all();
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
-    QnStoragePluginFactory::instance()->registerStoragePlugin("qtfile", QnQtFileStorageResource::instance);
 }
+
+QStringList checkFileNames(const QString& fileNames)
+{
+    QStringList files;
+    for (auto& file: fileNames.split(',')) {
+        if (!QFile::exists(file))
+            qWarning() << "File" << file << "not found";
+        else
+            files.append(file);
+    }
+    return files;
+}
+
+void showUsage(char* exeName)
+{
+    qDebug() << "usage:";
+    qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
+    qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
+    qDebug() << "count=N";
+    qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
+    qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
+    qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
+    qDebug() << "";
+    qDebug() << "example:";
+    QString str = QFileInfo(exeName).baseName() + QString(" files=\"c:/test.264\";count=20");
+    qDebug() << str;
+    qDebug() << "\n[options]: ";
+    qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+}
+
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
-    QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    QCoreApplication::setOrganizationName(QnAppInfo::organizationName());
+    QCoreApplication::setApplicationName("Nx Witness Test Camera");
+    QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
-    
-    ffmpegInit();  
-    
+
+    ffmpegInit();
+
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
-    QnCommonModule common(argc, argv);
+    QnCommonModule common;
     QnSyncTime syncTime;
 
     new QnLongRunnablePool();
 
-    QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
+    //QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-    qDebug() << QN_APPLICATION_NAME << "version" << QN_APPLICATION_VERSION;
-    
+    qDebug() << qApp->applicationName() << "version" << qApp->applicationVersion();
+
     if (argc == 1)
     {
-        qDebug() << "usage:";
-        qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
-        qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-        qDebug() << "count=N";
-        qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
-        qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-        qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
-        qDebug() << "";
-        qDebug() << "example:";
-        QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");
-        qDebug() << str;
-        qDebug() << "\n[options]: ";
-        qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+        showUsage(argv[0]);
         return 1;
     }
 
@@ -87,7 +115,9 @@ int main(int argc, char *argv[])
 
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
-
+    QnResourceStatusDictionary statusDictionary;
+	QnResourcePropertyDictionary dictionary;
+	std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];
@@ -138,23 +168,15 @@ int main(int argc, char *argv[])
             continue;
         }
 
-
-        primaryFiles = primaryFileNames.split(',');
-        for (int k = 0; k < primaryFiles.size(); ++k)
-        if (!QFile::exists(primaryFiles[k])) {
-            qWarning() << "File" << primaryFiles[k] << "not found";
+        primaryFiles = checkFileNames(primaryFileNames);
+        if (primaryFiles.isEmpty()) {
+            qWarning() << "No one of the specified files exists!";
             continue;
         }
 
         if (!secondaryFileNames.isEmpty())
-            secondaryFiles = secondaryFileNames.split(',');
-        for (int k = 0; k < secondaryFiles.size(); ++k)
-            if (!QFile::exists(secondaryFiles[k])) {
-                qWarning() << "File" << secondaryFiles[k] << "not found";
-                continue;
-            }
-
-        if(secondaryFiles.isEmpty())
+            secondaryFiles = checkFileNames(secondaryFileNames);
+        if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
         QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);

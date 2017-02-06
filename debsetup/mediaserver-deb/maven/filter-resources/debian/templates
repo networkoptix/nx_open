@@ -1,7 +1,7 @@
 
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword
 Type: string
-Default: 
+Default:
 Description: Admin's password:
 
 Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
@@ -10,7 +10,7 @@ Description: Password can't be empty
 
 Template: ${deb.customization.company.name}-mediaserver/port
 Type: string
-Default: 
+Default:
 Description: Port:
 
 Template: ${deb.customization.company.name}-mediaserver/port_invalid
@@ -27,6 +27,29 @@ Type: select
 Choices: ${choices}
 Description: Keep the database, remove or revert to previous version (if any)
 
-Template: ${deb.customization.company.name}-mediaserver/allowCameraChanges
+Template: ${deb.customization.company.name}-mediaserver/cameraSettingsOptimization
 Type: boolean
 Description: Allow system to optimize cameras settings (Recommended)
+
+Template: ${deb.customization.company.name}-mediaserver/statisticsReportAllowed
+Type: boolean
+Description: Send usage and crash statistics to software developers
+
+Template: ${deb.customization.company.name}-mediaserver/present-mediaserver-eula
+Type: note
+Description: ${license.text}
+
+Template: ${deb.customization.company.name}-mediaserver/accepted-mediaserver-eula
+Type: boolean
+Default: false
+Description: I accept the EULA license terms.
+ In order to install this package, you must accept the license terms. Not accepting will cancel the
+ installation.
+
+Template: ${deb.customization.company.name}-mediaserver/error-mediaserver-eula
+Type: error
+Description: Declined EULA
+ If you do not agree to the EULA license
+ terms you cannot install this software.
+ .
+ The installation of this package will be canceled.

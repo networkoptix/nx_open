@@ -4,24 +4,25 @@
 #include <stdexcept>
 #include <string>
 
+#include <vector>
+#include <QtCore/QString>
+
+class QSettings;
+struct QnHardwareInfo;
+
 namespace LLUtil {
 
-class HardwareIdError : public std::exception {
-public:
-    HardwareIdError(const std::string& msg_): msg(msg_) {}
-    ~HardwareIdError() throw () {}
+const int LATEST_HWID_VERSION = 5;
 
-    virtual const char* what() const throw () { return msg.c_str(); }
+// This function should be called once before
+// any other calls to the hardware id library
+// It uses settings to store/retrive MAC addess hardware id is bound to.
+void initHardwareId(QSettings *settings);
 
-private:
-    std::string msg;
-};
-
-const int LATEST_HWID_VERSION = 3;
-
-QByteArray getHardwareId(int version, bool guidCompatibility);
-QList<QByteArray> getMainHardwareIds(int guidCompatibility);
-QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility);
+const QnHardwareInfo &getHardwareInfo();
+QString getLatestHardwareId();
+QStringList getAllHardwareIds();
+int hardwareIdVersion(const QString& hardwareId);
 
 }
 

@@ -1,19 +1,21 @@
 #ifndef QN_PRESET_PTZ_CONTROLLER_H
 #define QN_PRESET_PTZ_CONTROLLER_H
 
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
+#include <core/resource/resource_fwd.h>
+#include <api/resource_property_adaptor.h>
 
 #include "proxy_ptz_controller.h"
 
-template<class T>
-class QnResourcePropertyAdaptor;
 
 struct QnPtzPresetRecord;
+
 typedef QHash<QString, QnPtzPresetRecord> QnPtzPresetRecordHash;
 
 class QnPresetPtzController: public QnProxyPtzController {
     Q_OBJECT
     typedef QnProxyPtzController base_type;
+	typedef std::function<bool(QnPtzPresetRecordHash& records, QnPtzPreset)> PresetsActionFunc;
 
 public:
     QnPresetPtzController(const QnPtzControllerPtr &baseController);
@@ -30,8 +32,14 @@ public:
     virtual bool getPresets(QnPtzPresetList *presets) override;
 
 private:
-    QMutex m_mutex;
-    QnResourcePropertyAdaptor<QnPtzPresetRecordHash> *m_adaptor;
+	QString serializePresets(const QnPtzPresetRecordHash& presets);
+	QnPtzPresetRecordHash deserializePresets(const QString& presetsSerialized);
+	bool doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset);
+
+private:
+    QnMutex m_mutex;
+	QnVirtualCameraResourcePtr m_camera;
+	std::unique_ptr<QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>> m_propertyHandler;
 };
 
 #endif // QN_PRESET_PTZ_CONTROLLER_H

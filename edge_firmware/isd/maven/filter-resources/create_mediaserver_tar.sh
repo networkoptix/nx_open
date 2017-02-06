@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # SRC_DIR=../../..
 
 
@@ -8,16 +10,6 @@
 #     echo "--target-dir={dir to copy packet to}"
 #     echo
 # }
-
-# function get_var()
-# {
-#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-#         h=networkoptix
-#     fi
-#     echo "$h"
-# }
-
 
 
 CUSTOMIZATION=${deb.customization.company.name}
@@ -28,22 +20,16 @@ MAJOR_VERSION="${parsedVersion.majorVersion}"
 MINOR_VERSION="${parsedVersion.minorVersion}"
 BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=${box}
-BETA=""
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
-PACKAGE_NAME=$PACKAGE$BETA.tar.gz
-UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
+PACKAGE_NAME=${artifact.name.server}.tar.gz
+UPDATE_NAME=${artifact.name.server_update}.zip
 
-BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
+BUILD_DIR="`mktemp -d`"
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
-STRIP="`find ${root.dir}/mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
+STRIP=${packages.dir}/${rdep.target}/gcc-${gcc.version}/bin/arm-linux-gnueabihf-strip
 
 
 for i in "$@"
@@ -59,30 +45,36 @@ do
 done
 
 LIBS_TO_COPY=\
-( libavcodec.so.54.23.100 \
-libavdevice.so.54.0.100 \
-libavfilter.so.2.77.100 \
-libavformat.so.54.6.100 \
-libavutil.so.51.54.100 \
-libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libpostproc.so.52.0.100 \
-libQt5Concurrent.so.5.2.1 \
-libQt5Core.so.5.2.1 \
-libQt5Gui.so.5.2.1 \
-libQt5Multimedia.so.5.2.1 \
-libQt5Network.so.5.2.1 \
-libQt5Sql.so.5.2.1 \
-libQt5Xml.so.5.2.1 \
-libquazip.so.1.0.0 \
+( libavcodec.so \
+libavdevice.so \
+libavfilter.so \
+libavformat.so \
+libavutil.so \
+libudt.so \
+libcommon.so \
+libcloud_db_client.so \
+libnx_fusion.so \
+libnx_network.so \
+libnx_streaming.so \
+libnx_utils.so \
+libnx_email.so \
+libappserver2.so \
+libmediaserver_core.so \
+libquazip.so \
+libsasl2.so \
+liblber-2.4.so.2 \
+libldap-2.4.so.2 \
+libldap_r-2.4.so.2 \
 libsigar.so \
-libswresample.so.0.15.100 \
-libswscale.so.2.1.100 )
+libswresample.so \
+libswscale.so )
 
-if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
-  LIBS_TO_COPY+=( libvpx.so.1.2.0 )
+if [ -e "$LIBS_DIR/libvpx.so" ]; then
+  LIBS_TO_COPY+=( libvpx.so )
 fi
-
+if [ -e "$LIBS_DIR/libcreateprocess.so" ]; then
+  LIBS_TO_COPY+=( libcreateprocess.so )
+fi
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
@@ -92,22 +84,21 @@ echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  echo "Adding lib" $var
+  cp $LIBS_DIR/${var}* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
-     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
 
-#generating links
-pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
-LIBS="`find ./ -name '*.so.*.*.*'`"
-for var in $LIBS
+#copying qt libs
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+for var in $QTLIBS
 do
-    ln -s $var "`echo $var | cut -d . -f 1,2,3,4`"
+    qtlib=libQt5$var.so
+    echo "Adding Qt lib" $qtlib
+    cp -P ${qt.dir}/lib/$qtlib* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 done
-popd
-
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
@@ -121,7 +112,7 @@ cp $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/libisd_native_plugin.so 
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp ./usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf.template $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
@@ -134,16 +125,19 @@ pushd $BUILD_DIR
 tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
 
 if [ ! -z $TARGET_DIR ]; then
-  cp $PACKAGE_NAME $TARGET_DIR 
+  cp $PACKAGE_NAME $TARGET_DIR
 fi
 
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+
+set +e
 cp -P $LIBS_DIR/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
 cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
 tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
+set -e
 rm -Rf $BUILD_DIR
 
 mkdir -p zip
@@ -151,7 +145,11 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
-zip ./$UPDATE_NAME.zip ./*
+if [ ! -f $PACKAGE_NAME ]; then
+  echo "Distribution is not created! Exiting"
+  exit 1
+fi
+zip ./$UPDATE_NAME ./*
 mv ./* ../
 cd ..
 rm -Rf zip

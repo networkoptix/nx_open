@@ -1,0 +1,37 @@
+<h1>{{event}} {{#source}}from <b>{{source}}</b>{{/source}}</h1>
+
+<div class="description">
+    {{#caption}}
+        <h2>{{caption}}</h2>
+    {{/caption}}
+    {{#description}}
+        <p> {{description}}</p>
+    {{/description}}
+
+    {{#hasCameras}}
+        <hr>
+        <h2>Related cameras:</h2>
+        {{#cameras}}
+            <div class="camera-block">
+                <p class="margin-top"><b>{{name}}</b> ({{cameraIP}})</p>
+                {{#screenshot}}<img class="margin-top screenshot" alt="Screenshot" src="{{screenshot}}"/>{{/screenshot}}
+
+                <p class="margin-top">
+                {{#urlint}}
+                    <a href="{{urlint}}">Play archive from the local network</a><br>
+                {{/urlint}}
+                {{#urlext}}
+                    <a href="{{urlext}}">Play archive from the web</a>
+                {{/urlext}}
+                </p>
+            </div>
+        {{/cameras}}
+    {{/hasCameras}}
+</div>
+
+{{#aggregated}}
+<div class="date">
+     <b>{{{timestamp}}}</b>
+</div>
+{{/aggregated}}
+

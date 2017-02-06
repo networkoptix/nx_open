@@ -3,13 +3,16 @@
 
 #include <algorithm> /* For std::find_if. */
 
+#include <QtNetwork/QNetworkReply>
 #include <QtCore/QList>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
 
-#include <QNetworkReply>
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/uuid.h>
+
+#include <utils/common/systemerror.h>
 
 
 class QnRequestParam: public QPair<QString, QString> {
@@ -19,7 +22,7 @@ public:
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
-    QnRequestParam(const char *first, const QUuid &second): base_type(QLatin1String(first), second.toString()) {}
+    QnRequestParam(const char *first, const QnUuid &second): base_type(QLatin1String(first), second.toString()) {}
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
     QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };
@@ -45,6 +48,14 @@ public:
         return defaultValue;
     }
 
+    QList<Value> allValues(const Key &key) const {
+        QList<Value> result;
+        for(const QPair<Key, Value> &pair: *this)
+            if(pair.first == key)
+                result << pair.second;
+        return result;
+    }
+
     bool contains(const Key &key) const {
         for(const QPair<Key, Value> &pair: *this)
             if(pair.first == key)
@@ -65,6 +76,13 @@ public:
     void insert(const Key &key, const Value &value) {
         base_type::push_back(qMakePair(key, value));
     }
+
+    QHash<Key, Value> toHash() const {
+        QHash<Key, Value> result;
+        for(const QPair<Key, Value> &pair: *this)
+            result.insert(pair.first, pair.second);
+        return result;
+    }
 };
 
 typedef QPair<QString, QString> QnRequestHeader;
@@ -78,25 +96,24 @@ typedef QHash<QString, QString> QnRequestParams;
 
 struct QnHTTPRawResponse
 {
-    QnHTTPRawResponse()
-    :
-    status( QNetworkReply::NoError )
-    {
-    }
+    QnHTTPRawResponse();
+    QnHTTPRawResponse(
+        SystemError::ErrorCode _sysErrorCode,
+        const nx_http::StatusLine& statusLine,
+        const QByteArray& _contentType,
+        const QByteArray& _msgBody);
 
-    QnHTTPRawResponse( QNetworkReply::NetworkError status, const QnReplyHeaderList &headers, const QByteArray &data, const QByteArray &errorString )
-    :
-        status(status),
-        headers(headers),
-        data(data),
-        errorString(errorString)
-    {
-    }
-
+    SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;
-    QnReplyHeaderList headers;
-    QByteArray data;
-    QByteArray errorString;
+    QByteArray contentType;
+    QByteArray msgBody;
+    QString errorString;
+
+private:
+    QNetworkReply::NetworkError sysErrorCodeToNetworkError(
+        SystemError::ErrorCode errorCode);
+    QNetworkReply::NetworkError httpStatusCodeToNetworkError(
+        nx_http::StatusCode::Value statusCode);
 };
 
 Q_DECLARE_METATYPE(QnRequestParamList); /* Also works for QnRequestHeaderList. */

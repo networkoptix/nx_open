@@ -1,8 +1,13 @@
 #include "utils/common/util.h"
 
-#ifndef Q_OS_WIN
+#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
 #   include <sys/statvfs.h>
 #   include <sys/time.h>
+#endif
+
+#ifdef Q_OS_WIN32
+#   include <windows.h>
+#   include <mmsystem.h>
 #endif
 
 #include <QtCore/QDateTime>
@@ -16,7 +21,66 @@
 #include <common/common_globals.h>
 #include <utils/mac_utils.h>
 #include <utils/common/app_info.h>
+#include <nx/utils/thread/mutex.h>
 
+#if defined (Q_OS_WIN32)
+WinDriveInfoList getWinDrivesInfo()
+{
+    WinDriveInfoList result;
+    const DWORD drivesBufLen = 512;
+    TCHAR drivesBuf[drivesBufLen];
+
+    if (!GetLogicalDriveStrings(drivesBufLen, drivesBuf))
+        return result;
+
+    LPTSTR pdrivesBuf = drivesBuf;
+    while (*pdrivesBuf != L'\0')
+    {
+        QString drive = QString::fromUtf16((ushort*)pdrivesBuf);
+        pdrivesBuf += drive.length() + 1;
+
+        WinDriveInfo driveInfo;
+        driveInfo.path = drive;
+        QString driveSysString = QString(lit("\\\\.\\%1:")).arg(drive[0]);
+
+        HANDLE driveHandle = CreateFile((LPCWSTR) driveSysString.data(),
+                                        FILE_READ_ATTRIBUTES,
+                                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                                        NULL,
+                                        OPEN_EXISTING,
+                                        0,
+                                        NULL);
+        if (driveHandle == INVALID_HANDLE_VALUE)
+            continue;
+        WORD bytesReturned;
+        bool success = DeviceIoControl(driveHandle,
+                                        IOCTL_STORAGE_CHECK_VERIFY2,
+                                        NULL, 0,
+                                        NULL, 0,
+                                        (LPDWORD)&bytesReturned,
+                                        NULL);
+        if (!success)
+        {
+            CloseHandle(driveHandle);
+            continue;
+        }
+        driveInfo.access |= WinDriveInfo::Readable;
+        success = DeviceIoControl(driveHandle,
+                                  IOCTL_DISK_IS_WRITABLE,
+                                  NULL, 0,
+                                  NULL, 0,
+                                  (LPDWORD)&bytesReturned,
+                                  NULL);
+        driveInfo.access |= success ? WinDriveInfo::Writable : 0;
+        driveInfo.type = GetDriveType((LPCWSTR) driveInfo.path.data());
+
+        CloseHandle(driveHandle);
+        result.append(driveInfo);
+    }
+
+    return result;
+}
+#endif
 
 bool removeDir(const QString &dirName)
 {
@@ -25,18 +89,15 @@ bool removeDir(const QString &dirName)
 
     if (dir.exists(dirName))
     {
-        foreach(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
+        for(const QFileInfo& info: dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst))
         {
             if (info.isDir())
-                result = removeDir(info.absoluteFilePath());
+                result &= removeDir(info.absoluteFilePath());
             else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return result;
+                result &= QFile::remove(info.absoluteFilePath());
         }
 
-        result = dir.rmdir(dirName);
+        result &= dir.rmdir(dirName);
     }
 
     return result;
@@ -141,7 +202,6 @@ QString getParentFolder(const QString& root)
     return newRoot.left(newRoot.lastIndexOf(QDir::separator())+1);
 }
 
-
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -180,10 +240,28 @@ qint64 getDiskTotalSpace(const QString& root)
     return totalNumberOfBytes;
 };
 
-#else 
+#elif defined(Q_OS_ANDROID)
+
 qint64 getDiskFreeSpace(const QString& root) {
-    struct statvfs buf;
-    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    return 0; // TODO: #android
+}
+
+qint64 getDiskTotalSpace(const QString& root) {
+    return 0; // TODO: #android
+}
+
+#else
+
+//TODO #ak introduce single function for getting partition info
+    //and place platform-specific code in a single pace
+
+#ifdef __APPLE__
+#define statvfs64 statvfs
+#endif
+
+qint64 getDiskFreeSpace(const QString& root) {
+    struct statvfs64 buf;
+    if (statvfs64(root.toUtf8().data(), &buf) == 0)
     {
         //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
         //TODO #ak if we run under root, MUST use buf.f_bfree, else buf.f_bavail
@@ -198,8 +276,8 @@ qint64 getDiskFreeSpace(const QString& root) {
 }
 
 qint64 getDiskTotalSpace(const QString& root) {
-    struct statvfs buf;
-    if (statvfs(root.toUtf8().data(), &buf) == 0)
+    struct statvfs64 buf;
+    if (statvfs64(root.toUtf8().data(), &buf) == 0)
     {
         qint64 disk_size = buf.f_blocks * (qint64) buf.f_frsize;
         //qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
@@ -225,10 +303,10 @@ quint64 getUsecTimer()
 
     static quint32 prevTics = 0;
     static quint64 cycleCount = 0;
-    static QMutex timeMutex;
-    QMutexLocker lock(&timeMutex);
+    static QnMutex timeMutex;
+    QnMutexLocker lock( &timeMutex );
     quint32 tics = (qint32) timeGetTime();
-    if (tics < prevTics) 
+    if (tics < prevTics)
         cycleCount+= 0x100000000ull;
     prevTics = tics;
     return ((quint64) tics + cycleCount) * 1000ull;
@@ -238,7 +316,7 @@ quint64 getUsecTimer()
     gettimeofday(&tv, 0);
     return tv.tv_sec * 1000000ull + tv.tv_usec;
 #endif
-} 
+}
 
 QString getValueFromString(const QString& line)
 {
@@ -259,15 +337,6 @@ int currentTimeZone()
     int res = dt2.secsTo(dt1);
     return res;
 }
-
-int random(int min, int max) {
-    return min + static_cast<int>(static_cast<qint64>(max - min) * qrand() / (static_cast<qint64>(RAND_MAX) + 1));
-}
-
-qreal frandom() {
-    return qrand() / (RAND_MAX + 1.0);
-}
-
 
 static uint hash(const QChar *p, int n)
 {
@@ -292,3 +361,90 @@ QString debugTime(qint64 timeMSec, const QString &fmt) {
     return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
 }
 #endif
+
+int formatJSonStringInternal(const char* srcPtr, const char* srcEnd, char* dstPtr)
+{
+    static const int INDENT_SIZE = 4;           // how many space add to formatting
+    static const char INDENT_SYMBOL = ' ';      // space filler
+    static QByteArray OUTPUT_DELIMITER("\n");   // new line
+    static const QByteArray INPUT_DELIMITERS("[]{},");  // delimiters in a input string
+    static const int INDENTS[] = {1, -1, 1, -1, 0};     // indent offset for INPUT_DELIMITERS
+    const char* dstPtrBase = dstPtr;
+    const char* srcPtrBase = srcPtr;
+    int indent = 0;
+    bool quoted = false;
+    bool escaped = false;
+    for (; srcPtr < srcEnd; ++srcPtr)
+    {
+        if (*srcPtr == '"' && !escaped)
+            quoted = !quoted;
+
+        escaped = *srcPtr == '\\' && !escaped;
+
+        int symbolIdx = INPUT_DELIMITERS.indexOf(*srcPtr);
+        bool isDelimBefore = (symbolIdx >= 0 && INDENTS[symbolIdx] < 0);
+        if (!dstPtrBase)
+            dstPtr++;
+        else if (!isDelimBefore)
+            *dstPtr++ = *srcPtr;
+
+        if (symbolIdx >= 0 && !quoted)
+        {
+            if (dstPtrBase)
+                memcpy(dstPtr, OUTPUT_DELIMITER.data(), OUTPUT_DELIMITER.size());
+            dstPtr += OUTPUT_DELIMITER.size();
+            indent += INDENT_SIZE * INDENTS[symbolIdx];
+            if (dstPtrBase)
+                memset(dstPtr, INDENT_SYMBOL, indent);
+            dstPtr += indent;
+        }
+
+        if (dstPtrBase && isDelimBefore)
+            *dstPtr++ = *srcPtr;
+    }
+    return dstPtr - dstPtrBase;
+}
+
+QByteArray formatJSonString(const QByteArray& data)
+{
+    QByteArray result;
+    result.resize(formatJSonStringInternal(data.data(), data.data() + data.size(), 0));
+    formatJSonStringInternal(data.data(), data.data() + data.size(), result.data());
+    return result;
+}
+
+static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
+static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+QByteArray dateTimeToHTTPFormat(const QDateTime& value)
+{
+    static const int SECONDS_PER_MINUTE = 60;
+    static const int SECONDS_PER_HOUR = 3600;
+
+    if( value.isNull() || !value.isValid() )
+        return QByteArray();
+
+    const QDate& date = value.date();
+    const QTime& time = value.time();
+    const int offsetFromUtcSeconds = value.offsetFromUtc();
+    const int offsetFromUtcHHMM =
+        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
+        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
+
+    char strDateBuf[256];
+    sprintf( strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
+        weekDaysStr[date.dayOfWeek()-1],
+        date.day(),
+        months[date.month()-1],
+        date.year(),
+        time.hour(),
+        time.minute(),
+        time.second(),
+        offsetFromUtcHHMM );
+
+    return QByteArray( strDateBuf );
+
+
+
+    //return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
+}

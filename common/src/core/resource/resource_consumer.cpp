@@ -5,7 +5,8 @@
 QnResourceConsumer::QnResourceConsumer(const QnResourcePtr& resource):
     m_resource(resource)
 {
-    m_resource->addConsumer(this);
+    if (m_resource)
+        m_resource->addConsumer(this);
 }
 
 QnResourceConsumer::~QnResourceConsumer()
@@ -20,11 +21,15 @@ const QnResourcePtr &QnResourceConsumer::getResource() const
 
 bool QnResourceConsumer::isConnectedToTheResource() const
 {
-    return m_resource->hasConsumer(const_cast<QnResourceConsumer*>(this));
+    if (m_resource)
+        return m_resource->hasConsumer(const_cast<QnResourceConsumer*>(this));
+    else
+        return false;
 }
 
 void QnResourceConsumer::disconnectFromResource()
 {
-    m_resource->removeConsumer(this);
+    if (m_resource)
+        m_resource->removeConsumer(this);
 }
 

@@ -1,9 +1,7 @@
 #ifndef single_shot_file_reader_h_215
 #define single_shot_file_reader_h_215
 
-#ifdef ENABLE_ARCHIVE
-
-#include "core/dataprovider/media_streamdataprovider.h"
+#include "nx/streaming/abstract_media_stream_data_provider.h"
 
 // difference between this class and pull reader is that run function does not have infinit loop
 // it quits after first getData
@@ -26,7 +24,5 @@ private:
     QnStorageResourcePtr m_storage;
 };
 
-
-#endif // ENABLE_ARCHIVE
 
 #endif //single_shot_file_reader_h_215

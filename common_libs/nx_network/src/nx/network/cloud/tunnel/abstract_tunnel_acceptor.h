@@ -1,0 +1,41 @@
+#pragma once
+
+#include "abstract_incoming_tunnel_connection.h"
+
+#include <nx/network/cloud/mediator_server_connections.h>
+
+namespace nx {
+namespace network {
+namespace cloud {
+
+/**
+ *  Creates incoming specialized connected AbstractIncomingTunnelConnection
+ *  using one of a nat traversal methods.
+ */
+class NX_NETWORK_API AbstractTunnelAcceptor
+:
+    public QnStoppableAsync
+{
+public:
+    AbstractTunnelAcceptor();
+
+    // common connection info setters
+    void setConnectionInfo(String connectionId, String remotePeerId);
+    void setMediatorConnection(hpm::api::MediatorServerTcpConnection* connection);
+
+    typedef std::function<void(
+        SystemError::ErrorCode,
+        std::unique_ptr<AbstractIncomingTunnelConnection>)> AcceptHandler;
+
+    /** Shell be called only once to estabilish incomming tunnel connection */
+    virtual void accept(AcceptHandler handler) = 0;
+
+protected:
+    hpm::api::MediatorServerTcpConnection* m_mediatorConnection;
+    String m_connectionId;
+    String m_remotePeerId;
+};
+
+} // namespace cloud
+} // namespace network
+} // namespace nx

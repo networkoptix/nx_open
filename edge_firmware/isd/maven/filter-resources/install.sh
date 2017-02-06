@@ -1,16 +1,12 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-BETA=
-
-if [[ "${beta}" == "true" ]]; then 
-  BETA="-beta" 
-fi 
-DISTRIB=$COMPANY_NAME-mediaserver-${box}-${release.version}.${buildNumber}$BETA
+export DISTRIB=${artifact.name.server}
 
 update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop
-    tar xfv $DISTRIB.tar.gz  --exclude='./usr/local/apps/networkoptix/mediaserver/etc/mediaserver.conf' -C /
+    rm -Rf /usr/local/apps/${deb.customization.company.name}/mediaserver/lib
+    tar xfv $DISTRIB.tar.gz -C /
     /etc/init.d/S99$COMPANY_NAME-mediaserver start
 }
 

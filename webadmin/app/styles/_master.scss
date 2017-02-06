@@ -1,0 +1,330 @@
+
+.master-modal {
+  overflow-y: auto;
+  display: block;
+
+  @media screen and (min-height: 550px) {
+    margin-top: 135px;
+  }
+}
+
+
+.master {
+  width: 520px;
+  margin: 0 auto;
+
+
+  .horisontal-line-text{
+    padding: 10px 0;
+
+    .line{
+
+      display: inline-block;
+      width:150px;
+      height: 1px;
+      line-height: 0;
+      border: 0;
+      border-top: 1px solid #ccc;
+      margin: .4em 0;
+      padding: 0;
+    }
+
+    .text{
+      display: inline-block;
+      padding: 0 10px;
+    }
+  }
+  .panel-body {
+    height: 365px;
+    position: relative;
+  }
+  .panel-body-big{
+    height: 420px;
+  }
+
+  .vertical-center {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    margin: -60px 0 0 0 !important;
+  }
+
+  .vertical-bottom {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    margin-bottom: 16px;
+
+    a{
+      display: inline-block;
+      line-height: 16px;
+      margin-top:8px;
+    }
+  }
+
+  h2 {
+    margin-top: 30px;
+    margin-bottom: 16px;
+  }
+
+  h3{
+    margin-top: 12px;
+    margin-bottom: 12px;
+    font-size: 20px;
+  }
+
+  p.master-description {
+    height: 32px;
+    line-height: 1.6;
+  }
+
+  form {
+    display: inline-block;
+    width: 240px;
+    &.wide {
+      width: 320px;
+    }
+    &.widest {
+      width: 400px;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 8px;
+  }
+
+
+  .dropdown {
+    text-align: left;
+  }
+
+  .alert {
+    padding: 10px;
+  }
+
+  a:hover {
+    text-decoration: none;
+  }
+
+  a.external,
+  a.external:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .master-controls {
+    margin-top: 50px;
+  }
+  .master-icon+h2+.master-controls {
+    margin-top: 24px;
+  }
+
+  .panel-body > .master-icon {
+    margin-top: 40px;
+  }
+  .master-icon {
+    height: 70px;
+
+
+    .icon-success {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: 0px 0px;
+    }
+
+    .icon-fail {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -86px 0px;
+    }
+
+
+    .icon-account {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -176px 0;
+    }
+
+
+    .icon-cloud {
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -264px 0;
+    }
+
+    .icon-localSystem{
+      @include icon;
+      width: 86px;
+      height: 86px;
+      background-position: -1px -90px;
+
+    }
+    .icon-arrow-right{
+      @include icon;
+      width: 40px;
+      height: 40px;
+      margin: 15px 0;
+      background-position: -124px -180px;
+    }
+    a:hover .icon-arrow-right{
+      background-position: -172px -180px;
+    }
+    .icon-arrow-left{
+      @include icon;
+      width: 40px;
+      height: 40px;
+      margin: 15px 0;
+      background-position: -20px -180px;
+    }
+
+    a:hover .icon-arrow-left{
+      background-position: -68px -180px;
+    }
+
+    .preloader {
+      display: inline-block;
+      background-repeat: no-repeat;
+      background-size: 66px 14px;
+
+      margin-top: 56px;
+      width: 66px;
+      height: 14px;
+    }
+  }
+
+  .glyphicon.glyphicon-arrow-left {
+    @include kill-glyphicon;
+    width: 20px;
+    height: 12px;
+    background-position: 0 -175px;
+
+  }
+
+  .glyphicon.glyphicon-arrow-right {
+    @include kill-glyphicon;
+    width: 20px;
+    height: 12px;
+    background-position:  0 -188px;
+  }
+
+  .lite-client-instruction{
+    margin-top: -140px;
+  }
+}
+
+.password-input {
+  position:relative;
+  .help-block {
+    position: absolute;
+    right:0;
+  }
+  .label-container {
+    position: absolute;
+    right: 0;
+    top:0;
+    height: 100%;
+    line-height: 1;
+    padding: 6px;
+    .label {
+      height: 100%;
+      line-height: 100%;
+      display: table;
+      padding: 0 8px;
+
+      .message {
+        display: table-cell;
+        vertical-align: middle;
+        background: transparent;
+        text-transform: uppercase;
+
+        &:after{
+          white-space: pre;
+          text-transform: none;
+          border-radius: 2px;
+          line-height: 1.5;
+        }
+      }
+
+      .hint{
+
+        display: block;
+        /*display: none;*/
+        position:absolute;
+        border-radius: 2px;
+        padding:6px;
+      }
+      :hover .hint{
+        display: block;
+      }
+    }
+  }
+}
+
+[class*=hint--]:after,[class*=hint--]:before{
+  -webkit-transition-duration: 0s;
+  -moz-transition-duration: 0s;
+  transition-duration: 0s;
+}
+
+
+
+button, select, .form-control{
+  &.disabled,
+  &[disabled],
+  &.readonly,
+  &[readonly] {
+    outline: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border-color: $input-border;
+    box-shadow: none;
+  }
+}
+
+.radio-panels {
+  margin: 0;
+
+  .radio-panel {
+    padding: 0 2px;
+    .radio-panel-body {
+      border-radius: 2px;
+      padding: 0px 16px 2px;
+
+      .checkbox-icon{
+        position: absolute;
+        left: 16px;
+        top: 16px;
+
+        @include icon;
+        width: 20px;
+        height: 20px;
+
+        background-position:  -40px -176px;
+      }
+
+
+      &:hover {
+        background-color: $radio-panels-hover-bg;
+        border-color: 1px solid $radio-panels-hover-border;
+      }
+
+      &.selected {
+        .checkbox-icon{
+
+          background-position:  -20px -176px;
+        }
+        background-color: $radio-panels-selected-bg;
+        border-color: 1px solid $radio-panels-selected-border;
+      }
+
+    }
+  }
+}

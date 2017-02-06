@@ -1,33 +1,30 @@
-/**********************************************************
-* 4 mar 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef API_LICENSE_DATA_H
-#define API_LICENSE_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
 
-namespace ec2
+namespace ec2 {
+
+struct ApiLicenseData: ApiData
 {
-    struct ApiLicenseData : ApiData {
-        QnLatin1Array key;
-        QnLatin1Array licenseBlock;
-    };
+    QnLatin1Array key;
+    QnLatin1Array licenseBlock;
+
+    bool operator<(const ApiLicenseData& other) const;
+};
 #define ApiLicenseData_Fields (key)(licenseBlock)
 
-    struct ApiDetailedLicenseData: public ApiLicenseData
-    {
-        QString name;
-        qint32 cameraCount;
-        QByteArray hardwareId;
-        QString licenseType;
-        QString version;
-        QString brand;
-        QString expiration;
-    };
-#define ApiDetailedLicenseData_Fields ApiLicenseData_Fields (name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)
-}
+struct ApiDetailedLicenseData: ApiLicenseData
+{
+    QString name;
+    qint32 cameraCount;
+    QString hardwareId;
+    QString licenseType;
+    QString version;
+    QString brand;
+    QString expiration;
+};
+#define ApiDetailedLicenseData_Fields ApiLicenseData_Fields \
+    (name)(cameraCount)(hardwareId)(licenseType)(version)(brand)(expiration)
 
-#endif  //API_LICENSE_DATA_H
+} // namespace ec2

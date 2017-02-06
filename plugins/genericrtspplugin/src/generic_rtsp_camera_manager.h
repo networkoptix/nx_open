@@ -19,7 +19,7 @@ class GenericRTSPMediaEncoder;
 
 class GenericRTSPCameraManager
 :
-    public nxcip::BaseCameraManager
+    public nxcip::BaseCameraManager3
 {
 public:
     GenericRTSPCameraManager( const nxcip::CameraInfo& info );
@@ -50,8 +50,25 @@ public:
     virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
     virtual nxcip::CameraRelayIOManager* getCameraRelayIOManager() const override;
-    //!Implementation of nxcip::BaseCameraManager::getLastErrorString
+    //!Implementation of nxcip::BaseCameraManager::c
     virtual void getLastErrorString( char* errorString ) const override;
+
+
+    //!Implementation of nxcip::BaseCameraManager2::createDtsArchiveReader
+    virtual int createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const override;
+    //!Implementation of nxcip::BaseCameraManager2::find
+    virtual int find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const override;
+    //!Implementation of nxcip::BaseCameraManager2::setMotionMask
+    virtual int setMotionMask( nxcip::Picture* motionMask ) override;
+
+
+    //!Implementation of nxcip::BaseCameraManager3::getParametersDescriptionXML
+    virtual const char* getParametersDescriptionXML() const override;
+    //!Implementation of nxcip::BaseCameraManager3::getParamValue
+    virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const override;
+    //!Implementation of nxcip::BaseCameraManager3::setParamValue
+    virtual int setParamValue( const char* paramName, const char* value ) override;
+
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();

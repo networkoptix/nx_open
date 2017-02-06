@@ -14,8 +14,8 @@ namespace ec2
             return false;
 
 #ifdef _DEBUG
-        foreach (const QUuid& peer, transportHeader.dstPeers)
-            assert(!peer.isNull());
+        for (const QnUuid& peer: transportHeader.dstPeers)
+            NX_ASSERT(!peer.isNull());
 #endif
 
         tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());

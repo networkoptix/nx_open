@@ -11,7 +11,7 @@
 
 #include <QObject>
 
-#include "../datapacket/abstract_data_packet.h"
+#include <nx/streaming/abstract_data_packet.h>
 
 
 //!Interface of class, providing data on demand (pull mode)
@@ -31,6 +31,8 @@ public:
     virtual bool tryRead( QnAbstractDataPacketPtr* const data ) = 0;
     //!Returns current timestamp (in micros)
     virtual quint64 currentPos() const = 0;
+    //!Return packet to the top of the stream
+    virtual void put( QnAbstractDataPacketPtr packet ) = 0;
 
 signals:
     //!

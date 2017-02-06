@@ -16,16 +16,14 @@ const QString& QnCameraInputEvent::inputPortID() const
     return m_inputPortID;
 }
 
-bool QnCameraInputEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
-    if (!base_type::checkCondition(state, params))
-        return false;
-
-    QString inputPort = params.getInputPortId();
+bool QnCameraInputEvent::checkEventParams(const QnBusinessEventParameters &params) const 
+{
+    QString inputPort = params.inputPortId;
     return inputPort.isEmpty() || inputPort == m_inputPortID;
 }
 
 QnBusinessEventParameters QnCameraInputEvent::getRuntimeParams() const {
     QnBusinessEventParameters params = base_type::getRuntimeParams();
-    params.setInputPortId(m_inputPortID);
+    params.inputPortId = m_inputPortID;
     return params;
 }

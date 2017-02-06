@@ -1,39 +1,34 @@
-/**********************************************************
-* 21 jan 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "ec2_connection.h"
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrlQuery>
 
+#include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection(
-        ServerQueryProcessor* queryProcessor,
-        const ResourceContext& resCtx,
+    Ec2DirectConnection::Ec2DirectConnection(ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const QUrl& dbUrl)
     :
-        BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
-        m_transactionLog( new QnTransactionLog(QnDbManager::instance()) ),
-        m_connectionInfo( connectionInfo )
+        BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
+        m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
+        m_connectionInfo( connectionInfo ),
+        m_isInitialized( false )
     {
-        QnDbManager::instance()->init(
-            resCtx.resFactory,
-            dbUrl.toLocalFile(),
-            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path") );
-
-        ApiResourceParamDataList paramList;
-        QnDbManager::instance()->doQueryNoLock(nullptr, paramList);
+        m_isInitialized = detail::QnDbManager::instance()->init(dbUrl);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
-        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
+
+        // NOTE: Ec2StaticticsReporter can only be created after connection is established
+        if (m_isInitialized)
+        {
+            m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(
+                getMediaServerManager(Qn::kSystemAccess));
+        }
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -47,7 +42,18 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications() {
-        QnTransactionMessageBus::instance()->start();
+    QString Ec2DirectConnection::authInfo() const
+    {
+        return QString();
+    }
+
+    bool Ec2DirectConnection::initialized() const
+    {
+        return m_isInitialized;
+    }
+
+    Ec2StaticticsReporter* Ec2DirectConnection::getStaticticsReporter()
+    {
+        return m_staticticsReporter.get();
     }
 }

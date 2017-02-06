@@ -1,11 +1,13 @@
 #ifndef NX_CAMERA_PLUGIN_H
 #define NX_CAMERA_PLUGIN_H
 
+#include <stdint.h>
+
 #include "camera_plugin_types.h"
 #include "plugin_api.h"
 
 
-//!Network Optix Camera Integration Plugin API (c++)
+//!VMS Camera Integration Plugin API (c++)
 /*!
     Contains structures and abstract classes to be implemented in real plugin.
     
@@ -18,7 +20,7 @@
 
     \note all text values are NULL-terminated utf-8
     \note If not specified in interface's description, plugin interfaces are used in multithreaded environment the following way:\n
-        - single interface pointer is never used concurrently by multiple threads, but different pointers to same interface 
+        - single interface instance is never used concurrently by multiple threads, but different instances of the same interface 
             (e.g., \a nxcip::BaseCameraManager) can be used by different threads concurrently
 */
 namespace nxcip
@@ -46,6 +48,9 @@ namespace nxcip
     static const int NX_TRY_AGAIN = -26;
     //!Blocking call has been interrupted (e.g., by \a StreamReader::interrupt)
     static const int NX_INTERRUPTED = -27;
+    static const int NX_PARAM_READ_ONLY = -40;
+    static const int NX_UNKNOWN_PARAMETER = -41;
+    static const int NX_INVALID_PARAM_VALUE = -42;
     static const int NX_OTHER_ERROR = -100;
 
 
@@ -61,7 +66,7 @@ namespace nxcip
         char modelName[256];
         //!Firmware version in any human readable format. Optional
         char firmware[256];
-        //!Camera's unique identifier. MAC address can be used
+        //!Camera's unique identifier. MAC address can be used. MUST NOT be empty
         char uid[256];
         //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
@@ -85,7 +90,7 @@ namespace nxcip
         }
     };
 
-    static const int CAMERA_INFO_ARRAY_SIZE = 1024;
+    static const int CAMERA_INFO_ARRAY_SIZE = 256;
     static const int MAX_MODEL_NAME_SIZE = 256;
 
     //!This interface is used to find cameras and create \a BaseCameraManager instance
@@ -120,11 +125,10 @@ namespace nxcip
             It is recommended that this method works in asynchronous mode (only returning list of already found cameras).
             This method is called periodically.
             \param[out] cameras Array of size \a CAMERA_INFO_ARRAY_SIZE. Implementation filles this array with found camera(s) information
-            \param[in] localInterfaceIPAddr String representation of local interface ip (ipv4 or ipv6). 
-                If not NULL, camera search should be done on that interface only
+            \param[in] serverURL Server URL. If camera do not have own URL it should use this one
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
         */
-        virtual int findCameras( CameraInfo* cameras, const char* localInterfaceIPAddr ) = 0;
+        virtual int findCameras( CameraInfo* cameras, const char* serverURL ) = 0;
         //!Check host for camera presence
         /*!
             Plugin should investigate \a address for supported camera presence and fill \a cameras array with found camera(s) information
@@ -316,7 +320,7 @@ namespace nxcip
 
         AudioFormat()
         :
-            compressionType(CODEC_ID_NONE),
+            compressionType(AV_CODEC_ID_NONE),
             sampleRate(0),
             bitrate(0),
             byteOrder(boLittleEndian),
@@ -329,7 +333,7 @@ namespace nxcip
         }
     };
 
-        // {9A1BDA18-563C-42de-8E23-B9244FD00658}
+    // {9A1BDA18-563C-42de-8E23-B9244FD00658}
     static const nxpl::NX_GUID IID_CameraMediaEncoder2 = { { 0x9a, 0x1b, 0xda, 0x18, 0x56, 0x3c, 0x42, 0xde, 0x8e, 0x23, 0xb9, 0x24, 0x4f, 0xd0, 0x6, 0x58 } };
 
     //!Extends \a CameraMediaEncoder by adding functionality for plugin to directly provide live media stream
@@ -351,6 +355,67 @@ namespace nxcip
         virtual int getAudioFormat( AudioFormat* audioFormat ) const = 0;
     };
 
+#ifndef __GNUC__
+#pragma pack(push, 1)
+#define PACKED
+#else
+#define PACKED __attribute__((__packed__))
+#endif
+    /*!
+    */
+    struct PACKED LiveStreamConfig
+    {
+        enum LiveStreamFlags
+        {
+            LIVE_STREAM_FLAG_AUDIO_ENABLED = 0x1
+        };
+
+        int32_t reserved_head;      //!< reserved, do not use
+        int32_t flags;              //!< \sa LiveStreamFlags
+        int32_t codec;              //!< \sa nxcip::CompressionType
+        int32_t width;
+        int32_t height;
+        float framerate;
+        int32_t bitrateKbps;
+        int16_t quality;
+        int16_t gopLength;
+        uint8_t reserved_tail[96];  //!< reserved, do not use
+    };
+#ifndef __GNUC__
+#pragma pack(pop)
+#endif
+#undef PACKED
+
+    // {D1C7F082-B6F9-45F3-82D6-3CFE3EAE0260}
+    static const nxpl::NX_GUID IID_CameraMediaEncoder3 = { { 0xd1, 0xc7, 0xf0, 0x82, 0xb6, 0xf9, 0x45, 0xf3, 0x82, 0xd6, 0x3c, 0xfe, 0x3e, 0xae, 0x2, 0x60 } };
+
+    class CameraMediaEncoder3
+    :
+        public CameraMediaEncoder2
+    {
+    public:
+        //!Returns configured stream reader, providing live data stream
+        /*!
+            \a BaseCameraManager::nativeMediaStreamCapability should be present.
+
+            \param[in] config
+            \param[out] reader
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \note It's possible to return both NULL as a reader and \a nxcip::NX_NO_ERROR as error code.\n
+                - \a CameraMediaEncoder::getMediaUrl() will be used in this case.
+            \note Using with this call \a setResolution(), \a setFps() and \a setBitrate() may return \a nxcip::NX_NOT_IMPLEMENTED
+        */
+        virtual int getConfiguredLiveStreamReader(LiveStreamConfig * config, StreamReader ** reader) = 0;
+
+        //!Returns video format
+        /*!
+            \param[out] codec
+            \param[out] pixelFormat
+            \return \a nxcip::NX_NO_ERROR on success, otherwise - error code
+            \sa nxcip::CompressionType \sa nxcip::PixelFormat
+        */
+        virtual int getVideoFormat(CompressionType * codec, PixelFormat * pixelFormat) const = 0;
+    };
 
     class CameraPtzManager;
     class CameraMotionDataProvider;
@@ -421,8 +486,13 @@ namespace nxcip
             shareIpCapability                   = 0x0080,     //!< allow multiple instances on a same IP address
             dtsArchiveCapability                = 0x0100,     //!< camera has archive storage and provides access to its archive
             nativeMediaStreamCapability         = 0x0200,     //!< provides media stream through \a StreamReader interface, otherwise - \a CameraMediaEncoder::getMediaUrl is used
-            primaryStreamSoftMotionCapability   = 0x0400      //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
+            primaryStreamSoftMotionCapability   = 0x0400,     //!< it is allowed to detect motion by primary stream (if no dual streaming on camera)
+            cameraParamsPersistentCapability    = 0x0800,     //!< camera parameters can be read/set even if camera is not accessible at the moment
+            searchByMotionMaskCapability        = 0x1000,     //!< if present, \a nxcip::BaseCameraManager2::find supports \a ArchiveSearchOptions::motionMask()
+            motionRegionCapability              = 0x2000,     //!< if present, \a nxcip::BaseCameraManager3::setMotionMask is implemented
+            needIFrameDetectionCapability       = 0x4000      //!< packet will be tested if it's a I-Frame. Use it if plugin can't set \a fKeyPacket
         };
+
         //!Return bit set of camera capabilities (\a CameraCapability enumeration)
         /*!
             \param[out] capabilitiesMask
@@ -535,7 +605,7 @@ namespace nxcip
     {
     public:
         /*!
-            monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 1-bit designates that pixel MUST take part in motion search. Dimensions of this data are not
                 the same as those of video picture. Motion data just designates video frame regions that are of interest.
                 If \a motionMask is NULL, then whole picture is of interest
@@ -604,7 +674,7 @@ namespace nxcip
         virtual int find( ArchiveSearchOptions* searchOptions, TimePeriods** timePeriods ) const = 0;
         //!If camera plugin implements this method, it MUST report motion only on for region specified (\a motionMask)
         /*!
-            \param motionMask 8bpp (format \a nxcip::PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            \param motionMask 8bpp (format \a nxcip::AV_PIX_FMT_GRAY8) picture of size (\a DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 pixel value designates motion sensitivity for pixel position.
                 255 - no motion for pixel coordinates(aka motion mask), 0 - maximum possible motion sensitivity. 
                 For instance: motion detection algorithm may use this value to compare absolute difference between pixels of Y plane in subsequent frames. 
@@ -614,6 +684,56 @@ namespace nxcip
             \return \b NX_NO_ERROR on success, otherwise - error code
         */
         virtual int setMotionMask( Picture* motionMask ) = 0;
+    };
+
+
+    // {840DEECD-2F9B-4859-9081-9592D17177F8}
+    static const nxpl::NX_GUID IID_BaseCameraManager3 = { { 0x84, 0x0d, 0xee, 0xcd, 0x2f, 0x9b, 0x48, 0x59, 0x90, 0x81, 0x95, 0x92, 0xd1, 0x71, 0x77, 0xf8 } };
+
+    //!Extends \a BaseCameraManager2 by adding editable parameters
+    /*!
+        - all parameters have type string
+        - parameter ids always start with 0
+    */
+    class BaseCameraManager3
+    :
+        public BaseCameraManager2
+    {
+    public:
+        enum CameraCapability3
+        { 
+            cameraParamsPersistentCapability   = 0x0800,    //!< Camera parameters can be read/set even if camera is not accessible at the moment
+        };
+
+        //!Returns XML describing camera parameters
+        /*!
+            XML MUST conform to camera_parameters.xsd which can be found in SDK. Sample XML also can be found there
+            This XML describes parameters (types, possible values, etc..) accessible with \a getParamValue and \a setParamValue
+        */
+        virtual const char* getParametersDescriptionXML() const = 0;
+        //!Reads value of parameter \a paramName
+        /*!
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param valueBufSize IN: Length of \a valueBuf, OUT: length of string value not including \0-character
+            \return\n
+                - \a NX_NO_ERROR if value loaded to value buf. Value is always \0-terminated utf8 string
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
+                - \a NX_MORE_DATA if \a valueBuf has not enough space. In this case \a *valueBufSize is set to required buf size
+        */
+        virtual int getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const = 0;
+        //!Set value of parameter \a paramName to \a value
+        /*!
+            \param paramName \0-terminated utf-8 string specifing name of parameter.
+                This is a full name. I.e., if parameter belongs to some group, then /group_name/param_name is specified here
+            \param value \0-terminated utf8 string
+            \return\n
+                - \a NX_NO_ERROR if value successfully applied
+                - \a NX_UNKNOWN_PARAMETER if \a paramName specifies unknown parameter
+                - \a NX_PARAM_READ_ONLY if parameter is read only (check \a pfReadOnly flag)
+                - \a NX_INVALID_PARAM_VALUE if parameter value does not pass validity check
+        */
+        virtual int setParamValue( const char* paramName, const char* value ) = 0;
     };
 
 
@@ -806,8 +926,7 @@ namespace nxcip
             fReverseStream      = 0x02,
             //!set in first packet of gop block of reverse stream (see \a nxcip::DtsArchiveReader::setReverseMode)
             fReverseBlockStart  = 0x04,
-            //!packet belongs to low-quality stream. If unset, assuming frame is in high quality
-            fLowQuality         = 0x08,
+            DEPRECATED_fLowQuality = 0x08,
             /*!
                 MUST be set after each \a nxcip::DtsArchiveReader::seek, \a nxcip::DtsArchiveReader::reverseModeCapability, 
                 \a nxcip::DtsArchiveReader::setQuality to signal discontinuity in timestamp
@@ -822,10 +941,10 @@ namespace nxcip
         //!Coded media stream data
         /*!
             Data format for different codecs:\n
-                - h.264 (\a nxcip::CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
+                - h.264 (\a nxcip::AV_CODEC_ID_H264): [iso-14496-10, AnnexB] byte stream. SPS and PPS MUST be available in the stream. 
                     It is recommended that SPS and PPS are repeated before each group of pictures
-                - motion jpeg (\a nxcip::CODEC_ID_MJPEG): Each packet is a complete jpeg picture
-                - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
+                - motion jpeg (\a nxcip::AV_CODEC_ID_MJPEG): Each packet is a complete jpeg picture
+                - aac (\a nxcip::AV_CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
             \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
@@ -871,7 +990,7 @@ namespace nxcip
     public:
         //!Returns motion data. Can be NULL, if no motion
         /*!
-            Motion data is a monochrome (format \a nxcip::PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
+            Motion data is a monochrome (format \a nxcip::AV_PIX_FMT_MONOBLACK) picture of size (\a nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH, \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT) pixels, 
                 '1' bit designates motion presence in that pixel. It is not required that motion data dimensions same as 
                 those of video picture. Motion data just designates regions of video picture where motion has been detected.
             \warning motion data MUST be rotated by 90 degrees clock-wise! That means, picture returned here is \a nxcip::DEFAULT_MOTION_DATA_PICTURE_HEIGHT pixels wide and

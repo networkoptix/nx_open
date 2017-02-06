@@ -1,5 +1,4 @@
-#ifndef QN_BUSINESS_FWD_H
-#define QN_BUSINESS_FWD_H
+#pragma once
 
 #include <vector>
 
@@ -8,7 +7,9 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
-#include <utils/common/model_functions_fwd.h>
+#include <common/common_globals.h>
+
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
@@ -34,21 +35,13 @@ typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
 struct QnCameraConflictList;
 
-#ifdef Q_MOC_RUN
-class QnBusiness
-#else
-namespace QnBusiness
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
 #endif
-{
-#ifdef Q_MOC_RUN
-    Q_GADGET
-    Q_ENUMS(EventReason EventState EventType ActionType)
-public:
-#else
-    Q_NAMESPACE
-#endif
+QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType ActionType UserGroup, )
 
-    enum EventReason {
+    enum EventReason
+    {
         NoReason = 0,
         NetworkNoFrameReason,
         NetworkConnectionClosedReason,
@@ -58,10 +51,23 @@ public:
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
-        LicenseRemoved
-    };
+        LicenseRemoved,
 
-    enum EventState {
+        BackupFailedNoBackupStorageError,
+        BackupFailedSourceStorageError,
+        BackupFailedSourceFileError,
+        BackupFailedTargetFileError,
+        BackupFailedChunkError,
+        BackupEndOfPeriod,
+        BackupDone,
+        BackupCancelled,
+
+        NetworkNoResponseFromDevice
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
+
+    enum EventState
+    {
         InactiveState = 0,
         ActiveState = 1,
 
@@ -70,11 +76,12 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventState)
 
-    enum EventType {
+    enum EventType
+    {
         /** Event type is not defined. Used in rules. */
         UndefinedEvent = 0,
 
-        /** Motion has occured on a camera. */
+        /** Motion has occurred on a camera. */
         CameraMotionEvent = 1,
 
         /** Camera input signal is received. */
@@ -92,26 +99,24 @@ public:
         /** Found some cameras with same IP address. */
         CameraIpConflictEvent = 6,
 
-        /** Connection to mediaserver lost. */
+        /** Connection to server lost. */
         ServerFailureEvent = 7,
 
-        /** Two or more mediaservers are running. */
+        /** Two or more servers are running. */
         ServerConflictEvent = 8,
 
         /** Server started */
         ServerStartEvent = 9,
-        
+
         /** Not enough licenses */
         LicenseIssueEvent = 10,
 
-        /**
-         * Used when enumerating to build GUI lists, this and followed actions
-         * should not be displayed.
-         */
-        EventCount, // TODO: #Elric remove
+        /** Archive backup done */
+        BackupFinishedEvent = 11,
 
         /** System health message. */
         SystemHealthEvent = 500,
+        MaxSystemHealthEvent = 599,
 
         /** Event group. */
         AnyCameraEvent = 600,
@@ -119,71 +124,102 @@ public:
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
-        UserEvent = 1000
+        UserDefinedEvent = 1000
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
-    enum ActionType {
-        UndefinedAction = 0,
+    enum ActionType
+    {
+        UndefinedAction         = 0,
 
-        /** 
+        /**
          * Change camera output state.
          *
          * Parameters:
          * - relayOutputID (string, required)          - id of output to trigger.
-         * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
+         * - durationMs (uint, optional)               - timeout (in milliseconds) to reset camera state back.
          */
-        CameraOutputAction = 1,
+        CameraOutputAction      = 1,
 
-        CameraOutputOnceAction = 2,
-
-        BookmarkAction = 3,
+        BookmarkAction          = 3,
 
         /** Start camera recording. */
-        CameraRecordingAction = 4,
+        CameraRecordingAction   = 4,
 
         /** Activate panic recording mode. */
-        PanicRecordingAction = 5,
+        PanicRecordingAction    = 5,
 
-        /** 
-         * Send an email. This action can be executed from any endpoint. 
+        /**
+         * Send an email. This action can be executed from any endpoint.
          *
          * Parameters:
          * - emailAddress (string, required)
          */
-        SendMailAction = 6,
+        SendMailAction          = 6,
 
         /** Write a record to the server's log. */
-        DiagnosticsAction = 7,
+        DiagnosticsAction       = 7,
 
-        ShowPopupAction = 8,
+        ShowPopupAction         = 8,
 
         /**
          * Parameters:
-         * - soundUrl (string, required)               - url of sound, contains path to sound on the Server.
+         * - url (string, required)                    - url of sound, contains path to sound on the Server.
          */
-        PlaySoundAction = 9,
-
-        PlaySoundOnceAction = 10,
+        PlaySoundAction         = 9,
+        PlaySoundOnceAction     = 10,
 
         /**
          * Parameters:
          * - sayText (string, required)                - text that will be provided to TTS engine.
          */
-        SayTextAction = 11,
+        SayTextAction           = 11,
 
         /**
-         * Used when enumerating to build GUI lists, this and followed actions
-         * should not be displayed.
+         * Execute given PTZ preset.
+         * Parameters:
+         * (resourceId, presetId)
          */
-        ActionCount // TODO: #Elric remove
+        ExecutePtzPresetAction  = 12,
+
+        /**
+         * Show text overlay over the given camera(s).
+         * Parameters:
+         * - text (string, required)                    - text that will be displayed.
+         */
+        ShowTextOverlayAction   = 13,
+
+        /**
+         * Put the given camera(s) to the Alarm Layout.
+         * Parameters:
+         * - users                                      - list of users, which will receive this alarm notification
+         */
+        ShowOnAlarmLayoutAction = 14,
+
+        /**
+         * Send HTTP request as an action.
+         * Parameters:
+         * - url                                        - full HTTP url to execute. username/password are stored as part of the URL
+         * - text                                       - HTTP message body for POST method
+         */
+        ExecHttpRequestAction = 15
+
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
-    bool isImplemented(ActionType actionType);
+    enum UserGroup
+    {
+        EveryOne  = 0,
+        AdminOnly = 1,
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserGroup)
 
 } // namespace QnBusiness
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventState)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical))
+#define QN_BUSINESS_ENUM_TYPES \
+    (QnBusiness::EventReason)\
+    (QnBusiness::EventType)\
+    (QnBusiness::ActionType)\
+    (QnBusiness::UserGroup)\
 
-#endif // QN_BUSINESS_FWD_H
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_BUSINESS_ENUM_TYPES(QnBusiness::EventState), (metatype)(lexical))

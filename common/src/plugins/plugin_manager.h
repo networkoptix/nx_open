@@ -10,13 +10,16 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>
+#include <QtCore/QSettings>
+
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "plugin_api.h"
+#include "plugin_container_api.h"
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -32,7 +35,8 @@
 */
 class PluginManager
 :
-    public QObject
+    public QObject,
+    public Singleton<PluginManager>
 {
     Q_OBJECT
 
@@ -45,16 +49,18 @@ public:
         AllPlugins = QtPlugin | NxPlugin
     };
 
-    PluginManager( const QString& pluginDir = QString() );
+    PluginManager(
+        const QString& pluginDir = QString(),
+        nxpl::PluginInterface* const pluginContainer = nullptr);
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
     template<class T> QList<T*> findPlugins() const
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
 
         QList<T*> foundPlugins;
-        foreach( QSharedPointer<QPluginLoader> plugin, m_qtPlugins )
+        for( QSharedPointer<QPluginLoader> plugin: m_qtPlugins )
         {
             T* foundPlugin = qobject_cast<T*>(plugin->instance());
             if( foundPlugin )
@@ -71,7 +77,7 @@ public:
     template<class T> QList<T*> findNxPlugins( const nxpl::NX_GUID& guid ) const
     {
         QList<T*> foundPlugins;
-        foreach( nxpl::PluginInterface* plugin, m_nxPlugins )
+        for( nxpl::PluginInterface* plugin: m_nxPlugins )
         {
             void* ptr = plugin->queryInterface( guid );
             if( ptr )
@@ -82,12 +88,12 @@ public:
     }
 
     /*!
+        \param settings This settings are reported to each plugin (if supported by plugin of course)
         This method must be called implicitly
     */
-    void loadPlugins( PluginType pluginsToLoad = AllPlugins );
-
-    //!Guess what
-    static PluginManager* instance( const QString& pluginDir = QString() );
+    void loadPlugins(
+        const QSettings* settings,
+        PluginType pluginsToLoad = AllPlugins );
 
 signals:
     //!Emitted just after new plugin has been loaded
@@ -95,14 +101,20 @@ signals:
 
 private:
     const QString m_pluginDir;
+    nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 
-    void loadPluginsFromDir( const QString& dirToSearchIn, PluginType pluginsToLoad );
+    void loadPluginsFromDir(
+        const std::vector<nxpl::Setting>& settingsForPlugin,
+        const QString& dirToSearchIn,
+        PluginType pluginsToLoad );
     bool loadQtPlugin( const QString& fullFilePath );
     //!Loads \a nxpl::PluginInterface based plugin
-    bool loadNxPlugin( const QString& fullFilePath );
+    bool loadNxPlugin(
+        const std::vector<nxpl::Setting>& settingsForPlugin,
+        const QString& fullFilePath );
 };
 
 #endif /* PLUGIN_MANAGER_H */

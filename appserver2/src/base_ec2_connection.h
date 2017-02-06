@@ -10,6 +10,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "ec_connection_notification_manager.h"
+#include "ec_connection_audit_manager.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -24,6 +25,7 @@
 #include "managers/resource_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
+#include "managers/webpage_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
@@ -34,61 +36,84 @@ namespace ec2
 {
     class ECConnectionNotificationManager;
 
+    // TODO: #2.4 remove Ec2 suffix to avoid ec2::BaseEc2Connection
     template<class QueryProcessorType>
     class BaseEc2Connection
     :
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection(
-            QueryProcessorType* queryProcessor,
-            const ResourceContext& resCtx );
+        BaseEc2Connection(QueryProcessorType* queryProcessor);
+        virtual ~BaseEc2Connection();
 
-        virtual AbstractResourceManagerPtr getResourceManager() override;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
-        virtual AbstractCameraManagerPtr getCameraManager() override;
-        virtual AbstractLicenseManagerPtr getLicenseManager() override;
-        virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
-        virtual AbstractUserManagerPtr getUserManager() override;
-        virtual AbstractLayoutManagerPtr getLayoutManager() override;
-        virtual AbstractVideowallManagerPtr getVideowallManager() override;
-        virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
-        virtual AbstractMiscManagerPtr getMiscManager() override;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
-        virtual AbstractTimeManagerPtr getTimeManager() override;
+        virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &userAccessData) override;
 
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
+        virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
+        virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
+        virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
+        virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
+        virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
+        virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
+        virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
+        virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
+        virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
+        virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
+        virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
+        virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
+        virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
+        virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+
+        virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
+
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
-        QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
 
+        QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
+        virtual ECConnectionNotificationManager* notificationManager() override 
+        { return m_notificationManager.get(); }
+        ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
+
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
         QueryProcessorType* m_queryProcessor;
-        ResourceContext m_resCtx;
-        std::shared_ptr<QnLicenseManager<QueryProcessorType>> m_licenseManager;
-        std::shared_ptr<QnResourceManager<QueryProcessorType>> m_resourceManager;
-        std::shared_ptr<QnMediaServerManager<QueryProcessorType>> m_mediaServerManager;
-        std::shared_ptr<QnCameraManager<QueryProcessorType>> m_cameraManager;
-        std::shared_ptr<QnUserManager<QueryProcessorType>> m_userManager;
-        std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
-        std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
-        std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
-        std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
-        std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
-        std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
-        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
-        std::shared_ptr<QnTimeManager<QueryProcessorType>> m_timeManager;
+        QnLicenseNotificationManagerPtr m_licenseNotificationManager;
+        QnResourceNotificationManagerPtr m_resourceNotificationManager;
+        QnMediaServerNotificationManagerPtr m_mediaServerNotificationManager;
+        QnCameraNotificationManagerPtr m_cameraNotificationManager;
+        QnUserNotificationManagerPtr m_userNotificationManager;
+        QnBusinessEventNotificationManagerPtr m_businessEventNotificationManager;
+        QnLayoutNotificationManagerPtr m_layoutNotificationManager;
+        QnVideowallNotificationManagerPtr m_videowallNotificationManager;
+        QnWebPageNotificationManagerPtr m_webPageNotificationManager;
+        QnStoredFileNotificationManagerPtr m_storedFileNotificationManager;
+        QnUpdatesNotificationManagerPtr m_updatesNotificationManager;
+        QnMiscNotificationManagerPtr m_miscNotificationManager;
+        QnDiscoveryNotificationManagerPtr m_discoveryNotificationManager;
+        AbstractTimeNotificationManagerPtr m_timeNotificationManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
-
-    private:
-        QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
+        std::unique_ptr<ECConnectionAuditManager> m_auditManager;
     };
 }
 

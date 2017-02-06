@@ -25,91 +25,168 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    AbstractResourceManagerPtr OldEcConnection::getResourceManager()
+    QString OldEcConnection::authInfo() const
+    {
+        return m_connectionInfo.ecUrl.password();
+    }
+
+    AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
     {
         return AbstractResourceManagerPtr();
     }
 
-    AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager()
+    AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
     {
         return AbstractMediaServerManagerPtr();
     }
 
-    AbstractCameraManagerPtr OldEcConnection::getCameraManager()
+    AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
     {
         return AbstractCameraManagerPtr();
     }
 
-    AbstractLicenseManagerPtr OldEcConnection::getLicenseManager()
+    AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
     {
         return AbstractLicenseManagerPtr();
     }
 
-    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager()
+    AbstractBusinessEventManagerPtr OldEcConnection::getBusinessEventManager(const Qn::UserAccessData &)
     {
         return AbstractBusinessEventManagerPtr();
     }
 
-    AbstractUserManagerPtr OldEcConnection::getUserManager()
+    AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
     {
         return AbstractUserManagerPtr();
     }
 
-    AbstractLayoutManagerPtr OldEcConnection::getLayoutManager()
+    AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
     {
         return AbstractLayoutManagerPtr();
     }
 
-    AbstractVideowallManagerPtr OldEcConnection::getVideowallManager()
+    AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
     {
         return AbstractVideowallManagerPtr();
     }
 
-    AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager()
+    AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
+    {
+        return AbstractWebPageManagerPtr();
+    }
+
+    AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
     {
         return AbstractStoredFileManagerPtr();
     }
 
-    AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager()
+    AbstractUpdatesManagerPtr OldEcConnection::getUpdatesManager(const Qn::UserAccessData &)
     {
         return AbstractUpdatesManagerPtr();
     }
 
-    AbstractMiscManagerPtr OldEcConnection::getMiscManager()
+    AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
     {
         return AbstractMiscManagerPtr();
     }
 
-    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager()
+    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
     {
         return AbstractDiscoveryManagerPtr();
     }
 
-    AbstractTimeManagerPtr OldEcConnection::getTimeManager()
+    AbstractTimeManagerPtr OldEcConnection::getTimeManager(const Qn::UserAccessData &)
     {
         return AbstractTimeManagerPtr();
     }
 
-    int OldEcConnection::setPanicMode(Qn::PanicMode /*value*/, impl::SimpleHandlerPtr handler)
+    AbstractLicenseNotificationManagerPtr OldEcConnection::getLicenseNotificationManager()
     {
-        const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
-        return reqID;
+        return AbstractLicenseNotificationManagerPtr();
+    }
+
+    AbstractTimeNotificationManagerPtr OldEcConnection::getTimeNotificationManager()
+    {
+        return AbstractTimeNotificationManagerPtr();
+    }
+
+    AbstractResourceNotificationManagerPtr OldEcConnection::getResourceNotificationManager()
+    {
+        return AbstractResourceNotificationManagerPtr();
+    }
+
+    AbstractMediaServerNotificationManagerPtr OldEcConnection::getMediaServerNotificationManager()
+    {
+        return AbstractMediaServerNotificationManagerPtr();
+    }
+
+    AbstractCameraNotificationManagerPtr OldEcConnection::getCameraNotificationManager()
+    {
+        return AbstractCameraNotificationManagerPtr();
+    }
+
+    AbstractBusinessEventNotificationManagerPtr OldEcConnection::getBusinessEventNotificationManager()
+    {
+        return AbstractBusinessEventNotificationManagerPtr();
+    }
+
+    AbstractUserNotificationManagerPtr OldEcConnection::getUserNotificationManager()
+    {
+        return AbstractUserNotificationManagerPtr();
+    }
+
+    AbstractLayoutNotificationManagerPtr OldEcConnection::getLayoutNotificationManager()
+    {
+        return AbstractLayoutNotificationManagerPtr();
+    }
+
+    AbstractWebPageNotificationManagerPtr OldEcConnection::getWebPageNotificationManager()
+    {
+        return AbstractWebPageNotificationManagerPtr();
+    }
+
+    AbstractDiscoveryNotificationManagerPtr OldEcConnection::getDiscoveryNotificationManager()
+    {
+        return AbstractDiscoveryNotificationManagerPtr();
+    }
+
+    AbstractMiscNotificationManagerPtr OldEcConnection::getMiscNotificationManager()
+    {
+        return AbstractMiscNotificationManagerPtr();
+    }
+
+    AbstractUpdatesNotificationManagerPtr OldEcConnection::getUpdatesNotificationManager()
+    {
+        return AbstractUpdatesNotificationManagerPtr();
+    }
+
+    AbstractStoredFileNotificationManagerPtr OldEcConnection::getStoredFileNotificationManager()
+    {
+        return AbstractStoredFileNotificationManagerPtr();
+    }
+
+    AbstractVideowallNotificationManagerPtr OldEcConnection::getVideowallNotificationManager()
+    {
+        return AbstractVideowallNotificationManagerPtr();
     }
 
     int OldEcConnection::dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::DumpDatabaseHandler::done, handler, reqID, ec2::ErrorCode::notImplemented, ec2::ApiDatabaseDumpData()));
+        return reqID;
+    }
+
+    int OldEcConnection::dumpDatabaseToFileAsync( const QString& /*dumpFilePath*/, ec2::impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
 
     int OldEcConnection::restoreDatabaseAsync(const ApiDatabaseDumpData& /*dbFile*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
         QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(&impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented));
         return reqID;
     }
@@ -126,7 +203,28 @@ namespace ec2
     {
     }
 
+    Timestamp OldEcConnection::getTransactionLogTime() const {
+        return Timestamp();
+    }
+
+    void OldEcConnection::setTransactionLogTime(Timestamp /* value */)
+    {
+
+    }
+
+
     void OldEcConnection::startReceivingNotifications()
     {
     }
+
+    void OldEcConnection::stopReceivingNotifications()
+    {
+    }
+
+    QnUuid OldEcConnection::routeToPeerVia(const QnUuid& uuid, int* ) const
+    {
+        Q_UNUSED(uuid);
+        return QnUuid();
+    }
+
 }

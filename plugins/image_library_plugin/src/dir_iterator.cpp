@@ -11,6 +11,7 @@
 #   include <sys/types.h>
 #   include <dirent.h>
 #   include <sys/stat.h>
+#   include <errno.h>
 #else
 #   error "Unsupported platform"
 #endif

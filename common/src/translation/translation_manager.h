@@ -21,8 +21,10 @@ public:
     void addSearchPath(const QString &searchPath);
     void removeSearchPath(const QString &searchPath);
 
+    QnTranslation defaultTranslation() const;
+
     QList<QnTranslation> loadTranslations();
-    QnTranslation loadTranslation(const QString &translationPath);
+    QnTranslation loadTranslation(const QString &translationPath) const;
 
     static void installTranslation(const QnTranslation &translation);
 

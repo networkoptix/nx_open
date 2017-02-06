@@ -4,239 +4,397 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include "utils/common/delete_later.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/fusion/serialization/lexical.h>
+
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
+
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource/server_backup_schedule.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_pool.h>
+
+#include "nx_ec/ec_proto_version.h"
+
 #include <rest/server/json_rest_result.h>
-#include "utils/common/sleep.h"
-#include "utils/network/networkoptixmodulerevealcommon.h"
+
 #include <utils/common/app_info.h>
+#include "utils/common/delete_later.h"
+#include "utils/common/sleep.h"
+#include "utils/common/util.h"
+#include "network/networkoptixmodulerevealcommon.h"
+#include "api/server_rest_connection.h"
+#include <common/common_module.h>
+#include <api/global_settings.h>
 
+namespace {
+    const QString kUrlScheme = lit("rtsp");
+    const QString protoVersionPropertyName = lit("protoVersion");
+    const QString safeModePropertyName = lit("ecDbReadOnly");
+}
 
-const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
-
-class QnMediaServerResourceGuard: public QObject {
-public:
-    QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
-
-private:
-    QnMediaServerResourcePtr m_resource;
-};
-
-QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePool):
-    m_primaryIFSelected(false),
-    m_serverFlags(Qn::SF_None),
-    m_panicMode(Qn::PM_None),
-    m_guard(NULL),
-    m_maxCameras(0),
-    m_redundancy(false)
+QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
 {
-    setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
+    return sslAllowed ? lit("https") : lit("http");
+}
+
+QnMediaServerResource::QnMediaServerResource():
+    base_type(),
+    m_serverFlags(Qn::SF_None),
+    m_panicModeCache(
+        std::bind(&QnMediaServerResource::calculatePanicMode, this),
+        &m_mutex )
+{
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 
-    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
-    setName(tr("Server"));
-
-    m_primaryIFSelected = false;
     m_statusTimer.restart();
+
+    QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+    if (!resList.isEmpty())
+        m_firstCamera = resList.first();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,
+        this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved,
+        this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+
+    connect(this, &QnResource::resourceChanged,
+        this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
+
+    connect(this, &QnResource::propertyChanged,
+        this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
+
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
 {
-    QMutexLocker lock(&m_mutex); // TODO: #Elric remove once m_guard hell is removed.
+    directDisconnectAll();
+    QnMutexLocker lock( &m_mutex );
+    m_runningIfRequests.clear();
+}
+
+void QnMediaServerResource::at_propertyChanged(const QnResourcePtr & /*res*/, const QString & key)
+{
+    if (key == QnMediaResource::panicRecordingKey())
+        m_panicModeCache.update();
+}
+
+void QnMediaServerResource::at_cloudSettingsChanged()
+{
+    if (hasFlags(Qn::fake_server))
+        return;
+
+    emit auxUrlsChanged(toSharedPointer(this));
+}
+
+void QnMediaServerResource::onNewResource(const QnResourcePtr &resource)
+{
+    QnMutexLocker lock( &m_mutex );
+    if (m_firstCamera.isNull() && resource.dynamicCast<QnSecurityCamResource>() &&  resource->getParentId() == getId())
+        m_firstCamera = resource;
+}
+
+void QnMediaServerResource::onRemoveResource(const QnResourcePtr &resource)
+{
+    QnMutexLocker lock( &m_mutex );
+    if (m_firstCamera && resource->getId() == m_firstCamera->getId())
+        m_firstCamera.clear();
+}
+
+void QnMediaServerResource::beforeDestroy()
+{
+    QnMutexLocker lock(&m_mutex);
+    m_firstCamera.clear();
+}
+
+void QnMediaServerResource::atResourceChanged()
+{
+    m_panicModeCache.update();
 }
 
 QString QnMediaServerResource::getUniqueId() const
 {
-    assert(!getId().isNull());
+    NX_ASSERT(!getId().isNull());
     return QLatin1String("Server ") + getId().toString();
 }
 
-void QnMediaServerResource::setApiUrl(const QString& restUrl)
+QString QnMediaServerResource::getName() const
 {
-    QMutexLocker lock(&m_mutex);
-    if (restUrl != m_apiUrl)
+    if (getServerFlags() & Qn::SF_Edge)
     {
-        m_apiUrl = restUrl;
-        m_restConnection.clear();
+        QnMutexLocker lock( &m_mutex );
+        if (m_firstCamera)
+            return m_firstCamera->getName();
     }
+
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if( !(*lk)->name.isEmpty() )
+            return (*lk)->name;
+    }
+    return QnResource::getName();
 }
 
-QString QnMediaServerResource::getApiUrl() const
+QString QnMediaServerResource::toSearchString() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_apiUrl;
+    return base_type::toSearchString()
+        + L' '
+        + getUrl();
 }
 
-void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
+void QnMediaServerResource::setName( const QString& name )
 {
-    QMutexLocker lock(&m_mutex);
-    m_netAddrList = netAddrList;
+    if (getId().isNull())
+    {
+        base_type::setName(name);
+        return;
+    }
+
+    if (getServerFlags() & Qn::SF_Edge)
+        return;
+
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->name == name)
+            return;
+        (*lk)->name = name;
+    }
+    emit nameChanged(toSharedPointer(this));
 }
 
-const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
+void QnMediaServerResource::setNetAddrList(const QList<SocketAddress>& netAddrList)
 {
-    QMutexLocker lock(&m_mutex);
+    {
+        QnMutexLocker lock( &m_mutex );
+        if (m_netAddrList == netAddrList)
+            return;
+        m_netAddrList = netAddrList;
+    }
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<SocketAddress> QnMediaServerResource::getNetAddrList() const
+{
+    QnMutexLocker lock( &m_mutex );
     return m_netAddrList;
 }
 
 void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_additionalUrls = urls;
+    QnUuid id = getId();
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->additionalUrls(id);
+    if (oldUrls == urls)
+        return;
+
+    qnServerAdditionalAddressesDictionary->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_additionalUrls;
+    return qnServerAdditionalAddressesDictionary->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
 {
-    QMutexLocker lock(&m_mutex);
-    m_ignoredUrls = urls;
+    QnUuid id = getId();
+    QList<QUrl> oldUrls = qnServerAdditionalAddressesDictionary->ignoredUrls(id);
+    if (oldUrls == urls)
+        return;
+
+    qnServerAdditionalAddressesDictionary->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_ignoredUrls;
+    return qnServerAdditionalAddressesDictionary->ignoredUrls(getId());
+}
+
+boost::optional<SocketAddress> QnMediaServerResource::getCloudAddress() const
+{
+    const auto cloudId = getModuleInformation().cloudId();
+    if (cloudId.isEmpty())
+        return boost::none;
+    else
+        return SocketAddress(cloudId);
+}
+
+quint16 QnMediaServerResource::getPort() const
+{
+    return getPrimaryAddress().port;
+}
+
+QList<SocketAddress> QnMediaServerResource::getAllAvailableAddresses() const
+{
+    auto toAddress = [](const QUrl& url) { return SocketAddress(url.host(), url.port(0)); };
+
+    QSet<SocketAddress> ignored;
+    for (const QUrl &url : getIgnoredUrls())
+        ignored.insert(toAddress(url));
+
+    QSet<SocketAddress> result;
+    for (const auto& address : getNetAddrList())
+    {
+        if (ignored.contains(address))
+            continue;
+        result.insert(address);
+    }
+
+    for (const QUrl &url : getAdditionalUrls())
+    {
+        SocketAddress address = toAddress(url);
+        if (ignored.contains(address))
+            continue;
+        result.insert(address);
+    }
+
+    if (auto cloudAddress = getCloudAddress())
+        result.insert(std::move(*cloudAddress));
+
+    return result.toList();
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
-    /* We want the video server connection to be deleted in its associated thread, 
+    /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
-    if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+    if (!m_apiConnection)
+    {
+        QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
+        m_apiConnection = QnMediaServerConnectionPtr(
+            new QnMediaServerConnection(thisPtr, QnAppServerConnectionFactory::videowallGuid()),
+            &qnDeleteLater);
+    }
+
+    return m_apiConnection;
+}
+
+rest::QnConnectionPtr QnMediaServerResource::restConnection()
+{
+    QnMutexLocker lock( &m_mutex );
+
+    if (!m_restConnection)
+        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
 
     return m_restConnection;
 }
 
-QnResourcePtr QnMediaServerResourceFactory::createResource(const QUuid& resourceTypeId, const QnResourceParams& /*params*/)
+void QnMediaServerResource::setUrl(const QString& url)
 {
-    Q_UNUSED(resourceTypeId)
+    QnResource::setUrl(url);
 
-    QnResourcePtr result(new QnMediaServerResource(qnResTypePool));
-    //result->deserialize(parameters);
+    QnMutexLocker lock(&m_mutex);
+    if (!m_primaryAddress.isNull())
+        return;
 
+    if (m_apiConnection)
+        m_apiConnection->setUrl(getApiUrl());
+
+    lock.unlock();
+
+    emit apiUrlChanged(toSharedPointer(this));
+}
+
+QUrl QnMediaServerResource::getApiUrl() const
+{
+    return getPrimaryAddress().toUrl(apiUrlScheme(isSslAllowed()));
+}
+
+QString QnMediaServerResource::getUrl() const
+{
+    return getPrimaryAddress().toUrl(kUrlScheme).toString();
+}
+
+QnStorageResourceList QnMediaServerResource::getStorages() const
+{
+    return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
+}
+
+void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (primaryAddress == m_primaryAddress)
+            return;
+
+        m_primaryAddress = primaryAddress;
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
+    }
+
+    emit primaryAddressChanged(toSharedPointer(this));
+}
+
+bool QnMediaServerResource::isSslAllowed() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_sslAllowed;
+}
+
+void QnMediaServerResource::setSslAllowed(bool sslAllowed)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (sslAllowed == m_sslAllowed)
+            return;
+
+        m_sslAllowed = sslAllowed;
+        if (m_apiConnection)
+        {
+            auto url = m_primaryAddress.isNull()
+                ? m_apiConnection->url()
+                : m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed));
+            url.setScheme(apiUrlScheme(m_sslAllowed));
+            m_apiConnection->setUrl(url);
+        }
+    }
+
+    emit primaryAddressChanged(toSharedPointer(this));
+}
+
+SocketAddress QnMediaServerResource::getPrimaryAddress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    if (!m_primaryAddress.isNull())
+        return m_primaryAddress;
+    return nx::network::url::getEndpoint(QUrl(m_url));
+}
+
+Qn::PanicMode QnMediaServerResource::getPanicMode() const
+{
+    return m_panicModeCache.get();
+}
+
+Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
+{
+    QString strVal = getProperty(QnMediaResource::panicRecordingKey());
+    Qn::PanicMode result = Qn::PM_None;
+    QnLexical::deserialize(strVal, &result);
     return result;
 }
 
-QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
-{
-    return m_storages;
-}
-
-void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
-{
-    m_storages = storages;
-}
-
-// --------------------------------------------------
-
-/*
-class TestConnectionTask: public QRunnable
-{
-public:
-    TestConnectionTask(QnMediaServerResourcePtr owner, const QUrl& url): m_owner(owner), m_url(url) {}
-
-    void run()
-    {
-        QnHTTPRawResponse response;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), response);
-        QByteArray guid = m_owner->getGuid().toUtf8();
-        if (response.data.contains("Requested method is absent") || response.data.contains(guid))
-        {
-            // server OK
-            m_owner->setPrimaryIF(m_url.host());
-        }
-    }
-private:
-    QnMediaServerResourcePtr m_owner;
-    QUrl m_url;
-};
-*/
-
-void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int responseNum)
-{
-    QMutexLocker lock(&m_mutex);
-
-    const QString& urlStr = m_runningIfRequests.value(responseNum);
-    if( response.status == QNetworkReply::NoError )
-    {
-        QnPingReply reply;
-        QnJsonRestResult result;
-        if( QJson::deserialize(response.data, &result) && QJson::deserialize(result.reply(), &reply) && (reply.moduleGuid == getId()) )
-        {
-            // server OK
-            if (urlStr == QnMediaServerResource::USE_PROXY)
-                setPrimaryIF(urlStr);
-            else
-                setPrimaryIF(QUrl(urlStr).host());
-        }
-    }
-
-    m_runningIfRequests.remove(responseNum);
-
-    if(m_runningIfRequests.isEmpty() && m_guard) {
-        m_guard->deleteLater();
-        m_guard = NULL;
-    }
-}
-
-void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
-{
-    QUrl origApiUrl = getApiUrl();
-    {
-        QMutexLocker lock(&m_mutex);
-        if (m_primaryIFSelected)
-            return;
-        m_primaryIFSelected = true;
-    
-        if (primaryIF != USE_PROXY)
-        {
-            QUrl apiUrl(getApiUrl());
-            apiUrl.setHost(primaryIF);
-            setApiUrl(apiUrl.toString());
-
-            QUrl url(getUrl());
-            url.setHost(primaryIF);
-            setUrl(url.toString());
-        }
-
-        m_primaryIf = primaryIF;
-    }
-    emit serverIfFound(::toSharedPointer(this), primaryIF, origApiUrl.toString());
-}
-
-QString QnMediaServerResource::getPrimaryIF() const 
-{
-    QMutexLocker lock(&m_mutex);
-
-    return m_primaryIf;
-}
-
-Qn::PanicMode QnMediaServerResource::getPanicMode() const {
-    return m_panicMode;
-}
-
 void QnMediaServerResource::setPanicMode(Qn::PanicMode panicMode) {
-    {
-        QMutexLocker lock(&m_mutex);
-        if(m_panicMode == panicMode)
-            return;
-        m_panicMode = panicMode;
-    }
-    emit panicModeChanged(::toSharedPointer(this));
+    if(getPanicMode() == panicMode)
+        return;
+    QString strVal;
+    QnLexical::serialize(panicMode, &strVal);
+    setProperty(QnMediaResource::panicRecordingKey(), strVal);
+    m_panicModeCache.update();
 }
 
 Qn::ServerFlags QnMediaServerResource::getServerFlags() const
@@ -246,116 +404,117 @@ Qn::ServerFlags QnMediaServerResource::getServerFlags() const
 
 void QnMediaServerResource::setServerFlags(Qn::ServerFlags flags)
 {
-    m_serverFlags = flags;
-}
-
-
-void QnMediaServerResource::determineOptimalNetIF()
-{
-    QMutexLocker lock(&m_mutex);
-    
-    //using proxy before we able to establish direct connection
-    setPrimaryIF( QnMediaServerResource::USE_PROXY );
-
-    m_prevNetAddrList = m_netAddrList;
-    m_primaryIFSelected = false;
-
-    for (int i = 0; i < m_netAddrList.size(); ++i)
     {
-        QUrl url(m_apiUrl);
-        url.setHost(m_netAddrList[i].toString());
-        int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(url, QLatin1String("ping"), this, "at_pingResponse", Qt::DirectConnection);
-        m_runningIfRequests.insert(requestNum, url.toString());
+        QnMutexLocker lock(&m_mutex);
+        if (flags == m_serverFlags)
+            return;
+        m_serverFlags = flags;
     }
-
-    if(!m_guard) {
-        m_guard = new QnMediaServerResourceGuard(::toSharedPointer(this));
-        m_guard->moveToThread(qApp->thread());
-    }
+    emit serverFlagsChanged(::toSharedPointer(this));
 }
 
-void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
-    QString oldUrl = m_url;
-    QnResource::updateInner(other, modifiedFields);
-    bool netAddrListChanged = false;
+QnStorageResourcePtr QnMediaServerResource::getStorageByUrl(const QString& url) const
+{
+   for(const QnStorageResourcePtr& storage: getStorages()) {
+       if (storage->getUrl() == url)
+           return storage;
+   }
+   return QnStorageResourcePtr();
+}
+
+void QnMediaServerResource::updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers)
+{
+    /* Calculate primary address before the url is changed. */
+    const SocketAddress oldPrimaryAddress = getPrimaryAddress();
+    const auto oldApiUrl = getUrl();
+
+    base_type::updateInternal(other, notifiers);
+    if (getUrl() != oldApiUrl)
+        notifiers << [r = toSharedPointer(this)]{ emit r->apiUrlChanged(r); };
 
     QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
-    if(localOther) {
-        if (m_panicMode != localOther->m_panicMode)
-            modifiedFields << "panicModeChanged";
+    if (localOther)
+    {
         if (m_version != localOther->m_version)
-            modifiedFields << "versionChanged";
+            notifiers << [r = toSharedPointer(this)]{ emit r->versionChanged(r); };
+        if (m_serverFlags != localOther->m_serverFlags)
+            notifiers << [r = toSharedPointer(this)]{ emit r->serverFlagsChanged(r); };
+        if (m_netAddrList != localOther->m_netAddrList)
+            notifiers << [r = toSharedPointer(this)]{ emit r->auxUrlsChanged(r); };
 
-        m_panicMode = localOther->m_panicMode;
-
-        m_serverFlags = localOther->m_serverFlags;
-        netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
-        m_netAddrList = localOther->m_netAddrList;
         m_version = localOther->m_version;
+        m_serverFlags = localOther->m_serverFlags;
+        m_netAddrList = localOther->m_netAddrList;
         m_systemInfo = localOther->m_systemInfo;
-        m_systemName = localOther->m_systemName;
-        m_redundancy = localOther->m_redundancy;
-        m_maxCameras = localOther->m_maxCameras;
+        m_authKey = localOther->m_authKey;
 
-        QnAbstractStorageResourceList otherStorages = localOther->getStorages();
-        
-        /* Keep indices unchanged (Server does not provide this info). */
-        foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
-        {
-            foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)
-            {
-                if (otherStorage->getId() == storage->getId()) {
-                    otherStorage->setIndex(storage->getIndex());
-                    break;
-                }
-            }
-        }
-
-        setStorages(otherStorages);
     }
-    if (netAddrListChanged) {
-        m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
-        determineOptimalNetIF();
-    } else {
-        m_url = oldUrl; //rollback changed value to autodetected
+
+    const auto currentAddress = getPrimaryAddress();
+    if (oldPrimaryAddress != currentAddress)
+    {
+        if (m_apiConnection)
+            m_apiConnection->setUrl(getApiUrl());
+        if (oldPrimaryAddress.port != currentAddress.port)
+            notifiers << [r = toSharedPointer(this)]{ emit r->portChanged(r); };
     }
 }
 
 QnSoftwareVersion QnMediaServerResource::getVersion() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return m_version;
 }
 
+void QnMediaServerResource::setMaxCameras(int value)
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    (*lk)->maxCameras = value;
+}
+
 int QnMediaServerResource::getMaxCameras() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_maxCameras;
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->maxCameras;
+}
+
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->backupSchedule;
+}
+
+void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->backupSchedule == value)
+            return;
+        (*lk)->backupSchedule = value;
+    }
+    emit backupScheduleChanged(::toSharedPointer(this));
 }
 
 void QnMediaServerResource::setRedundancy(bool value)
 {
-    QMutexLocker lock(&m_mutex);
-    m_redundancy = value;
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->isRedundancyEnabled == value)
+            return;
+        (*lk)->isRedundancyEnabled = value;
+    }
+    emit redundancyChanged(::toSharedPointer(this));
 }
 
-int QnMediaServerResource::isRedundancy() const
+bool QnMediaServerResource::isRedundancy() const
 {
-    QMutexLocker lock(&m_mutex);
-    return m_redundancy;
-}
-
-void QnMediaServerResource::setMaxCameras(int value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_maxCameras = value;
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->isRedundancyEnabled;
 }
 
 void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 {
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (m_version == version)
             return;
         m_version = version;
@@ -364,65 +523,91 @@ void QnMediaServerResource::setVersion(const QnSoftwareVersion &version)
 }
 
 QnSystemInformation QnMediaServerResource::getSystemInfo() const {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return m_systemInfo;
 }
 
 void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo) {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_systemInfo = systemInfo;
 }
+QnModuleInformation QnMediaServerResource::getModuleInformation() const
+{
+    if (getId() == qnCommon->moduleGUID())
+        return qnCommon->moduleInformation();
 
-QString QnMediaServerResource::getSystemName() const {
-    QMutexLocker lock(&m_mutex);
-
-    return m_systemName;
-}
-
-void QnMediaServerResource::setSystemName(const QString &systemName) {
-    QMutexLocker lock(&m_mutex);
-
-    m_systemName = systemName;
-}
-
-QnModuleInformation QnMediaServerResource::getModuleInformation() const {
-    QMutexLocker lock(&m_mutex);
+    // build module information for other server
 
     QnModuleInformation moduleInformation;
-    moduleInformation.type = nxMediaServerId;
+    moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
-    moduleInformation.version = m_version;
-    moduleInformation.systemInformation = m_systemInfo;
-    moduleInformation.systemName = m_systemName;
+    moduleInformation.sslAllowed = m_sslAllowed;
     moduleInformation.name = getName();
-    moduleInformation.port = QUrl(m_apiUrl).port();
-    foreach (const QHostAddress &address, m_netAddrList)
-        moduleInformation.remoteAddresses.insert(address.toString());
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
+    if (moduleInformation.protoVersion == 0)
+        moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
+
+    if (hasProperty(safeModePropertyName))
+    {
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(
+            getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+    }
+
+    moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
+    moduleInformation.systemName = qnGlobalSettings->systemName();
     moduleInformation.id = getId();
-    moduleInformation.sslAllowed = false;
+    moduleInformation.port = getPort();
+    moduleInformation.version = getVersion();
+    moduleInformation.systemInformation = getSystemInfo();
+    moduleInformation.serverFlags = getServerFlags();
+    moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
+
     return moduleInformation;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return (server->getServerFlags() & Qn::SF_Edge);
     return false;
 }
 
-void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
+bool QnMediaServerResource::isHiddenServer(const QnResourcePtr &resource) {
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        return (server->getServerFlags() & Qn::SF_Edge) && !server->isRedundancy();
+    return false;
+}
+
+void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
-    if (getStatus() != newStatus) {
-        QMutexLocker lock(&m_mutex);
-        m_statusTimer.restart();
+    if (getStatus() != newStatus)
+    {
+        {
+            QnMutexLocker lock( &m_mutex );
+            m_statusTimer.restart();
+        }
+
+        QnResource::setStatus(newStatus, reason);
+        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        for(const QnResourcePtr& res: childList)
+        {
+            if (res->hasFlags(Qn::depend_on_parent_status))
+            {
+                NX_LOG(lit("%1 Emit statusChanged signal for resource %2, %3, %4")
+                        .arg(QString::fromLatin1(Q_FUNC_INFO))
+                        .arg(res->getId().toString())
+                        .arg(res->getName())
+                        .arg(res->getUrl()), cl_logDEBUG2);
+                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
+            }
+        }
     }
-    QnResource::setStatus(newStatus, silenceMode);
 }
 
 qint64 QnMediaServerResource::currentStatusTime() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_statusTimer.elapsed();
 }
 
@@ -434,4 +619,9 @@ QString QnMediaServerResource::getAuthKey() const
 void QnMediaServerResource::setAuthKey(const QString& authKey)
 {
     m_authKey = authKey;
+}
+
+QString QnMediaServerResource::realm() const
+{
+    return QnAppInfo::realm();
 }

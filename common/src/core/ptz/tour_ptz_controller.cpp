@@ -1,15 +1,22 @@
 #include "tour_ptz_controller.h"
 
 #include <QtCore/QMetaObject>
-#include <QtCore/QMutexLocker>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>
 
 #include "tour_ptz_executor.h"
 #include "ptz_controller_pool.h"
+
+bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
+{
+    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    return false;
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnTourPtzController
@@ -19,11 +26,11 @@ QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseControlle
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController))
 {
-    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     if(!baseController->hasCapabilities(Qn::VirtualPtzCapability)) // TODO: #Elric implement it in a saner way
-        m_executor->moveToThread(qnPtzPool->executorThread()); 
+        m_executor->moveToThread(qnPtzPool->executorThread());
 
     m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ToursPtzField); }, Qt::QueuedConnection);
@@ -34,10 +41,10 @@ QnTourPtzController::~QnTourPtzController() {
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
+    return
         (capabilities & Qn::PresetsPtzCapability) &&
-        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+        //((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+        //(capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
         !(capabilities & Qn::ToursPtzCapability);
 }
 
@@ -57,7 +64,7 @@ bool QnTourPtzController::continuousMove(const QVector3D &speed) {
 bool QnTourPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(!supports(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space)))
         return false;
-    
+
     clearActiveTour();
     return base_type::absoluteMove(space, position, speed);
 }
@@ -85,7 +92,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
     bool restartTour = false;
     QnPtzTour activeTour;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         QnPtzTourHash records = m_adaptor->value();
         if(records.contains(tour.id) && records.value(tour.id) == tour)
             return true; /* No need to save it. */
@@ -95,7 +102,7 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
         if(m_activeTour.id == tour.id) {
             activeTour = tour;
             activeTour.optimize();
-            
+
             if(activeTour != m_activeTour) {
                 restartTour = true;
                 m_activeTour = activeTour;
@@ -118,12 +125,12 @@ bool QnTourPtzController::createTour(const QnPtzTour &tour) {
 bool QnTourPtzController::removeTour(const QString &tourId) {
     bool stopTour = false;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
 
         QnPtzTourHash records = m_adaptor->value();
         if(records.remove(tourId) == 0)
             return false;
-    
+
         if(m_activeTour.id == tourId) {
             m_activeTour = QnPtzTour();
             stopTour = true;
@@ -134,7 +141,7 @@ bool QnTourPtzController::removeTour(const QString &tourId) {
 
     if(stopTour)
         m_executor->stopTour();
-    
+
     emit changed(Qn::ToursPtzField);
     return true;
 }
@@ -146,7 +153,7 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 
     QnPtzTour activeTour;
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_activeTour.id == tourId)
             return true; /* Already activated. */
 
@@ -156,7 +163,7 @@ bool QnTourPtzController::activateTour(const QString &tourId) {
 
         activeTour = records.value(tourId);
         activeTour.optimize();
-        
+
         m_activeTour = activeTour;
     }
 
@@ -174,6 +181,6 @@ bool QnTourPtzController::getTours(QnPtzTourList *tours) {
 void QnTourPtzController::clearActiveTour() {
     m_executor->stopTour();
 
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_activeTour = QnPtzTour();
 }

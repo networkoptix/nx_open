@@ -2,11 +2,24 @@
 
 #include <QtCore/QDebug>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
-namespace {
-    const QString desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
-}
+const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
+const QString QnResourceTypePool::kServerTypeId(lit("Server"));
+const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
+const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+const QString QnResourceTypePool::kStorageTypeId(lit("Storage"));
+const QString QnResourceTypePool::kUserTypeId(lit("User"));
+
+const QnUuid QnResourceTypePool::kUserTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kUserTypeId));
+const QnUuid QnResourceTypePool::kServerTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kServerTypeId));
+const QnUuid QnResourceTypePool::kStorageTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kStorageTypeId));
+const QnUuid QnResourceTypePool::kLayoutTypeUuid(
+    qnResTypePool->getFixedResourceTypeId(kLayoutTypeId));
+const QnUuid QnResourceTypePool::kDesktopCameraTypeUuid("{1657647e-f6e4-bc39-d5e8-563c93cb5e1c}");
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -23,7 +36,7 @@ QnResourceType::~QnResourceType()
 {
 }
 
-void QnResourceType::setParentId(const QUuid &value) {
+void QnResourceType::setParentId(const QnUuid &value) {
     m_parentId = value;
 }
 
@@ -40,7 +53,7 @@ bool QnResourceType::isCamera() const
         return m_isCamera;
     }
 
-    foreach (QUuid parentId, allParentList())
+    for (const QnUuid& parentId: allParentList())
     {
         if (!parentId.isNull())
         {
@@ -61,7 +74,7 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
-void QnResourceType::addAdditionalParent(QUuid parent)
+void QnResourceType::addAdditionalParent(const QnUuid& parent)
 {
     if (parent.isNull()) {
         qWarning() << "Adding NULL parentId";
@@ -72,59 +85,63 @@ void QnResourceType::addAdditionalParent(QUuid parent)
         m_additionalParentList << parent;
 }
 
-QList<QUuid> QnResourceType::allParentList() const
+QList<QnUuid> QnResourceType::allParentList() const
 {
-    QList<QUuid> result;
+    QList<QnUuid> result;
     if (!m_parentId.isNull())
         result << m_parentId;
     result << m_additionalParentList;
     return result;
 }
 
-void QnResourceType::addParamType(QnParamTypePtr param)
+void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QMutexLocker _lock(&m_allParamTypeListCacheMutex); // in case of connect to anther app server 
-    m_paramTypeList.append(param);
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server
+    m_paramTypeList.insert(name, defaultValue);
 }
 
-const QList<QnParamTypePtr>& QnResourceType::paramTypeList() const
+bool QnResourceType::hasParam(const QString& name) const
+{
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().contains(name);
+}
+
+QString QnResourceType::defaultValue(const QString& key) const
+{
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().value(key);
+}
+
+const ParamTypeMap QnResourceType::paramTypeList() const
+{
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe();
+}
+
+const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
 {
     if (m_allParamTypeListCache.isNull())
     {
-        QMutexLocker _lock(&m_allParamTypeListCacheMutex);
-
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
-        QSharedPointer<ParamTypeList> allParamTypeListCache(new ParamTypeList());
+        QSharedPointer<ParamTypeMap> allParamTypeListCache(new ParamTypeMap());
+        *allParamTypeListCache = m_paramTypeList;
 
-        ParamTypeList paramTypeList = ParamTypeList();
-
-        paramTypeList += m_paramTypeList;
-
-        foreach (QUuid parentId, allParentList()) {
+        for (const QnUuid& parentId: allParentList()) {
             if (parentId.isNull()) {
                 continue;
             }
 
-            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) {
-                paramTypeList += parent->paramTypeList();
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
+            {   // Note. Copy below, should be thread safe.
+                ParamTypeMap parentData = parent->paramTypeList();
+                for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
+                    if (!allParamTypeListCache->contains(itr.key()))
+                        allParamTypeListCache->insert(itr.key(), itr.value());
+                }
             } else {
                 qWarning() << "parentId is" << parentId.toString() << "but there is no such parent in database";
-            }
-        }
-
-        QSet<QString> paramTypeNames;
-
-        QList<QnParamTypePtr>::iterator it = paramTypeList.begin();
-        for (; it != paramTypeList.end(); ++it)
-        {
-            const QnParamTypePtr& paramType = *it;
-
-            if (!paramTypeNames.contains(paramType->name))
-            {
-                allParamTypeListCache->append(paramType);
-                paramTypeNames.insert(paramType->name);
             }
         }
 
@@ -145,7 +162,7 @@ QnResourceTypePool *QnResourceTypePool::instance()
 
 QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
     {
         if (itr.value()->getName() == name)
@@ -154,72 +171,64 @@ QnResourceTypePtr QnResourceTypePool::getResourceTypeByName(const QString& name)
     return QnResourceTypePtr();
 }
 
-QnResourceTypePtr QnResourceTypePool::getResourceType(QUuid id) const
+QnResourceTypePtr QnResourceTypePool::getResourceType(QnUuid id) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.find(id);
     return itr != m_resourceTypeMap.end() ? itr.value() : QnResourceTypePtr();
 }
 
-void QnResourceTypePool::addResourceTypeList(const QList<QnResourceTypePtr>& resourceTypeList)
+void QnResourceTypePool::replaceResourceTypeList(const QnResourceTypeList &resourceTypeList)
 {
-    QMutexLocker lock(&m_mutex);
-    foreach(const QnResourceTypePtr& resourceType, resourceTypeList)
-        m_resourceTypeMap.insert(resourceType->getId(), resourceType);
-}
-
-void QnResourceTypePool::replaceResourceTypeList(const QList<QnResourceTypePtr> &resourceTypeList)
-{
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     m_resourceTypeMap.clear();
 
-    foreach(const QnResourceTypePtr& resourceType, resourceTypeList)
+    for(const QnResourceTypePtr& resourceType: resourceTypeList)
         m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
 void QnResourceTypePool::addResourceType(QnResourceTypePtr resourceType)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_resourceTypeMap.insert(resourceType->getId(), resourceType);
 }
 
-QUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
+QnUuid QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning) const
 {
-    QMutexLocker lock(&m_mutex);
-    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    QnMutexLocker lock( &m_mutex );
+    for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
-        //NX_LOG(rt->getName(), cl_logALWAYS); //debug
-
-        if (rt->getName() == name && rt->getManufacture()==manufacture)
+        if (rt->getManufacture()==manufacture && rt->getName().compare(name, Qt::CaseInsensitive) == 0)
             return rt->getId();
     }
 
     if (showWarning)
-        qWarning() << "Cannot find such resource type!!!!: " << manufacture << name;
+        NX_LOG( lit("Cannot find resource type for manufacturer: %1, model name: %2").arg(manufacture).arg(name), cl_logDEBUG2 );
 
-    // Q_ASSERT(false);
-    return QUuid();
+    // NX_ASSERT(false);
+    return QnUuid();
 }
 
-QUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name) const {
-    QUuid result = guidFromArbitraryData(name.toUtf8() + QByteArray("-"));
+QnUuid QnResourceTypePool::getFixedResourceTypeId(const QString& name)
+{
+    QnUuid result = guidFromArbitraryData(name.toUtf8() + QByteArray("-"));
 
 #ifdef _DEBUG
-    QUuid online = getResourceTypeId(QString(), name, false);
+    QnUuid online = qnResTypePool->getResourceTypeId(QString(), name, false);
     if (!online.isNull())
-        Q_ASSERT(result == online);
+        NX_ASSERT(result == online);
 #endif
 
     return result;
 }
 
-QUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
+QnUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, const QString& name) const
 {
-    QMutexLocker lock(&m_mutex);
-    QUuid result;
+    QnMutexLocker lock( &m_mutex );
+    QnUuid result;
     int bestLen = -1;
-    foreach(QnResourceTypePtr rt, m_resourceTypeMap)
+    for(const QnResourceTypePtr& rt: m_resourceTypeMap)
     {
         if (rt->getManufacture() == manufacture)
         {
@@ -233,30 +242,19 @@ QUuid QnResourceTypePool::getLikeResourceTypeId(const QString& manufacture, cons
         }
     }
 
-
     return result;
 }
 
 bool QnResourceTypePool::isEmpty() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return m_resourceTypeMap.isEmpty();
 }
 
 QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     return QnResourceTypeMap(m_resourceTypeMap);
-}
-
-QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
-    QMutexLocker lock(&m_mutex);
-    for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
-    {
-        if (itr.value()->getName() == desktopCameraTypeName)
-            return itr.value();
-    }
-    return QnResourceTypePtr();
 }

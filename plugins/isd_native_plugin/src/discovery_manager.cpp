@@ -10,6 +10,7 @@
 #ifdef _POSIX_C_SOURCE
 #include <unistd.h>
 #endif
+#include <iostream>
 #include <cstdio>
 
 #include "camera_manager.h"
@@ -27,13 +28,16 @@
 #include <string.h>
 
 #include <QtCore/QFile>
-#include <utils/network/nettools.h>
+#include <nx/network/nettools.h>
 
 
 DiscoveryManager::DiscoveryManager()
 :
     m_refManager( IsdNativePlugin::instance()->refManager() )
 {
+#ifndef NO_ISD_AUDIO
+    m_audioStreamReader.reset( new AudioStreamReader() );
+#endif
 }
 
 void* DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
@@ -73,7 +77,12 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     //const char* mac = "543959ab129a";
     char  mac[MAC_ADDR_LEN];
     char* host = 0;
-    getMacFromPrimaryIF(mac, &host);
+    if( getMacFromPrimaryIF(mac, &host) == -1 )
+    {
+        const int error = errno;    //saving errno so that it is not broken by output
+        std::cerr<<"Failed to get primary interface MAC/IP. "<<strerror(error)<<std::endl;
+        return 0;
+    }
 
     if( m_modelName.isEmpty() )
     {
@@ -160,7 +169,12 @@ nxcip::BaseCameraManager* DiscoveryManager::createCameraManager( const nxcip::Ca
     {
         //TODO/IMPL checking, if audio is present at info.url
     }
-    return new CameraManager( infoCopy );
+    return new CameraManager(
+        infoCopy
+#ifndef NO_ISD_AUDIO
+        , m_audioStreamReader
+#endif
+        );
 }
 
 int DiscoveryManager::getReservedModelList( char** /*modelList*/, int* count )

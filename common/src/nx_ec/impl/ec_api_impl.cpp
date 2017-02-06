@@ -26,14 +26,24 @@ namespace ec2
                 return lit( "unsupported" );
             case ErrorCode::unauthorized:
                 return lit( "unauthorized" );
+            case ErrorCode::ldap_temporary_unauthorized:
+                return lit("ldap temporary unauthorized");
+            case ErrorCode::forbidden:
+                return lit( "forbidden" );
+            case ErrorCode::cloud_temporary_unauthorized:
+                return lit( "cloud temporary unauthorized" );
             case ErrorCode::badResponse:
                 return lit( "badResponse" );
-            case ErrorCode::skipped:
-                return lit( "skipped" );
             case ErrorCode::dbError:
                 return lit( "dbError" );
+            case ErrorCode::containsBecauseTimestamp:
+                return lit ("containsBecauseTimestamp");
+            case ErrorCode::containsBecauseSequence:
+                return lit ("containsBecauseSequence");
             case ErrorCode::notImplemented:
                 return lit( "notImplemented" );
+            case ErrorCode::incompatiblePeer:
+                return lit( "incompatiblePeer" );
             default:
                 return lit( "unknown error" );
         }

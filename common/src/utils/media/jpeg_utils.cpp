@@ -5,6 +5,7 @@
 
 #include "jpeg_utils.h"
 
+#include <nx/utils/log/assert.h>
 
 namespace nx_jpg
 {
@@ -98,7 +99,7 @@ namespace nx_jpg
                 }
 
                 default:
-                    assert( false );
+                    NX_ASSERT( false );
             }
         }
         return succeeded;

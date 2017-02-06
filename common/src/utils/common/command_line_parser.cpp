@@ -6,6 +6,11 @@
 #include <QtCore/QStringList>
 
 #include <utils/common/warnings.h>
+#include <nx/utils/log/assert.h>
+
+namespace {
+    const QString uriDelimiter(lit("://"));
+};
 
 void QnCommandLineParameter::init(void *target, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
     m_target = target;
@@ -88,19 +93,19 @@ void QnCommandLineParser::print(QTextStream &stream) const {
 
     int shortNameWidth = 0;
     int longNameWidth = 0;
-    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+    for(const QnCommandLineParameter &parameter: m_parameters) {
         shortNameWidth = qMax(shortNameWidth, parameter.shortName().size());
         longNameWidth = qMax(longNameWidth, parameter.longName().size());
     }
     if(longNameWidth > 0)
         longNameWidth++; /* So that there is a single space between long & short names. */
 
-    foreach(const QnCommandLineParameter &parameter, m_parameters) {
+    for(const QnCommandLineParameter &parameter: m_parameters) {
         stream.setFieldAlignment(QTextStream::AlignRight);
-        
+
         stream.setFieldWidth(shortNameWidth);
         stream << parameter.shortName();
-        
+
         stream.setFieldWidth(longNameWidth);
         stream << parameter.longName();
 
@@ -111,31 +116,41 @@ void QnCommandLineParser::print(QTextStream &stream) const {
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, FILE *errorFile, ParameterPreservationMode preservationMode) {
-    if(errorFile) {
+bool QnCommandLineParser::parse(int &argc, const char **argv, FILE *errorFile)
+{
+    if (errorFile)
+    {
         QTextStream errorStream(errorFile);
-        return parse(argc, argv, &errorStream, preservationMode);
-    } else {
-        return parse(argc, argv, static_cast<QTextStream *>(NULL), preservationMode);
+        return parse(argc, argv, &errorStream);
+    }
+    else
+    {
+        return parse(argc, argv, static_cast<QTextStream *>(NULL));
     }
 }
 
-bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream, ParameterPreservationMode preservationMode) {
+bool QnCommandLineParser::parse(int &argc, const char **argv, QTextStream *errorStream)
+{
     bool result = true;
-    int pos = 0, skipped = 0;
+    int pos = 0;
 
-    while(pos < argc) {
+    while (pos < argc)
+    {
         /* Extract name. */
-        QStringList paramInfo = QString(QLatin1String(argv[pos])).split(QLatin1Char('='));
+        QString argument = QString(QLatin1String(argv[pos]));
+        bool isUri = argument.contains(uriDelimiter);
+
+        QStringList paramInfo = isUri
+            ? argument.split(uriDelimiter)
+            : argument.split(L'=');
         QString name = paramInfo[0];
+        if (isUri)
+            name += uriDelimiter;   /* So the registering code looks much better. */
 
         int index = m_indexByName.value(name, -1);
-        if(index == -1) {
-            if(preservationMode == RemoveParsedParameters)
-                argv[skipped] = argv[pos];
-
+        if (index == -1)
+        {
             pos++;
-            skipped++;
             continue;
         }
 
@@ -143,17 +158,25 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
 
         /* Extract value. */
         QVariant value;
-        if (paramInfo.size() > 1) {
+        if (paramInfo.size() > 1)
+        {
             value = paramInfo[1];
-        } else if(parameter.impliedValue().isValid()) {
+        }
+        else if (parameter.impliedValue().isValid())
+        {
             value = parameter.impliedValue();
-        } else {
+        }
+        else
+        {
             pos++;
-            if(pos >= argc) {
-                if(errorStream)
-                    *errorStream << tr("No value provided for the '%1' argument.").arg(name) << endl;
+            if (pos >= argc)
+            {
+                if (errorStream)
+                    *errorStream << lit("No value provided for the '%1' argument.").arg(name) << endl;
                 result = false;
-            } else {
+            }
+            else
+            {
                 value = QLatin1String(argv[pos]);
             }
         }
@@ -161,14 +184,17 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         /* Convert to typed value. */
         QVariant typedValue = value;
         bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
-        if(!success) {
-            if(errorStream)
-                *errorStream << tr("Invalid value for '%1' argument - expected %2, provided '%3'.")
-                    .arg(name)
-                    .arg(QLatin1String(QMetaType::typeName(parameter.type())))
-                    .arg(value.toString()) << endl;
+        if (!success)
+        {
+            if (errorStream)
+                *errorStream << lit("Invalid value for '%1' argument - expected %2, provided '%3'.")
+                .arg(name)
+                .arg(QLatin1String(QMetaType::typeName(parameter.type())))
+                .arg(value.toString()) << endl;
             result = false;
-        } else {
+        }
+        else
+        {
             value = typedValue;
         }
 
@@ -176,8 +202,9 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         m_values[index] = value;
 
         /* Write value out if needed. */
-        if(parameter.target() && parameter.metaType() && result) {
-            assert(value.userType() == parameter.type());
+        if (parameter.target() && parameter.metaType() && result)
+        {
+            NX_ASSERT(value.userType() == parameter.type());
 
             parameter.metaType()->construct(parameter.target(), value.data());
         }
@@ -185,7 +212,5 @@ bool QnCommandLineParser::parse(int &argc, char **argv, QTextStream *errorStream
         pos++;
     }
 
-    if(preservationMode == RemoveParsedParameters)
-        argc = skipped;
     return result;
 }

@@ -3,9 +3,9 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <utils/common/sleep.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 #include <core/resource/camera_resource.h>
 
 
@@ -25,7 +25,7 @@ void QnClientPullMediaStreamProvider::run()
 {
     initSystemThreadId();
     setPriority(QThread::HighPriority);
-    NX_LOG("stream reader started", cl_logDEBUG1);
+    NX_LOG("stream reader started", cl_logDEBUG2);
 
     int numberOfChnnels = 1;
 
@@ -52,7 +52,8 @@ void QnClientPullMediaStreamProvider::run()
         }
 
 
-        if (getResource()->hasUnprocessedCommands()) // if command processor has something in the queue for this resource let it go first
+        if (getResource()->hasUnprocessedCommands() || // if command processor has something in the queue for this resource let it go first
+            !m_resource->isInitialized())
         {
             QnSleep::msleep(5);
             continue;
@@ -62,12 +63,9 @@ void QnClientPullMediaStreamProvider::run()
 
         if (data==0)
         {
-            if (needToStop())
-                continue;
-
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
@@ -78,15 +76,8 @@ void QnClientPullMediaStreamProvider::run()
                 m_stat[0].onLostConnection();
             }
 
-            /*
-            if (getResource()->getStatus() == Qn::Offline) {
-                for (int i = 0; i < 100 && !m_needStop; ++i)
-                    QnSleep::msleep(10);
-            }
-            else */
-            {
+            if (!needToStop())
                 QnSleep::msleep(30);
-            }
 
             continue;
         }
@@ -106,8 +97,7 @@ void QnClientPullMediaStreamProvider::run()
                 getResource()->setStatus(Qn::Online);
         }
 
-        QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-        
+        QnCompressedVideoDataPtr videoData = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
 
         if (mFramesLost>0) // we are alive again
         {
@@ -126,7 +116,7 @@ void QnClientPullMediaStreamProvider::run()
             {
                 if (videoData->channelNumber>CL_MAX_CHANNEL_NUMBER-1)
                 {
-                    Q_ASSERT(false);
+                    NX_ASSERT(false);
                     continue;
                 }
 
@@ -145,24 +135,31 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(videoData->dataSize());
+            m_stat[videoData->channelNumber].onData(
+                static_cast<unsigned int>(videoData->dataSize()),
+                videoData->flags & AV_PKT_FLAG_KEY);
+
             if (lp)
-                lp->onGotVideoFrame(videoData);
+                lp->onGotVideoFrame(videoData, getLiveParams(), isCameraControlRequired());
+
         }
+
         if (data && lp && lp->getRole() == Qn::CR_SecondaryLiveVideo)
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 
         putData(std::move(data));
 
-        if (videoData && !isMaxFps())
-            m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
+        if (videoData && !isMaxFps()) {
+            qint64 sleepTimeUsec = 1000*1000ll / getLiveParams().fps;
+            m_fpsSleep.sleep(sleepTimeUsec / numberOfChnnels); // reduce sleep time if camera has several channels to archive requested fps per channel
+        }
 
     }
 
     afterRun();
 
-    NX_LOG("stream reader stopped", cl_logDEBUG1);
+    NX_LOG("stream reader stopped", cl_logDEBUG2);
 }
 
 void QnClientPullMediaStreamProvider::beforeRun()

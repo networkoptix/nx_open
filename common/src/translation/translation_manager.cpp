@@ -4,19 +4,24 @@
 #include <QtCore/QTranslator>
 #include <QtCore/QCoreApplication>
 
+#include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
-#include <common/common_globals.h>
+
+namespace {
+    const QString defaultSearchPath(lit(":/translations"));
+
+    const QString defaultPrefix(lit("common"));
+}
 
 QnTranslationManager::QnTranslationManager(QObject *parent):
     QObject(parent),
     m_translationsValid(false)
 {
-    addPrefix(lit("common"));
+    addPrefix(defaultPrefix);
     addPrefix(lit("qt"));
     addPrefix(lit("qtbase"));
-    addPrefix(lit("qtmultimedia"));
-    
-    addSearchPath(lit(":/translations"));
+
+    addSearchPath(defaultSearchPath);
     // Closing a backdoor for custom translations --Elric
     /*if(qApp) {
         addSearchPath(qApp->applicationDirPath() + lit("/translations"));
@@ -93,11 +98,16 @@ void QnTranslationManager::installTranslation(const QnTranslation &translation) 
     if(locale.language() != QLocale::C)
         QLocale::setDefault(locale);
 
-    foreach(const QString &file, translation.filePaths()) {
+    for(const QString &file: translation.filePaths()) {
         QScopedPointer<QTranslator> translator(new QTranslator(qApp));
         if(translator->load(file))
             qApp->installTranslator(translator.take());
     }
+}
+
+QnTranslation QnTranslationManager::defaultTranslation() const {
+    QString defaultTranslationPath = lit("%1/%2_%3.qm").arg(defaultSearchPath).arg(defaultPrefix).arg(QnAppInfo::defaultLanguage());
+    return loadTranslation(defaultTranslationPath);
 }
 
 QList<QnTranslation> QnTranslationManager::loadTranslations() {
@@ -109,7 +119,7 @@ QList<QnTranslation> QnTranslationManager::loadTranslations() {
     return m_translations;
 }
 
-QnTranslation QnTranslationManager::loadTranslation(const QString &translationPath) {
+QnTranslation QnTranslationManager::loadTranslation(const QString &translationPath) const {
     if(m_prefixes.isEmpty())
         return QnTranslation();
 
@@ -124,13 +134,15 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
     if(m_searchPaths.isEmpty() || m_prefixes.isEmpty())
         return result;
 
-    foreach(const QString &path, m_searchPaths) {
+    for(const QString &path: m_searchPaths) {
         QDir dir(path);
         if(!dir.exists())
             continue;
 
         QString mask = m_prefixes[0] + lit("*.qm");
-        foreach(const QString &fileName, dir.entryList(QStringList(mask))) {
+        for(const QString &fileName: dir.entryList(QStringList(mask)))
+        {
+            qDebug() << "found translation" << fileName;
             QnTranslation translation = loadTranslationInternal(dir.absolutePath(), fileName);
             if(!translation.isEmpty())
                 result.push_back(translation);
@@ -144,12 +156,16 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
     QString filePath = translationDir + L'/' + translationName;
     QString suffix = translationName.mid(m_prefixes[0].size());
 
+    if (!QFileInfo(filePath).exists())
+        return QnTranslation();
+
     QTranslator translator;
-    translator.load(filePath);
+    if (!translator.load(filePath))
+        return QnTranslation();
 
     /* Note that '//:' denotes a comment for translators that will appear in TS files. */
 
-    //: Internal. Please don't change existing translation.
+    //: Language name that will be displayed to user. Must not be empty.
     QString languageName = translator.translate("Language", "Language Name");
 
     //: Internal. Please don't change existing translation.
@@ -164,4 +180,3 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
 
     return QnTranslation(languageName, localeCode, filePaths);
 }
-

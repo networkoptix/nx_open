@@ -1,11 +1,15 @@
 #ifndef QN_SPACE_MAPPER_H
 #define QN_SPACE_MAPPER_H
 
+#ifndef Q_MOC_RUN
 #include <boost/array.hpp>
+#endif
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
 #include <QtCore/QMetaType>
+
+#include <QtGui/QVector3D>
 
 #include "interpolator.h"
 
@@ -57,7 +61,7 @@ public:
 private:
     void init(const QVector<QPair<qreal, qreal> > &sourceToTarget, Qn::ExtrapolationMode extrapolationMode) {
         QVector<QPair<qreal, qreal> > targetToSource;
-        foreach(const auto &point, sourceToTarget)
+        for(const auto &point: sourceToTarget)
             targetToSource.push_back(qMakePair(point.second, point.first));
 
         m_sourceToTarget.setPoints(sourceToTarget);
@@ -79,7 +83,7 @@ public:
         m_mappers[2] = zMapper;
     }
 
-    QVector3D sourceToTarget(const QVector3D &source) const { 
+    QVector3D sourceToTarget(const QVector3D &source) const {
         return QVector3D(
             m_mappers[0]->sourceToTarget(source.x()),
             m_mappers[1]->sourceToTarget(source.y()),
@@ -87,7 +91,7 @@ public:
         );
     }
 
-    QVector3D targetToSource(const QVector3D &target) const { 
+    QVector3D targetToSource(const QVector3D &target) const {
         return QVector3D(
             m_mappers[0]->targetToSource(target.x()),
             m_mappers[1]->targetToSource(target.y()),

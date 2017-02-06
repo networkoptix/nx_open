@@ -13,9 +13,9 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/synctime.h>
 
 #include "session_manager.h"
@@ -34,22 +34,6 @@ QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
     return;
 }
 
-void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_currentVersion = version;
-    }
-}
-
-QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_currentVersion;
-    }
-
-    return QnSoftwareVersion();
-}
-
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -59,40 +43,22 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
     return 0;
 }
 
-QString QnAppServerConnectionFactory::clientGuid()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_clientGuid;
-    }
-
-    return QString();
-}
-
 QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
-
-        QMutexLocker locker(&factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
+        NX_ASSERT(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
         return factory->m_url;
     }
 
     return QUrl();
 }
 
-void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_clientGuid = guid;
-    }
-}
-
-
 void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
     if (url.isValid())
-        Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+        NX_ASSERT(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        QMutexLocker locker(&factory->m_mutex);
+        QnMutexLocker locker( &factory->m_mutex );
         factory->m_url = url;
     }
 }
@@ -104,30 +70,44 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
     }
 }
 
-QUuid QnAppServerConnectionFactory::videowallGuid() {
+QnUuid QnAppServerConnectionFactory::videowallGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_videowallGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setVideowallGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setVideowallGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_videowallGuid = uuid;
     }
 }
 
-QUuid QnAppServerConnectionFactory::instanceGuid() {
+QnUuid QnAppServerConnectionFactory::instanceGuid() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
         return factory->m_instanceGuid;
-    return QUuid();
+    return QnUuid();
 }
 
-void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
+void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_instanceGuid = uuid;
     }
+}
+
+QnConnectionInfo QnAppServerConnectionFactory::connectionInfo()
+{
+    if (auto factory = qn_appServerConnectionFactory_instance())
+        return factory->m_connectionInfo;
+
+    return QnConnectionInfo();
+}
+
+void QnAppServerConnectionFactory::setConnectionInfo(const QnConnectionInfo& connectionInfo)
+{
+    if (auto factory = qn_appServerConnectionFactory_instance())
+        factory->m_connectionInfo = connectionInfo;
 }
 
 static ec2::AbstractECConnectionFactory* ec2ConnectionFactoryInstance = nullptr;
@@ -150,18 +130,4 @@ void QnAppServerConnectionFactory::setEc2Connection(const ec2::AbstractECConnect
 
 ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2() {
     return currentlyUsedEc2Connection;
-}
-
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection) // TODO: #Elric #EC2 pass reference
-{
-    QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager()->getResourceTypesSync(&resourceTypeList);
-    if( errorCode != ec2::ErrorCode::ok )
-    {
-        NX_LOG( QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR );
-        return false;
-    }
-
-    qnResTypePool->replaceResourceTypeList(resourceTypeList);
-    return true;
 }

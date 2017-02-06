@@ -11,7 +11,10 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/hash.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
+#include <nx/utils/log/assert.h>
+
+#include <nx/utils/log/assert.h>
 
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.
@@ -56,7 +59,7 @@ public:
      * \param[out] items                Set to add found values to.
      */
     void values(const QRect &region, QSet<T> *items) const {
-        assert(items != NULL);
+        NX_ASSERT(items != NULL);
 
         for (int r = region.top(); r <= region.bottom(); ++r) {
             for (int c = region.left(); c <= region.right(); ++c) {
@@ -83,7 +86,7 @@ public:
      */
     QSet<T> values(const QList<QRect> &regions) const {
         QSet<T> result;
-        foreach(const QRect &region, regions)
+        for(const QRect &region: regions)
             values(region, &result);
         return result;
     }

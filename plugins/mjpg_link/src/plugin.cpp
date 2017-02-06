@@ -22,11 +22,10 @@ static HttpLinkPlugin* httpLinkPluginInstance = NULL;
 
 HttpLinkPlugin::HttpLinkPlugin()
 :
-    m_refManager( this )
+    m_refManager( this ),
+    m_timeProvider(nullptr)
 {
     httpLinkPluginInstance = this;
-
-    m_discoveryManager.reset( new DiscoveryManager() );
 }
 
 HttpLinkPlugin::~HttpLinkPlugin()
@@ -42,6 +41,10 @@ void* HttpLinkPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
 {
     if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
     {
+        if (!m_discoveryManager)
+            m_discoveryManager.reset(new DiscoveryManager(
+                &m_refManager,
+                m_timeProvider));
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
@@ -49,6 +52,16 @@ void* HttpLinkPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::Plugin*>(this);
+    }
+    if( memcmp( &interfaceID, &nxpl::IID_Plugin2, sizeof( nxpl::IID_Plugin2) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::Plugin2*>(this);
     }
 
     return NULL;
@@ -62,6 +75,21 @@ unsigned int HttpLinkPlugin::addRef()
 unsigned int HttpLinkPlugin::releaseRef()
 {
     return m_refManager.releaseRef();
+}
+
+const char* HttpLinkPlugin::name() const
+{
+    return "mjpg_link";
+}
+
+void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
+{
+}
+
+void HttpLinkPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
+{
+    m_timeProvider = static_cast<nxpl::TimeProvider *>(
+            pluginContainer->queryInterface(nxpl::IID_TimeProvider));
 }
 
 nxpt::CommonRefManager* HttpLinkPlugin::refManager()

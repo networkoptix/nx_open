@@ -32,8 +32,8 @@ static void down_mix_to_stereo(T *data, int channels, int len)
             rl = input[4];
             rr = input[5];
 
-            /* Postings on Doom9 say that Dolby specifically says the LFE (.1) 
-             * channel should usually be ignored during downmixing to Dolby ProLogic II, 
+            /* Postings on Doom9 say that Dolby specifically says the LFE (.1)
+             * channel should usually be ignored during downmixing to Dolby ProLogic II,
              * with quotes from official Dolby documentation. */
             Q_UNUSED(lfe);
 
@@ -50,25 +50,6 @@ static void down_mix_to_stereo(T *data, int channels, int len)
     }
 }
 
-//=======================================================================
-int QnAudioProcessor::downmix(quint8* data, int size, AVCodecContext* ctx)
-{
-    if (ctx->channels <= 2)
-        return size;
-
-    if (ctx->sample_fmt == AV_SAMPLE_FMT_U8)
-        down_mix_to_stereo<qint8>((qint8*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S16)
-        down_mix_to_stereo<qint16>((qint16*)data, ctx->channels, size);
-    else if (ctx->sample_fmt == AV_SAMPLE_FMT_S32 || ctx->sample_fmt == AV_SAMPLE_FMT_FLT)
-        down_mix_to_stereo<qint32>((qint32*)data, ctx->channels, size);
-    else
-        Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
-
-    return size / ctx->channels * 2;
-}
-
-
 QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFormat format)
 {
     if (format.channelCount() > 2)
@@ -81,7 +62,7 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
             down_mix_to_stereo<qint32>((qint32*)(audio.data()), format.channelCount(), audio.size());
         else
         {
-            Q_ASSERT_X(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
+            NX_ASSERT(1 == 0, Q_FUNC_INFO + __LINE__, "invalid sample size");
         }
         audio.resize(audio.size() / format.channelCount() * 2);
         format.setChannelCount(2);
@@ -91,7 +72,7 @@ QnCodecAudioFormat QnAudioProcessor::downmix(QnByteArray& audio, QnCodecAudioFor
 
 QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
@@ -112,7 +93,7 @@ QnCodecAudioFormat QnAudioProcessor::float2int16(QnByteArray& audio, QnCodecAudi
 
 QnCodecAudioFormat QnAudioProcessor::int32Toint16(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     qint16* outP = (qint16*)inP;
@@ -132,7 +113,7 @@ QnCodecAudioFormat QnAudioProcessor::int32Toint16(QnByteArray& audio, QnCodecAud
 
 QnCodecAudioFormat QnAudioProcessor::float2int32(QnByteArray& audio, QnCodecAudioFormat format)
 {
-    Q_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
+    NX_ASSERT(sizeof(float) == 4); // not sure about sizeof(float) in 64 bit version
 
     qint32* inP = (qint32*)(audio.data());
     int len = audio.size()/4;

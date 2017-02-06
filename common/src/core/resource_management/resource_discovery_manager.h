@@ -2,21 +2,42 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <memory> // for auto_ptr
+#include <atomic>
 
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
 #include <utils/common/long_runnable.h>
-#include <utils/network/netstate.h>
-#include <utils/network/nettools.h>
+#include <nx/utils/singleton.h>
+#include <nx/network/netstate.h>
+#include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_factory.h>
 #include <core/resource/resource_processor.h>
+
+#include <utils/common/connective.h>
+#include <nx/utils/log/log.h>
+
+//#define DISCOVERY_DBG
+
+#if defined (DISCOVERY_DBG)
+#   define DLOG(...) NX_LOG(__VA_ARGS__, cl_logINFO)
+#   define NetResString(res) \
+        QString::fromLatin1("Network resource url: %1, ip: %2, mac: %3, uniqueId: %4") \
+            .arg(res->getUrl()) \
+            .arg(res->getHostAddress()) \
+            .arg(res->getMAC().toString()) \
+            .arg(res->getUniqueId()) 
+# define FL1(x) QString::fromLatin1(x)
+#else
+#   define DLOG(...)
+#endif
+
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -30,6 +51,7 @@ struct QnManualCameraInfo
     QnResourceTypePtr resType;
     QAuthenticator auth;
     QnAbstractResourceSearcher* searcher;
+    QString uniqueId;
 };
 typedef QMap<QString, QnManualCameraInfo> QnManualCameraInfoMap;
 
@@ -37,7 +59,7 @@ class QnAbstractResourceSearcher;
 
 class QnResourceDiscoveryManager;
 /*!
-    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread, 
+    This class instance only calls QnResourceDiscoveryManager::doResourceDiscoverIteration from QnResourceDiscoveryManager thread,
     since we cannot move QnResourceDiscoveryManager object to QnResourceDiscoveryManager thread (weird...)
 */
 class QnResourceDiscoveryManagerTimeoutDelegate
@@ -61,10 +83,15 @@ class CameraDriverRestrictionList;
 // this class just searches for new resources
 // it uses others plugins
 // it puts result into resource pool
-class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFactory
+class QnResourceDiscoveryManager
+:
+    public Connective<QnLongRunnable>,
+    public QnResourceFactory,
+    public Singleton<QnResourceDiscoveryManager>
 {
-    Q_OBJECT;
+    Q_OBJECT
 
+    typedef Connective<QnLongRunnable> base_type;
 public:
     enum State
     {
@@ -78,44 +105,42 @@ public:
     QnResourceDiscoveryManager();
     ~QnResourceDiscoveryManager();
 
-    static QnResourceDiscoveryManager* instance();
-
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    virtual QnResourcePtr createResource(const QUuid &resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 
     void setReady(bool ready);
 
-    bool registerManualCameras(const QnManualCameraInfoMap& cameras);
+    /** Returns number of cameras that were sucessfully added. */
+    int registerManualCameras(const QnManualCameraInfoMap& cameras);
     bool containManualCamera(const QString& url);
     void fillManualCamInfo(QnManualCameraInfoMap& cameras, const QnSecurityCamResourcePtr& camera);
 
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
-    void doResourceDiscoverIteration();
+    virtual void doResourceDiscoverIteration();
 
-    static void init(QnResourceDiscoveryManager* instance);
     State state() const;
-    
+
     void setLastDiscoveredResources(const QnResourceList& resources);
-    QnResourceList lastDiscoveredResources() const;
+    QSet<QString> lastDiscoveredIds() const;
+    void addResourcesImmediatly(QnResourceList& resources);
+
+    static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
+
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;
-
 protected:
-    QMutex m_discoveryMutex;
-
     unsigned int m_runNumber;
 
     virtual void run();
-    virtual bool processDiscoveredResources(QnResourceList& resources);
 
 signals:
     void localSearchDone();
@@ -123,9 +148,16 @@ signals:
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
 protected slots:
-    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
-    void at_resourceChanged(const QnResourcePtr& resource);
+    void at_resourceAdded(const QnResourcePtr& resource);
+protected:
+    enum class SearchType
+    {
+        Full,
+        Partial
+    };
+    virtual bool processDiscoveredResources(QnResourceList& resources, SearchType searchType);
+    bool canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -135,33 +167,34 @@ private:
     void appendManualDiscoveredResources(QnResourceList& resources);
     void dtsAssignment();
 
-    void updateSearcherUsage(QnAbstractResourceSearcher *searcher);
+    void updateSearcherUsage(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();
-
+    bool isRedundancyUsing() const;
 private:
-    QMutex m_searchersListMutex;
+    QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCameraInfoMap m_manualCameraMap;
 
     bool m_server;
-    volatile bool m_ready;
+    std::atomic<bool> m_ready;
 
     QList<QHostAddress> m_allLocalAddresses;
 
     QVector<QnAbstractDTSSearcher*> m_dstList;
-    static QnResourceDiscoveryManager* m_instance;
 
-    std::auto_ptr<QTimer> m_timer;
+    QScopedPointer<QTimer> m_timer;
     State m_state;
     QSet<QString> m_recentlyDeleted;
 
-    QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
-    QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
+    QHash<QnUuid, QnManualResourceSearchStatus> m_searchProcessStatuses;
+    QHash<QnUuid, QnManualResourceSearchList> m_searchProcessResults;
 
-    mutable QMutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[4];
+    mutable QnMutex m_resListMutex;
+    QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
+protected:
+    int m_serverOfflineTimeout;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

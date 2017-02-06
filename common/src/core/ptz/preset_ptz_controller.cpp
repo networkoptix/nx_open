@@ -1,20 +1,29 @@
 #include "preset_ptz_controller.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <api/app_server_connection.h>
-#include <api/resource_property_adaptor.h>
 #include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 
 #include "ptz_preset.h"
 
-namespace {
-    const QString propertyKey = lit("ptzPresets");
+bool deserialize(const QString& /*value*/, QnPtzPresetRecordHash* /*target*/)
+{
+    Q_ASSERT_X(0, Q_FUNC_INFO, "Not implemented");
+    return false;
+}
+
+namespace
+{
+const QString kPresetsPropertyKey = lit("ptzPresets");
 }
 
 // -------------------------------------------------------------------------- //
 // Model Data
 // -------------------------------------------------------------------------- //
-struct QnPtzPresetData {
+
+struct QnPtzPresetData
+{
     QnPtzPresetData(): space(Qn::DevicePtzCoordinateSpace) {}
 
     QVector3D position;
@@ -22,7 +31,8 @@ struct QnPtzPresetData {
 };
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
 
-struct QnPtzPresetRecord {
+struct QnPtzPresetRecord
+{
     QnPtzPresetRecord() {}
     QnPtzPresetRecord(const QnPtzPreset &preset, const QnPtzPresetData &data): preset(preset), data(data) {}
 
@@ -37,105 +47,193 @@ Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 // -------------------------------------------------------------------------- //
 // QnPresetPtzController
 // -------------------------------------------------------------------------- //
-QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController): 
+QnPresetPtzController::QnPresetPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzPresetRecordHash>(lit("ptzPresets"), QnPtzPresetRecordHash(), this))
+    m_camera(resource().dynamicCast<QnVirtualCameraResource>()),
+    m_propertyHandler(new QnJsonResourcePropertyHandler<QnPtzPresetRecordHash>())
 {
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
-
-    m_adaptor->setResource(baseController->resource());
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::PresetsPtzField); }, Qt::QueuedConnection);
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 }
 
-QnPresetPtzController::~QnPresetPtzController() {
+QnPresetPtzController::~QnPresetPtzController()
+{
     return;
 }
 
-bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
+bool QnPresetPtzController::extends(Qn::PtzCapabilities capabilities)
+{
+    return
         ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
         (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
         !(capabilities & Qn::PresetsPtzCapability);
 }
 
-Qn::PtzCapabilities QnPresetPtzController::getCapabilities() {
+Qn::PtzCapabilities QnPresetPtzController::getCapabilities()
+{
     /* Note that this controller preserves both Qn::AsynchronousPtzCapability and Qn::SynchronizedPtzCapability. */
     Qn::PtzCapabilities capabilities = base_type::getCapabilities();
     return extends(capabilities) ? (capabilities | Qn::PresetsPtzCapability) : capabilities;
 }
 
-bool QnPresetPtzController::createPreset(const QnPtzPreset &preset) {
-    if(preset.id.isEmpty())
+bool QnPresetPtzController::createPreset(const QnPtzPreset &preset)
+{
+    if (preset.id.isEmpty())
         return false;
 
-    QnPtzPresetData data;
-    data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
-    if(!getPosition(data.space, &data.position)) // TODO: #Elric this won't work for async base controller.
-        return false;
-
+    auto createPresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
-        QMutexLocker locker(&m_mutex);
-        QnPtzPresetRecordHash records = m_adaptor->value();
+        QnPtzPresetData data;
+        data.space = hasCapabilities(Qn::LogicalPositioningPtzCapability) ?
+            Qn::LogicalPtzCoordinateSpace :
+            Qn::DevicePtzCoordinateSpace;
+
+        if (!getPosition(data.space, &data.position)) // TODO: #Elric this won't work for async base controller.
+            return false;
+
         records.insert(preset.id, QnPtzPresetRecord(preset, data));
 
-        m_adaptor->setValue(records);
+        return true;
+    };
+
+
+    bool status = false;
+    {
+        QnMutexLocker locker(&m_mutex);
+        if ((status = doPresetsAction(createPresetActionFunc, preset)))
+            m_camera->saveParamsAsync();
     }
 
-    emit changed(Qn::PresetsPtzField);
-    return true;
+    if (status)
+        emit changed(Qn::PresetsPtzField);
+
+    return status;
 }
 
-bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset) {
+bool QnPresetPtzController::updatePreset(const QnPtzPreset &preset)
+{
+    auto updatePresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
-        QMutexLocker locker(&m_mutex);
-
-        QnPtzPresetRecordHash records = m_adaptor->value();
-        if(!records.contains(preset.id))
+        if (!records.contains(preset.id))
             return false;
 
         QnPtzPresetRecord &record = records[preset.id];
-        if(record.preset == preset)
-            return true; /* No need to save it. */
+        if (record.preset == preset)
+            return true;
+
         record.preset = preset;
-    
-        m_adaptor->setValue(records);
+        return true;
+    };
+
+
+    bool status = false;
+    {
+        QnMutexLocker locker(&m_mutex);
+        if ((status = doPresetsAction(updatePresetActionFunc, preset)))
+        {
+            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot update preset since corresponding resource does not exist.");
+            m_camera->saveParamsAsync();
+        }
     }
 
-    emit changed(Qn::PresetsPtzField);
-    return true;
+    if (status)
+        emit changed(Qn::PresetsPtzField);
+
+    return status;
 }
 
-bool QnPresetPtzController::removePreset(const QString &presetId) {
+bool QnPresetPtzController::removePreset(const QString &presetId)
+{
+    auto removePresetActionFunc = [this](QnPtzPresetRecordHash& records, QnPtzPreset preset)
     {
-        QMutexLocker locker(&m_mutex);
-
-        QnPtzPresetRecordHash records = m_adaptor->value();
-        if(records.remove(presetId) == 0)
+        if (records.remove(preset.id) == 0)
             return false;
 
-        m_adaptor->setValue(records);
+        return true;
+    };
+
+    bool status = false;
+    {
+        QnMutexLocker locker(&m_mutex);
+        if ((status = doPresetsAction(removePresetActionFunc, QnPtzPreset(presetId, QString()))))
+        {
+            NX_ASSERT(m_camera, Q_FUNC_INFO, "Cannot remove preset since correspondent resource does not exist.");
+            m_camera->saveParamsAsync();
+        }
     }
 
-    emit changed(Qn::PresetsPtzField);
-    return true;
+    if (status)
+        emit changed(Qn::PresetsPtzField);
+
+    return status;
 }
 
-bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed) {
-    const QnPtzPresetRecordHash &records = m_adaptor->value();
-    if(!records.contains(presetId))
-        return false;
-    QnPtzPresetData data = records.value(presetId).data;
+bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
+{
+    auto activatePresetActionFunc = [this, speed](QnPtzPresetRecordHash& records, QnPtzPreset preset)
+    {
+        if (!records.contains(preset.id))
+            return false;
 
-    if(!absoluteMove(data.space, data.position, speed))
-        return false;
+        QnPtzPresetData data = records.value(preset.id).data;
 
-    return true;
+        if (!absoluteMove(data.space, data.position, speed))
+            return false;
+
+        return true;
+    };
+
+    return doPresetsAction(activatePresetActionFunc, QnPtzPreset(presetId, QString()));
 }
 
-bool QnPresetPtzController::getPresets(QnPtzPresetList *presets) {
-    presets->clear();
-    foreach(const QnPtzPresetRecord &record, m_adaptor->value())
-        presets->push_back(record.preset);
+bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
+{
+    auto activatePresetActionFunc =
+        [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
+        {
+            presets->clear();
+            for (const QnPtzPresetRecord &record : records)
+                presets->push_back(record.preset);
+
+            return true;
+        };
+
+    {
+        QnMutexLocker lock(&m_mutex);
+        return doPresetsAction(activatePresetActionFunc, QnPtzPreset());
+    }
+
+}
+
+QString QnPresetPtzController::serializePresets(const QnPtzPresetRecordHash& presets)
+{
+    QString serialized;
+    m_propertyHandler->serialize(presets, &serialized);
+
+    return serialized;
+}
+
+QnPtzPresetRecordHash QnPresetPtzController::deserializePresets(const QString& presetsSerialized)
+{
+    QnPtzPresetRecordHash deserialized;
+    m_propertyHandler->deserialize(presetsSerialized, &deserialized);
+
+    return deserialized;
+}
+
+bool QnPresetPtzController::doPresetsAction(PresetsActionFunc actionFunc, QnPtzPreset preset)
+{
+    if (!m_camera)
+        return false;
+
+    auto serialized = m_camera->getProperty(kPresetsPropertyKey);
+    auto deserialized = deserializePresets(serialized);
+
+    if (!actionFunc(deserialized, preset))
+        return false;
+
+    serialized = serializePresets(deserialized);
+    m_camera->setProperty(kPresetsPropertyKey, serialized);
+
     return true;
 }
 

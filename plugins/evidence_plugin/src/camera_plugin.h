@@ -18,7 +18,7 @@
 
 /*! \mainpage
     \par
-    This project demonstrates usage of Network Optix camera integration plugin API to add AXIS camera support to HD Witness. Overrides built-in AXIS camera driver.\n
+    This project demonstrates usage of camera integration plugin API to add AXIS camera support. Overrides built-in AXIS camera driver.\n
 
     \par Build how-to
     It is Qt 4.7 project. Compiles to dynamic library. Tested on MS Windows 7 and Ubuntu 12.04.\n
@@ -35,9 +35,8 @@
     On successful build You will find libaxiscamplugin.so (linux) or axiscamplugin.dll (mswin) in %SDK_DIR%/sample/axiscamplugin/release directory
 
     \par Usage
-    You MUST have HD Witness mediaserver installed to use this plugin.\n
-    To use plugin simply put built library to mediaserver directory (by default, "C:\Program Files\Network Optix\HD Witness\Mediaserver" on ms windows and
-    /opt/networkoptix/mediaserver/bin/ on linux) and restart server
+    You MUST have mediaserver installed to use this plugin.\n
+    To use plugin simply put built library to mediaserver directory and restart server
 
     \par Implements following camera integration interfaces:
     - \a nxcip::CameraDiscoveryManager to enable AXIS camera discovery by MDNS

@@ -20,32 +20,53 @@ namespace ec2
         OldEcConnection(const QnConnectionInfo& connectionInfo);
 
         virtual QnConnectionInfo connectionInfo() const override;
+        virtual QString authInfo() const override;
 
-        virtual AbstractResourceManagerPtr getResourceManager() override;
-        virtual AbstractMediaServerManagerPtr getMediaServerManager() override;
-        virtual AbstractCameraManagerPtr getCameraManager() override;
-        virtual AbstractLicenseManagerPtr getLicenseManager() override;
-        virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
-        virtual AbstractUserManagerPtr getUserManager() override;
-        virtual AbstractLayoutManagerPtr getLayoutManager() override;
-        virtual AbstractVideowallManagerPtr getVideowallManager() override;
-        virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
-        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
-        virtual AbstractMiscManagerPtr getMiscManager() override;
-        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
-        virtual AbstractTimeManagerPtr getTimeManager() override;
+        virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &) override;
+        virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
+        virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &) override;
+        virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &) override;
+        virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &) override;
+        virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
+        virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
+        virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
+        virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
+        virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &) override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &) override;
+        virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
+        virtual AbstractTimeManagerPtr getTimeManager(const Qn::UserAccessData &) override;
+
+        virtual AbstractLicenseNotificationManagerPtr getLicenseNotificationManager() override;
+        virtual AbstractTimeNotificationManagerPtr getTimeNotificationManager() override;
+        virtual AbstractResourceNotificationManagerPtr getResourceNotificationManager() override;
+        virtual AbstractMediaServerNotificationManagerPtr getMediaServerNotificationManager() override;
+        virtual AbstractCameraNotificationManagerPtr getCameraNotificationManager() override;
+        virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
+        virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
+        virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
+        virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
+        virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
+        virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
+        virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
+        virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
+        virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
 
         virtual void addRemotePeer(const QUrl& url) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
+
+
         virtual void startReceivingNotifications() override;
-
+        virtual void stopReceivingNotifications() override;
+        virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     protected:
-        virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
+        virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, ec2::impl::SimpleHandlerPtr) override;
         virtual int restoreDatabaseAsync( const ApiDatabaseDumpData& dbFile, impl::SimpleHandlerPtr handler ) override;
-
     private:
         QnConnectionInfo m_connectionInfo;
     };

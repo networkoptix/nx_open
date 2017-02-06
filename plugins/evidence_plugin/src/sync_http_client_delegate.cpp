@@ -27,7 +27,7 @@ SyncHttpClientDelegate::~SyncHttpClientDelegate()
 
 void SyncHttpClientDelegate::get( const QNetworkRequest& request )
 {
-    Q_ASSERT( QThread::currentThread() != thread() );
+    NX_ASSERT( QThread::currentThread() != thread() );
  
     QMutexLocker lk( &m_mutex );
 
@@ -51,7 +51,7 @@ void SyncHttpClientDelegate::get( const QNetworkRequest& request )
 
 QByteArray SyncHttpClientDelegate::readWholeMessageBody()
 {
-    Q_ASSERT( QThread::currentThread() != thread() );
+    NX_ASSERT( QThread::currentThread() != thread() );
 
     if( m_requestState > rsReadingMessageBody )
         return QByteArray();

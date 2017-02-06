@@ -24,6 +24,9 @@
 class QnAbstractPtzController: public Connective<QObject> {
     Q_OBJECT
 public:
+
+    static const qreal MaxPtzSpeed;
+
     /**
      * \param resource                  Resource that this PTZ controller belongs to.
      */
@@ -53,46 +56,46 @@ public:
     bool supports(Qn::PtzCommand command);
 
     /**
-     * Starts or stops continuous PTZ movement. 
-     * 
-     * Speed is specified in image-based coordinate space and all of its 
-     * components are expected to be in range <tt>[-1, 1]</tt>. This means that 
-     * implementation must handle flipped / mirrored state of the video stream. 
-     * 
+     * Starts or stops continuous PTZ movement.
+     *
+     * Speed is specified in image-based coordinate space and all of its
+     * components are expected to be in range <tt>[-1, 1]</tt>. This means that
+     * implementation must handle flipped / mirrored state of the video stream.
+     *
      * Passing zero in speed should stop PTZ movement.
-     * 
+     *
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
-     * 
-     * \param speed                     Movement speed. 
+     *
+     * \param speed                     Movement speed.
      * \returns                         Whether the operation was successful.
      */
     virtual bool continuousMove(const QVector3D &speed) = 0;
 
     /**
      * Starts or stops continuous focus movement.
-     * 
-     * Speed is specified in device-specific coordinate space and is expected 
-     * to be in range <tt>[-1, 1]</tt>. Positive speed is for far focus. 
-     * 
+     *
+     * Speed is specified in device-specific coordinate space and is expected
+     * to be in range <tt>[-1, 1]</tt>. Positive speed is for far focus.
+     *
      * Passing zero should stop focus movement.
-     * 
+     *
      * This function is expected to be implemented if this controller has
      * <tt>Qn::ContinuousFocusCapability</tt>.
-     * 
+     *
      * \param speed                     Focus speed.
      * \returns                         Whether the operation was successful.
      */
     virtual bool continuousFocus(qreal speed) = 0;
 
     /**
-     * Sets camera PTZ position in the given coordinate space. 
-     * 
-     * Note that for the function to succeed, this controller must have a 
-     * capability corresponding to the provided coordinate space, 
-     * that is <tt>Qn::DevicePositioningPtzCapability</tt> or 
+     * Sets camera PTZ position in the given coordinate space.
+     *
+     * Note that for the function to succeed, this controller must have a
+     * capability corresponding to the provided coordinate space,
+     * that is <tt>Qn::DevicePositioningPtzCapability</tt> or
      * <tt>Qn::LogicalPositioningPtzCapability</tt>.
-     * 
+     *
      * This function is expected to be implemented if this controller has
      * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
      *
@@ -104,13 +107,13 @@ public:
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) = 0;
 
     /**
-     * Moves camera's viewport relative to current viewport. New viewport 
+     * Moves camera's viewport relative to current viewport. New viewport
      * coordinates are provided in a coordinate space where current viewport
      * is a square with side 1 with top-left at <tt>(0, 0)</tt>.
-     * 
+     *
      * This function is expected to be implemented only if this controller has
      * <tt>Qn::ViewportPtzCapability</tt>.
-     * 
+     *
      * \param aspectRatio               Actual aspect ratio of the current viewport.
      * \param viewport                  New viewport position.
      * \param speed                     Movement speed, in range [0, 1].
@@ -125,18 +128,18 @@ public:
      * at least one of the <tt>Qn::AbsolutePtzCapabilities</tt>.
      *
      * \param space                     Coordinate space to get position in.
-     * \param[out] position             Current ptz position. 
+     * \param[out] position             Current ptz position.
      * \returns                         Whether the operation was successful.
      * \see absoluteMove
      */
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) = 0;
 
     /**
-     * Gets PTZ limits of the camera. 
-     * 
-     * This function is expected to be implemented only if this controller has 
+     * Gets PTZ limits of the camera.
+     *
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::LimitsPtzCapability<tt>.
-     * 
+     *
      * \param space                     Coordinate space to get limits in.
      * \param[out] limits               Ptz limits.
      * \returns                         Whether the operation was successful.
@@ -146,7 +149,7 @@ public:
     /**
      * Returns the camera streams's flipped state. This function can be used for
      * implementing emulated viewport movement.
-     * 
+     *
      * This function is expected to be implemented only if this controller has
      * <tt>Qn::FlipPtzCapability</tt>.
      *
@@ -156,14 +159,14 @@ public:
     virtual bool getFlip(Qt::Orientations *flip) = 0;
 
     /**
-     * Saves current PTZ position as a preset, either as a new one or 
+     * Saves current PTZ position as a preset, either as a new one or
      * replacing an existing one. Note that id of the provided preset
-     * must be set. 
-     * 
-     * If you want to create a new preset, a good idea would be to set its id to 
-     * <tt>QUuid::createUuid().toString()</tt>.
-     * 
-     * This function is expected to be implemented only if this controller has 
+     * must be set.
+     *
+     * If you want to create a new preset, a good idea would be to set its id to
+     * <tt>QnUuid::createUuid().toString()</tt>.
+     *
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::PresetsPtzCapability<tt>.
      *
      * \param preset                    Preset to create.
@@ -175,9 +178,9 @@ public:
      * Updates the given preset without changing its associated position.
      * Currently this function can only be used to change preset name.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::PresetsPtzCapability<tt>.
-     * 
+     *
      * \param preset                    Preset to update.
      * \returns                         Whether the operation was successful.
      */
@@ -186,9 +189,9 @@ public:
     /**
      * Removes the given preset.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::PresetsPtzCapability<tt>.
-     * 
+     *
      * \param presetId                  Id of the preset to remove.
      * \returns                         Whether the operation was successful.
      */
@@ -197,9 +200,9 @@ public:
     /**
      * Activates the given preset.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::PresetsPtzCapability<tt>.
-     * 
+     *
      * \param presetId                  Id of the preset to activate.
      * \param speed                     Movement speed, in range [0, 1].
      * \returns                         Whether the operation was successful.
@@ -209,49 +212,49 @@ public:
     /**
      * Gets a list of all PTZ presets for the camera.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::PresetsPtzCapability<tt>.
-     * 
+     *
      * \param[out] presets              PTZ presets.
      * \returns                         Whether the operation was successful.
      */
     virtual bool getPresets(QnPtzPresetList *presets) = 0;
 
     /**
-     * Saves the given tour either as a new one, or replacing an existing one. 
-     * Note that id of the provided preset must be set. 
-     * 
-     * If you want to create a new preset, a good idea would be to set its id to 
-     * <tt>QUuid::createUuid().toString()</tt>.
-     * 
-     * This function is expected to be implemented only if this controller has 
+     * Saves the given tour either as a new one, or replacing an existing one.
+     * Note that id of the provided preset must be set.
+     *
+     * If you want to create a new preset, a good idea would be to set its id to
+     * <tt>QnUuid::createUuid().toString()</tt>.
+     *
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::ToursPtzCapability<tt>.
      *
      * \param tour                      Tour to create.
      * \returns                         Whether the operation was successful.
      */
     virtual bool createTour(const QnPtzTour &tour) = 0;
-    
+
     /**
      * Removes the given tour.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::ToursPtzCapability<tt>.
-     * 
+     *
      * \param tourId                    Id of the tour to remove.
      * \returns                         Whether the operation was successful.
      */
     virtual bool removeTour(const QString &tourId) = 0;
-    
+
     /**
      * Activates the given tour.
-     * 
-     * Note that after the tour has been started, any movement command issued 
+     *
+     * Note that after the tour has been started, any movement command issued
      * to the controller will stop that tour.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::ToursPtzCapability<tt>.
-     * 
+     *
      * \param tourId                    Id of the tour to activate.
      * \returns                         Whether the operation was successful.
      */
@@ -260,9 +263,9 @@ public:
     /**
      * Gets a list of all PTZ tours for the camera.
      *
-     * This function is expected to be implemented only if this controller has 
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::ToursPtzCapability<tt>.
-     * 
+     *
      * \param[out] tours                PTZ tours.
      * \returns                         Whether the operation was successful.
      */
@@ -272,10 +275,10 @@ public:
 
     /**
      * Updates PTZ home position for the camera.
-     * 
-     * This function is expected to be implemented only if this controller has 
+     *
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::HomePtzCapability<tt>.
-     * 
+     *
      * \param homeObject                PTZ home object.
      * \returns                         Whether the operation was successful.
      */
@@ -283,10 +286,10 @@ public:
 
     /**
      * Gets PTZ home position that is currently assigned for the camera.
-     * 
-     * This function is expected to be implemented only if this controller has 
+     *
+     * This function is expected to be implemented only if this controller has
      * <tt>Qn::HomePtzCapability<tt>.
-     * 
+     *
      * \param[out] homePosition         PTZ home object.
      * \returns                         Whether the operation was successful.
      */
@@ -299,7 +302,7 @@ public:
     /**
      * Gets all PTZ data associated with this controller in a single operation.
      * Default implementation just calls all the accessor functions one by one.
-     * 
+     *
      * \param query                     Data fields to get.
      * \param[out] data                 PTZ data.
      * \returns                         Whether the operation was successful.
@@ -316,5 +319,7 @@ protected:
 private:
     QnResourcePtr m_resource;
 };
+
+bool deserialize(const QString &value, QnPtzObject *target);
 
 #endif // QN_ABSTRACT_PTZ_CONTROLLER_H

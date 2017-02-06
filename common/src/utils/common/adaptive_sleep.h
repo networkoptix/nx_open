@@ -1,8 +1,8 @@
 #ifndef cl_adaptive_sleep_137
 #define cl_adaptive_sleep_137
 
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QTime>
 #include "sleep.h"
 
@@ -82,10 +82,9 @@ public:
                 afterdelay();
             return havetowait;
         }
-        //NX_LOG("sleep time=", havetowait/1000000.0, cl_logALWAYS);
         if (havetowait < MAX_VALID_SLEEP_TIME) 
         {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             m_waitCond.wait(&m_mutex, qMin(havetowait / 1000, maxSleepTime / 1000));
         }
         else {
@@ -124,8 +123,8 @@ private:
     qint64 m_maxOverdraft;
     qint64 m_totalTime;
     
-    QMutex m_mutex;
-    QWaitCondition m_waitCond;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCond;
 };
 
 #endif //cl_adaptive_sleep_137

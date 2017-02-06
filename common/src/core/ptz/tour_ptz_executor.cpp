@@ -8,9 +8,13 @@
 #include <utils/math/math.h>
 #include <utils/common/invocation_event.h>
 #include <utils/common/connective.h>
-#include <utils/common/collection.h>
+#include <nx/utils/collection.h>
 
 #include "threaded_ptz_controller.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
+#include "core/resource/security_cam_resource.h"
 
 #define QN_TOUR_PTZ_EXECUTOR_DEBUG
 #ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
@@ -110,6 +114,8 @@ public:
     QVector3D lastPosition;
     int lastPositionRequestTime;
     int newPositionRequestTime;
+    bool tourGetPosWorkaround;
+    bool canReadPosition;
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
@@ -122,7 +128,8 @@ QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
     needPositionUpdate(false),
     waitingForNewPosition(false),
     lastPositionRequestTime(0),
-    newPositionRequestTime(0)
+    newPositionRequestTime(0),
+    canReadPosition(false)
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
@@ -151,15 +158,23 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     }
 
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
+    QnResourceData resourceData = qnCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
+    tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
 
-void QnTourPtzExecutorPrivate::updateDefaults() {
+void QnTourPtzExecutorPrivate::updateDefaults() 
+{
     defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
+
+    canReadPosition = baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) ||
+                      baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
+    TRACE("STOP TOUR" << data.tour.name);
+
     state = Stopped;
 
     moveTimer.stop();
@@ -248,6 +263,8 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &posit
         if(state == Moving) {
             QnPtzTourSpotData &spotData = currentSpotData();
             spotData.moveTime = lastPositionRequestTime;
+            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition)) 
+                spotData.moveTime += pingTimeout; // workaround for VIVOTEK SD8363E camera. It stops after getPosition call. So, increase getPosition timeout if we detect that camera changes position.
             spotData.position = lastPosition;
         }
 
@@ -296,7 +313,11 @@ void QnTourPtzExecutorPrivate::activateCurrentSpot() {
     baseController->activatePreset(spot.presetId, spot.speed);
 }
 
-void QnTourPtzExecutorPrivate::requestPosition() {
+void QnTourPtzExecutorPrivate::requestPosition() 
+{
+    if (!canReadPosition)
+        return;
+
     QVector3D position;
     baseController->getPosition(defaultSpace, &position);
 
@@ -321,8 +342,13 @@ bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
     }
 }
 
-void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) {
-    if(command == defaultCommand)
+void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) 
+{
+    if (!canReadPosition && command == Qn::ActivatePresetPtzCommand) {
+        moveTimer.stop();
+        startWaiting();
+    }
+    else if(command == defaultCommand)
         processMoving(data.isValid(), data.value<QVector3D>());
 }
 
@@ -343,7 +369,7 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    assert(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread()); 
 }
 
 void QnTourPtzExecutor::startTour(const QnPtzTour &tour) {

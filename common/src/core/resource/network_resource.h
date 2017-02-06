@@ -1,9 +1,10 @@
 #ifndef QN_NETWORK_RESOURCE_H
 #define QN_NETWORK_RESOURCE_H
 
+#include <boost/optional.hpp>
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include "utils/network/mac_address.h"
+#include <nx/network/mac_address.h>
 #include "resource.h"
 
 class QnTimePeriodList;
@@ -15,6 +16,7 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QnMacAddress macAddress READ getMAC WRITE setMAC)
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
+    using base_type = QnResource;
 public:
     enum NetworkStatusFlag {
         BadHostAddr = 0x01,
@@ -28,7 +30,7 @@ public:
     virtual QString getUniqueId() const;
 
     virtual QString getHostAddress() const;
-    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory);
+    virtual void setHostAddress(const QString &ip);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);
@@ -36,19 +38,18 @@ public:
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    inline void setAuth(const QString &user, const QString &password)
-    { QAuthenticator auth; auth.setUser(user); auth.setPassword(password); setAuth(auth); }
+    void setAuth(const QString &user, const QString &password);
     void setAuth(const QAuthenticator &auth);
+
+    void setDefaultAuth(const QString &user, const QString &password);
+    void setDefaultAuth(const QAuthenticator &auth);
+
+    static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called
     bool isAuthenticated() const;
     void setAuthenticated(bool auth);
-
-    // address used to discover this resource ( in case if machine has more than one NIC/address)
-    // by default we assume that password is login and password are known and getDiscoveryAddr returns true
-    QHostAddress getDiscoveryAddr() const;
-    void setDiscoveryAddr(QHostAddress addr);
 
     virtual int httpPort() const;
     virtual void setHttpPort( int newPort );
@@ -59,9 +60,7 @@ public:
     virtual int mediaPort() const;
     void setMediaPort( int newPort );
 
-    virtual QString toString() const;
-    QString toSearchString() const;
-
+    virtual QString toSearchString() const override;
 
     void addNetworkStatus(NetworkStatus status);
     void removeNetworkStatus(NetworkStatus status);
@@ -73,20 +72,7 @@ public:
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
 
-
-    // sometimes resource is not in your lan, and it might be not pingable from one hand
-    // but from other hand it's still might replay to standard requests
-    // so this is the way to find out do we have to change ip address
-    virtual bool isResourceAccessible()  = 0;
-
-
-    // is some cases( like  device behind the router) the only possible way to discover the device is to check every ip address
-    // and no broad cast and multi cast is accessible. so you can not get MAC of device with standard methods
-    // the only way is to request it from device through http or so
-    // we need to get mac anyway to differentiate one device from another
-    virtual bool updateMACAddress() { return true; }
-
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
@@ -101,20 +87,28 @@ public:
     //!Returns true if camera is accessible
     /*!
         Default implementation just establishes connection to \a getHostAddress() : \a httpPort()
+        \todo #ak This method is used in diagnostics only. Throw it away and use \a QnNetworkResource::checkIfOnlineAsync instead
     */
     virtual bool ping();
+    //!Checks if camera is online
+    /*!
+        \param completionHandler Invoked on check completion. Check result is passed to the functor
+        \return true if async operation has been started. false otherwise
+        \note Implementation MUST check not only camera address:port accessibility, but also check some unique parameters of camera
+        \note Default implementation returns false
+    */
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
-    static QUuid uniqueIdToId(const QString& uniqId);
-    virtual bool isAbstractResource() const { return false; }
+    static QnUuid physicalIdToId(const QString& uniqId);
+    virtual void initializationDone() override;
+
 private:
-    QAuthenticator m_auth;
+    //QAuthenticator m_auth;
     bool m_authenticated;
 
     //QHostAddress m_hostAddr;
     QnMacAddress m_macAddress;
     QString m_physicalId;
-
-    QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
     NetworkStatus m_networkStatus;
 

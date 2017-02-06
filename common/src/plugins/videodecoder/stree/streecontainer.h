@@ -10,8 +10,14 @@
 
 namespace stree
 {
+    //TODO #ak use template alias here
+    template <class KeyType, class MappedType>
+        class EqualMatchContainer : public std::map<KeyType, MappedType>
+    {
+    };
+
     /*!
-        \a find methods select element with min key greater than searched one
+        \a find method selects element with min key greater than searched one
     */
     template<class KeyType, class MappedType, class Predicate>
        class ConditionMatchContainer
@@ -63,6 +69,14 @@ namespace stree
         std::pair<iterator, bool> insert( const value_type& val )
         {
             return m_container.insert( val );
+        }
+
+        template<typename KeyTypeRef, typename MappedTypeRef>
+        std::pair<iterator, bool> emplace(KeyTypeRef&& key, MappedTypeRef&& mapped)
+        {
+            return m_container.emplace(
+                std::forward<KeyTypeRef>(key),
+                std::forward<MappedTypeRef>(mapped) );
         }
 
     private:

@@ -4,46 +4,24 @@
 #include "api_globals.h"
 #include "api_data.h"
 
-namespace ec2 
+namespace ec2
 {
     struct ApiPropertyTypeData: ApiData {
-        QUuid resourceTypeId;
+        QnUuid resourceTypeId;
 
         QString name;
-        Qn::PropertyDataType type;
-
-        // MinMaxStep
-        qint32 min;
-        qint32 max;
-        qint32 step;
-
-        // Enumaration
-        QString values;
-        QString uiValues;
-
-        // Value
         QString defaultValue;
-
-        QString group;
-        QString subGroup;
-        QString description;
-
-        bool ui;
-        bool readOnly;
-
-        QString internalData; // additional parameter data used for internal software purpose
     };
-#define ApiPropertyTypeData_Fields (resourceTypeId)(name)(type)(min)(max)(step)(values)(uiValues)(defaultValue)(group)(subGroup)(description)(ui)(readOnly)(internalData)
+#define ApiPropertyTypeData_Fields (resourceTypeId)(name)(defaultValue)
 
 
-    struct ApiResourceTypeData: ApiData {
-        QUuid id;
+    struct ApiResourceTypeData: ApiIdData {
         QString name;
         QString vendor;
-        std::vector<QUuid> parentId;
+        std::vector<QnUuid> parentId;
         std::vector<ApiPropertyTypeData> propertyTypes;
     };
-#define ApiResourceTypeData_Fields (id)(name)(vendor)(parentId)(propertyTypes)
+#define ApiResourceTypeData_Fields ApiIdData_Fields (name)(vendor)(parentId)(propertyTypes)
 
 }
 

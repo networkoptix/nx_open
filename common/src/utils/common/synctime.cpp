@@ -2,7 +2,7 @@
 #include <QtCore/QRunnable>
 #include <QtCore/QThreadPool>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "synctime.h"
 #include "api/app_server_connection.h"
@@ -17,30 +17,20 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-static QnSyncTime* QnSyncTime_instance = nullptr;
-
-QnSyncTime::QnSyncTime()
+QnSyncTime::QnSyncTime(QObject *parent)
 :
+    QObject(parent),
     m_lastReceivedTime( 0 ),
     m_lastWarnTime( 0 ),
     m_lastLocalTime( 0 ),
-    m_syncTimeRequestIssued( false )
+    m_syncTimeRequestIssued( false ),
+    m_refCounter( 1 )
 {
     reset();
-
-    assert( QnSyncTime_instance == nullptr );
-    QnSyncTime_instance = this;
 }
 
-QnSyncTime::~QnSyncTime()
-{
-    QnSyncTime_instance = nullptr;
-}
+QnSyncTime::~QnSyncTime() {}
 
-QnSyncTime* QnSyncTime::instance()
-{
-    return QnSyncTime_instance;
-}
 
 void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
 {
@@ -50,7 +40,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
     
     m_lastReceivedTime = newTime;
@@ -80,6 +70,36 @@ void QnSyncTime::reset()
     m_lastLocalTime = 0;
 }
 
+unsigned int QnSyncTime::addRef()
+{
+    return ++m_refCounter;
+}
+
+unsigned int QnSyncTime::releaseRef()
+{
+    return --m_refCounter;
+}
+
+void* QnSyncTime::queryInterface(const nxpl::NX_GUID& interfaceID)
+{
+    if (memcmp(&interfaceID, &nxpl::IID_TimeProvider, sizeof(nxpl::IID_TimeProvider)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::TimeProvider*>(this);
+    }
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return NULL;
+}
+
+uint64_t QnSyncTime::millisSinceEpoch() const
+{
+    return const_cast<QnSyncTime*>(this)->currentMSecsSinceEpoch();
+}
+
 void QnSyncTime::updateTime(qint64 newTime)
 {
     updateTime( 0, ec2::ErrorCode::ok, newTime );
@@ -87,9 +107,9 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
-    QMutexLocker lock(&m_mutex);
-
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
+    QnMutexLocker lock( &m_mutex );
+
     if (
         (
             m_lastReceivedTime == 0 
@@ -102,7 +122,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         if( appServerConnection ) 
         {
-            appServerConnection->getTimeManager()->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
+            appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;
         }
     }
@@ -122,5 +142,5 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         return time;
     }
     else
-        return QDateTime::currentMSecsSinceEpoch();
+        return localTime;
 }

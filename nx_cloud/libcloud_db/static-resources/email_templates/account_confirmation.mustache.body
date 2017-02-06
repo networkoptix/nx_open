@@ -1,0 +1,9 @@
+<div class="content">
+    <div class="callout">
+        <h4>Follow <a href="{{confirmationUrl}}">this</a> link to confirm your email address or copy link below and paste into your browser's address line</h4>
+        <br/>
+        <br/>
+        <br/>
+        {{confirmationUrl}}
+    </div>
+</div>

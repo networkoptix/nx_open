@@ -1,0 +1,26 @@
+<h1>{{event}} {{#source}}on <b>{{source}}</b>{{/source}}</h1>
+
+{{#aggregated}}
+<table class="description">
+    <thead>
+    <tr>
+        <th class="number">#</th>
+        <th>Server IP</th>
+        <th>Camera Physical ID</th>
+    </tr>
+    </thead>
+    <tbody>
+        {{#msConflicts}}
+            <tr>
+                <td class="number">{{number}}</td>
+                <td>{{ip}}</td>
+                <td>{{mac}}</td>
+            </tr>
+        {{/msConflicts}}
+    </tbody>
+</table>
+
+<div class="date">
+    <b>{{{timestamp}}}</b>
+</div>
+{{/aggregated}}

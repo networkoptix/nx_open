@@ -10,12 +10,13 @@
 #include <memory>
 
 #include <QtCore/QDir>
-#include <QtCore/QMutexLocker>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
 #include <core/resource/resource.h>
 #include <utils/fs/file.h>
+#include <nx/utils/random.h>
 
 
 class DummyResource
@@ -24,6 +25,19 @@ class DummyResource
 {
 public:
     virtual QString getUniqueId() const { return QString(); }
+
+    virtual Qn::ResourceStatus getStatus() const override {
+        return Qn::Online;
+    }
+
+    virtual void setStatus(
+        Qn::ResourceStatus newStatus,
+        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override
+    {
+        Q_UNUSED(newStatus);
+        Q_UNUSED(reason);
+        //do nothing
+    }
 };
 
 FileTranscoder::FileTranscoder()
@@ -57,7 +71,7 @@ bool FileTranscoder::setDestFile( const QString& filePath )
 
 bool FileTranscoder::setContainer( const QString& containerName )
 {
-    return m_transcoder.setContainer( containerName ) == 0;
+    return m_transcoder.setContainer( containerName ) == QnTranscoder::OperationResult::Success;
 }
 
 bool FileTranscoder::addTag( const QString& name, const QString& value )
@@ -66,21 +80,21 @@ bool FileTranscoder::addTag( const QString& name, const QString& value )
 }
 
 bool FileTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod,
     Qn::StreamQuality quality,
     const QSize& resolution,
     int bitrate,
     QnCodecParams::Value params )
 {
-    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params ) == 0;
+    return m_transcoder.setVideoCodec( codec, transcodeMethod, quality, resolution, bitrate, params ) == QnTranscoder::OperationResult::Success;
 }
 
 bool FileTranscoder::setAudioCodec(
-    CodecID codec,
+    AVCodecID codec,
     QnTranscoder::TranscodeMethod transcodeMethod )
 {
-    return m_transcoder.setAudioCodec( codec, transcodeMethod );
+    return m_transcoder.setAudioCodec( codec, transcodeMethod ) == QnTranscoder::OperationResult::Success;
 }
 
 void FileTranscoder::setTranscodeDurationLimit( unsigned int lengthToReadMS )
@@ -105,7 +119,8 @@ bool FileTranscoder::setTagValue(
         return false;
 
     QDir srcFileDir = QFileInfo(srcFilePath).dir();
-    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch()).arg(rand()).arg(QLatin1String(formatCtx->iformat->name));
+    const QString& tempFileName = lit("~%1%2.tmp.%3").arg(QDateTime::currentMSecsSinceEpoch())
+            .arg(nx::utils::random::number()).arg(QLatin1String(formatCtx->iformat->name));
     const QString& tempFilePath = lit("%1/%2").arg(srcFileDir.path()).arg(tempFileName);
 
     //setting audio/video codecID
@@ -148,13 +163,13 @@ void FileTranscoder::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_cond.wakeAll();
 }
 
 bool FileTranscoder::startAsync()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( !openFiles() )
         return false;
@@ -179,7 +194,7 @@ bool FileTranscoder::doSyncTranscode()
     if( !startAsync() )
         return false;
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( m_state == sWorking )
         m_cond.wait( lk.mutex() );
 
@@ -195,7 +210,7 @@ void FileTranscoder::run()
     qint64 prevSrcPacketTimestamp = -1;
     qint64 srcUSecRead = 0;
 
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     while( !needToStop() )
     {
         while( m_state < sWorking && !needToStop() )
@@ -294,7 +309,6 @@ bool FileTranscoder::openFiles()
 
     QnResourcePtr res( new DummyResource() );
     res->setUrl( m_srcFilePath );
-    res->setStatus( Qn::Online );
     if( !mediaFileReader->open( res ) )
         return false;
 

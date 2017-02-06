@@ -12,7 +12,6 @@
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
-class MediaStreamCache;
 
 namespace Qn {
 
@@ -23,7 +22,7 @@ namespace Qn {
 }
 
 /*!
-    \note Derived class MUST call \a initMediaResource() just after object instanciation
+    \note Derived class MUST call \a initMediaResource() just after object instantiation
 */
 class QnMediaResource
 {
@@ -41,8 +40,7 @@ public:
     // resource can use DataProvider for addition info (optional)
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
-
-    void setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout);
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const;
 
     virtual const QnResource* toResource() const = 0;
     virtual QnResource* toResource() = 0;
@@ -52,6 +50,11 @@ public:
     QnMediaDewarpingParams getDewarpingParams() const;
     void setDewarpingParams(const QnMediaDewarpingParams& params);
 
+    //TODO: #dklychkov change to QnAspectRatio in 2.4
+    qreal customAspectRatio() const;
+    void setCustomAspectRatio(qreal value);
+    void clearCustomAspectRatio();
+
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
     static QString rotationKey();
@@ -59,14 +62,26 @@ public:
     static QString dontRecordPrimaryStreamKey();
     static QString dontRecordSecondaryStreamKey();
     static QString rtpTransportKey();
+    static QString panicRecordingKey();
+    static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
+
+    static QString primaryStreamValue();
+    static QString secondaryStreamValue();
+
+    static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
+
 protected:
     void initMediaResource();
-    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
 protected:
     mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
-    QnMediaDewarpingParams m_dewarpingParams;
+    //QnMediaDewarpingParams m_dewarpingParams;
+
+private:
+    mutable QString m_cachedLayout;
+    mutable QnMutex m_layoutMutex;
+    mutable boost::optional<bool> m_hasVideo;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

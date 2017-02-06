@@ -1,75 +1,35 @@
+#pragma once
 
-#ifndef EC2_LAYOUT_MANAGER_H
-#define EC2_LAYOUT_MANAGER_H
+#include <transaction/transaction.h>
 
-#include <core/resource/layout_resource.h>
-
-#include "nx_ec/ec_api.h"
-#include "nx_ec/data/api_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "transaction/transaction.h"
-#include "nx_ec/data/api_conversion_functions.h"
-
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
+#include <core/resource_access/user_access_data.h>
 
 namespace ec2
 {
-    class QnLayoutNotificationManager
-    :
-        public AbstractLayoutManager
+    class QnLayoutNotificationManager : public AbstractLayoutNotificationManager
     {
     public:
-        QnLayoutNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert( tran.command == ApiCommand::removeLayout );
-            emit removed( QUuid(tran.params.id) );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
-        {
-            assert( tran.command == ApiCommand::saveLayout);
-            QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
-            fromApiToResource(tran.params, layoutResource);
-            emit addedOrUpdated( layoutResource );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
-        {
-            assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayoutData& layout, tran.params) 
-            {
-                QnLayoutResourcePtr layoutResource(new QnLayoutResource(m_resCtx.resTypePool));
-                fromApiToResource(layout, layoutResource);
-                emit addedOrUpdated( layoutResource );
-            }
-        }
-
-    protected:
-        const ResourceContext m_resCtx;
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiLayoutData>& tran, NotificationSource source);
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran, NotificationSource source);
     };
 
-
+    typedef std::shared_ptr<QnLayoutNotificationManager> QnLayoutNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnLayoutManager
-    :
-        public QnLayoutNotificationManager
+    class QnLayoutManager: public AbstractLayoutManager
     {
     public:
-        QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnLayoutManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
         virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
-        virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
-        virtual int remove( const QUuid& resource, impl::SimpleHandlerPtr handler ) override;
-
-    private:
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& id );
-        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+        virtual int save(const ec2::ApiLayoutData& layout, impl::SimpleHandlerPtr handler) override;
+        virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
+        Qn::UserAccessData m_userAccessData;
     };
 }
-
-#endif  //EC2_LAYOUT_MANAGER_H

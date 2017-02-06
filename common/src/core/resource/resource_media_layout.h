@@ -7,8 +7,11 @@
 #include <QtCore/QStringList>
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
+#include <QtCore/QSharedPointer>
 
-#include <core/datapacket/abstract_media_context.h>
+#include <nx/streaming/media_context.h>
+
+#include <nx/utils/literal.h>
 
 #include <common/common_globals.h>
 
@@ -17,7 +20,7 @@ public:
     QnResourceLayout() {}
     virtual ~QnResourceLayout() {}
 
-    /** 
+    /**
      * \returns                         Number of audio or video channels a device has.
      */
     virtual int channelCount() const = 0;
@@ -30,10 +33,10 @@ private:
 class QnResourceAudioLayout: public QnResourceLayout {
 public:
     struct AudioTrack {
-        AudioTrack() {} 
-        AudioTrack(QnAbstractMediaContextPtr codecContext, const QString &description): codecContext(codecContext), description(description) {}
+        AudioTrack() {}
+        AudioTrack(const QnConstMediaContextPtr& codecContext, const QString &description): codecContext(codecContext), description(description) {}
 
-        QnAbstractMediaContextPtr codecContext;
+        QnConstMediaContextPtr codecContext;
         QString description;
     };
 
@@ -75,7 +78,7 @@ public:
     QnResourceVideoLayout() {}
 
     /**
-     * \returns                         Size of the channel matrix. 
+     * \returns                         Size of the channel matrix.
      */
     virtual QSize size() const = 0;
 
@@ -149,7 +152,7 @@ public:
     {
         QString result(lit("width=%1;height=%2;sensors=%3"));
         QString sensors;
-        for (int i = 0; i < m_channels.size(); ++i) 
+        for (int i = 0; i < m_channels.size(); ++i)
         {
             if (i > 0)
                 sensors += L',';
@@ -188,7 +191,7 @@ public:
     }
 
     virtual QPoint position(int channel) const override {
-        for (int i = 0; i < m_size.width() * m_size.height(); ++i) 
+        for (int i = 0; i < m_size.width() * m_size.height(); ++i)
             if (m_channels[i] == channel)
                 return QPoint(i % m_size.width(), i / m_size.width());
 

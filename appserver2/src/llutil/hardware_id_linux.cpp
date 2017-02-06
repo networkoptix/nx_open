@@ -8,6 +8,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QList>
 #include <QtCore/QDebug>
+#include <QtCore/QDir>
 
 #ifdef __arm__
 #include <sys/types.h>
@@ -21,9 +22,13 @@
 #endif
 
 #include "util.h"
+#include "licensing/hardware_info.h"
 #include "hardware_id.h"
+#include "hardware_id_p.h"
 
 namespace {
+
+const QString kEmptyMac = lit("");
 
 QByteArray fromString(const std::string& s) {
     return QByteArray(s.data(), s.size());
@@ -38,9 +43,10 @@ std::string trim(const std::string& str) {
     return result;
 }
 
-std::string read_file(const char* path) {
+QString read_file(const char* path) {
     std::ifstream ifs(path);
-    return trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
+    std::string content = trim(std::string((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>()));
+    return QString::fromStdString(content);
 }
 
 void trim2(std::string& str) {
@@ -55,7 +61,7 @@ void trim2(std::string& str) {
     }
 }
 
-void getMemoryInfo(std::string& memoryInfo) {
+void getMemoryInfo(QString &partNumber, QString &serialNumber) {
     static const int PARAMETER_COUNT = 2;
 
     const char *STRINGS[] = {
@@ -67,7 +73,7 @@ void getMemoryInfo(std::string& memoryInfo) {
     StrSet values[PARAMETER_COUNT];
 
     FILE *fp = popen("/usr/sbin/dmidecode -t17", "r");
-    
+
     if (fp == NULL)
         return;
 
@@ -83,11 +89,16 @@ void getMemoryInfo(std::string& memoryInfo) {
         }
     }
 
-    for (int i = 0; i < PARAMETER_COUNT; i++) {
-        for (StrSet::const_iterator ci = values[i].begin(); ci != values[i].end(); ++ci) {
-            memoryInfo += *ci;
-        }
+
+    for (StrSet::const_iterator ci = values[0].begin(); ci != values[0].end(); ++ci) {
+        partNumber += ci->c_str();
     }
+
+
+    for (StrSet::const_iterator ci = values[1].begin(); ci != values[1].end(); ++ci) {
+        serialNumber += ci->c_str();
+    }
+
 
     pclose(fp);
 }
@@ -98,35 +109,94 @@ namespace LLUtil {
 
 #if defined(__i686__) || defined(__x86_64__)
 
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void findMacAddresses(QnMacAndDeviceClassList& devices) {
+    QStringList classes;
+    classes << "PCI" << "USB";
+
+    QDir interfacesDir("/sys/class/net");
+    QStringList interfaces = interfacesDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    foreach (QString interface, interfaces) {
+        QFileInfo addressFileInfo(interfacesDir, interface + "/address");
+        if (!addressFileInfo.exists())
+            continue;
+
+        QFile addressFile(addressFileInfo.absoluteFilePath());
+        if (!addressFile.open(QFile::ReadOnly))
+            continue;
+
+        QString mac = QString(addressFile.readAll()).trimmed().toUpper();
+        if (mac.isEmpty())
+            continue;
+
+        QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
+        QString xclass = QDir(subsystemFileInfo.symLinkTarget()).dirName().toUpper();
+
+        if (classes.contains(xclass)) {
+            devices.push_back(QnMacAndDeviceClass(xclass, mac));
+        }
+    }
+}
+
+void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareInfo& hi, int version, bool guidCompatibility)
 {
-    std::string board_serial = read_file("/sys/class/dmi/id/board_serial");
-    std::string board_vendor = read_file("/sys/class/dmi/id/board_vendor");
-    std::string board_name = read_file("/sys/class/dmi/id/board_name");
+    hardwareIdMap.clear();
 
-    std::string product_uuid = read_file("/sys/class/dmi/id/product_uuid");
-    std::string product_serial = read_file("/sys/class/dmi/id/product_serial");
-    std::string bios_vendor = read_file("/sys/class/dmi/id/bios_vendor");
+    QString hardwareId;
 
-    std::string memory_info;
-    getMemoryInfo(memory_info);
-    QByteArray memory_info_ba = fromString(memory_info);
+    if (hi.boardID.length() || hi.boardUUID.length() || hi.biosID.length()) {
+        hardwareId = hi.boardID + (guidCompatibility ? hi.compatibilityBoardUUID : hi.boardUUID) + hi.boardManufacturer + hi.boardProduct + hi.biosID + hi.biosManufacturer;
+        if (version == 3 || version == 4) { // this part differs from windows, unfortunately
+            hardwareId += hi.memoryPartNumber + hi.memorySerialNumber;
+        }
+    } else {
+        hardwareId.clear();
+    }
 
-    QByteArray hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
-    hardwareIds[0] = hardwareId;
-	hardwareIds[1] = hardwareId;
-    hardwareIds[2] = (hardwareId + memory_info_ba);
-    
-    changeGuidByteOrder(product_uuid);
-    hardwareId = fromString(board_serial + product_uuid + board_vendor + board_name + product_serial + bios_vendor);
+    if (version == 4 || version == 5)
+    {
+        for (const auto& nic : hi.nics)
+        {
+            const QString& mac = nic.mac;
 
-    hardwareIds[3] = hardwareId;
-	hardwareIds[4] = hardwareId;
-    hardwareIds[5] = (hardwareId + memory_info_ba);
+            if (!mac.isEmpty())
+            {
+                hardwareIdMap[mac] = hardwareId + mac;
+            }
+        }
+    } else
+    {
+        hardwareIdMap[kEmptyMac] = hardwareId;
+    }
+}
+
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
+{
+    hardwareInfo.boardUUID = read_file("/sys/class/dmi/id/product_uuid");
+    hardwareInfo.compatibilityBoardUUID = changedGuidByteOrder(hardwareInfo.boardUUID);
+
+    hardwareInfo.boardID = read_file("/sys/class/dmi/id/board_serial");
+    hardwareInfo.boardManufacturer = read_file("/sys/class/dmi/id/board_vendor");
+    hardwareInfo.boardProduct = read_file("/sys/class/dmi/id/board_name");
+
+    hardwareInfo.biosID = read_file("/sys/class/dmi/id/product_serial");
+    hardwareInfo.biosManufacturer = read_file("/sys/class/dmi/id/bios_vendor");
+
+    getMemoryInfo(hardwareInfo.memoryPartNumber, hardwareInfo.memorySerialNumber);
+
+    findMacAddresses(hardwareInfo.nics);
+
+    HardwareIdListForVersion macHardwareIds;
+
+    // We start from 1 here because hwid[0] is not based on hardware
+    for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
+        calcHardwareIds(macHardwareIds, hardwareInfo, i);
+        hardwareIds << macHardwareIds;
+    }
 }
 
 #elif defined(__arm__)
 
+// TODO: Use getMacFromPrimaryIF instead
 void mac_eth0(char  MAC_str[13], char** host)
 {
     #define HWADDR_len 6
@@ -147,14 +217,30 @@ void mac_eth0(char  MAC_str[13], char** host)
 }
 
 
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     char MAC_str[13];
-    memset(MAC_str, sizeof(MAC_str), 0);
+    memset(MAC_str, 0, sizeof(MAC_str));
     mac_eth0( MAC_str, nullptr );
-    QByteArray hardwareId = QByteArray( MAC_str, sizeof(MAC_str) );
-    hardwareIds.clear();
-    hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
+
+    // Historically hardware id is mac + '\0'
+    QByteArray hardwareId = QByteArray(MAC_str, sizeof(MAC_str));
+
+    // when copying bytearray to string, trailing '\0' is removed
+    hardwareInfo.mac = hardwareId;
+
+    QStringList hardwareIdList = QStringList() << QString::fromUtf8(MAC_str, sizeof(MAC_str));
+
+    HardwareIdListForVersion macHardwareIds;
+    macHardwareIds << MacAndItsHardwareIds(kEmptyMac, hardwareIdList);
+
+    for (int i = 1; i <= LATEST_HWID_VERSION; i++) {
+        hardwareIds << macHardwareIds;
+    }
+}
+
+void calcHardwareIdMap(QMap<QString, QString>& /* hardwareIdMap */, const QnHardwareInfo& /*hi*/, int /*version*/, bool /*guidCompatibility*/)
+{
 }
 
 #endif

@@ -43,7 +43,7 @@ IPPH264Decoder::~IPPH264Decoder()
 
 bool IPPH264Decoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame)
 {
-    return m_decoder && ptr_decode(m_decoder, data.data(), outFrame->data());
+    return m_decoder && ptr_decode(m_decoder, data.get(), outFrame->data());
 }
 
 QSize IPPH264Decoder::getOriginalPictureSize() const
@@ -69,6 +69,8 @@ unsigned int IPPH264Decoder::getDecoderCaps() const
 
 void IPPH264Decoder::setSpeed( float newValue )
 {
+    Q_UNUSED(newValue)
+    //TODO/IMPL
 }
 
 #endif

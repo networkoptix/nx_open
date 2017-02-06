@@ -1,10 +1,8 @@
-#ifndef QN_APP_SERVER_CONNECTION_H
-#define QN_APP_SERVER_CONNECTION_H
+#pragma once
 
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/request_param.h>
-#include <utils/common/software_version.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/misc/schedule_task.h>
@@ -15,37 +13,31 @@
 #include <api/model/servers_reply.h>
 #include <api/model/connection_info.h>
 
-#include "api_fwd.h"
-
 class QnAppServerConnectionFactory;
 class QnApiSerializer;
 
-class QN_EXPORT QnAppServerConnectionFactory 
+class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
     QnAppServerConnectionFactory();
     virtual ~QnAppServerConnectionFactory();
 
-    static QString clientGuid();
     static QUrl url();
-    static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    static void setClientGuid(const QString &guid);
     static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
-    static void setCurrentVersion(const QnSoftwareVersion &version);
-    
-    /** If the client is started in videowall mode, videowall's guid is stored here. */ 
-    static QUuid videowallGuid();
-    static void setVideowallGuid(const QUuid &uuid);
 
-    /** If the client is started in videowall mode, instance's guid is stored here. */ 
-    static QUuid instanceGuid();
-    static void setInstanceGuid(const QUuid &uuid);
+    /** If the client is started in videowall mode, videowall's guid is stored here. */
+    static QnUuid videowallGuid();
+    static void setVideowallGuid(const QnUuid &uuid);
 
-    //static QnAppServerConnectionPtr createConnection();
-    //static QnAppServerConnectionPtr createConnection(const QUrl &url);
+    /** If the client is started in videowall mode, instance's guid is stored here. */
+    static QnUuid instanceGuid();
+    static void setInstanceGuid(const QnUuid &uuid);
+
+    static QnConnectionInfo connectionInfo();
+    static void setConnectionInfo(const QnConnectionInfo& connectionInfo);
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
@@ -53,18 +45,14 @@ public:
     static ec2::AbstractECConnectionPtr getConnection2();
 
 private:
-    QMutex m_mutex;
-    QString m_clientGuid;
+    QnMutex m_mutex;
     QUrl m_url;
 
     /** Videowall-related fields */
-    QUuid m_videowallGuid;
-    QUuid m_instanceGuid;
+    QnUuid m_videowallGuid;
+    QnUuid m_instanceGuid;
 
-    QnSoftwareVersion m_currentVersion;
+    QnConnectionInfo m_connectionInfo;
+
     QnResourceFactory *m_resourceFactory;
 };
-
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection);
-
-#endif // QN_APP_SERVER_CONNECTION_H

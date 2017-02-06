@@ -12,12 +12,16 @@
 #include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
 
+#include "core/resource/resource_media_layout.h"
 
-static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
+#include <nx/streaming/config.h>
+
+
+static const int TEXT_HEIGHT_IN_FRAME_PARTS = 20;
 static const int MIN_TEXT_HEIGHT = 14;
-static const double FPS_EPS = 1e-8;
+//static const double FPS_EPS = 1e-8;
 
-QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
+QnTimeImageFilter::QnTimeImageFilter(const QSharedPointer<const QnResourceVideoLayout>& videoLayout, Qn::Corner datePos, qint64 timeOffsetMs, qint64 timeMsec):
     m_dateTimeXOffs(0),
     m_dateTimeYOffs(0),
     m_bufXOffs(0),
@@ -25,9 +29,11 @@ QnTimeImageFilter::QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs):
     m_timeImg(0),
     m_onscreenDateOffset(timeOffsetMs),
     m_imageBuffer(0),
-    m_dateTextPos(datePos)
+    m_dateTextPos(datePos),
+    m_checkHash(videoLayout && videoLayout->channelCount() > 1),
+    m_hash(-1),
+    m_timeMsec(timeMsec)
 {
-
 }
 
 QnTimeImageFilter::~QnTimeImageFilter()
@@ -36,12 +42,21 @@ QnTimeImageFilter::~QnTimeImageFilter()
     qFreeAligned(m_imageBuffer);
 }
 
-void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr)
+void QnTimeImageFilter::initTimeDrawing(const CLVideoDecoderOutputPtr& frame, const QString& timeStr)
 {
+    if (frame->width == m_timeImgSrcSiz.width() && frame->height == m_timeImgSrcSiz.height())
+        return;
+    m_timeImgSrcSiz = QSize(frame->width, frame->height);
+
     m_timeFont.setBold(true);
-    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
+    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS ));
     QFontMetrics metric(m_timeFont);
-    //m_bufYOffs;
+
+    while (metric.width(timeStr) >= frame->width - metric.averageCharWidth() && m_timeFont.pixelSize() > MIN_TEXT_HEIGHT)
+    {
+        m_timeFont.setPixelSize(m_timeFont.pixelSize()-1);
+        metric = QFontMetrics(m_timeFont);
+    }
 
     switch(m_dateTextPos)
     {
@@ -73,55 +88,59 @@ void QnTimeImageFilter::initTimeDrawing(CLVideoDecoderOutput* frame, const QStri
     int drawWidth = metric.width(timeStr);
     int drawHeight = metric.height();
     drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    qFreeAligned(m_imageBuffer);
+	delete m_timeImg;
     m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
 }
 
-void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar)
+qint64 QnTimeImageFilter::calcHash(const quint8* data, int width, int height, int linesize)
 {
-    switch(m_dateTextPos)
-    {
-    case Qn::TopLeftCorner:
-        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return;
-        break;
-    case Qn::TopRightCorner:
-        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.top()) > FPS_EPS)
-            return;
-        break;
-    case Qn::BottomRightCorner:
-        if (qAbs(updateRect.right()-1.0) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return;
-        break;
-    case Qn::BottomLeftCorner:
-    default:
-        if (qAbs(updateRect.left()) > FPS_EPS || qAbs(updateRect.bottom()-1.0) > FPS_EPS)
-            return;
-        break;
+    qint64 result = 0;
+    const qint64* data64 = (const qint64*) data;
+    for (int y = 0; y < height; ++y) {
+        for (int i = 0; i < static_cast<int>(width / sizeof(qint64)); ++i)
+            result ^= data64[i];
+        data64 += linesize / sizeof(qint64);
     }
+    return result;
+}
+
+CLVideoDecoderOutputPtr QnTimeImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
+{
 
     QString timeStr;
-    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
-    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
+    qint64 displayTime = m_timeMsec > 0
+        ? m_timeMsec
+        : frame->pts / 1000;
+
+    displayTime += m_onscreenDateOffset;
+
+    if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
         timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = QTime(0, 0, 0, 0).addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
-    if (m_timeImg == 0)
-        initTimeDrawing(frame, timeStr);
+    initTimeDrawing(frame, timeStr);
 
     int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
     int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
+
+    if (m_checkHash) {
+        qint64 hash = calcHash(frame->data[0]+bufPlaneYOffs, m_timeImg->width(), m_timeImg->height(), frame->linesize[0]);
+        if (hash == m_hash)
+            return frame;
+    }
 
     // copy and convert frame buffer to image
     yuv420_argb32_simd_intr(m_imageBuffer,
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
-        m_timeImg->bytesPerLine(), 
+        m_timeImg->bytesPerLine(),
         frame->linesize[0], frame->linesize[1], 255);
 
     QPainter p(m_timeImg);
-    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
     QPainterPath path;
     path.addText(m_dateTimeXOffs, m_dateTimeYOffs, m_timeFont, timeStr);
     p.setBrush(Qt::white);
@@ -129,10 +148,15 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
     p.strokePath(path, QPen(QColor(32,32,32,80)));
 
     // copy and convert RGBA32 image back to frame buffer
-    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
+    bgra_to_yv12_simd_intr(m_imageBuffer, m_timeImg->bytesPerLine(),
         frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
-        frame->linesize[0], frame->linesize[1], 
+        frame->linesize[0], frame->linesize[1],
         m_timeImg->width(), m_timeImg->height(), false);
+
+    if (m_checkHash)
+        m_hash = calcHash(frame->data[0]+bufPlaneYOffs, m_timeImg->width(), m_timeImg->height(), frame->linesize[0]);
+
+    return frame;
 }
 
 #endif // ENABLE_DATA_PROVIDERS

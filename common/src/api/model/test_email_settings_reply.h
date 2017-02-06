@@ -1,20 +1,18 @@
-#ifndef TEST_EMAIL_SETTINGS_REPLY_H
-#define TEST_EMAIL_SETTINGS_REPLY_H
+#pragma once
 
 #include <QtCore/QMetaType>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
+#include <utils/email/email_fwd.h>
 
 struct QnTestEmailSettingsReply
 {
+    QnTestEmailSettingsReply();
 
-    QnTestEmailSettingsReply(): errorCode(0) { }
-
-    int errorCode;
+    SmtpError errorCode;
+    SmtpReplyCode smtpReplyCode;
     QString errorString;
 };
 
-#define QnTestEmailSettingsReply_Fields (errorCode)(errorString)
-    QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(metatype))
+#define QnTestEmailSettingsReply_Fields (errorCode)(smtpReplyCode)(errorString)
 
-
-#endif // TEST_EMAIL_SETTINGS_REPLY_H
+QN_FUSION_DECLARE_FUNCTIONS(QnTestEmailSettingsReply, (json)(metatype))

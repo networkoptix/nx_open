@@ -1,16 +1,21 @@
 #ifndef resource_pool_h_1537
 #define resource_pool_h_1537
 
+#include <functional>
+
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
+
+#include <nx/utils/singleton.h>
+#include <utils/common/connective.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -27,10 +32,11 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public QObject
+class QN_EXPORT QnResourcePool : public Connective<QObject>, public Singleton<QnResourcePool>
 {
     Q_OBJECT
 
+    typedef Connective<QObject> base_type;
 public:
     enum Filter
     {
@@ -40,17 +46,20 @@ public:
         AllResources
     };
 
-    QnResourcePool();
+    QnResourcePool(QObject* parent = NULL);
     ~QnResourcePool();
 
-    static void initStaticInstance( QnResourcePool* inst );
-    static QnResourcePool* instance();
+    /**
+     * This function will add or update existing resources.
+     * By default it add resources to the mainPool. if mainPoos parameter is false then resources are put to
+     * the incompatible resource pool.
+     */
 
-    // this function will add or update existing resources
-    // keeps database ID ( if possible )
-    void addResources(const QnResourceList &resources);
+    void addResources(const QnResourceList &resources, bool mainPool = true);
 
     void addResource(const QnResourcePtr &resource);
+    // TODO: We need to remove this function. Client should use separate instance of resource pool instead
+    void addIncompatibleResource(const QnResourcePtr &resource);
 
     void beginTran();
     void commit();
@@ -61,9 +70,24 @@ public:
 
     QnResourceList getResources() const;
 
+    template <class IDList>
+    QnResourceList getResources(IDList idList) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        QnResourceList result;
+        for (const auto& id : idList)
+        {
+            const auto itr = m_resources.find(id);
+            if (itr != m_resources.end())
+                result.push_back(itr.value());
+        }
+        return result;
+    }
+
     template <class Resource>
-    QnSharedResourcePointerList<Resource> getResources() const {
-        QMutexLocker locker(&m_resourcesMtx);
+    QnSharedResourcePointerList<Resource> getResources() const
+    {
+        QnMutexLocker locker( &m_resourcesMtx );
         QnSharedResourcePointerList<Resource> result;
         for (const QnResourcePtr &resource : m_resources)
             if(QnSharedResourcePointer<Resource> derived = resource.template dynamicCast<Resource>())
@@ -71,10 +95,51 @@ public:
         return result;
     }
 
-    QnResourcePtr getResourceById(const QUuid &id) const;
+    template <class Resource, class IDList>
+    QnSharedResourcePointerList<Resource> getResources(const IDList& idList) const
+    {
+        QnMutexLocker locker( &m_resourcesMtx );
+        QnSharedResourcePointerList<Resource> result;
+        for (const auto& id: idList)
+        {
+            const auto itr = m_resources.find(id);
+            if (itr != m_resources.end()) {
+                if (QnSharedResourcePointer<Resource> derived = itr.value().template dynamicCast<Resource>())
+                    result.push_back(derived);
+            }
+        }
+        return result;
+    }
 
-    QnResourcePtr getResourceByUniqId(const QString &id) const;
+    QnResourcePtr getResource(std::function<bool(const QnResourcePtr&)> filter) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        auto itr = std::find_if( m_resources.begin(), m_resources.end(), filter);
+        return itr != m_resources.end() ? itr.value() : QnResourcePtr();
+    }
+
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceByUniqueId(const QString &id) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&id](const QnResourcePtr &resource) { return resource->getUniqueId() == id; });
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
+    template <class Resource>
+    QnSharedResourcePointer<Resource> getResourceById(const QnUuid &id) const
+    {
+        QnMutexLocker locker(&m_resourcesMtx);
+        auto itr = m_resources.find(id);
+        return itr != m_resources.end() ? itr.value().template dynamicCast<Resource>() : QnSharedResourcePointer<Resource>(NULL);
+    }
+
+    QnResourcePtr getResourceById(const QnUuid &id) const;
+
+    QnResourcePtr getResourceByUniqueId(const QString &id) const;
     void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
+
+    QnResourcePtr getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const;
 
     bool hasSuchResource(const QString &uniqid) const;
 
@@ -89,19 +154,22 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
-    QnMediaServerResourceList getAllServers() const;
-    QnResourceList getResourcesByParentId(const QUuid& parentId) const;
+    QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
+
+    // @note Never returns fake servers
+    QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
+    QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(Qn::ResourceFlag flag) const;
 
-    QnResourceList getResourcesWithParentId(QUuid id) const;
-    QnResourceList getResourcesWithTypeId(QUuid id) const;
+    QnResourceList getResourcesWithParentId(QnUuid id) const;
+    QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
-    QnResourcePtr getIncompatibleResourceById(const QUuid &id, bool useCompatible = false) const;
-    QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
+    QnResourcePtr getIncompatibleResourceById(const QnUuid &id, bool useCompatible = false) const;
     QnResourceList getAllIncompatibleResources() const;
+
 
     QnUserResourcePtr getAdministrator() const;
 
@@ -110,55 +178,81 @@ public:
      * @param uuid                              Unique id of the item.
      * @return                                  Valid index containing the videowall and item's uuid or null index if such item does not exist.
      */
-    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QnUuid &uuid) const;
 
     /**
      * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
-    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
-    
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
+
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.
      * @return                                  Index containing the videowall and matrix's uuid.
      */
-    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QUuid &uuid) const;
+    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QnUuid &uuid) const;
 
     /**
      * @brief getVideoWallMatricesByUuid        Find list of videowall matrices by their uuids.
      * @param uuids                             Unique ids of the matrices.
      * @return                                  List of indices containing the videowall and matrices' uuid.
      */
-    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const;
+    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QnUuid> &uuids) const;
 
     QStringList allTags() const;
-
-    int activeCamerasByLicenseType(Qn::LicenseType licenseType) const;
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
+    /** Check if there is at least one I/O Module in the system. */
+    bool containsIoModules() const;
+
+    /** Check if layout was created automatically, e.g. by 'Push my screen' action.
+     *  //TODO: #GDM replace this method by corresponding boolean flag in 2.6
+     */
+    static bool isAutoGeneratedLayout(const QnLayoutResourcePtr &layout);
+    static void markLayoutAutoGenerated(const QnLayoutResourcePtr &layout);
+
+    /** In the future we may want to distinguish lite client layout from the others. */
+    static void markLayoutLiteClient(const QnLayoutResourcePtr &layout);
+
+
+    QnLayoutResourceList getLayoutsWithResource(const QnUuid &cameraGuid) const;
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);
     void resourceChanged(const QnResourcePtr &resource);
-    void statusChanged(const QnResourcePtr &resource);
+    void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
 
     void aboutToBeDestroyed();
+private:
+    /*!
+        \note MUST be called with \a m_resourcesMtx locked
+    */
+    void invalidateCache();
+    void ensureCache() const;
 
 private:
-    mutable QMutex m_resourcesMtx;
+    mutable struct Cache {
+        bool valid;
+        bool containsIoModules;
+        QnMediaServerResourceList serversList;
+    } m_cache;
+
+    mutable QnMutex m_resourcesMtx;
     bool m_tranInProgress;
+
     QnResourceList m_tmpResources;
-    QHash<QUuid, QnResourcePtr> m_resources;
-    QHash<QUuid, QnResourcePtr> m_incompatibleResources;
+    QHash<QnUuid, QnResourcePtr> m_resources;
+    QHash<QnUuid, QnResourcePtr> m_incompatibleResources;
+    mutable QnUserResourcePtr m_adminResource;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource
     */
-    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QUuid, QnResourcePtr>* const resourcePool );
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QnUuid, QnResourcePtr>* const resourcePool );
 };
 
 

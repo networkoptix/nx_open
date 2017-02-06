@@ -1,47 +1,75 @@
-#ifndef __API_PEER_DATA_H_
-#define __API_PEER_DATA_H_
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "utils/common/latin1_array.h"
+#include "nx/utils/latin1_array.h"
 
-namespace ec2
+namespace ec2 {
+
+struct ApiPeerData: ApiIdData
 {
+    ApiPeerData():
+        dataFormat(Qn::UbjsonFormat)
+    {}
 
-    struct ApiPeerData: ApiData 
-    {
-        ApiPeerData()
+    ApiPeerData(
+        const QnUuid& id,
+        const QnUuid& instanceId,
+        Qn::PeerType peerType,
+        Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
         :
-            dataFormat( Qn::UbjsonFormat )
-        {}
+        ApiIdData(id),
+        instanceId(instanceId),
+        peerType(peerType),
+        dataFormat(dataFormat)
+    {}
 
-        ApiPeerData(QUuid id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
-            id(id),
-            peerType(peerType),
-            dataFormat(dataFormat) 
-        {}
+    bool operator==(const ApiPeerData& other) const
+    {
+        return id == other.id
+            && instanceId == other.instanceId
+            && peerType == other.peerType
+            && dataFormat == other.dataFormat;
+    }
 
-        bool operator==(const ApiPeerData& other) const {
-            return id == other.id && peerType == other.peerType && dataFormat == other.dataFormat;
-        }
+    static bool isClient(Qn::PeerType peerType)
+    {
+            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer && peerType != Qn::PT_OldServer;
+    }
 
-        bool isClient() const {
-            return peerType != Qn::PT_Server;
-        }
+    bool isClient() const
+    {
+        return isClient(peerType);
+    }
 
-        /** Unique ID of the peer. */ 
-        QUuid id;
+    static bool isServer(Qn::PeerType peerType)
+    {
+        return peerType == Qn::PT_Server || peerType == Qn::PT_OldServer;
+    }
 
-        /** Type of the peer. */
-        Qn::PeerType peerType;
+    bool isServer() const
+    {
+        return isServer(peerType);
+    }
 
-        /** Preferred client data serialization format */
-        Qn::SerializationFormat dataFormat;
-    };
-    typedef QSet<QUuid> QnPeerSet;
+    bool isMobileClient() const
+    {
+        return
+            peerType == Qn::PT_OldMobileClient ||
+            peerType == Qn::PT_MobileClient;
+    }
 
-#define ApiPeerData_Fields (id)(peerType)(dataFormat)
+    /** Unique running instance ID of the peer. */
+    QnUuid instanceId;
 
-}
+    /** Type of the peer. */
+    Qn::PeerType peerType;
 
-#endif // __API_PEER_DATA_H_
+    /** Preferred client data serialization format */
+    Qn::SerializationFormat dataFormat;
+};
+typedef QSet<QnUuid> QnPeerSet;
+
+#define ApiPeerData_Fields ApiIdData_Fields (instanceId)(peerType)(dataFormat)
+
+} // namespace ec2

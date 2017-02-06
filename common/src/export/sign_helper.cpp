@@ -3,11 +3,14 @@
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
+#include <nx/streaming/config.h>
 #include "licensing/license.h"
+#include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
 #include "utils/math/math.h"
+#include "utils/media/ffmpeg_helper.h"
 
 extern "C" {
 #include <libswscale/swscale.h>
@@ -56,45 +59,75 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
 }
 
 QnSignHelper::QnSignHelper():
-    m_cachedMetric(QFont())
+    m_cachedMetric(QFont()),
+    m_outPacket(av_packet_alloc())
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
-    m_hwIdStr = QLatin1String(qnLicensePool->currentHardwareId());
+    m_hwIdStr = qnLicensePool->currentHardwareId();
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    m_licensedToStr = tr("Trial license");
-    foreach (QnLicensePtr license, list)
+    m_licensedToStr = tr("Trial License");
+    for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial)
+        if (license->type() != Qn::LC_Trial && license->isValid()) {
             m_licensedToStr = license->name();
+            break;
+        }
     }
+}
+
+QnSignHelper::~QnSignHelper()
+{
+    av_packet_free(&m_outPacket);
 }
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
 {
-    if (srcCodec == 0 || srcCodec->codec_id != CODEC_ID_H264) {
-        ctx.addData((const char*) data, size);
+    if (!srcCodec)
+        doUpdateDigestNoCodec(ctx, data, size);
+    else
+        doUpdateDigest(srcCodec->codec_id, srcCodec->extradata, srcCodec->extradata_size, ctx, data, size);
+}
+
+void QnSignHelper::updateDigest(const QnConstMediaContextPtr& context, QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    if (!context)
+        doUpdateDigestNoCodec(ctx, data, size);
+    else
+        doUpdateDigest(context->getCodecId(), context->getExtradata(), context->getExtradataSize(), ctx, data, size);
+}
+
+void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    ctx.addData((const char*) data, size);
+}
+
+void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    if (codecId != AV_CODEC_ID_H264)
+    {
+        doUpdateDigestNoCodec(ctx, data, size);
         return;
     }
 
     // skip nal prefixes (sometimes it is 00 00 01 code, sometimes unitLen)
     const quint8* dataEnd = data + size;
 
-    if (srcCodec->extradata_size >= 7 && srcCodec->extradata[0] == 1)
+    if (extradataSize >= 7 && extradata[0] == 1)
     {
         // prefix is unit len
-        int reqUnitSize = (srcCodec->extradata[4] & 0x03) + 1;
+        int reqUnitSize = (extradata[4] & 0x03) + 1;
 
         const quint8* curNal = data;
         while (curNal < dataEnd - reqUnitSize)
         {
             int curSize = 0;
-            for (int i = 0; i < reqUnitSize; ++i) 
+            for (int i = 0; i < reqUnitSize; ++i)
                 curSize = (curSize << 8) + curNal[i];
             curNal += reqUnitSize;
             curSize = qMin(curSize, (int)(dataEnd - curNal));
@@ -103,10 +136,11 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &c
             curNal += curSize;
         }
     }
-    else {
+    else
+    {
         // prefix is 00 00 01 code
         const quint8* curNal = NALUnit::findNextNAL(data, dataEnd);
-        while(curNal < dataEnd)
+        while (curNal < dataEnd)
         {
             const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
             ctx.addData((const char*) curNal, nextNal - curNal);
@@ -146,11 +180,11 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
                 writer.putBit(1);
             else if (avgColor >= (255-COLOR_THRESHOLD))
                 writer.putBit(0);
-            else 
+            else
                 return QByteArray(); // invalid data
 
             // check colors plane
-            const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+            const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
             for (int i = 0; i < descr->log2_chroma_w; ++i)
                 checkRect = QRect(checkRect.left()/2, checkRect.top(), checkRect.width()/2, checkRect.height());
             for (int i = 0; i < descr->log2_chroma_h; ++i)
@@ -260,7 +294,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), m_versionStr);
 
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(m_hwIdStr));
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(m_licensedToStr));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed To: ").append(m_licensedToStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: ").append(QLatin1String(m_sign.toHex())));
     }
 
@@ -284,7 +318,7 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
     m_roundRectPixmap = QPixmap(SQUARE_SIZE, SQUARE_SIZE);
     QPainter tmpPainter(&m_roundRectPixmap);
     tmpPainter.fillRect(0,0, SQUARE_SIZE, SQUARE_SIZE, signBkColor);
-    
+
     tmpPainter.setBrush(Qt::black);
     tmpPainter.setPen(QColor(signBkColor.red()/2,signBkColor.green()/2,signBkColor.blue()/2));
     tmpPainter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
@@ -316,7 +350,7 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
     QImage img(imgBuffer, frame->width, frame->height, frame->linesize[0]*4, QImage::Format_ARGB32);
     draw(img, true);
 
-    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, PIX_FMT_BGRA, frame->width, frame->height, (PixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
+    SwsContext* scaleContext = sws_getContext(frame->width, frame->height, AV_PIX_FMT_BGRA, frame->width, frame->height, (AVPixelFormat) frame->format, SWS_POINT, NULL, NULL, NULL);
     if (scaleContext)
     {
         quint8* srcData[4];
@@ -326,8 +360,8 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
         srcLineSize[0] = img.bytesPerLine();
         srcLineSize[1] = srcLineSize[2] = srcLineSize[3] = 0;
         sws_scale(scaleContext,
-            srcData, srcLineSize, 
-            0, frame->height, 
+            srcData, srcLineSize,
+            0, frame->height,
             frame->data, frame->linesize);
 
         sws_freeContext(scaleContext);
@@ -404,7 +438,7 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     QString profile;
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), sps, pps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -440,7 +474,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 
     extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
     if ((!spsReady || !ppsReady) && iFrame)
-        extractSpsPpsFromPrivData((quint8*)iFrame->data(), iFrame->dataSize(), oldSps, oldPps, spsReady, ppsReady);
+        extractSpsPpsFromPrivData((quint8*)iFrame->data(), static_cast<int>(iFrame->dataSize()), oldSps, oldPps, spsReady, ppsReady);
 
     if (!spsReady || !ppsReady)
         return out_size;
@@ -465,7 +499,7 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
     }
 
     int newLen= newSps.log2_max_pic_order_cnt_lsb;
-    Q_ASSERT(newLen <= oldLen);
+    NX_ASSERT(newLen <= oldLen);
 
     bufEnd = videoBuf + out_size;
     SliceUnit frame;
@@ -475,13 +509,13 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
     frame.m_shortDeserializeMode = false;
     if (frame.deserialize(&newSps, &newPps) != 0)
         return -1;
-    if (!frame.moveHeaderField(frame.m_picOrderBitPos+8, oldLen, newLen)) 
+    if (!frame.moveHeaderField(frame.m_picOrderBitPos+8, oldLen, newLen))
         return out_size;
 
     oldLen = oldSps.log2_max_frame_num;
     newLen = newSps.log2_max_frame_num;
-    Q_ASSERT(newLen <= oldLen);
-    if (!frame.moveHeaderField(frame.m_frameNumBitPos+8, oldLen, newLen)) 
+    NX_ASSERT(newLen <= oldLen);
+    if (!frame.moveHeaderField(frame.m_frameNumBitPos+8, oldLen, newLen))
         return out_size;
 
     out_size = frame.encodeNAL(nalData, videoBufSize-nalCodeLen) + nalCodeLen;
@@ -526,7 +560,7 @@ int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* 
     }
     else {
         int tmp = out_size - reqUnitSize;
-        for (int i = 0; i < reqUnitSize; ++i) 
+        for (int i = 0; i < reqUnitSize; ++i)
         {
             videoBuf[reqUnitSize-1-i] = (quint8) tmp;
             tmp >>= 8;
@@ -542,17 +576,20 @@ int QnSignHelper::runX264Process(AVFrame* frame, QString optionStr, quint8* rezB
         return -1;
     QString tempName = file.fileName();
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[frame->format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) frame->format);
     file.write((const char*) frame->data[0], frame->linesize[0]*frame->height);
     file.write((const char*) frame->data[1], frame->linesize[1]*frame->height/(1 << descr->log2_chroma_h));
     file.write((const char*) frame->data[2], frame->linesize[2]*frame->height/(1 << descr->log2_chroma_h));
     file.close();
-                                                        
+
     QString executableName = closeDirPath(qApp->applicationDirPath()) + QLatin1String("x264");
     QString command(QLatin1String("\"%1\" %2 -o \"%3\" --input-res %4x%5 \"%6\""));
     QString outFileName(tempName + QLatin1String(".264"));
     command = command.arg(executableName).arg(optionStr).arg(outFileName).arg(frame->width).arg(frame->height).arg(tempName);
-    int execResult = QProcess::execute(command);
+    int execResult = 1;
+    #if !defined(QT_NO_PROCESS)
+        execResult = QProcess::execute(command);
+    #endif
     if (execResult != 0)
         return -1;
 
@@ -590,7 +627,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
     return size;
 }
 
-QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
+QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
 {
     QnWritableCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
@@ -609,7 +646,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     videoCodecCtx->time_base.den = 30;
 
 
-    AVFrame* frame = avcodec_alloc_frame();
+    AVFrame* frame = av_frame_alloc();
     frame->width = videoCodecCtx->width;
     frame->height = videoCodecCtx->height;
     frame->format = videoCodecCtx->pix_fmt;
@@ -626,7 +663,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     drawOnSignFrame(frame);
 
     int out_size = 0;
-    if (videoCodecCtx->codec_id == CODEC_ID_H264)
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)
     {
         // To avoid X.264 GPL restriction run x264 as separate process
         QString optionStr = fillH264EncoderParams(srcCodecExtraData, iFrame, videoCodecCtx); // make X264 frame compatible with existing stream
@@ -642,34 +679,45 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
         }
 
         // TODO: #vasilenko avoid using deprecated methods
-        out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
-        if (out_size == 0)
-            out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer
+        //out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
+
+        m_outPacket->data = videoBuf;
+        m_outPacket->size = videoBufSize;
+        int got_packet = 0;
+        avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);
+
+        if (!got_packet)
+        {
+            m_outPacket->data = videoBuf;
+            m_outPacket->size = videoBufSize;
+            avcodec_encode_video2(videoCodecCtx, m_outPacket, frame, &got_packet);  //< flush encoder buffer
+        }
+        if (got_packet)
+            out_size = m_outPacket->size;
     }
 
-    if (videoCodecCtx->codec_id == CODEC_ID_H264) 
+    if (videoCodecCtx->codec_id == AV_CODEC_ID_H264)
     {
         // skip x264 SEI message
         out_size = removeH264SeiMessage(videoBuf, out_size);
 
         // make X264 frame compatible with existing stream
-        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize); 
+        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize);
         if (out_size == -1)
             goto error_label;
             // change nal prefix if need
-        out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize); 
+        out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize);
     }
 
     generatedFrame = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->m_data.write((const char*) videoBuf, out_size);
     generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;
-    generatedFrame->channelNumber = 0; 
+    generatedFrame->channelNumber = 0;
 error_label:
     delete [] videoBuf;
-    avcodec_close(videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(videoCodecCtx);
     av_free(frame);
-    av_free(videoCodecCtx);
 
     return generatedFrame;
 }
@@ -707,14 +755,14 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = QLatin1String(qnLicensePool->currentHardwareId());
+    QString hid = qnLicensePool->currentHardwareId();
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses();
-    QString licenseName(tr("FREE license"));
-    foreach (QnLicensePtr license, list)
+    QString licenseName(tr("FREE License"));
+    for (const QnLicensePtr& license: list)
     {
         if (license->name() != QLatin1String("FREE"))
             licenseName = license->name();

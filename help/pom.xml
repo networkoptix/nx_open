@@ -1,24 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.3.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.3.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>help</artifactId>
 	<packaging>pom</packaging>
-	<name>HD Witness Help</name>
+	<name>Nx Witness Help</name>
 
 	<properties>
         <root.dir>${basedir}/..</root.dir>
@@ -64,6 +57,57 @@
 					</execution>
 				</executions>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-icons</id>
+                        <!-- This variable is for Android. Resources for all modules should be copied on the "generate-sources" phase. However Android should copy resources at "validate" -->
+                        <phase>${resources.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/icons</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>          
+                                <resource>
+                                    <directory>${parent.customization.dir}/client/resources/skin</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                        <exclude>**/intro.*</exclude>
+                                    </excludes>
+                                </resource>     
+                                <resource>
+                                    <directory>${parent.customization.dir}/client/resources/skin_dark</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                    </excludes>
+                                </resource>    
+                                <resource>
+                                    <directory>${customization.dir}/client/resources/skin</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                        <exclude>**/intro.*</exclude>
+                                    </excludes>
+                                </resource>     
+                                <resource>
+                                    <directory>${customization.dir}/client/resources/skin_dark</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/_unused/**</exclude>
+                                    </excludes>
+                                </resource>                                                                        
+                            </resources>              
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>             
 		</plugins>
 	</build>
 </project>

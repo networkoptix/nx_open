@@ -1,9 +1,10 @@
 #include "resource_searcher.h"
 
 #include <core/resource/resource_type.h>
+#include <api/global_settings.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher():
-    m_shouldbeUsed(true),
+QnAbstractResourceSearcher::QnAbstractResourceSearcher() :
+    m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)
 {}
@@ -19,14 +20,16 @@ QnResourceList QnAbstractResourceSearcher::search() {
     return findResources();
 }
 
-void QnAbstractResourceSearcher::setShouldBeUsed(bool use)
+void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 {
-    m_shouldbeUsed = use;
+    m_discoveryMode = mode;
 }
 
-bool QnAbstractResourceSearcher::shouldBeUsed() const
+DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
-    return m_shouldbeUsed;
+    if (qnGlobalSettings->isInitialized() && qnGlobalSettings->isNewSystem())
+        return DiscoveryMode::disabled;
+    return m_discoveryMode;
 }
 
 void QnAbstractResourceSearcher::pleaseStop()
@@ -49,7 +52,7 @@ void QnAbstractResourceSearcher::setLocal(bool l)
     m_localResources = l;
 }
 
-bool QnAbstractResourceSearcher::isResourceTypeSupported(QUuid resourceTypeId) const
+bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
     if (resourceType.isNull())
@@ -59,24 +62,24 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QUuid resourceTypeId) c
 }
 
 
-//=============================================================================
+// =============================================================================
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     return m_pathListToCheck;
 }
 
 void QnAbstractFileResourceSearcher::setPathCheckList(const QStringList& paths)
 {
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_pathListToCheck = paths;
 }
 
 QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &files) const
 {
     QnResourceList result;
-    foreach (const QString &file, files) {
+    for (const QString &file: files) {
         if (QnResourcePtr res = checkFile(file))
             result.append(res);
     }

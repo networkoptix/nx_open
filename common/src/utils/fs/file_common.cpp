@@ -68,13 +68,13 @@ QString QnFile::absolutePath( const QString& path )
 bool QnFile::writeAsync( const QByteArray& buffer, AbstractWriteHandler* handler )
 {
     const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
-    assert( sharedThis );
+    NX_ASSERT( sharedThis );
     return AsyncFileProcessor::instance()->fileWrite( sharedThis, buffer, handler );
 }
 
 bool QnFile::closeAsync( AbstractCloseHandler* handler )
 {
     const std::shared_ptr<QnFile>& sharedThis = shared_from_this();
-    assert( sharedThis );
+    NX_ASSERT( sharedThis );
     return AsyncFileProcessor::instance()->fileClose( sharedThis, handler );
 }

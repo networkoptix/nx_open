@@ -6,10 +6,9 @@
 
 #include <qglobal.h>
 
-#if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
-
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
+#include <nx/utils/log/log.h>
 #include "../file.h"
 
 #include <sstream>
@@ -22,6 +21,10 @@
 #define O_LARGEFILE 0
 #endif
 
+#ifdef Q_OS_IOS
+#define stat64 stat
+#define fstat64 fstat
+#endif
 
 void makeUnixOpenFlags( 
     const QIODevice::OpenMode& oflag,
@@ -52,12 +55,12 @@ void makeUnixOpenFlags(
 	*unixOflag = sysFlags;
 }
 
-QnFile::QnFile(): m_impl(0)
+QnFile::QnFile(): m_impl(0), m_eof(false)
 {
 
 }
 
-QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(0)
+QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(0), m_eof(false)
 {
 
 }
@@ -77,34 +80,60 @@ bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentF
     makeUnixOpenFlags( mode, &sysFlags );
     int handle = ::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 
+    if (handle == -1 && (mode & QIODevice::WriteOnly) && errno == ENOENT)
+    {
+        QDir dir;
+        if (dir.mkpath(QnFile::absolutePath(m_fileName))) 
+            handle = ::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
+    }
+
     if (handle == -1)
         m_impl = 0;
     else
-        m_impl = (void*) handle;
+        m_impl = reinterpret_cast<void*>(handle);
 
     return m_impl != 0;
 }
 
 void QnFile::close()
 {
-    if( ::close( (long)m_impl ) == 0 )
-	{
-        m_impl = 0;
-	}
+    ::close( (long)m_impl );
+    m_impl = 0;
 }
+
+bool QnFile::eof() const { return m_eof; }
 
 qint64 QnFile::read( char* buffer, qint64 count )
 {
 	if( !isOpen() )
 		return -1;
-	return ::read( (long)m_impl, buffer, count );
+    ssize_t bytesRead = ::read((long)m_impl, buffer, count);
+    if (count > 0 && bytesRead == 0)
+        m_eof = true;
+	return bytesRead;
 }
 
 qint64 QnFile::write( const char* buffer, qint64 count )
 {
+    auto printLogMessage = [](const QString& m, QnLogLevel l)
+    {
+        NX_LOG(lit("QnFile::write failed. %1 Errno: %2")
+                .arg(m)
+                .arg(errno),
+            cl_logERROR);
+    };
 	if( !isOpen() )
+    {
+        printLogMessage(lit("File is not opened."), cl_logERROR);
 		return -1;
-	return ::write( (long)m_impl, buffer, count );
+    }
+	ssize_t writtenBytes = ::write( (long)m_impl, buffer, count );
+    if (writtenBytes == -1)
+        printLogMessage(lit(""), cl_logERROR);
+    else if (writtenBytes < count) 
+        printLogMessage(lit("Failed to write all bytes."), cl_logERROR);
+
+    return writtenBytes;
 }
 
 bool QnFile::isOpen() const
@@ -129,7 +158,7 @@ bool QnFile::seek( qint64 offset)
         return false;
 
 
-#ifdef Q_OS_DARWIN
+#if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
     return lseek( (long)m_impl, offset, SEEK_SET) != -1;
 #else
     return lseek64( (long)m_impl, offset, SEEK_SET) != -1;
@@ -138,7 +167,7 @@ bool QnFile::seek( qint64 offset)
 
 bool QnFile::truncate( qint64 newFileSize )
 {
-#ifdef Q_OS_DARWIN
+#if defined(Q_OS_DARWIN) || defined(Q_OS_ANDROID)
 	return ftruncate( (long)m_impl, newFileSize ) == 0;
 #else
 	return ftruncate64( (long)m_impl, newFileSize ) == 0;
@@ -165,5 +194,3 @@ qint64 QnFile::getFileSize( const QString& fileName )
         return -1;
     return fstat.st_size;
 }
-
-#endif

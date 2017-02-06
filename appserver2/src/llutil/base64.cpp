@@ -5,6 +5,8 @@
 
 #include "base64.h"
 
+#include <nx/utils/log/assert.h>
+
 static const char b64_table[65] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 static const char reverse_table[128] = {
@@ -44,12 +46,12 @@ static const char reverse_table[128] = {
       }
    }
    if (bits_collected > 0) { // Any trailing bits that are missing.
-      assert(bits_collected < 6);
+      NX_ASSERT(bits_collected < 6);
       accumulator <<= 6 - bits_collected;
       retval[outpos++] = b64_table[accumulator & 0x3fu];
    }
-   assert(outpos >= (retval.size() - 2));
-   assert(outpos <= retval.size());
+   NX_ASSERT(outpos >= (retval.size() - 2));
+   NX_ASSERT(outpos <= retval.size());
    return retval;
 }
 

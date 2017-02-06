@@ -2,7 +2,7 @@
 #define VIDEOWALL_CONTROL_MESSAGE_H
 
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 #include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
@@ -30,11 +30,17 @@ public:
         ZoomLinkRemoved,
 
         NavigatorPositionChanged,
+        NavigatorPlayingChanged,
         NavigatorSpeedChanged,
 
         SynchronizationChanged,
         MotionSelectionChanged,
         MediaDewarpingParamsChanged,
+
+        RadassModeChanged,
+
+        EnterFullscreen,
+        ExitFullscreen,
 
         Count
     };
@@ -43,13 +49,15 @@ public:
     QnVideoWallControlMessage(Operation operation):
         operation(operation){}
 
-    QUuid videoWallGuid;
-    QUuid instanceGuid;
+    QnUuid videoWallGuid;
+    QnUuid instanceGuid;
     Operation operation;
     QHash<QString, QString> params;
 
     QString& operator[](const QString &key) { return params[key]; }
     const QString operator[](const QString &key) const {return params[key]; }
+    bool contains(const QString& key) const { return params.contains(key); }
+
 };
 
 

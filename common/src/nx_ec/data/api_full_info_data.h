@@ -3,27 +3,33 @@
 
 #include "api_globals.h"
 #include "api_data.h"
-#include "api_discovery_data.h"
-#include "api_resource_type_data.h"
-#include "api_server_info_data.h"
 
-namespace ec2 
+namespace ec2
 {
     struct ApiFullInfoData: ApiData {
         ApiResourceTypeDataList resourceTypes;
         ApiMediaServerDataList servers;
+        ApiMediaServerUserAttributesDataList serversUserAttributesList;
         ApiCameraDataList cameras;
+        ApiCameraAttributesDataList cameraUserAttributesList;
         ApiUserDataList users;
+        ApiUserRoleDataList userRoles;
+        ApiAccessRightsDataList accessRights;
         ApiLayoutDataList layouts;
         ApiVideowallDataList videowalls;
         ApiBusinessRuleDataList rules;
-        ApiCameraServerItemDataList cameraHistory;
+        ApiServerFootageDataList cameraHistory;
         ApiLicenseDataList licenses;
-        //ApiServerInfoData serverInfo;
         ApiDiscoveryDataList discoveryData;
+        ApiResourceParamWithRefDataList allProperties;
+        ApiStorageDataList storages;
+        ApiResourceStatusDataList resStatusList;
+        ApiWebPageDataList webPages;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userRoles)
 
 } // namespace ec2
 
 #endif // __EC2_FULL_DATA_H_
+

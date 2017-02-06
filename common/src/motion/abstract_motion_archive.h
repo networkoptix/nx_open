@@ -1,7 +1,7 @@
 #ifndef __QN_ABSTRACT_MOTION_ARCHIVE_H__
 #define __QN_ABSTRACT_MOTION_ARCHIVE_H__
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 
 class QnAbstractMotionArchiveConnection
 {

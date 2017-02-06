@@ -16,8 +16,8 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzHomeObject"), QnPtzObject(), this)),
     m_executor(new QnHomePtzExecutor(baseController))
 {
-    assert(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
-    assert(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
+    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
+    NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 
     m_adaptor->setResource(baseController->resource());
     m_executor->moveToThread(qnPtzPool->executorThread());
@@ -25,6 +25,7 @@ QnHomePtzController::QnHomePtzController(const QnPtzControllerPtr &baseControlle
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnHomePtzController::at_adaptor_valueChanged);
 
     at_adaptor_valueChanged();
+    restartExecutor();
 }
 
 QnHomePtzController::~QnHomePtzController() {

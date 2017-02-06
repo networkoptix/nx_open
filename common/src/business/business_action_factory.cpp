@@ -1,17 +1,29 @@
 #include "business_action_factory.h"
 
+#include <common/common_module.h>
+
 #include <business/actions/camera_output_business_action.h>
 #include <business/actions/panic_business_action.h>
 #include <business/actions/recording_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/common_business_action.h>
+#include <business/actions/bookmark_business_action.h>
+
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+
+QVector<QnUuid> toIdList(const QnResourceList& list)
+{
+    QVector<QnUuid> result;
+    result.reserve(list.size());
+    for (const QnResourcePtr& r: list)
+        result << r->getId();
+    return result;
+}
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    if (QnBusiness::requiresCameraResource(rule->actionType()) && rule->actionResources().isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera is not exists anymore
-    //TODO: #GDM #Business check resource type?
-
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
+    runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 
@@ -46,19 +58,36 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
     switch(actionType)
     {
         case QnBusiness::UndefinedAction:
-        case QnBusiness::BookmarkAction:
         case QnBusiness::DiagnosticsAction:
         case QnBusiness::ShowPopupAction:
         case QnBusiness::PlaySoundOnceAction:
         case QnBusiness::PlaySoundAction:
         case QnBusiness::SayTextAction:
-            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+            break;
 
-        case QnBusiness::CameraOutputAction:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
-        case QnBusiness::CameraOutputOnceAction:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
-        case QnBusiness::CameraRecordingAction:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
-        case QnBusiness::PanicRecordingAction:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
-        case QnBusiness::SendMailAction:           return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
-        default: return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(runtimeParams));
+        case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
+        case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
+        case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
+        case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
+
+        case QnBusiness::ExecutePtzPresetAction:
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+        case QnBusiness::ExecHttpRequestAction:
+            break;
+
+        default:
+            NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
+            break;
     }
+
+    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+}
+
+QnAbstractBusinessActionPtr QnBusinessActionFactory::cloneAction(QnAbstractBusinessActionPtr action)
+{
+    QnAbstractBusinessActionPtr result = createAction(action->actionType(), action->getRuntimeParams());
+    *result = *action;
+    return result;
 }

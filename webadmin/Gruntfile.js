@@ -9,11 +9,29 @@
 
 module.exports = function (grunt) {
 
+    var proxy = grunt.file.readJSON('proxy.json');
+    var proxy_server_port = proxy.proxy_server_port;
+    var proxy_server_host = proxy.proxy_server_host;
+
+    //var proxy_server_host = '10.1.5.105';  //la_office_test - Burbank
+    //var proxy_server_host = '10.1.5.147';  //Parallels - Burbank
+    //var proxy_server_port = 7001;
+
+    var package_dir = 'buildenv/packages/any/server-external-3.0.0/bin';
     // Load grunt tasks automatically
     require('load-grunt-tasks')(grunt);
 
+
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
+
+
+    grunt.loadNpmTasks('grunt-protractor-webdriver');
+    grunt.loadNpmTasks('grunt-protractor-runner');
+    grunt.loadNpmTasks('grunt-wiredep');
+    grunt.loadNpmTasks('grunt-zip-directories');
+
+
 
     // Define the configuration for all the tasks
     grunt.initConfig({
@@ -22,14 +40,15 @@ module.exports = function (grunt) {
         yeoman: {
             // configurable paths
             app: require('./bower.json').appPath || 'app',
-            dist: 'dist'
+            dist: 'static'
         },
 
         // Automatically inject Bower components into the app
         wiredep: {
             target: {
                 src: [
-                    '<%= yeoman.app %>/index.html'
+                    '<%= yeoman.app %>/*.html',
+                    '<%= yeoman.app %>/index.xsl'
                 ],
                 ignorePath: '<%= yeoman.app %>/'
             }
@@ -37,7 +56,7 @@ module.exports = function (grunt) {
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             js: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
+                files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**'],
                 tasks: ['newer:jshint:all'],
                 options: {
                     livereload: true
@@ -59,7 +78,8 @@ module.exports = function (grunt) {
                     livereload: '<%= connect.options.livereload %>'
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
+                    '<%= yeoman.app %>/**/*.html',
+                    '<%= yeoman.app %>/views/**',
                     '.tmp/styles/{,*/}*.css',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
@@ -69,55 +89,99 @@ module.exports = function (grunt) {
         // The actual grunt server settings
         connect: {
             options: {
-                port: 9000,
+                port: 10000,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost',
+                hostname: '0.0.0.0',
                 livereload: 35729
             },
             proxies: [
-                {
+                /*{
                     context: '/ec2/',
                     host: '10.0.2.229',
                     port: 7039,
                     headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
+                        'Authorization': 'Basic YWRtaW46MTIz'
                     }
-                },
-                /*{//Daria
-                    context: '/api/',
-                    host: '10.0.2.229',
-                    port: 7039,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
-                    }
+                 },
+                 */
 
-                },*/
+                //'Authorization': 'Basic YWRtaW46MTIz' //admin:123
+                //'Authorization': 'Basic dXNlcjoxMjM=' //user:123
 
-                /*{//Sergey Yuldashev
-                    context: '/api/',
-                    host: '10.0.2.203',
-                    port: 7501,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
-                    }
-                },*/
-                {//Denis
-                    context: '/api/',
-                    host: '10.0.2.182',
-                    port: 7001,
-                    headers: { //admin:123
-                        "Authorization": "Basic YWRtaW46MTIz"
-                    }
+                //Total proxy
+                //{context: '/',        host: '192.168.56.101',port: 7002},
 
-                }
-                /* ,
-                {
-                    context: '/',
-                    host: 'mono',
-                    port: 41000,
-                } */
+                {context: '/web/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/api/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/ec2/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/hls/',      host: proxy_server_host, port: proxy_server_port},
+                {context: '/media/',    host: proxy_server_host, port: proxy_server_port},
+                {context: '/proxy/',    host: proxy_server_host, port: proxy_server_port}
+
             ],
             livereload: {
+                options: {
+                    middleware: function (connect, options) {
+                        var serveStatic = require('serve-static');
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(serveStatic(base));
+                        });
+
+                        // Make directory browse-able.
+                        //var directory = options.directory || options.base[options.base.length - 1];
+                        //middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    },
+                    open: true,
+                    base: [
+                        '.tmp',
+                        'test',
+                        '<%= yeoman.app %>'
+                    ]
+                }
+            },
+            test: {
+                options: {
+                    middleware: function (connect, options) {
+
+                        var serveStatic = require('serve-static');
+                        if (!Array.isArray(options.base)) {
+                            options.base = [options.base];
+                        }
+
+                        // Setup the proxy
+                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+
+                        // Serve static files.
+                        options.base.forEach(function (base) {
+                            middlewares.push(serveStatic(base));
+                        });
+
+                        // Make directory browse-able.
+                        // var directory = options.directory || options.base[options.base.length - 1];
+                        // middlewares.push(connect.directory(directory));
+
+                        return middlewares;
+                    },
+                    port: 10000,
+
+                    base: [
+                        '.tmp',
+                        'test',
+                        '<%= yeoman.app %>'
+                    ]
+                }
+            },
+            dist: {
                 options: {
                     middleware: function (connect, options) {
                         if (!Array.isArray(options.base)) {
@@ -139,24 +203,6 @@ module.exports = function (grunt) {
                         return middlewares;
                     },
                     open: true,
-                    base: [
-                        '.tmp',
-                        '<%= yeoman.app %>'
-                    ]
-                }
-            },
-            test: {
-                options: {
-                    port: 9001,
-                    base: [
-                        '.tmp',
-                        'test',
-                        '<%= yeoman.app %>'
-                    ]
-                }
-            },
-            dist: {
-                options: {
                     base: '<%= yeoman.dist %>'
                 }
             }
@@ -170,7 +216,8 @@ module.exports = function (grunt) {
             },
             all: [
                 'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
+                '<%= yeoman.app %>/scripts/**/*.js',
+                '!<%= yeoman.app %>/scripts/vendor/**'
             ],
             test: {
                 options: {
@@ -194,7 +241,29 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp'
+            server: '.tmp',
+            publish:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.app %>/../../../' + package_dir + '/external.dat'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            },
+            zip:{
+                files:[
+                    {
+                        dot: true,
+                        src: '<%= yeoman.app %>/../external.dat'
+                    }
+                ],
+                options: {
+                    force: true
+                }
+            }
         },
 
         // Add vendor prefixed styles
@@ -215,13 +284,6 @@ module.exports = function (grunt) {
         },
 
         // Automatically inject Bower components into the app
-        'bower-install': {
-            app: {
-                html: '<%= yeoman.app %>/index.html',
-                ignorePath: '<%= yeoman.app %>/'
-            }
-        },
-
 
         // Compiles Sass to CSS and generates necessary files if requested
         compass: {
@@ -231,11 +293,11 @@ module.exports = function (grunt) {
                 generatedImagesDir: '.tmp/images/generated',
                 imagesDir: '<%= yeoman.app %>/images',
                 javascriptsDir: '<%= yeoman.app %>/scripts',
-                fontsDir: '<%= yeoman.app %>/styles/fonts',
+                fontsDir: '<%= yeoman.app %>/fonts',
                 importPath: '<%= yeoman.app %>/bower_components',
                 httpImagesPath: '/images',
                 httpGeneratedImagesPath: '/images/generated',
-                httpFontsPath: '/styles/fonts',
+                httpFontsPath: '/fonts',
                 relativeAssets: false,
                 assetCacheBuster: false,
                 raw: 'Sass::Script::Number.precision = 10\n'
@@ -258,9 +320,10 @@ module.exports = function (grunt) {
                 files: {
                     src: [
                         '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '<%= yeoman.dist %>/styles/{,*/}*.css',
-                        '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
-                        '<%= yeoman.dist %>/styles/fonts/*'
+                        '!<%= yeoman.dist %>/scripts/{,*/}language.js',
+                        '<%= yeoman.dist %>/styles/{,*/}*.css'//,
+                        //'<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                        //'<%= yeoman.dist %>/fonts/*'
                     ]
                 }
             }
@@ -270,7 +333,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
+            html: ['<%= yeoman.app %>/*.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -278,10 +341,16 @@ module.exports = function (grunt) {
 
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
-            html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
+            html: ['<%= yeoman.dist %>/{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
-                assetsDirs: ['<%= yeoman.dist %>']
+                assetsDirs: [
+                    '<%= yeoman.dist %>',
+                    '<%= yeoman.dist %>/fonts',
+
+                    '<%= yeoman.app %>',
+                    '<%= yeoman.app %>/fonts'
+                ]
             }
         },
 
@@ -365,11 +434,16 @@ module.exports = function (grunt) {
                             '.htaccess',
                             '*.html',
                             '*.xml',
-                            '*.xsl',                                                        
+                            '*.xsl',
+                            '*.json',
                             'views/{,*/}*.html',
-                            'bower_components/**/*',
-                            'images/{,*/}*.{webp}',
-                            'fonts/*'
+                            'scripts/language.js',
+                            'customization/*',
+                            //'bower_components/**/*',
+                            //'bower_components/videogular-themes-default/videogular.css',
+                            'images/**',
+                            'fonts/**',
+                            'components/**'
                         ]
                     },
                     {
@@ -377,6 +451,23 @@ module.exports = function (grunt) {
                         cwd: '.tmp/images',
                         dest: '<%= yeoman.dist %>/images',
                         src: ['generated/*']
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>',
+                        flatten: true,
+                        dest: '<%= yeoman.dist %>/fonts',
+                        src: ['bower_components/sass-bootstrap/fonts/*']
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= yeoman.app %>',
+                        flatten: true,
+                        dest: '<%= yeoman.dist %>/components',
+                        src: ['bower_components/mediaelement/build/silverlightmediaelement.xap',
+                            'bower_components/mediaelement/build/flashmediaelement.swf',
+                            'bower_components/locomote/dist/Player.swf']
+
                     }
                 ]
             },
@@ -385,6 +476,53 @@ module.exports = function (grunt) {
                 cwd: '<%= yeoman.app %>/styles',
                 dest: '.tmp/styles/',
                 src: '{,*/}*.css'
+            },
+            zip:{
+                expand: true,
+                nonull:true,
+                cwd: '<%= yeoman.app %>/../',
+                dest: '<%= yeoman.app %>/../../../' + package_dir,
+                src: 'external.dat'
+            }
+        },
+        compress: {
+            external: {
+                options: {
+                    archive: '<%= yeoman.app %>/../external.dat',
+                    mode: 'zip'
+                },
+                files: [
+                    { src: '<%= yeoman.dist %>/**' }
+                ]
+            }
+        },
+        shell: {
+            deploy: {
+                command: 'cd ~/networkoptix/develop/' + package_dir + '; python ~/networkoptix/develop/netoptix_vms/build_utils/python/rdep.py -u -t=any;'
+            },
+            merge: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r prod_3.0.0;python ../../devtools/util/merge_dev.py -t prod_3.0.0;hg push;'
+            },
+            merge_release: {
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'
+            },
+            version: {
+                command: 'hg parent > static/version.txt'
+            },
+            print_version:{
+                command: 'hg parent'
+            },
+            generate_translation:{
+                command: 'cd translation; python generate_ts.py; python localize.py'
+            },
+            localize:{
+                command: 'cd translation; python localize.py'
+            },
+            run_ffmpeg:{
+                command: './ffmpeg.sh'
+            },
+            close_ffmpeg:{
+                command: 'tmux send-keys -t ffmpeg_buffer q'
             }
         },
 
@@ -403,51 +541,111 @@ module.exports = function (grunt) {
             ]
         },
 
-        // By default, your `index.html`'s <!-- Usemin block --> will take care of
-        // minification. These next options are pre-configured if you do not wish
-        // to use the Usemin blocks.
-        // cssmin: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/styles/main.css': [
-        //         '.tmp/styles/{,*/}*.css',
-        //         '<%= yeoman.app %>/styles/{,*/}*.css'
-        //       ]
-        //     }
-        //   }
-        // },
-        // uglify: {
-        //   dist: {
-        //     files: {
-        //       '<%= yeoman.dist %>/scripts/scripts.js': [
-        //         '<%= yeoman.dist %>/scripts/scripts.js'
-        //       ]
-        //     }
-        //   }
-        // },
-        // concat: {
-        //   dist: {}
-        // },
-
         // Test settings
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
             }
-        }
+        },
+
+        protractor: {
+            options: {
+                configFile: 'protractor-conf.js', // Default config file
+                keepAlive: true, // If false, the grunt process stops when the test fails.
+                noColor: false, // If true, protractor will not use colors in its output.
+                args: {
+                    // Arguments passed to the command
+                }
+            },
+            all: {   // Grunt requires at least one target to run so you can simply put 'all: {}' here too.
+                options: {
+                    //args: {specs: ['test/e2e/*/*spec.js']} // Target-specific arguments
+                }
+            },
+            advanced: {
+                options: {
+                    args: {specs: ['test/e2e/advanced/*spec.js']} // Target-specific arguments
+                }
+            },
+            developers: {
+                options: {
+                    args: {specs: ['test/e2e/developers/*spec.js']} // Target-specific arguments
+                }
+            },
+            help: {
+                options: {
+                    args: {specs: ['test/e2e/help/*spec.js']} // Target-specific arguments
+                }
+            },
+            info: {
+                options: {
+                    args: {specs: ['test/e2e/info/*spec.js']} // Target-specific arguments
+                }
+            },
+            merge: {
+                options: {
+                    args: {specs: ['test/e2e/merge/*spec.js']} // Target-specific arguments
+                }
+            },
+            restart: {
+                options: {
+                    args: {specs: ['test/e2e/restart/*spec.js']} // Target-specific arguments
+                }
+            },
+            settings: {
+                options: {
+                    args: {specs: ['test/e2e/settings/spec.js']} // Target-specific arguments
+                }
+            },
+            settingsAll: {
+                options: {
+                    args: {specs: ['test/e2e/settings/*spec.js']} // Target-specific arguments
+                }
+            },
+            settingsCloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/cloud_spec.js']} // Target-specific arguments
+                }
+            },
+            settingsUncloud: {
+                options: {
+                    args: {specs: ['test/e2e/settings/uncloud_spec.js']} // Target-specific arguments
+                }
+            },
+            setup: {
+                options: {
+                    args: {specs: ['test/e2e/setup/*spec.js']} // Target-specific arguments
+                }
+            }
+        },
+        'protractor_webdriver': {
+            options:{
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom',
+                keepAlive : true
+            },
+            default:{
+
+            }
+        },
+
+        scp: grunt.file.readJSON('publish.json')
     });
 
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
+            return grunt.task.run([
+                'build',
+                'configureProxies:server',
+                //'connect:livereload',
+                'connect:dist:keepalive'
+            ]);
         }
 
         grunt.task.run([
             'clean:server',
             'wiredep',
-            'bower-install',
             'concurrent:server',
             'autoprefixer',
             'configureProxies:server',
@@ -467,12 +665,131 @@ module.exports = function (grunt) {
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
-        'karma'
+        'protractor_webdriver',
+        'shell:print_version',
+        // 'shell:run_ffmpeg',
+        'protractor:all'
+        // 'shell:close_ffmpeg',
+        // 'newer:jshint',
+        // 'karma'
+    ]);
+    grunt.registerTask('test-advanced', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:advanced'
+    ]);
+    grunt.registerTask('test-developers', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:developers'
+    ]);
+    grunt.registerTask('test-help', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:help'
+    ]);
+    grunt.registerTask('test-info', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:info'
+    ]);
+    grunt.registerTask('test-merge', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:merge'
+    ]);
+    grunt.registerTask('test-restart', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:restart'
+    ]);
+    grunt.registerTask('test-settings', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settings'
+    ]);
+    grunt.registerTask('test-settings-all', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsAll'
+    ]);
+    grunt.registerTask('test-settings-cloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsCloud'
+    ]);
+    grunt.registerTask('test-settings-uncloud', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:settingsUncloud'
+    ]);
+    grunt.registerTask('test-setup', [
+        'clean:server',
+        'concurrent:test',
+        'configureProxies:server',
+        'autoprefixer',
+        'connect:test',
+        'protractor_webdriver',
+        'shell:print_version',
+        'protractor:setup'
+    ]);
+    grunt.registerTask('code', [
+        'newer:jshint'
     ]);
 
     grunt.registerTask('build', [
         'clean:dist',
-        'bower-install',
+        'wiredep',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
@@ -484,12 +801,58 @@ module.exports = function (grunt) {
         'uglify',
         'rev',
         'usemin',
-        'htmlmin'
+        'htmlmin',
+        'shell:version',
+        'shell:generate_translation',
+        'shell:localize'
     ]);
 
     grunt.registerTask('default', [
         'newer:jshint',
         'test',
         'build'
+    ]);
+
+
+    grunt.registerTask('publish', [
+        'build',
+        'clean:zip',
+        'clean:publish',
+        'compress:external'
+    ]);
+
+
+    grunt.registerTask('pub', [
+        'publish'
+    ]);
+
+    grunt.registerTask('merge', [
+        'shell:merge'
+    ]);
+
+
+    grunt.registerTask('merge_release', [
+        'shell:merge_release'
+    ]);
+
+    
+
+    grunt.registerTask('deploy', [
+        'publish',
+        'copy:zip',
+        'shell:deploy',
+        'clean:zip',
+        'clean:publish'
+    ]);
+
+    grunt.registerTask('demo', [
+        'build',
+        'scp:demo'
+    ]);
+
+
+    grunt.registerTask('de', [
+        'build',
+        'scp:demo_fast'
     ]);
 };

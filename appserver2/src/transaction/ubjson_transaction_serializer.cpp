@@ -11,11 +11,21 @@ namespace ec2
             return false;
 
 #ifdef _DEBUG
-        foreach (const QUuid& peer, transportHeader.dstPeers)
-            assert(!peer.isNull());
+        for (const QnUuid& peer: transportHeader.dstPeers)
+            NX_ASSERT(!peer.isNull());
 #endif
 
         tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());
         return true;
     }
+
+#ifndef QN_NO_QT
+    uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id) 
+    {
+        return ::qHash(QByteArray(id.persistentInfo.dbID.toRfc4122()).
+            append((const char*)&id.persistentInfo.timestamp, sizeof(id.persistentInfo.timestamp)).
+            append((const char*)&id.persistentInfo.sequence, sizeof(id.persistentInfo.sequence)),
+            id.command);
+    }
+#endif
 }

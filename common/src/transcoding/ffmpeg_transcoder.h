@@ -5,12 +5,13 @@
 
 extern "C"
 {
-    #include <libavcodec/avcodec.h>
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 }
 
 #include "transcoder.h"
 #include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 
 class QnFfmpegTranscoder: public QnTranscoder
@@ -24,6 +25,7 @@ public:
     ~QnFfmpegTranscoder();
 
     int setContainer(const QString& value);
+    bool isCodecSupported(AVCodecID id) const;
 
     AVCodecContext* getVideoCodecContext() const;
     AVCodecContext* getAudioCodecContext() const;
@@ -35,8 +37,10 @@ public:
     virtual bool addTag( const QString& name, const QString& value ) override;
     void setInMiddleOfStream(bool value) { m_inMiddleOfStream = value; }
     bool inMiddleOfStream() const { return m_inMiddleOfStream; }
+    void setStartTimeOffset(qint64 value) { m_startTimeOffset = value; }
 protected:
     virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
+    virtual int finalizeInternal(QnByteArray* const result) override;
 
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
@@ -49,11 +53,12 @@ private:
     int m_videoBitrate;
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
-   
+
     AVIOContext* m_ioContext;
     QString m_container;
     qint64 m_baseTime;
     bool m_inMiddleOfStream;
+    qint64 m_startTimeOffset;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

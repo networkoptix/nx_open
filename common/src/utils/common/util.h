@@ -1,19 +1,41 @@
-#ifndef _UNIVERSAL_CLIENT_UTIL_H
-#define _UNIVERSAL_CLIENT_UTIL_H
-
-#include <common/config.h>
+#pragma once
 
 #include <QtCore/QString>
-
-#include <utils/math/defines.h> /* For INT64_MAX. */
 
 template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
+#if defined (Q_OS_WIN32)
+
+struct WinDriveInfo
+{
+    enum Access
+    {
+        NoAccess = 0,
+        Readable = 1,
+        Writable = 2,
+    };
+
+    QString path;
+    unsigned long type;
+    int access;
+
+    WinDriveInfo():
+        type(0),
+        access(NoAccess)
+    {
+    }
+};
+
+using WinDriveInfoList = QList<WinDriveInfo>;
+
+WinDriveInfoList getWinDrivesInfo();
+#endif
+
 /**
  * Remove directory recursively.
- * 
+ *
  * \param dirName                       Name of the directory to remove.
  * \returns                             Whether the operation completer successfully.
  */
@@ -21,7 +43,7 @@ bool removeDir(const QString &dirName);
 
 /**
  * Convert path from native to universal.
- * 
+ *
  * \param path                          Path to convert.
  * \returns                             Converted path.
  */
@@ -58,6 +80,7 @@ qint64 getDiskFreeSpace(const QString &root);
 
 qint64 getDiskTotalSpace(const QString &root);
 
+// TODO: #ynikitenkov move to cpp, get rid of define
 #define DEFAULT_APPSERVER_HOST "127.0.0.1"
 #define DEFAULT_APPSERVER_PORT 7001
 
@@ -87,26 +110,20 @@ int currentTimeZone(); // TODO: #Elric move to time.h
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 /**
- * Returns random integer number between min and max parameters. Thread-safe.
- * Correctness of parameters is responsibility of the callee.
- * 
- * \returns                             Random number in range [min, max).
- */
-int random(int min, int max);
-
-/**
- * \returns                             Random floating point number in range [0.0, 1.0).
- */
-qreal frandom();
-
-/**
  * \returns                             has of string. Added for compatibility with QT4 code
  */
 uint qt4Hash(const QString& key);
+
+/**
+ * Format JSon string to human readable format
+ */
+QByteArray formatJSonString(const QByteArray& data);
 
 #ifdef _DEBUG
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
 
-
-#endif // _UNIVERSAL_CLIENT_UTIL_H
+/**
+ * Convert QDateTime to HTTP header date format (rfc822#section-5)
+ */
+QByteArray dateTimeToHTTPFormat(const QDateTime& value);

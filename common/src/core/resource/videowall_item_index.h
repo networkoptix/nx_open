@@ -2,12 +2,14 @@
 #define VIDEOWALL_ITEM_INDEX_H
 
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 /**
  * This class contains all the necessary information to look up a videowall item.
@@ -16,11 +18,11 @@ class QnVideoWallItemIndex: public boost::equality_comparable1<QnVideoWallItemIn
 public:
     QnVideoWallItemIndex() {}
 
-    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid);
+    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QnUuid &uuid);
 
     QnVideoWallResourcePtr videowall() const;
     QnVideoWallItem item() const;
-    QUuid uuid() const;
+    QnUuid uuid() const;
 
     /** \return true if the index item is not initialized. */
     bool isNull() const;
@@ -33,7 +35,7 @@ public:
     }
 private:
     QnVideoWallResourcePtr m_videowall;
-    QUuid m_uuid;
+    QnUuid m_uuid;
 };
 
 Q_DECLARE_METATYPE(QnVideoWallItemIndex)

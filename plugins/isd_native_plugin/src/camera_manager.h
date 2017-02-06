@@ -6,11 +6,15 @@
 #ifndef ILP_CAMERA_MANAGER_H
 #define ILP_CAMERA_MANAGER_H
 
+#include <memory>
+
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 
 #include <plugins/plugin_tools.h>
 #include "plugin.h"
+
+#include "audio_stream_reader.h"
 
 
 class MediaEncoder;
@@ -20,7 +24,12 @@ class CameraManager
     public nxcip::BaseCameraManager2
 {
 public:
-    CameraManager( const nxcip::CameraInfo& info );
+    CameraManager(
+        const nxcip::CameraInfo& info
+#ifndef NO_ISD_AUDIO
+        , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+        );
     virtual ~CameraManager();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -69,10 +78,13 @@ private:
     */
     nxpt::ScopedRef<IsdNativePlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
-    unsigned int m_capabilities;
+    mutable unsigned int m_capabilities;
     std::auto_ptr<MediaEncoder> m_encoder[2];
     nxcip::Picture* m_motionMask;
     bool m_audioEnabled;
+#ifndef NO_ISD_AUDIO
+    const std::unique_ptr<AudioStreamReader>& m_audioStreamReader;
+#endif
 };
 
 #endif  //ILP_CAMERA_MANAGER_H

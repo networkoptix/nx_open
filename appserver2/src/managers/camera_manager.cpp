@@ -1,214 +1,182 @@
-
 #include "camera_manager.h"
 
-#include <functional>
-
-#include <QtConcurrent>
-
-#include "core/resource/camera_resource.h"
-#include "database/db_manager.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-#include "transaction/transaction_log.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
 
 namespace ec2
 {
+    QnCameraNotificationManager::QnCameraNotificationManager()
+    { }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraData>& tran, NotificationSource source)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveCamera);
+        emit addedOrUpdated(tran.params, source);
+    }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraDataList>& tran, NotificationSource source)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveCameras);
+        for (const ApiCameraData& camera : tran.params)
+            emit addedOrUpdated(camera, source);
+    }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraAttributesData>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributes);
+        emit userAttributesChanged(tran.params);
+    }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiCameraAttributesDataList>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveCameraUserAttributesList);
+        for (const ApiCameraAttributesData& attrs : tran.params)
+            emit userAttributesChanged(attrs);
+    }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::removeCamera ||
+                  tran.command == ApiCommand::removeCameraUserAttributes);
+        switch (tran.command)
+        {
+        case ApiCommand::removeCamera:
+            emit removed(tran.params.id);
+            break;
+        case ApiCommand::removeCameraUserAttributes:
+            emit userAttributesRemoved(tran.params.id);
+            break;
+        default:
+            NX_ASSERT(0);
+        }
+    }
+
+    void QnCameraNotificationManager::triggerNotification(const QnTransaction<ApiServerFootageData>& tran, NotificationSource /*source*/)
+    {
+        if (tran.command == ApiCommand::addCameraHistoryItem)
+            emit cameraHistoryChanged(tran.params);
+    }
+
+
+
     template<class QueryProcessorType>
-    QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnCameraManager<QueryProcessorType>::QnCameraManager(QueryProcessorType* const queryProcessor , const Qn::UserAccessData &userAccessData)
     :
-        QnCameraNotificationManager( resCtx ),
-        m_queryProcessor( queryProcessor )
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
     {
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::addCamera( const QnVirtualCameraResourcePtr& resource, impl::AddCameraHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::getCameras(impl::GetCamerasHandlerPtr handler)
     {
         const int reqID = generateRequestID();
 
-        //preparing output data 
-        QnVirtualCameraResourceList cameraList;
-        Q_ASSERT_X(
-            resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
-            Q_FUNC_INFO,
-            "You must fill camera ID as md5 hash of unique id" );
-        if( resource->getId().isNull() )
-            resource->setId(QUuid::createUuid());
-        cameraList.push_back( resource );
-
-        //performing request
-        auto tran = prepareTransaction( ApiCommand::saveCamera, resource );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
-        
-        return reqID;
-    }
-
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-        ApiCommand::Value command = ApiCommand::addCameraHistoryItem;
-        auto tran = prepareTransaction( command, cameraHistoryItem );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
-
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getCameras( const QUuid& mediaServerId, impl::GetCamerasHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
-            QnVirtualCameraResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(cameras, outData, m_resCtx.resFactory);
-            handler->done( reqID, errorCode, outData);
+        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const ApiCameraDataList& cameras)
+        {
+            handler->done(reqID, errorCode, cameras);
         };
-        m_queryProcessor->template processQueryAsync<QUuid, ApiCameraDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraDataList, decltype(queryDoneHandler)>
+            (ApiCommand::getCameras, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::addCamera( const ec2::ApiCameraData& camera, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCamera, camera, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::save(const ec2::ApiCameraDataList& cameras, impl::SimpleHandlerPtr handler)
+    {
+        for (const auto& camera : cameras)
+        {
+            if (camera.id.isNull())
+            {
+                NX_ASSERT(0, "Only update operation is supported", Q_FUNC_INFO);
+                return INVALID_REQ_ID;
+            }
+        }
+
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCameras, cameras, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeCamera, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
+            {
+                handler->done(reqID, errorCode);
+            });
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::setServerFootageData( const QnUuid& serverGuid, const std::vector<QnUuid>& cameras, impl::SimpleHandlerPtr handler )
+    {
+        ApiServerFootageData data(serverGuid, cameras);
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::addCameraHistoryItem, data, [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
+
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::getServerFootageData( impl::GetCamerasHistoryHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
-            QnCameraHistoryList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(cameraHistory, outData);
-            handler->done( reqID, errorCode, outData);
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiServerFootageDataList& cameraHistory) {
+            handler->done( reqID, errorCode, cameraHistory);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t, ApiServerFootageDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }
 
+
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler )
+    int QnCameraManager<QueryProcessorType>::saveUserAttributes(const ec2::ApiCameraAttributesDataList& cameraAttributes, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-
-        //preparing output data
-        QnVirtualCameraResourceList cameraList;
-        foreach(const QnVirtualCameraResourcePtr& camera, cameras)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(ApiCommand::saveCameraUserAttributesList, cameraAttributes, [handler, reqID](ec2::ErrorCode errorCode)
         {
-            if (camera->getId().isNull()) {
-                Q_ASSERT_X(0, "Only update operation is supported", Q_FUNC_INFO);
-                return INVALID_REQ_ID;
-            }
-            cameraList.push_back( camera );
-        }
-
-        //performing request
-        auto tran = prepareTransaction( ApiCommand::saveCameras, cameras );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::AddCameraHandler::done ), handler, reqID, _1, cameraList ) );
-
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
     template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeCamera, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
-
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::addCameraBookmarkTags, tags );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
-
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler)
+    int QnCameraManager<QueryProcessorType>::getUserAttributes(impl::GetCameraUserAttributesHandlerPtr handler)
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraBookmarkTagDataList& tags) {
-            QnCameraBookmarkTags outData;
-            if (errorCode == ErrorCode::ok)
-                for (const ApiCameraBookmarkTagData &tagData: tags)
-                    outData << tagData.name;
-            handler->done( reqID, errorCode, outData);
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraAttributesDataList& cameraUserAttributesList ) {
+            handler->done( reqID, errorCode, cameraUserAttributesList);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraBookmarkTagDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getCameraBookmarkTags, nullptr, queryDoneHandler );
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraAttributesDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getCameraUserAttributesList, QnUuid(), queryDoneHandler );
         return reqID;
     }
 
-    template<class QueryProcessorType>
-    int QnCameraManager<QueryProcessorType>::removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeCameraBookmarkTags, tags );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
-        return reqID;
-    }
-
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value command,
-        const QnVirtualCameraResourcePtr& resource )
-    {
-        QnTransaction<ApiCameraData> tran(command);
-        fromResourceToApi(resource, tran.params);
-        return tran;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiCameraDataList> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value command,
-        const QnVirtualCameraResourceList& cameras )
-    {
-        QnTransaction<ApiCameraDataList> tran(command);
-        fromResourceListToApi(cameras, tran.params);
-        return tran;
-    }
-
-    template<class QueryProcessorType>
-    QnTransaction<ApiCameraServerItemData> QnCameraManager<QueryProcessorType>::prepareTransaction(
-        ApiCommand::Value command,
-        const QnCameraHistoryItem& historyItem )
-    {
-        QnTransaction<ApiCameraServerItemData> tran(command);
-        fromResourceToApi(historyItem, tran.params);
-        return tran;
-    }
-
-    template<class T>
-    QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
-    {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
-    }
-
-
-    template<class T>
-    QnTransaction<ApiCameraBookmarkTagDataList> QnCameraManager<T>::prepareTransaction(ApiCommand::Value command, const QnCameraBookmarkTags& tags)
-    {
-        QnTransaction<ApiCameraBookmarkTagDataList> tran(command);
-        fromResourceToApi(tags, tran.params);
-        return tran;
-    }
-
-    template class QnCameraManager<ServerQueryProcessor>;
+    template class QnCameraManager<ServerQueryProcessorAccess>;
     template class QnCameraManager<FixedUrlClientQueryProcessor>;
+
 }

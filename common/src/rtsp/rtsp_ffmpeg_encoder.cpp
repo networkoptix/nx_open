@@ -2,14 +2,13 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/network/socket.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/common/util.h"
-#include "utils/network/rtpsession.h"
-#include "utils/network/rtp_stream_parser.h"
-
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <network/ffmpeg_sdp.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <utils/common/util.h>
+#include <nx/network/socket.h>
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),
@@ -19,45 +18,77 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_eofReached(false),
     m_isLastDataContext(false)
 {
-
+    // Do nothing.
 }    
+
+void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
+{
+    m_videoTranscoder.reset(new QnFfmpegVideoTranscoder(dstCodec));
+    m_videoTranscoder->setResolution(dstVideSize);
+}
 
 void QnRtspFfmpegEncoder::init()
 { 
-    m_ctxSended.clear();
+    m_contextSent.reset();
     m_gotLivePacket = false;
     m_eofReached = false;
 }
 
-QnMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
+QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(AVCodecID compressionType)
 {
-    QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
-    if (itr != m_generatedContext.end())
-        return itr.value();
-    QnMediaContextPtr result(new QnMediaContext(compressionType));
-    m_generatedContext.insert(compressionType, result);
+    QMap<AVCodecID, QnConstMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
+    QnConstMediaContextPtr result;
+    if (itr != m_generatedContexts.end())
+    {
+        result = itr.value();
+    }
+    else
+    {
+        result = QnConstMediaContextPtr(new QnAvCodecMediaContext(compressionType));
+        m_generatedContexts.insert(compressionType, result);
+    }
+
+    NX_ASSERT(result);
     return result;
+}
+
+QnConstAbstractMediaDataPtr QnRtspFfmpegEncoder::transcodeVideoPacket(QnConstAbstractMediaDataPtr media)
+{
+    QnAbstractMediaDataPtr transcodedMedia;
+    m_videoTranscoder->transcodePacket(media, &transcodedMedia);
+    if (!transcodedMedia)
+        return QnConstAbstractMediaDataPtr();
+    transcodedMedia->opaque = media->opaque;
+    if (media->flags & QnAbstractMediaData::MediaFlags_LIVE)
+        transcodedMedia->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+    return transcodedMedia;
 }
 
 void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
+    if (m_videoTranscoder && media->dataType == QnAbstractMediaData::VIDEO)
+        media = transcodeVideoPacket(media);
+    if (!media)
+        return;
+
     m_media = media;
     m_curDataBuffer = media->data();
     m_codecCtxData.clear();
     if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        m_ctxSended.clear();
+        m_contextSent.reset();
 
-    QnConstMetaDataV1Ptr metadata = qSharedPointerDynamicCast<const QnMetaDataV1>(m_media);
+    QnConstMetaDataV1Ptr metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
     {
-        QnMediaContextPtr currentContext = m_media->context;
-        if (currentContext == 0)
+        QnConstMediaContextPtr currentContext = m_media->context;
+        if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
+        NX_ASSERT(currentContext);
         //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
-        if (!m_ctxSended || !m_ctxSended->equalTo(currentContext.data()))
+        if (!m_contextSent || !m_contextSent->isSimilarTo(currentContext))
         {
-            m_ctxSended = currentContext;
-            QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &m_codecCtxData);
+            m_contextSent = currentContext;
+            m_codecCtxData = currentContext->serialize();
         }
     }
     m_eofReached = false;
@@ -65,11 +96,14 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
+    if (!m_media)
+        return false;
+
     sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
 
     if (!m_codecCtxData.isEmpty())
     {
-        Q_ASSERT(!m_codecCtxData.isEmpty());
+        NX_ASSERT(!m_codecCtxData.isEmpty());
         sendBuffer.write(m_codecCtxData);
         m_codecCtxData.clear();
         m_isLastDataContext = true;
@@ -102,18 +136,19 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_curDataBuffer == m_media->data())
     {
         // send data with RTP headers
-        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.data());
-        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.data());
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(m_media.get());
+        const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(m_media.get());
+#if 0
         int ffHeaderSize = RTSP_FFMPEG_GENERIC_HEADER_SIZE;
         if (video)
             ffHeaderSize += RTSP_FFMPEG_VIDEO_HEADER_SIZE;
         else if (metadata)
             ffHeaderSize += RTSP_FFMPEG_METADATA_HEADER_SIZE;
-
+#endif
         //m_mutex.unlock();
 
         //buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
-        //QMutexLocker lock(&m_owner->getSockMutex());
+        //QnMutexLocker lock( &m_owner->getSockMutex() );
         //sendBuffer->write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
         quint8 packetType = m_media->dataType;
         sendBuffer.write((const char*) &packetType, 1);
@@ -149,7 +184,7 @@ quint32 QnRtspFfmpegEncoder::getSSRC()
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    int dataRest = m_media->data() + m_media->dataSize() - m_curDataBuffer;
+    int dataRest = m_media->data() + static_cast<int>(m_media->dataSize()) - m_curDataBuffer;
     return m_isLastDataContext || dataRest == 0;
 }
 
@@ -163,15 +198,9 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
     return RTP_FFMPEG_GENERIC_CODE;
 }
 
-QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
+QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
-    if (!m_codecCtxData.isEmpty()) {
-        QString result(lit("a=fmtp:%1 config=%2\r\n"));
-        return result.arg((int)getPayloadtype()).arg(QLatin1String(m_codecCtxData.toBase64())).toLatin1();
-    }
-    else {
-        return QByteArray();
-    }
+    return QByteArray();
 }
 
 QString QnRtspFfmpegEncoder::getName()
@@ -187,11 +216,6 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
-}
-
-void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
-{
-    QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

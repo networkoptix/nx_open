@@ -4,22 +4,10 @@
 #include "request_handler.h"
 #include "utils/common/util.h"
 
-qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime) const
+QnRestRequestHandler::QnRestRequestHandler():
+    m_permissions(Qn::NoGlobalPermissions)
 {
-    if (dateTime.toLower().trimmed() == QLatin1String("now"))
-    {
-        return DATETIME_NOW;
-    }
-    else if( dateTime.contains(L'T') || (dateTime.contains(L'-') && !dateTime.startsWith(L'-')) )
-    {
-        QStringList dateTimeParts = dateTime.split(L'.');
-        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
-        if (dateTimeParts.size() > 1)
-            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
-        return tmpDateTime.toMSecsSinceEpoch() * 1000;
-    }
-    else
-        return dateTime.toLongLong();
+
 }
 
 QString QnRestRequestHandler::extractAction(const QString &path) const {
@@ -52,7 +40,7 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
     delete d_ptr;
 }
 
-int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const  QnRestConnectionProcessor*)
 {
     Q_D(QnRestGUIRequestHandler);
     d->path = path;
@@ -64,7 +52,8 @@ int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestPara
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
+int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+                                         QByteArray& contentType, const  QnRestConnectionProcessor*)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;

@@ -1,14 +1,19 @@
 #include "nov_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include "plugins/storage/file_storage/layout_storage_resource.h"
+#include <utils/common/util.h>
 
-QnNovArchiveDelegate::QnNovArchiveDelegate(): 
+QnNovArchiveDelegate::QnNovArchiveDelegate():
     QnAviArchiveDelegate(),
-    m_skipFramesBeforeTime(AV_NOPTS_VALUE)
+    m_skipFramesBeforeTime(AV_NOPTS_VALUE),
+    m_reverseMode(false)
 {
 
+}
+
+void QnNovArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
+{
+    m_reverseMode = value;
 }
 
 bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)
@@ -26,10 +31,11 @@ bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)
 qint64 QnNovArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
     m_skipFramesBeforeTime = AV_NOPTS_VALUE;
-    if (!m_chunks.isEmpty())  {
+    if (!m_chunks.empty())  {
         qint64 oldTime = time;
-        time = m_chunks.roundTimeToPeriodUSec(time, true);
-        if (time != oldTime)
+        time = m_chunks.roundTimeToPeriodUSec(time, !m_reverseMode);
+
+        if (!m_reverseMode && time != oldTime)
             m_skipFramesBeforeTime = time;
     }
     return QnAviArchiveDelegate::seek(time, findIFrame);
@@ -56,5 +62,3 @@ QnAbstractMediaDataPtr QnNovArchiveDelegate::getNextData()
 
     return QnAbstractMediaDataPtr();
 }
-
-#endif // ENABLE_ARCHIVE

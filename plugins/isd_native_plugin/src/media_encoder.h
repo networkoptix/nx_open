@@ -12,8 +12,8 @@
 #include <QString>
 
 #include <plugins/camera_plugin.h>
-
 #include <plugins/plugin_tools.h>
+
 #include "stream_reader.h"
 
 
@@ -29,7 +29,11 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
-        unsigned int encoderNum );
+        unsigned int encoderNum
+#ifndef NO_ISD_AUDIO
+        , const std::unique_ptr<AudioStreamReader>& audioStreamReader
+#endif
+        );
     virtual ~MediaEncoder();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -65,6 +69,9 @@ private:
     CameraManager* m_cameraManager;
     mutable std::unique_ptr<StreamReader> m_streamReader;
     unsigned int m_encoderNum;
+#ifndef NO_ISD_AUDIO
+    const std::unique_ptr<AudioStreamReader>& m_audioStreamReader;
+#endif
     nxcip::Picture* m_motionMask;
     mutable bool m_fpsListRead;
     mutable std::vector<float> m_supportedFpsList;

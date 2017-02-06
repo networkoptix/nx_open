@@ -2,7 +2,7 @@
 #define VIDEOWALL_MATRIX_INDEX_H
 
 #include <QtCore/QMetaType>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
@@ -14,33 +14,28 @@ class QnVideoWallMatrixIndex {
 public:
     QnVideoWallMatrixIndex() {}
 
-    QnVideoWallMatrixIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid):
+    QnVideoWallMatrixIndex(const QnVideoWallResourcePtr &videowall, const QnUuid &uuid):
         m_videowall(videowall), m_uuid(uuid)
     {}
 
-    const QnVideoWallResourcePtr &videowall() const {
-        return m_videowall;
-    }
+    QnVideoWallResourcePtr videowall() const;
+    void setVideoWall(const QnVideoWallResourcePtr &videowall);
 
-    void setVideoWall(const QnVideoWallResourcePtr &videowall) {
-        m_videowall = videowall;
-    }
+    QnUuid uuid() const;
+    void setUuid(const QnUuid &uuid);
 
-    const QUuid &uuid() const {
-        return m_uuid;
-    }
+    /** \return true if the index is not initialized. */
+    bool isNull() const;
 
-    void setUuid(const QUuid &uuid) {
-        m_uuid = uuid;
-    }
+    /** \return true if the index contains valid videowall matrix data. */
+    bool isValid() const;
 
-    bool isNull() const {
-        return m_videowall.isNull() || m_uuid.isNull();
-    }
+    QnVideoWallMatrix matrix() const;
+
 
 private:
     QnVideoWallResourcePtr m_videowall;
-    QUuid m_uuid;
+    QnUuid m_uuid;
 };
 
 Q_DECLARE_METATYPE(QnVideoWallMatrixIndex)

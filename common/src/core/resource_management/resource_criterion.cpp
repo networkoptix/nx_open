@@ -7,13 +7,13 @@ namespace {
     QnResourceCriterion::Operation nextCriterionFunction(const QnResourcePtr &, const QVariant &) {
         return QnResourceCriterion::Next;
     }
-
+#if 0
     /**
      * This function is currently unused, but it may come in handy later. Don't delete. 
      */
     QRegExp buildFilter(const QList<QString> &parts) {
         QString pattern;
-        foreach (const QString &part, parts) {
+        for (const QString &part: parts) {
             if (!pattern.isEmpty())
                 pattern += QLatin1Char('|');
             pattern += QRegExp::escape(part);
@@ -21,7 +21,7 @@ namespace {
         pattern = QLatin1String(".*(") + pattern + QLatin1String(").*");
         return QRegExp(pattern, Qt::CaseInsensitive, QRegExp::RegExp2);
     }
-
+#endif
     static int qn_criterionListMetaTypeId = 0;
 
     void qn_initCriterionListMetaType() {
@@ -117,13 +117,13 @@ bool QnResourceCriterion::isGroup() const {
 }
 
 QnResourceCriterionGroup &QnResourceCriterion::asGroup() {
-    assert(isGroup());
+    NX_ASSERT(isGroup());
 
     return static_cast<QnResourceCriterionGroup &>(*this);
 }
 
 const QnResourceCriterionGroup &QnResourceCriterion::asGroup() const {
-    assert(isGroup());
+    NX_ASSERT(isGroup());
 
     return static_cast<const QnResourceCriterionGroup &>(*this);
 }
@@ -247,7 +247,7 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
         break;
     }
     case Group:
-        foreach(const QnResourceCriterion &criterion, static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
+        for(const QnResourceCriterion &criterion: static_cast<const QnResourceCriterionGroup *>(this)->criteria()) {
             result = criterion.check(resource);
             if(result != Next)
                 break;
@@ -324,14 +324,14 @@ QnResourceCriterionGroup::QnResourceCriterionGroup(Operation matchOperation, Ope
 }
 
 void QnResourceCriterionGroup::addCriterion(const QnResourceCriterion &criterion) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     d->push_front(criterion);
 }
 
 bool QnResourceCriterionGroup::removeCriterion(const QnResourceCriterion &criterion) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     QnResourceCriterionList *d = static_cast<QnResourceCriterionList *>(targetValueData());
     return d->removeOne(criterion);
@@ -342,7 +342,7 @@ void QnResourceCriterionGroup::clear() {
 }
 
 const QnResourceCriterionList &QnResourceCriterionGroup::criteria() const {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     return *static_cast<const QnResourceCriterionList *>(targetValueData());
 }
@@ -356,7 +356,7 @@ int QnResourceCriterionGroup::size() const {
 }
 
 void QnResourceCriterionGroup::setCriteria(const QnResourceCriterionList &criteria) {
-    assert(targetValue().userType() == qn_criterionListMetaTypeId);
+    NX_ASSERT(targetValue().userType() == qn_criterionListMetaTypeId);
 
     setTargetValue(QVariant::fromValue<QnResourceCriterionList>(criteria));
 }
@@ -400,7 +400,7 @@ void QnResourceCriterionGroup::setPattern(const QString &pattern) {
 
         QString chunks = normalizedPattern.mid(pos, i - pos);
         pos = i + 1;
-        foreach(const QString &chunk, chunks.split(spaces, QString::SkipEmptyParts)) {
+        for(const QString &chunk: chunks.split(spaces, QString::SkipEmptyParts)) {
             QString key;
             QString pattern;
             

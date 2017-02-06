@@ -15,12 +15,14 @@
 #include <sys/stat.h>
 
 
-QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE)
+QnFile::QnFile(): m_impl(INVALID_HANDLE_VALUE), m_eof(false)
 {
 
 }
 
-QnFile::QnFile(const QString& fName): m_fileName(fName), m_impl(INVALID_HANDLE_VALUE)
+QnFile::QnFile(const QString& fName): m_fileName(fName), 
+                                      m_impl(INVALID_HANDLE_VALUE),
+                                      m_eof(false)
 {
 
 }
@@ -62,6 +64,21 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
         (DWORD) systemDependentFlags,
         NULL);
 
+    if (m_impl == INVALID_HANDLE_VALUE && (openMode & QIODevice::WriteOnly) && GetLastError() == ERROR_PATH_NOT_FOUND)
+    {
+        QDir dir;
+        if (dir.mkpath(QnFile::absolutePath(m_fileName))) 
+        {
+            m_impl = CreateFile((const wchar_t*)m_fileName.constData(),
+                accessRights,
+                shareMode,
+                &securityAtts,
+                creationDisp,
+                (DWORD) systemDependentFlags,
+                NULL);
+        }
+    }
+
     // Bail out on error.
     if (m_impl == INVALID_HANDLE_VALUE) {
         qWarning() << qt_error_string();
@@ -73,6 +90,11 @@ bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDepend
         truncate(0);
 
     return true;
+}
+
+bool QnFile::eof() const 
+{
+    return m_eof;
 }
 
 void QnFile::close()
@@ -89,6 +111,7 @@ qint64 QnFile::read(char* buffer, qint64 count )
 
     DWORD bytesRead = 0;
     BOOL res = ReadFile( m_impl, buffer, count, &bytesRead, NULL );
+    m_eof = res && !bytesRead;
     if( !res )
         return -1;
     return bytesRead;

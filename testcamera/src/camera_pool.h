@@ -1,11 +1,12 @@
 #ifndef __CAMERA_POOL_H__
 #define __CAMERA_POOL_H__
 
-#include <QMap>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
 #include "test_camera.h"
-#include "utils/network/socket.h"
-#include "utils/common/long_runnable.h"
-#include "utils/network/tcp_listener.h"
+#include <nx/network/socket.h>
+#include <utils/common/long_runnable.h>
+#include <network/tcp_listener.h>
 
 class QnCameraDiscoveryListener;
 
@@ -20,12 +21,12 @@ public:
 
     static void initGlobalInstance( QnCameraPool* _inst );
     static QnCameraPool* instance();
-    
+
     void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();
 protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner);
+    virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket);
 private:
     QMap<QString, QnTestCamera*> m_cameras;
     int m_cameraNum;

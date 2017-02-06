@@ -86,6 +86,14 @@ namespace stree
             return m_container.insert( val );
         }
 
+        template<typename KeyTypeRef, typename MappedTypeRef>
+        std::pair<iterator, bool> emplace(KeyTypeRef&& key, MappedTypeRef&& mapped)
+        {
+            return m_container.emplace(
+                std::forward<KeyTypeRef>(key),
+                std::forward<MappedTypeRef>(mapped));
+        }
+
     private:
         InternalContainerType m_container;
     };

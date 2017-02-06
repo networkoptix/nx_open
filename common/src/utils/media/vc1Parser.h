@@ -3,14 +3,13 @@
 
 #include <QtCore/QString>
 
+#include "bitStream.h"
+#include <memory.h>
+
 extern "C"
 {
-    #include <libavutil/rational.h>
+    #include <libavutil/avutil.h>
 }
-
-#include "bitStream.h"
-#include "memory.h"
-
 
 static const int NOT_ENOUGHT_BUFFER = -1;
 

@@ -5,12 +5,11 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
         QnBusiness::EventReason reasonCode,
-        const QnResourcePtr& storageResource):
+        const QString& storageUrl):
     base_type(QnBusiness::StorageFailureEvent,
                             resource,
                             timeStamp,
                             reasonCode)
 {
-    if (storageResource)
-        m_reasonParamsEncoded = storageResource->getUrl();
+    m_reasonParamsEncoded = storageUrl;
 }

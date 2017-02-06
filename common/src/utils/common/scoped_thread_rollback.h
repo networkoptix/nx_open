@@ -4,8 +4,20 @@
 #include <QtCore/QThreadPool>
 #include <QtCore/QPointer>
 
+
 /*!
-    Intended for use in thread of thread pool
+    Intended for use in thread of thread pool.
+    Instance of this class is required if waiting for completion of operation running in thread pool while within thread pool.
+
+    E.g.:
+    \code {*.cpp}
+    CustomRunnable::run()
+    {
+        //this method is called within tread of thread pool
+        QnScopedThreadRollback ensureFreeThread( 1 );
+        QtConcurrent::mapped(...)   //running some operation in thread pool and waiting for completion, must use QnScopedThreadRollback
+    }
+    \endcode
 */
 class QnScopedThreadRollback {
 public:

@@ -1,60 +1,43 @@
-#ifndef __USER_MANAGER_H_
-#define __USER_MANAGER_H_
+#pragma once
 
-#include <core/resource/user_resource.h>
-
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-
+#include <transaction/transaction.h>
+#include <nx_ec/managers/abstract_user_manager.h>
 
 namespace ec2
 {
-    class QnUserNotificationManager
-    :
-        public AbstractUserManager
+    class QnUserNotificationManager: public AbstractUserNotificationManager
     {
     public:
-        QnUserNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnUserNotificationManager( );
 
-        void triggerNotification( const QnTransaction<ApiUserData>& tran )
-        {
-            assert( tran.command == ApiCommand::saveUser);
-            QnUserResourcePtr userResource(new QnUserResource());
-            fromApiToResource(tran.params, userResource);
-            emit addedOrUpdated( userResource );
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert( tran.command == ApiCommand::removeUser );
-            emit removed( QUuid(tran.params.id) );
-        }
-
-    protected:
-        ResourceContext m_resCtx;
+        void triggerNotification(const QnTransaction<ApiUserData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiAccessRightsData>& tran, NotificationSource source);
+        void triggerNotification(const QnTransaction<ApiUserRoleData>& tran, NotificationSource source);
     };
 
+    typedef std::shared_ptr<QnUserNotificationManager> QnUserNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnUserManager
-    :
-        public QnUserNotificationManager
+    class QnUserManager: public AbstractUserManager
     {
     public:
-        QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnUserManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
 
-        virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
-        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
-        virtual int remove( const QUuid& id, impl::SimpleHandlerPtr handler ) override;
 
+        virtual int getUsers(impl::GetUsersHandlerPtr handler ) override;
+        virtual int save( const ec2::ApiUserData& user, const QString& newPassword, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) override;
+
+        virtual int getUserRoles(impl::GetUserRolesHandlerPtr handler) override;
+        virtual int saveUserRole(const ec2::ApiUserRoleData& userRole, impl::SimpleHandlerPtr handler) override;
+        virtual int removeUserRole(const QnUuid& id, impl::SimpleHandlerPtr handler) override;
+
+        virtual int getAccessRights(impl::GetAccessRightsHandlerPtr handler) override;
+        virtual int setAccessRights(const ec2::ApiAccessRightsData& data, impl::SimpleHandlerPtr handler) override;
     private:
         QueryProcessorType* const m_queryProcessor;
-
-        QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
-        QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QUuid& resource );
+        Qn::UserAccessData m_userAccessData;
     };
-}
 
-#endif  // __USER_MANAGER_H_
+}

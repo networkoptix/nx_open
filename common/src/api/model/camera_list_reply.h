@@ -6,9 +6,9 @@
 #ifndef QN_CAMERA_LIST_REPLY_H
 #define QN_CAMERA_LIST_REPLY_H
 
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 
 //!mediaserver's response to \a ping request

@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <business/business_event_parameters.h>
+#include <business/business_action_parameters.h>
 
 
 namespace QnBusiness
@@ -16,15 +17,29 @@ namespace QnBusiness
 
     QList<EventType> childEvents(EventType eventType);
 
+    QList<EventType> allEvents();
+
     EventType parentEvent(EventType eventType);
 
+    /** Check if resource required to SETUP rule on this event. */
     bool isResourceRequired(EventType eventType);
 
+
     bool hasToggleState(EventType eventType);
+
+    QList<EventState> allowedEventStates(EventType eventType);
 
     bool requiresCameraResource(EventType eventType);
 
     bool requiresServerResource(EventType eventType);
+
+    /** Check if camera required for this event to OCCUR. */
+    bool isSourceCameraRequired(EventType eventType);
+
+    /** Check if server required for this event to OCCUR. */
+    bool isSourceServerRequired(EventType eventType);
+
+
 }
 
 /**
@@ -68,11 +83,17 @@ public:
     QnBusiness::EventState getToggleState()     const { return m_toggleState; }
 
     /**
-     * @brief checkCondition    Checks event parameters. 
-     * @param params            Parameters of an event that are selected in rule.
-     * @return                  True if event should be handled, false otherwise.
+     * @brief isEventStateMatched Checks if event state matches to a rule. Rule will be terminated if it isn't pass any longer
+     * @return                    True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const = 0;
+
+    /**
+     * @brief checkCondition      Checks if event params matches to a rule. Rule will not start if it isn't pass
+     * @param params              Parameters of an event that are selected in rule.
+     * @return                    True if event should be handled, false otherwise.
+     */
+    virtual bool checkEventParams(const QnBusinessEventParameters &params) const;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 
@@ -85,7 +106,7 @@ private:
     /**
      * @brief m_timeStamp       Event date and time in usec from UTC.
      */
-    const qint64 m_timeStamp;
+    const qint64 m_timeStampUsec;
 
     /**
      * @brief m_resource        Resource that provide this event.

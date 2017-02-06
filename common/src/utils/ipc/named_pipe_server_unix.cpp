@@ -2,8 +2,6 @@
 // 14 jan 2014    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifndef _WIN32
-
 #include "named_pipe_server.h"
 
 #include <unistd.h>
@@ -101,5 +99,3 @@ SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int /*ti
         return SystemError::noError;
     }
 }
-
-#endif

@@ -3,8 +3,9 @@
 #include <QtCore/QFile>
 
 #include <utils/common/warnings.h>
-#include <utils/serialization/json_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
+#include "utils/match/wildcard.h"
 
 struct QnResourceDataPoolChunk {
     QList<QString> keys;
@@ -29,6 +30,12 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     QObject(parent) 
 {
     m_shortVendorByName.insert(lit("digital watchdog"), lit("dw"));
+    m_shortVendorByName.insert(lit("panoramic"), lit("dw"));
+    m_shortVendorByName.insert(lit("ipnc"), lit("dw"));
+    m_shortVendorByName.insert(lit("acti corporation"), lit("acti"));
+    m_shortVendorByName.insert(lit("innovative security designs"), lit("isd"));
+    m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
+    m_shortVendorByName.insert(lit("norbain"), lit("vista"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {
@@ -39,25 +46,48 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
     return m_dataByKey.value(key.toLower());
 }
 
-QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera) const {
-    QString vendor = camera->getVendor().toLower();
-    vendor = m_shortVendorByName.value(vendor, vendor);
-    QString model = camera->getModel().toLower();
-    QString key1 = vendor + lit("|") + model;
-   
+QnResourceData QnResourceDataPool::data(const QnConstSecurityCamResourcePtr &camera) const {
+    if (!camera)
+        return QnResourceData();
+    return data(camera->getVendor(), camera->getModel(), camera->getFirmware());
+}
+
+QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _model, const QString& firmware) const {
+
+    QString vendor = m_shortVendorByName.value(_vendor.toLower(), _vendor.toLower());
+    QString model = _model.toLower();
+    QStringList keyList;
+
+    QString vendorAndModelKey = vendor + lit("|") + model;
+    keyList.append(vendorAndModelKey);
+
+    if (!firmware.isEmpty())
+        keyList.append(vendorAndModelKey + lit("|") + firmware.toLower());
+
     QnResourceData result;
-    if (!m_cachedResultByKey.contains(key1)) {
-        for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
-            QRegExp regExpr(itr.key(), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (regExpr.exactMatch(key1))
-                result.add(itr.value());
+    
+    {
+        QnMutexLocker lock(&m_cachedDataMtx);
+
+        for (const auto& key: keyList)
+        {
+            if (!m_cachedResultByKey.contains(key))
+            {
+                for (auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
+                {
+                    if (wildcardMatch(itr.key(), key))
+                        result.add(itr.value());
+                }
+                m_cachedResultByKey.insert(key, result);
+            }
+            else
+            {
+                result.add(m_cachedResultByKey[key]);
+            }
         }
-        m_cachedResultByKey.insert(key1, result);
-    } else {
-        result = m_cachedResultByKey[key1];
     }
-    result.add(m_dataByKey.value(key1 + lit("|") + camera->getFirmware().toLower()));
-    return result;
+
+    return result;    
 }
 
 bool QnResourceDataPool::load(const QString &fileName) {
@@ -100,8 +130,8 @@ bool QnResourceDataPool::loadInternal(const QString &fileName) {
     if(!QJson::deserialize(map, lit("data"), &chunks))
         return false;
 
-    foreach(const QnResourceDataPoolChunk &chunk, chunks)
-        foreach(const QString &key, chunk.keys)
+    for(const QnResourceDataPoolChunk &chunk: chunks)
+        for(const QString &key: chunk.keys)
             m_dataByKey[key.toLower()].add(chunk.data);
 
     return true;

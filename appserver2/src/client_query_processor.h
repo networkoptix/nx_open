@@ -9,27 +9,39 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "ec2_thread_pool.h"
 #include "rest/request_params.h"
 #include "transaction/binary_transaction_serializer.h"
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
-#include "utils/serialization/ubjson.h"
+#include "nx/fusion/serialization/ubjson.h"
+#include "http/custom_headers.h"
+#include "api/model/audit/auth_session.h"
 
+namespace {
+    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat) {
+        Qn::SerializationFormat format = defaultFormat;
+        QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
+        if (!formatString.isEmpty())
+            format = QnLexical::deserialized(formatString, defaultFormat);
+        return format;
+    }
+} // anonymous namespace
 
 namespace ec2
 {
-    static const size_t RESPONSE_WAIT_TIMEOUT_MS = 10*1000;
+    static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
+    static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
 
     class ClientQueryProcessor
     :
@@ -40,53 +52,62 @@ namespace ec2
     public:
         virtual ~ClientQueryProcessor()
         {
-            //TODO #ak following assert can be triggered during client stop
-            assert( m_runningHttpRequests.empty() );
+            pleaseStopSync();
+        }
+
+        void pleaseStopSync(bool checkForLocks = true)
+        {
+            QnMutexLocker lk(&m_mutex);
+            while (!m_runningHttpRequests.empty())
+            {
+                nx_http::AsyncHttpClientPtr httpClient = m_runningHttpRequests.begin()->first;
+                lk.unlock();    //must unlock mutex to avoid deadlock with http completion handler
+                httpClient->pleaseStopSync(checkForLocks);
+                //it is garanteed that no http event handler is running currently and no handler will be called
+                lk.relock();
+                m_runningHttpRequests.erase(m_runningHttpRequests.begin());
+            }
         }
 
         //!Asynchronously executes update query
         /*!
             \param handler Functor ( ErrorCode )
         */
-        template<class QueryDataType, class HandlerType>
-            void processUpdateAsync( const QUrl& ecBaseUrl, const QnTransaction<QueryDataType>& tran, HandlerType handler )
+        template<class InputData, class HandlerType>
+            void processUpdateAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
 
-            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
+            requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
 
-            QByteArray tranBuffer;
-            Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
+            QByteArray serializedData;
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
             if( format == Qn::JsonFormat )
-                tranBuffer = QJson::serialized(tran);
-            //else if( format == Qn::BnsFormat )
-            //    tranBuffer = QnBinary::serialized(tran);
+                serializedData = QJson::serialized(input);
             else if( format == Qn::UbjsonFormat )
-                tranBuffer = QnUbjson::serialized(tran);
-            //else if( format == Qn::CsvFormat )
-            //    tranBuffer = QnCsv::serialized(tran);
-            //else if( format == Qn::XmlFormat )
-            //    tranBuffer = QnXml::serialized(tran, lit("reply"));
+                serializedData = QnUbjson::serialized(input);
             else
-                assert(false);
+            {
+                NX_ASSERT(false);
+            }
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
-            if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
-            {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
-                return;
-            }
+            QnMutexLocker lk( &m_mutex );
+            httpClient->doPost(
+                requestUrl,
+                Qn::serializationFormatToHttpContentType(format),
+                std::move(serializedData));
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -99,8 +120,9 @@ namespace ec2
             void processQueryAsync( const QUrl& ecBaseUrl, ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
             QUrl requestUrl( ecBaseUrl );
-            nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
             httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
+            httpClient->setSendTimeoutMs( TCP_CONNECT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
@@ -110,23 +132,21 @@ namespace ec2
 
             //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
-            toUrlParams( input, &query );
-            query.addQueryItem("format", QnLexical::serialized(Qn::UbjsonFormat));
-            requestUrl.setQuery( query );
+            toUrlParams(input, &query);
+            Qn::SerializationFormat format = serializationFormatFromUrl(ecBaseUrl);
+
+            query.addQueryItem("format", QnLexical::serialized(format));
+            requestUrl.setQuery(query);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
-            QMutexLocker lk( &m_mutex );
-            if( !httpClient->doGet( requestUrl ) )
-            {
-                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
-                return;
-            }
+            QnMutexLocker lk( &m_mutex );
+            httpClient->doGet( requestUrl );
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -136,11 +156,11 @@ namespace ec2
         {
             std::function<void()> handler;
             {
-                QMutexLocker lk( &m_mutex );
+                QnMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
-                assert( it != m_runningHttpRequests.end() );
+                NX_ASSERT( it != m_runningHttpRequests.end() );
                 handler = std::move(it->second);
-                httpClient->terminate();
+                httpClient->pleaseStopSync();
                 m_runningHttpRequests.erase( it );
             }
 
@@ -148,7 +168,7 @@ namespace ec2
         }
 
     private:
-        QMutex m_mutex;
+        QnMutex m_mutex;
         std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>
@@ -160,10 +180,21 @@ namespace ec2
             {
                 case nx_http::StatusCode::ok:
                     break;
-                case nx_http::StatusCode::unauthorized:
+                case nx_http::StatusCode::unauthorized: {
+                    QString authResultStr = nx_http::getHeaderValue(httpClient->response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+                    if (!authResultStr.isEmpty()) {
+                        Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
+                        if (authResult == Qn::Auth_LDAPConnectError)
+                            return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
+                        else if (authResult == Qn::Auth_CloudConnectError)
+                            return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
+                    }
                     return handler( ErrorCode::unauthorized, OutputData() );
+                }
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported, OutputData() );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden, OutputData());
                 default:
                     return handler( ErrorCode::serverError, OutputData() );
             }
@@ -191,7 +222,7 @@ namespace ec2
                 //    tran = QnXml::deserialized<OutputData>(msgBody, OutputData(), &success);
                 //    break;
             default:
-                assert(false);
+                NX_ASSERT(false);
             }
 
             if( !success)
@@ -211,6 +242,8 @@ namespace ec2
                     return handler( ErrorCode::ok );
                 case nx_http::StatusCode::unauthorized:
                     return handler( ErrorCode::unauthorized );
+                case nx_http::StatusCode::forbidden:
+                    return handler(ErrorCode::forbidden);
                 case nx_http::StatusCode::notImplemented:
                     return handler( ErrorCode::unsupported );
                 default:

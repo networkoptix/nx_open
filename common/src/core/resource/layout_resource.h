@@ -1,23 +1,40 @@
-#ifndef QN_LAYOUT_RESOURCE_H
-#define QN_LAYOUT_RESOURCE_H
+#pragma once
 
 #include <QtCore/QRectF>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 
 #include <recording/time_period.h>
 
-#include "resource.h"
-#include "layout_item_data.h"
+#include <core/resource/resource.h>
+#include <core/resource/layout_item_data.h>
 
-class QnLayoutResource: public QnResource {
+#include <utils/common/threadsafe_item_storage.h>
+
+
+/**
+ * QnLayoutResource class describes the set of resources together with their view options.
+ *
+ * There are several types of layouts:
+ * 1) Common layouts. They belong to one of user. Layout's parentId is user's id.
+ * 2) Shared layouts. They can be accessible to several users. ParentId is null.
+ * 3) Service layouts. These can have server id or videowall id as parentId.
+*/
+class QnLayoutResource: public QnResource,
+    private QnThreadsafeItemStorageNotifier<QnLayoutItemData>
+{
     Q_OBJECT
 
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource(const QnResourceTypePool* resTypePool);
+    QnLayoutResource();
+
+    virtual QString getUniqueId() const override;
+    virtual Qn::ResourceStatus getStatus() const override;
 
     QnLayoutResourcePtr clone() const;
+
+    virtual QString toSearchString() const override;
 
     void setItems(const QnLayoutItemDataList &items);
 
@@ -25,27 +42,25 @@ public:
 
     QnLayoutItemDataMap getItems() const;
 
-    QnLayoutItemData getItem(const QUuid &itemUuid) const;
+    QnLayoutItemData getItem(const QnUuid &itemUuid) const;
 
     void addItem(const QnLayoutItemData &item);
 
     void removeItem(const QnLayoutItemData &item);
 
-    void removeItem(const QUuid &itemUuid);
+    void removeItem(const QnUuid &itemUuid);
 
-    void updateItem(const QUuid &itemUuid, const QnLayoutItemData &item);
+    void updateItem(const QnLayoutItemData &item);
 
-    qreal cellAspectRatio() const;
+    float cellAspectRatio() const;
 
-    void setCellAspectRatio(qreal cellAspectRatio);
+    void setCellAspectRatio(float cellAspectRatio);
 
     bool hasCellAspectRatio() const;
 
-    QSizeF cellSpacing() const;
+    qreal cellSpacing() const;
 
-    void setCellSpacing(const QSizeF &cellSpacing);
-
-    void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
+    void setCellSpacing(qreal spacing);
 
     void setData(const QHash<int, QVariant> &dataByRole);
 
@@ -59,9 +74,6 @@ public:
     void setLocalRange(const QnTimePeriod& value);
 
     virtual void setUrl(const QString& value) override;
-
-    bool userCanEdit() const;
-    void setUserCanEdit(bool value);
 
     /** Size of background image - in cells */
     QSize backgroundSize() const;
@@ -79,36 +91,48 @@ public:
     bool locked() const;
     void setLocked(bool value);
 
+    /** Check if layout is an exported file. */
+    bool isFile() const;
+
+    /** Check if layout is shared. */
+    bool isShared() const;
+
+    /** Get all resources ids placed on the layout. */
+    QSet<QnUuid> layoutResourceIds() const;
+
+    /** Get all resources placed on the layout. WARNING: method is SLOW! */
+    QSet<QnResourcePtr> layoutResources() const;
+
+    /** Get all resources placed on the layout. WARNING: method is SLOW! */
+    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
-    void userCanEditChanged(const QnLayoutResourcePtr &resource);
     void storeRequested(const QnLayoutResourcePtr &resource);
 
     void backgroundSizeChanged(const QnLayoutResourcePtr &resource);
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
 protected:
-    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
+    virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemChanged(const QnLayoutItemData& item) override;
+
+    virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 
 private:
-    void setItemsUnderLock(const QnLayoutItemDataMap &items);
-
-    void addItemUnderLock(const QnLayoutItemData &item);
-    void updateItemUnderLock(const QUuid &itemUuid, const QnLayoutItemData &item);
-    void removeItemUnderLock(const QUuid &itemUuid);
-
-private:
-    QnLayoutItemDataMap m_itemByUuid;
-    qreal m_cellAspectRatio;
-    QSizeF m_cellSpacing;
+    QScopedPointer<QnThreadsafeItemStorage<QnLayoutItemData> > m_items;
+    float m_cellAspectRatio;
+    qreal m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
     QnTimePeriod m_localRange;
-    bool m_userCanEdit;
     QSize m_backgroundSize;
     QString m_backgroundImageFilename;
     qreal m_backgroundOpacity;
@@ -117,6 +141,3 @@ private:
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);
 Q_DECLARE_METATYPE(QnLayoutResourceList);
-
-#endif // QN_LAYOUT_RESOURCE_H
-

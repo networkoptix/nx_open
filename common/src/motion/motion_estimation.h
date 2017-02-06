@@ -6,11 +6,13 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
 #include <QtCore/QByteArray>
-#include <QtCore/QMutex>
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
-#include "decoders/video/ffmpeg.h"
+#include <nx/utils/thread/mutex.h>
+#include "nx/streaming/media_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "core/resource/motion_window.h"
+
+#include <motion/motion_detection.h>
 
 static const int FRAMES_BUFFER_SIZE = 2;
 
@@ -20,10 +22,11 @@ public:
     QnMotionEstimation();
     ~QnMotionEstimation();
     /*
-    * Set motion mask as array of quint8 values in range [0..255] . array size is MD_WIDTH * MD_HEIGHT
+    * Set motion mask as array of quint8 values in range [0..255] . array size is Qn::kMotionGridWidth * Qn::kMotionGridHeight
     * As motion data, motion mask is rotated to 90 degree.
     */
     void setMotionMask(const QnMotionRegion& region);
+    void setChannelNum(int value);
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     //void analizeFrame(const CLVideoDecoderOutput* frame);
     /*!
@@ -45,13 +48,13 @@ private:
 	void scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,uint8_t* prevFrameBuffer, uint8_t* deltaBuffer);
 
 private:
-    QMutex m_mutex;
-    CLFFmpegVideoDecoder* m_decoder;
+    QnMutex m_mutex;
+    QnFfmpegVideoDecoder* m_decoder;
     QSharedPointer<CLVideoDecoderOutput> m_frames[2];
-    
+
     quint8* m_motionMask;
     quint8* m_motionSensMask;
-    quint8* m_scaledMask; // mask scaled to x * MD_HEIGHT. for internal use
+    quint8* m_scaledMask; // mask scaled to x * Qn::kMotionGridHeight. for internal use
     quint8* m_motionSensScaledMask;
     int m_scaledWidth;
     int m_xStep; // 8, 16, 24 e.t.c value
@@ -66,9 +69,9 @@ private:
     int m_totalFrames;
     bool m_isNewMask;
 
-    int m_linkedMap[MD_WIDTH*MD_HEIGHT];
+    int m_linkedMap[Qn::kMotionGridWidth*Qn::kMotionGridHeight];
     int* m_linkedNums;
-    int m_linkedSquare[MD_WIDTH*MD_HEIGHT];
+    int m_linkedSquare[Qn::kMotionGridWidth*Qn::kMotionGridHeight];
     //quint8 m_sadTransformMatrix[10][256];
 
     QSize m_videoResolution;
@@ -77,6 +80,7 @@ private:
 	//int m_numFrame;
 	int m_scaleXStep;
     int m_scaleYStep;
+    int m_channelNum;
 };
 
 #endif  //ENABLE_SOFTWARE_MOTION_DETECTION

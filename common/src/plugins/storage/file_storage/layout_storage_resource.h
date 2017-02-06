@@ -1,8 +1,6 @@
 #ifndef _LAYOUT_STORAGE_PROTOCOL_H__
 #define _LAYOUT_STORAGE_PROTOCOL_H__
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QFile>
 
 extern "C"
@@ -17,7 +15,8 @@ class QnTimePeriodList;
 /*
 * QnLayoutFileStorageResource uses for layout export
 */
-class QnLayoutFileStorageResource: public QnStorageResource
+class QnLayoutFileStorageResource
+    : public QnStorageResource
 {
 public:
     enum StorageFlags {
@@ -28,34 +27,30 @@ public:
     QnLayoutFileStorageResource();
     virtual ~QnLayoutFileStorageResource();
 
-    static QnStorageResource* instance();
+    static QnStorageResource* instance(const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
 
-    virtual int getChunkLen() const override;
-    virtual bool isStorageAvailable() override;
-    virtual bool isStorageAvailableForWriting() override;
-    virtual QFileInfoList getFileList(const QString& dirName) override;
-    virtual qint64 getFileSize(const QString& url) const override;
-    virtual bool isNeedControlFreeSpace() override;
+    virtual int getCapabilities() const override;
+    virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
+    qint64 getFileSize(const QString& url) const override;
     virtual bool removeFile(const QString& url) override;
     virtual bool removeDir(const QString& url) override;
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
-    virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
-    virtual qint64 getTotalSpace() override;
+    virtual qint64 getTotalSpace() const override;
     virtual void setUrl(const QString& value) override;
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
     QnTimePeriodList getTimePeriods(const QnResourcePtr &resource);
 
-    static QString updateNovParent(const QString& novName, const QString& itemName);
+    static QString itemUniqueId(const QString& layoutUrl, const QString& itemUniqueId);
 
-    static QString layoutPrefix();
-
+    virtual QString getPath() const override;
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 
@@ -81,8 +76,6 @@ public:
     };
 #pragma pack(pop)
 
-    static QString removeProtocolPrefix(const QString& url);
-
 private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
@@ -101,15 +94,15 @@ private:
     friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
     QSet<QnLayoutFile*> m_openedFiles;
-    QMutex m_fileSync;
-    static QMutex m_storageSync;
+    QnMutex m_fileSync;
+    static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
     qint64 m_novFileOffset;
+
+    int m_capabilities;
     //qint64 m_novFileLen;
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif // _LAYOUT_STORAGE_PROTOCOL_H__

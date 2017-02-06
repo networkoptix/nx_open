@@ -31,6 +31,10 @@ public:
         Just delegates call to \a dataSource
     */
     virtual quint64 currentPos() const override;
+    /*!
+        Just delegates call to \a dataSource
+    */
+    virtual void put(QnAbstractDataPacketPtr packet) override;
 
 protected:
     AbstractOnDemandDataProviderPtr m_dataSource;

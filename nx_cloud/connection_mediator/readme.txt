@@ -1,0 +1,1 @@
+Minimal application that just executes code in libconnection_mediator

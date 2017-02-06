@@ -2,7 +2,7 @@
 #define __DISTRIBUTED_MUTEX_H_
 
 #include <QtCore/QObject>
-#include <QtCore/QUuid>
+#include <nx/utils/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>
@@ -17,7 +17,7 @@ namespace ec2
 
     struct LockRuntimeInfo: public ApiLockData
     {
-        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
+        LockRuntimeInfo(const QnUuid& _peer = QnUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
             peer = _peer;
             timestamp = _timestamp;
             name = _name;
@@ -27,7 +27,7 @@ namespace ec2
         bool operator<(const LockRuntimeInfo& other) const  { return timestamp != other.timestamp ? timestamp < other.timestamp : peer < other.peer; }
         bool operator==(const LockRuntimeInfo& other) const { return timestamp == other.timestamp && peer == other.peer; }
         bool isEmpty() const { return peer.isNull(); }
-        void clear()         { peer = QUuid(); }
+        void clear()         { peer = QnUuid(); }
     };
 
     /*
@@ -55,7 +55,7 @@ namespace ec2
         bool isLocked() const;
     signals:
         void locked();
-        void lockTimeout();
+        void lockTimeout(const QSet<QnUuid> &failedPeers);
     private slots:
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
@@ -66,16 +66,16 @@ namespace ec2
     private:
         bool isAllPeersReady() const;
         void checkForLocked();
-        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QUuid& dstPeer);
+        void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer);
         void unlockInternal();
     private:
         QString m_name;
         LockRuntimeInfo m_selfLock;
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
-        QSet<QUuid> m_proccesedPeers;
+        QSet<QnUuid> m_proccesedPeers;
         QTimer* m_timer;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
         QnDistributedMutexManager* m_owner;

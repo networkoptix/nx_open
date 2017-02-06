@@ -8,13 +8,23 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSharedPointer>
 
-#include "utils/common/request_param.h"
+#include <nx/utils/string.h>
+
+#include <common/common_globals.h>
+#include <utils/common/request_param.h>
+
 
 class TCPSocket;
+class QnRestConnectionProcessor;
 
 // TODO: #MSAPI header-class naming inconsistency. As all derived classes
 // are named XyzRestHandler I suggest to rename this one to either
 // QnAbstractRestHandler or simply to QnRestHandler. And rename the header.
+
+enum class RestPermissions {
+    anyUser,
+    adminOnly
+};
 
 
 /**
@@ -25,29 +35,38 @@ class TCPSocket;
 class QnRestRequestHandler: public QObject {
     Q_OBJECT
 public:
+    QnRestRequestHandler();
 
-    // TODO: #Elric #EC2 replace QnRequestParamList -> QnRequestParams
-
+    //TODO: #rvasilenko #EC2 replace QnRequestParamList -> QnRequestParams
+    //TODO: #rvasilenko replace parameters set with a single struct, 8 arguments is far too many
+    //TODO: #rvasilenko looks like QnRestConnectionProcessor* is used only to get and modify its headers
     /*!
         \return http statusCode
     */
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType) = 0;
+    virtual int executeGet(const QString& path, const QnRequestParamList& params,
+                           QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) = 0;
     /*!
         \return http statusCode
     */
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& resultContentType) = 0;
+    virtual int executePost(const QString& path, const QnRequestParamList& params,
+                            const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
+                            QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
 
-    
+    virtual void afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
+                              const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/) {}
+
     friend class QnRestProcessorPool;
+
+    Qn::GlobalPermission permissions() const { return m_permissions; }
 
 protected:
     void setPath(const QString &path) { m_path = path; }
-    
-    qint64 parseDateTime(const QString &dateTime) const;
+    void setPermissions(Qn::GlobalPermission permissions ) {m_permissions = permissions; }
     QString extractAction(const QString &path) const;
 
 protected:
     QString m_path;
+    Qn::GlobalPermission m_permissions;
 };
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
@@ -59,8 +78,9 @@ class QnRestGUIRequestHandler: public QnRestRequestHandler {
 public:
     QnRestGUIRequestHandler();
     virtual ~QnRestGUIRequestHandler();
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
+                            QByteArray& contentType, const QnRestConnectionProcessor*) override;
 protected:
     virtual int executeGetGUI(const QString& path, const QnRequestParamList& params, QByteArray& result) = 0;
     virtual int executePostGUI(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result) = 0;

@@ -56,6 +56,11 @@ void* GenericRTSPPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
     }
+    if( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin) ) == 0 )
+    {
+        addRef();
+        return static_cast<nxpl::Plugin*>(this);
+    }
 
     return NULL;
 }
@@ -68,6 +73,15 @@ unsigned int GenericRTSPPlugin::addRef()
 unsigned int GenericRTSPPlugin::releaseRef()
 {
     return m_refManager.releaseRef();
+}
+
+const char* GenericRTSPPlugin::name() const
+{
+    return "GENERIC_RTSP";
+}
+
+void GenericRTSPPlugin::setSettings( const nxpl::Setting* /*settings*/, int /*count*/ )
+{
 }
 
 nxpt::CommonRefManager* GenericRTSPPlugin::refManager()

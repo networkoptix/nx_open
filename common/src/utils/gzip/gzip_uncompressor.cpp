@@ -5,12 +5,13 @@
 
 #include "gzip_uncompressor.h"
 
+#include <nx/utils/log/assert.h>
 
 static const int OUTPUT_BUFFER_SIZE = 16*1024;
 
 GZipUncompressor::GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter )
 :
-    AbstractByteStreamConverter( nextFilter ),
+    AbstractByteStreamFilter( nextFilter ),
     m_state( State::init )
 {
     memset( &m_zStream, 0, sizeof(m_zStream) );
@@ -23,10 +24,10 @@ GZipUncompressor::~GZipUncompressor()
     inflateEnd( &m_zStream );
 }
 
-void GZipUncompressor::processData( const QnByteArrayConstRef& data )
+bool GZipUncompressor::processData( const QnByteArrayConstRef& data )
 {
     if( data.isEmpty() )
-        return;
+        return true;
 
     int zFlushMode = Z_NO_FLUSH;
 
@@ -41,10 +42,11 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
         switch( m_state )
         {
             case State::init:
+            case State::done:   //to support stream of gzipped files
                 zResult = inflateInit2(&m_zStream, 16+MAX_WBITS);
                 if( zResult != Z_OK )
                 {
-                    assert( false );
+                    NX_ASSERT( false );
                 }
                 m_state = State::inProgress;
 
@@ -73,8 +75,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         else if( m_zStream.avail_in == 0 )
                         {
                             //input depleted
-                            m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
-                            return;
+                            return m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
                         }
                         else    //m_zStream.avail_out > 0 && m_zStream.avail_in > 0
                         {
@@ -122,7 +123,7 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
                         {
                             if( m_zStream.avail_out > 0 )
                                m_nextFilter->processData( QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size()-m_zStream.avail_out) );
-                            return;
+                            return true;
                         }
 
                     default:
@@ -133,15 +134,17 @@ void GZipUncompressor::processData( const QnByteArrayConstRef& data )
             }
 
             case State::failed:
-            case State::done:
+            //case State::done:
                 break;
 
             default:
-                assert( false );
+                NX_ASSERT( false );
         }
 
         break;
     }
+
+    return true;
 }
 
 size_t GZipUncompressor::flush()

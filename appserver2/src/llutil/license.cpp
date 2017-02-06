@@ -10,15 +10,6 @@
 #include "base64.h"
 #include "license.h" 
 
-namespace {
-
-char networkOptixRSAPublicKey[] = "-----BEGIN PUBLIC KEY-----\n"
-        "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAN4wCk8ISwRsPH0Ev/ljnEygpL9n7PhA\n"
-        "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
-        "-----END PUBLIC KEY-----";
-
-}
-
 namespace LLUtil {
 
 bool isSignatureMatch(const std::string &data, const std::string& signature, const std::string &publicKey) {
@@ -31,7 +22,7 @@ bool isSignatureMatch(const std::string &data, const std::string& signature, con
     RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
     BIO_free(bp);
 
-    if (publicRSAKey == 0 || signature.size() != RSA_size(publicRSAKey))
+    if (publicRSAKey == 0 || signature.size() != static_cast<size_t>(RSA_size(publicRSAKey)))
         return false;
 
     // Decrypt data
@@ -43,11 +34,6 @@ bool isSignatureMatch(const std::string &data, const std::string& signature, con
 
     // Verify signature is correct
     return std::memcmp(decrypted.data(), dataHash, ret) == 0;
-}
-
-bool isNoptixTextSignatureMatch(const std::string &data, const std::string &signature) {
-    std::string binarySig = base64_decode(signature);
-    return isSignatureMatch(data, binarySig, networkOptixRSAPublicKey);
 }
 
 }

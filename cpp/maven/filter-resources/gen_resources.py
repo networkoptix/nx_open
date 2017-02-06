@@ -2,29 +2,31 @@ import os, sys, posixpath, platform, subprocess, fileinput, shutil, re
 from subprocess import Popen, PIPE
 from os.path import dirname, join, exists, isfile
 from os import listdir
-
-sys.path.insert(0, '${root.dir}/common')
-from gencomp import gencomp_cpp
+from sets import Set
 
 template_file='template.pro'
+skip_template_file = 'template.skip'
 specifics_file='${project.artifactId}-specifics.pro'
 output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
-translations=['${translation1}','${translation2}','${translation3}','${translation4}','${translation5}','${translation6}','${translation7}','${translation8}','${translation9}']
+translations=['${translation1}', '${translation2}', '${translation3}', '${translation4}', '${translation5}', '${translation6}', '${translation7}', '${translation8}', '${translation9}', '${translation10}',
+              '${translation11}','${translation12}','${translation13}','${translation14}','${translation15}','${translation16}','${translation17}','${translation18}','${translation19}','${translation20}']
+qml_files = [ ".qml", ".js", "qmldir" ]
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
-os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
+os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
 
-def execute(command):
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+def execute(commands):
+    process = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = ''
 
     # Poll process for new output until finished
     for line in iter(process.stdout.readline, ""):
-        print line,
-        output += line
+        text = line.rstrip() + '\n'
+        sys.stdout.write(text)
+        output += line.rstrip()
 
     process.wait()
     exitCode = process.returncode
@@ -32,9 +34,15 @@ def execute(command):
     if (exitCode == 0):
         return output
     else:
-        raise Exception(command, exitCode, output)
+        raise Exception(commands, exitCode, output)
 
-def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
+def fileIsAllowed(file, exclusions):
+    for exclusion in exclusions:
+        if file.endswith(exclusion):
+            return False
+    return True
+
+def genqrc(qrcname, qrcprefix, pathes, exclusions):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -43,31 +51,33 @@ def genqrc(qrcname, qrcprefix, pathes, extensions, exclusion, additions=''):
     print >> qrcfile, '<RCC version="1.0">'
     print >> qrcfile, '<qresource prefix="%s">' % (qrcprefix)
 
+    aliases = Set()
+
     for path in pathes:
         for root, dirs, files in os.walk(path):
             parent = root[len(path) + 1:]
-        
             for f in files:
-                for extension in extensions:
-                    if f.endswith(extension) and not f.endswith(exclusion):
-                        print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
-  
-    print >> qrcfile, additions
+                if fileIsAllowed(f, exclusions):
+                    alias = os.path.join(parent, f)
+                    if not alias in aliases:
+                        aliases.add(alias)
+                        print >> qrcfile, '<file alias="%s">%s</file>' % (alias, os.path.join(root, f))
+
     print >> qrcfile, '</qresource>'
     print >> qrcfile, '</RCC>'
-  
+
     qrcfile.close()
 
 def rreplace(s, old, new):
     li = s.rsplit(old, 1)
     return new.join(li)
-    
-def gentext(file, path, extensions, text): 
+
+def gentext(file, path, extensions, text):
     os.path = posixpath
-   
+
     for root, dirs, files in os.walk(path):
         parent = root[len(path) + 1:]
-        
+
         for f in files:
             n = os.path.splitext(f)[0]
             p = os.path.join(parent, f)
@@ -76,21 +86,35 @@ def gentext(file, path, extensions, text):
                     continue
                 if n == 'StdAfx':
                     continue
-                
+
                 cond = ''
                 if n.endswith('_win') or parent.endswith('_win'):
-                    cond = 'win*:'
-                elif n.endswith('_mac') or parent.endswith('_mac'):
-                    cond = 'mac:'
+                    cond = 'win32:'
                 elif n.endswith('_linux') or parent.endswith('_linux'):
                     cond = 'linux*:'
+                    if os.path.exists(rreplace(p, '_linux', '_android')):
+                        cond += '!android:'
                 elif n.endswith('_unix'):
                     cond = 'unix:'
-                    if(os.path.exists(rreplace(p, '_unix', '_mac'))):
-                        cond += '!mac:'
-                    if(os.path.exists(rreplace(p, '_unix', '_linux'))):
+                    if os.path.exists(rreplace(p, '_unix', '_linux')):
                         cond += '!linux*:'
-                
+                    if os.path.exists(rreplace(p, '_unix', '_mac')):
+                        cond += '!mac:'
+                    if os.path.exists(rreplace(p, '_unix', '_macx')):
+                        cond += '!macx:'
+                    if os.path.exists(rreplace(p, '_unix', '_android')):
+                        cond += '!android:'
+                    if os.path.exists(rreplace(p, '_unix', '_ios')):
+                        cond += '!ios:'
+                elif n.endswith('_mac') or parent.endswith('_mac'):
+                    cond = 'mac:'
+                elif n.endswith('_macx') or parent.endswith('_macx'):
+                    cond = 'macx:'
+                elif n.endswith('_android') or parent.endswith('_android'):
+                    cond = 'android:'
+                elif n.endswith('_ios') or parent.endswith('_ios'):
+                    cond = 'ios:'
+
                 print >> file, '\n%s%s%s/%s' % (cond, text, path, os.path.join(parent, f))
 
 def replace(file,searchExp,replaceExp):
@@ -99,75 +123,105 @@ def replace(file,searchExp,replaceExp):
             line = re.sub(r'%s', r'%s', line.rstrip() % (searchExp, replaceExp))
         sys.stdout.write(line)
 
-        
+def gen_includepath(file, path):
+    if not os.path.isdir(path):
+        return
 
-def gen_includepath(file, path):      
     for dirs in os.walk(path).next()[1]:
-        print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
-                    
+        if(dirs.endswith('win32')):
+            print >> file, '\nwin*:INCLUDEPATH += %s/%s' % (path, dirs)
+        else:
+            print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
+
+def append_file(source_file, dest_file):
+    print 'Appending file {0} to file {1}'.format(source_file, dest_file)
+    if not os.path.exists(source_file):
+        print 'File {0} was not found!'
+        return
+
+    with open(source_file, 'r') as src:
+        with open(dest_file, 'a') as dst:
+            dst.write(src.read())
+            print >> dst, '\n'
+
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):
-        os.makedirs('${project.build.directory}/build') 
-    gencomp_cpp(open('${project.build.sourceDirectory}/compatibility_info.cpp', 'w'))
-    if not os.path.exists(translations_target_dir):
-        os.makedirs(translations_target_dir) 
+        os.makedirs('${project.build.directory}/build')
 
-    if os.path.exists(translations_dir):    
+    if not os.path.exists(translations_target_dir):
+        os.makedirs(translations_target_dir)
+
+    if os.path.exists(translations_dir):
         for f in listdir(translations_dir):
-    	    for translation in translations:
-    	        if f.endswith('_%s.ts' % translation):
-        	    if '${platform}' == 'windows':
-            	        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+            for translation in translations:
+                if not translation:
+                    continue
+                if f.endswith('_%s.ts' % translation):
+                    if '${platform}' == 'windows':
+                        os.system('${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
                     else:
-	                os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
-  
-    genqrc('build/${project.artifactId}.qrc', '/', ['${project.build.directory}/resources','${project.basedir}/static-resources','${customization.dir}/icons'], [''],'vmsclient.png')  
-    
-    if os.path.exists(os.path.join(r'${project.build.directory}', template_file)):
-        f = open(output_pro_file, "w")
-        for file in [template_file, specifics_file]:
-            if os.path.exists(file):
-                fo = open(file, "r")
-                f.write(fo.read())
-                print >> f, '\n'
-                fo.close()
+                        os.system('export DYLD_LIBRARY_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/lrelease %s/%s -qm %s/%s.qm' % (ldpath, ldpath, translations_dir, f, translations_target_dir, os.path.splitext(f)[0]))
+
+    exceptions = ['vmsclient.png', '.ai', '.svg', '.profile']
+    if "${noQmlInQrc}" == "true":
+        exceptions += qml_files
+
+    genqrc(
+        'build/${project.artifactId}.qrc',
+        '/',
+        ['${customization.dir}/icons/all',
+            '${project.build.directory}/resources',
+            '${project.basedir}/static-resources'],
+        exceptions)
+
+    if os.path.exists('${project.build.directory}/additional-resources'):
+        genqrc('build/${project.artifactId}_additional.qrc', '/', ['${project.build.directory}/additional-resources'], exceptions)
+        pro_file = open('${project.artifactId}-specifics.pro', 'a')
+        print >> pro_file, 'RESOURCES += ${project.build.directory}/build/${project.artifactId}_additional.qrc'
+        pro_file.close()
+
+    output_pro_path = os.path.join(r'${project.build.directory}', output_pro_file)
+
+    # Rewrite file
+    open(output_pro_file, 'w').close()
+
+    skip_template = os.path.exists(os.path.join(r'${project.build.directory}', skip_template_file))
+    if not skip_template:
+        append_file(template_file, output_pro_file)
+
+    append_file(specifics_file, output_pro_file)
+
+    with open(output_pro_file, "a") as f:
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.h'], 'HEADERS += ')
-        gentext(f, '${project.build.sourceDirectory}', ['.proto'], 'PB_FILES += ')
         gentext(f, '${project.build.sourceDirectory}', ['.ui'], 'FORMS += ')
+        if "${noQmlInQrc}" == "true":
+            gentext(f, '${project.basedir}/static-resources', qml_files, 'OTHER_FILES += ')
         gen_includepath(f, '${libdir}/include')
-        gen_includepath(f, '${environment.dir}/include')
-        f.close()
-    
-    if os.path.exists(os.path.join(r'${project.build.directory}', output_pro_file)):
-        print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
-        qmake = os.system('${qt.dir}/bin/qmake -query')
-        print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
-        if '${platform}' == 'windows':
-            vc_path = r'%s..\..\VC\bin' % os.getenv('VS110COMNTOOLS')
-            print(vc_path)
-            os.environ["path"] += os.pathsep + vc_path
-            os.system('echo %PATH%')
-            p = subprocess.Popen(r'qmake.bat %s' % output_pro_file, shell=True, stdout=PIPE)
-            p = subprocess.Popen(r'${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile %s' % output_pro_file, shell=True, stdout=PIPE)
-            out, err = p.communicate()
-            print out
-            p.wait()
-            if p.returncode:  
-                print "failed with code: %s" % str(p.returncode) 
-                sys.exit(1)
 
-            #os.system('${qt.dir}/bin/qmake -spec ${qt.spec} -tp vc -o ${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj %s' % output_pro_file)
-            
-            #if '${arch}' == 'x64' and '${force_x86}' == 'false':
-            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Win32', '${arch}')
-            #    replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', 'Name="VCLibrarianTool"', 'Name="VCLibrarianTool" \n				AdditionalOptions="/MACHINE:x64"')
-            #print ('f++++++++++++++++++++++++++++++++++++++ Replacing +++++++++++++++++++++++++++++++++++++++')
-            #replace ('${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', '<None\s*Include=\"(.*)[\\/]{1}([\w\d_\-]+)\.([\w\d_\-]+)\".*/>', '''    <CustomBuild Include="$1/$2.$3"> \n
-      #<AdditionalInputs>${libdir}/build/bin/protoc;$1/$2.$3</AdditionalInputs> \n
-      #<Command         >${libdir}/build/bin/protoc --proto_path=${root}/${project.artifactId}/src/api/pb --cpp_out=${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/ ${root}/${project.artifactId}/src/$1/$2.$3</Command> \n
-      #<Message         >Generating code from $1/$2.$3 to $2.pb.cc</Message> \n
-      #<Outputs         >${root}/${project.artifactId}/x86/build/\$(Configuration)/generated/$2.pb.cc</Outputs> \n
-    #</CustomBuild>''')
-        else:
-            os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake -spec ${qt.spec} CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, output_pro_file))
+    print (' ++++++++++++++++++++++++++++++++ qMake info: ++++++++++++++++++++++++++++++++')
+    execute([r'${qt.dir}/bin/qmake', '-query'])
+    print (' ++++++++++++++++++++++++++++++++ generating project file ++++++++++++++++++++++++++++++++')
+    if '${platform}' == 'windows':
+        vc_path = r'%s..\..\VC\bin' % os.getenv('${VCVars}')
+        os.environ["path"] += os.pathsep + vc_path
+        execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', '-tp', 'vc', '-o', r'${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj', output_pro_file])
+        execute([r'${qt.dir}/bin/qmake', '-spec', '${qt.spec}', r'CONFIG+=${build.configuration}', '-o', r'${project.build.directory}/Makefile', output_pro_file])
+    elif '${platform}' in [ 'ios', 'macosx' ]:
+        os.environ["DYLD_FRAMEWORK_PATH"] = ldpath
+        os.environ["DYLD_LIBRARY_PATH"] = ldpath
+        makefile = "Makefile.${build.configuration}"
+        config = ""
+        if "${platform}" == "ios":
+            config = "CONFIG+=${iosTarget}"
+            if "${iosTarget}" != "iphonesimulator":
+                config += " CONFIG-=iphonesimulator"
+        qmake = "${qt.dir}/bin/qmake {0} -o {1} CONFIG+=${build.configuration} {2}".format(output_pro_file, makefile, config)
+        print qmake
+        os.system(qmake)
+    else:
+        qt_spec = "${qt.spec}"
+        if qt_spec:
+            qt_spec = "-spec {0}".format(qt_spec)
+        os.system('export DYLD_FRAMEWORK_PATH=%s && export LD_LIBRARY_PATH=%s && ${qt.dir}/bin/qmake %s CONFIG+=${build.configuration} -o ${project.build.directory}/Makefile.${build.configuration} %s' % (ldpath, ldpath, qt_spec,  output_pro_file))
+

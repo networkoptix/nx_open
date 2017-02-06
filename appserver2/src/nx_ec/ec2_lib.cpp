@@ -10,8 +10,10 @@
 
 extern "C"
 {
-    ec2::AbstractECConnectionFactory* getConnectionFactory( Qn::PeerType peerType )
+    ec2::AbstractECConnectionFactory* getConnectionFactory(
+        Qn::PeerType peerType,
+        nx::utils::TimerManager* const timerManager)
     {
-        return new ec2::Ec2DirectConnectionFactory( peerType );
+        return new ec2::Ec2DirectConnectionFactory(peerType, timerManager);
     }
 }

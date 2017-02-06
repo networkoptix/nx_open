@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>
@@ -36,6 +36,7 @@ public:
     QnPtzControllerPtr controller(const QnResourcePtr &resource) const;
 
 signals:
+    void controllerAboutToBeChanged(const QnResourcePtr &resource);
     void controllerChanged(const QnResourcePtr &resource);
 
 protected:
@@ -50,6 +51,8 @@ protected:
     Q_SLOT virtual void unregisterResource(const QnResourcePtr &resource);
 
     Q_SLOT void updateController(const QnResourcePtr &resource);
+
+    virtual void deinitialize();
 
 private:
     friend class QnPtzControllerCreationCommand;

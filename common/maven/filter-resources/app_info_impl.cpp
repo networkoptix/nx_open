@@ -3,145 +3,201 @@
 //
 #include <utils/common/app_info.h>
 
-//unused variable, why was in required?
-#define QN_BUILDENV_PATH                "${environment.dir}"
+int QnAppInfo::ec2ProtoVersion()
+{
+    return ${nxec.ec2ProtoVersion};
+}
 
-QString QnAppInfo::organizationName() {
+QString QnAppInfo::organizationName()
+{
     return QStringLiteral("${company.name}");
 }
 
-QString QnAppInfo::linuxOrganizationName() {
+QString QnAppInfo::linuxOrganizationName()
+{
     return QStringLiteral("${deb.customization.company.name}");
 }
 
-QString QnAppInfo::applicationVersion() {
+QString QnAppInfo::realm()
+{
+    return QStringLiteral("VMS");
+}
+
+QString QnAppInfo::applicationVersion()
+{
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
 
-QString QnAppInfo::applicationRevision() {
+QString QnAppInfo::applicationRevision()
+{
     return QStringLiteral("${changeSet}");
 }
 
-QString QnAppInfo::applicationPlatform() {
-    return QStringLiteral("${platform}");
-}
-
-QString QnAppInfo::applicationArch() {
-    return QStringLiteral("${arch}");
-}
-
-QString QnAppInfo::applicationPlatformModification() {
+QString QnAppInfo::applicationPlatformModification()
+ {
     return QStringLiteral("${modification}");
 }
 
-QString QnAppInfo::applicationCompiler() {
-    return QStringLiteral("${additional.compiler}");
+QString QnAppInfo::applicationCompiler()
+{
+    #if defined(__clang__)
+        return QStringLiteral("clang");
+    #elif defined(__GNUC__)
+        return QStringLiteral("gcc");
+    #elif defined(_MSC_VER)
+        return QStringLiteral("msvc");
+    #else
+        return QStringLiteral();
+    #endif
 }
 
-QString QnAppInfo::engineVersion() {
+QString QnAppInfo::engineVersion()
+ {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
 }
 
-QString QnAppInfo::ffmpegVersion() {
+QString QnAppInfo::ffmpegVersion()
+ {
     return QStringLiteral("${ffmpeg.version}");
 }
 
-QString QnAppInfo::sigarVersion() {
+QString QnAppInfo::sigarVersion()
+{
     return QStringLiteral("${sigar.version}");
 }
 
-QString QnAppInfo::boostVersion() {
+QString QnAppInfo::boostVersion()
+{
     return QStringLiteral("${boost.version}");
 }
 
-QString QnAppInfo::armBox() {
-    return QStringLiteral("${box}");
+bool QnAppInfo::beta()
+{
+    static const auto betaString = QStringLiteral("${beta}").toLower();
+    static const bool beta =
+        (betaString == lit("on") || betaString == lit("true"));
+    return beta;
 }
 
-bool QnAppInfo::beta() {
-    return ${beta};
-}
-
-QString QnAppInfo::productName() {
+QString QnAppInfo::productName()
+{
 #ifdef _WIN32
     return QStringLiteral("${product.name}");
 #else
-    return QStringLiteral("${namespace.additional}");
+    return QStringLiteral("${product.appName}");
 #endif
 }
 
-QString QnAppInfo::productNameShort() {
+QString QnAppInfo::productNameShort()
+{
     return QStringLiteral("${product.name.short}");
 }
 
-QString QnAppInfo::productNameLong() {
-    return QStringLiteral("${product.name}");
+QString QnAppInfo::productNameLong()
+{
+    return QStringLiteral("${display.product.name}");
 }
 
-QString QnAppInfo::customizationName() {
-    return lit("${customization}");
+QString QnAppInfo::customizationName()
+{
+    return QStringLiteral("${customization}");
 }
 
-QString QnAppInfo::clientExecutableName() {
-#ifdef _WIN32
-    return QStringLiteral("${product.name}.exe"); // TODO: #Boris probably there exists a variable for this?
-#else
-    return QStringLiteral("client-bin");
-#endif
+QString QnAppInfo::defaultLanguage()
+{
+    return QStringLiteral("${translation1}");
 }
 
-QString QnAppInfo::applauncherExecutableName() {
-#ifdef _WIN32
-    return QStringLiteral("${product.name} Launcher.exe");
-#else
-    return QStringLiteral("applauncher-bin");
-#endif
+QString QnAppInfo::clientExecutableName()
+{
+    return QStringLiteral("${client.binary.name}");
 }
 
-QString QnAppInfo::mediaFolderName() {
+QString QnAppInfo::applauncherExecutableName()
+{
+    return QStringLiteral("${applauncher.binary.name}");
+}
+
+QString QnAppInfo::mediaFolderName()
+{
     return QStringLiteral("${client.mediafolder.name}");
 }
 
-QString QnAppInfo::licensingEmailAddress() {
+QString QnAppInfo::licensingEmailAddress()
+{
     return QStringLiteral("${company.license.address}");
 }
 
-QString QnAppInfo::companyUrl() {
+QString QnAppInfo::companyUrl()
+{
     return QStringLiteral("${company.url}");
 }
 
-QString QnAppInfo::supportAddress() {
+QString QnAppInfo::supportEmailAddress()
+{
     return QStringLiteral("${company.support.address}");
 }
 
-QString QnAppInfo::showcaseUrl() {
+QString QnAppInfo::supportLink()
+{
+    return QStringLiteral("${company.support.link}");
+}
+
+QString QnAppInfo::showcaseUrl()
+{
     return QStringLiteral("${showcase.url}/${customization}");
 }
 
-QString QnAppInfo::settingsUrl() {
+QString QnAppInfo::settingsUrl()
+{
     return QStringLiteral("${settings.url}/${customization}.json");
 }
 
-QString QnAppInfo::mirrorListUrl() {
-    return QStringLiteral("${mirrorListUrl}");
-}
-
-QString QnAppInfo::helpUrl() {
+QString QnAppInfo::helpUrl()
+{
     return QStringLiteral("${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url");
 }
 
-int QnAppInfo::freeLicenseCount() {
+QString QnAppInfo::updateGeneratorUrl()
+{
+    return QStringLiteral("${update.generator.url}");
+}
+
+//Filling string constant with zeros to be able to change this constant in already-built binary
+static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloudHost}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
+
+QString QnAppInfo::defaultCloudHost()
+{
+    return QString::fromUtf8(kCloudHostName);
+}
+
+QString QnAppInfo::defaultCloudPortalUrl()
+{
+    return QString::fromLatin1("https://%1").arg(defaultCloudHost());
+}
+
+QString QnAppInfo::defaultCloudModulesXmlUrl()
+{
+    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
+}
+
+QString QnAppInfo::cloudName()
+{
+    return QStringLiteral("${cloudName}");
+}
+
+int QnAppInfo::freeLicenseCount()
+{
     return ${freeLicenseCount};
 }
 
-QString QnAppInfo::freeLicenseKey() {
+QString QnAppInfo::freeLicenseKey()
+{
     return QStringLiteral("${freeLicenseKey}");
 }
 
-bool QnAppInfo::freeLicenseIsTrial() {
+bool QnAppInfo::freeLicenseIsTrial()
+{
     return ${freeLicenseIsTrial};
-}
-
-QString QnAppInfo::iosPlayButtonTint() {
-    return QStringLiteral("${ios.playButton.tint}");
 }

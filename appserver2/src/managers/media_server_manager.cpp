@@ -1,97 +1,175 @@
-
 #include "media_server_manager.h"
 
-#include <functional>
-
-#include <QtConcurrent>
-
 #include "fixed_url_client_query_processor.h"
-#include "database/db_manager.h"
-#include "transaction/transaction_log.h"
 #include "server_query_processor.h"
-#include "core/resource/media_server_resource.h"
-
-
-using namespace ec2;
 
 namespace ec2
 {
+    QnMediaServerNotificationManager::QnMediaServerNotificationManager()
+    {}
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesDataList>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributesList);
+        for (const ec2::ApiMediaServerUserAttributesData& attrs: tran.params)
+            emit userAttributesChanged(attrs);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerUserAttributesData>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServerUserAttributes);
+        emit userAttributesChanged(tran.params);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiIdDataList>& tran, NotificationSource /*source*/)
+    {
+        NX_ASSERT(tran.command == ApiCommand::removeStorages);
+        for (const ApiIdData& idData : tran.params)
+            emit storageRemoved(idData.id);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
+    {
+        if (tran.command == ApiCommand::removeMediaServer)
+            emit removed(tran.params.id);
+        else if (tran.command == ApiCommand::removeStorage)
+            emit storageRemoved(tran.params.id);
+        else if (tran.command == ApiCommand::removeServerUserAttributes)
+            emit userAttributesRemoved(tran.params.id);
+        else
+            NX_ASSERT(0, "Invalid transaction", Q_FUNC_INFO);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageDataList>& tran, NotificationSource source)
+    {
+        for (const auto& storage : tran.params)
+            emit storageChanged(storage, source);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiStorageData>& tran, NotificationSource source)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveStorage);
+        emit storageChanged(tran.params, source);
+    }
+
+    void QnMediaServerNotificationManager::triggerNotification(const QnTransaction<ApiMediaServerData>& tran, NotificationSource source)
+    {
+        NX_ASSERT(tran.command == ApiCommand::saveMediaServer);
+        emit addedOrUpdated(tran.params, source);
+    }
+
+
     template<class QueryProcessorType>
-    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
+    QnMediaServerManager<QueryProcessorType>::QnMediaServerManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
     :
-        QnMediaServerNotificationManager( resCtx ),
-        m_queryProcessor( queryProcessor )
-    {
-    }
+      m_queryProcessor( queryProcessor ),
+      m_userAccessData(userAccessData)
+    {}
 
     template<class T>
-    int QnMediaServerManager<T>::getServers( const QUuid& mediaServerId,  impl::GetServersHandlerPtr handler )
+    int QnMediaServerManager<T>::getServers(impl::GetServersHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
-            QnMediaServerResourceList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(servers, outData, m_resCtx);
-            handler->done( reqID, errorCode, outData);
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ec2::ApiMediaServerDataList& servers) {
+            handler->done( reqID, errorCode, servers);
         };
-        m_queryProcessor->template processQueryAsync<QUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServers, mediaServerId, queryDoneHandler);
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServers, QnUuid(), queryDoneHandler);
         return reqID;
     }
 
     template<class T>
-    int QnMediaServerManager<T>::save( const QnMediaServerResourcePtr& resource, impl::SaveServerHandlerPtr handler )
+    int QnMediaServerManager<T>::save(const ec2::ApiMediaServerData& server, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-
-        if (resource->getId().isNull())
-            resource->setId( QUuid::createUuid());
-
-        QnAbstractStorageResourceList storages = resource->getStorages();
-        for (int i = 0; i < storages.size(); ++i)
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveMediaServer,
+            server, [handler, reqID](ec2::ErrorCode errorCode)
         {
-            if (storages[i]->getId().isNull())
-                storages[i]->setId(QUuid::createUuid());
-        }
-        resource->setStorages(storages);
-
-        //performing request
-        auto tran = prepareTransaction( ApiCommand::saveMediaServer, resource );
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SaveServerHandler::done ), handler, reqID, _1, resource ) );
-
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
     template<class T>
-    int QnMediaServerManager<T>::remove( const QUuid& id, impl::SimpleHandlerPtr handler )
+    int QnMediaServerManager<T>::remove( const QnUuid& id, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::removeMediaServer, id );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeMediaServer, ApiIdData(id),
+            [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
         return reqID;
     }
 
     template<class T>
-    QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
+    int QnMediaServerManager<T>::saveUserAttributes(const ec2::ApiMediaServerUserAttributesDataList& serverAttrs, impl::SimpleHandlerPtr handler)
     {
-        QnTransaction<ApiMediaServerData> tran(command);
-        fromResourceToApi(resource, tran.params);
-        return tran;
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveMediaServerUserAttributesList, serverAttrs,
+            [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
     }
 
     template<class T>
-    QnTransaction<ApiIdData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QUuid& id )
+    int QnMediaServerManager<T>::saveStorages( const ec2::ApiStorageDataList& storages, impl::SimpleHandlerPtr handler )
     {
-        QnTransaction<ApiIdData> tran(command);
-        tran.params.id = id;
-        return tran;
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::saveStorages, storages,
+            [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
     }
 
+    template<class T>
+    int QnMediaServerManager<T>::removeStorages( const ApiIdDataList& storages, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+            ApiCommand::removeStorages, storages,
+            [handler, reqID](ec2::ErrorCode errorCode)
+        {
+            handler->done(reqID, errorCode);
+        });
+        return reqID;
+    }
 
-    template class QnMediaServerManager<ServerQueryProcessor>;
+    template<class T>
+    int QnMediaServerManager<T>::getUserAttributes( const QnUuid& mediaServerId, impl::GetServerUserAttributesHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerUserAttributesDataList& serverUserAttributesList ) {
+            handler->done( reqID, errorCode, serverUserAttributesList);
+        };
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiMediaServerUserAttributesDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getMediaServerUserAttributesList, mediaServerId, queryDoneHandler );
+        return reqID;
+    }
+
+    template<class T>
+    int QnMediaServerManager<T>::getStorages( const QnUuid& mediaServerId, impl::GetStoragesHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ec2::ApiStorageDataList& storages )
+        {
+            handler->done( reqID, errorCode, storages );
+        };
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<ParentId, ec2::ApiStorageDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getStorages, mediaServerId, queryDoneHandler );
+        return reqID;
+    }
+
+    template class QnMediaServerManager<ServerQueryProcessorAccess>;
     template class QnMediaServerManager<FixedUrlClientQueryProcessor>;
+
 }

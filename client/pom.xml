@@ -1,93 +1,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
     <parent>
-        <artifactId>cpp</artifactId>
+        <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.3.0-SNAPSHOT</version>
-        <relativePath>../cpp</relativePath>
+        <version>3.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Client</name>
+    <name>Client Package</name>
 
-    <properties>  
-        <product.title>${client.name}</product.title>
-        <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-        <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
-        <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
-        <windows.oslibs.release/>
-        <windows.oslibs.debug/>
-        <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
-        <!--Global defines-->
-        <global.defines>CL_FORCE_LOGO</global.defines>
-        <!--Specific os defines-->
-        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
-        <linux.defines/>
-        <mac.defines/>
-    </properties>   
+    <properties>
+        <root.dir>${basedir}/..</root.dir>
+        <template>app</template>
+        <qt.libs></qt.libs>
+    </properties>
+
+    <modules>
+        <module>applauncher</module>
+        <module>desktop_client</module>
+        <module>libclient</module>
+        <module>libclient_core</module>
+        <module>minilauncher</module>
+        <module>mobile_client</module>
+    </modules>
+
     <profiles>
+        <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
-            <id>windows</id>
+            <id>paxton</id>
             <activation>
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>
-            <build>
-                <plugins>                   
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1.1</version>
-                        <executions>
-                            <execution>
-                                <id>launcher-compile</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <configuration>
-                                    <executable>build-${arch}.bat</executable>
-                                    <workingDirectory>${basedir}/launcher</workingDirectory>        
-                                    <arguments>
-                                        <commandlineArgs>${build.configuration}</commandlineArgs>
-                                    </arguments>
-                                </configuration>
-                            </execution>                            
-                        </executions>
-                    </plugin>   
-                </plugins>
-            </build>
-        </profile>  
-
-        <profile>
-            <id>webkit-win</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>    
                 <property>
-                    <name>webkit</name>
-                    <value>!false</value>
-                </property>                  
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>customization/${customization}/paxton.skip</missing>
+                </file>
             </activation>
-            <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-            </properties>
-        </profile>  
+            <modules>
+                <module>activex_client</module>
+            </modules>
+        </profile>
     </profiles>
+
 </project>

@@ -16,10 +16,10 @@ QnPlaybackMaskHelper::QnPlaybackMaskHelper()
 qint64 QnPlaybackMaskHelper::findTimeAtPlaybackMask(qint64 timeUsec, bool isForwardDirection)
 {
     qint64 timeMs = timeUsec/1000;
-    if (m_playbackMask.isEmpty() || m_curPlaybackPeriod.contains(timeMs))
+    if (m_playbackMask.empty() || m_curPlaybackPeriod.contains(timeMs))
         return timeUsec;
     QnTimePeriodList::const_iterator itr = m_playbackMask.findNearestPeriod(timeMs, isForwardDirection);
-    if (itr == m_playbackMask.constEnd()) 
+    if (itr == m_playbackMask.cend())
         return isForwardDirection ? DATETIME_NOW : 0;
     
     m_curPlaybackPeriod = *itr;
@@ -49,8 +49,8 @@ void QnPlaybackMaskHelper::setPlaybackRange(const QnTimePeriod& playbackRange)
     
     if (m_playbackRange.isEmpty())
         m_playbackMask = m_playBackMaskOrig;
-    else if (m_playbackMask.isEmpty())
-        m_playbackMask << playbackRange;
+    else if (m_playbackMask.empty())
+        m_playbackMask.push_back(playbackRange);
     else
         m_playbackMask = m_playbackMask.intersected(playbackRange);
     m_curPlaybackPeriod.clear();
@@ -65,16 +65,16 @@ void QnPlaybackMaskHelper::setPlaybackMask(const QnTimePeriodList& playbackMask)
         m_playbackMask = playbackMask;
     else {
         m_playbackMask = playbackMask.intersected(m_playbackRange);
-        if (m_playbackMask.isEmpty() && !m_playbackRange.isEmpty())
-            m_playbackMask << m_playbackRange;
+        if (m_playbackMask.empty() && !m_playbackRange.isEmpty())
+            m_playbackMask.push_back(m_playbackRange);
     }
     m_curPlaybackPeriod.clear();
 }
 
 qint64 QnPlaybackMaskHelper::endTimeMs() const
 {
-    if (m_playbackMask.isEmpty())
+    if (m_playbackMask.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_playbackMask.last().endTimeMs();
+        return (m_playbackMask.end()-1)->endTimeMs();
 }

@@ -335,9 +335,9 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 PixelFormat QuickSyncVideoDecoder::GetPixelFormat() const
 {
 #ifndef CONVERT_NV12_TO_YV12
-    return PIX_FMT_NV12;
+    return AV_PIX_FMT_NV12;
 #else
-    return PIX_FMT_YUV420P;
+    return AV_PIX_FMT_YUV420P;
 #endif
 }
 
@@ -365,7 +365,7 @@ bool QuickSyncVideoDecoder::decode( const QnConstCompressedVideoDataPtr data, QS
     memset( &inputStream, 0, sizeof(inputStream) );
     if( data && data->data.size() > 0 )
     {
-        Q_ASSERT( data->compressionType == CODEC_ID_H264 );
+        NX_ASSERT( data->compressionType == AV_CODEC_ID_H264 );
 
         const DWORD millisSincePrevInputFrame = (m_prevInputFrameMs != (DWORD)-1) ? (GetTickCount() - m_prevInputFrameMs) : 0;
         const bool delayedInputFrame = millisSincePrevInputFrame > (m_sourceStreamFps > 0 ? 1000 / m_sourceStreamFps : 50)*3;
@@ -990,7 +990,7 @@ void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSizeVal )
 
     const double originalAspectRatio = (double)originalSize.width() / originalSize.height();
 
-    Q_ASSERT( originalSize.width() > 0 && originalSize.height() > 0 );
+    NX_ASSERT( originalSize.width() > 0 && originalSize.height() > 0 );
 
     //TODO/IMPL preserving original aspect ratio
     const double requestedWidthCompression = (double)outSize.width() / originalSize.width();
@@ -1280,7 +1280,7 @@ bool QuickSyncVideoDecoder::initMfxSession()
 
 bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader )
 {
-    Q_ASSERT( m_mfxSessionEstablished );
+    NX_ASSERT( m_mfxSessionEstablished );
 
     NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. Initializing decoder..."), cl_logDEBUG1 );
 
@@ -1442,7 +1442,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
 #ifdef SCALE_WITH_MFX
 bool QuickSyncVideoDecoder::initProcessor()
 {
-    Q_ASSERT( m_decodingInitialized );
+    NX_ASSERT( m_decodingInitialized );
 
     NX_LOG( QString::fromLatin1("QuickSyncVideoDecoder. Initializing VPP processor..."), cl_logDEBUG1 );
 
@@ -2167,7 +2167,7 @@ void QuickSyncVideoDecoder::saveToAVFrame(
             outFrame->reallocate(
                 decodedFrame->Data.Pitch,
                 decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual),
-                !convertNV12ToYV12 ? PIX_FMT_NV12 : PIX_FMT_YUV420P,
+                !convertNV12ToYV12 ? AV_PIX_FMT_NV12 : AV_PIX_FMT_YUV420P,
                 decodedFrame->Data.Pitch );
 
     #ifdef USE_SYSMEM_SURFACE
@@ -2222,7 +2222,7 @@ void QuickSyncVideoDecoder::saveToAVFrame(
     const QSize& originalPictureSize = getOriginalPictureSize();
     outFrame->width = originalPictureSize.width();
     outFrame->height = originalPictureSize.height();
-    outFrame->format = !convertNV12ToYV12 ? PIX_FMT_NV12 : PIX_FMT_YUV420P;
+    outFrame->format = !convertNV12ToYV12 ? AV_PIX_FMT_NV12 : AV_PIX_FMT_YUV420P;
     //outFrame->key_frame = decodedFrame->Data.
     //outFrame->pts = av_rescale_q( decodedFrame->Data.TimeStamp, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION, SRC_DATA_TIMESTAMP_RESOLUTION );
     outFrame->pts = decodedFrame->Data.TimeStamp;
@@ -2258,7 +2258,7 @@ mfxStatus QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputSt
          curNalu = nextNalu )
     {
         nextNalu = NALUnit::findNextNAL( curNalu, dataEnd );
-        Q_ASSERT( nextNalu > curNalu );
+        NX_ASSERT( nextNalu > curNalu );
         switch( *curNalu & 0x1f )
         {
             case nuSPS:
@@ -2839,8 +2839,8 @@ mfxStatus QuickSyncVideoDecoder::doDecodingStep( mfxBitstream* const inputStream
         }
         break;
     }
-    Q_ASSERT( workingSurface.data() );
-    Q_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
+    NX_ASSERT( workingSurface.data() );
+    NX_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
 
 #ifdef WRITE_INPUT_STREAM_TO_FILE_2
     const int dataOffsetBak = inputStream->DataOffset;
@@ -2878,8 +2878,8 @@ mfxStatus QuickSyncVideoDecoder::doProcessingStep( QSharedPointer<SurfaceContext
         }
         break;
     }
-    Q_ASSERT( scaledFrameCtx->data() );
-    Q_ASSERT( (*scaledFrameCtx)->mfxSurface.Data.Locked == 0 );
+    NX_ASSERT( scaledFrameCtx->data() );
+    NX_ASSERT( (*scaledFrameCtx)->mfxSurface.Data.Locked == 0 );
 
     mfxStatus opStatus = MFX_ERR_NONE;
 

@@ -10,6 +10,7 @@
 #include <business/business_fwd.h>
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace QnBusiness
 {
@@ -18,6 +19,13 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
+    bool canBeInstant(ActionType actionType);
+    bool supportsDuration(ActionType actionType);
+    bool allowsAggregation(ActionType actionType);
+
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
+
+    QList<ActionType> allActions();
 }
 
 
@@ -32,17 +40,20 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessAction();
-    QnBusiness::ActionType actionType() const { return m_actionType; }
+
+    QnBusiness::ActionType actionType() const;
 
     /**
      * Resource depend of action type.
      * see: QnBusiness::requiresCameraResource()
      * see: QnBusiness::requiresUserResource()
      */
-    void setResources(const QVector<QUuid>& resources);
+    void setResources(const QVector<QnUuid>& resources);
 
-    const QVector<QUuid>& getResources() const;
-    QnResourceList getResourceObjects() const;
+    const QVector<QnUuid>& getResources() const;
+
+    /** Source resource of the action (including custom for generic events). */
+    QVector<QnUuid> getSourceResources() const;
 
     void setParams(const QnBusinessActionParameters& params);
     const QnBusinessActionParameters& getParams() const;
@@ -51,8 +62,8 @@ public:
     void setRuntimeParams(const QnBusinessEventParameters& params);
     const QnBusinessEventParameters& getRuntimeParams() const;
 
-    void setBusinessRuleId(const QUuid& value);
-    QUuid getBusinessRuleId() const;
+    void setBusinessRuleId(const QnUuid& value);
+    QnUuid getBusinessRuleId() const;
 
     void setToggleState(QnBusiness::EventState value);
     QnBusiness::EventState getToggleState() const;
@@ -64,7 +75,9 @@ public:
     void setAggregationCount(int value);
     int getAggregationCount() const;
 
-    /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId 
+    bool isProlonged() const;
+
+    /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId
      * This function help to share physical resources between actions
      * Do not used for instant actions
      */
@@ -74,10 +87,10 @@ protected:
     QnBusiness::ActionType m_actionType;
     QnBusiness::EventState m_toggleState;
     bool m_receivedFromRemoteHost;
-    QVector<QUuid> m_resources;
+    QVector<QnUuid> m_resources;
     QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
-    QUuid m_businessRuleId; // business rule that generated this action
+    QnUuid m_businessRuleId; // business rule that generated this action
     int m_aggregationCount;
 };
 
@@ -87,45 +100,24 @@ class QnBusinessActionData
 public:
     // TODO: #EC2 Add comments. Maybe remove the flag altogether. What is it for? Which actions?
     enum Flags {
-        MotionExists = 1
+        VideoLinkExists = 1
     };
 
-    QnBusinessActionData(): m_actionType(QnBusiness::UndefinedAction), m_flags(0) {}
+    QnBusinessActionData(): actionType(QnBusiness::UndefinedAction), flags(0) {}
+    bool hasFlags(int value) const { return flags & value; }
 
-    QnBusiness::ActionType actionType() const { return m_actionType; }
-    void setActionType(QnBusiness::ActionType type) { m_actionType = type; }
+    QnBusiness::ActionType actionType;
+    QnBusinessActionParameters actionParams;
+    QnBusinessEventParameters eventParams;
+    QnUuid businessRuleId;
+    int aggregationCount;
 
-    void setParams(const QnBusinessActionParameters& params) { m_params = params;}
-    const QnBusinessActionParameters& getParams() const { return m_params; }
-
-    void setRuntimeParams(const QnBusinessEventParameters& params) {m_runtimeParams = params;}
-    const QnBusinessEventParameters& getRuntimeParams() const {return m_runtimeParams; }
-
-    void setBusinessRuleId(const QUuid& value) {m_businessRuleId = value; }
-    QUuid getBusinessRuleId() const { return m_businessRuleId; }
-
-    void setAggregationCount(int value) { m_aggregationCount = value; }
-    int getAggregationCount() const { return m_aggregationCount; }
-
-    qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
-    QnBusiness::EventType eventType() const { return m_runtimeParams.getEventType(); }
-
-    void setCompareString(const QString& value) { m_compareString = value; }
-    const QString& compareString() const { return m_compareString; }
-
-    void setFlags(int value) { m_flags = value; }
-    int flags() const { return m_flags; }
-    bool hasFlags(int flags) const { return m_flags & flags; }
-
-protected:
-    QnBusiness::ActionType m_actionType;
-    QnBusinessActionParameters m_params;
-    QnBusinessEventParameters m_runtimeParams;
-    QUuid m_businessRuleId; 
-    int m_aggregationCount;
-    QString m_compareString;
-    int m_flags;
+    int flags;
+    QString compareString; // todo: this string is used on a client side for internal purpose. Need to move it to separate class
 };
+
+#define QnBusinessActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
+QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionData, (ubjson)(json)(xml)(csv_record));
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionList)

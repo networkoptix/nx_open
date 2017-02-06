@@ -1,7 +1,5 @@
 #include "avi_resource.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QDir>
 
 #include "avi_archive_delegate.h"
@@ -9,7 +7,7 @@
 #include <core/resource/storage_resource.h>
 #include <utils/fs/file.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <plugins/resource/avi/single_shot_file_reader.h>
 
 #include "plugins/storage/file_storage/layout_storage_resource.h"
@@ -68,6 +66,12 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
     return QnMediaResource::getVideoLayout();
 }
 
+bool QnAviResource::hasVideo(const QnAbstractStreamDataProvider* dataProvider) const
+{
+    return dataProvider ? dataProvider->hasVideo() : true;
+}
+
+
 QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
@@ -106,5 +110,3 @@ qint64 QnAviResource::timeZoneOffset() const
 {
     return m_timeZoneOffset;
 }
-
-#endif // ENABLE_ARCHIVE

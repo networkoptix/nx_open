@@ -34,12 +34,12 @@ namespace ec2
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
         //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QUuid peer);
-        void at_peerLost(QUuid peer);
+        void at_newPeerFound(QnUuid peer);
+        void at_peerLost(QnUuid peer);
         void releaseMutex(const QString& name);
     private:
         QMap<QString, QnDistributedMutex*> m_mutexList;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         qint64 m_timestamp;
         QnMutexUserDataHandler* m_userDataHandler;
     };

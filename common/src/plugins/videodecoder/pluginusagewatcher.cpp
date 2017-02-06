@@ -5,9 +5,9 @@
 #include "pluginusagewatcher.h"
 
 #include <QtCore/QDateTime>
-#include <QtCore/QMutexLocker>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 static const size_t SHARED_MEMORY_SIZE = 16*1024;
@@ -72,13 +72,13 @@ PluginUsageWatcher::~PluginUsageWatcher()
 
 size_t PluginUsageWatcher::currentSessionCount() const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_currentSessions.size();
 }
 
 stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //reading usage from shared memory
     const quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
@@ -117,14 +117,14 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 
 void PluginUsageWatcher::decoderCreated( stree::AbstractResourceReader* const decoder )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     m_currentSessions.insert( decoder );
 }
 
 void PluginUsageWatcher::decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     m_currentSessions.erase( decoder );
 
@@ -147,7 +147,7 @@ bool PluginUsageWatcher::updateUsageParams()
         m_usageRecordID = ++m_totalUsageArray.prevUsageRecordID;
         NX_LOG( lit("PluginUsageWatcher. Selected usage record id %1").arg(m_usageRecordID), cl_logDEBUG1 );
     }
-    localUsage.sequence = m_usageRecordID;
+    localUsage.sequence = static_cast<quint32>(m_usageRecordID);
     localUsage.updateClock = QDateTime::currentMSecsSinceEpoch();
     m_totalUsageArray.records.push_back( localUsage );
 
@@ -184,7 +184,7 @@ void PluginUsageWatcher::run()
 
 bool PluginUsageWatcher::lockSharedMemory()
 {
-    Q_ASSERT( !m_sharedMemoryLocked );
+    NX_ASSERT( !m_sharedMemoryLocked );
     m_sharedMemoryLocked = m_sharedMemoryLocker.lock();
     if( !m_sharedMemoryLocked )
     {
@@ -196,7 +196,7 @@ bool PluginUsageWatcher::lockSharedMemory()
 
 bool PluginUsageWatcher::unlockSharedMemory()
 {
-    Q_ASSERT( m_sharedMemoryLocked );
+    NX_ASSERT( m_sharedMemoryLocked );
     m_sharedMemoryLocked = !m_sharedMemoryLocker.unlock();
     if( m_sharedMemoryLocked )
     {
@@ -231,22 +231,22 @@ UsageRecord PluginUsageWatcher::currentUsage() const
         ++it )
     {
         unsigned int framePictureSize = 0;
-        if( (*it)->getTypedVal( DecoderParameter::framePictureSize, &framePictureSize ) )
+        if( (*it)->get( DecoderParameter::framePictureSize, &framePictureSize ) )
             rec.framePictureSize += framePictureSize;
 
         double fps = 0;
-        if( (*it)->getTypedVal( DecoderParameter::fps, &fps ) )
+        if( (*it)->get( DecoderParameter::fps, &fps ) )
             rec.fps += fps;
 
         quint64 pixelsPerSecond = 0;
-        if( (*it)->getTypedVal( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
+        if( (*it)->get( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
             rec.pixelsPerSecond += pixelsPerSecond;
 
         quint64 videoMemoryUsage = 0;
-        if( (*it)->getTypedVal( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
+        if( (*it)->get( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
             rec.videoMemoryUsage += videoMemoryUsage;
     }
-    rec.simultaneousStreamCount = m_currentSessions.size();
+    rec.simultaneousStreamCount = static_cast<quint32>(m_currentSessions.size());
 
     return rec;
 }

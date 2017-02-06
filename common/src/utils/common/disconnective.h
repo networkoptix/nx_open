@@ -25,7 +25,7 @@ public:
     }
 
     void disconnectAll() {
-        foreach(const QMetaObject::Connection &connection, m_connections)
+        for(const QMetaObject::Connection &connection: m_connections)
             QObject::disconnect(connection);
         m_connections.clear();
     }

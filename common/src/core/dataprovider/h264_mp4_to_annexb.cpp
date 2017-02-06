@@ -6,7 +6,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 
 H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSource )
@@ -19,8 +19,8 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSou
 QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )
 {
     static const quint8 START_CODE[] = { 0, 0, 0, 1 };
-    QnCompressedVideoDataPtr srcVideoPacket = data->dynamicCast<QnCompressedVideoData>();
-    if( !srcVideoPacket || srcVideoPacket->compressionType != CODEC_ID_H264 )
+    QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data->get());
+    if( !srcVideoPacket || srcVideoPacket->compressionType != AV_CODEC_ID_H264 )
         return *data;
     if( srcVideoPacket->data()[3] == 1 )
         return *data;   //already in annexb format. TODO #ak: format validation is too weak
@@ -41,15 +41,16 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 
     if( m_isFirstPacket && isH264SeqHeaderInExtraData( videoPacket ) )
     {
-        m_newContext = QnMediaContextPtr( new QnMediaContext(videoPacket->context->ctx()) );
+        m_newContext = QnConstMediaContextPtr(!videoPacket->context? nullptr :
+            videoPacket->context->cloneWithoutExtradata());
 
         //reading sequence header from extradata
         std::basic_string<quint8> seqHeader;
         readH264SeqHeaderFromExtraData( videoPacket, &seqHeader );
         if( seqHeader.size() > 0 )
         {
-            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, seqHeader.size() + videoPacket->dataSize() );
-            mediaDataWithSeqHeader.resize( seqHeader.size() + videoPacket->dataSize() );
+            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
+            mediaDataWithSeqHeader.resize( static_cast<unsigned int>(seqHeader.size() + videoPacket->dataSize()) );
             memcpy( mediaDataWithSeqHeader.data(), seqHeader.data(), seqHeader.size() );
             memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), videoPacket->data(), videoPacket->dataSize() );
             videoPacket->m_data = mediaDataWithSeqHeader;
@@ -57,8 +58,6 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 
             //TODO #ak: monitor sequence header change
         }
-
-        m_newContext->ctx()->extradata_size = 0;
     }
 
     videoPacket->context = m_newContext;
@@ -76,14 +75,21 @@ static const quint8 H264_START_CODE[] = { 0, 0, 0, 1 };
 
 bool H264Mp4ToAnnexB::isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr& data ) const
 {
-    return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
+    return data->context &&
+        data->context->getExtradataSize() >= 7 &&
+        data->context->getExtradata()[0] == 1;
 }
 
+// TODO: Code duplication with "h264_utils.cpp".
+/**
+ * @param data data->context should not be null.
+ */
 void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
     const QnAbstractMediaDataPtr& data,
     std::basic_string<quint8>* const seqHeader )
 {
-    const unsigned char* p = data->context->ctx()->extradata;
+    NX_ASSERT(data->context);
+    const unsigned char* p = data->context->getExtradata();
 
     //sps & pps is in the extradata, parsing it...
     //following code has been taken from libavcodec/h264.c
@@ -98,11 +104,11 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
     int cnt = *(p + 5) & 0x1f; // Number of sps
     p += 6;
 
-    for( int i = 0; i < cnt; i++ )
+    for (int i = 0; i < cnt; i++)
     {
         const int nalsize = AV_RB16(p);
         p += 2; //skipping nalusize
-        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+        if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
         seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
         seqHeader->append( p, nalsize );
@@ -111,13 +117,12 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
 
     // Decode pps from avcC
     cnt = *(p++); // Number of pps
-    for( int i = 0; i < cnt; ++i )
+    for (int i = 0; i < cnt; ++i)
     {
         const int nalsize = AV_RB16(p);
         p += 2;
-        if( nalsize > data->context->ctx()->extradata_size - (p-data->context->ctx()->extradata) )
+        if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
-
         seqHeader->append( H264_START_CODE, sizeof(H264_START_CODE) );
         seqHeader->append( p, nalsize );
         p += nalsize;

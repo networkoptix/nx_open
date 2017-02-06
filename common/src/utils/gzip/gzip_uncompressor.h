@@ -6,7 +6,9 @@
 #ifndef GZIP_UNCOMPRESSOR_H
 #define GZIP_UNCOMPRESSOR_H
 
-#ifdef Q_OS_MACX
+#include <QtCore/QtGlobal>
+
+#if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #include <zlib.h>
 #else
 #include <QtZlib/zlib.h>
@@ -18,14 +20,14 @@
 //!Deflates gzip-compressed stream. Suitable for decoding gzip http content encoding
 class GZipUncompressor
 :
-    public AbstractByteStreamConverter
+    public AbstractByteStreamFilter
 {
 public:
     GZipUncompressor( const std::shared_ptr<AbstractByteStreamFilter>& nextFilter = std::shared_ptr<AbstractByteStreamFilter>() );
     virtual ~GZipUncompressor();
 
     //!Implementation of \a AbstractByteStreamFilter::processData
-    virtual void processData( const QnByteArrayConstRef& data ) override;
+    virtual bool processData( const QnByteArrayConstRef& data ) override;
     //!Implementation of \a AbstractByteStreamFilter::flush
     virtual size_t flush() override;
 

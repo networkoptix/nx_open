@@ -13,10 +13,9 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QVector4D>
 
-#include <common/config.h>
-
-#include "fuzzy.h"
-#include "defines.h"
+#include <nx/utils/compiler_options.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/math/fuzzy.h>
 
 namespace QnMathDetail {
     using ::qFuzzyIsNull;
@@ -50,7 +49,7 @@ inline bool qIsNaN(const QVector4D &vector) {
 template<class T> inline T qQNaN();
 template<class T> inline T qSNaN();
 
-#define QN_DEFINE_NAN_FUNCTION(TYPE, NAME, VALUE) template<> inline TYPE NAME<TYPE>() { return VALUE; }                           
+#define QN_DEFINE_NAN_FUNCTION(TYPE, NAME, VALUE) template<> inline TYPE NAME<TYPE>() { return VALUE; }
 QN_DEFINE_NAN_FUNCTION(float, qQNaN, std::numeric_limits<float>::quiet_NaN())
 QN_DEFINE_NAN_FUNCTION(float, qSNaN, std::numeric_limits<float>::signaling_NaN())
 QN_DEFINE_NAN_FUNCTION(double, qQNaN, std::numeric_limits<double>::quiet_NaN())
@@ -83,8 +82,12 @@ inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigE
 
 /* Note that we have to use #defines here so that these functions work even if
  * they are also defined in system network headers. */
+#ifndef htonll
 #define htonll qn_htonll
+#endif
+#ifndef ntohll
 #define ntohll qn_ntohll
+#endif
 
 
 /**
@@ -102,12 +105,12 @@ inline bool qIsPower2(T value) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Ceil(unsigned int value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
 inline quint64 qPower2Ceil(quint64 value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
@@ -117,13 +120,13 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Floor(unsigned int value, int step) {
-    DEBUG_CODE(assert(qIsPower2(step)));
+    DEBUG_CODE(NX_ASSERT(qIsPower2(step)));
     return value & ~(step - 1);
 }
 
 /**
  * Modulo function that never returns negative values.
- * 
+ *
  * \param l                             The dividend.
  * \param r                             The divisor.
  * \returns                             Non-negative modulo.
@@ -155,7 +158,7 @@ inline double qMod(double l, double r) {
  */
 template<class T, class Step>
 T qCeil(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     T mod = qMod(value, static_cast<T>(step));
     return QnMathDetail::qFuzzyIsNull(mod) ? value : static_cast<T>(value - mod + step);
 }
@@ -167,7 +170,7 @@ T qCeil(T value, Step step) {
  */
 template<class T, class Step>
 T qFloor(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     return value - qMod(value, static_cast<T>(step));
 }
 
@@ -178,12 +181,12 @@ T qFloor(T value, Step step) {
  */
 template<class T, class Step>
 T qRound(T value, Step step) {
-    DEBUG_CODE(assert(step > 0));
+    DEBUG_CODE(NX_ASSERT(step > 0));
     return qFloor(value + static_cast<T>(step) / 2, step);
 }
 
 /**
- * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.  
+ * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.
  *                                      (1 << IntegerLog2(x)) is a mask for the most significant bit of x.
  *                                      Result is undefined if input is zero.
  */

@@ -5,14 +5,22 @@
 
 namespace ec2 {
 
-    struct ApiConnectionData : ApiData {
-        QUuid discovererId;
-        QUuid peerId;
+    struct ApiConnectionData : ApiData 
+    {
+        ApiConnectionData(): port(0) {}
+
+        QnUuid peerId;
         QString host;
         int port;
+
+        bool operator ==(const ApiConnectionData &other) const {
+            return  peerId == other.peerId &&
+                    host == other.host &&
+                    port == other.port;
+        }
     };
 
-#define ApiConnectionData_Fields (discovererId)(peerId)(host)(port)
+#define ApiConnectionData_Fields (peerId)(host)(port)
 
 } // namespace ec2
 

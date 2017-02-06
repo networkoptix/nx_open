@@ -3,5 +3,6 @@
     "platform" : "${platform}",
     "arch" : "${arch}",
     "modification" : "${modification}",
+    "cloudHost" : "${cloudHost}",
     "executable" : "install.bat"
 }

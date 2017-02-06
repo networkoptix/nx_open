@@ -3,52 +3,57 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include "param.h"
 #include "utils/common/id.h"
+#include "core/resource/resource_fwd.h"
 
-class QN_EXPORT QnResourceType
+typedef QMap<QString, QString> ParamTypeMap;
+
+class QnResourceType
 {
 public:
     QnResourceType();
     //QnResourceType(const QString& name);
     virtual ~QnResourceType();
 
-    void setId(const QUuid& value) { m_id = value; }
-    QUuid getId() const { return m_id;}
+    void setId(const QnUuid& value) { m_id = value; }
+    const QnUuid& getId() const { return m_id;}
 
-    void setParentId(const QUuid &value);
-    QUuid getParentId() const { return m_parentId;}
+    void setParentId(const QnUuid &value);
+    const QnUuid& getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
-    QString getName() const { return m_name;}
+    const QString& getName() const { return m_name;}
 
     void setManufacture(const QString& value) { m_manufacture = value; }
-    QString getManufacture() const { return m_manufacture;}
+    const QString& getManufacture() const { return m_manufacture;}
 
     bool isCamera() const;
 
-    void addAdditionalParent(QUuid parent);
-    QList<QUuid> allParentList() const;
+    void addAdditionalParent(const QnUuid& parent);
+    QList<QnUuid> allParentList() const;
 
-    void addParamType(QnParamTypePtr param);
+    void addParamType(const QString& name, const QString& defaultValue);
+    bool hasParam(const QString& name) const;
 
-    const QList<QnParamTypePtr>& paramTypeList() const;
+    const ParamTypeMap& paramTypeListUnsafe() const;
+    const ParamTypeMap paramTypeList() const;
 
+    QString defaultValue(const QString& key) const;
 private:
-    QUuid m_id;
-    QUuid m_parentId;
+    QnUuid m_id;
+    QnUuid m_parentId;
     QString m_name;
     QString m_manufacture;
-    QList<QUuid> m_additionalParentList;
+    QList<QnUuid> m_additionalParentList;
 
-    typedef QList<QnParamTypePtr> ParamTypeList;
-    ParamTypeList m_paramTypeList;
+    ParamTypeMap m_paramTypeList;
 
-    mutable QMutex m_allParamTypeListCacheMutex;
-    mutable QSharedPointer<ParamTypeList> m_allParamTypeListCache;
+    mutable QnMutex m_allParamTypeListCacheMutex;
+    mutable QSharedPointer<ParamTypeMap> m_allParamTypeListCache;
 
     mutable bool m_isCamera;
     mutable bool m_isCameraSet;
@@ -59,33 +64,45 @@ Q_DECLARE_METATYPE(QnResourceTypeList)
 class QN_EXPORT QnResourceTypePool
 {
 public:
-    typedef QMap<QUuid, QnResourceTypePtr> QnResourceTypeMap;
+    typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
+
+    static const QString kLayoutTypeId;
+    static const QString kServerTypeId;
+    static const QString kVideoWallTypeId;
+    static const QString kWebPageTypeId;
+    static const QString kStorageTypeId;
+    static const QString kUserTypeId;
+
+    static const QnUuid kUserTypeUuid;
+    static const QnUuid kServerTypeUuid;
+    static const QnUuid kStorageTypeUuid;
+    static const QnUuid kLayoutTypeUuid;
+    static const QnUuid kDesktopCameraTypeUuid;
 
     static QnResourceTypePool *instance();
 
     QnResourceTypePtr getResourceTypeByName(const QString& name) const;
-    QnResourceTypePtr getResourceType(QUuid id) const;
+    QnResourceTypePtr getResourceType(QnUuid id) const;
     void addResourceType(QnResourceTypePtr resourceType);
-    void addResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
-    void replaceResourceTypeList(const QList<QnResourceTypePtr>& resourceType);
+    void replaceResourceTypeList(const QnResourceTypeList& resourceType);
 
     /* exact match name */
-    QUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
+    QnUuid getResourceTypeId(const QString& manufacture, const QString& name, bool showWarning = true) const;
 
     /* exact match name for fixed resourceTypes (Layout, Server, etc) */
-    QUuid getFixedResourceTypeId(const QString& name) const;
+    static QnUuid getFixedResourceTypeId(const QString& name);
 
     /* match name using like operation */
-    QUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
+    QnUuid getLikeResourceTypeId(const QString& manufacture, const QString& name) const;
 
     QnResourceTypeMap getResourceTypeMap() const;
 
     bool isEmpty() const;
 
-    QnResourceTypePtr desktopCameraResourceType() const;
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;
+    mutable QnResourceTypePtr m_desktopCamResourceType;
 };
 
 #define qnResTypePool QnResourceTypePool::instance()

@@ -2,52 +2,104 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/common/model_functions.h>
+#include <api/app_server_connection.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource/param.h>
+
+#include <nx_ec/data/api_camera_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+
+#include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 #include <utils/math/math.h>
+#include <utils/crypt/symmetrical.h>
 
-#include <api/app_server_connection.h>
-#include "nx_ec/dummy_handler.h"
-
+namespace {
 
 static const float MAX_EPS = 0.01f;
-static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
-static const qint64 ISSUE_KEEP_TIMEOUT = 1000000ll * 60;
+static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
+static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
+static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
+
+bool storeUrlForRole(Qn::ConnectionRole role)
+{
+    switch (role)
+    {
+        case Qn::CR_LiveVideo:
+        case Qn::CR_SecondaryLiveVideo:
+            return true;
+        default:
+            break;
+    }
+    return false;
+}
+
+} //anonymous namespace
 
 QnVirtualCameraResource::QnVirtualCameraResource():
-    m_dtsFactory(0)
+    m_dtsFactory(0),
+    m_issueCounter(0),
+    m_lastIssueTimer()
 {}
 
-QnPhysicalCameraResource::QnPhysicalCameraResource(): 
+QString QnVirtualCameraResource::getUniqueId() const
+{
+    return getPhysicalId();
+}
+
+QString QnVirtualCameraResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result)
+        << QnNetworkResource::toSearchString()
+        << " "
+        << getModel()
+        << " "
+        << getFirmware()
+        << " "
+        << getVendor(); //TODO: #Elric evil!
+    return result;
+}
+
+QnPhysicalCameraResource::QnPhysicalCameraResource():
     QnVirtualCameraResource(),
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
-    // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
-    // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
+    float lowEnd = 0.1f;
+    float hiEnd = 1.0f;
 
-    int hiEnd = 1024*10;
-    int lowEnd = 1024*1;
+    float qualityFactor = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
 
-    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
-    resolutionFactor = pow(resolutionFactor, (float)0.5);
+    float resolutionFactor = 0.009f * pow(resolution.width() * resolution.height(), 0.7f);
 
-    float frameRateFactor = fps/30.0;
-    frameRateFactor = pow(frameRateFactor, (float)0.4);
+    float frameRateFactor = fps/1.0f;
 
-    int result = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
-    result *= (resolutionFactor * frameRateFactor);
+    float result = qualityFactor*frameRateFactor * resolutionFactor;
 
-    return qMax(192,result);
+    return qMax(192.0, result);
+}
+
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role) const
+{
+    QN_UNUSED(role);
+
+    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
+
+    if (bitratePerGopType() != Qn::BPG_None)
+        result = result * (30.0 / (qreal)fps);
+
+    return (int) result;
 }
 
 int QnPhysicalCameraResource::getChannel() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_channelNumber;
 }
 
@@ -55,7 +107,7 @@ void QnPhysicalCameraResource::setUrl(const QString &urlStr)
 {
     QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QUrl url( urlStr );
     m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
     setHttpPort( url.port( httpPort() ) );
@@ -71,6 +123,9 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
     // SD NTCS/PAL resolutions have non standart SAR. fix it
     if (resolution.width() == 720 && (resolution.height() == 480 || resolution.height() == 576))
         result = float(4.0 / 3.0);
+    // SD NTCS/PAL resolutions have non standart SAR. fix it
+    else if (resolution.width() == 960 && (resolution.height() == 480 || resolution.height() == 576))
+        result = float(16.0 / 9.0);
     return result;
 }
 
@@ -122,13 +177,185 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
     return CameraDiagnostics::NoErrorResult();
 }
 
+bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreams& streams )
+{
+    bool rez = false;
+    for (const auto& streamInfo: streams.streams)
+        rez |= saveMediaStreamInfoIfNeeded(streamInfo);
+    return rez;
+}
+
+bool QnPhysicalCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo )
+{
+    auto bitrateInfos = QJson::deserialized<CameraBitrates>(
+        getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toLatin1() );
+
+    auto it = std::find_if(bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
+                           [&](const CameraBitrateInfo& info)
+                           { return info.encoderIndex == bitrateInfo.encoderIndex; });
+
+    if (it != bitrateInfos.streams.end())
+    {
+        const auto time = QDateTime::fromString(bitrateInfo.timestamp, Qt::ISODate);
+        const auto lastTime = QDateTime::fromString(it->timestamp, Qt::ISODate);
+
+        // Generally update should not happen more often than once per
+        // UPDATE_BITRATE_TIMEOUT_DAYS
+        if (lastTime.isValid() && lastTime < time &&
+            lastTime.addDays(UPDATE_BITRATE_TIMEOUT_DAYS) > time)
+        {
+            // If camera got configured we shell update anyway
+            bool isGotConfigured = bitrateInfo.isConfigured &&
+                it->isConfigured != bitrateInfo.isConfigured;
+
+            if (!isGotConfigured)
+                return false;
+        }
+
+        // override old data
+        *it = bitrateInfo;
+    }
+    else
+    {
+        // add new record
+        bitrateInfos.streams.push_back(std::move(bitrateInfo));
+    }
+
+    setProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
+                QString::fromUtf8(QJson::serialized(bitrateInfos)));
+
+    return true;
+}
+
+bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
+{
+    if (newParams.codec != oldParams.codec)
+        return false;
+    bool streamParamsMatched = newParams.customStreamParams == oldParams.customStreamParams ||
+         (newParams.customStreamParams.empty() && !oldParams.customStreamParams.empty());
+    bool resolutionMatched = newParams.resolution == oldParams.resolution ||
+         ((newParams.resolution == CameraMediaStreamInfo::anyResolution) && (oldParams.resolution != CameraMediaStreamInfo::anyResolution));
+    return streamParamsMatched && resolutionMatched;
+}
+
+#if !defined(EDGE_SERVER) && !defined(__arm__)
+#define TRANSCODING_AVAILABLE
+static const bool transcodingAvailable = true;
+#else
+static const bool transcodingAvailable = false;
+#endif
+
+bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStreamInfo& mediaStreamInfo )
+{
+    //saving hasDualStreaming flag before locking mutex
+    const auto hasDualStreamingLocal = hasDualStreaming2();
+
+    //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
+    QnMutexLocker lk( &m_mediaStreamsMutex );
+
+    //get saved stream info with index encoderIndex
+    const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
+    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>( mediaStreamsStr.toLatin1() );
+
+    const bool isTranscodingAllowedByCurrentMediaStreamsParam = std::find_if(
+        supportedMediaStreams.streams.begin(),
+        supportedMediaStreams.streams.end(),
+        []( const CameraMediaStreamInfo& mediaInfo ) {
+            return mediaInfo.transcodingRequired;
+        } ) != supportedMediaStreams.streams.end();
+
+    bool needUpdateStreamInfo = true;
+    if( isTranscodingAllowedByCurrentMediaStreamsParam == transcodingAvailable )
+    {
+        //checking if stream info has been changed
+        for( auto it = supportedMediaStreams.streams.begin();
+            it != supportedMediaStreams.streams.end();
+            ++it )
+        {
+            if( it->encoderIndex == mediaStreamInfo.encoderIndex )
+            {
+                if( *it == mediaStreamInfo)
+                    needUpdateStreamInfo = false;
+                //if new media stream info does not contain resolution, preferring existing one
+                if (isParamsCompatible(mediaStreamInfo, *it))
+                    needUpdateStreamInfo = false;   //stream info has not been changed
+                break;
+            }
+        }
+    }
+    //else
+    //    we have to update information about transcoding availability anyway
+
+    bool modified = false;
+    if (needUpdateStreamInfo)
+    {
+        //removing stream with same encoder index as mediaStreamInfo
+        QString previouslySavedResolution;
+        supportedMediaStreams.streams.erase(
+            std::remove_if(
+                supportedMediaStreams.streams.begin(),
+                supportedMediaStreams.streams.end(),
+                [&mediaStreamInfo, &previouslySavedResolution]( CameraMediaStreamInfo& mediaInfo ) {
+                    if( mediaInfo.encoderIndex == mediaStreamInfo.encoderIndex )
+                    {
+                        previouslySavedResolution = std::move(mediaInfo.resolution);
+                        return true;
+                    }
+                    return false;
+                } ),
+            supportedMediaStreams.streams.end() );
+
+        CameraMediaStreamInfo newMediaStreamInfo = mediaStreamInfo; //have to copy it anyway to save to supportedMediaStreams.streams
+        if( !previouslySavedResolution.isEmpty() &&
+            newMediaStreamInfo.resolution == CameraMediaStreamInfo::anyResolution )
+        {
+            newMediaStreamInfo.resolution = std::move(previouslySavedResolution);
+        }
+        //saving new stream info
+        supportedMediaStreams.streams.push_back(std::move(newMediaStreamInfo));
+
+        modified = true;
+    }
+
+    if (!hasDualStreamingLocal)
+    {
+        //checking whether second stream has disappeared
+        auto secondStreamIter = std::find_if(
+            supportedMediaStreams.streams.begin(),
+            supportedMediaStreams.streams.end(),
+            [](const CameraMediaStreamInfo& mediaInfo) {
+                return mediaInfo.encoderIndex == CameraMediaStreamInfo::SECONDARY_STREAM_INDEX;
+            });
+        if (secondStreamIter != supportedMediaStreams.streams.end())
+        {
+            supportedMediaStreams.streams.erase(secondStreamIter);
+            modified = true;
+        }
+    }
+
+    if (!modified)
+        return false;
+
+    //removing non-native streams (they will be re-generated)
+    supportedMediaStreams.streams.erase(
+        std::remove_if(
+            supportedMediaStreams.streams.begin(),
+            supportedMediaStreams.streams.end(),
+            []( const CameraMediaStreamInfo& mediaStreamInfo ) -> bool {
+                return mediaStreamInfo.transcodingRequired;
+            } ),
+        supportedMediaStreams.streams.end() );
+
+    saveResolutionList( supportedMediaStreams );
+
+    return true;
+}
+
 void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
     static const char* HLS_TRANSPORT_NAME = "hls";
     static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
-
-    static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
 
     CameraMediaStreams fullStreamList( supportedNativeStreams );
     for( std::vector<CameraMediaStreamInfo>::iterator
@@ -141,17 +368,18 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
             it = fullStreamList.streams.erase( it );
             continue;
         }
+        it->transports.clear();
 
         switch( it->codec )
         {
-            case CODEC_ID_H264:
+            case AV_CODEC_ID_H264:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 it->transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MPEG4:
+            case AV_CODEC_ID_MPEG4:
                 it->transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
                 break;
-            case CODEC_ID_MJPEG:
+            case AV_CODEC_ID_MJPEG:
                 it->transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
                 break;
             default:
@@ -161,15 +389,13 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
         ++it;
     }
 
-#if !defined(EDGE_SERVER) && !defined(__arm__)
-#define TRANSCODING_AVAILABLE
-#endif
-
+         //TODO: #GDM change to bool transcodingAvailable variable check
 #ifdef TRANSCODING_AVAILABLE
     static const char* WEBM_TRANSPORT_NAME = "webm";
 
     CameraMediaStreamInfo transcodedStream;
     //any resolution is supported
+    transcodedStream.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
     transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
     transcodedStream.transports.push_back( QLatin1String(WEBM_TRANSPORT_NAME) );
     transcodedStream.transcodingRequired = true;
@@ -177,8 +403,8 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 #endif
 
     //saving fullStreamList;
-    const QByteArray& serializedStreams = QJson::serialized( fullStreamList );
-    setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
+    QByteArray serializedStreams = QJson::serialized( fullStreamList );
+    setProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME, QString::fromUtf8(serializedStreams));
 }
 
 // --------------- QnVirtualCameraResource ----------------------
@@ -204,126 +430,183 @@ void QnVirtualCameraResource::unLockDTSFactory()
 }
 
 
-QString QnVirtualCameraResource::getUniqueId() const
-{
-    return getPhysicalId();
-}
-
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
-    QVariant val;
-    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
-        return false;
+    QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
 }
 
 void QnVirtualCameraResource::forceEnableAudio()
-{ 
+{
 	if (isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
-    saveParams(); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, 1);
+    saveParams();
 }
 
 void QnVirtualCameraResource::forceDisableAudio()
-{ 
+{
     if (!isForcedAudioSupported())
         return;
-    setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
-    saveParams(); 
+    setProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, QString(lit("0")));
+    saveParams();
 }
 
 void QnVirtualCameraResource::saveParams()
 {
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    QnKvPairList params;
-
-    foreach(const QnParam& param, getResourceParamList().list())
-    {
-        if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
-    }
-
-    QnKvPairListsById  outData;
-    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
-
-    if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << ec2::toString(rez);
-    }
+    propertyDictionary->saveParams(getId());
 }
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    QnKvPairList params;
-    foreach(const QnParam& param, getResourceParamList().list())
+    propertyDictionary->saveParamsAsync(getId());
+}
+
+void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
+{
+    auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
+        getProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME));
+
+    if (decodedCredentials.isEmpty() || decodedCredentials == lit(":"))
     {
-        if (param.domain() == QnDomainDatabase)
-            params << QnKvPair(param.name(), param.value().toString());
+        setDefaultAuth(login, password);
+        saveParams();
     }
-    QnAppServerConnectionFactory::getConnection2()->getResourceManager()->save(getId(), params, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
-QString QnVirtualCameraResource::toSearchString() const
+QString QnVirtualCameraResource::sourceUrl(Qn::ConnectionRole role) const
 {
-    QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
-    return result;
+    if (!storeUrlForRole(role))
+        return QString();
+
+    QJsonObject streamUrls = QJsonDocument::fromJson(getProperty(Qn::CAMERA_STREAM_URLS).toUtf8()).object();
+    const auto roleStr = QString::number(role);
+    return streamUrls[roleStr].toString();
 }
 
-
-void QnVirtualCameraResource::issueOccured()
+void QnVirtualCameraResource::updateSourceUrl(const QString& url, Qn::ConnectionRole role)
 {
-    QMutexLocker lock(&m_mutex);
-    m_issueTimes.push_back(getUsecTimer());
-    if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
-        if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-            addStatusFlags(Qn::CSF_HasIssuesFlag);
-            lock.unlock();
-            saveAsync();
-        }
-    }
+    if (!storeUrlForRole(role) || url.isEmpty())
+        return;
+
+    auto cachedUrl = m_cachedStreamUrls.find(role);
+    bool cachedUrlExists = cachedUrl != m_cachedStreamUrls.end();
+
+    if (cachedUrlExists && cachedUrl->second == url)
+        return;
+
+    auto urlUpdater =
+        [url, role](QString oldValue)
+        {
+            const auto roleStr = QString::number(role);
+            QJsonObject streamUrls = QJsonDocument::fromJson(oldValue.toUtf8()).object();
+            streamUrls[roleStr] = url;
+            return QString::fromUtf8(QJsonDocument(streamUrls).toJson());
+        };
+
+    if (updateProperty(Qn::CAMERA_STREAM_URLS, urlUpdater))
+        saveParams();
 }
 
 int QnVirtualCameraResource::saveAsync()
 {
+    ec2::ApiCameraData apiCamera;
+    fromResourceToApi(toSharedPointer(this), apiCamera);
+
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
+    return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
-{
-    // not used
-}
-
-void QnVirtualCameraResource::noCameraIssues()
-{
-    QMutexLocker lock(&m_mutex);
-    qint64 threshold = getUsecTimer() - ISSUE_KEEP_TIMEOUT;
-    while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
-        m_issueTimes.pop_front();
-
-    if (m_issueTimes.empty() && hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
-        removeStatusFlags(Qn::CSF_HasIssuesFlag);
-        lock.unlock();
+void QnVirtualCameraResource::issueOccured() {
+    bool tooManyIssues = false;
+    {
+        /* Calculate how many issues have occurred during last check period. */
+        QnMutexLocker lock( &m_mutex );
+        m_issueCounter++;
+        tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
+        m_lastIssueTimer.restart();
+    }
+    if (tooManyIssues && !hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        addStatusFlags(Qn::CSF_HasIssuesFlag);
         saveAsync();
     }
 }
 
-
-CameraMediaStreamInfo::CameraMediaStreamInfo()
-:
-    resolution( lit("*") ),
-    transcodingRequired( false ),
-    codec( CODEC_ID_NONE )
-{
+void QnVirtualCameraResource::cleanCameraIssues() {
+    {
+        /* Check if no issues occurred during last check period. */
+        QnMutexLocker lock( &m_mutex );
+        if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs()))
+            return;
+        m_issueCounter = 0;
+    }
+    if (hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CSF_HasIssuesFlag);
+        saveAsync();
+    }
 }
 
-CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec )
-:
-    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
-    transcodingRequired( false ),
-    codec( _codec )
-{
+int QnVirtualCameraResource::issuesTimeoutMs() {
+    return ISSUE_KEEP_TIMEOUT_MS;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
+{
+    const QString& mediaStreamsStr = getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
+    return supportedMediaStreams;
+}
+
+QnAspectRatio QnVirtualCameraResource::aspectRatio() const
+{
+    qreal customAr = customAspectRatio();
+    if (!qFuzzyIsNull(customAr))
+        return QnAspectRatio::closestStandardRatio(customAr);
+
+    const auto s = mediaStreams();
+    if (!s.streams.empty())
+    {
+        const QSize size = s.streams[0].getResolution();
+        return QnAspectRatio::closestStandardRatio(static_cast<qreal>(size.width()) / size.height());
+    }
+
+    return QnAspectRatio();
+}
+
+const QLatin1String CameraMediaStreamInfo::anyResolution("*");
+
+QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
+{
+    if ( !resolution.isValid() )
+        return anyResolution;
+
+    return QString::fromLatin1("%1x%2").arg(resolution.width()).arg(resolution.height());
+}
+
+bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
+{
+    return transcodingRequired == rhs.transcodingRequired
+        && codec == rhs.codec
+        && encoderIndex == rhs.encoderIndex
+        && resolution == rhs.resolution
+        && transports == rhs.transports
+        && customStreamParams == rhs.customStreamParams;
+}
+
+bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
+{
+    return !( *this == rhs );
+}
+
+QSize CameraMediaStreamInfo::getResolution() const
+{
+    QStringList tmp = resolution.split(L'x');
+    if (tmp.size() == 2)
+        return QSize(tmp[0].toInt(), tmp[1].toInt());
+    else
+        return QSize();
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (CameraMediaStreamInfo)(CameraMediaStreams)(CameraBitrateInfo)(CameraBitrates),
+    (json),
+    _Fields)

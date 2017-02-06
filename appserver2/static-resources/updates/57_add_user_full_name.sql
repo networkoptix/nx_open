@@ -1,0 +1,1 @@
+ALTER TABLE "vms_userprofile" ADD COLUMN "full_name" VARCHAR(200) NULL;

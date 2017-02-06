@@ -5,9 +5,10 @@
 #include <QStringList>
 #include <QMap>
 #include <QFile>
-#include "utils/network/socket.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include <QtCore/QMutex>
+#include <nx/network/socket.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 
 class QnTestCamera
@@ -37,7 +38,7 @@ private:
     QStringList m_secondaryFiles;
     int m_prefixLen;
     int m_offlineFreq;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     bool m_isEnabled;
     QTime m_offlineTimer;
     QTime m_checkTimer;

@@ -1,11 +1,9 @@
 #ifndef QN_AVI_RESOURCE_H
 #define QN_AVI_RESOURCE_H
 
-#ifdef ENABLE_ARCHIVE
-
-#include <plugins/resource/archive/abstract_archive_resource.h>
-
-#include "core/datapacket/media_data_packet.h"
+#include <nx/streaming/abstract_archive_resource.h>
+#include <nx/streaming/config.h>
+#include "nx/streaming/media_data_packet.h"
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
@@ -36,15 +34,11 @@ public:
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
-
+    virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
 };
-
-typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_RESOURCE_H

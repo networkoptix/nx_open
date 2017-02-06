@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 
 #include "core/resource/storage_resource.h"
 
@@ -34,18 +34,12 @@ public:
     */
     virtual QIODevice* open( const QString& fileName, QIODevice::OpenMode openMode ) override;
 
-    //!Implementation of QnStorageResource::getChunkLen
-    virtual int getChunkLen() const override { return 0; }
-    //!Implementation of QnStorageResource::isNeedControlFreeSpace
-    virtual bool isNeedControlFreeSpace() override { return false; }
     //!Implementation of QnStorageResource::getFreeSpace
     virtual qint64 getFreeSpace() override { return 0; }
     //!Implementation of QnStorageResource::getTotalSpace
-    virtual qint64 getTotalSpace() override { return 0; }
+    virtual qint64 getTotalSpace() const override { return 0; }
     //!Implementation of QnStorageResource::isStorageAvailable
-    virtual bool isStorageAvailable() override { return true; }
-    //!Implementation of QnStorageResource::isStorageAvailableForWriting
-    virtual bool isStorageAvailableForWriting() override { return false; }
+    virtual Qn::StorageInitResult initOrUpdate() override { return Qn::StorageInit_Ok; }
     //!Implementation of QnStorageResource::removeFile
     virtual bool removeFile( const QString& path ) override;
     //!Implementation of QnStorageResource::removeDir
@@ -53,18 +47,17 @@ public:
     //!Implementation of QnStorageResource::renameFile
     virtual bool renameFile( const QString& oldName, const QString& newName ) override { Q_UNUSED(oldName) Q_UNUSED(newName) return false; }
     //!Implementation of QnStorageResource::getFileList
-    virtual QFileInfoList getFileList( const QString& dirName );
+    virtual QnAbstractStorageResource::FileInfoList getFileList( const QString& dirName );
     //!Implementation of QnStorageResource::isFileExists
     virtual bool isFileExists( const QString& path );
     //!Implementation of QnStorageResource::isDirExists
     virtual bool isDirExists( const QString& path ) override { Q_UNUSED(path) return false; }
-    //!Implementation of QnStorageResource::isCatalogAccessible
-    virtual bool isCatalogAccessible() override { return true; }
     //!Implementation of QnStorageResource::isRealFiles
     virtual bool isRealFiles() const{ return false; }
     //!Implementation of QnStorageResource::getFileSize
     virtual qint64 getFileSize( const QString& path ) const override;
 
+    virtual int getCapabilities() const override;
     /*!
         Takes ownership of \a data.
         If \a path is already used, old data is destroyed and replaced by a new one
@@ -73,7 +66,8 @@ public:
 
 private:
     std::map<QString, QIODevice*> m_urlToDevice;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
+    int m_capabilities;
 };
 
 typedef QnSharedResourcePointer<QnExtIODeviceStorageResource> QnExtIODeviceStorageResourcePtr;

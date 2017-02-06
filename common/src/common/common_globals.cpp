@@ -1,4 +1,5 @@
 #include "common_globals.h"
+#include <nx/utils/log/assert.h>
 
 
 namespace Qn
@@ -17,8 +18,12 @@ namespace Qn
                 return "text/csv";
             case XmlFormat:
                 return "application/xml";
+            case CompressedPeriodsFormat:
+                return "application/x-periods";
+            case UrlQueryFormat:
+                return "application/x-url-query";
             default:
-                assert(false);
+                NX_ASSERT(false);
                 return "unsupported";
         }
     }
@@ -27,18 +32,20 @@ namespace Qn
     {
         if( httpContentType == "application/json" )
             return JsonFormat;
-        else if( httpContentType == "application/ubjson" )
+        if( httpContentType == "application/ubjson" )
             return UbjsonFormat;
-        else if( httpContentType == "application/octet-stream" )
+        if( httpContentType == "application/octet-stream" )
             return BnsFormat;
-        else if( httpContentType == "text/csv" )
+        if( httpContentType == "text/csv" )
             return CsvFormat;
-        else if( httpContentType == "application/xml" )
+        if( httpContentType == "application/xml" )
             return XmlFormat;
-        else
-        {
-            assert(false);
-            return UnsupportedFormat;
-        }
+        if (httpContentType == "application/x-periods")
+            return CompressedPeriodsFormat;
+        if (httpContentType == "application/x-url-query")
+            return UrlQueryFormat;
+
+        return UnsupportedFormat;
     }
+
 }

@@ -5,7 +5,9 @@ import fnmatch
 import subprocess
 import shutil
 import sys
+import plistlib
 
+from itertools import chain
 from os.path import join
 
 
@@ -27,34 +29,71 @@ def binary_deps(binary):
         yield fname
 
 
+def set_permissions(path):
+    if os.path.isdir(path):
+        os.chmod(path, 0755)
+        for root, dirs, files in os.walk(path):
+            for xdir in dirs:
+                os.chmod(join(root, xdir), 0755)
+            for xfile in files:
+                os.chmod(join(root, xfile), 0644)
+    else:
+        os.chmod(path, 0644)
+
+	
 def prepare(binary, sbindir, tlibdir):
     tbindir = os.path.dirname(binary)
-    if os.path.exists(tbindir):
-        shutil.rmtree(tbindir)
-    os.mkdir(tbindir)
+#    if os.path.exists(tbindir):
+#        shutil.rmtree(tbindir)
+#    os.mkdir(tbindir)
 
     if os.path.exists(tlibdir):
         shutil.rmtree(tlibdir)
 
     os.mkdir(tlibdir)
 
-    shutil.copyfile(join(sbindir, 'client'), binary)
-    os.chmod(binary, 0755)
-    yield binary
+    tcontentsdir = os.path.dirname(tbindir)
+    tresdir = join(tcontentsdir, 'Resources')
 
-    ignore_debug = shutil.ignore_patterns('*debug*')
-    for subfolder in 'platforms', 'styles', 'imageformats':
+    applauncher_binary = join(tbindir, 'applauncher-bin')
+    applauncher_script = join(tbindir, 'applauncher')
+
+    shutil.copyfile(join(sbindir, 'desktop_client'), binary)
+    shutil.copyfile(join(sbindir, 'applauncher'), applauncher_binary)
+
+    os.chmod(binary, 0755)
+    os.chmod(applauncher_binary, 0755)
+    os.chmod(applauncher_script, 0755)
+
+    yield binary
+    yield applauncher_binary
+
+    handler_bin_dir = join(tbindir, 'protocol_handler.app/Contents/MacOS')
+    handler_binary = join(handler_bin_dir, 'applet')
+    handler_script = join(handler_bin_dir, 'run')
+    
+    os.chmod(handler_binary, 0755)
+    os.chmod(handler_script, 0755)
+
+    ignore = shutil.ignore_patterns('*debug*', '.*')
+    for subfolder in 'platforms', 'imageformats', 'audio':
         tfolder = join(tbindir, subfolder)
-        shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore_debug)
+        shutil.copytree(join(sbindir, subfolder), tfolder, ignore=ignore)
         for f in os.listdir(tfolder):
             dep = join(tfolder, f)
-            os.chmod(dep, 0644)
+            set_permissions(dep)
             yield dep
 
-    shutil.copytree(join(sbindir, 'vox'), join(tbindir, 'vox'))
+    tqmldir = join(tcontentsdir, 'qml')
+    shutil.copytree(join(sbindir, 'vox'), join(tresdir, 'vox'))
+    shutil.copytree(join(sbindir, 'qml'), tqmldir)
 
+    for root, dirs, files in os.walk(tqmldir):
+        for xfile in files:
+            if xfile.endswith('.dylib'):
+                yield join(root, xfile)
 
-def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
+def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
     libs = fnmatch.filter(os.listdir(libdir), 'lib*dylib*')
     qframeworks = fnmatch.filter(os.listdir(qlibdir), '*.framework')
 
@@ -73,30 +112,56 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir):
             if not os.path.exists(tpath):
                 shutil.copy(fpath, tlibdir)
                 os.chmod(tpath, 0644)
-                fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
+                fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)
             change_dep_path(binary, full_name, name)
         elif name.startswith('Q'):
+            # name: QtCore
+            #
+            # QtCore.framework
             framework_name = '{name}.framework'.format(name=name)
             if framework_name in qframeworks:
+                # QtCore.framework/Versions/5
                 folder = path[path.find(framework_name):]
                 if not os.path.exists(join(tlibdir, folder)):
                     os.makedirs(join(tlibdir, folder))
 
                 if not os.path.exists(join(tlibdir, folder, name)):
+                    # <source>/QtCore.framework/Versions/5/QtCore
                     fpath = join(qlibdir, folder, name)
+
+                    # <target>/QtCore.framework
+                    troot = join(tlibdir, framework_name)
+
+                    # <target>/QtCore.framework/Versions/5
                     tfolder = join(tlibdir, folder)
+
+                    # <target>/QtCore.framework/Versions/5/QtCore
                     tpath = join(tfolder, name)
 
                     # Copy framework binary
                     shutil.copy(fpath, tfolder)
                     os.chmod(tpath, 0644)
-                    shutil.copytree(join(qlibdir, framework_name, 'Contents'), join(tlibdir, framework_name, 'Contents'))
-                    fix_binary(tpath, bindir, libdir, qlibdir, tlibdir)
+
+                    resources_dir = join(tfolder, 'Resources')
+                    os.mkdir(resources_dir)
+
+                    info_plist_path = join(qlibdir, framework_name, 'Resources', 'Info.plist')
+                    info_plist = open(info_plist_path).read().replace('_debug', '')
+                    plist_obj = plistlib.readPlistFromString(info_plist)
+                    plist_obj['CFBundleIdentifier'] = 'org.qt-project.{}'.format(name)
+                    plist_obj['CFBundleVersion'] = qtver
+                    plistlib.writePlist(plist_obj, join(resources_dir, 'Info.plist'))
+
+                    os.symlink(join('Versions/Current', name), join(troot, name))
+                    os.symlink('Versions/Current/Resources', join(troot, 'Resources'))
+                    os.symlink('5', join(troot, 'Versions/Current'))
+
+                    fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)
                 change_dep_path(binary, full_name, join(folder, name))
 
 
-def main(app_path, bindir, libdir, helpdir):
-    qlibdir = '{env}/qt5/qtbase-x64/lib'.format(env=os.getenv('environment'))
+def main(app_path, bindir, libdir, helpdir, qtdir, qtver):
+    qlibdir = join(qtdir, 'lib')
 
     appdir = os.path.basename(app_path)
     app, _ = os.path.splitext(appdir)
@@ -104,10 +169,13 @@ def main(app_path, bindir, libdir, helpdir):
     tlibdir = "{app_path}/Contents/Frameworks".format(app_path=app_path)
 
     for binary in prepare(client_binary, bindir, tlibdir):
-        fix_binary(binary, bindir, libdir, qlibdir, tlibdir)
+        fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver)
 
-    shutil.copytree(helpdir, "{app_path}/Contents/help".format(app_path=app_path))
+    resources_dir = "{app_path}/Contents/Resources".format(app_path=app_path)
+    help_dir = "{}/help".format(resources_dir)
+    shutil.copytree(helpdir, help_dir)
+    shutil.copy(join(bindir, 'launcher.version'), resources_dir)
 
 if __name__ == '__main__':
-    _, appdir, bindir, libdir, helpdir = sys.argv
-    main(appdir, bindir, libdir, helpdir)
+    _, appdir, bindir, libdir, helpdir, qtdir, qtver = sys.argv
+    main(appdir, bindir, libdir, helpdir, qtdir, qtver)

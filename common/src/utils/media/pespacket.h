@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx/utils/log/assert.h>
+
 const static quint64 MAX_PTS = 8589934592ll - 1;
 const static quint8 PES_DATA_ALIGNMENT = 4;
 
@@ -138,7 +140,7 @@ struct PESPacket {
 	void setPacketLength(quint16 len) 
 	{
 		if (len != 0) {
-			Q_ASSERT(len >= 6);
+			NX_ASSERT(len >= 6);
 			len -= 6;
 		}
 		m_pesPacketLenHi = len >> 8;

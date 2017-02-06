@@ -10,7 +10,7 @@ public:
     QnStorageFailureBusinessEvent(const QnResourcePtr& resource,
                           qint64 timeStamp,
                           QnBusiness::EventReason reasonCode,
-                          const QnResourcePtr& storageResource
+                          const QString& storageUrl
                           );
 
 };

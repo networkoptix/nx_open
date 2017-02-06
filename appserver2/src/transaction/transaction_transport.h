@@ -1,225 +1,131 @@
-#ifndef __TRANSACTION_TRANSPORT_H__
-#define __TRANSACTION_TRANSPORT_H__
 
-#include <deque>
+#pragma once
 
-#include <QUuid>
-#include <QByteArray>
-#include <QSet>
-#include <QTime>
+#include "transaction_descriptor.h"
+#include "transaction_transport_base.h"
 
-#include <transaction/transaction.h>
-#include <transaction/binary_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-#include <transaction/ubjson_transaction_serializer.h>
-#include <transaction/transaction_transport_header.h>
 
-#include <utils/network/abstract_socket.h>
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/common/id.h"
-
-#ifdef _DEBUG
-#include <common/common_module.h>
-#endif
-
-#define TRANSACTION_MESSAGE_BUS_DEBUG
-
-namespace ec2
-{
+namespace ec2 {
 
 class QnTransactionTransport
 :
-    public QObject
+    public QnTransactionTransportBase
 {
-    Q_OBJECT
 public:
-    //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
-    typedef std::function<void(QnTransactionTransport*, const std::vector<nx_http::ChunkExtension>&)> HttpChunkExtensonHandler;
-    typedef std::function<void(QnTransactionTransport*, std::vector<nx_http::ChunkExtension>*)> BeforeSendingChunkHandler;
-
-    enum State {
-        NotDefined,
-        ConnectingStage1,
-        ConnectingStage2,
-        Connected,
-        NeedStartStreaming,
-        ReadyForStreaming,
-        Closed,
-        Error
-    };
-    static QString toString( State state );
-
-    QnTransactionTransport(const ApiPeerData &localPeer,
-        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
+    /** Initializer for incoming connection */
+    QnTransactionTransport(
+        const QnUuid& connectionGuid,
+        ConnectionLockGuard connectionLockGuard,
+        const ApiPeerData& localPeer,
+        const ApiPeerData& remotePeer,
+        QSharedPointer<AbstractStreamSocket> socket,
+        ConnectionType::Type connectionType,
+        const nx_http::Request& request,
+        const QByteArray& contentEncoding,
+        const Qn::UserAccessData &userAccessData);
+    /** Initializer for outgoing connection */
+    QnTransactionTransport(
+        ConnectionGuardSharedState* const connectionGuardSharedState,
+        const ApiPeerData& localPeer);
     ~QnTransactionTransport();
 
-signals:
-    void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
-    void stateChanged(State state);
-    void remotePeerUnauthorized(const QUuid& id);
-    void peerIdDiscovered(const QUrl& url, const QUuid& id);
-public:
-
-    template<class T> 
-    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
-    {
-        QnTransactionTransportHeader header(_header);
-        assert(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
-#ifdef _DEBUG
-
-        foreach (const QUuid& peer, header.dstPeers) {
-            Q_ASSERT(!peer.isNull());
-            Q_ASSERT(peer != qnCommon->moduleGUID());
-        }
-#endif
-
-#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
-        qDebug() << "send transaction to peer " << remotePeer().id << "command=" << ApiCommand::toString(transaction.command) 
-                 << "transport seq=" << header.sequence << "db seq=" << transaction.persistentInfo.sequence << "timestamp=" << transaction.persistentInfo.timestamp;
-#endif
-
-        switch (m_remotePeer.dataFormat) {
-        case Qn::JsonFormat:
-            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        //case Qn::BnsFormat:
-        //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-        //    break;
-        case Qn::UbjsonFormat:
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        default:
-            qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-            break;
-        }
-    }
-
-    bool sendSerializedTransaction(Qn::SerializationFormat srcFormat, const QByteArray& serializedTran, const QnTransactionTransportHeader& _header);
-
-    void doOutgoingConnect(QUrl remoteAddr);
+    /**
+     * @note This method is non-blocking if called within internal socket's aio thread.
+     */
     void close();
 
-    // these getters/setters are using from a single thread
-    qint64 lastConnectTime() { return m_lastConnectTime; }
-    void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync(ApiCommand::Value command) const;
-    void setReadSync(bool value)  {m_readSync = value;}
-    bool isReadyToSend(ApiCommand::Value command) const;
-    void setWriteSync(bool value) { m_writeSync = value; }
-
-    bool isSyncDone() const { return m_syncDone; }
-    void setSyncDone(bool value)  {m_syncDone = value;} // end of sync marker received
-
-    QUrl remoteAddr() const       { return m_remoteAddr; }
-
-    ApiPeerData remotePeer() const { return m_remotePeer; }
-
-    // This is multi thread getters/setters
-    void setState(State state);
-    State getState() const;
-
-    //!Set \a eventHandler that will receive all http chunk extensions
-    /*!
-        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
-    */
-    int setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler );
-    //!Set \a eventHandler that will be called before sending each http chunk. It (handler) is allowed to add some extensions to the chunk
-    /*!
-        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
-    */
-    int setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler );
-    //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
-    void removeEventHandler( int eventHandlerID );
-
-    AbstractStreamSocket* getSocket() const;
-
-    static bool tryAcquireConnecting(const QUuid& remoteGuid, bool isOriginator);
-    static bool tryAcquireConnected(const QUuid& remoteGuid, bool isOriginator);
-    static void connectingCanceled(const QUuid& id, bool isOriginator);
-    static void connectDone(const QUuid& id);
-
-    void processExtraData();
-    void startListening();
-    void setRemotePeer(const ApiPeerData& value) { m_remotePeer = value; }
-    void sendHttpKeepAlive();
-    bool isHttpKeepAliveTimeout() const;
-private:
-    struct DataToSend
+    template<class T>
+    void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
-        QByteArray sourceData;
-        QByteArray encodedSourceData;
+        if (!transactionShouldBeSentToRemotePeer(transaction))
+            return;
 
-        DataToSend() {}
-        DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
-    };
+        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
+        if (remoteAccess == RemotePeerAccess::Forbidden)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
+                .arg(transaction.toString())
+                .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
+            return;
+        }
+        sendTransactionImpl(transaction, header);
+    }
 
-    ApiPeerData m_localPeer;
-    ApiPeerData m_remotePeer;
+    template<template<typename, typename> class Cont, typename Param, typename A>
+    void sendTransaction(const QnTransaction<Cont<Param, A>>& transaction, const QnTransactionTransportHeader& header)
+    {
+        if (!transactionShouldBeSentToRemotePeer(transaction))
+            return;
 
-    qint64 m_lastConnectTime;
+        auto td = ec2::getTransactionDescriptorByTransaction(transaction);
+        auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
 
-    bool m_readSync;
-    bool m_writeSync;
-    bool m_syncDone;
+        if (remoteAccess == RemotePeerAccess::Forbidden)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
+                .arg(transaction.toString())
+                .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
+            return;
+        }
+        else if (remoteAccess == RemotePeerAccess::Partial)
+        {
+            NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check PARTIALLY failed while sending transaction %1 to peer %2")
+                .arg(transaction.toString())
+                .arg(remotePeer().id.toString()),
+                cl_logDEBUG1);
 
-    mutable QMutex m_mutex;
-    QSharedPointer<AbstractStreamSocket> m_socket;
-    nx_http::AsyncHttpClientPtr m_httpClient;
-    State m_state;
-    /*std::vector<quint8>*/ nx::Buffer m_readBuffer;
-    int m_chunkHeaderLen;
-    size_t m_chunkLen;
-    int m_sendOffset;
-    //!Holds raw data. It is serialized to http chunk just before sending to socket
-    std::deque<DataToSend> m_dataToSend;
-    QUrl m_remoteAddr;
-    bool m_connected;
+            Cont<Param, A> filteredParams = transaction.params;
+            td->filterByReadPermissionFunc(m_userAccessData, filteredParams);
+            auto newTransaction = transaction;
+            newTransaction.params = filteredParams;
 
-    std::map<int, HttpChunkExtensonHandler> m_httpChunkExtensonHandlers;
-    std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
-    int m_prevGivenHandlerID;
+            sendTransactionImpl(newTransaction, header);
+        }
+        sendTransactionImpl(transaction, header);
+    }
 
-    static QSet<QUuid> m_existConn;
-    typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;
-    static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
-    static QMutex m_staticMutex;
+    bool sendSerializedTransaction(
+        Qn::SerializationFormat srcFormat,
+        const QByteArray& serializedTran,
+        const QnTransactionTransportHeader& _header);
 
-    QByteArray m_extraData;
-    bool m_authByKey;
-    QTime m_lastReceiveTimer;
-    QTime m_sendTimer;
-    QByteArray m_emptyChunkData;
+    void setBeforeDestroyCallback(std::function<void()> ttFinishCallback);
+
+    const Qn::UserAccessData& getUserAccessData() const { return m_userAccessData; }
+
+protected:
+    virtual void fillAuthInfo(
+        const nx_http::AsyncHttpClientPtr& httpClient,
+        bool authByKey) override;
+
 private:
-    //void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
-    void closeSocket();
-    void addData(QByteArray &&data);
-    /*!
-        \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
-        \note In case of error \a chunkHeader contents are undefined
-    */
-    int readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader);
-    void processTransactionData( const QByteArray& data);
-    void setStateNoLock(State state);
-    void cancelConnecting();
-    static void connectingCanceledNoLock(const QUuid& remoteGuid, bool isOriginator);
-    void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
-    void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
-    void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead );
-    void serializeAndSendNextDataBuffer();
-    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesSent );
-    void setExtraDataBuffer(const QByteArray& data);
-    void fillAuthInfo();
-private slots:
-    void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
-    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
-    void repeatDoGet();
+    const Qn::UserAccessData m_userAccessData;
+    std::function<void()> m_beforeDestructionHandler;
+
+    template<class T>
+    bool transactionShouldBeSentToRemotePeer(const QnTransaction<T>& transaction)
+    {
+        if (remotePeer().peerType == Qn::PT_OldServer)
+            return false;
+
+        if (transaction.isLocal() && !remotePeer().isClient())
+            return false;
+
+        if (remotePeer().peerType == Qn::PT_CloudServer)
+        {
+            if (transaction.transactionType != TransactionType::Cloud &&
+                transaction.command != ApiCommand::tranSyncRequest &&
+                transaction.command != ApiCommand::tranSyncResponse &&
+                transaction.command != ApiCommand::tranSyncDone)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 };
 
-typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
-}
-
-Q_DECLARE_METATYPE(ec2::QnTransactionTransport::State);
-
-#endif // __TRANSACTION_TRANSPORT_H__
+}   // namespace ec2

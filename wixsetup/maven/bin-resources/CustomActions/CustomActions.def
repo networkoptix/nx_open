@@ -2,7 +2,6 @@ LIBRARY "CustomActions"
 
 EXPORTS
 
-FindConfiguredStorages
 GenerateGuidsForServers
 CheckPorts
 FindFreePorts
@@ -10,11 +9,15 @@ CopyMediaServerProfile
 CopyAppServerProfile
 CopyAppServerNotificationFiles
 DeleteDatabaseFile
+DeleteRegistryKeys
+DeleteAllRegistryKeys
 BackupDatabaseFile
 RestoreDatabaseFile
 CopyDatabaseFile
+CopyHostedFiles
 PopulateRestoreVersions
 CAQuitExecAndWarn
 DeleteOldMediaserverSettings
 GenerateSystemName
 DetectIfSystemIsStandalone
+SetPreviousServerInstalled

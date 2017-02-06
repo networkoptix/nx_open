@@ -5,16 +5,22 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnTimePeriod;
 
-class QN_EXPORT QnTimePeriod {
+class QN_EXPORT QnTimePeriod
+{
 public:
+
+    static const qint64 UnlimitedPeriod = -1;
+    static const qint64 kMaxTimeValue;
+    static const qint64 kMinTimeValue;
+
     /**
      * Constructs a null time period.
      */
-    QnTimePeriod(): startTimeMs(0), durationMs(0) {}
+    QnTimePeriod();
 
     /**
      * Constructor.
@@ -22,9 +28,12 @@ public:
      * \param startTimeMs               Period's start time, normally in milliseconds since epoch.
      * \param durationMs                Period's duration, in milliseconds.
      */
-    QnTimePeriod(qint64 startTimeMs, qint64 durationMs): startTimeMs(startTimeMs), durationMs(durationMs) {}
+    QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
 
-    bool operator==(const QnTimePeriod &other) const;
+    static QnTimePeriod fromInterval(qint64 startTimeMs
+        , qint64 endTimeMs);
+
+    QnTimePeriod& operator = (const QnTimePeriod &other);
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
@@ -40,34 +49,39 @@ public:
     void clear();
 
     /**
-     * \returns                         Whether this is an empty period --- a 
+     * \returns                         Whether this is an empty period --- a
      *                                  period of zero length.
      */
-    bool isEmpty() const {
-        return durationMs == 0;
-    }
+    bool isEmpty() const;
 
     qint64 endTimeMs() const;
 
     /**
-     * \returns                         Whether this is a null time period. 
+     * \returns                         Whether this is a null time period.
      */
-    bool isNull() const {
-        return startTimeMs == 0 && durationMs == 0;
-    }
+    bool isNull() const;
+
+    /**
+     * \returns                         Whether this is a infinite time period.
+     */
+    bool isInfinite() const;
+
+    bool isValid() const;
+
+    /**
+     * \returns                         Infinite duration constant value (-1).
+     */
+    static qint64 infiniteDuration();
+
+    /**
+     * \returns distance from the nearest period edge to the time in ms. Returns zerro if timeMs inside period
+     */
+    qint64 distanceToTime(qint64 timeMs) const;
 
     /**
      * \return                          Type of this time period.
      */
-    Qn::TimePeriodType type() const {
-        if(isNull()) {
-            return Qn::NullTimePeriod;
-        } else if(isEmpty()) {
-            return Qn::EmptyTimePeriod;
-        } else {
-            return Qn::NormalTimePeriod;
-        }
-    }
+    Qn::TimePeriodType type() const;
 
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
@@ -75,13 +89,14 @@ public:
     /** Start time in milliseconds. */
     qint64 startTimeMs;
 
-    /** Duration in milliseconds. 
-     * 
-     * -1 if duration is infinite or unknown. It may be the case if this time period 
+    /** Duration in milliseconds.
+     *
+     * infiniteDuration() if duration is infinite or unknown. It may be the case if this time period
      * represents a video chunk that is being recorded at the moment. */
     qint64 durationMs;
 };
 
+bool operator==(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &first, const QnTimePeriod &other);
 bool operator<(qint64 first, const QnTimePeriod &other);
 bool operator<(const QnTimePeriod &other, qint64 first);
@@ -89,6 +104,7 @@ bool operator<(const QnTimePeriod &other, qint64 first);
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
-QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype));
+
+QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype)(ubjson)(xml)(csv_record));
 
 #endif // QN_TIME_PERIOD_H

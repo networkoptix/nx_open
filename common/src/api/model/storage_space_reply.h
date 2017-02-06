@@ -5,12 +5,12 @@
 #include <QtCore/QVariant>
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 #include "storage_status_reply.h"
 
 struct QnStorageSpaceReply {
-    QList<QnStorageSpaceData> storages;
+    QnStorageSpaceDataList storages;
     QList<QString> storageProtocols;
 };
 

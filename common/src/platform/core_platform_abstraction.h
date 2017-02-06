@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include "notification/platform_notifier.h"
 #include "process/platform_process.h"

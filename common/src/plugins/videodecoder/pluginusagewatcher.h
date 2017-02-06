@@ -7,12 +7,12 @@
 
 #include <set>
 
-#include <QtCore/QMutex>
+#include <nx/utils/thread/mutex.h>
 #include <QSharedMemory>
 
 #include "pluginusagerecord.h"
 #include "videodecoderplugintypes.h"
-#include "../../decoders/video/abstractdecoder.h"
+#include "../../decoders/video/abstract_video_decoder.h"
 #include "../../utils/ipc/namedmutex.h"
 
 
@@ -110,7 +110,7 @@ protected:
     virtual void run();
 
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QString m_uniquePluginID;
     std::set<stree::AbstractResourceReader*> m_currentSessions;
     bool m_sharedMemoryLocked;

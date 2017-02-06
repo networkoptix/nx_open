@@ -1,25 +1,30 @@
 import os, sys, subprocess, shutil
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from os.path import dirname, join, exists, isfile
 
-bin_source_dir = '${libdir}/${arch}/bin/${build.configuration}'
+properties_dir='${root.dir}/wixsetup/${arch}'
 
-for wxs in ('dbsync', 'help', 'vox', 'bg'):
-    p = subprocess.Popen('${python.dir}/python generate-%s-wxs.py' % wxs, shell=True, stdout=PIPE)
+generated_items = [
+    ('fonts', ''),
+    ('qml', ''),
+    ('help', ''),
+    ('vox', ''),
+    ('bg', ''),
+    ('vcrt14', 'Client'),
+    ('vcrt14', 'Server'),
+    ('vcrt14', 'Traytool'),
+    ('vcrt14', 'Nxtool')
+]
+
+if '${nxtool}' == 'true':
+    generated_items += [('qtquickcontrols', '')]
+
+for wxs, args in generated_items:
+    p = subprocess.Popen('${init.python.dir}/python generate-{}-wxs.py {}'.format(wxs, args), shell=True, stdout=PIPE, stderr=STDOUT)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py++++++++++++++++++++++' % wxs)
     print out
     p.wait()
-    if p.returncode:  
-        print "failed with code: %s" % str(p.returncode) 
+    if p.returncode:
+        print "failed with code: %s" % str(p.returncode)
         sys.exit(1)
-		
-if os.path.exists(join(bin_source_dir, '${product.name} Launcher.exe')):
-    os.unlink(join(bin_source_dir, '${product.name} Launcher.exe'))
-if os.path.exists(join(bin_source_dir, 'applauncher.exe')):
-    shutil.copy2(join(bin_source_dir, 'applauncher.exe'), join(bin_source_dir, '${product.name} Launcher.exe'))
-    
-if os.path.exists(join(bin_source_dir, '${product.name}.exe')):
-    os.unlink(join(bin_source_dir, '${product.name}.exe'))          
-if os.path.exists(join(bin_source_dir, 'client.exe')):
-    shutil.copy2(join(bin_source_dir, 'client.exe'), join(bin_source_dir, '${product.name}.exe'))

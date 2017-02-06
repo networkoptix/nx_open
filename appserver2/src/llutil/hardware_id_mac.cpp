@@ -1,9 +1,16 @@
 #include <string>
+
+#ifndef Q_OS_IOS
 #include <IOKit/IOKitLib.h>
+#endif
+
 #include <cassert>
 
-#include <QList>
+#include <QtCore/QStringList>
 
+#include <nx/utils/log/assert.h>
+
+#include "licensing/hardware_info.h"
 #include "hardware_id.h"
 
 namespace {
@@ -20,30 +27,33 @@ inline std::string trim(const std::string& str)
 
 }
 
-QByteArray getHardwareId(int version, bool guidCompatibility)
+QString getHardwareId(int version, bool guidCompatibility)
 {
-    assert( false );
-    return QByteArray();
+    NX_ASSERT( false );
+    return QString();
 }
 
-QList<QByteArray> getMainHardwareIds(int guidCompatibility)
+QStringList getMainHardwareIds(int guidCompatibility)
 {
-    assert( false );
-    return QList<QByteArray>();
+    NX_ASSERT( false );
+    return QStringList();
 }
 
-QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility)
+QStringList getCompatibleHardwareIds(int guidCompatibility)
 {
-    assert( false );
-    return QList<QByteArray>();
+    NX_ASSERT( false );
+    return QStringList();
 }
 
 
 namespace LLUtil
 {
-void fillHardwareIds(QList<QByteArray>& hardwareIds)
+void fillHardwareIds(QStringList& hardwareIds, QSettings *settings, QnHardwareInfo& hardwareInfo)
 {
+    Q_UNUSED(settings)
     #define MAX_HWID_SIZE 1024
+
+#ifndef Q_OS_IOS
 
     char buf[MAX_HWID_SIZE];
 
@@ -53,6 +63,8 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
     CFStringGetCString(uuidCf, buf, MAX_HWID_SIZE, kCFStringEncodingMacRoman);
     CFRelease(uuidCf);
 
-    hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = buf;
+    hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = QLatin1String(buf);
+
+#endif
 }
 }

@@ -110,7 +110,7 @@ public:
     template<class Resource>
     QnSharedResourcePointerList<Resource> filter(const QnSharedResourcePointerList<Resource> &resources) const {
         QnSharedResourcePointerList<Resource> result;
-        foreach(const QnSharedResourcePointer<Resource> &resource, resources) {
+        for(const QnSharedResourcePointer<Resource> &resource: resources) {
             Operation operation = check(resource);
             if(operation == Accept)
                 result.push_back(resource);

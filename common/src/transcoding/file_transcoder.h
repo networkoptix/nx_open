@@ -11,15 +11,14 @@
 #include <memory>
 
 #include <QtCore/QIODevice>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 extern "C"
 {
     #include <libavcodec/avcodec.h>
 }
 
-#include <core/resource/media_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/long_runnable.h>
@@ -75,7 +74,7 @@ public:
         \return Returns \a true on success
     */
     bool setVideoCodec(
-        CodecID codec,
+        AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode,
         Qn::StreamQuality quality = Qn::QualityHighest,
         const QSize& resolution = QSize(0,0),
@@ -88,7 +87,7 @@ public:
         \return Returns \a true on success
     */
     bool setAudioCodec(
-        CodecID codec,
+        AVCodecID codec,
         QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_FfmpegTranscode );
     //!Set source data duration (in millis) to read. By default, whole source data is read
     void setTranscodeDurationLimit( unsigned int lengthToReadMS );
@@ -131,8 +130,8 @@ private:
         sWorking
     };
 
-    mutable QMutex m_mutex;
-    QWaitCondition m_cond;
+    mutable QnMutex m_mutex;
+    QnWaitCondition m_cond;
     std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode;

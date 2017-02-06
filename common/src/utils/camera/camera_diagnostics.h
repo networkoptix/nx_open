@@ -9,6 +9,7 @@
 #include <QList>
 #include <QString>
 
+#include <core/resource/resource_fwd.h>
 
 //!Holds types related to performing camera availability diagnostics
 namespace CameraDiagnostics
@@ -70,12 +71,22 @@ namespace CameraDiagnostics
             cameraInvalidParams,
             badMediaStream,
             noMediaStream,
+            cameraInitializationInProgress,
+            cameraPluginError,
             unknown
         };
 
         //!Returns textual description of error with  parameters
-        QString toString( Value val, const QList<QString>& errorParams = QList<QString>() );
-        QString toString( int val, const QList<QString>& errorParams = QList<QString>() );
+
+        typedef QList<QString> ErrorParams;
+
+        QString toString(Value val
+            , const QnVirtualCameraResourcePtr &device
+            , const ErrorParams& errorParams = ErrorParams());
+
+        QString toString(int val
+            , const QnVirtualCameraResourcePtr &device
+            , const ErrorParams& errorParams = ErrorParams());
     }
 
     /*!
@@ -153,7 +164,7 @@ namespace CameraDiagnostics
     class CameraResponseParseErrorResult : public Result
     {
     public:
-        CameraResponseParseErrorResult( const QString& requestedURL, const QString requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
+        CameraResponseParseErrorResult( const QString& requestedURL, const QString &requestName ) : Result( ErrorCode::responseParseError, requestedURL, requestName ) {}
     };
 
     class NoMediaTrackResult : public Result
@@ -210,10 +221,22 @@ namespace CameraDiagnostics
         UnknownErrorResult() : Result( ErrorCode::unknown ) {}
     };
 
+    class InitializationInProgress : public Result
+    {
+    public:
+        InitializationInProgress() : Result( ErrorCode::cameraInitializationInProgress ) {}
+    };
+
     class ServerTerminatedResult : public Result
     {
     public:
         ServerTerminatedResult() : Result( ErrorCode::serverTerminated ) {}
+    };
+
+    class CameraPluginErrorResult : public Result
+    {
+    public:
+        CameraPluginErrorResult( const QString& errorMessage ) : Result( ErrorCode::cameraPluginError, errorMessage ) {}
     };
 }
 

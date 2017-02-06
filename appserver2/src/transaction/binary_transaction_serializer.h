@@ -8,8 +8,8 @@
 #include <transaction/transaction.h>
 #include <transaction/transaction_transport_header.h>
 
-#include <utils/common/singleton.h>
-#include <utils/common/model_functions.h>
+#include <nx/utils/singleton.h>
+#include <nx/fusion/model_functions.h>
 
 namespace ec2
 {
@@ -23,7 +23,7 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
@@ -56,7 +56,7 @@ namespace ec2
 
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 

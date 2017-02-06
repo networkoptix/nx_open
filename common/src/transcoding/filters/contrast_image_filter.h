@@ -11,9 +11,9 @@
 class QnContrastImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnContrastImageFilter(const ImageCorrectionParams& params);
-    virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect, qreal ar) override;
-
+    QnContrastImageFilter(const ImageCorrectionParams& params, bool doDeepCopy);
+    CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
+    virtual QSize updatedResolution(const QSize& srcSize) override { return srcSize; }
 private:
     bool isFormatSupported(CLVideoDecoderOutput* frame) const;
 
@@ -22,6 +22,7 @@ private:
     ImageCorrectionResult m_gamma;
     float m_lastGamma;
     quint8 m_gammaCorrection[256];
+    CLVideoDecoderOutputPtr m_deepCopyFrame;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

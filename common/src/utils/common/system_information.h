@@ -3,7 +3,7 @@
 
 #include <QtCore/QString>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 class QnSystemInformation {
 public:
@@ -19,9 +19,10 @@ public:
     QString modification;
 
     static QnSystemInformation currentSystemInformation();
+    static QString currentSystemRuntime();
 };
 #define QnSystemInformation_Fields (arch)(platform)(modification)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnSystemInformation, (json)(datastream)(eq)(hash)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnSystemInformation, (ubjson)(xml)(json)(datastream)(eq)(hash)(metatype))
 
 #endif // SYSTEM_INFORMATION_H

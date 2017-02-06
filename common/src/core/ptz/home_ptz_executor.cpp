@@ -1,6 +1,8 @@
 #include "home_ptz_executor.h"
 
-#include <QtCore/QMutex>
+#include <QtCore/QTimerEvent>
+
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_ptz_controller.h"
 #include "ptz_object.h"
@@ -28,7 +30,7 @@ public:
     QBasicTimer timer;
     QAtomicInt isRunning;
 
-    QMutex mutex;
+    QnMutex mutex;
     QnPtzObject homePosition;
 };
 
@@ -41,21 +43,21 @@ void QnHomePtzExecutorPrivate::stop() {
 }
 
 bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
-    if(timerId != timer.timerId()) 
+    if(timerId != timer.timerId())
         return false;
     timer.stop();
 
     QnPtzObject homePosition;
     {
-        QMutexLocker locker(&mutex);
+        QnMutexLocker locker( &mutex );
         homePosition = this->homePosition;
     }
 
-    /* Note that we don't use threaded PTZ controller here as 
+    /* Note that we don't use threaded PTZ controller here as
      * the activation commands are pretty rare. */
 
     if(homePosition.type == Qn::PresetPtzObject) {
-        controller->activatePreset(homePosition.id, 1.0);
+        controller->activatePreset(homePosition.id, QnAbstractPtzController::MaxPtzSpeed);
     } else if(homePosition.type == Qn::TourPtzObject) {
         controller->activateTour(homePosition.id);
     }
@@ -79,7 +81,7 @@ QnHomePtzExecutor::QnHomePtzExecutor(const QnPtzControllerPtr &controller):
 
 QnHomePtzExecutor::~QnHomePtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    assert(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread());
 }
 
 void QnHomePtzExecutor::restart() {
@@ -99,13 +101,13 @@ bool QnHomePtzExecutor::isRunning() {
 }
 
 void QnHomePtzExecutor::setHomePosition(const QnPtzObject &homePosition) {
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     d->homePosition = homePosition;
 }
 
 QnPtzObject QnHomePtzExecutor::homePosition() const {
-    QMutexLocker locker(&d->mutex);
+    QnMutexLocker locker( &d->mutex );
 
     return d->homePosition;
 }

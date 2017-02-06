@@ -42,7 +42,7 @@ public:
     void setPoints(const QVector<point_type> &points) {
         m_points = points;
 
-        qSort(m_points.begin(), m_points.end(), PointLess());
+        std::sort(m_points.begin(), m_points.end(), PointLess());
     }
 
     T operator()(const T &x) const{
@@ -54,7 +54,7 @@ public:
     }
 
     void setExtrapolationMode(Qn::ExtrapolationMode extrapolationMode) {
-        assert(extrapolationMode == Qn::ConstantExtrapolation || extrapolationMode == Qn::LinearExtrapolation || extrapolationMode == Qn::PeriodicExtrapolation);
+        NX_ASSERT(extrapolationMode == Qn::ConstantExtrapolation || extrapolationMode == Qn::LinearExtrapolation || extrapolationMode == Qn::PeriodicExtrapolation);
 
         m_extrapolationMode = extrapolationMode;
     }
@@ -67,7 +67,7 @@ protected:
     };
 
     T valueInternal(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
-        typename QVector<point_type>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
+        typename QVector<point_type>::const_iterator pos = std::lower_bound(m_points.begin(), m_points.end(), point_type(x, T()), PointLess());
 
         if(pos == m_points.begin()) {
             return extrapolateStart(x, extrapolationMode);
@@ -95,7 +95,7 @@ protected:
         case Qn::PeriodicExtrapolation:
             return extrapolatePeriodic(x);
         default:
-            assert(false);
+            NX_ASSERT(false);
             return 0.0;
         }
     }
@@ -112,7 +112,7 @@ protected:
         case Qn::PeriodicExtrapolation:
             return extrapolatePeriodic(x);
         default:
-            assert(false);
+            NX_ASSERT(false);
             return 0.0;
         }
     }

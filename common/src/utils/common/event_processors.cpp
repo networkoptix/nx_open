@@ -5,14 +5,14 @@
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 
-#include <common/config.h>
+#include <nx/utils/log/assert.h>
 
 
 // -------------------------------------------------------------------------- //
 // QnEventSignalEmitter
 // -------------------------------------------------------------------------- //
 void QnEventSignalEmitter::activate(int signalIndex, QObject *watched, QEvent *event) {
-    assert(signalIndex >= 0 && signalIndex < SignalCount);
+    NX_ASSERT(signalIndex >= 0 && signalIndex < SignalCount);
 
     switch(signalIndex) {
 #define CASE(Z, N, D)                                                           \
@@ -27,7 +27,7 @@ void QnEventSignalEmitter::activate(int signalIndex, QObject *watched, QEvent *e
 }
 
 const char *QnEventSignalEmitter::signature(int signalIndex) {
-    assert(signalIndex >= 0 && signalIndex < SignalCount);
+    NX_ASSERT(signalIndex >= 0 && signalIndex < SignalCount);
 
     switch(signalIndex) {
 #define CASE(Z, N, D)                                                           \
@@ -58,14 +58,14 @@ void QnEventSignalEmitterPool::grow(QnEventSignalEmitter *emitter) {
 QnEventSignalEmitterPool::Signal QnEventSignalEmitterPool::allocate() {
     if(m_freeList.isEmpty())
         grow(new QnEventSignalEmitter(this));
-    
+
     Signal result = m_freeList.back();
     m_freeList.pop_back();
     return result;
 }
 
 void QnEventSignalEmitterPool::release(const Signal &signal) {
-    DEBUG_CODE(assert(signal.sender == this || signal.sender->parent() == this));
+    DEBUG_CODE(NX_ASSERT(signal.sender == this || signal.sender->parent() == this));
 
     m_freeList.push_back(signal);
 }

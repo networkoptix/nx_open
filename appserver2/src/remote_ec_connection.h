@@ -21,16 +21,19 @@ namespace ec2
     :
         public BaseEc2Connection<FixedUrlClientQueryProcessor>
     {
+    typedef BaseEc2Connection<FixedUrlClientQueryProcessor> base_type;
+
     public:
         RemoteEC2Connection(
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
-            const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo );
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual void startReceivingNotifications() override;
+        virtual QString authInfo() const override;
 
+        virtual void startReceivingNotifications() override;
+        virtual void stopReceivingNotifications() override;
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;

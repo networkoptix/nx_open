@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <plugins/plugin_tools.h>
+#include <nx/utils/log/assert.h>
 
 
 MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
@@ -19,14 +20,14 @@ MotionDataPicture::MotionDataPicture( nxcip::PixelFormat _pixelFormat )
     m_height( nxcip::DEFAULT_MOTION_DATA_PICTURE_WIDTH ),
     m_stride( 0 )
 {
-    assert( m_pixelFormat == nxcip::PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::PIX_FMT_GRAY8 );
+    NX_ASSERT( m_pixelFormat == nxcip::AV_PIX_FMT_MONOBLACK || m_pixelFormat == nxcip::AV_PIX_FMT_GRAY8 );
 
     switch( m_pixelFormat )
     {
-        case nxcip::PIX_FMT_MONOBLACK:
+        case nxcip::AV_PIX_FMT_MONOBLACK:
             m_stride = nxpt::alignUp( m_width, CHAR_BIT ) / CHAR_BIT;
             break;
-        case nxcip::PIX_FMT_GRAY8:
+        case nxcip::AV_PIX_FMT_GRAY8:
             m_stride = m_width;
             break;
         default:
@@ -84,19 +85,20 @@ int MotionDataPicture::planeCount() const
 //!Width (pixels)
 int MotionDataPicture::width() const
 {
-    return m_width;
+    //TODO: #ak why are the fields are declared as size_t and getters as int?
+    return static_cast<int>(m_width);
 }
 
 //!Hidth (pixels)
 int MotionDataPicture::height() const
 {
-    return m_height;
+    return static_cast<int>(m_height);
 }
 
 //!Length of horizontal line in bytes
 int MotionDataPicture::xStride( int /*planeNumber*/ ) const
 {
-    return m_stride;
+    return static_cast<int>(m_stride);
 }
 
 //!Returns pointer to horizontal line \a lineNumber (starting with 0)
@@ -128,7 +130,7 @@ void MotionDataPicture::setPixel( int x, int y, int val )
 {
     switch( m_pixelFormat )
     {
-        case nxcip::PIX_FMT_MONOBLACK:
+        case nxcip::AV_PIX_FMT_MONOBLACK:
         {
             const size_t bitPos = x % CHAR_BIT;
             uint8_t* thatVeryByte = (m_data + m_stride*y) + (x / CHAR_BIT);
@@ -139,7 +141,7 @@ void MotionDataPicture::setPixel( int x, int y, int val )
             break;
         }
 
-        case nxcip::PIX_FMT_GRAY8:
+        case nxcip::AV_PIX_FMT_GRAY8:
             *(m_data + y*m_stride + x) = val;
             break;
 

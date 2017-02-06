@@ -1,5 +1,7 @@
 #include "update_utils.h"
 
+#if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
+
 #include <QtCore/QJsonDocument>
 #include <QtCore/QDir>
 #include <QtCore/QCryptographicHash>
@@ -7,39 +9,61 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <utils/common/app_info.h>
+#include <nx/fusion/model_functions.h>
+
 namespace {
 
 const QString infoEntryName = lit("update.json");
 const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
 const int passwordLength = 6;
-const int readBufferSize = 1024 * 16;
+//const int readBufferSize = 1024 * 16;
+const QString updatesCacheDirName = QnAppInfo::productNameShort() + lit("_updates");
 
-bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0, bool *isClient = 0) {
+struct UpdateFileData
+{
+    QnSoftwareVersion version;
+    QString platform;
+    QString arch;
+    QString modification;
+    QString cloudHost;
+    QString executable;
+    bool client = false;
+    QnSoftwareVersion minimalVersion;
+};
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    UpdateFileData, (json),
+    (version)(platform)(arch)(modification)(cloudHost)(executable)(client)(minimalVersion))
+
+bool verifyUpdatePackageInternal(
+    QuaZipFile* infoFile,
+    QnSoftwareVersion* version = nullptr,
+    QnSystemInformation* sysInfo = nullptr,
+    QString* cloudHost = nullptr,
+    bool* isClient = nullptr)
+{
     if (!infoFile->open(QuaZipFile::ReadOnly))
         return false;
 
-    QVariantMap info = QJsonDocument::fromJson(infoFile->readAll()).toVariant().toMap();
-    if (info.isEmpty())
-        return false;
+    const auto data = infoFile->readAll();
+    auto fileData = QJson::deserialized<UpdateFileData>(data);
 
-    QnSystemInformation locSysInfo(info.value(lit("platform")).toString(), info.value(lit("arch")).toString(), info.value(lit("modification")).toString());
+    QnSystemInformation locSysInfo(fileData.platform, fileData.arch, fileData.modification);
     if (!locSysInfo.isValid())
         return false;
 
-    QnSoftwareVersion locVersion(info.value(lit("version")).toString());
-    if (locVersion.isNull())
-        return false;
-
-    bool client = info.value(lit("client")).toBool();
-    if (!client && !info.contains(lit("executable")))
+    if (!fileData.client && fileData.executable.isEmpty())
         return false;
 
     if (version)
-        *version = locVersion;
+        *version = fileData.version;
     if (sysInfo)
         *sysInfo = locSysInfo;
+    if (cloudHost)
+        *cloudHost = fileData.cloudHost;
     if (isClient)
-        *isClient = client;
+        *isClient = fileData.client;
 
     return true;
 }
@@ -47,32 +71,50 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
 } // anonymous namespace
 
 
-bool verifyUpdatePackage(const QString &fileName, QnSoftwareVersion *version, QnSystemInformation *sysInfo, bool *isClient) {
+bool verifyUpdatePackage(
+    const QString& fileName,
+    QnSoftwareVersion* version,
+    QnSystemInformation* sysInfo,
+    QString* cloudHost,
+    bool* isClient)
+{
     QuaZipFile infoFile(fileName, infoEntryName);
-    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
+    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, cloudHost, isClient);
 }
 
 
-bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystemInformation *sysInfo, bool *isClient) {
+bool verifyUpdatePackage(
+    QIODevice* device,
+    QnSoftwareVersion* version,
+    QnSystemInformation* sysInfo,
+    QString* cloudHost,
+    bool* isClient)
+{
     QuaZip zip(device);
     if (!zip.open(QuaZip::mdUnzip))
         return false;
 
     zip.setCurrentFile(infoEntryName);
     QuaZipFile infoFile(&zip);
-    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, isClient);
+    return verifyUpdatePackageInternal(&infoFile, version, sysInfo, cloudHost, isClient);
 }
 
-QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+QDir updatesCacheDir()
+{
     QDir dir = QDir::temp();
-    if (!dir.exists(updatesDirPath))
-        dir.mkdir(updatesDirPath);
-    dir.cd(updatesDirPath);
-    return dir.absoluteFilePath(fileName);
+    if (!dir.exists(updatesCacheDirName))
+        dir.mkdir(updatesCacheDirName);
+    dir.cd(updatesCacheDirName);
+    return dir;
 }
 
+QString updateFilePath(const QString& fileName)
+{
+    return updatesCacheDir().absoluteFilePath(fileName);
+}
 
-QString makeMd5(const QString &fileName) {
+QString makeMd5(const QString &fileName)
+{
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
         return QString();
@@ -81,7 +123,8 @@ QString makeMd5(const QString &fileName) {
 }
 
 
-QString makeMd5(QIODevice *device) {
+QString makeMd5(QIODevice* device)
+{
     if (!device->isOpen() && !device->open(QIODevice::ReadOnly))
         return QString();
 
@@ -95,7 +138,8 @@ QString makeMd5(QIODevice *device) {
     return QString::fromLatin1(hash.result().toHex());
 }
 
-QString passwordForBuild(unsigned buildNumber) {
+QString passwordForBuild(unsigned buildNumber)
+{
     unsigned seed1 = buildNumber;
     unsigned seed2 = (buildNumber + 13) * 179;
     unsigned seed3 = buildNumber << 16;
@@ -104,58 +148,29 @@ QString passwordForBuild(unsigned buildNumber) {
 
     QString password;
     const int charsCount = sizeof(passwordChars) - 1;
-    for (int i = 0; i < passwordLength; i++) {
+    for (int i = 0; i < passwordLength; i++)
+    {
         password += QChar::fromLatin1(passwordChars[seed % charsCount]);
         seed /= charsCount;
     }
     return password;
 }
 
-bool extractZipArchive(QuaZip *zip, const QDir &dir) {
-    if (!dir.exists())
-        return false;
-
-    QuaZipFile file(zip);
-    for (bool more = zip->goToFirstFile(); more; more = zip->goToNextFile()) {
-        QuaZipFileInfo info;
-        zip->getCurrentFileInfo(&info);
-
-        QFileInfo fileInfo(info.name);
-        QString path = fileInfo.path();
-
-        if (!path.isEmpty() && !dir.exists(path) && !dir.mkpath(path))
-            return false;
-
-        if (!info.name.endsWith(lit("/"))) {
-            QFile destFile(dir.absoluteFilePath(info.name));
-            if (!destFile.open(QFile::WriteOnly))
-                return false;
-
-            if (!file.open(QuaZipFile::ReadOnly))
-                return false;
-
-            QByteArray buf(readBufferSize, 0);
-            while (file.bytesAvailable()) {
-                qint64 read = file.read(buf.data(), readBufferSize);
-                if (read != destFile.write(buf.data(), read)) {
-                    file.close();
-                    return false;
-                }
-            }
-            destFile.close();
-            file.close();
-
-            destFile.setPermissions(info.getPermissions());
+void clearUpdatesCache(const QnSoftwareVersion& versionToKeep)
+{
+    QDir dir = updatesCacheDir();
+    QStringList entries = dir.entryList(QDir::Files);
+    for (const auto& fileName: entries)
+    {
+        QnSoftwareVersion version;
+        if (verifyUpdatePackage(dir.absoluteFilePath(fileName), &version)
+            && version == versionToKeep)
+        {
+            continue;
         }
+
+        dir.remove(fileName);
     }
-    return zip->getZipError() == UNZ_OK;
 }
 
-
-bool extractZipArchive(const QString &zipFileName, const QDir &dir) {
-    QuaZip zip(zipFileName);
-    if (!zip.open(QuaZip::mdUnzip))
-        return false;
-
-    return extractZipArchive(&zip, dir);
-}
+#endif

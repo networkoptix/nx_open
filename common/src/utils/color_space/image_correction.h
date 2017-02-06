@@ -9,7 +9,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QMetaType>
 
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 
 struct ImageCorrectionParams
@@ -47,6 +47,8 @@ struct ImageCorrectionParams
     qreal gamma;
     bool enabled;
 };
+
+#define ImageCorrectionParams_Fields (blackLevel)(whiteLevel)(gamma)(enabled)
 
 QN_FUSION_DECLARE_FUNCTIONS(ImageCorrectionParams, (json)(metatype))
 

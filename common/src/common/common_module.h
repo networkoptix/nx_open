@@ -1,65 +1,108 @@
 #ifndef QN_COMMON_MODULE_H
 #define QN_COMMON_MODULE_H
 
-#include <QUuid>
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QMutexLocker>
+#include <QtCore/QUrl>
+#include <QtCore/QDateTime>
 
-#include <utils/common/singleton.h>
+#include <core/resource/resource_fwd.h>
+
+#include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
-#include <utils/network/module_information.h>
+#include <nx/utils/uuid.h>
+#include <nx/utils/thread/mutex.h>
+#include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include <utils/common/value_cache.h>
 
-class QnSessionManager;
+class QSettings;
+struct BeforeRestoreDbData
+{
+    void saveToSettings(QSettings* settings);
+    void loadFromSettings(const QSettings* settings);
+    bool isEmpty() const;
+
+    bool hasInfoForStorage(const QString& url) const;
+    qint64 getSpaceLimitForStorage(const QString& url) const;
+
+    static void clearSettings(QSettings* settings);
+
+    QByteArray digest;
+    QByteArray hash;
+    QByteArray cryptSha512Hash;
+    QByteArray realm;
+    QByteArray localSystemId;
+    QByteArray localSystemName;
+    QByteArray serverName;
+    QByteArray storageInfo;
+};
+
+
 class QnResourceDataPool;
 
 /**
  * Storage for common module's global state.
- * 
+ *
  * All singletons and initialization/deinitialization code goes here.
  */
-class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
+class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule>
+{
     Q_OBJECT
 public:
-    QnCommonModule(int &argc, char **argv, QObject *parent = NULL);
+    QnCommonModule(QObject *parent = NULL);
     virtual ~QnCommonModule();
 
     using Singleton<QnCommonModule>::instance;
     using QnInstanceStorage::instance;
+    using QnInstanceStorage::store;
+
+    void bindModuleinformation(const QnMediaServerResourcePtr &server);
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
     }
 
-    QnSessionManager *sessionManager() const {
-        return m_sessionManager;
-    }
+    void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
+    QnUuid moduleGUID() const{ return m_uuid; }
 
-    void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
-    QUuid moduleGUID() const{ return m_uuid; }
+    QnUuid runningInstanceGUID() const;
+    void updateRunningInstanceGuid();
 
-    void setObsoleteServerGuid(const QUuid& guid) { m_obsoleteUuid = guid; }
-    QUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
-    
-    void setRemoteGUID(const QUuid& guid) {
-        QMutexLocker lock(&m_mutex);
-        m_remoteUuid = guid; 
-    }
-    QUuid remoteGUID() const{ 
-        QMutexLocker lock(&m_mutex);
-        return m_remoteUuid; 
-    }
+    void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
+    QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
 
-    QUrl moduleUrl() const { return m_url; }
-    void setModuleUlr(const QUrl& url) { m_url = url; }
+    /*
+    * This timestamp is using for database backup/restore operation.
+    * Server has got systemIdentity time after DB restore operation
+    * This time help pushing database from current server to all others
+    */
+    void setSystemIdentityTime(qint64 value, const QnUuid& sender);
+    qint64 systemIdentityTime() const;
 
-    void setLocalSystemName(const QString& value);
-    QString localSystemName() const;
+    void setRemoteGUID(const QnUuid& guid);
+    QnUuid remoteGUID() const;
+
+    /** Server we are currently connected to. */
+    QnMediaServerResourcePtr currentServer() const;
+
+    void setReadOnly(bool value);
+    bool isReadOnly() const;
 
     void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
     QString defaultAdminPassword() const { return m_defaultAdminPassword; }
+
+    /*
+    * This function should resolve issue with install new media servers and connect their to current system
+    * Installer tell media server change password after insllation.
+    * At this case admin user will rewritted. To keep other admin user field unchanged (email settings)
+    * we have to insert new transaction with low priority
+    */
+    void setUseLowPriorityAdminPasswordHack(bool value);
+    bool useLowPriorityAdminPasswordHack() const;
+
+    void setBeforeRestoreData(const BeforeRestoreDbData& data);
+    BeforeRestoreDbData beforeRestoreDbData() const;
 
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
@@ -67,28 +110,49 @@ public:
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
 
-    void setModuleInformation(const QnModuleInformation &moduleInformation);
-    QnModuleInformation moduleInformation() const;
+    void setModuleInformation(const QnModuleInformation& moduleInformation);
+    QnModuleInformation moduleInformation();
 
+    bool isTranscodeDisabled() const { return m_transcodingDisabled; }
+    void setTranscodeDisabled(bool value) { m_transcodingDisabled = value; }
+
+    inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
+    inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
+
+    void setLocalPeerType(Qn::PeerType peerType);
+    Qn::PeerType localPeerType() const;
+    QDateTime startupTime() const;
 signals:
-    void systemNameChanged(const QString &systemName);
-
+    void readOnlyChanged(bool readOnly);
+    void moduleInformationChanged();
+    void remoteIdChanged(const QnUuid &id);
+    void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
+    void runningInstanceGUIDChanged();
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
-
 private:
-    QnSessionManager *m_sessionManager;
+    void resetCachedValue();
+    void updateModuleInformationUnsafe();
+private:
+    bool m_dirtyModuleInformation;
     QnResourceDataPool *m_dataPool;
-    QString m_localSystemName;
     QString m_defaultAdminPassword;
-    QUuid m_uuid;
-    QUuid m_obsoleteUuid;
-    QUuid m_remoteUuid;
-    QUrl m_url;
+    QnUuid m_uuid;
+    QnUuid m_runUuid;
+    QnUuid m_obsoleteUuid;
+    QnUuid m_remoteUuid;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
+    bool m_transcodingDisabled;
+    QSet<QnUuid> m_allowedPeers;
+    qint64 m_systemIdentityTime;
+
+    BeforeRestoreDbData m_beforeRestoreDbData;
+    bool m_lowPriorityAdminPassword;
+    Qn::PeerType m_localPeerType;
+    QDateTime m_startupTime;
 };
 
 #define qnCommon (QnCommonModule::instance())

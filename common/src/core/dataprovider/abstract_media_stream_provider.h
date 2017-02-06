@@ -8,7 +8,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/camera/camera_diagnostics.h"
 
@@ -32,6 +32,7 @@ public:
         TODO #ak does not look appropriate here
     */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const { return QnConstResourceAudioLayoutPtr(); };
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout() const { return QnConstResourceVideoLayoutPtr(); }
 };
 
 #endif // ENABLE_DATA_PROVIDERS

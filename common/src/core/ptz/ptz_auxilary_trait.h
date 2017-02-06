@@ -3,7 +3,9 @@
 
 #include <QtCore/QString>
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include "ptz_fwd.h"
 

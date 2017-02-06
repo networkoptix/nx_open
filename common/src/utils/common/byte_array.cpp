@@ -5,13 +5,9 @@
 
 #include <plugins/plugin_tools.h>
 #include <utils/memory/system_allocator.h>
+#include <nx/utils/log/assert.h>
 
 #include "warnings.h"
-
-/**
- * Same as FF_INPUT_BUFFER_PADDING_SIZE.
- */
-#define QN_BYTE_ARRAY_PADDING 16
 
 //#define CALC_QnByteArray_ALLOCATION
 #ifdef CALC_QnByteArray_ALLOCATION
@@ -111,6 +107,13 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
     m_size += size;
 
     return size;
+}
+
+void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
+{
+    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+    memcpy(m_data + m_size, data, size);  //1s
+    m_size += size;
 }
 
 unsigned int QnByteArray::write(quint8 value)
@@ -250,7 +253,7 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
 
 bool QnByteArray::reallocate(unsigned int capacity)
 {
-    Q_ASSERT(capacity > 0);
+    NX_ASSERT(capacity > 0);
 
     if (capacity < m_size)
     {

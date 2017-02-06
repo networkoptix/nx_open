@@ -1,16 +1,27 @@
 #include "transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
+#include <utils/media/sse_helper.h>
 
-#include "filters/abstract_image_filter.h"
+#include <transcoding/ffmpeg_transcoder.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
+#include <transcoding/ffmpeg_audio_transcoder.h>
 
-#include "ffmpeg_transcoder.h"
-#include "ffmpeg_video_transcoder.h"
-#include "ffmpeg_audio_transcoder.h"
+#include <transcoding/filters/abstract_image_filter.h>
+#include <transcoding/filters/tiled_image_filter.h>
+#include <transcoding/filters/scale_image_filter.h>
+#include <transcoding/filters/rotate_image_filter.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/config.h>
+#include <core/resource/camera_resource.h>
+#include <nx/fusion/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
-QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)
+QnCodecTranscoder::QnCodecTranscoder(AVCodecID codecId)
 :
     m_bitrate(-1),
     m_quality(Qn::QualityNormal)
@@ -51,14 +62,9 @@ void QnCodecTranscoder::setQuality( Qn::StreamQuality quality )
     m_quality = quality;
 }
 
-void QnCodecTranscoder::setSrcRect(const QRectF& srcRect)
+QRect QnCodecTranscoder::roundRect(const QRect& srcRect)
 {
-    m_srcRectF = srcRect;
-}
-
-QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
-{
-    int left = qPower2Floor((unsigned) srcRect.left(), 16);
+    int left = qPower2Floor((unsigned) srcRect.left(), CL_MEDIA_ALIGNMENT);
     int top = qPower2Floor((unsigned) srcRect.top(), 2);
 
     int width = qPower2Ceil((unsigned) srcRect.width(), 16);
@@ -67,24 +73,24 @@ QRect QnCodecTranscoder::roundRect(const QRect& srcRect) const
     return QRect(left, top, width, height);
 }
 
+QSize QnCodecTranscoder::roundSize(const QSize& size)
+{
+    int width = qPower2Ceil((unsigned) size.width(), 16);
+    int height = qPower2Ceil((unsigned) size.height(), 2);
+
+    return QSize(width, height);
+}
+
 // --------------------------- QnVideoTranscoder -----------------
 
-QnVideoTranscoder::QnVideoTranscoder(CodecID codecId):
-    QnCodecTranscoder(codecId),
-    m_layout(0)
+QnVideoTranscoder::QnVideoTranscoder(AVCodecID codecId):
+    QnCodecTranscoder(codecId)
 {
 
 }
 
 QnVideoTranscoder::~QnVideoTranscoder()
 {
-    foreach(QnAbstractImageFilter* filter, m_filters)
-        delete filter;
-}
-
-void QnVideoTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_layout = layout;
 }
 
 void QnVideoTranscoder::setResolution(const QSize& value)
@@ -92,15 +98,23 @@ void QnVideoTranscoder::setResolution(const QSize& value)
     m_resolution = value;
 }
 
-void QnVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
+void QnVideoTranscoder::setFilterList(QList<QnAbstractImageFilterPtr> filterList)
 {
-    m_filters << filter;
+    m_filters = filterList;
 }
 
-void QnVideoTranscoder::processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect, qreal ar)
+CLVideoDecoderOutputPtr QnVideoTranscoder::processFilterChain(const CLVideoDecoderOutputPtr& decodedFrame)
 {
-    foreach(QnAbstractImageFilter* filter, m_filters)
-        filter->updateImage(decodedFrame, updateRect, ar);
+    if (m_filters.isEmpty())
+        return decodedFrame;
+    CLVideoDecoderOutputPtr result = decodedFrame;
+    for(QnAbstractImageFilterPtr filter: m_filters)
+    {
+        result = filter->updateImage(result);
+        if (!result)
+            break;
+    }
+    return result;
 }
 
 QSize QnVideoTranscoder::getResolution() const
@@ -108,64 +122,54 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
+QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
+{
+    QSize result;
+    if (!video->dataProvider)
+        return result;
+    QnResourcePtr res = video->dataProvider->getResource();
+    if (!res)
+        return result;
+    const CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(res->getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME ).toLatin1() );
+    for(const auto& stream: supportedMediaStreams.streams)
+    {
+        QStringList resolutionInfo = stream.resolution.split(L'x');
+        if (resolutionInfo.size() == 2) {
+            QSize newRes(resolutionInfo[0].toInt(), resolutionInfo[1].toInt());
+            if (newRes.height() > result.height())
+                result = newRes;
+        }
+    }
+    return result;
+}
+
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+    QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-    bool lineAmountSpecified = false;
+    //bool lineAmountSpecified = false;
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
-        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
-        m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
+        QSize srcResolution = findSavedResolution(video);
+        if (srcResolution.isEmpty())
+            srcResolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
 
-        float ar = decoder.getContext()->width / (float) decoder.getContext()->height;
+
+        m_resolution.setHeight(qMin(srcResolution.height(), m_resolution.height())); // strict to source frame height
+        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),8)); // round resolution height
+
+        float ar = srcResolution.width() / (float) srcResolution.height();
         m_resolution.setWidth(m_resolution.height() * ar);
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
-        m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
-        lineAmountSpecified = true;
+        //lineAmountSpecified = true;
     }
     else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty()) {
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
     }
 
-    int width = m_resolution.width();
-    int height = m_resolution.height();
-    if (m_layout) {
-        if (lineAmountSpecified) {
-            int maxDimension = qMax(m_layout->size().width(), m_layout->size().height());
-            width /= maxDimension;
-            height /= maxDimension;
-        }
-        width = qPower2Ceil((unsigned) width , WIDTH_ALIGN);
-        height = qPower2Ceil((unsigned) height , HEIGHT_ALIGN);
-
-        width *= m_layout->size().width();
-        height *= m_layout->size().height();
-    }
-
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-        int srcLeft = qPower2Floor(unsigned(m_srcRectF.left() * width), WIDTH_ALIGN);
-        int srcTop = qPower2Floor(unsigned(m_srcRectF.top() * height), HEIGHT_ALIGN);
-        int srcWidth = qPower2Ceil(unsigned(m_srcRectF.width() * width), WIDTH_ALIGN);
-        int srcHeight = qPower2Ceil(unsigned(m_srcRectF.height() * height), HEIGHT_ALIGN);
-
-        m_srcRectF = QRectF(srcLeft / (qreal) width, srcTop / (qreal) height, 
-                            srcWidth / (qreal) width, srcHeight / (qreal) height);
-
-        width  = srcWidth;
-        height = srcHeight;
-    }
-
-    m_resolution.setWidth(qPower2Ceil((unsigned)width, WIDTH_ALIGN));
-    m_resolution.setHeight(qPower2Ceil((unsigned)height, HEIGHT_ALIGN));
-
-    if (!m_srcRectF.isEmpty())
-    {
-        // round srcRect
-    }
+    for(auto filter: m_filters)
+        setResolution(filter->updatedResolution(getResolution()));
 
     return true;
 }
@@ -174,18 +178,20 @@ bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
 
 QnTranscoder::QnTranscoder():
-    m_videoCodec(CODEC_ID_NONE),
-    m_audioCodec(CODEC_ID_NONE),
+    m_videoCodec(AV_CODEC_ID_NONE),
+    m_audioCodec(AV_CODEC_ID_NONE),
     m_videoStreamCopy(false),
     m_audioStreamCopy(false),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
     m_initialized(false),
-    m_vLayout(0),
+    m_initializedAudio(false),
+    m_initializedVideo(false),
     m_eofCounter(0),
-    m_packetizedMode(false)
+    m_packetizedMode(false),
+    m_useRealTimeOptimization(false)
 {
-    QThread::currentThread()->setPriority(QThread::LowPriority); 
+    QThread::currentThread()->setPriority(QThread::LowPriority);
 }
 
 QnTranscoder::~QnTranscoder()
@@ -194,7 +200,7 @@ QnTranscoder::~QnTranscoder()
 }
 
 int QnTranscoder::suggestMediaStreamParams(
-    CodecID codec,
+    AVCodecID codec,
     QSize resolution,
     Qn::StreamQuality quality,
     QnCodecParams::Value* const params )
@@ -210,15 +216,20 @@ int QnTranscoder::suggestMediaStreamParams(
     {
         case Qn::QualityLowest:
             hiEnd = 1024;
+            break;
         case Qn::QualityLow:
             hiEnd = 1024 + 512;
+            break;
         case Qn::QualityNormal:
             hiEnd = 1024*2;
+            break;
         case Qn::QualityHigh:
             hiEnd = 1024*3;
+            break;
         case Qn::QualityHighest:
         default:
             hiEnd = 1024*5;
+            break;
     }
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
@@ -226,7 +237,7 @@ int QnTranscoder::suggestMediaStreamParams(
 
     int result = hiEnd * resolutionFactor;
 
-    if( codec == CODEC_ID_MJPEG )
+    if( codec == AV_CODEC_ID_MJPEG )
     {
         //setting qmin and qmax, since mjpeg encoder uses only these
         if( params && !params->contains(QnCodecParams::qmin) && !params->contains(QnCodecParams::qmax) )
@@ -261,13 +272,8 @@ int QnTranscoder::suggestMediaStreamParams(
     return qMax(128,result)*1024;
 }
 
-void QnTranscoder::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
-{
-    m_vLayout = layout;
-}
-
 int QnTranscoder::setVideoCodec(
-    CodecID codec,
+    AVCodecID codec,
     TranscodeMethod method,
     Qn::StreamQuality quality,
     const QSize& resolution,
@@ -284,16 +290,27 @@ int QnTranscoder::setVideoCodec(
     switch (method)
     {
         case TM_DirectStreamCopy:
-            m_vTranscoder = QnVideoTranscoderPtr();
+            m_vTranscoder.reset();
             break;
         case TM_FfmpegTranscode:
         {
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
-            ffmpegTranscoder->setVideoLayout(m_vLayout);
-            bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
-            if (isAtom || resolution.height() >= 1080)
-                ffmpegTranscoder->setMTMode(true);
-            m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
+
+            ffmpegTranscoder->setResolution(resolution);
+            ffmpegTranscoder->setBitrate(bitrate);
+            ffmpegTranscoder->setParams(params);
+            ffmpegTranscoder->setQuality(quality);
+            ffmpegTranscoder->setUseRealTimeOptimization(m_useRealTimeOptimization);
+            m_extraTranscodeParams.setCodec(codec);
+            ffmpegTranscoder->setFilterList(m_extraTranscodeParams.createFilterChain(resolution));
+
+            if (codec != AV_CODEC_ID_H263P && codec != AV_CODEC_ID_MJPEG) {
+                // H263P and MJPEG codecs have bug for multi thread encoding in current ffmpeg version
+                bool isAtom = getCPUString().toLower().contains(QLatin1String("atom"));
+                if (isAtom || resolution.height() >= 1080)
+                    ffmpegTranscoder->setMTMode(true);
+            }
+            m_vTranscoder = QSharedPointer<QnFfmpegVideoTranscoder>(ffmpegTranscoder);
             break;
         }
             /*
@@ -303,24 +320,23 @@ int QnTranscoder::setVideoCodec(
             */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCL transcoding is not implemented.");
-            return -1;
+            return OperationResult::Error;
         default:
             m_lastErrMessage = tr("Unknown transcoding method.");
-            return -1;
+            return OperationResult::Error;
     }
-    if (m_vTranscoder)
-    {
-        m_vTranscoder->setResolution(resolution);
-        m_vTranscoder->setBitrate(bitrate);
-        m_vTranscoder->setParams(params);
-        m_vTranscoder->setQuality(quality);
-    }
-    return 0;
+    return OperationResult::Success;
 }
 
-int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
+void QnTranscoder::setUseRealTimeOptimization(bool value)
 {
-    Q_UNUSED(method);
+    m_useRealTimeOptimization = value;
+    if (m_vTranscoder)
+        m_vTranscoder->setUseRealTimeOptimization(value);
+}
+
+QnTranscoder::OperationResult QnTranscoder::setAudioCodec(AVCodecID codec, TranscodeMethod method)
+{
     m_audioCodec = codec;
     switch (method)
     {
@@ -336,13 +352,15 @@ int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             break;
             */
         case TM_OpenCLTranscode:
-            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            m_lastErrMessage = tr("OpenCLTranscode is not implemented.");
             break;
         default:
-            m_lastErrMessage = tr("Unknown Transcode Method");
+            m_lastErrMessage = tr("Unknown transcode method");
             break;
     }
-    return m_lastErrMessage.isEmpty() ? 0 : 1;
+    return m_lastErrMessage.isEmpty()
+        ? OperationResult::Success
+        : OperationResult::Error;
 }
 
 int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
@@ -361,31 +379,44 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
 
     m_eofCounter = 0;
 
-    if ((quint64)m_firstTime == AV_NOPTS_VALUE)
+    if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
     bool doTranscoding = true;
+    static const size_t kMaxDelayedQueueSize = 60;
+
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
-            m_delayedVideoQueue << qSharedPointerDynamicCast<const QnCompressedVideoData> (media);
+            m_delayedVideoQueue << std::dynamic_pointer_cast<const QnCompressedVideoData> (media);
         else
-            m_delayedAudioQueue << qSharedPointerDynamicCast<const QnCompressedAudioData> (media);
+            m_delayedAudioQueue << std::dynamic_pointer_cast<const QnCompressedAudioData> (media);
         doTranscoding = false;
-        if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
+        if (m_videoCodec != AV_CODEC_ID_NONE && m_delayedVideoQueue.isEmpty()
+            && m_delayedAudioQueue.size() < (int)kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
-        if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
+        }
+        if (m_audioCodec != AV_CODEC_ID_NONE && m_delayedAudioQueue.isEmpty()
+            && m_delayedVideoQueue.size() < (int)kMaxDelayedQueueSize)
+        {
             return 0; // not ready to init
-        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(), 
+        }
+        int rez = open(m_delayedVideoQueue.isEmpty() ? QnConstCompressedVideoDataPtr() : m_delayedVideoQueue.first(),
                        m_delayedAudioQueue.isEmpty() ? QnConstCompressedAudioDataPtr() : m_delayedAudioQueue.first());
         if (rez != 0)
             return rez;
-        m_initialized = true;
+    }
+
+    if ((media->dataType == QnAbstractMediaData::AUDIO && !m_initializedAudio) ||
+        (media->dataType == QnAbstractMediaData::VIDEO && !m_initializedVideo))
+    {
+        return OperationResult::Success;
     }
 
     if( result )
         result->clear();
-    int errCode = 0;
+    int errCode = OperationResult::Success;
     while (!m_delayedVideoQueue.isEmpty()) {
         errCode = transcodePacketInternal(m_delayedVideoQueue.dequeue(), result);
         if (errCode != 0)
@@ -402,11 +433,23 @@ int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnBy
         if (errCode != 0)
             return errCode;
     }
-    
+
     if( result )
         result->write(m_internalBuffer.data(), m_internalBuffer.size());
-    
-    return 0;
+
+    return OperationResult::Success;
+}
+
+int QnTranscoder::finalize(QnByteArray* const result)
+{
+    if (!m_initialized)
+        return OperationResult::Success;
+
+    m_internalBuffer.clear();
+    finalizeInternal(result);
+    if (result)
+        result->write(m_internalBuffer.data(), m_internalBuffer.size());
+    return OperationResult::Success;
 }
 
 bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )
@@ -436,3 +479,11 @@ const QVector<int>& QnTranscoder::getPacketsSize()
 {
     return m_outputPacketSize;
 }
+
+void QnTranscoder::setExtraTranscodeParams(const QnImageFilterHelper& extraParams)
+{
+    m_extraTranscodeParams = extraParams;
+}
+
+#endif // ENABLE_DATA_PROVIDERS
+

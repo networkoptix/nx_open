@@ -1,13 +1,24 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
-#include <QtCore/QMutex>
+#include <atomic>
+
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_factory.h>
 
 class QUrl;
 class QAuthenticator;
+
+enum class DiscoveryMode
+{
+    fullyEnabled,
+    //!In this mode only known cameras are searched. Unknown cameras are ignored
+    partiallyEnabled,
+    //!No auto camera discovery is done
+    disabled
+};
 
 /**
  * Interface for resource searcher plugins.
@@ -20,28 +31,33 @@ protected:
 public:
     virtual ~QnAbstractResourceSearcher();
 
-    /**
-     * Enables or disables this searcher.
-     * 
-     * \param use                       Whether this searcher should be used.
-     */
-    void setShouldBeUsed(bool use);
+    //!Enables/disables camera discovery
+    void setDiscoveryMode( DiscoveryMode mode );
+    DiscoveryMode discoveryMode() const;
 
-    /**
-     * \returns                         Whether this searcher should be used.
+    /** 
+     * Some searchers should be run first and in sequential order.
+     * It's needed because some devices just are not able to handle  
+     * many search request at the same time. If such a searcher returns 
+     * not empty list of found resources then search process stops and no searcher
+     * checks this url after that.
+     *
+     * Sequential searcher should be as fast as possible in order to not increase search
+     * iteration time very much.
+     *
      */
-    bool shouldBeUsed() const;
+    virtual bool isSequential() const { return false; };
 
     /**
      * Searches for resources.
-     * 
+     *
      * \returns                         List of resources found.
      */
     QnResourceList search();
 
     /**
      * Search for resources may take time. This function can be used to
-     * stop resource search prematurely. 
+     * stop resource search prematurely.
      */
     virtual void pleaseStop();
 
@@ -53,12 +69,12 @@ public:
      * \param resourceTypeId            Identifier of the type to check.
      * \returns                         Whether this factory can be used to create resources of the given type.
      */
-    virtual bool isResourceTypeSupported(QUuid resourceTypeId) const;
+    virtual bool isResourceTypeSupported(QnUuid resourceTypeId) const;
 
     /**
-     * \returns                         Name of the manufacturer for the resources this searcher adds. 
+     * \returns                         Name of the manufacturer for the resources this searcher adds.
      *                                  For example, 'AreconVision' or 'IQInVision'.
-     */ 
+     */
     virtual QString manufacture() const = 0;
 
 
@@ -66,7 +82,7 @@ public:
     virtual bool isVirtualResource() const { return false; }
 protected:
     /**
-     * This is the actual function that searches for resources. 
+     * This is the actual function that searches for resources.
      * To be implemented in derived classes.
      *
      * \returns                         List of resources found.
@@ -84,13 +100,13 @@ protected:
     bool shouldStop() const;
 
 private:
-    bool m_shouldbeUsed;
+    DiscoveryMode m_discoveryMode;
     bool m_localResources;
-    volatile bool m_shouldStop;
+    std::atomic<bool> m_shouldStop;
 };
 
 
-//=====================================================================
+// =====================================================================
 class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 protected:
@@ -102,9 +118,9 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
 };
 
-//=====================================================================
+// =====================================================================
 
-class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance?
+class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
     QnAbstractFileResourceSearcher() {}
@@ -120,7 +136,7 @@ public:
     QnResourceList checkFiles(const QStringList &files) const;
 
 protected:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QStringList m_pathListToCheck;
 };
 

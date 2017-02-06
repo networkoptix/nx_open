@@ -18,7 +18,7 @@ namespace ec2
     :
         public ApiData
     {
-        QUuid peerID;
+        QnUuid peerID;
         //!Serialized \a ec2::TimePriorityKey structure
         qint64 timePriorityKey;
         //!UTC, millis from epoch

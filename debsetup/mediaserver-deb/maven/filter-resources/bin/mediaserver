@@ -1,8 +1,22 @@
 #!/bin/bash
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 
-export LD_LIBRARY_PATH=`dirname $DIR`/lib
-export VMS_PLUGIN_DIR=`dirname $DIR`/lib/plugins
+export LD_LIBRARY_PATH="$VMS_DIR/lib"
+#export VMS_PLUGIN_DIR="$VMS_DIR/lib"
 
-$DIR/mediaserver-bin -e
+# Switch off rp_filter for all interfaces to allow
+# discover/install cameras with invalid ip addresses
+for interface in /proc/sys/net/ipv4/conf/*/rp_filter; do
+    echo "0" > ${interface}
+done
+
+# Process core dumps async
+$VMS_DIR/bin/shell_utils.sh crash_gdb_bt $VMS_DIR/bin/mediaserver-bin
+
+lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
+ulimit -n 8192
+ulimit -c unlimited
+
+ARGS="-e"
+exec start-stop-daemon --start -d $VMS_DIR/bin --exec $VMS_DIR/bin/mediaserver-bin -- $ARGS

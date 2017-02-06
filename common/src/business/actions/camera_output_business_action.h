@@ -9,7 +9,9 @@ class QnCameraOutputBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:
-    explicit QnCameraOutputBusinessAction(bool instant, const QnBusinessEventParameters &runtimeParams);
+    explicit QnCameraOutputBusinessAction(const QnBusinessEventParameters &runtimeParams);
+
+    static const int kInstantActionAutoResetTimeoutMs = 30000;
 
     QString getRelayOutputId() const;
     int getRelayAutoResetTimeout() const;

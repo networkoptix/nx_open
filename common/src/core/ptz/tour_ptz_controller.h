@@ -3,6 +3,8 @@
 
 #include "proxy_ptz_controller.h"
 
+#include <nx/utils/thread/mutex.h>
+
 template<class T>
 class QnResourcePropertyAdaptor;
 class QnTourPtzExecutor;
@@ -35,7 +37,7 @@ private:
     void clearActiveTour();
 
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QnResourcePropertyAdaptor<QnPtzTourHash> *m_adaptor;
     QnPtzTour m_activeTour;
     QnTourPtzExecutor *m_executor;

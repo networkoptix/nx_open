@@ -17,7 +17,8 @@ def runProcess(exe):
 
 def donotrebuild(result):
     if result == 'true':
-        os.makedirs('build_variables/target')
+        if not os.path.exists('build_variables/target'):
+            os.makedirs('build_variables/target')
         f = open('build_variables/target/donotrebuild', 'w')
         print 'build_variables/target/donotrebuild'
         f.close()
@@ -73,28 +74,36 @@ if __name__ == '__main__':
 
     build_branch = os.popen('hg branch').read()[:-1]
     
-    print '\n++++++++++++++++++++++++ CONFUGURED ++++++++++++++++++++++++\n'
+    print '\n++++++++++++++++++++++++ CONFIGURED ++++++++++++++++++++++++\n'
     print >> sys.stderr, 'customization is: %s' % build_customization
     print >> sys.stderr, 'configuration is: %s' % build_configuration
     print >> sys.stderr, 'build_arch is: %s' % build_arch
     print >> sys.stderr, 'branch is: %s\n' % build_branch
     print >> sys.stderr, 'box is: %s\n' % build_box
     if build_arch == 'arm':
-        targetdir = 'build_environment/target-%s' % build_box
+        if build_box != "android" and build_box != "ios":
+            targetdir = 'build_environment/target-%s' % build_box
+        else:
+            targetdir = 'build_environment/target'
     else:
         targetdir = 'build_environment/target'
     print targetdir
-    if get_environment_variable('platform') == 'windows':
-        if branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
-            donotrebuild('true')
-        else:
-            donotrebuild('false')        
+#    if get_environment_variable('platform') == 'windows':
+    if branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
+        result='true'
     else:
-        if arch == build_arch and box == build_box and branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
-            donotrebuild('true')
-        else:
-            donotrebuild('false')    
+        result='false'
+#    else:
+#        if arch == build_arch and box == build_box and branch == build_branch and os.path.isfile('%s/donotrebuild' % targetdir):
+#            result='true'
+#        else:
+#            result='false'
+
+    donotrebuild(result)    
     f = open('configure_settings_tmp.py', 'w')
     print >> f, \
     'customization = "%s" \nconfiguration = "%s" \narch = "%s" \nbranch = "%s" \nbox = "%s"' %(build_customization, build_configuration, build_arch, build_branch, build_box)
     f.close()            
+    f = open('build_variables/target/rebuild.properties', 'w')
+    print >> f,'donotrebuild = %s' %(result)
+    f.close()

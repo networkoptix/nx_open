@@ -6,281 +6,52 @@
 #include "database/db_manager.h"
 #include "utils/common/synctime.h"
 
-#include "utils/common/model_functions.h"
+#include "nx/fusion/model_functions.h"
+#include "transaction_descriptor.h"
 
+namespace ec2 {
 
-namespace ec2
+namespace ApiCommand
 {
+    QString toString(Value val) { return getTransactionDescriptorByValue(val)->getName(); }
 
-    QAtomicInt qn_abstractTransaction_sequence(1);
-
-    namespace ApiCommand
-    {
-        QString toString( Value val )
-        {
-            switch( val )
-            {
-                case tranSyncRequest:
-                    return "tranSyncRequest";
-                case tranSyncResponse:
-                    return "tranSyncResponse";
-                case lockRequest:
-                    return "lockRequest";
-                case lockResponse:
-                    return "lockResponse";
-                case unlockRequest:
-                    return "unlockRequest";
-                case peerAliveInfo:
-                    return "peerAliveInfo";
-
-                case testConnection:
-                    return "testConnection";
-                case connect:
-                    return "connect";
-
-                case getResourceTypes:
-                    return "getResourceTypes";
-                case setResourceStatus:
-                    return "setResourceStatus";
-                //case setResourceDisabled:
-                //    return "setResourceDisabled";
-                case setResourceParams:
-                    return "setResourceParams";
-                case getResourceParams:
-                    return "getResourceParams";
-                case saveResource:
-                    return "saveResource";
-                case removeResource:
-                    return "removeResource";
-                case setPanicMode:
-                    return "setPanicMode";
-                case getFullInfo:
-                    return "getFullInfo";
-
-                case saveCamera:
-                    return "saveCamera";
-                case saveCameras:
-                    return "updateCameras";
-                case removeCamera:
-                    return "removeCamera";
-                case getCameras:
-                    return "getCameras";
-                case getCameraHistoryItems:
-                    return "getCameraHistoryItems";
-                case addCameraHistoryItem:
-                    return "addCameraHistoryItem";
-
-                case getMediaServers:
-                    return "getMediaServers";
-                case saveMediaServer:
-                    return "saveMediaServer";
-                case removeMediaServer:
-                    return "removeMediaServer";
-
-                case saveUser:
-                    return "saveUser";
-                case getUsers:
-                    return "getUsers";
-                case removeUser:
-                    return "removeUser";
-
-                case saveBusinessRule:
-                    return "saveBusinessRule";
-                case removeBusinessRule:
-                    return "removeBusinessRule";
-                case broadcastBusinessAction:
-                    return "broadcastBusinessAction";
-                case execBusinessAction:
-                    return "execBusinessAction";
-                case getBusinessRules:
-                    return "getBusinessRules";
-                case resetBusinessRules:
-                    return "resetBusinessRules";
-
-                case saveLayout:
-                    return "saveLayout";
-                case saveLayouts:
-                    return "addOrUpdateLayouts";
-                case getLayouts:
-                    return "getLayouts";
-                case removeLayout:
-                    return "removeLayout";
-
-                case saveVideowall:
-                    return "saveVideowall";
-                case getVideowalls:
-                    return "getVideowalls";
-                case removeVideowall:
-                    return "removeVideowall";
-                case videowallControl:
-                    return "videowallControl";
-
-                case listDirectory:
-                    return "listDirectory";
-                case getStoredFile:
-                    return "getStoredFile";
-                case addStoredFile:
-                    return "addStoredFile";
-                case updateStoredFile:
-                    return "updateStoredFile";
-                case removeStoredFile:
-                    return "removeStoredFile";
-
-                case addLicenses:
-                    return "addLicenses";
-                case addLicense:
-                    return "addLicense";
-                case getLicenses:
-                    return "getLicenses";
-                case removeLicense:
-                    return "removeLicense";
-
-                case testEmailSettings:
-                    return "testEmailSettings";
-                case sendEmail:
-                    return "sendEmail";
-
-                case uploadUpdate:
-                    return "uploadUpdate";
-                case uploadUpdateResponce:
-                    return "uploadUpdateResponce";
-                case installUpdate:
-                    return "installUpdate";
-
-                case addCameraBookmarkTags:
-                    return "addCameraBookmarkTags";
-                case getCameraBookmarkTags:
-                    return "getCameraBookmarkTags";
-                case removeCameraBookmarkTags:
-                    return "removeCameraBookmarkTags";
-
-                case moduleInfo:
-                    return "moduleInfo";
-                case moduleInfoList:
-                    return "moduleInfoList";
-
-                case discoverPeer:
-                    return "discoverPeer";
-                case addDiscoveryInformation:
-                    return "addDiscoveryInformation";
-                case removeDiscoveryInformation:
-                    return "removeDiscoveryInformation";
-
-                case addConnection:
-                    return "addConnection";
-                case removeConnection:
-                    return "removeConnection";
-                case availableConnections:
-                    return "availableConnections";
-
-                case forcePrimaryTimeServer:
-                    return "forcePrimaryTimeServer";
-                case broadcastPeerSystemTime:
-                    return "broadcastPeerSystemTime";
-                case getCurrentTime:
-                    return "getCurrentTime";
-                case changeSystemName:
-                    return "changeSystemName";
-                case getKnownPeersSystemTime:
-                    return "getKnownPeersSystemTime";
-
-                case runtimeInfoChanged:
-                    return "runtimeInfoChanged";
-                case dumpDatabase:
-                    return "dumpDatabase";
-                case restoreDatabase:
-                    return "restoreDatabase";
-                case syncDoneMarker:
-                    return "syncDoneMarker";
-                case markLicenseOverflow:
-                    return "markLicenseOverflow";
-                default:
-                    return "unknown " + QString::number((int)val);
-            }
-        }
-
-        bool isSystem( Value val )
-        {
-            return  val == lockRequest   ||
-                    val == lockResponse  ||
-                    val == unlockRequest ||
-                    val == tranSyncRequest ||
-                    val == tranSyncResponse ||
-                    val == runtimeInfoChanged ||
-                    val == peerAliveInfo ||
-                    val == broadcastPeerSystemTime ||
-                    val == syncDoneMarker;
-        }
-
-        bool isPersistent( Value val )
-        {
-            return  val == saveResource   ||
-                val == removeResource  ||
-                val == setResourceStatus ||
-                val == setResourceParams ||
-                val == setPanicMode ||
-                val == saveCamera ||
-                val == saveCameras ||
-                val == removeCamera ||
-                val == addCameraHistoryItem ||
-                val == addCameraBookmarkTags ||
-                val == removeCameraBookmarkTags ||
-                val == saveMediaServer ||
-                val == removeMediaServer ||
-                val == saveUser ||
-                val == removeUser ||
-                val == saveLayout ||
-                val == saveLayouts ||
-                val == removeLayout ||
-                val == saveVideowall ||
-                val == removeVideowall ||
-                val == saveBusinessRule ||
-                val == removeBusinessRule ||
-                val == resetBusinessRules ||
-                val == addStoredFile ||
-                val == updateStoredFile ||
-                val == removeStoredFile ||
-                val == addDiscoveryInformation ||
-                val == removeDiscoveryInformation ||
-                val == addLicense ||
-                val == addLicenses ||
-                val == removeLicense || 
-                val == restoreDatabase ||
-                val == markLicenseOverflow;
-        }
-
+    Value fromString(const QString& val)
+	{
+        auto descriptor = getTransactionDescriptorByName(val);
+        return descriptor ? descriptor->getValue() : ApiCommand::NotDefined;
     }
 
+    bool isSystem(Value val) { return getTransactionDescriptorByValue(val)->isSystem; }
 
-    void QnAbstractTransaction::setStartSequence(int value)
-    {
-        qn_abstractTransaction_sequence = value;
-    }
+    bool isPersistent(Value val) { return getTransactionDescriptorByValue(val)->isPersistent; }
+}
 
-    void QnAbstractTransaction::fillPersistentInfo()
-    {
-        if (QnDbManager::instance() && persistentInfo.isNull()) {
-            if (!isLocal)
-                persistentInfo.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
-            persistentInfo.dbID = QnDbManager::instance()->getID();
-            persistentInfo.timestamp = QnTransactionLog::instance()->getTimeStamp();
-        }
-    }
+int generateRequestID()
+{
+    static std::atomic<int> requestId(0);
+    return ++requestId;
+}
 
-    void QnAbstractTransaction::cancel()
-    {
-        if (persistentInfo.sequence)
-            qn_abstractTransaction_sequence.fetchAndAddAcquire(-1);
-    }
+QString QnAbstractTransaction::toString() const
+{
+    return lm("command=%1 time=%2 peer=%3 dbId=%4 dbSeq=%5")
+        .arg(ApiCommand::toString(command))
+        .str(persistentInfo.timestamp)
+        .arg(peerID.toString())
+        .arg(persistentInfo.dbID.toString())
+        .arg(persistentInfo.sequence);
+}
 
-    int generateRequestID()
-    {
-        static std::atomic<int> requestID;
-        return ++requestID;
-    }
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnAbstractTransaction::PersistentInfo,
+    (json)(ubjson)(xml)(csv_record),
+    QnAbstractTransaction_PERSISTENT_Fields,
+    (optional, true))
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson),   QnAbstractTransaction_PERSISTENT_Fields)
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson),   QnAbstractTransaction_Fields)
-	
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (HistoryAttributes)(QnAbstractTransaction)(ApiTransactionData),
+    (json)(ubjson)(xml)(csv_record),
+    _Fields,
+    (optional, true))
+
 } // namespace ec2
-

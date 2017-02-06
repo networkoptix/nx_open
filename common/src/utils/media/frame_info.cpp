@@ -1,5 +1,7 @@
 #include "frame_info.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstring>
 #include <cstdio>
 
@@ -10,6 +12,7 @@ extern "C" {
 #   define AVPixFmtDescriptor __declspec(dllimport) AVPixFmtDescriptor
 #endif
 #include <libavutil/pixdesc.h>
+#include <libswscale/swscale.h>
 #ifdef WIN32
 #   undef AVPixFmtDescriptor
 #endif
@@ -80,41 +83,29 @@ void CLVideoDecoderOutput::clean()
 void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderOutput* dst)
 {
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
-    {
-        // need to reallocate dst memory
-        //rounding width and height to 32 and 16 bytes respectively
-        const int roundedWidth = (src->width & 0x1f) != 0 ? ((src->width & 0xffffffe0) + 0x20) : src->width;
-        const int roundedHeight = (src->height & 0x0f) != 0 ? ((src->height & 0xfffffff0) + 0x10) : src->height;
-        dst->setUseExternalData(false);
-        int numBytes = avpicture_get_size((PixelFormat) src->format, roundedWidth, roundedHeight);
-        avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, roundedWidth, roundedHeight);
+        dst->reallocate(src->width, src->height, src->format);
 
-        dst->width = src->width;
-        dst->height = src->height;
-        dst->format = src->format;
-    }
-
-    int yu_h = dst->format == PIX_FMT_YUV420P ? dst->height/2 : dst->height;
-
-    dst->pkt_dts = src->pkt_dts;
-    dst->pkt_pts = src->pkt_pts;
-    dst->pts = src->pts;
-
-    dst->flags = src->flags;
-    dst->sample_aspect_ratio = src->sample_aspect_ratio ;
-    dst->channel = src->channel;
+    dst->assignMiscData(src);
     //TODO/IMPL
     //dst->metadata = QnMetaDataV1Ptr( new QnMetaDataV1( *src->metadata ) );
 
-    copyPlane(dst->data[0], src->data[0], dst->linesize[0], dst->linesize[0], src->linesize[0], src->height);
-    copyPlane(dst->data[1], src->data[1], dst->linesize[1], dst->linesize[1], src->linesize[1], yu_h);
-    copyPlane(dst->data[2], src->data[2], dst->linesize[2], dst->linesize[2], src->linesize[2], yu_h);
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) src->format);
+    for (int i = 0; i < descr->nb_components && src->data[i]; ++i)
+    {
+        int h = src->height;
+        int w = src->width;
+        if (i > 0) {
+            h >>= descr->log2_chroma_h;
+            w >>= descr->log2_chroma_w;
+        }
+        copyPlane(dst->data[i], src->data[i], w, dst->linesize[i], src->linesize[i], h);
+    }
 }
 
 /*
 int CLVideoDecoderOutput::getCapacity()
 {
-    int yu_h = format == PIX_FMT_YUV420P ? height/2 : height;
+    int yu_h = format == AV_PIX_FMT_YUV420P ? height/2 : height;
     return linesize[0]*height + (linesize[1] + linesize[2])*yu_h;
 }
 */
@@ -133,23 +124,26 @@ void CLVideoDecoderOutput::fillRightEdge()
 {
     if (format == -1)
         return;
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
-    quint8 filler = 0;
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    quint32 filler = 0;
     int w = width;
     int h = height;
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int bpp = descr->comp[i].step_minus1 + 1;
         int fillLen = linesize[i] - w*bpp;
-        if (fillLen) {
+        if (fillLen >= 4)
+        {
             quint8* dst = data[i] + w*bpp;
-            for (int y = 0; y < h; ++y) {
-                memset(dst, filler, fillLen);
+            for (int y = 0; y < h; ++y)
+            {
+                *dst = filler;
                 dst += linesize[i];
             }
         }
-        if (i == 0) {
-            filler = 0x80;
+        if (i == 0)
+        {
+            filler = 0x80808080;
             w >>= descr->log2_chroma_w;
             h >>= descr->log2_chroma_h;
         }
@@ -158,7 +152,7 @@ void CLVideoDecoderOutput::fillRightEdge()
 
 void CLVideoDecoderOutput::memZerro()
 {
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && data[i]; ++i)
     {
         int w = linesize[i];
@@ -172,6 +166,11 @@ void CLVideoDecoderOutput::memZerro()
     }
 }
 
+void CLVideoDecoderOutput::reallocate(const QSize& size, int newFormat)
+{
+    reallocate(size.width(), size.height(), newFormat);
+}
+
 void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat)
 {
     clean();
@@ -180,12 +179,12 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int rc = 32 >> (newFormat == PIX_FMT_RGBA || newFormat == PIX_FMT_ABGR || newFormat == PIX_FMT_BGRA ? 2 : 0);
+    int rc = 32 >> (newFormat == AV_PIX_FMT_RGBA || newFormat == AV_PIX_FMT_ABGR || newFormat == AV_PIX_FMT_BGRA ? 2 : 0);
     int roundWidth = qPower2Ceil((unsigned) width, rc);
-    int numBytes = avpicture_get_size((PixelFormat) format, roundWidth, height);
+    int numBytes = avpicture_get_size((AVPixelFormat) format, roundWidth, height);
     if (numBytes > 0) {
         numBytes += FF_INPUT_BUFFER_PADDING_SIZE; // extra alloc space due to ffmpeg doc
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, roundWidth, height);
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, roundWidth, height);
         fillRightEdge();
     }
 }
@@ -198,9 +197,9 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
     height = newHeight;
     format = newFormat;
 
-    int numBytes = avpicture_get_size((PixelFormat) format, lineSizeHint, height);
+    int numBytes = avpicture_get_size((AVPixelFormat) format, lineSizeHint, height);
     if (numBytes > 0) {
-        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (PixelFormat) format, lineSizeHint, height);
+        avpicture_fill((AVPicture*) this, (quint8*) av_malloc(numBytes), (AVPixelFormat) format, lineSizeHint, height);
         fillRightEdge();
     }
 }
@@ -208,13 +207,13 @@ void CLVideoDecoderOutput::reallocate(int newWidth, int newHeight, int newFormat
 
 bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, const CLVideoDecoderOutput* img2, unsigned int max_diff)
 {
-    if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format) 
+    if (img1->width!=img2->width || img1->height!=img2->height || img1->format != img2->format)
         return false;
 
     if (!equalPlanes(img1->data[0], img2->data[0], img1->width, img1->linesize[0], img2->linesize[0], img1->height, max_diff))
         return false;
 
-    int uv_h = img1->format == PIX_FMT_YUV420P ? img1->height/2 : img1->height;
+    int uv_h = img1->format == AV_PIX_FMT_YUV420P ? img1->height/2 : img1->height;
 
     if (!equalPlanes(img1->data[1], img2->data[1], img1->width/2, img1->linesize[1], img2->linesize[1], uv_h, max_diff))
         return false;
@@ -225,7 +224,7 @@ bool CLVideoDecoderOutput::imagesAreEqual(const CLVideoDecoderOutput* img1, cons
     return true;
 }
 
-bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width, 
+bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsigned char* plane2, int width,
                                        int stride1, int stride2, int height, int max_diff)
 {
     const unsigned char* p1 = plane1;
@@ -260,6 +259,7 @@ bool CLVideoDecoderOutput::equalPlanes(const unsigned char* plane1, const unsign
     return true;
 }
 
+#if 0
 void CLVideoDecoderOutput::saveToFile(const char* filename)
 {
 
@@ -301,19 +301,20 @@ void CLVideoDecoderOutput::saveToFile(const char* filename)
     }
 
 }
+#endif
 
-bool CLVideoDecoderOutput::isPixelFormatSupported(PixelFormat format)
+bool CLVideoDecoderOutput::isPixelFormatSupported(AVPixelFormat format)
 {
-    return format == PIX_FMT_YUV422P || format == PIX_FMT_YUV420P || format == PIX_FMT_YUV444P;
+    return format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUV420P || format == AV_PIX_FMT_YUV444P;
 }
 
 void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 {
-    Q_ASSERT(width == frame->width);
-    Q_ASSERT(height == frame->height);
-    Q_ASSERT(format == frame->format);
+    NX_ASSERT(width == frame->width);
+    NX_ASSERT(height == frame->height);
+    NX_ASSERT(format == frame->format);
 
-    const AVPixFmtDescriptor* descr = &av_pix_fmt_descriptors[format];
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
     for (int i = 0; i < descr->nb_components && frame->data[i]; ++i)
     {
         int h = height;
@@ -327,19 +328,19 @@ void CLVideoDecoderOutput::copyDataFrom(const AVFrame* frame)
 }
 
 
-CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image) 
+CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 {
     memset( this, 0, sizeof(*this) );
 
-    reallocate(image.width(), image.height(), PIX_FMT_YUV420P);
+    reallocate(image.width(), image.height(), AV_PIX_FMT_YUV420P);
     CLVideoDecoderOutput src;
 
-    src.reallocate(width, height, PIX_FMT_RGBA);
+    src.reallocate(width, height, AV_PIX_FMT_BGRA);
     for (int y = 0; y < height; ++y)
         memcpy(src.data[0] + src.linesize[0]*y, image.scanLine(y), width * 4);
 
-    SwsContext* scaleContext = sws_getContext(width, height, PIX_FMT_RGBA, 
-                                              width, height, PIX_FMT_YUV420P, 
+    SwsContext* scaleContext = sws_getContext(width, height, AV_PIX_FMT_BGRA,
+                                              width, height, AV_PIX_FMT_YUV420P,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, src.data, src.linesize, 0, height, data, linesize);
     sws_freeContext(scaleContext);
@@ -348,10 +349,10 @@ CLVideoDecoderOutput::CLVideoDecoderOutput(QImage image)
 QImage CLVideoDecoderOutput::toImage() const
 {
     CLVideoDecoderOutput dst;
-    dst.reallocate(width, height, PIX_FMT_RGBA);
+    dst.reallocate(width, height, AV_PIX_FMT_BGRA);
 
-    SwsContext* scaleContext = sws_getContext(width, height, (PixelFormat) format, 
-                                              width, height, PIX_FMT_RGBA, 
+    SwsContext* scaleContext = sws_getContext(width, height, (AVPixelFormat) format,
+                                              width, height, AV_PIX_FMT_BGRA,
                                               SWS_BICUBIC, NULL, NULL, NULL);
     sws_scale(scaleContext, data, linesize, 0, height, dst.data, dst.linesize);
     sws_freeContext(scaleContext);
@@ -359,6 +360,171 @@ QImage CLVideoDecoderOutput::toImage() const
     QImage img(width, height, QImage::Format_ARGB32);
     for (int y = 0; y < height; ++y)
         memcpy(img.scanLine(y), dst.data[0] + dst.linesize[0]*y, width * 4);
-    
+
     return img;
 }
+
+void CLVideoDecoderOutput::assignMiscData(const CLVideoDecoderOutput* other)
+{
+    pkt_dts = other->pkt_dts;
+    pkt_pts = other->pkt_pts;
+    pts = other->pts;
+    flags = other->flags;
+    sample_aspect_ratio = other->sample_aspect_ratio;
+    channel = other->channel;
+}
+
+bool CLVideoDecoderOutput::invalidScaleParameters(const QSize& size) const
+{
+    return size.width() == 0 || size.height() == 0 || height == 0 || width == 0;
+}
+
+CLVideoDecoderOutput* CLVideoDecoderOutput::scaled(const QSize& newSize, AVPixelFormat newFormat)
+{
+    if (invalidScaleParameters(newSize))
+        return nullptr;
+
+    if (newFormat == AV_PIX_FMT_NONE)
+        newFormat = (AVPixelFormat) format;
+    CLVideoDecoderOutput* dst(new CLVideoDecoderOutput);
+    dst->reallocate(newSize.width(), newSize.height(), newFormat);
+    dst->assignMiscData(this);
+    dst->sample_aspect_ratio = 1.0;
+
+    SwsContext* scaleContext = sws_getContext(
+        width, height, (AVPixelFormat) format,
+        newSize.width(), newSize.height(), newFormat,
+        SWS_BICUBIC, NULL, NULL, NULL);
+
+    if (!scaleContext)
+        return nullptr;
+
+    sws_scale(scaleContext, data, linesize, 0, height, dst->data, dst->linesize);
+    sws_freeContext(scaleContext);
+    return dst;
+}
+
+CLVideoDecoderOutput* CLVideoDecoderOutput::rotated(int angle)
+{
+    if (angle > 180)
+        angle = 270;
+    else if (angle > 90)
+        angle = 180;
+    else
+        angle = 90;
+
+    int dstWidth = width;
+    int dstHeight = height;
+    if (angle != 180)
+        qSwap(dstWidth, dstHeight);
+
+    bool transposeChroma = false;
+    if (angle == 90 || angle == 270) {
+        if (format == AV_PIX_FMT_YUV422P || format == AV_PIX_FMT_YUVJ422P)
+            transposeChroma = true;
+    }
+
+    CLVideoDecoderOutput* dstPict(new CLVideoDecoderOutput());
+    dstPict->reallocate(dstWidth, dstHeight, format);
+    dstPict->assignMiscData(this);
+
+    const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    for (int i = 0; i < descr->nb_components && data[i]; ++i)
+    {
+        int filler = (i == 0 ? 0x0 : 0x80);
+        int numButes = dstPict->linesize[i] * dstHeight;
+        if (i > 0)
+            numButes >>= descr->log2_chroma_h;
+        memset(dstPict->data[i], filler, numButes);
+
+        int w = width;
+        int h = height;
+
+        if (i > 0 && !transposeChroma) {
+            w >>= descr->log2_chroma_w;
+            h >>= descr->log2_chroma_h;
+        }
+
+        if (angle == 90)
+        {
+            int dstLineStep = dstPict->linesize[i];
+
+            if (transposeChroma && i > 0)
+            {
+                for (int y = 0; y < h; y += 2)
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (h - y)/2 - 1;
+                    for (int x = 0; x < w/2; ++x) {
+                        quint8 pixel = ((quint16) src[0] + (quint16) src[linesize[i]]) >> 1;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        src++;
+                    }
+                }
+            }
+            else {
+                for (int y = 0; y < h; ++y)
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + h - y -1;
+                    if (angle == 270)
+                        dst += (w-1) * dstPict->linesize[i];
+                    for (int x = 0; x < w; ++x) {
+                        *dst = *src++;
+                        dst += dstLineStep;
+                    }
+                }
+            }
+        }
+        else if (angle == 270)
+        {
+            int dstLineStep = -dstPict->linesize[i];
+
+            if (transposeChroma && i > 0)
+            {
+                for (int y = 0; y < h; y += 2)
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y/2;
+                    for (int x = 0; x < w/2; ++x) {
+                        quint8 pixel = ((quint16) src[0] + (quint16) src[linesize[i]]) >> 1;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        dst[0] = pixel;
+                        dst += dstLineStep;
+                        src++;
+                    }
+                }
+            }
+            else {
+                for (int y = 0; y < h; ++y)
+                {
+                    quint8* src = data[i] + linesize[i] * y;
+                    quint8* dst = dstPict->data[i] + (w-1) * dstPict->linesize[i] + y;
+                    for (int x = 0; x < w; ++x) {
+                        *dst = *src++;
+                        dst += dstLineStep;
+                    }
+                }
+            }
+        }
+        else
+        {  // 180
+            for (int y = 0; y < h; ++y) {
+                quint8* src = data[i] + linesize[i] * y;
+                quint8* dst = dstPict->data[i] + dstPict->linesize[i] * (h-1 - y) + w-1;
+                for (int x = 0; x < w; ++x) {
+                    *dst-- = *src++;
+                }
+            }
+        }
+    }
+
+    return dstPict;
+}
+
+#endif // ENABLE_DATA_PROVIDERS
+

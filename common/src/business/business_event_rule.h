@@ -21,15 +21,14 @@ public:
 
     QString getUniqueId() const;
 
-    QUuid id() const;
-    void setId(const QUuid& value);
+    QnUuid id() const;
+    void setId(const QnUuid& value);
 
     QnBusiness::EventType eventType() const;
     void setEventType(QnBusiness::EventType eventType);
 
-    QVector<QUuid> eventResources() const;
-    void setEventResources(const QVector<QUuid> &value);
-    QnResourceList eventResourceObjects() const;
+    QVector<QnUuid> eventResources() const;
+    void setEventResources(const QVector<QnUuid> &value);
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -40,12 +39,13 @@ public:
     QnBusiness::ActionType actionType() const;
     void setActionType(QnBusiness::ActionType actionType);
 
-    QVector<QUuid> actionResources() const;
-    QnResourceList actionResourceObjects() const;
-    void setActionResources(const QVector<QUuid> &value);
+    QVector<QnUuid> actionResources() const;
+    void setActionResources(const QVector<QnUuid> &value);
 
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
+
+    bool isActionProlonged() const;
 
     /* action aggregation period in seconds */
     int aggregationPeriod() const;
@@ -67,23 +67,26 @@ public:
     bool isScheduleMatchTime(const QDateTime& datetime) const;
 
     static QnBusinessEventRuleList getDefaultRules();
+    static QnBusinessEventRuleList getSystemRules();
+    static QnBusinessEventRuleList getRulesUpd43();
+    static QnBusinessEventRuleList getRulesUpd48();
 
     QnBusinessEventRule* clone();
-    void removeResource(const QUuid& resId);
+    void removeResource(const QnUuid& resId);
 
 private:
     QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
         QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes= QnResourcePtr());
 
-    QUuid m_id;
+    QnUuid m_id;
 
     QnBusiness::EventType m_eventType;
-    QVector<QUuid> m_eventResources;
+    QVector<QnUuid> m_eventResources;
     QnBusinessEventParameters m_eventParams;
     QnBusiness::EventState m_eventState;
 
     QnBusiness::ActionType m_actionType;
-    QVector<QUuid> m_actionResources;
+    QVector<QnUuid> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;

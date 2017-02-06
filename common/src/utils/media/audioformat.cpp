@@ -38,9 +38,12 @@
 ** $QT_END_LICENSE$
 **
 ****************************************************************************/
+
+
 #include <QtCore/QDebug>
 #include "audioformat.h"
 
+#ifdef CUSTOM_AUDIO_FORMAT_CLASS
 
 QT_BEGIN_NAMESPACE
 
@@ -365,6 +368,32 @@ QnAudioFormat::SampleType QnAudioFormat::sampleType() const
     return d->sampleType;
 }
 
+qint64 QnAudioFormat::durationForBytes(int bytes) const
+{
+    if (!isValid() || bytes <= 0)
+        return 0;
+
+    // We round the byte count to ensure whole frames
+    return qint64(1000000LL * (bytes / bytesPerFrame())) / sampleRate();
+}
+
+int QnAudioFormat::bytesForDuration(qint64 durationUs) const
+{
+    if (!isValid() || durationUs <= 0)
+        return 0;
+
+    return int((durationUs * bytesPerFrame() * sampleRate()) / 1000000LL);
+}
+
+int QnAudioFormat::bytesPerFrame() const
+{
+    if (!isValid())
+        return 0;
+
+    return (sampleSize() * channelCount()) / 8;
+}
+
+
 /*!
     \enum QnAudioFormat::SampleType
 
@@ -381,5 +410,39 @@ QnAudioFormat::SampleType QnAudioFormat::sampleType() const
     \value LittleEndian  samples are little endian byte order
 */
 
+QDebug operator<<(QDebug dbg, QnAudioFormat::SampleType type)
+{
+    QDebugStateSaver saver(dbg);
+    dbg.nospace();
+    switch (type) {
+    case QnAudioFormat::SignedInt:
+        dbg << "SignedInt";
+        break;
+    case QnAudioFormat::UnSignedInt:
+        dbg << "UnSignedInt";
+        break;
+    case QnAudioFormat::Float:
+        dbg << "Float";
+        break;
+    default:
+        dbg << "Unknown";
+        break;
+    }
+    return dbg;
+}
+
+QDebug operator<<(QDebug dbg, const QnAudioFormat &f)
+{
+    QDebugStateSaver saver(dbg);
+    dbg.nospace();
+    dbg << "QAudioFormat(" << f.sampleRate() << "Hz, "
+        << f.sampleSize() << "bit, channelCount=" << f.channelCount()
+        << ", sampleType=" << f.sampleType() << ", byteOrder=" << f.byteOrder()
+        << ", codec=" << f.codec() << ')';
+
+    return dbg;
+}
+
 QT_END_NAMESPACE
 
+#endif // CUSTOM_AUDIO_FORMAT_CLASS

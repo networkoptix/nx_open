@@ -1,8 +1,6 @@
 #ifndef __NOV_ARCHIVE_DELEGATE_H
 #define __NOV_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QSharedPointer>
 #include "avi_archive_delegate.h"
 #include "recording/time_period_list.h"
@@ -20,13 +18,13 @@ public:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
     virtual bool open(const QnResourcePtr &resource) override;
+    virtual void onReverseMode(qint64 displayTime, bool value) override;
 private:
     QnTimePeriodList m_chunks;
     qint64 m_skipFramesBeforeTime;
+    bool m_reverseMode;
 };
 
 typedef QSharedPointer<QnNovArchiveDelegate> QnNovArchiveDelegatePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif // __NOV_ARCHIVE_DELEGATE_H

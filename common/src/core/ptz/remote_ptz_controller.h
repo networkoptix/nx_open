@@ -1,10 +1,12 @@
 #ifndef QN_REMOTE_PTZ_CONTROLLER_H
 #define QN_REMOTE_PTZ_CONTROLLER_H
 
-#include <QtCore/QUuid>
 #include <QtCore/QAtomicInt>
 
 #include "abstract_ptz_controller.h"
+
+#include <nx/utils/uuid.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnRemotePtzController: public QnAbstractPtzController {
     Q_OBJECT
@@ -52,7 +54,7 @@ private:
     bool isPointless(Qn::PtzCommand command);
 
     int nextSequenceNumber();
-
+    QnMediaServerResourcePtr getMediaServer() const;
 private:
     struct PtzCommandData {
         PtzCommandData(): command(Qn::InvalidPtzCommand) {}
@@ -62,12 +64,11 @@ private:
         QVariant value;
     };
 
-    QnNetworkResourcePtr m_resource;
-    QnMediaServerResourcePtr m_server;
-    QUuid m_sequenceId;
+    QnNetworkResourcePtr m_resource; //TODO: #GDM check if it is a camera
+    QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
     QHash<int, PtzCommandData> m_dataByHandle;
 };
 
