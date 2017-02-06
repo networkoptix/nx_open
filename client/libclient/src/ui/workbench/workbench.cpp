@@ -227,8 +227,6 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if (!activeItemUuid.isNull())
         setItem(Qn::ActiveRole, m_currentLayout->item(activeItemUuid));
 
-    emit currentLayoutChanged();
-
     connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(m_currentLayout,    SIGNAL(cellAspectRatioChanged()),               this, SLOT(at_layout_cellAspectRatioChanged()));
@@ -246,6 +244,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     updateActiveRoleItem();
 
     m_inLayoutChangeProcess = false;
+
+    emit currentLayoutChanged();
     emit layoutChangeProcessFinished();
 }
 

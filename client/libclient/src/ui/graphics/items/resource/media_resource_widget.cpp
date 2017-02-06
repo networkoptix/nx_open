@@ -81,6 +81,7 @@
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
 
@@ -593,6 +594,14 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    const auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource && aviResource->flags().testFlag(Qn::still_image))
+    {
+        const auto aspect = aviResource->imageAspectRatio();
+        if (aspect > 0)
+            return aspect;
+    }
+
     /* Here we get 0.0 if no custom aspect ratio set. */
     qreal result = resource()->customAspectRatio();
     if (!qFuzzyIsNull(result))
