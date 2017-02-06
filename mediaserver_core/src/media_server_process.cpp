@@ -247,6 +247,7 @@
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
@@ -2635,11 +2636,6 @@ void MediaServerProcess::run()
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
 
-#if !defined(EDGE_SERVER)
-    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
-    speechSynthesizer->start();
-#endif
-
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     auto upnpPortMapper = initializeUpnpPortMapper();
@@ -3213,6 +3209,15 @@ int MediaServerProcess::main(int argc, char* argv[])
 
 #ifdef __linux__
     signal( SIGUSR1, SIGUSR1_handler );
+#endif
+
+
+#ifndef EDGE_SERVER
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(argc, argv));
+
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
 #endif
 
     QnVideoService service( argc, argv );

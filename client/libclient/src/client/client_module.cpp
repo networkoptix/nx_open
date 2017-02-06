@@ -53,7 +53,6 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
-#include <nx_speech_synthesizer/text_to_wav.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -312,11 +311,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #ifdef Q_OS_WIN
     common->store(new QnIexploreUrlHandler());
     common->store(new QnQtbugWorkaround());
-#endif
-
-#ifndef DISABLE_FESTIVAL
-    auto textToWaveServer = qnCommon->store(new TextToWaveServer());
-    textToWaveServer->start();
 #endif
 
     common->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
