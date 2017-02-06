@@ -36,6 +36,14 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libcloud_db</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libcloud_db/pom.xml</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
