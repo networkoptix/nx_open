@@ -82,7 +82,7 @@ Page
             ownerDescription: cloudSystem ? model.ownerDescription : ""
             online: model.isConnectable
             compatible: model.isCompatible
-            invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
+            invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
         }
         highlight: Rectangle
         {
