@@ -123,11 +123,6 @@ Pane
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
             activeFocusOnTab: true
             onAccepted: credentialsEditor.accepted()
-            Component.onCompleted:
-            {
-                if (Qt.platform.os == "android")
-                    passwordCharacter = "\u2022"
-            }
             onActiveFocusChanged:
             {
                 if (activeFocus)
