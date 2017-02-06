@@ -91,10 +91,17 @@ var Config = {
             }
         ],
         order: [
+            'Live Viewer',
             'liveViewer',
+            'Viewer',
             'viewer',
+            'Advanced Viewer',
             'advancedViewer',
+            'Cloud Administrator',
             'cloudAdmin',
+            'Administrator',
+            'admin',
+            'Owner',
             'owner'
         ]
     },

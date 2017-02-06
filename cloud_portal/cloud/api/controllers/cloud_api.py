@@ -34,7 +34,7 @@ class System(object):
     @lower_case_email
     def list(email, password):
         # TODO: create wrappers
-        request = CLOUD_DB_URL + "/system/get"
+        request = CLOUD_DB_URL + "/system/get?customization=" + settings.CUSTOMIZATION
         return requests.get(request, auth=HTTPDigestAuth(email, password))
 
     @staticmethod

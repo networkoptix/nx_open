@@ -35,38 +35,41 @@ def visited_key(request):
     return Response({'visited': value})
 
 
+def detect_language_by_request(request):
+    lang = request.session.get('language', False)
+
+    # 2. Try cookie value
+    if not lang:
+        if 'language' in request.COOKIES:
+            lang = request.COOKIES['language']
+
+    # 3. Try account value
+    if not lang and request.user.is_authenticated():
+        lang = request.user.language
+
+    # 4. Try ACCEPT_LANGUAGE header
+    if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
+        languages = request.META['HTTP_ACCEPT_LANGUAGE']
+        languages = languages.split(';')[0]
+        languages = languages.split(',')
+        for l in languages:
+            if l in settings.LANGUAGES:
+                lang = l
+                break
+            if l.split('-')[0] in settings.LANGUAGES:
+                lang = l.split('-')[0]
+                break
+
+    if not lang or lang not in settings.LANGUAGES:  # not supported language
+        lang = settings.DEFAULT_LANGUAGE  # return default
+    return lang
+
+
 @api_view(['GET', 'POST'])
 @permission_classes((AllowAny, ))
 def language(request):
     if request.method == 'GET':  # Get language for current user
-        # 1. Try session value
-        lang = request.session.get('language', False)
-
-        # 2. Try cookie value
-        if not lang:
-            if 'language' in request.COOKIES:
-                lang = request.COOKIES['language']
-
-        # 3. Try account value
-        if not lang and request.user.is_authenticated():
-            lang = request.user.language
-
-        # 4. Try ACCEPT_LANGUAGE header
-        if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
-            languages = request.META['HTTP_ACCEPT_LANGUAGE']
-            languages = languages.split(';')[0]
-            languages = languages.split(',')
-            for l in languages:
-                if l in settings.LANGUAGES:
-                    lang = l
-                    break
-                if l.split('-')[0] in settings.LANGUAGES:
-                    lang = l.split('-')[0]
-                    break
-
-        if not lang:  # not supported language
-            lang = settings.DEFAULT_LANGUAGE  # return default
-
+        lang = detect_language_by_request(request)
         language_file = '/static/lang_' + lang + '/language.json'
         # Return: redirect to language.json file for selected language
         return redirect(language_file)
@@ -107,6 +110,8 @@ def downloads(request):
             customization = 'default'
         updates_record = updates_json[customization]
         latest_release = updates_record['current_release']
+        if not latest_release:  # Hack for new customizations
+            latest_release = '3.0'
         latest_version = updates_record['releases'][latest_release]
 
         build_number = latest_version.split('.')[-1]

@@ -31,10 +31,6 @@
       <translation>http://vista-cctv.com</translation>
     </message>
     <message>
-      <source>{{portalDomain}}</source>
-      <translation>qulu.cloud</translation>
-    </message>
-    <message>
       <source>{{iOSappID}}</source>
       <translation>N3KX2CKR5P.com.vista.quluMobile</translation>
     </message>  

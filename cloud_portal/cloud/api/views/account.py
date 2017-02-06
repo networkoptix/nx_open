@@ -17,7 +17,11 @@ from api.helpers.exceptions import handle_exceptions, APIRequestException, APINo
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def register(request):
-    serializer = CreateAccountSerializer(data=request.data)
+    from .utils import detect_language_by_request
+    lang = detect_language_by_request(request)
+    data = request.data
+    data['language'] = lang
+    serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
         raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
     serializer.save()

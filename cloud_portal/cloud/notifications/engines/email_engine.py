@@ -15,11 +15,11 @@ logos_cache = {}
 
 
 def send(email, msg_type, message, customization):
-    lang = get_language_for_email(email)
+    custom_config = get_custom_config(customization)
+    lang = get_language_for_email(email, custom_config['languages'])
+
     templates_root = os.path.join(settings.STATIC_LOCATION, customization, "templates")
     templates_location = os.path.join(templates_root, "lang_" + lang)
-
-    custom_config = get_custom_config(customization)
     subject = msg_type
 
     config = {
