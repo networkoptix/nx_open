@@ -1,5 +1,6 @@
 #include "resource_list_view.h"
 
+#include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
@@ -26,6 +27,8 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setUniformRowHeights(true);
     setHeaderHidden(true);
     setFocusPolicy(Qt::NoFocus);
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setProperty(style::Properties::kSideIndentation, qVariantFromValue(QnIndents()));
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);
