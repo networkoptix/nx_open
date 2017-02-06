@@ -182,6 +182,7 @@ public:
 
     //!Returns handle for PollSet
     virtual nx::network::Pollable* pollable() = 0;
+    const nx::network::Pollable* pollable() const { return const_cast<AbstractSocket*>(this)->pollable(); }
 
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
@@ -210,6 +211,9 @@ public:
               certaind thread type is not the same)
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
+
+    //!Returns true if this socket in own AIO thread
+    virtual bool isInSelfAioThread() const;
 };
 
 //!Interface for writing to/reading from socket

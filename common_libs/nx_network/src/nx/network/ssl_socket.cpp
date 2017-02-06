@@ -1480,7 +1480,7 @@ void SslSocket::cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void
 void SslSocket::cancelIOSync(nx::network::aio::EventType eventType)
 {
     Q_D(SslSocket);
-    if (pollable()->isInSelfAioThread())
+    if (isInSelfAioThread())
     {
         d->wrappedSocket->cancelIOSync(eventType);
         cancelIoFromAioThread(d, eventType);

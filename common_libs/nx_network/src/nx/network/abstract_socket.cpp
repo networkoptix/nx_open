@@ -11,6 +11,10 @@ bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
     return bind(SocketAddress(localAddress, localPort));
 }
 
+bool AbstractSocket::isInSelfAioThread() const
+{
+    return pollable()->isInSelfAioThread();
+}
 
 ////////////////////////////////////////////////////////////
 //// class AbstractCommunicatingSocket

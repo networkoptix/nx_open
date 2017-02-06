@@ -442,6 +442,12 @@ void UdtSocket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* ai
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::isInSelfAioThread() const
+{
+    return Pollable::isInSelfAioThread();
+}
+
+template<typename InterfaceToImplement>
 Pollable* UdtSocket<InterfaceToImplement>::pollable()
 {
     return this;
