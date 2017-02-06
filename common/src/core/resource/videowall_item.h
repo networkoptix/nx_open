@@ -67,6 +67,8 @@ public:
     }
 };
 
+QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
+
 Q_DECLARE_METATYPE(QnVideoWallItem)
 Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
 

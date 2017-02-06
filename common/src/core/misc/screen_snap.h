@@ -54,3 +54,6 @@ struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps>
         return l.values == r.values;
     }
 };
+
+QDebug operator<<(QDebug dbg, const QnScreenSnap& snap);
+QDebug operator<<(QDebug dbg, const QnScreenSnaps& snaps);

@@ -12,7 +12,6 @@ const QString mimeTypeId = lit("application/x-noptix-videowall-items");
 
 } // namespace
 
-
 QString QnVideoWallItem::mimeType()
 {
     return mimeTypeId;
@@ -42,4 +41,16 @@ QList<QnUuid> QnVideoWallItem::deserializeUuids(const QMimeData* mimeData)
 
     return result;
 
+}
+
+QDebug operator<<(QDebug dbg, const QnVideoWallItem& item)
+{
+    dbg.nospace()
+        << "QnVideoWallItem(" << item.name
+        << " [" << item.uuid.toSimpleString() << "]"
+        << " layout " << item.layout.toSimpleString()
+        << " pc " << item.pcUuid.toSimpleString()
+        << " at screens " << item.screenSnaps
+        << ")";
+    return dbg.space();
 }
