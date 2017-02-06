@@ -25,7 +25,7 @@ QnCloudUserPanelWidget::QnCloudUserPanelWidget(QWidget* parent /*= 0*/):
 {
     ui->setupUi(this);
 
-    ui->iconLabel->setPixmap(qnSkin->pixmap("user_settings/cloud_user_icon.png"));
+    ui->iconLabel->setPixmap(qnSkin->pixmap("cloud/cloud_32_thin_selected.png"));
 
     QFont font;
     font.setPixelSize(kCloudUserFontSizePixels);

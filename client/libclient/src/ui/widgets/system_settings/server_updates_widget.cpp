@@ -365,11 +365,11 @@ void QnServerUpdatesWidget::updateDownloadButton()
         && !m_latestVersion.isNull()
         && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
 
-    bool showButton = m_mode == QnServerUpdatesWidget::Mode::LatestVersion
+    bool showButton = m_mode != QnServerUpdatesWidget::Mode::LocalFile
         && !hasLatestVersion;
 
     ui->downloadButton->setVisible(showButton);
-    ui->downloadButton->setText(ui->targetVersionLabel->text() == kNoVersionNumberText
+    ui->downloadButton->setText(m_mode == Mode::LatestVersion
         ? tr("Download the Latest Version Update File")
         : tr("Download Update File"));
 }
@@ -558,7 +558,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::InternetProblem:
-            versionText = kNoVersionNumberText;
+            if (m_mode == Mode::LatestVersion)
+                versionText = kNoVersionNumberText;
             detail = tr("Unable to check updates on the Internet.");
             break;
 

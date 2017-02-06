@@ -367,9 +367,14 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
 
     if (!resources.isEmpty())
     {
-        qint64 pos = m_model->eventTimestamp(idx.row())/1000;
         QnActionParameters params(resources);
-        params.setArgument(Qn::ItemTimeRole, pos);
+
+        const auto timePos = m_model->eventTimestamp(idx.row());
+        if (timePos != AV_NOPTS_VALUE)
+        {
+            qint64 pos = timePos / 1000;
+            params.setArgument(Qn::ItemTimeRole, pos);
+        }
 
         context()->menu()->trigger(QnActions::OpenInNewLayoutAction, params);
 

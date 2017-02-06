@@ -1,44 +1,18 @@
-project(applauncher)
-set(PROJECT_SHORTNAME "applauncher")
-set(PROJECT_LONGNAME "${short.company.name} Application Launcher")
-if(WIN32)
-    set(WINDOWS_RES_FILE ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.obj)
-endif()
-include(default_project_properties)
+set(product.title "${applauncher.name}")
 
-# Additional Include Directories
-include_directories (${include_directories} src)
+find_sources(src CPP_FILES HPP_FILES)
+qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
 
-# Configure Qt
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Network REQUIRED)
-find_package(Qt5Xml REQUIRED)
+nx_configure_file(maven/filter-resources/applauncher_app_info_impl.cpp
+    ${CMAKE_CURRENT_BINARY_DIR})
 
-find_sources(src)
-add_qtsinglecoreapplication()
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_rc()
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)  
+add_executable(applauncher
+    ${CPP_FILES} ${MOC_FILES}
+    src/StdAfx.cpp src/StdAfx.h
+    ${CMAKE_CURRENT_BINARY_DIR}/applauncher_app_info_impl.cpp)
 
-add_executable(${PROJECT_SHORTNAME} WIN32
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
-  ${WINDOWS_RES_FILE}
-)
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core Qt5::Gui Qt5::Network Qt5::Xml quazip common nx_utils nx_network nx_streaming udt DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib
-)
-#set_target_properties(${PROJECT_SHORTNAME} PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "src/stdafx.h")
-#cotire(${PROJECT_SHORTNAME})
+add_precompiled_header(applauncher src/StdAfx.h FORCEINCLUDE)
 
-if (UNIX)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          RUNTIME DESTINATION bin)
-elseif (WIN32)
-  install(TARGETS ${PROJECT_SHORTNAME}
-          DESTINATION .)
-endif()
+target_include_directories(applauncher PRIVATE src)
+
+target_link_libraries(applauncher qtsinglecoreapplication nx_network)
