@@ -85,6 +85,8 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(p.helper.userEmail.toUpperCase());
         p.passwordInput.sendKeys(p.helper.userPassword);
         p.dialogLoginButton.click();
+
+        p.helper.sleepInIgnoredSync(2000);
         p.helper.logout();
     });
 
@@ -244,8 +246,8 @@ describe('Login dialog', function () {
         p.helper.login();
         p.helper.logout();
         browser.navigate().back();
-        // browser.pause();
-        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
+        p.helper.sleepInIgnoredSync(2000);
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
         expect(p.loginDialog.isDisplayed()).toBe(true);
     });
 
@@ -261,8 +263,10 @@ describe('Login dialog', function () {
         p.helper.login();
         p.helper.get(p.helper.urls.account);
         var accountElem = p.helper.forms.account.lastNameInput;
+        p.helper.sleepInIgnoredSync(1000);
         expect(accountElem.isDisplayed()).toBe(true);
         p.helper.logout();
+        p.helper.sleepInIgnoredSync(1000);
         expect(accountElem.isPresent()).toBe(false);
     });
 
@@ -305,12 +309,14 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword)
             .sendKeys(protractor.Key.ENTER);
+        p.helper.sleepInIgnoredSync(1000);
         expect(p.helper.loginSuccessElement.isPresent()).toBe(true);
         p.helper.logout();
     });
 
     it("should respond to Tab key", function () {
         // Navigate to next field using TAB key
+        p.helper.sleepInIgnoredSync(2000);
         p.emailInput.sendKeys(protractor.Key.TAB);
         p.helper.checkElementFocusedBy(p.passwordInput, 'id');
     });
@@ -340,19 +346,24 @@ describe('Login dialog', function () {
             var newWindow = handles[1];
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();
-                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
+                p.helper.sleepInIgnoredSync(1000);
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
                 p.helper.login();
+                p.helper.sleepInIgnoredSync(1000);
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
             });
             browser.switchTo().window(oldWindow).then(function () {
                 browser.refresh();
+                p.helper.sleepInIgnoredSync(1000);
                 expect(p.helper.loginSuccessElement.isDisplayed()).toBe(true); // user is logged in
                 p.helper.logout();
-                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
+                p.helper.sleepInIgnoredSync(1000);
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
             });
             browser.switchTo().window(newWindow).then(function () {
                 browser.refresh();
-                expect(p.helper.loginSuccessElement.isPresent()).toBe(false); // user is logged out
+                p.helper.sleepInIgnoredSync(1000);
+                expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false); // user is logged out
                 browser.close();
             });
             browser.switchTo().window(oldWindow);

@@ -11,10 +11,14 @@ describe('Confirmation email', function () {
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
             p.helper.login(p.helper.userEmail2);
             p.helper.get(url);
+
+            expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
+            p.helper.forms.logout.logOut.click(); // log out
+
             p.setNewPassword(p.helper.userPassword);
             p.helper.waitIfNotPresent(p.messageLoginLink, 500);
             expect(p.helper.forms.logout.dropdownToggle.isDisplayed()).toBe(false);
-            expect(p.messageLoginLink.isDisplayed()).toBe(true);
+            expect(p.helper.forms.restorePassPassword.messageLoginLink.isDisplayed()).toBe(true);
             expect(p.helper.forms.login.openLink.isDisplayed()).toBe(true);
         });
     });

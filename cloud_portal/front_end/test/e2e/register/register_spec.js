@@ -217,6 +217,7 @@ describe('Registration suite', function () {
         expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
         p.helper.forms.logout.logOut.click(); // log out
 
+
         // Check that element that is visible only for authorized user is NOT displayed on page
         expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
         // Check that register form is opened

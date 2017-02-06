@@ -9,6 +9,8 @@ LoginPage = function () {
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
 
+    var p = this;
+
     this.get = function () {
         browser.get('/');
         browser.waitForAngular();
@@ -43,8 +45,7 @@ LoginPage = function () {
     this.dialogLoginButton = this.helper.forms.login.submitButton;
     this.dialogCloseButton = this.loginDialog.all(by.css('button.close')).first();
 
-    this.loginSuccessElement = element.all(by.css('.auth-visible')).first(); // some element on page, that is only visible when user is authenticated
-
+    this.loginSuccessElement = p.helper.loginSuccessElement;
     this.loginDialogBackground = element(by.css('.modal')); // login dialog overlay
 
     this.navbar = element(by.css('header')).element(by.css('.navbar'));

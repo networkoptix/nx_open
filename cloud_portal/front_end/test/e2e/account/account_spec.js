@@ -31,10 +31,12 @@ describe('On account page,', function () {
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
         expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
         expect(p.userAccountDropdownMenu.getText()).toContain('Log out');
+        p.userAccountDropdownToggle.click();
     });
 
     it("it is possible to log out", function () {
         p.helper.get(p.helper.urls.homepage);
+        //element(by.css('header')).element(by.css('.navbar')).element(by.css('a[uib-dropdown-toggle]')).click();
         p.helper.logout();
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
     });

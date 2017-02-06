@@ -27,13 +27,13 @@ var RegisterPage = function () {
     this.submitButton = p.helper.forms.register.submitButton;
 
     this.openInClientButton = element(by.cssContainingText('button', 'Open '));
-    this.messageLoginLink = p.helper.forms.login.messageLoginLink;
+    this.messageLoginLink = p.helper.forms.restorePassPassword.messageLoginLink;
 
     this.fieldWrap = function(field) {
         return field.element(by.xpath('../..'));
     };
 
-    this.preRegisterMessage = "By clicking 'Create Account', you agree to our Terms and Conditions";
+    this.preRegisterMessage = "By clicking 'Create Account', you agree\nto Terms and Conditions";
 
     this.invalidClassRequired = 'ng-invalid-required';
     this.invalidClass = 'ng-invalid';
