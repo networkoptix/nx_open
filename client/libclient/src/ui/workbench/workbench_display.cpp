@@ -839,6 +839,20 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
                 newWidget->setOption(QnResourceWidget::ActivityPresence, true);
             }
 
+            /* Hide / show other items when zoomed. */
+            static const qreal kOpaque = 1.0;
+            static const qreal kTransparent = 0.0;
+
+            if (newWidget)
+                opacityAnimator(newWidget)->animateTo(kOpaque);
+
+            const auto opacity = (newWidget ? kTransparent : kOpaque);
+            for(auto widget: m_widgets)
+            {
+                if (widget != newWidget)
+                    opacityAnimator(widget)->animateTo(opacity);
+            }
+
             /* Update margin flags. */
             updateCurrentMarginFlags();
 

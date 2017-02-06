@@ -138,44 +138,36 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         addOverlayWidget(m_mainOverlayWidget, detail::OverlayParams(UserVisible, true));
     }
 
-    while (m_mainLayout->count() > 0) {
+    while (m_mainLayout->count() > 0)
+    {
         QGraphicsLayoutItem* item = m_mainLayout->itemAt(0);
         m_mainLayout->removeAt(0);
         delete item;
     }
 
-    ReviewButtons state;
-    if (item())
-        state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
+    auto createItem = [this](const QnUuid &id)
+        {
+            auto itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
+            connect(itemWidget, &QnClickableWidget::clicked, this,
+                [this](Qt::MouseButton button)
+                {
+                    if (button != Qt::LeftButton)
+                        return;
+                    workbench()->setItem(Qn::SingleSelectedRole, item());
+                });
 
-    auto createItem = [this, &state](const QnUuid &id) {
-        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
-        connect(itemWidget, &QnClickableWidget::clicked, this,
-            [this](Qt::MouseButton button)
-            {
-                if (button != Qt::LeftButton)
-                    return;
-                workbench()->setItem(Qn::SingleSelectedRole, item());
-            });
-
-        if (state.contains(id))
-            itemWidget->setInfoVisible(state[id] > 0, false);
-
-        connect(itemWidget, &QnVideowallItemWidget::infoVisibleChanged, this, [this, id](bool visible){
-            if (!this->item())
-                return;
-            ReviewButtons state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
-            state[id] = visible ? 1 : 0;    //TODO: #VW #temporary solution, will be improved if new buttons will be added
-            item()->setData(Qn::ItemVideowallReviewButtonsRole, state);
-        });
-
-        return itemWidget;
-    };
+            return itemWidget;
+        };
 
 
-    auto partOfScreen = [](const QnScreenSnaps &snaps) {
-        return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
-    };
+    auto partOfScreen = [](const QnScreenSnaps &snaps)
+        {
+            return std::any_of(snaps.values.cbegin(), snaps.values.cend(),
+                [](const QnScreenSnap &snap)
+                {
+                    return snap.snapIndex > 0;
+                });
+        };
 
     // can have several items on a single screen - or one item can take just part of the screen
     if (m_items.size() > 1 || (m_items.size() == 1 && partOfScreen(m_items.first().screenSnaps))) {

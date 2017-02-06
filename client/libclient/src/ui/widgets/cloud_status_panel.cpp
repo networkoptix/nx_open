@@ -99,8 +99,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     systemsMenu(nullptr),
 #endif
     originalTextColor(parent->palette().color(QPalette::ButtonText)),
-    loggedInIcon(qnSkin->icon("titlebar/cloud_logged.png")),
-    offlineIcon(qnSkin->icon("titlebar/cloud_offline.png"))
+    loggedInIcon(qnSkin->icon("cloud/cloud_20_selected.png")),
+    offlineIcon(qnSkin->icon("cloud/cloud_20_offline_disabled.png"))
 {
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());

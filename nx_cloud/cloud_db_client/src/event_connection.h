@@ -75,7 +75,7 @@ private:
         const std::string& proxyHost,
         std::uint16_t proxyPort) override;
 
-private slots:
+private:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);
     void onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
     void onHttpClientDone(nx_http::AsyncHttpClientPtr);
