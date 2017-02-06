@@ -166,6 +166,11 @@ void Socket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* aioTh
     return Pollable::bindToAioThread(aioThread);
 }
 
+template<typename InterfaceToImplement>
+bool Socket<InterfaceToImplement>::isInSelfAioThread() const
+{
+    return Pollable::isInSelfAioThread();
+}
 
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::bind( const SocketAddress& localAddress )

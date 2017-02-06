@@ -184,6 +184,10 @@ TEST_F(AsyncHttpClientTest, FastRemove)
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
     testHttpClientForFastRemove(lit("http://doestNotExist.host/"));
+
+    testHttpClientForFastRemove(lit("https://127.0.0.1/"));
+    testHttpClientForFastRemove(lit("https://localhost/"));
+    testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
 TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
