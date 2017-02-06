@@ -24,6 +24,7 @@ Page
             flat: true
             leftPadding: 0
             rightPadding: 0
+            labelPadding: 8
             visible: cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut
             onClicked: Workflow.openCloudScreen()
         }
