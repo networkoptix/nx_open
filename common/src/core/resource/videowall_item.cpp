@@ -7,14 +7,19 @@
 #include <common/common_globals.h>
 
 namespace {
-    const QString mimeTypeId = lit("application/x-noptix-videowall-items");
-}
 
-QString QnVideoWallItem::mimeType() {
+const QString mimeTypeId = lit("application/x-noptix-videowall-items");
+
+} // namespace
+
+
+QString QnVideoWallItem::mimeType()
+{
     return mimeTypeId;
 }
 
-void QnVideoWallItem::serializeUuids(const QList<QnUuid> &uuids, QMimeData *mimeData) {
+void QnVideoWallItem::serializeUuids(const QList<QnUuid>& uuids, QMimeData* mimeData)
+{
     if (uuids.isEmpty())
         return;
 
@@ -25,7 +30,8 @@ void QnVideoWallItem::serializeUuids(const QList<QnUuid> &uuids, QMimeData *mime
     mimeData->setData(mimeTypeId, result);
 }
 
-QList<QnUuid> QnVideoWallItem::deserializeUuids(const QMimeData *mimeData) {
+QList<QnUuid> QnVideoWallItem::deserializeUuids(const QMimeData* mimeData)
+{
     QList<QnUuid> result;
     if (!mimeData->hasFormat(mimeTypeId))
         return result;
