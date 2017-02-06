@@ -1,5 +1,5 @@
 'use strict';
-fdescribe('Create user', function () {
+describe('Create user', function () {
     var Helper = require('../helper.js');
     this.helper = new Helper();
     var self = this;
