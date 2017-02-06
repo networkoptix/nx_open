@@ -28,6 +28,7 @@ Drawer
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
             anchors.bottomMargin: bottomContent.height
+            bottomMargin: 8
             flickableDirection: Flickable.VerticalFlick
             clip: true
 
