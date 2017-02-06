@@ -13,7 +13,7 @@ describe('User activation', function () {
         p.openRegisterButton.click();
 
         expect(browser.getCurrentUrl()).toContain('register');
-        expect(p.helper.htmlBody.getText()).toContain('By clicking Register, you agree to our Terms and Conditions');
+        expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
     });
 
     it("should activate registration with a registration code sent to an email", function () {
@@ -147,7 +147,7 @@ describe('User activation', function () {
         });
     });
 
-    it("link works and logs out user, if he was logged in", function () {
+    it("link works and suggests to log out user, if he was logged in", function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail);
@@ -155,13 +155,17 @@ describe('User activation', function () {
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
+            expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
+            p.helper.forms.logout.logOut.click(); // log out
+
             expect(p.helper.forms.logout.dropdownToggle.isDisplayed()).toBe(false);
             expect(p.messageLoginLink.isDisplayed()).toBe(true);
             expect(p.helper.forms.login.openLink.isDisplayed()).toBe(true);
         });
     });
 
-    it('email can be sent again', function () {
+    // Email can not be sent again
+    xit('email can be sent again', function () {
         var userEmail = p.helper.getRandomEmail();
 
         p.helper.register(null, null, userEmail).then(function () {

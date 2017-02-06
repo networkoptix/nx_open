@@ -9,7 +9,7 @@ describe('System suite', function () {
     });
 
     it("has system name, owner and OpenInNx button visible on every system page", function() {
-        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
 
         p.systemsList.map(function (elem, index) {
             return {
@@ -34,7 +34,7 @@ describe('System suite', function () {
     xit("has system status visible if system is not online", function() {
     });
     it("has OpenInNx button disabled if system is not online", function() {
-        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
         var offlineSystems = p.systemsList.filter(function(elem) {
             // First filter systems that are not activated or offline
             return elem.getInnerHtml().then(function(content) {
@@ -54,27 +54,29 @@ describe('System suite', function () {
     }, 120000);
 
     it("should confirm, if owner deletes system (You are going to disconnect your system from cloud)", function() {
-        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
         p.ownedSystem.click();
         p.ownerDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('You will be able to connect to your system ' +
-            'only from local network. If you don\'t have local administator account, you will have to ' +
-            'create it first time when you connect to the system.');
+        expect(p.disconnectDialog.getText()).toContain('Cloud?\n'+
+        'System will be unavailable through the cloud. The only possible way to connect to the system will '+
+        'be addressing it directly(host address and port). If you don\'t have local administator account,'+
+        ' you will have to create it the first time when you connect to the system.');
         p.cancelDisconnectButton.click();
     });
 
     it("should confirm, if not owner deletes system (You will loose access to this system)", function() {
-        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailViewer, p.helper.userPassword);
         p.ownedSystem.click();
         p.userDeleteButton.click();
         expect(p.disconnectDialog.isDisplayed()).toBe(true);
-        expect(p.disconnectDialog.getText()).toContain('You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?');
+        expect(p.disconnectDialog.getText()).toContain('Delete system?\nYou are about to disconnect this system '+
+            'from your account. You will not be able to access this system via cloud anymore. Are you sure?');
         p.cancelDisconnectButton.click();
     });
 
     it("has Share button, visible for admin and owner", function() {
-        p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailAdmin, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isDisplayed()).toBe(true);
 
@@ -85,17 +87,17 @@ describe('System suite', function () {
     });
 
     it("does not show Share button to viewer, advanced viewer, live viewer", function() {
-        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
 
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdvViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailAdvViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
 
         p.helper.logout();
-        p.helper.login(p.helper.userEmailLiveViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailLiveViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.shareButton.isPresent()).toBe(false);
     });
@@ -103,7 +105,10 @@ describe('System suite', function () {
     it("should open System page by link to not authorized user and redirect to homepage, if he does not log in", function() {
         browser.get(p.url + p.systemLink);
         // Check that system page is not displayed and login form pops up
-        p.alert.catchAlert(p.alert.alertMessages.systemAccessError, p.alert.alertTypes.danger);
+
+        // Error alert used to be here. Now it's not
+        // p.alert.catchAlert(p.alert.alertMessages.systemAccessError, p.alert.alertTypes.danger);
+
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
 
@@ -116,7 +121,10 @@ describe('System suite', function () {
     it("should open System page by link to not authorized user and show it, after owner logs in", function() {
         browser.get(p.url + p.systemLink);
         // Check that system page is not displayed and login form pops up
-        p.alert.catchAlert(p.alert.alertMessages.systemAccessError, p.alert.alertTypes.danger);
+
+        //Error alert used to be here. Now it's not
+        //p.alert.catchAlert(p.alert.alertMessages.systemAccessRestricted, p.alert.alertTypes.danger);
+
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
         // Fill data into login page
@@ -125,7 +133,7 @@ describe('System suite', function () {
     });
 
     it("should open System page by link to user without permission and show alert (System info is unavailable: You have no access to this system)", function() {
-        p.helper.login(p.helper.userEmailNoPerm, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailNoPerm, p.helper.userPassword);
 
         //p.helper.getSysPage(p.systemLink);
         browser.get(p.url + p.systemLink);
@@ -136,7 +144,10 @@ describe('System suite', function () {
     it("should open System page by link not authorized user, and show alert if logs in and has no permission", function() {
         browser.get(p.url + p.systemLink);
         // Check that system page is not displayed and login form pops up
-        p.alert.catchAlert(p.alert.alertMessages.systemAccessError, p.alert.alertTypes.danger);
+
+        //Error alert used to be here. Now it's not
+        //p.alert.catchAlert(p.alert.alertMessages.systemAccessError, p.alert.alertTypes.danger);
+
         expect(p.systemNameElem.getText()).not.toContain(p.systemName);
         expect(p.loginButton.isPresent()).toBe(true);
         // Fill data into login page
@@ -158,14 +169,14 @@ describe('System suite', function () {
             p.submitShareButton.click();
 
             p.helper.logout();
-            p.helper.login(userEmail, p.helper.userPassword);
+            p.helper.loginToSystems(userEmail, p.helper.userPassword);
             p.helper.getSysPage(p.systemLink);
             expect(p.usrDataRow(userEmail).getText()).toContain(p.helper.userNameCyrillic + ' ' + p.helper.userNameCyrillic);
         });
-    }, 120000);
+    }, 180000);
 
     it("should display same user data as showed in user account (stress to cyrillic)", function() {
-        p.helper.login(p.helper.userEmailAdmin);
+        p.helper.loginToSystems(p.helper.userEmailAdmin);
         p.helper.get(p.helper.urls.account);
 
         p.helper.changeAccountNames(p.helper.userNameCyrillic, p.helper.userNameCyrillic);

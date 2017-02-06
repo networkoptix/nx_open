@@ -6,7 +6,9 @@ exports.config = {
     //chromeDriver: 'node_modules/protractor/selenium/chromedriver',
 
     //baseUrl: 'http://127.0.0.1:9000', // Local grunt serve
-    baseUrl: 'http://cloud-test.hdw.mx',
+    //baseUrl: 'http://nx.cloud-demo.hdw.mx',
+    //baseUrl: 'http://cloud-test.hdw.mx',
+    baseUrl: 'http://cox.cloud-test.hdw.mx',
     //baseUrl: 'http://cloud-local', // local vagrant
 
 
@@ -27,7 +29,7 @@ exports.config = {
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 60000
+        defaultTimeoutInterval: 120000
     },
 
     allScriptsTimeout: 8000, // by default it is 11s. See Waiting For Page Sync http://www.protractortest.org/#/timeouts

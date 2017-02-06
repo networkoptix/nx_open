@@ -2,6 +2,7 @@
 
 var RestorePasswordPage;
 RestorePasswordPage = function () {
+    var p = this;
 
     var Helper = require('../helper.js');
     this.helper = new Helper();
@@ -26,14 +27,14 @@ RestorePasswordPage = function () {
         expect(this.emailInputWrap.getAttribute('class')).toContain('has-error');
     };
 
-    this.iForgotPasswordLink = element(by.linkText('I forgot my password'));
+    this.iForgotPasswordLink = p.helper.forms.login.messageLoginLink;
     this.emailInput = element(by.model('data.email'));
     this.emailInputWrap = this.emailInput.element(by.xpath('../..'));
     this.passwordInput = element(by.model('data.newPassword')).element(by.css('input[type=password]'));
-    this.submitButton = element(by.buttonText('Restore password'));
-    this.savePasswordButton = element(by.buttonText('Save password'));
+    this.submitButton = p.helper.forms.restorePassEmail.submitButton;
+    this.savePasswordButton = p.helper.forms.restorePassPassword.submitButton;
 
-    this.messageLoginLink = element(by.css('h2')).element(by.linkText('Login'));
+    this.messageLoginLink = p.helper.forms.restorePassPassword.messageLoginLink;
 
     this.passCheck = {
         input: this.passwordInput,
@@ -65,7 +66,6 @@ RestorePasswordPage = function () {
         this.savePasswordButton.click();
         expect(element(by.css('.process-success')).isDisplayed()).toBe(true);
         expect(element(by.css('.process-success')).getText()).toContain(this.alert.alertMessages.restorePassSuccess);
-
     };
 
     this.verifySecondAttemptFails = function(restorePassUrl, newPassword) {

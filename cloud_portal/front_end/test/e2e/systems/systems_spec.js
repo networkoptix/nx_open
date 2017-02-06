@@ -6,6 +6,7 @@ describe('Systems list suite', function () {
 
     beforeAll(function() {
         p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.get('/systems');
     });
 
     beforeEach(function() {
@@ -19,12 +20,7 @@ describe('Systems list suite', function () {
     it("should show list of Systems", function () {
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(p.helper.htmlBody.getText()).toContain('Systems');
-
         expect(p.systemsList.first().isDisplayed()).toBe(true);
-    });
-
-    it("should display menu item 'Systems' as active", function () {
-        expect(p.activeMenuItem.getText()).toContain('Systems');
     });
 
     it("should show Open in NX client button for every online system", function () {
@@ -53,7 +49,7 @@ describe('Systems list suite', function () {
 
     it("should show system's state for systems if they are offline. Otherwise - button Open in Nx", function () {
         p.systemsList.each(function (elem) {
-            expect(elem.getText()).toContainAnyOf(['Open in Nx Witness','offline']);
+            expect(elem.getText()).toContainAnyOf(['Open in ','offline']);
         });
     });
 
