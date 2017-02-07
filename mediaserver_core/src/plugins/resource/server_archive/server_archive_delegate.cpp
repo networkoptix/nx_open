@@ -324,7 +324,8 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, 
                                         DeviceFileCatalog::OnRecordHole_NextChunk, 
                                         false, ignoreChunks);
-    return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
+    return chunk.startTimeMs > m_currentChunk.startTimeMs || 
+           (chunk.endTimeMs() != DATETIME_NOW && chunk.endTimeMs() > m_currentChunk.endTimeMs());
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
@@ -349,13 +350,14 @@ begin_label:
     int chunkSwitchCnt = 0;
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
-        DeviceFileCatalog::TruncableChunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
         DeviceFileCatalog::UniqueChunkCont ignoreChunks;
         bool switchResult;
         DeviceFileCatalog::Chunk fallbackChunk;
 
-        do {
+        do 
+        {
+            DeviceFileCatalog::TruncableChunk chunk;
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {
