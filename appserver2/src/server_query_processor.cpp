@@ -42,7 +42,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     PostProcessList* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
-    dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
+    m_db.getResourceParamsNoLock(tran.params.id, resourceParams);
 
     return processMultiUpdateSync(
         ApiCommand::removeResourceParam,

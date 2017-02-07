@@ -71,8 +71,7 @@ namespace detail
     class QnDbManager
     :
         public QObject,
-        public QnDbHelper,
-        public Singleton<QnDbManager>
+        public QnDbHelper
     {
         Q_OBJECT
 
@@ -663,7 +662,10 @@ namespace detail
 class QnDbManagerAccess
 {
 public:
-    QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
+    QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
+
+    Qn::UserAccessData userAccessData() const { return m_userAccessData; }
+
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullInfoData& data)
@@ -674,7 +676,7 @@ public:
     ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
     {
         const ErrorCode errorCode =
-            detail::QnDbManager::instance()->readApiFullInfoDataComplete(data);
+            m_dbManager->readApiFullInfoDataComplete(data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -704,7 +706,7 @@ public:
     ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
     {
         const ErrorCode errorCode =
-            detail::QnDbManager::instance()->readApiFullInfoDataForMobileClient(data, userId);
+            m_dbManager->readApiFullInfoDataForMobileClient(data, userId);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -734,7 +736,7 @@ public:
     template <typename T1, typename T2>
     ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
+        ErrorCode errorCode = m_dbManager->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -749,7 +751,7 @@ public:
     template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
     ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
+        ErrorCode errorCode = m_dbManager->doQuery(inParam, outParam);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -766,7 +768,7 @@ public:
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
-        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
@@ -779,7 +781,7 @@ public:
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <class Param, class SerializedTransaction>
@@ -789,7 +791,7 @@ public:
             return ErrorCode::forbidden;
         if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
             return ErrorCode::forbidden;
-        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
@@ -802,7 +804,7 @@ public:
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
 private:
@@ -813,10 +815,11 @@ private:
     }
 
     Qn::UserAccessData m_userAccessData;
+    detail::QnDbManager* m_dbManager;
 };
 
 } // namespace ec2
 
-#define dbManager(userAccessData) QnDbManagerAccess(userAccessData)
+#define dbManager(db, userAccessData) QnDbManagerAccess(db, userAccessData)
 
 #endif // __DB_MANAGER_H_

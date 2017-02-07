@@ -207,7 +207,8 @@ QnUuid QnTransactionLog::makeHash(const QByteArray &extraData, const ApiDiscover
 
 ErrorCode QnTransactionLog::updateSequence(const ApiUpdateSequenceData& data)
 {
-    detail::QnDbManager::QnDbTransactionLocker locker(dbManager(Qn::kSystemAccess).getTransaction());
+    detail::QnDbManager::QnDbTransactionLocker
+        locker(dbManager(m_dbManager, Qn::kSystemAccess).getTransaction());
     for(const ApiSyncMarkerRecord& record: data.markers)
     {
         NX_LOG( QnLog::EC2_TRAN_LOG, lit("update transaction sequence in log. key=%1 dbID=%2 dbSeq=%3").arg(record.peerID.toString()).arg(record.dbID.toString()).arg(record.sequence), cl_logDEBUG1);
@@ -254,7 +255,7 @@ ErrorCode QnTransactionLog::saveToDB(
     NX_ASSERT(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     NX_ASSERT(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     NX_ASSERT(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
-    if (tran.peerID == qnCommon->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->instance()->getID())
+    if (tran.peerID == qnCommon->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->getID())
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());

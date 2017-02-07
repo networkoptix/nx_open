@@ -4617,43 +4617,47 @@ QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 }
 } // namespace detail
 
-QnDbManagerAccess::QnDbManagerAccess(const Qn::UserAccessData &userAccessData)
-    : m_userAccessData(userAccessData)
+QnDbManagerAccess::QnDbManagerAccess(
+    detail::QnDbManager* dbManager,
+    const Qn::UserAccessData &userAccessData)
+    :
+    m_dbManager(dbManager),
+    m_userAccessData(userAccessData)
 {}
 
 ApiObjectType QnDbManagerAccess::getObjectType(const QnUuid& objectId)
 {
-    return detail::QnDbManager::instance()->getObjectType(objectId);
+    return m_dbManager->getObjectType(objectId);
 }
 
 QnDbHelper::QnDbTransaction* QnDbManagerAccess::getTransaction()
 {
-    return detail::QnDbManager::instance()->getTransaction();
+    return m_dbManager->getTransaction();
 }
 
 ApiObjectType QnDbManagerAccess::getObjectTypeNoLock(const QnUuid& objectId)
 {
-    return detail::QnDbManager::instance()->getObjectTypeNoLock(objectId);
+    return m_dbManager->getObjectTypeNoLock(objectId);
 }
 
 ApiObjectInfoList QnDbManagerAccess::getNestedObjectsNoLock(const ApiObjectInfo& parentObject)
 {
-    return detail::QnDbManager::instance()->getNestedObjectsNoLock(parentObject);
+    return m_dbManager->getNestedObjectsNoLock(parentObject);
 }
 
 ApiObjectInfoList QnDbManagerAccess::getObjectsNoLock(const ApiObjectType& objectType)
 {
-    return detail::QnDbManager::instance()->getObjectsNoLock(objectType);
+    return m_dbManager->getObjectsNoLock(objectType);
 }
 
 void QnDbManagerAccess::getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams)
 {
-    detail::QnDbManager::instance()->doQueryNoLock(resourceId, resourceParams);
+    m_dbManager->doQueryNoLock(resourceId, resourceParams);
 }
 
 bool QnDbManagerAccess::isTranAllowed(const QnAbstractTransaction& tran) const
 {
-    if (!detail::QnDbManager::instance()->isReadOnly())
+    if (!m_dbManager->isReadOnly())
         return true;
 
     switch (tran.command)

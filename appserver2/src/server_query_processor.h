@@ -106,8 +106,11 @@ public:
 
     virtual ~ServerQueryProcessor() {}
 
-    ServerQueryProcessor(const Qn::UserAccessData &userAccessData):
-        m_userAccessData(userAccessData),
+    ServerQueryProcessor(
+        detail::QnDbManager* dbManager,
+        const Qn::UserAccessData &userAccessData)
+        :
+        m_db(dbManager, userAccessData),
         m_auditManager(nullptr)
     {
     }
@@ -287,12 +290,12 @@ public:
     {
         QN_UNUSED(cmdCode);
 
-        Qn::UserAccessData accessDataCopy(m_userAccessData);
+        QnDbManagerAccess accessDataCopy(m_db);
         QnConcurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input, handler]()
             {
                 OutputData output;
-                const ErrorCode errorCode = dbManager(accessDataCopy).doQuery(input, output);
+                const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
                 handler(errorCode, output);
             });
     }
@@ -328,7 +331,7 @@ private:
 
     aux::AuditData createAuditDataCopy()
     {
-        return aux::AuditData(m_auditManager, m_authSession, m_userAccessData);
+        return aux::AuditData(m_auditManager, m_authSession, m_db.userAccessData());
     }
 
     /**
@@ -355,7 +358,7 @@ private:
             if (ApiCommand::isPersistent(tran.command))
             {
                 dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(
-                    dbManager(m_userAccessData).getTransaction()));
+                    m_db.getTransaction()));
                 errorCode = syncFunction(tran, &localPostProcessList);
                 if (errorCode != ErrorCode::ok)
                     return;
@@ -367,7 +370,7 @@ private:
             }
             else
             {
-                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_db.m_userAccessData, tran.params))
                 {
                     errorCode = ErrorCode::forbidden;
                     return;
@@ -485,7 +488,7 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeResource,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
@@ -527,7 +530,7 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeLayout,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
@@ -542,7 +545,7 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeLayout,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
@@ -575,7 +578,7 @@ private:
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeEventRule,
             tran.transactionType,
-            dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
+            m_db.getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsPostProcessList);
         if(errorCode != ErrorCode::ok)
             return errorCode;
@@ -603,7 +606,7 @@ private:
         QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
         ErrorCode errorCode =
-            dbManager(m_userAccessData).executeTransactionNoLock(tran, serializedTran);
+            m_db.executeTransactionNoLock(tran, serializedTran);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
             && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)
@@ -633,7 +636,7 @@ private:
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager(m_userAccessData).getObjectTypeNoLock(tran.params.id))
+                switch(m_db.getObjectTypeNoLock(tran.params.id))
                 {
                     case ApiObject_Server:
                         updatedTran.command = ApiCommand::removeMediaServer;
@@ -710,6 +713,7 @@ private:
 
 
 private:
+    QnDbManagerAccess m_db;
     Qn::UserAccessData m_userAccessData;
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
@@ -736,9 +740,11 @@ void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData,
 
 struct ServerQueryProcessorAccess
 {
-    detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData)
+    detail::ServerQueryProcessor getAccess(
+        detail::QnDbManager* db,
+        const Qn::UserAccessData userAccessData)
     {
-        return detail::ServerQueryProcessor(userAccessData);
+        return detail::ServerQueryProcessor(db, userAccessData);
     }
 };
 
