@@ -195,6 +195,11 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
+        const auto activeItem = m_itemByRole[Qn::ActiveRole];
+        m_currentLayout->setData(Qn::LayoutActiveItemRole, activeItem
+            ? QVariant::fromValue(activeItem->uuid())
+            : QVariant());
+
         for(int i = 0; i < Qn::ItemRoleCount; i++)
             setItem(static_cast<Qn::ItemRole>(i), NULL);
 
@@ -217,6 +222,10 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
      * signals should be emitted. */
     if(m_currentLayout == NULL)
         return;
+
+    const auto activeItemUuid = m_currentLayout->data(Qn::LayoutActiveItemRole).value<QnUuid>();
+    if (!activeItemUuid.isNull())
+        setItem(Qn::ActiveRole, m_currentLayout->item(activeItemUuid));
 
     emit currentLayoutChanged();
 
