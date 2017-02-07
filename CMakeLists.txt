@@ -20,7 +20,6 @@ set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTORCC ON)
 
 if(NOT WIN32)
     set(BUILD_SHARED_LIBS ON)
@@ -39,6 +38,7 @@ include(precompiled_header)
 include(python_exec)
 include(rdep)
 include(mercurial)
+include(project_utils)
 
 detect_platform()
 rdep_configure()

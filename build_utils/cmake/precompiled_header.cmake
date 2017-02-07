@@ -160,7 +160,7 @@ function(add_precompiled_header _target _input)
 
   if(CMAKE_COMPILER_IS_GNUCXX)
     get_filename_component(_name ${_input} NAME)
-    set(_pch_header "${CMAKE_CURRENT_SOURCE_DIR}/${_input}")
+    set(_pch_header "${_input}")
     set(_pch_binary_dir "${CMAKE_CURRENT_BINARY_DIR}/${_target}_pch")
     set(_pchfile "${_pch_binary_dir}/${_input}")
     set(_outdir "${CMAKE_CURRENT_BINARY_DIR}/${_target}_pch/${_name}.gch")
