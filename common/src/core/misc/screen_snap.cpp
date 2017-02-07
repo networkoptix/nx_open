@@ -92,7 +92,7 @@ QRect QnScreenSnaps::geometry(const QList<QRect>& screens) const
 
 QDebug operator<<(QDebug dbg, const QnScreenSnap& snap)
 {
-    dbg.nospace() << "[" << snap.screenIndex << ":" << snap.screenIndex << "]";
+    dbg.nospace() << "[" << snap.screenIndex << ":" << snap.snapIndex << "]";
     return dbg.space();
 }
 
