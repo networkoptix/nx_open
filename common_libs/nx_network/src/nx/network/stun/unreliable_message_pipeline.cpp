@@ -4,7 +4,7 @@ namespace nx {
 namespace network {
 
 DatagramPipeline::DatagramPipeline():
-    m_socket(std::make_unique<UDPSocket>())
+    m_socket(SocketFactory::createUdpSocket())
 {
     // TODO: #ak Should report this error to the caller.
     NX_ASSERT(m_socket->setNonBlockingMode(true));
