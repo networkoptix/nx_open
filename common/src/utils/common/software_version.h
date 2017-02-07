@@ -15,13 +15,24 @@
 #include <nx/fusion/model_functions_fwd.h>
 
 
-class QnSoftwareVersion: public boost::equality_comparable1<QnSoftwareVersion, boost::less_than_comparable1<QnSoftwareVersion> > {
+class QnSoftwareVersion:
+    public boost::equality_comparable1<
+        QnSoftwareVersion, boost::less_than_comparable1<QnSoftwareVersion>>
+{
+    Q_GADGET
+    Q_PROPERTY(int major READ major CONSTANT)
+    Q_PROPERTY(int minor READ minor CONSTANT)
+    Q_PROPERTY(int bugfix READ bugfix CONSTANT)
+    Q_PROPERTY(int build READ build CONSTANT)
+
 public:
-    enum Format {
+    enum Format
+    {
         FullFormat = 4,
         BugfixFormat = 3,
         MinorFormat = 2
     };
+    Q_ENUM(Format)
 
     QnSoftwareVersion();
 
@@ -37,9 +48,9 @@ public:
     explicit QnSoftwareVersion(const char *versionString);
     explicit QnSoftwareVersion(const QByteArray &versionString);
 
-    QString toString(Format format = FullFormat) const;
+    Q_INVOKABLE QString toString(Format format = FullFormat) const;
 
-    bool isNull() const;
+    Q_INVOKABLE bool isNull() const;
 
     int major() const
     {
@@ -70,6 +81,8 @@ public:
     {
         return l.isCompatible(r);
     }
+
+    Q_INVOKABLE bool isLessThan(const QnSoftwareVersion& other) const;
 
     friend bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
     friend bool operator==(const QnSoftwareVersion &l, const QnSoftwareVersion &r);

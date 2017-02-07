@@ -102,7 +102,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All fields must be filled</source>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login can&apos;t be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password can&apos;t be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -379,6 +395,13 @@
     </message>
     <message>
         <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -744,6 +744,16 @@
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
         <translation>주위:시스템에 영향이 미치것에 대해 완전히 이해 하지 않은 한 설정을 변경하지 마십시오.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1067,6 +1077,11 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>비밀번호</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1710,6 +1725,14 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Don&apos;t show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2731,32 +2754,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

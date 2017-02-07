@@ -1526,7 +1526,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         mainWindow());
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
 
     if (result == QDialogButtonBox::Cancel)
@@ -2055,7 +2055,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
 
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;

@@ -413,6 +413,22 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
+/** Locked layouts on videowall still can be removed if the user has control permissions. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLockedLayout)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, true, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+    desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
+}
+
 /************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/

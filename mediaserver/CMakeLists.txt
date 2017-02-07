@@ -14,3 +14,8 @@ add_precompiled_header(mediaserver src/StdAfx.h FORCEINCLUDE)
 target_include_directories(mediaserver PRIVATE src)
 
 target_link_libraries(mediaserver mediaserver_core festival)
+
+rdep_add_package(any/server-external-${branch} OPTIONAL PATH_VARIABLE server_external_path)
+if(NOT server_external_path)
+    rdep_add_package(any/server-external-${releaseVersion})
+endif()

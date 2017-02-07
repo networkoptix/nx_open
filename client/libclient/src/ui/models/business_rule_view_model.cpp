@@ -241,17 +241,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                     break;
             }
 
-        case Qt::TextColorRole:
-            break;
-
-        case Qt::BackgroundRole:
-            if (m_disabled || isValid())
-                break;
-
-            if (!isValid(column))
-                return qnGlobals->businessRuleInvalidColumnBackgroundColor();
-            return qnGlobals->businessRuleInvalidBackgroundColor();
-
         case Qn::UuidRole:
             return qVariantFromValue(m_id);
         case Qn::ModifiedRole:

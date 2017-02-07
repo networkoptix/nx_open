@@ -54,7 +54,7 @@ bool showCompositeDialog(
     messageBox.setText(text);
 
     if (useResources)
-        messageBox.addCustomWidget(new QnResourceListView(resources, true));
+        messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
 
     messageBox.setInformativeText(extras);
     messageBox.setCheckBoxEnabled();
@@ -146,7 +146,7 @@ bool Resources::deleteSharedLayouts(QWidget* parent, const QnResourceList& layou
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Question);
     messageBox.setText(tr("Delete %n shared layouts?", "", layouts.size()));
-    messageBox.addCustomWidget(new QnResourceListView(layouts, true));
+    messageBox.addCustomWidget(new QnResourceListView(layouts, true, &messageBox));
     messageBox.setInformativeText(
         tr("These %n layouts are shared with other users, so you delete it for them too.",
             "", layouts.size()));
@@ -178,7 +178,7 @@ bool Resources::removeItemsFromLayout(QWidget* parent,
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true));
+    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
     messageBox.setCheckBoxEnabled();
     const auto result = messageBox.exec();
     if (messageBox.isChecked())
@@ -266,7 +266,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true));
+    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
     messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();

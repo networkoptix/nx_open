@@ -11,6 +11,7 @@
 namespace {
 
 const int kMinColumnWidth = 160;
+const int kTotalLineOffset = 4;
 
 const int kTotalCamerasFontWeight = QFont::Bold;
 const int kForeignCamerasFontWeight = QFont::Normal;
@@ -41,9 +42,10 @@ void QnRecordingStatsItemDelegate::setColors(const QnRecordingStatsColors& color
 void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     NX_ASSERT(index.isValid());
-    bool isCameraName = index.column() == QnRecordingStatsModel::CameraNameColumn;
+    const bool isCameraName = index.column() == QnRecordingStatsModel::CameraNameColumn;
 
-    if (isCameraName && rowType(index) == RowType::normal)
+    const auto type = rowType(index);
+    if (isCameraName && (type == RowType::normal))
     {
         m_resourceDelegate->paint(painter, option, index);
         return;
@@ -58,6 +60,12 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
     QString label = opt.text;
 
     opt.text = QString();
+
+    const bool isTotal = (type == RowType::total);
+
+    if (isTotal)
+        opt.rect = opt.rect.adjusted(0, kTotalLineOffset, 0, 0);
+
     style->drawControl(QStyle::CE_ItemViewItem, &opt, painter, widget);
 
     if (!isCameraName)
@@ -77,11 +85,17 @@ void QnRecordingStatsItemDelegate::paint(QPainter* painter, const QStyleOptionVi
         label = opt.fontMetrics.elidedText(label, Qt::ElideRight, textRect.width());
 
     painter->drawText(textRect, opt.displayAlignment | Qt::TextSingleLine, label);
+    if (isTotal)
+    {
+        painter->setPen(opt.palette.color(QPalette::Mid));
+        painter->drawLine(opt.rect.topLeft(), opt.rect.topRight());
+    }
 }
 
 QSize QnRecordingStatsItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    bool isNormal = rowType(index) == RowType::normal;
+    const auto type = rowType(index);
+    const bool isNormal = (type == RowType::normal);
 
     if (isNormal && index.column() == QnRecordingStatsModel::CameraNameColumn)
         return m_resourceDelegate->sizeHint(option, index);
@@ -89,6 +103,8 @@ QSize QnRecordingStatsItemDelegate::sizeHint(const QStyleOptionViewItem& option,
     QSize size = base_type::sizeHint(option, index);
     if (isNormal)
         size.setWidth(std::max(size.width(), kMinColumnWidth));
+    else if (type == RowType::total)
+        size.setHeight(size.height() + kTotalLineOffset * 3);
 
     return size;
 }
