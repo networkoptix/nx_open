@@ -19,6 +19,7 @@ namespace cloud {
 static constexpr const char* const kCloudDbModuleName = "cdb";
 static constexpr const char* const kConnectionMediatorModuleName = "hpm";
 static constexpr const char* const kNotificationModuleName = "notification_module";
+static constexpr std::chrono::seconds kHttpRequestTimeout = std::chrono::seconds(10);
 
 //-------------------------------------------------------------------------------------------------
 // class CloudInstanceSelectionAttributeNameset
@@ -94,6 +95,9 @@ void CloudModuleUrlFetcher::get(Handler handler)
 //!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
 {
+    using namespace std::chrono;
+    using namespace std::placeholders;
+
     //if requested endpoint is known, providing it to the output
     QnMutexLocker lk(&m_mutex);
     if (m_url)
@@ -115,16 +119,18 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient = nx_http::AsyncHttpClient::create();
     m_httpClient->setAuth(auth);
     m_httpClient->bindToAioThread(getAioThread());
-    QObject::connect(
-        m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-        m_httpClient.get(),
-        [this](nx_http::AsyncHttpClientPtr client)
-        {
-            onHttpClientDone(std::move(client));
-        },
-        Qt::DirectConnection);
+
+    m_httpClient->setSendTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+    m_httpClient->setResponseReadTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+    m_httpClient->setMessageBodyReadTimeoutMs(
+        duration_cast<milliseconds>(kHttpRequestTimeout).count());
+
     m_requestIsRunning = true;
-    m_httpClient->doGet(QUrl(m_modulesXmlUrl));
+    m_httpClient->doGet(
+        QUrl(m_modulesXmlUrl),
+        std::bind(&CloudModuleUrlFetcher::onHttpClientDone, this, _1));
 }
 
 void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
