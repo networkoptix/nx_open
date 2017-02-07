@@ -213,14 +213,14 @@ protected:
 
         const auto millisInSecond = duration_cast<milliseconds>(seconds(1)).count();
 
-        const seconds testDurationLimit(5);
+        const seconds testDurationLimit(3);
         // Limiting number of connections to limit number of allocated ports.
-        const int maxConnectionsToEstablish = 3000;
+        const int maxConnectionsToEstablish = 5000;
 
         TestResult testResult;
 
         bool terminated = false;
-        bool connectorDone = false;
+        std::atomic<bool> connectorDone(false);
         nx::utils::thread establishConnectionThread(
             [this, &terminated, testDurationLimit, maxConnectionsToEstablish, &connectorDone]()
             {
@@ -228,7 +228,7 @@ protected:
                 {
                     TCPSocket socket;
                     ASSERT_TRUE(socket.setReuseAddrFlag(true));
-                    socket.connect(m_localServerAddress, 500);
+                    socket.connect(m_localServerAddress, 50);
                     if (i >= maxConnectionsToEstablish && !connectorDone)
                         connectorDone = true;
                 }
@@ -262,7 +262,7 @@ protected:
 
     virtual void runAcceptLoop(
         std::chrono::milliseconds testDurationLimit,
-        bool* isCancelled)
+        std::atomic<bool>* isCancelled)
     {
         using namespace std::chrono;
 
@@ -291,13 +291,13 @@ private:
     {
         auto tcpServerSocket = std::make_unique<TCPServerSocket>(AF_INET);
         NX_GTEST_ASSERT_TRUE(tcpServerSocket->bind(SocketAddress(HostAddress::localhost, 0)));
-        NX_GTEST_ASSERT_TRUE(tcpServerSocket->listen());
+        NX_GTEST_ASSERT_TRUE(tcpServerSocket->listen(256));
         m_localServerAddress = tcpServerSocket->getLocalAddress();
         return tcpServerSocket;
     }
 };
 
-TEST_F(PerformanceMultipleServerSocket, single_tcp_socket_blocking_accept)
+TEST_F(PerformanceMultipleServerSocket, single_tcp_socket)
 {
     givenMultipleServerSocketWithATcpServerSocket();
     const auto testResult = measurePerformance();
@@ -305,6 +305,48 @@ TEST_F(PerformanceMultipleServerSocket, single_tcp_socket_blocking_accept)
 }
 
 TEST_F(PerformanceMultipleServerSocket, regular_tcp_server_socket)
+{
+    givenTcpServerSocket();
+    const auto testResult = measurePerformance();
+    printResults(testResult);
+}
+
+//-------------------------------------------------------------------------------------------------
+// PerformanceRegularTcpServerSocketSyncModeEmulation
+
+class PerformanceRegularTcpServerSocketSyncModeEmulation:
+    public PerformanceMultipleServerSocket
+{
+protected:
+    virtual void runAcceptLoop(
+        std::chrono::milliseconds testDurationLimit,
+        std::atomic<bool>* isCancelled) override
+    {
+        using namespace std::chrono;
+
+        const auto startTime = system_clock::now();
+        while ((system_clock::now() < (startTime + testDurationLimit)) && !*isCancelled)
+        {
+            nx::utils::promise<AbstractStreamSocket*> accepted;
+            serverSocket()->acceptAsync(
+                [this, &accepted](
+                    SystemError::ErrorCode /*sysErrorCode*/,
+                    AbstractStreamSocket* acceptedConnection)
+                {
+                    accepted.set_value(acceptedConnection);
+                });
+            auto clientSocket = accepted.get_future().get();
+
+            if (clientSocket)
+                ++m_socketsAccepted;
+            delete clientSocket;
+        }
+        const auto endTime = system_clock::now();
+        m_testRunDuration = duration_cast<milliseconds>(endTime - startTime);
+    }
+};
+
+TEST_F(PerformanceRegularTcpServerSocketSyncModeEmulation, regular_tcp_server_socket)
 {
     givenTcpServerSocket();
     const auto testResult = measurePerformance();
@@ -327,7 +369,7 @@ public:
 protected:
     void runAcceptLoop(
         std::chrono::milliseconds testDurationLimit,
-        bool* isCancelled) override
+        std::atomic<bool>* isCancelled) override
     {
         using namespace std::chrono;
         using namespace std::placeholders;
@@ -342,7 +384,7 @@ protected:
     }
 
 private:
-    bool* m_isCancelled;
+    std::atomic<bool>* m_isCancelled;
     std::chrono::milliseconds m_testDurationLimit;
     std::chrono::steady_clock::time_point m_startTime;
     nx::utils::promise<void> m_testDone;
