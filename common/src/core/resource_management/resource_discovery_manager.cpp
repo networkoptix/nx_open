@@ -41,7 +41,8 @@ QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& au
 {
     QString urlStr = url.toString();
     this->url = url;
-    this->auth = aut    this->resType = qnResTypePool->getResourceTypeByName(resType);
+    this->auth = auth;
+    this->resType = qnResTypePool->getResourceTypeByName(resType);
     this->searcher = 0;
 }
 
