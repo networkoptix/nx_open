@@ -529,7 +529,7 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/*/*spec.js']} // Target-specific arguments
                 }
             },
-            restore_all_pass: {
+            userclean: {
                 options: {
                     args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']} // Target-specific arguments
                 }
@@ -549,12 +549,12 @@ module.exports = function (grunt) {
                     args: {specs: ['test/e2e/register/*spec.js']} // Target-specific arguments
                 }
             },
-            restore_pass: {
+            restorepass: {
                 options: {
                     args: {specs: ['test/e2e/restore_pass/*spec.js']} // Target-specific arguments
                 }
             },
-            system_page: {
+            syspage: {
                 options: {
                     args: {specs: ['test/e2e/system_page/*spec.js']} // Target-specific arguments
                 }
@@ -570,8 +570,10 @@ module.exports = function (grunt) {
                 keepAlive : true,
                 command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom'
             },
-            default:{
-
+            default: { },
+            notkeepalive: {
+                keepAlive : false,
+                command: 'webdriver-manager start -Djava.security.egd=file:///dev/urandom'
             }
         },
 
@@ -620,13 +622,39 @@ module.exports = function (grunt) {
         }
     });
 
-
     grunt.registerTask('setbranding', function (branding) {
         var config = {customization: branding};
         grunt.file.write('config.json', JSON.stringify(config, null, 2) + '\n');
         grunt.task.run(['build']);
     });
 
+    grunt.registerTask('testallportals', function (specsuit) {
+        var specsuit = specsuit || 'all';
+        var customizationsObj = JSON.parse(grunt.file.read('./test-customizations.json'));
+        var brandQuant = customizationsObj.customizations.length;
+
+        for(var i = 0; i < brandQuant; i++) {
+            grunt.task.run(
+                'settestbranding:'+ i,
+                'clean:server',
+                'copy:custom_css',
+                'configureProxies:server',
+                'autoprefixer',
+                'protractor_webdriver:notkeepalive',
+                'shell:print_version',
+                'protractor:'+ specsuit,
+                'clean:server'
+            );
+        }
+    });
+
+    grunt.registerTask('settestbranding', function (brandindex) {
+        console.log(brandindex);
+        var customizationsObj = JSON.parse(grunt.file.read('./test-customizations.json'));
+        var customizationsArr = customizationsObj.customizations;
+        console.log(customizationsArr[brandindex]);
+        grunt.file.write('./test-customization.json', JSON.stringify(customizationsArr[brandindex]));
+    });
 
     grunt.registerTask('serve', function (target) {
         if (target === 'dist') {
@@ -660,96 +688,19 @@ module.exports = function (grunt) {
     /* Instead of grunt test use following command to run suits separately
     grunt test-restore-all-pass; grunt test-account; grunt test-login; grunt test-register; grunt test-restore-pass; grunt test-syspage; grunt test-systems
     */
-    grunt.registerTask('test', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:all'
-        //'newer:jshint'
-        //'karma'
-    ]);
-    grunt.registerTask('test-restore-all-pass', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:restore_all_pass'
-    ]);
-    grunt.registerTask('test-account', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:account'
-    ]);
-    grunt.registerTask('test-login', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:login'
-    ]);
-    grunt.registerTask('test-register', [
-        'clean:server',
-        'copy:custom_css',
-        'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:register'
-    ]);
-    grunt.registerTask('test-restore-pass', [
-        'clean:server',
-        'copy:custom_css',
-        'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:restore_pass'
-    ]);
-    grunt.registerTask('test-syspage', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:system_page'
-    ]);
-    grunt.registerTask('test-systems', [
-        'clean:server',
-        'copy:custom_css',
-        //'concurrent:test',
-        'configureProxies:server',
-        'autoprefixer',
-        'connect:test',
-        'protractor_webdriver',
-        'shell:print_version',
-        'protractor:systems'
-    ]);
+    grunt.registerTask('test', function(specsuit){
+            grunt.task.run([
+            'clean:server',
+            'copy:custom_css',
+            'configureProxies:server',
+            'autoprefixer',
+            'connect:test',
+            'protractor_webdriver',
+            'shell:print_version',
+            'protractor:' + specsuit
+        ]);
+    });
+
 
     // Perform backstop:test to compare screenshots for locations specified at backstop.json with latest ones
     grunt.registerTask('testshots', [

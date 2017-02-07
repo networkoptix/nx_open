@@ -1,5 +1,7 @@
-// An example configuration file.
+var customization = require('./test-customization.json');
 exports.config = {
+
+
     // Do not start a Selenium Standalone sever - only run this using chrome.
 
     //chromeOnly: true,
@@ -7,9 +9,8 @@ exports.config = {
 
     //baseUrl: 'http://127.0.0.1:9000', // Local grunt serve
     //baseUrl: 'http://nx.cloud-demo.hdw.mx',
-    //baseUrl: 'http://cloud-test.hdw.mx',
-    baseUrl: 'http://cox.cloud-test.hdw.mx',
     //baseUrl: 'http://cloud-local', // local vagrant
+    baseUrl: customization.portal, // get portal url from ./test-customization.json (filled by grunt testallbrands)
 
 
     // Capabilities to be passed to the webdriver instance.
