@@ -37,3 +37,8 @@ Qn::GlobalPermissions migrateFromV26(GlobalPermissionsV26 oldPermissions);
 } // namespace compatibility
 } // namespace common
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (nx::common::compatibility::user_permissions::GlobalPermissionV26)
+    (nx::common::compatibility::user_permissions::GlobalPermissionsV26),
+    (lexical))

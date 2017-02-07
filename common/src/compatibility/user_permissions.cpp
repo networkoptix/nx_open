@@ -91,5 +91,3 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (GlobalPermissionV26::V20ViewExportArchivePermission, "v20_viewArchive")
     (GlobalPermissionV26::V20PanicPermission, "v20_panic")
 )
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((GlobalPermissionV26)(GlobalPermissionsV26), (lexical))
