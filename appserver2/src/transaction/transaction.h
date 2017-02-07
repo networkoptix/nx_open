@@ -1150,28 +1150,6 @@ APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
-APPLY(4001, getClientInfoList, ApiClientInfoDataList, \
-                       false, \
-                       false, \
-                       InvalidGetHashHelper(), \
-                       InvalidTriggerNotificationHelper(), \
-                       InvalidAccess(), /* save permission checker */ \
-                       InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
-                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
-                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
-APPLY(4002, saveClientInfo, ApiClientInfoData, \
-                       true, \
-                       false, \
-                       CreateHashByIdRfc4122Helper(), \
-                       EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
-                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \

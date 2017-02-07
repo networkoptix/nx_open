@@ -66,6 +66,10 @@ class QnStoredFileNotificationManager;
 class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
+namespace detail
+{
+    class QnDbManager;
+}
 
 enum class RemotePeerAccess
 {
@@ -123,7 +127,7 @@ template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&, detail::QnDbManager*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;

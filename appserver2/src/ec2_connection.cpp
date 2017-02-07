@@ -15,19 +15,18 @@ namespace ec2
         const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
-        m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )
     {
-        m_isInitialized = detail::QnDbManager::instance()->init(dbUrl);
+        // todo: #singletone. Only one connection for each connection factory allowed now
+        m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
         {
-            m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(
-                getMediaServerManager(Qn::kSystemAccess));
+            m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(this);
         }
     }
 

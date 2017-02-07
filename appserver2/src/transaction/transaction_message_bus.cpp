@@ -209,8 +209,9 @@ QnTransactionMessageBus* QnTransactionMessageBus::instance()
     return m_globalInstance;
 }
 
-QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
+QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType)
     :
+    m_db(db),
     m_localPeerType(peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -819,13 +820,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 default:
                     // These ones are 'general' transactions. They will go through the DbManager
                     // and also will be notified about via the relevant notification manager.
-                    if (!tran.persistentInfo.isNull() && detail::QnDbManager::instance())
+                    if (!tran.persistentInfo.isNull() && m_db)
                     {
                         QByteArray serializedTran =
                             QnUbjsonTransactionSerializer::instance()->serializedTransaction(
                                 tran
                             );
-                        ErrorCode errorCode = dbManager(sender->getUserAccessData())
+                        ErrorCode errorCode = dbManager(m_db, sender->getUserAccessData())
                             .executeTransaction(tran, serializedTran);
                         switch (errorCode)
                         {
@@ -1034,12 +1035,12 @@ bool QnTransactionMessageBus::readApiFullInfoData(
     ErrorCode errorCode;
     if (transport->remotePeer().peerType == Qn::PT_MobileClient)
     {
-        errorCode = dbManager(user).readApiFullInfoDataForMobileClient(
+        errorCode = dbManager(m_db, user).readApiFullInfoDataForMobileClient(
             data, user.userId);
     }
     else
     {
-        errorCode = dbManager(user).readApiFullInfoDataComplete(data);
+        errorCode = dbManager(m_db, user).readApiFullInfoDataComplete(data);
     }
 
     if (errorCode != ErrorCode::ok)
@@ -1094,14 +1095,14 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiMediaServerDataExList> tranServers;
         tranServers.command = ApiCommand::getMediaServersEx;
         tranServers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranServers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }
 
         ec2::ApiCameraDataExList cameras;
-        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), cameras) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1122,7 +1123,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranUsers.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1131,7 +1132,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiLayoutDataList> tranLayouts;
         tranLayouts.command = ApiCommand::getLayouts;
         tranLayouts.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(QnUuid(), tranLayouts.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1140,7 +1141,7 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         QnTransaction<ApiServerFootageDataList> tranCameraHistory;
         tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
         tranCameraHistory.peerID = qnCommon->moduleGUID();
-        if (dbManager(transport->getUserAccessData()).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok)
+        if (dbManager(m_db, transport->getUserAccessData()).doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok)
         {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
@@ -1552,7 +1553,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     std::function<void()> ttFinishCallback,
     const Qn::UserAccessData &userAccessData)
 {
-    if (!detail::QnDbManager::instance())
+    if (!m_db)
     {
         qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
@@ -1608,7 +1609,7 @@ void QnTransactionMessageBus::gotIncomingTransactionsConnectionFromRemotePeer(
     const nx_http::Request& request,
     const QByteArray& requestBuf)
 {
-    if (!detail::QnDbManager::instance())
+    if (!m_db)
     {
         qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return;
@@ -1636,7 +1637,7 @@ bool QnTransactionMessageBus::gotTransactionFromRemotePeer(
     const nx_http::Request& request,
     const QByteArray& requestMsgBody)
 {
-    if (!detail::QnDbManager::instance())
+    if (!m_db)
     {
         qWarning() << "This peer connected to remote Server. Ignoring incoming connection";
         return false;

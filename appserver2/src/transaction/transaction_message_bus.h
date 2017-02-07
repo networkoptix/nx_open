@@ -36,7 +36,7 @@ class QnTransactionMessageBus
 {
     Q_OBJECT
 public:
-    QnTransactionMessageBus(Qn::PeerType peerType);
+    QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType);
     virtual ~QnTransactionMessageBus();
 
     static QnTransactionMessageBus* instance();
@@ -275,6 +275,8 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
+    detail::QnDbManager* m_db;
+
     /** Info about us. */
     Qn::PeerType m_localPeerType;
 

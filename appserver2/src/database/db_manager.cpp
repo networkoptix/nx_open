@@ -45,12 +45,10 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_client_info_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
-#include "nx_ec/data/api_client_info_data.h"
 #include <nx_ec/data/api_access_rights_data.h>
 #include "api/runtime_info_manager.h"
 #include <nx/utils/log/log.h>
@@ -515,11 +513,6 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 if (!fillTransactionLogInternal<QnUuid, ApiStorageData, ApiStorageDataList>(ApiCommand::saveStorage))
                     return false;
             }
-            if (m_resyncFlags.testFlag(ResyncClientInfo))
-            {
-                if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
-                    return false;
-            }
             if (m_resyncFlags.testFlag(ResyncVideoWalls))
             {
                 if (!fillTransactionLogInternal<QnUuid, ApiVideowallData, ApiVideowallDataList>(ApiCommand::saveVideowall))
@@ -700,7 +693,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
 
         if (transactionDescriptor)
-            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object);
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object, this);
         else
             transaction.transactionType = ec2::TransactionType::Unknown;
 
@@ -743,9 +736,6 @@ bool QnDbManager::resyncTransactionLog()
         return false;
 
     if (!fillTransactionLogInternal<nullptr_t, ApiStoredFileData, ApiStoredFileDataList>(ApiCommand::addStoredFile))
-        return false;
-
-    if (!fillTransactionLogInternal<QnUuid, ApiClientInfoData, ApiClientInfoDataList>(ApiCommand::saveClientInfo))
         return false;
 
     if (!fillTransactionLogInternal<QnUuid, ApiResourceStatusData, ApiResourceStatusDataList>(ApiCommand::setResourceStatus))
@@ -1915,22 +1905,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
         return ErrorCode::dbError; // invalid back file
     }
     testDB.close();
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran)
-{
-    QSqlQuery query(m_sdb);
-    query.prepare("INSERT OR REPLACE INTO vms_client_info_list VALUES ("
-        ":id, :parentId, :skin, :systemInfo, :cpuArchitecture, :cpuModelName,"
-        ":physicalMemory, :openGLVersion, :openGLVendor, :openGLRenderer,"
-        ":fullVersion, :systemRuntime)");
-
-    QnSql::bind(tran.params, &query);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
     return ErrorCode::ok;
 }
 
@@ -3720,31 +3694,6 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiTranLogFilter& filter, ApiTransact
         }
     }
 
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data)
-{
-    QString filterStr;
-    if (!clientId.isNull())
-        filterStr = QString("WHERE guid = %1").arg(guidToSqlString(clientId));
-
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare(lit(
-        "SELECT guid as id, parent_guid as parentId, skin, systemInfo,"
-            "cpuArchitecture, cpuModelName, cpuModelName, physicalMemory,"
-            "openGLVersion, openGLVendor, openGLRenderer,"
-            "full_version as fullVersion, systemRuntime "
-        "FROM vms_client_info_list %1 ORDER BY guid"
-        ).arg(filterStr));
-
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-
-    QnSql::fetch_many(query, &data);
     return ErrorCode::ok;
 }
 

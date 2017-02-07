@@ -1031,7 +1031,7 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&)
+    ec2::TransactionType::Value operator()(const Param&, detail::QnDbManager*)
     {
         return TransactionType::Regular;
     }
@@ -1040,16 +1040,16 @@ struct RegularTransactionType
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&)
+    ec2::TransactionType::Value operator()(const Param&, detail::QnDbManager*)
     {
         return TransactionType::Local;
     }
 };
 
-ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
+ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db)
 {
     ApiMediaServerDataList serverDataList;
-    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, serverDataList);
+    ec2::ErrorCode errorCode = db->doQueryNoLock(id, serverDataList);
 
     if (errorCode != ErrorCode::ok || serverDataList.empty())
         return ec2::TransactionType::Unknown;
@@ -1059,11 +1059,11 @@ ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id)
 
 struct SetStatusTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiResourceStatusData& params)
+    ec2::TransactionType::Value operator()(const ApiResourceStatusData& params, detail::QnDbManager* db)
     {
         QnResourcePtr resource = qnResPool->getResourceById<QnResource>(params.id);
         if (!resource)
-            return getStatusTransactionTypeFromDb(params.id);
+            return getStatusTransactionTypeFromDb(params.id, db);
         if(resource.dynamicCast<QnMediaServerResource>())
             return TransactionType::Local;
         else
@@ -1073,7 +1073,7 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiUserData& params)
+    ec2::TransactionType::Value operator()(const ApiUserData& params, detail::QnDbManager* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1081,7 +1081,9 @@ struct SaveUserTransactionType
 
 struct SetResourceParamTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiResourceParamWithRefData& param)
+    ec2::TransactionType::Value operator()(
+        const ApiResourceParamWithRefData& param,
+        detail::QnDbManager* /*db*/)
     {
         if (param.resourceId == QnUserResource::kAdminGuid &&
             param.name == nx::settings_names::kNameSystemName)
@@ -1094,10 +1096,12 @@ struct SetResourceParamTransactionType
     }
 };
 
-ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
+ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
+    const QnUuid& id,
+    detail::QnDbManager* db)
 {
     ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = QnDbManager::instance()->doQueryNoLock(id, userDataList);
+    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
 
     if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;
@@ -1107,11 +1111,11 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id)
 
 struct RemoveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiIdData& params)
+    ec2::TransactionType::Value operator()(const ApiIdData& params, detail::QnDbManager* db)
     {
         auto user = qnResPool->getResourceById<QnUserResource>(params.id);
         if (!user)
-            return getRemoveUserTransactionTypeFromDb(params.id);
+            return getRemoveUserTransactionTypeFromDb(params.id, db);
         return user->isCloud() ? TransactionType::Cloud : TransactionType::Regular;
     }
 };

@@ -82,6 +82,20 @@ namespace ec2
     }
 
     template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::getCamerasEx(impl::GetCamerasExHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler, this](ErrorCode errorCode, const ApiCameraDataExList& cameras)
+        {
+            handler->done(reqID, errorCode, cameras);
+        };
+        m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid, ApiCameraDataExList, decltype(queryDoneHandler)>
+            (ApiCommand::getCamerasEx, QnUuid(), queryDoneHandler);
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
     int QnCameraManager<QueryProcessorType>::addCamera( const ec2::ApiCameraData& camera, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();

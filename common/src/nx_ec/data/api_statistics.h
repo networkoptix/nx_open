@@ -111,14 +111,13 @@ namespace ec2 {
 
         std::vector<ApiBusinessRuleStatistics> businessRules;
         std::vector<ApiCameraDataStatistics> cameras;
-        std::vector<ApiClientInfoData> clients;
         std::vector<ApiLicenseStatistics> licenses;
         std::vector<ApiMediaServerDataStatistics> mediaservers;
         std::vector<ApiLayoutData> layouts;
         std::vector<ApiUserDataStatistics> users;
     };
 #define ApiSystemStatistics_Fields (systemId) \
-    (mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)(users) \
+    (mediaservers)(cameras)(licenses)(businessRules)(layouts)(users) \
     (reportInfo)
 
     struct ApiStatisticsServerInfo

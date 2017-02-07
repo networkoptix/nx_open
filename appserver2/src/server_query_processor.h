@@ -292,7 +292,7 @@ public:
 
         QnDbManagerAccess accessDataCopy(m_db);
         QnConcurrent::run(Ec2ThreadPool::instance(),
-            [accessDataCopy, input, handler]()
+            [accessDataCopy, input, handler]() mutable
             {
                 OutputData output;
                 const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
@@ -312,12 +312,12 @@ public:
     {
         QN_UNUSED(cmdCode);
 
-        Qn::UserAccessData accessDataCopy(m_userAccessData);
+        QnDbManagerAccess accessDataCopy(m_db);
         QnConcurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input1, input2, handler]()
             {
                 OutputData output;
-                const ErrorCode errorCode = dbManager(accessDataCopy).doQuery(
+                const ErrorCode errorCode = accessDataCopy.doQuery(
                     input1, input2, output);
                 handler(errorCode, output);
             });
@@ -370,7 +370,7 @@ private:
             }
             else
             {
-                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_db.m_userAccessData, tran.params))
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_db.userAccessData(), tran.params))
                 {
                     errorCode = ErrorCode::forbidden;
                     return;
@@ -598,7 +598,7 @@ private:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
-        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params);
+        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params, m_db.db());
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 
@@ -714,7 +714,6 @@ private:
 
 private:
     QnDbManagerAccess m_db;
-    Qn::UserAccessData m_userAccessData;
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
 
@@ -724,7 +723,7 @@ private:
         DataType data)
     {
         QnTransaction<DataType> transaction(command, std::move(data));
-        transaction.historyAttributes.author = m_userAccessData.userId;
+        transaction.historyAttributes.author = m_db.userAccessData().userId;
         return transaction;
     }
 };
@@ -740,12 +739,17 @@ void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData,
 
 struct ServerQueryProcessorAccess
 {
+    ServerQueryProcessorAccess(detail::QnDbManager* db): m_db(db) {}
+
     detail::ServerQueryProcessor getAccess(
-        detail::QnDbManager* db,
         const Qn::UserAccessData userAccessData)
     {
-        return detail::ServerQueryProcessor(db, userAccessData);
+        return detail::ServerQueryProcessor(m_db, userAccessData);
     }
+
+    detail::QnDbManager* getDb() const { return m_db; }
+private:
+    detail::QnDbManager* m_db;
 };
 
 } // namespace ec2

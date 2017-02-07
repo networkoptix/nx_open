@@ -37,7 +37,6 @@ namespace ec2
         Ec2StaticticsReporter* getStaticticsReporter();
 
     private:
-        std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
         std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;

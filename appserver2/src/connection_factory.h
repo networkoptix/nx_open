@@ -17,6 +17,7 @@
 #include "ec2_connection.h"
 #include "managers/time_manager.h"
 #include "settings.h"
+#include <transaction/transaction_log.h>
 
 namespace ec2 {
 
@@ -57,13 +58,14 @@ public:
     virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
 private:
-    ServerQueryProcessorAccess m_serverQueryProcessor;
+    std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;
     Settings m_settingsInstance;
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
+    std::unique_ptr<QnTransactionLog> m_transactionLog;
     Ec2DirectConnectionPtr m_directConnection;
     Ec2ThreadPool m_ec2ThreadPool;
     bool m_terminated;

@@ -76,8 +76,8 @@ namespace detail
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
-        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
-        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
 
     public:
         QnDbManager();
@@ -278,9 +278,6 @@ namespace detail
 
         //getTransactionLog
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
-
-        //getClientInfoList
-        ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
 
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
         ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
@@ -589,7 +586,7 @@ namespace detail
             ResyncRules             =  0x100,
             ResyncUsers             =  0x200,
             ResyncStorages          =  0x400,
-            ResyncClientInfo        =  0x800,
+            ResyncClientInfo        =  0x800, //< removed since 3.1
             ResyncVideoWalls        = 0x1000,
             ResyncWebPages          = 0x2000,
         };
@@ -665,6 +662,7 @@ public:
     QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
 
     Qn::UserAccessData userAccessData() const { return m_userAccessData; }
+    detail::QnDbManager* db() const { return m_dbManager; }
 
     ApiObjectType getObjectType(const QnUuid& objectId);
 

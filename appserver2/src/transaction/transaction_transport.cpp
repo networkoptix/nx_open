@@ -79,7 +79,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
         return;
     }
 
-    QnMediaServerResourcePtr ownServer = 
+    QnMediaServerResourcePtr ownServer =
         qnResPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
@@ -90,7 +90,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     {
         QUrl url = QnAppServerConnectionFactory::url();
         httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+        if (ApiPeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
             QnUserResourcePtr adminUser = qnResPool->getAdministrator();

@@ -40,13 +40,26 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     nx::utils::TimerManager* const timerManager)
     :
     // dbmanager is initialized by direct connection.
-    m_dbManager(peerType == Qn::PT_Server ? new detail::QnDbManager() : nullptr),
+    m_dbManager(
+        peerType == Qn::PT_Server
+        ? new detail::QnDbManager()
+        : nullptr),
+    m_transactionLog(
+        peerType == Qn::PT_Server
+        ? new QnTransactionLog(m_dbManager.get())
+        : nullptr),
+    m_serverQueryProcessor(
+        peerType == Qn::PT_Server
+        ? new ServerQueryProcessorAccess(m_dbManager.get())
+        : nullptr),
     m_timeSynchronizationManager(new TimeSynchronizationManager(peerType, timerManager)),
-    m_transactionMessageBus(new QnTransactionMessageBus(peerType)),
+    m_transactionMessageBus(new QnTransactionMessageBus(
+        peerType == Qn::PT_Server ? m_dbManager.get() : nullptr, peerType)),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false)
 {
+
     // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
     // order.
     // TODO: #Elric #EC2 register in a proper place!
@@ -1255,10 +1268,6 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
             m_timeSynchronizationManager.get(), _1));
     // TODO: #ak register AbstractTimeManager::getPeerTimeInfoList
 
-    // ApiClientInfoData
-    regUpdate<ApiClientInfoData>(p, ApiCommand::saveClientInfo);
-    regGet<QnUuid, ApiClientInfoDataList>(p, ApiCommand::getClientInfoList);
-
     /**%apidoc GET /ec2/getFullInfo
      * Read all data such as all servers, cameras, users, etc.
      * %param[default] format
@@ -1338,7 +1347,7 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
         if (!m_directConnection)
         {
             m_directConnection.reset(
-                new Ec2DirectConnection(&m_serverQueryProcessor, connectionInfo, url));
+                new Ec2DirectConnection(m_serverQueryProcessor.get(), connectionInfo, url));
             if (m_directConnection->initialized())
             {
                 m_timeSynchronizationManager->start(m_directConnection);
@@ -1626,42 +1635,6 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         connectionInfo->effectiveUserName =
             nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
     }
-
-    if (!loginInfo.clientInfo.id.isNull())
-    {
-        auto clientInfo = loginInfo.clientInfo;
-        clientInfo.parentId = qnCommon->moduleGUID();
-
-        ApiClientInfoDataList infoList;
-        auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
-        if (result != ErrorCode::ok)
-            return result;
-
-        if (infoList.size() > 0
-            && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
-        {
-            NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
-                cl_logDEBUG2);
-            return ErrorCode::ok;
-        }
-
-        m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
-            ApiCommand::saveClientInfo, clientInfo,
-            [&](ErrorCode result)
-            {
-                if (result == ErrorCode::ok)
-                {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
-                        cl_logINFO);
-                }
-                else
-                {
-                    NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
-                        .arg(toString(result)), cl_logERROR);
-                }
-            });
-    }
-
     return ErrorCode::ok;
 }
 
@@ -1716,9 +1689,9 @@ int Ec2DirectConnectionFactory::testRemoteConnection(
 ErrorCode Ec2DirectConnectionFactory::getSettings(
     nullptr_t, ApiResourceParamDataList* const outData, const Qn::UserAccessData& accessData)
 {
-    if (!detail::QnDbManager::instance())
+    if (!m_dbManager)
         return ErrorCode::ioError;
-    return dbManager(accessData).doQuery(nullptr, *outData);
+    return QnDbManagerAccess(m_dbManager.get(), accessData).doQuery(nullptr, *outData);
 }
 
 template<class InputDataType>
@@ -1754,7 +1727,7 @@ void Ec2DirectConnectionFactory::regGet(
 {
     restProcessorPool->registerHandler(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-        new QueryHttpHandler<InputDataType, OutputDataType>(cmd, &m_serverQueryProcessor),
+        new QueryHttpHandler<InputDataType, OutputDataType>(cmd, m_serverQueryProcessor.get()),
         permission);
 }
 

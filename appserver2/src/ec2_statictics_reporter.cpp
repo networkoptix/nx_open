@@ -37,8 +37,8 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
-    Ec2StaticticsReporter::Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager):
-        m_msManager(msManager),
+    Ec2StaticticsReporter::Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection):
+        m_ec2Connection(ec2Connection),
         m_firstTime(true),
         m_timerCycle(TIMER_CYCLE),
         m_timerDisabled(false),
@@ -55,47 +55,63 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::collectReportData(std::nullptr_t, ApiSystemStatistics* const outData)
     {
-        if(!detail::QnDbManager::instance() || !detail::QnDbManager::instance()->isInitialized())
+        if(!m_ec2Connection)
             return ErrorCode::ioError;
 
-        ErrorCode res;
-        // TODO: Get rid of these macros.
-        #define dbManager_queryOrReturn(ApiType, name) \
-            ApiType name; \
-            if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
-                return res;
-        #define dbManager_queryOrReturn_uuid(ApiType, name) \
-            ApiType name; \
-            if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), name)) != ErrorCode::ok) \
-                return res;
+        ErrorCode errCode;
 
-        dbManager_queryOrReturn_uuid(ApiMediaServerDataExList, mediaservers);
-        for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
+        ApiMediaServerDataExList mediaServers;
+        errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        dbManager_queryOrReturn_uuid(ApiCameraDataExList, cameras);
-        for (ApiCameraDataEx& cam : cameras)
+        for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
+
+
+        ApiCameraDataExList cameras;
+        errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
+        for (ApiCameraDataEx& cam: cameras)
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->clients)) != ErrorCode::ok)
-            return res;
+        QnLicenseList licenses;
+        errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        dbManager_queryOrReturn(ApiLicenseDataList, licenses);
-        for (auto& license : licenses)
+        for (const auto& license: licenses)
         {
-            QnLicense qnLicense(license.licenseBlock);
-            ApiLicenseStatistics statLicense(std::move(license));
-            statLicense.validation = qnLicense.validationInfo();
+            ApiLicenseData apiLicense;
+            fromResourceToApi(license, apiLicense);
+            ApiLicenseStatistics statLicense(std::move(apiLicense));
+            statLicense.validation = license->validationInfo();
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        dbManager_queryOrReturn_uuid(ApiBusinessRuleDataList, bRules);
-        for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
+        QnBusinessEventRuleList bRules;
+        errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->layouts)) != ErrorCode::ok)
-            return res;
+        for (auto& br: bRules)
+        {
+            ApiBusinessRuleData apiData;
+            fromResourceToApi(br, apiData);
+            outData->businessRules.push_back(std::move(apiData));
+        }
 
-        dbManager_queryOrReturn_uuid(ApiUserDataList, users);
+        errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
+        ApiUserDataList users;
+        errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
         for (auto& u : users) outData->users.push_back(std::move(u));
 
         #undef dbManager_queryOrReturn
