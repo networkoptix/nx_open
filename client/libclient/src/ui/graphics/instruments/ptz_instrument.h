@@ -176,7 +176,6 @@ private:
 
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
-    bool m_pendingMouseReturn = false;
 
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };

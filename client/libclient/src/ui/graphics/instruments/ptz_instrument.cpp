@@ -645,6 +645,7 @@ void PtzInstrument::startDrag(DragInfo* /*info*/)
     switch (m_movement)
     {
         case ContinuousMovement:
+        case VirtualMovement:
             targetManipulator()->setCursor(Qt::BlankCursor);
             target()->setCursor(Qt::BlankCursor);
 
@@ -658,10 +659,7 @@ void PtzInstrument::startDrag(DragInfo* /*info*/)
             opacityAnimator(selectionItem())->stop();
             selectionItem()->setOpacity(1.0);
             break;
-        case VirtualMovement:
-            m_pendingMouseReturn = false;
-            target()->setCursor(Qt::BlankCursor);
-            break;
+
         default:
             break;
     }
@@ -701,7 +699,7 @@ void PtzInstrument::dragMove(DragInfo* info)
             qreal arrowSize = 12.0 * (1.0 + 3.0 * speedMagnitude);
 
             ensureElementsWidget();
-            PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
+            auto arrowItem = elementsWidget()->arrowItem();
 
             arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
                 elementsWidget()->mapFromItem(target(), mouseItemPos));
@@ -719,16 +717,8 @@ void PtzInstrument::dragMove(DragInfo* info)
 
         case VirtualMovement:
         {
-            if (m_pendingMouseReturn)
-            {
-                if ((info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() < 64)
-                    m_pendingMouseReturn = false;
-                else
-                    QCursor::setPos(info->mousePressScreenPos()); // see comments below
-                break;
-            }
-
-            QPointF delta = info->mouseItemPos() - info->lastMouseItemPos();
+            const QPointF mouseItemPos = info->mouseItemPos();
+            QPointF delta = mouseItemPos - info->lastMouseItemPos();
 
             qreal scale = target()->size().width() / 2.0;
             QPointF shift(delta.x() / scale, -delta.y() / scale);
@@ -741,14 +731,13 @@ void PtzInstrument::dragMove(DragInfo* info)
             target()->ptzController()->absoluteMove(Qn::LogicalPtzCoordinateSpace,
                 position + positionDelta, 2.0); /* 2.0 means instant movement. */
 
-            /* Calling setPos on each move event causes serious lags which I so far
-             * was unable to explain. This is worked around by invoking it not that frequently.
-             * Note that we don't account for screen-relative position. */
-            if (!m_pendingMouseReturn && (info->mouseScreenPos() - info->mousePressScreenPos()).manhattanLength() > 128)
-            {
-                m_pendingMouseReturn = true;
-                QCursor::setPos(info->mousePressScreenPos()); // TODO: #PTZ #Elric this still looks bad, but not as bad as it looked without this hack.
-            }
+            ensureElementsWidget();
+            auto arrowItem = elementsWidget()->arrowItem();
+            arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
+                elementsWidget()->mapFromItem(target(), mouseItemPos));
+            const qreal arrowSize = 24.0;
+            arrowItem->setSize(QSizeF(arrowSize, arrowSize));
+
             break;
         }
 
@@ -757,13 +746,14 @@ void PtzInstrument::dragMove(DragInfo* info)
     }
 }
 
-void PtzInstrument::finishDrag(DragInfo* info)
+void PtzInstrument::finishDrag(DragInfo* /*info*/)
 {
     if (target())
     {
         switch (m_movement)
         {
             case ContinuousMovement:
+            case VirtualMovement:
                 targetManipulator()->setCursor(Qt::SizeAllCursor);
                 target()->unsetCursor();
 
@@ -786,11 +776,6 @@ void PtzInstrument::finishDrag(DragInfo* info)
                     processPtzDrag(selectionRect);
                 break;
             }
-
-            case VirtualMovement:
-                QCursor::setPos(info->mousePressScreenPos());
-                target()->unsetCursor();
-                break;
 
             default:
                 break;
