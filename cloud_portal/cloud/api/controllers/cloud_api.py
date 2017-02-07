@@ -62,6 +62,7 @@ class System(object):
     @validate_response
     @lower_case_email
     def share(email, password, system_id, account_email, role):
+        account_email = account_email.lower()
         request = CLOUD_DB_URL + "/system/share"
         params = {
             'systemId': system_id,
