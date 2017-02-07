@@ -128,7 +128,7 @@ Pane
             passwordMaskDelay: 1500
             onTextChanged: credentialsEditor.changed()
             selectionAllowed: false
-            inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+            inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
             activeFocusOnTab: true
             onAccepted: credentialsEditor.accepted()
             onActiveFocusChanged:
