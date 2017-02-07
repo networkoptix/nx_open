@@ -99,10 +99,10 @@ QDebug operator<<(QDebug dbg, const QnScreenSnap& snap)
 QDebug operator<<(QDebug dbg, const QnScreenSnaps& snaps)
 {
     dbg.nospace() << "QnScreenSnaps("
-        << "l" << snaps.left()
-        << " r" << snaps.right()
-        << " t" << snaps.top()
-        << " b" << snaps.bottom()
+        << snaps.left()
+        << snaps.right()
+        << snaps.top()
+        << snaps.bottom()
         << ")";
     return dbg.space();
 }

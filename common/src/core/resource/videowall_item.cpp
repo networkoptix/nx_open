@@ -47,10 +47,12 @@ QDebug operator<<(QDebug dbg, const QnVideoWallItem& item)
 {
     dbg.nospace()
         << "QnVideoWallItem(" << item.name
-        << " [" << item.uuid.toSimpleString() << "]"
-        << " layout " << item.layout.toSimpleString()
-        << " pc " << item.pcUuid.toSimpleString()
-        << " at screens " << item.screenSnaps
+        << "[" << item.uuid.toSimpleString() << "]";
+    if (!item.layout.isNull())
+        dbg.nospace() << " layout[" << item.layout.toSimpleString() << "]";
+    dbg.nospace()
+        << " pc[" << item.pcUuid.toSimpleString() << "]"
+        << " at " << item.screenSnaps
         << ")";
     return dbg.space();
 }
