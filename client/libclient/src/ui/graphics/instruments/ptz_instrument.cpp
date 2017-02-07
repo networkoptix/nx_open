@@ -779,7 +779,9 @@ void PtzInstrument::finishDrag(DragInfo* info)
                 QRectF selectionRect = selectionItem()->boundingRect();
                 QSizeF targetSize = target()->size();
 
-                qreal relativeSize = qMax(selectionRect.width() / targetSize.width(), selectionRect.height() / targetSize.height());
+                qreal relativeSize = qMax(selectionRect.width() / targetSize.width(),
+                    selectionRect.height() / targetSize.height());
+
                 if (relativeSize >= minPtzZoomRectSize)
                     processPtzDrag(selectionRect);
                 break;
