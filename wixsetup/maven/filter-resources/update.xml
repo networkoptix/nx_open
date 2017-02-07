@@ -12,8 +12,8 @@
                  Implemented plenty of great features
             </description>
             <pubDate>Mon, 23 Dec 2014 11:59:59 +0800</pubDate>
-            <sparkle:enclosure sparkle:os="windows-x86" url="${update.url}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
-            <sparkle:enclosure sparkle:os="windows-x64" url="${update.url}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
+            <sparkle:enclosure sparkle:os="windows-x86" url="${updateUrl}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
+            <sparkle:enclosure sparkle:os="windows-x64" url="${updateUrl}" sparkle:version="2.2.1" sparkle:engineVersion="2.2.1" length="1600000" type="application/octet-stream" sparkle:dsaSignature="MCwCFAmB39sazl2xGIxSF8pHBbBh1zBLAhRmawuNanltHMlkCLv6R8OYiDRigQ==" />
         </item>
         <item>
             <title>Version 2.2 (30 bugs fixed; 6 new features)</title>

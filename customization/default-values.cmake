@@ -11,7 +11,6 @@ set(uri.protocol "nx-vms")
 
 set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
 set(short.company.name "${company.name}")
-set(company.support.link "${company.support.address}")
 set(backgroundImage "{}")
 
 set(freeLicenseCount "4")
