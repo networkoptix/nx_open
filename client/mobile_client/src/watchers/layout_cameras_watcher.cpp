@@ -11,6 +11,8 @@ namespace mobile {
 LayoutCamerasWatcher::LayoutCamerasWatcher(QObject* parent):
     base_type(parent)
 {
+    connect(this, &LayoutCamerasWatcher::cameraAdded, this, &LayoutCamerasWatcher::countChanged);
+    connect(this, &LayoutCamerasWatcher::cameraRemoved, this, &LayoutCamerasWatcher::countChanged);
 }
 
 QnLayoutResourcePtr LayoutCamerasWatcher::layout() const
@@ -36,6 +38,7 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     m_layout = layout;
 
     emit layoutChanged(layout);
+    emit countChanged();
 
     if (!layout)
         return;
