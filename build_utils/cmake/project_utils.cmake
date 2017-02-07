@@ -29,7 +29,7 @@ function(nx_add_target name type)
             "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
 
-    set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES})
+    set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
 
     if("${type}" STREQUAL "EXECUTABLE")
         add_executable(${name} ${sources})
