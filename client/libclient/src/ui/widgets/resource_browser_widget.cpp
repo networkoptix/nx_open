@@ -782,6 +782,11 @@ void QnResourceBrowserWidget::showToolTip()
     animator->animateTo(1.0);
 }
 
+void QnResourceBrowserWidget::clearSelection()
+{
+    currentSelectionModel()->clear();
+}
+
 void QnResourceBrowserWidget::updateIcons()
 {
     QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
