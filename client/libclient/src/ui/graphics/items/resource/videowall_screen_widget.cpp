@@ -229,24 +229,33 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
     const QnVideoWallItem& item,
     const QnVideoWallItem& oldItem)
 {
-    int idx = qnIndexOf(m_items, [&item](const QnVideoWallItem &i) { return item.uuid == i.uuid; });
-    if (idx < 0)
-        return; // item on another widget
+    auto existing = std::find_if(m_items.begin(), m_items.end(),
+        [&item](const QnVideoWallItem& i)
+        {
+            return item.uuid == i.uuid;
+        });
 
-    /* Item is already updated from another call. */
-    if (m_items[idx] == oldItem)
+    // Check if item is on another widget
+    if (existing == m_items.end())
         return;
 
-    if (oldItem.screenSnaps.screens() != item.screenSnaps.screens())
+    // Check if item is already updated from another call.
+    if (*existing == item)
+        return;
+
+    NX_ASSERT(*existing == oldItem);
+
+    if (existing->screenSnaps.screens() != item.screenSnaps.screens())
     {
         // if there are more than one item on the widget, this one will be updated from outside
         if (m_items.size() == 1)
             updateItems();
+
         return;
     }
 
-    m_items[idx] = item;
-    m_layoutUpdateRequired = (item.screenSnaps != oldItem.screenSnaps);
+    m_layoutUpdateRequired |= (item.screenSnaps != existing->screenSnaps);
+    *existing = item;
     update();
 }
 
