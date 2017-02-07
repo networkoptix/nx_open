@@ -92,8 +92,32 @@ to view more bookmarks</source>
         <translation>月</translation>
     </message>
     <message>
-        <source>All Data</source>
-        <translation>全データ</translation>
+        <source>For the last 5 min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For the last hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For the last day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For the last week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For the last month</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For all data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -211,6 +235,37 @@ to view more bookmarks</source>
     <message>
         <source>Permissions</source>
         <translation type="unfinished">権限</translation>
+    </message>
+</context>
+<context>
+    <name>Ptz</name>
+    <message>
+        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished">カメラがオンラインになるまでお待ちください.</translation>
+    </message>
+    <message>
+        <source>Failed to get current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to set current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset used by some tours. Delete it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -644,10 +699,6 @@ to view more bookmarks</source>
     <message>
         <source>Stop Video Wall</source>
         <translation>ビデオウォール停止</translation>
-    </message>
-    <message>
-        <source>Detach Layout</source>
-        <translation>レイアウト表示のクリア</translation>
     </message>
     <message>
         <source>Save Layout</source>
@@ -1278,6 +1329,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Add Device...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Screen</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2044,11 +2099,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected devices already added</source>
+        <source>No devices found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No devices found</source>
+        <source>All devices already added</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2204,6 +2259,17 @@ to view more bookmarks</source>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
         <translation>ターゲットIOモジュールのメディアストリーム確認.</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraExpertSettingsWidget</name>
+    <message>
+        <source>Primary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2623,16 +2689,16 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>known issues</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 is in Beta yet. See %2</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;), %2 is a link to known issues</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Learn more about %1</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Known limitations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is in Beta.</source>
         <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -2815,18 +2881,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart %1 Client in compatibility mode will be required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to restart %1 Client in compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please close %1 Client and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Client and Server have different versions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2841,23 +2895,11 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You have to download another version of %1 Client to connect to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Download Client version %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have to restart %1 Client in compatibility mode to connect to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restart %1 Client in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2873,7 +2915,31 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to restart %1 Client</source>
+        <source>Restart %1 in compatibility mode will be required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to restart %1 in compatibility mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please close %1 and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have to download another version of %1 to connect to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart %1 in compatibility mode?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to restart %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3216,6 +3282,17 @@ devices</source>
         <source>Users</source>
         <translation type="unfinished">ユーザー</translation>
     </message>
+    <message>
+        <source>Open camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnExecHttpRequestActionWidget</name>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">自動</translation>
+    </message>
 </context>
 <context>
     <name>QnExecPtzPresetPolicy</name>
@@ -3396,7 +3473,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 Client may not work properly.</source>
+        <source>%1 may not work properly.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3582,95 +3659,6 @@ devices</source>
     <message>
         <source>&lt;Picture cannot be loaded&gt;</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutsHandlerMessages</name>
-    <message>
-        <source>You will lose access to following resources:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have permission to overwrite it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overwrite existing layout?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to User Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will get access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to Role Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Changes will affect other users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This layout is shared with other users, so you change it for them too.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n shared layouts?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3894,10 +3882,6 @@ devices</source>
         <translation>ライセンスをアクティベートしてください.</translation>
     </message>
     <message>
-        <source>Obtaining licenses from server...</source>
-        <translation>サーバーからライセンス取得...</translation>
-    </message>
-    <message>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4095,15 +4079,15 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some changes will take effect only after %1 Client restart</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Restart Now</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Restart Later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after %1 restart</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4142,12 +4126,12 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>There is an another connection with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete connection?</source>
         <translation type="unfinished">接続設定の削除</translation>
+    </message>
+    <message>
+        <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4515,15 +4499,15 @@ devices</source>
 <context>
     <name>QnPerformanceTest</name>
     <message>
-        <source>%1 Client can work in configuration mode only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 Client in configuration mode only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>For full - featured mode, please use another computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 can work in configuration mode only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4663,41 +4647,6 @@ devices</source>
     <message>
         <source>Tour Time: %1.</source>
         <translation>ツアー時間: %1.</translation>
-    </message>
-</context>
-<context>
-    <name>QnPtzMessages</name>
-    <message>
-        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished">カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
-        <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to set current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset used by some tours. Delete it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4863,18 +4812,6 @@ devices</source>
         <source>empty</source>
         <translation>空</translation>
     </message>
-    <message numerus="yes">
-        <source>Total %n devices</source>
-        <translation>
-            <numerusform>合計 %n デバイス</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Total %n cameras</source>
-        <translation>
-            <numerusform>合計 %n カメラ</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Devices with non-empty archive</source>
         <translation>デバイスアーカイブ</translation>
@@ -4899,12 +4836,6 @@ devices</source>
         <source>Camera</source>
         <translation>カメラ</translation>
     </message>
-    <message numerus="yes">
-        <source>Total %n I/O modules</source>
-        <translation>
-            <numerusform>合計 %n IOモジュール</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
         <translation>最初の記録からアーカイブする期間</translation>
@@ -4914,16 +4845,37 @@ devices</source>
         <translation type="unfinished">&lt;Cameras from other servers and removed cameras&gt;</translation>
     </message>
     <message>
-        <source>Bitrate for</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 TB</source>
         <translation type="unfinished">%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
         <translation type="unfinished">%1 Gb</translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n devices</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n cameras</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n I/O modules</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5316,6 +5268,10 @@ devices</source>
         <source>Apply changes before switching to another server?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnServerSettingsWidget</name>
@@ -5541,15 +5497,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please update %1 Client manually using an installation package.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Update completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 Client will be restarted to the updated version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5562,6 +5510,14 @@ devices</source>
     </message>
     <message>
         <source>Update failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5904,6 +5860,13 @@ devices</source>
     <message>
         <source>Export selected events to file</source>
         <translation type="unfinished">選択したイベントをファイルにエクスポート</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6530,16 +6493,6 @@ devices</source>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnUserProfileWidget</name>
@@ -6589,15 +6542,15 @@ devices</source>
         <source>Assign a new role</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>What to do with %1 users with this role?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Delete such users</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>What to do with %n users with this role?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -6746,13 +6699,6 @@ devices</source>
     <message>
         <source>Avoid leading and trailing spaces.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnVideowallItemWidget</name>
-    <message>
-        <source>Information</source>
-        <translation>情報</translation>
     </message>
 </context>
 <context>
@@ -6934,56 +6880,6 @@ devices</source>
         <source>Move</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Delete %n devices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n cameras?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n I/O Modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of them are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n I/O modules are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Too short period selected</source>
         <translation type="unfinished"></translation>
@@ -7038,6 +6934,10 @@ devices</source>
     </message>
     <message>
         <source>Failed to open server web page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7204,14 +7104,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AVI format not recommended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For exporting a non-continuous recording with audio track, MKV or some other format is recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export to AVI anyway?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7279,6 +7171,14 @@ devices</source>
         <source>Failed to export video</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>AVI format is not recommended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7344,20 +7244,6 @@ devices</source>
     <message>
         <source>New Layout %1</source>
         <translation>新規レイアウト%1</translation>
-    </message>
-    <message numerus="yes">
-        <source>Remove %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="unfinished">削除</translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7532,18 +7418,6 @@ devices</source>
         <translation>次のマトリックス %1</translation>
     </message>
     <message>
-        <source>Close %1 Client before starting Video Wall?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">閉じる</translation>
-    </message>
-    <message>
-        <source>Keep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Video Wall license required</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7607,10 +7481,6 @@ devices</source>
         <source>More Video Wall licenses required</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>There is another Video Wall with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -7628,10 +7498,184 @@ devices</source>
     </message>
 </context>
 <context>
+    <name>Resources</name>
+    <message>
+        <source>There is another layout with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You don&apos;t have permission to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Overwrite existing layout?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There is another layout with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will still have access to %n removed resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to User Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will get access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to Role Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will still have access to %n removed resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Changes will affect other users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This layout is shared with other users, so you change it for them too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>User will lose access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will lose access to %n resources:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n shared layouts?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from layout?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished">削除</translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will lose access to following resources:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n users?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n devices?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n cameras?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n I/O Modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n items?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of them are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules are auto-discovered.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>StatisticsOverlayWidget</name>
     <message>
         <source>%1%</source>
         <translation>%1%</translation>
+    </message>
+</context>
+<context>
+    <name>VideoWall</name>
+    <message>
+        <source>There is another video wall with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close %1 before starting Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">閉じる</translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local files can&apos;t be placed on Video Wall Screen attached to another computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

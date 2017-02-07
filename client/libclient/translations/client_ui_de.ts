@@ -749,6 +749,16 @@
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
         <translation>Warnung! Diese Einstellungen sollten Sie nur ändern, wenn Sie absolut sicher sind, dass Ihre Systemperformance nicht negativ beeinflußt wird.</translation>
     </message>
+    <message>
+        <location/>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -1075,6 +1085,11 @@ to the cloud&gt;</source>
         <location/>
         <source>Password</source>
         <translation>Passwort</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1719,6 +1734,14 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Don&apos;t show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2740,32 +2763,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
