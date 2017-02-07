@@ -58,7 +58,7 @@ namespace
 
     const QString kMaxRtpRetryCount(lit("maxRtpRetryCount"));
     const int kMaxRtpRetryCountDefault(6);
-	
+
     const int kAuditTrailPeriodDaysDefault = 183;
 }
 
@@ -105,9 +105,11 @@ bool QnGlobalSettings::isInitialized() const
 }
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors() {
-    QString defaultSupportLink = QnAppInfo::supportLink();
+    QString defaultSupportLink = QnAppInfo::supportUrl();
     if (defaultSupportLink.isEmpty())
         defaultSupportLink = QnAppInfo::supportEmailAddress();
+    if (defaultSupportLink.isEmpty())
+        defaultSupportLink = QnAppInfo::supportPhone();
 
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameFrom, QString(), this);
@@ -454,9 +456,10 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
      * VMS-1055 - default email changed to link.
      * We are checking if the value is not overridden and replacing it by the updated one.
      */
-    if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty())
+    if (result.supportEmail == QnAppInfo::supportEmailAddress() &&
+        !QnAppInfo::supportUrl().isEmpty())
     {
-        result.supportEmail = QnAppInfo::supportLink();
+        result.supportEmail = QnAppInfo::supportUrl();
     }
 
     return result;
