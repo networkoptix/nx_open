@@ -1884,27 +1884,29 @@ bool MediaServerProcess::initTcpListener(
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
     auto mapper = std::make_unique<nx_upnp::PortMapper>();
-
     const auto configValue = MSSettings::roSettings()->value(
         nx::settings_names::kNameUpnpPortMappingEnabled);
 
     if (!configValue.isNull())
     {
-        // config value prevail
-        mapper->setIsEnabled(configValue.toBool());
+        // Config can not be changed by global system settings.
+        if (!configValue.toBool())
+            return nullptr; //< Just to be sure, no mappings are going to be made ever.
+
+        mapper->setIsEnabled(true);
     }
     else
     {
-        // otherwise it's controlled by qnGlobalSettings
-        auto updateEnabled = [mapper = mapper.get()]()
-        {
-            mapper->setIsEnabled(qnGlobalSettings->isUpnpPortMappingEnabled());
-        };
+        auto updateEnabled =
+            [mapper = mapper.get()]()
+            {
+                const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
+                mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
+            };
 
+        connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
+        connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
         updateEnabled();
-        connect(
-            qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged,
-            std::move(updateEnabled));
     }
 
     mapper->enableMapping(
