@@ -9,7 +9,7 @@ set(company.name "Network Optix")
 set(short.company.name Nx)
 
 set(companyUrl "http://networkoptix.com")
-set(productUrl "http://networkoptix.com/nxwitness-overview/")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
 set(licenseEmail "support@networkoptix.com")
 set(supportEmail "support@networkoptix.com")
 set(supportUrl "http://support.networkoptix.com")
@@ -93,19 +93,4 @@ set(translation11 "zh_TW")
 set(translation12 "vi_VN")
 set(translation13 "pl")
 set(translation14 "hu")
-#translation15 fil
-#translation15 he
-set(translation15 "")
-#translation16 id
-#translation16 tr
-set(translation16 "")
-#translation17 km
-set(translation17 "")
-#translation18 pt_BR
-set(translation18 "")
-#translation18 nl_BE
-set(translation19 "")
-set(translation20 "")
 
-# Defines (in one string)
-set(customization.defines "")
