@@ -48,8 +48,6 @@ using boost::algorithm::any_of;
 
 namespace {
 
-    const auto kMinTableRows = 3;
-
     class SortRulesProxyModel: public QSortFilterProxyModel {
     public:
         explicit SortRulesProxyModel(QObject *parent = 0)
@@ -231,7 +229,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->installEventFilter(this);
 
     ui->tableView->setMinimumHeight(style::Metrics::kHeaderSize
-        + style::Metrics::kButtonHeight * kMinTableRows);
+        + style::Metrics::kButtonHeight * style::Hints::kMinimumTableRows);
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 
