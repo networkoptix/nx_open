@@ -13,16 +13,31 @@ function(nx_add_target name type)
         qt5_wrap_cpp(moc_files ${hpp_files})
     endif()
 
-    set(RESOURCES ${NX_ADDITIONAL_RESOURCES})
+    set(resources ${NX_ADDITIONAL_RESOURCES})
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/static-resources")
-        set(RESOURCES "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${RESOURCES})
+        list(INSERT resources 0 "${CMAKE_CURRENT_SOURCE_DIR}/static-resources" ${resources})
     endif()
-    if(RESOURCES)
-        generate_qrc("${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc" ${RESOURCES})
+
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
+        file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
+        file(GLOB ts_files "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+
+        set_source_files_properties(${ts_files}
+            PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
+
+        qt5_add_translation(qm_files ${ts_files})
+
+        list(APPEND resources ${qm_files})
+        set_source_files_properties(${qm_files}
+            PROPERTIES RESOURCE_BASE_DIR "${CMAKE_CURRENT_BINARY_DIR}/qm")
+    endif()
+
+    if(resources)
+        nx_generate_qrc("${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc" ${resources})
         qt5_add_resources(rcc_files "${CMAKE_CURRENT_BINARY_DIR}/${name}.qrc")
     endif()
 
-    set(sources ${cpp_files} ${moc_files} ${rcc_files})
+    set(sources ${cpp_files} ${moc_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
         set(sources ${sources}
             "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.cpp"

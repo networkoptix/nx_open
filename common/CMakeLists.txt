@@ -13,7 +13,6 @@ nx_add_target(common LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     ADDITIONAL_RESOURCES
-        "${customization_dir}/common/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
         Qt5::Gui Qt5::Concurrent Qt5::Network Qt5::Multimedia

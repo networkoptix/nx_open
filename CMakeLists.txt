@@ -69,6 +69,7 @@ rdep_add_package(any/qtsingleapplication)
 
 find_package(Qt5
     COMPONENTS
+        LinguistTools
         Core
         Gui
         Network
