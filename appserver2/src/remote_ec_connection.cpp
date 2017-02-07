@@ -63,4 +63,16 @@ namespace ec2
         TimeSynchronizationManager::instance()->forgetSynchronizedTime();
     }
 
+    Timestamp RemoteEC2Connection::getTransactionLogTime() const
+    {
+        NX_ASSERT(true); //< not implemented
+        return Timestamp();
+    }
+
+    void RemoteEC2Connection::setTransactionLogTime(Timestamp value)
+    {
+        NX_ASSERT(true); //< not implemented
+    }
+
 }
+

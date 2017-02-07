@@ -87,11 +87,8 @@ namespace ec2
         virtual void deleteRemotePeer(const QUrl& url) override;
         virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
-
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        virtual ECConnectionNotificationManager* notificationManager() override 
+        virtual ECConnectionNotificationManager* notificationManager() override
         { return m_notificationManager.get(); }
         ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 

@@ -366,21 +366,6 @@ void BaseEc2Connection<QueryProcessorType>::sendRuntimeData(const ApiRuntimeData
 }
 
 template<class QueryProcessorType>
-Timestamp BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
-{
-    NX_ASSERT(transactionLog);
-    return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
-}
-
-template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(Timestamp value)
-{
-    NX_ASSERT(transactionLog);
-    if (transactionLog)
-        transactionLog->setTransactionLogTime(value);
-}
-
-template<class QueryProcessorType>
 QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
     const QnUuid& dstPeer, int* distance) const
 {

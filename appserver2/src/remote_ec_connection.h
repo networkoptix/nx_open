@@ -34,6 +34,10 @@ namespace ec2
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
+
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
+
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;

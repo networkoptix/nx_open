@@ -602,7 +602,7 @@ private:
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 
-        transactionLog->fillPersistentInfo(tran);
+        m_db.db()->transactionLog()->fillPersistentInfo(tran);
         QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
         ErrorCode errorCode =

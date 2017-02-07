@@ -91,7 +91,7 @@ namespace detail
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal()) {
-                QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
+                QnTransactionLog::ContainsReason isContains = m_tranLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
                     return ErrorCode::containsBecauseTimestamp;
                 else if (isContains == QnTransactionLog::Reason_Sequence)
@@ -102,7 +102,7 @@ namespace detail
                 return result;
             if (tran.isLocal())
                 return ErrorCode::ok;
-            return transactionLog->saveTransaction( tran, serializedTran);
+            return m_tranLog->saveTransaction( tran, serializedTran);
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
@@ -165,6 +165,9 @@ namespace detail
         //!Reads settings (properties of user 'admin')
 
         virtual QnDbTransaction* getTransaction() override;
+
+        void setTransactionLog(QnTransactionLog* tranLog);
+        QnTransactionLog* transactionLog() const;
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -558,16 +561,24 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
-
     private:
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
-            QnDbTransactionExt(QSqlDatabase& database, QnReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
+            QnDbTransactionExt(
+                QSqlDatabase& database,
+                QnTransactionLog* tranLog,
+                QnReadWriteLock& mutex)
+                :
+                QnDbTransaction(database, mutex)
+            {
+            }
 
             virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
+        private:
+            QnTransactionLog* m_tranLog;
         };
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
@@ -645,7 +656,7 @@ namespace detail
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
         */
         QSqlDatabase m_sdbStatic;
-        QnDbTransactionExt m_tran;
+        std::unique_ptr<QnDbTransactionExt> m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
 
@@ -653,6 +664,7 @@ namespace detail
         bool m_isBackupRestore;
         bool m_dbReadOnly;
         ResyncFlags m_resyncFlags;
+        QnTransactionLog* m_tranLog;
     };
 } // namespace detail
 

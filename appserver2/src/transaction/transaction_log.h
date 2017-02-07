@@ -14,7 +14,7 @@ namespace ec2
     namespace detail { class QnDbManager; }
 
 
-    class QnTransactionLog: public Singleton<QnTransactionLog>
+    class QnTransactionLog
     {
     public:
 
@@ -125,6 +125,5 @@ namespace ec2
     };
 };
 
-#define transactionLog QnTransactionLog::instance()
 
 #endif // __TRANSACTION_LOG_H_

@@ -464,10 +464,10 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
     if (transport && transport->isSyncDone() && aliveData.isAlive)
     {
         bool needResync = false;
-        if (!aliveData.persistentState.values.empty() && transactionLog)
+        if (!aliveData.persistentState.values.empty() && m_db)
         {
             // check current persistent state
-            if (!transactionLog->contains(aliveData.persistentState))
+            if (!m_db->transactionLog()->contains(aliveData.persistentState))
             {
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("DETECT transaction GAP via update message. Resync with peer %1").
                     arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
@@ -631,11 +631,11 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
     m_lastTransportSeq[ttSenderKey] = transportHeader.sequence;
 
     // 2. check persistent sequence
-    if (tran.persistentInfo.isNull() || !transactionLog)
+    if (tran.persistentInfo.isNull() || !m_db)
         return true; // nothing to check
 
     QnTranStateKey persistentKey(tran.peerID, tran.persistentInfo.dbID);
-    int persistentSeq = transactionLog->getLatestSequence(persistentKey);
+    int persistentSeq =  m_db->transactionLog()->getLatestSequence(persistentKey);
 
     if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logWARNING)
         if (!transport->isSyncDone() && transport->isReadSync(ApiCommand::NotDefined) && transportHeader.sender != transport->remotePeer().id)
@@ -669,8 +669,8 @@ bool QnTransactionMessageBus::checkSequence(const QnTransactionTransportHeader& 
 
 void QnTransactionMessageBus::updatePersistentMarker(const QnTransaction<ApiUpdateSequenceData>& tran, QnTransactionTransport* /*transport*/)
 {
-    if (transactionLog)
-        transactionLog->updateSequence(tran.params);
+    if (m_db)
+        m_db->transactionLog()->updateSequence(tran.params);
 }
 
 void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction& tran, const QnTransactionTransportHeader& transportHeader)
@@ -683,7 +683,7 @@ void QnTransactionMessageBus::proxyFillerTransaction(const QnAbstractTransaction
     record.dbID = tran.persistentInfo.dbID;
     record.sequence = tran.persistentInfo.sequence;
     fillerTran.params.markers.push_back(record);
-    transactionLog->updateSequence(fillerTran.params);
+    m_db->transactionLog()->updateSequence(fillerTran.params);
     proxyTransaction(fillerTran, transportHeader);
 }
 
@@ -947,7 +947,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(
     ttBroadcast.flags |= Qn::TT_ProxyToClient;
 
     QList<QByteArray> serializedTransactions;
-    const ErrorCode errorCode = transactionLog->getTransactionsAfter(
+    const ErrorCode errorCode = m_db->transactionLog()->getTransactionsAfter(
         tran.params.persistentState,
         sender->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
         serializedTransactions);
@@ -1020,7 +1020,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     transport->setNeedResync(false);
 
     QnTransaction<ApiSyncRequestData> requestTran(ApiCommand::tranSyncRequest);
-    requestTran.params.persistentState = transactionLog->getTransactionsState();
+    requestTran.params.persistentState = m_db->transactionLog()->getTransactionsState();
     requestTran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
 
     NX_LOG(QnLog::EC2_TRAN_LOG, lit("send syncRequest to peer %1").arg(transport->remotePeer().id.toString()), cl_logDEBUG1);
@@ -1187,9 +1187,9 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo);
         tran.params = aliveData;
         NX_ASSERT(!tran.params.peer.instanceId.isNull());
-        if (isAlive && transactionLog && peer.id == qnCommon->moduleGUID())
+        if (isAlive && m_db && peer.id == qnCommon->moduleGUID())
         {
-            tran.params.persistentState = transactionLog->getTransactionsState();
+            tran.params.persistentState = m_db->transactionLog()->getTransactionsState();
             tran.params.runtimeState = m_runtimeTransactionLog->getTransactionsState();
         }
         if (peer.id == qnCommon->moduleGUID())
@@ -1458,8 +1458,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
         handlePeerAliveChanged(localPeer(), true, true);
         NX_LOG(QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1);
-        if (transactionLog)
-            printTranState(transactionLog->getTransactionsState());
+        if (m_db)
+            printTranState(m_db->transactionLog()->getTransactionsState());
     }
 
     QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more

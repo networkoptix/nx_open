@@ -142,13 +142,13 @@ bool QnDbManager::QnDbTransactionExt::beginTran()
 {
     if( !QnDbTransaction::beginTran() )
         return false;
-    transactionLog->beginTran();
+    m_tranLog->beginTran();
     return true;
 }
 
 void QnDbManager::QnDbTransactionExt::rollback()
 {
-    transactionLog->rollback();
+    m_tranLog->rollback();
     QnDbTransaction::rollback();
 }
 
@@ -156,7 +156,7 @@ bool QnDbManager::QnDbTransactionExt::commit()
 {
     const bool rez = m_database.commit();
     if (rez) {
-        transactionLog->commit();
+        m_tranLog->commit();
         m_mutex.unlock();
     }
     else {
@@ -187,12 +187,12 @@ QnDbManager::QnDbManager()
 :
     m_licenseOverflowMarked(false),
     m_initialized(false),
-    m_tran(m_sdb, m_mutex),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_dbReadOnly(false),
-    m_resyncFlags()
+    m_resyncFlags(),
+    m_tranLog(nullptr)
 {
 }
 
@@ -251,6 +251,9 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 
 bool QnDbManager::init(const QUrl& dbUrl)
 {
+    NX_ASSERT(m_tranLog != nullptr);
+    m_tran.reset(new QnDbTransactionExt(m_sdb, m_tranLog, m_mutex));
+
     {
         const QString dbFilePath = dbUrl.toLocalFile();
         const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
@@ -448,8 +451,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
             }
         }
 
-        if (QnTransactionLog::instance())
-            if (!QnTransactionLog::instance()->init())
+        if (m_tranLog)
+            if (!m_tranLog->init())
             {
                 qWarning() << "can't initialize transaction log!";
                 return false;
@@ -458,7 +461,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!syncLicensesBetweenDB())
             return false;
 
-        if (m_resyncFlags.testFlag(ClearLog) && !transactionLog->clear())
+        if (m_resyncFlags.testFlag(ClearLog) && !m_tranLog->clear())
             return false;
 
         if (m_resyncFlags.testFlag(ResyncLog))
@@ -580,7 +583,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         {
             // admin user resource has been updated
             QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
-            transactionLog->fillPersistentInfo(userTransaction);
+            m_tranLog->fillPersistentInfo(userTransaction);
             if (qnCommon->useLowPriorityAdminPasswordHack())
                 userTransaction.persistentInfo.timestamp = Timestamp::fromInteger(1); // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
             fromResourceToApi(userResource, userTransaction.params);
@@ -612,7 +615,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         while (queryCameras.next())
         {
             QnTransaction<ApiResourceStatusData> tran(ApiCommand::setResourceStatus);
-            transactionLog->fillPersistentInfo(tran);
+            m_tranLog->fillPersistentInfo(tran);
             tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
             tran.params.status = Qn::Offline;
             if (executeTransactionNoLock(tran, QnUbjson::serialized(tran)) != ErrorCode::ok)
@@ -697,14 +700,14 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
         else
             transaction.transactionType = ec2::TransactionType::Unknown;
 
-        transactionLog->fillPersistentInfo(transaction);
+        m_tranLog->fillPersistentInfo(transaction);
         if (updater && updater(transaction.params))
         {
             if (executeTransactionInternal(transaction) != ErrorCode::ok)
                 return false;
         }
 
-        if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
+        if (m_tranLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
     }
     return true;
@@ -1410,7 +1413,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
 bool QnDbManager::createDatabase()
 {
-    QnDbTransactionLocker lock(&m_tran);
+    QnDbTransactionLocker lock(m_tran.get());
 
     m_dbJustCreated = false;
 
@@ -4531,7 +4534,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCleanup
         return result;
 
     if (tran.params.cleanupTransactionLog)
-        result = transactionLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
+        result = m_tranLog->clear() && resyncTransactionLog() ? ErrorCode::ok : ErrorCode::failure;
 
     return result;
 }
@@ -4562,8 +4565,19 @@ bool QnDbManager::updateId()
 
 QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 {
-    return &m_tran;
+    return m_tran.get();
 }
+
+void QnDbManager::setTransactionLog(QnTransactionLog* tranLog)
+{
+    m_tranLog = tranLog;
+}
+
+QnTransactionLog* QnDbManager::transactionLog() const
+{
+    return m_tranLog;
+}
+
 } // namespace detail
 
 QnDbManagerAccess::QnDbManagerAccess(

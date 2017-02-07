@@ -59,6 +59,8 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     m_runningRequests(0),
     m_sslEnabled(false)
 {
+    if (m_dbManager)
+        m_dbManager->setTransactionLog(m_transactionLog.get());
 
     // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
     // order.

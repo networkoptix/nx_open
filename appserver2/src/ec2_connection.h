@@ -36,6 +36,9 @@ namespace ec2
 
         Ec2StaticticsReporter* getStaticticsReporter();
 
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
+
     private:
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;

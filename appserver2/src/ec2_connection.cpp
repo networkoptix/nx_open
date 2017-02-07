@@ -55,4 +55,20 @@ namespace ec2
     {
         return m_staticticsReporter.get();
     }
+
+    Timestamp Ec2DirectConnection::getTransactionLogTime() const
+    {
+        auto transactionLog = m_queryProcessor->getDb()->transactionLog();
+        NX_ASSERT(transactionLog);
+        return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
+    }
+
+    void Ec2DirectConnection::setTransactionLogTime(Timestamp value)
+    {
+        NX_ASSERT(m_queryProcessor->getDb());
+        auto transactionLog = m_queryProcessor->getDb()->transactionLog();
+        if (transactionLog)
+            transactionLog->setTransactionLogTime(value);
+    }
+
 }
