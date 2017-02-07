@@ -180,7 +180,7 @@ class Server(object):
     # if there are more than one return first
     def get_storage(self):
         storage_records = [record for record in self.rest.ec2.getStorages.get() if record['parentId'] == self.ecs_guid]
-        assert len(storage_records) >= 1, 'No storages for server with ecs guid %d is returned by %s' % (self.ecs_guid, self.url)
+        assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.url)
         return Storage(self.box, storage_records[0]['url'])
 
     def rebuild_archive(self):
