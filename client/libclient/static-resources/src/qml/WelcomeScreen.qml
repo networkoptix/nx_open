@@ -173,6 +173,13 @@ Rectangle
 
                     onOpenTile:
                     {
+                        if (systemId.length == 0)
+                        {
+                            // Just try to collapse current tile;
+                            grid.watcher.resetCurrentItem();
+                            return;
+                        }
+
                         var foundItem = null;
                         var count = openTileHandler.items.length;
                         for (var i = 0; i != count; ++i)
@@ -229,7 +236,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
-
+                        view: grid;
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -266,6 +273,9 @@ Rectangle
 
                 function setPage(index, animate)
                 {
+                    if (grid.watcher.currentItem)
+                        grid.watcher.currentItem.cancelAnimationOnCollapse();
+
                     switchPageAnimation.stop();
                     if (animate || (opacity == 0)) //< Opacity is 0 on first show
                     {
