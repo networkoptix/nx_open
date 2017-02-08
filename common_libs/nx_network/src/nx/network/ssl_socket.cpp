@@ -843,7 +843,7 @@ public:
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& op)
     {
-        // We have to recive some data at first to be able to understand if this connection
+        // We have to receive some data at first to be able to understand if this connection
         // is secure or not by analyzing client's request.
         NX_ASSERT(m_isInitialized);
         NX_ASSERT(m_isSsl);
@@ -1016,7 +1016,7 @@ SslSocket::SslSocket(
 
     // NOTE: Currently all IO operations are implemented over async because current SSL
     //     implementation is too twisted to support runtime mode switches.
-    // TODO: SSL sockets should be reimplemented to simplify overall appoarch and support
+    // TODO: SSL sockets should be reimplemented to simplify overall approach and support
     //     runtime mode switches.
     bool nonBlockingMode = false;
     if (!wrappedSocket->getNonBlockingMode(&nonBlockingMode))
@@ -1230,7 +1230,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     }
 
     unsigned int timeout = 0;
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->getRecvTimeout(&timeout))
             return -1;
@@ -1270,7 +1270,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     auto result = promise.get_future().get();
 
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->setRecvTimeout(timeout))
             return -1;
@@ -1303,7 +1303,7 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
     }
 
     unsigned int timeout = 0;
-    if (d->nonBlockingMode) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->getSendTimeout(&timeout))
             return -1;
@@ -1338,7 +1338,7 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
 
     auto result = promise.get_future().get();
 
-    if (d->nonBlockingMode) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->setSendTimeout(timeout))
             return -1;
