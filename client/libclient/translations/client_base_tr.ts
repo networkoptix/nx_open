@@ -3233,10 +3233,6 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Motion video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3271,12 +3267,6 @@ devices</source>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Users</source>
         <translation type="unfinished"></translation>
@@ -3284,6 +3274,18 @@ devices</source>
     <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

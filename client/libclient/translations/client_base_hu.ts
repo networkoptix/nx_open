@@ -3262,21 +3262,11 @@ devices</source>
         <source>All users</source>
         <translation>Minden felhasználó</translation>
     </message>
-    <message>
-        <source>%1 users</source>
-        <translation>%1 felhasználó</translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
             <numerusform>%1 (%n alkalom)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -3286,6 +3276,18 @@ devices</source>
     <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
