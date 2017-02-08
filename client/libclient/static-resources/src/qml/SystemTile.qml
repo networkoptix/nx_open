@@ -19,8 +19,8 @@ BaseTile
     property bool isRunning: false;
     property bool isReachable: false;
 
-    property var wrongVersion;
-    property var compatibleVersion;
+    property string wrongVersion;
+    property string compatibleVersion;
 
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
@@ -33,7 +33,7 @@ BaseTile
         if (impl.isFactoryTile)
             return true;
 
-        if (wrongVersion || !isCompatibleInternal)
+        if (wrongVersion.length || !isCompatibleInternal)
             return false;
 
 
@@ -74,7 +74,7 @@ BaseTile
             if (control.impl.isFactoryTile)
                 return false;    //< We don't have indicator for new systems
 
-            return (wrongVersion || compatibleVersion
+            return (wrongVersion.length || compatibleVersion.length
                 || !control.isConnectable || !isCompatibleInternal);
         }
 
@@ -82,9 +82,9 @@ BaseTile
         {
             if (!isCompatibleInternal)
                 return qsTr("INCOMPATIBLE");
-            if (wrongVersion)
+            if (wrongVersion.length)
                 return wrongVersion.toString(SoftwareVersion.BugfixFormat);
-            if (compatibleVersion)
+            if (compatibleVersion.length)
                 return compatibleVersion.toString(SoftwareVersion.BugfixFormat);
             if (!control.isRunning)
                 return qsTr("OFFLINE");
@@ -96,7 +96,7 @@ BaseTile
 
         textColor:
         {
-           if (wrongVersion || compatibleVersion || !isCompatibleInternal)
+           if (wrongVersion.length || compatibleVersion.length || !isCompatibleInternal)
                return Style.colors.shadow;
            else
                return Style.colors.windowText;
@@ -104,9 +104,9 @@ BaseTile
 
         color:
         {
-            if (wrongVersion || !isCompatibleInternal)
+            if (wrongVersion.length || !isCompatibleInternal)
                 return Style.colors.red_main;
-            else if (compatibleVersion)
+            else if (compatibleVersion.length)
                 return Style.colors.yellow_main;
             else
                 return Style.colors.custom.systemTile.offlineIndicatorBkg;
