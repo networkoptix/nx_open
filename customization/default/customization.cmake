@@ -94,3 +94,6 @@ set(translation12 "vi_VN")
 set(translation13 "pl")
 set(translation14 "hu")
 
+# TODO: #dklychkov Implement fetching parameters from the cloud
+set(cloudHost "cloud-test.hdw.mx")
+set(cloudName "Nx Cloud")
