@@ -313,6 +313,7 @@ void QnStatusOverlayWidget::setupExtrasControls()
      * graphics proxy doesn't handle size hint changes at all. */
 
     const auto container = new QWidget();
+    container->setAttribute(Qt::WA_TranslucentBackground);
     container->setObjectName(lit("extrasContainer"));
 
     const auto layout = new QHBoxLayout(container);
