@@ -215,7 +215,7 @@ protected:
 
         const seconds testDurationLimit(3);
         // Limiting number of connections to limit number of allocated ports.
-        const int maxConnectionsToEstablish = 5000;
+        const int maxConnectionsToEstablish = 2000;
 
         TestResult testResult;
 
