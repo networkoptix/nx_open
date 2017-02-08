@@ -8,6 +8,8 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
+#include <utils/common/guard.h>
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -47,6 +49,7 @@ protected:
         auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(
             moduleName,
             std::make_unique<nx::network::cloud::RandomEndpointSelector>());
+        auto fetcherGuard = makeScopedGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 
         nx::utils::promise<QUrl> urlFoundPromise;
@@ -64,11 +67,8 @@ protected:
                     urlFoundPromise.set_value(url);
                 }
             });
-        auto url = urlFoundPromise.get_future().get();
-
-        fetcher->pleaseStopSync();
-
-        return url;
+     
+        return urlFoundPromise.get_future().get();
     }
 
 protected:
