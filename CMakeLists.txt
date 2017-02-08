@@ -19,12 +19,6 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
-option(withMediaServer "Enable media server" ON)
-option(withDesktopClient "Enable desktop client" ON)
-option(withMobileClient "Enable mobile client" ON)
-option(withClouds "Enable cloud components" ON)
-option(withTests "Enable unit tests" OFF)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(NOT WIN32)
@@ -59,6 +53,7 @@ include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 include(properties)
 include(cloud_host)
+include(vms_parts)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
