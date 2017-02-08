@@ -531,37 +531,42 @@ module.exports = function (grunt) {
             },
             userclean: {
                 options: {
-                    args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/_restore-all-passwords/*spec.js']}
                 }
             },
             account: {
                 options: {
-                    args: {specs: ['test/e2e/account/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/account/*spec.js']}
                 }
             },
             login: {
                 options: {
-                    args: {specs: ['test/e2e/login/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/login/*spec.js']}
                 }
             },
             register: {
                 options: {
-                    args: {specs: ['test/e2e/register/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/register/*spec.js']}
                 }
             },
             restorepass: {
                 options: {
-                    args: {specs: ['test/e2e/restore_pass/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/restore_pass/*spec.js']}
                 }
             },
             syspage: {
                 options: {
-                    args: {specs: ['test/e2e/system_page/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/system_page/*spec.js']}
                 }
             },
             systems: {
                 options: {
-                    args: {specs: ['test/e2e/systems/*spec.js']} // Target-specific arguments
+                    args: {specs: ['test/e2e/systems/*spec.js']}
+                }
+            },
+            customize: {
+                options: {
+                    args: {specs: ['test/e2e/customize/*spec.js']}
                 }
             }
         },
@@ -630,8 +635,8 @@ module.exports = function (grunt) {
 
     grunt.registerTask('testallportals', function (specsuit) {
         var specsuit = specsuit || 'all';
-        var customizationsObj = JSON.parse(grunt.file.read('./test-customizations.json'));
-        var brandQuant = customizationsObj.customizations.length;
+        var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));
+        var brandQuant = customizationsArr.length;
 
         for(var i = 0; i < brandQuant; i++) {
             grunt.task.run(
@@ -648,12 +653,38 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask('testportal', function (specsuit, brand) {
+        var specsuit = specsuit || 'all';
+        var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));
+
+        grunt.task.run(
+            'settestbrandingname:'+ brand,
+            'clean:server',
+            'copy:custom_css',
+            'configureProxies:server',
+            'autoprefixer',
+            'protractor_webdriver:notkeepalive',
+            'shell:print_version',
+            'protractor:'+ specsuit,
+            'clean:server'
+        );
+    });
+
     grunt.registerTask('settestbranding', function (brandindex) {
         console.log(brandindex);
-        var customizationsObj = JSON.parse(grunt.file.read('./test-customizations.json'));
-        var customizationsArr = customizationsObj.customizations;
+        var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));
         console.log(customizationsArr[brandindex]);
         grunt.file.write('./test-customization.json', JSON.stringify(customizationsArr[brandindex]));
+    });
+
+    grunt.registerTask('settestbrandingname', function (brand) {
+        var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));
+        for (var i = 0; i < customizationsArr.length; i ++) {
+            if (customizationsArr[i].brand == brand) {
+                var customization = customizationsArr[i];
+            }
+        }
+        grunt.file.write('./test-customization.json', JSON.stringify(customization));
     });
 
     grunt.registerTask('serve', function (target) {
