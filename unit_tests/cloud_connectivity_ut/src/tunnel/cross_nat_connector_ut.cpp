@@ -69,10 +69,30 @@ TEST_F(CrossNatConnector, target_host_not_found)
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 
-TEST_F(CrossNatConnector, no_nat_traversal_method_available)
-{
-    ConnectorFactory::setEnabledCloudConnectMask(0);
+//-------------------------------------------------------------------------------------------------
+// CrossNatConnectorNoNatTraversalMethodAvailable
 
+class CrossNatConnectorNoNatTraversalMethodAvailable:
+    public CrossNatConnector
+{
+public:
+    CrossNatConnectorNoNatTraversalMethodAvailable():
+        m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(0);
+    }
+
+    ~CrossNatConnectorNoNatTraversalMethodAvailable()
+    {
+        ConnectorFactory::setEnabledCloudConnectMask(m_cloudConnectMaskBak);
+    }
+
+private:
+    int m_cloudConnectMaskBak;
+};
+
+TEST_F(CrossNatConnectorNoNatTraversalMethodAvailable, expecting_error)
+{
     const auto system1 = mediator().addRandomSystem();
     const auto server1 = mediator().addRandomServer(system1);
 
