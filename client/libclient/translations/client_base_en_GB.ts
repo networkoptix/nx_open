@@ -7323,7 +7323,7 @@ devices</source>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
         <translation>
-            <numerusform>The following  item is not saved:</numerusform>
+            <numerusform>The following item is not saved:</numerusform>
             <numerusform>The following %n items are not saved:</numerusform>
         </translation>
     </message>
@@ -7338,7 +7338,7 @@ devices</source>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
         <translation>
-            <numerusform>The following  item is not deleted:</numerusform>
+            <numerusform>The following item is not deleted:</numerusform>
             <numerusform>The following %n items are not deleted:</numerusform>
         </translation>
     </message>
