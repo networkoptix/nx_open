@@ -11,8 +11,8 @@ set(uri.protocol "nx-vms")
 
 set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
 set(short.company.name "${company.name}")
-set(company.support.link "${company.support.address}")
 set(backgroundImage "{}")
+set(defaultWebPages "{}")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
@@ -32,6 +32,4 @@ set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 # Additional Features
 set(vmax "false")
 
-# Cloud parameters
-set(cloudHost "cloud-test.hdw.mx")
-set(cloudName "Nx Cloud")
+set(customization.defines "")
