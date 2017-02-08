@@ -171,6 +171,25 @@ function(add_precompiled_header _target _input)
     set(_pch_flags_file "${_pch_binary_dir}/compile_flags.rsp")
     export_all_flags("${_pch_flags_file}")
     set(_compiler_FLAGS "@${_pch_flags_file}")
+
+    get_property(_cxx_standard TARGET ${_target} PROPERTY CXX_STANDARD)
+    if(_cxx_standard STREQUAL "98")
+        set(_cxx_standard "-std=c++98")
+    elseif(_cxx_standard STREQUAL "11")
+        set(_cxx_standard "-std=c++0x")
+    elseif(_cxx_standard STREQUAL "14")
+        set(_cxx_standard "-std=c++1y")
+    elseif(_cxx_standard STREQUAL "17")
+        set(_cxx_standard "-std=c++1z")
+    else()
+        unset(_cxx_standard)
+    endif()
+
+    get_property(_c_standard TARGET ${_target} PROPERTY C_STANDARD)
+    if(_c_standard STREQUAL "90" OR _c_standard STREQUAL "99" OR _c_standard STREQUAL "11")
+        set(_c_standard "-std=c${_c_standard}")
+    endif()
+
     add_custom_command(
       OUTPUT "${_pchfile}"
       COMMAND "${CMAKE_COMMAND}" -E copy "${_pch_header}" "${_pchfile}"
@@ -178,12 +197,12 @@ function(add_precompiled_header _target _input)
       COMMENT "Updating ${_name}")
     add_custom_command(
       OUTPUT "${_output_cxx}"
-      COMMAND "${CMAKE_CXX_COMPILER}" ${_compiler_FLAGS} -x c++-header -o "${_output_cxx}" "${_pchfile}"
+      COMMAND "${CMAKE_CXX_COMPILER}" ${_compiler_FLAGS} -x c++-header ${_cxx_standard} -o "${_output_cxx}" "${_pchfile}"
       DEPENDS "${_pchfile}" "${_pch_flags_file}"
       COMMENT "Precompiling ${_name} for ${_target} (C++)")
     add_custom_command(
       OUTPUT "${_output_c}"
-      COMMAND "${CMAKE_C_COMPILER}" ${_compiler_FLAGS} -x c-header -o "${_output_c}" "${_pchfile}"
+      COMMAND "${CMAKE_C_COMPILER}" ${_compiler_FLAGS} -x c-header ${_c_standard} -o "${_output_c}" "${_pchfile}"
       DEPENDS "${_pchfile}" "${_pch_flags_file}"
       COMMENT "Precompiling ${_name} for ${_target} (C)")
 

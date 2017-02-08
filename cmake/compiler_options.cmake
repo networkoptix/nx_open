@@ -1,3 +1,7 @@
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -75,7 +79,6 @@ endif()
 
 if(UNIX)
     add_definitions(
-        -std=c++1y
         -Werror=enum-compare
         -Werror=reorder
         -Werror=delete-non-virtual-dtor
