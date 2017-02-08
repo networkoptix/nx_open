@@ -1,5 +1,4 @@
-#ifndef QN_SCREEN_SNAP_H
-#define QN_SCREEN_SNAP_H
+#pragma once
 
 #include <QtCore/QMetaType>
 
@@ -9,7 +8,8 @@
 #include <boost/operators.hpp>
 #endif
 
-struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>  {
+struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>
+{
     int screenIndex;    /**< Index of the screen. */
     int snapIndex;      /**< Index of the snap on the screen. */
 
@@ -21,24 +21,25 @@ struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>  {
     static QnScreenSnap decode(int encoded);
     static int snapsPerScreen();
 
-    friend bool operator==(const QnScreenSnap &l, const QnScreenSnap &r) {
-        return (l.screenIndex == r.screenIndex &&
-            l.snapIndex == r.snapIndex);
+    friend bool operator==(const QnScreenSnap& l, const QnScreenSnap& r)
+    {
+        return (l.screenIndex == r.screenIndex && l.snapIndex == r.snapIndex);
     }
 };
 
-struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps> {
-    inline QnScreenSnap &left() {return values[0];}
-    inline const QnScreenSnap &left() const {return values[0];}
+struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps>
+{
+    inline QnScreenSnap& left() { return values[0]; }
+    inline const QnScreenSnap& left() const { return values[0]; }
 
-    inline QnScreenSnap &right() {return values[1];}
-    inline const QnScreenSnap &right() const {return values[1];}
+    inline QnScreenSnap& right() { return values[1]; }
+    inline const QnScreenSnap& right() const { return values[1]; }
 
-    inline QnScreenSnap &top() {return values[2];}
-    inline const QnScreenSnap &top() const {return values[2];}
+    inline QnScreenSnap& top() { return values[2]; }
+    inline const QnScreenSnap& top() const { return values[2]; }
 
-    inline QnScreenSnap &bottom() {return values[3];}
-    inline const QnScreenSnap &bottom() const {return values[3];}
+    inline QnScreenSnap& bottom() { return values[3]; }
+    inline const QnScreenSnap& bottom() const { return values[3]; }
 
     std::array<QnScreenSnap, 4> values;
 
@@ -46,11 +47,13 @@ struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps> {
 
     QSet<int> screens() const;
 
-    QRect geometry(const QList<QRect> &screens) const;
+    QRect geometry(const QList<QRect>& screens) const;
 
-    friend bool operator==(const QnScreenSnaps &l, const QnScreenSnaps &r) {
+    friend bool operator==(const QnScreenSnaps& l, const QnScreenSnaps& r)
+    {
         return l.values == r.values;
     }
 };
 
-#endif // QN_SCREEN_SNAP_H
+QDebug operator<<(QDebug dbg, const QnScreenSnap& snap);
+QDebug operator<<(QDebug dbg, const QnScreenSnaps& snaps);

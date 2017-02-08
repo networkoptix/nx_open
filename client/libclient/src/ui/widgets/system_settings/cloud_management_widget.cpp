@@ -78,14 +78,13 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         SystemUri::ReferralContext::SettingsDialog);
 
     const QString kLimitationsLink = makeHref(tr("Known limitations"), urlHelper.faqUrl());
-    const QString kPromoText = tr("%1 is in Beta. %2",
-        "%1 is name of cloud (like 'Nx Cloud'), %2 is a link to known issues")
-        .arg(QnAppInfo::cloudName()).arg(kLimitationsLink);
+    const QString kPromoText = tr("%1 is in Beta.", "%1 is name of cloud (like 'Nx Cloud')")
+        .arg(QnAppInfo::cloudName());
 
     /* Realign content in intro panel if promo bar is shown: */
     if (kShowPromoBar)
     {
-        ui->promoBar->setText(kPromoText);
+        ui->promoBar->setText(kPromoText + L' ' + kLimitationsLink);
 
         QMargins margins = ui->introLayout->contentsMargins();
         margins.setTop(margins.top() - style::Metrics::kHeaderSize / 2);

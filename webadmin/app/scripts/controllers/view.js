@@ -401,8 +401,11 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
 
-
         function searchCams(){
+            if($scope.searchCams.toLowerCase() == "links panel"){ // Enable cameras and clean serach fields
+                $scope.cameraLinksEnabled = true;
+                $scope.searchCams = "";
+            }
             function has(str, substr){
                 return str && str.toLowerCase().indexOf(substr.toLowerCase()) >= 0;
             }

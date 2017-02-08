@@ -249,6 +249,7 @@ Control
                         playLive()
                 }
                 videoQuality: QnPlayer.LowIframesOnlyVideoQuality
+                audioEnabled: false
             }
 
             Connections

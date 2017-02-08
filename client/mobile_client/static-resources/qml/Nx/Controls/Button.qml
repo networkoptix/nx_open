@@ -14,6 +14,7 @@ Button
     property bool flat: false
     property string icon: ""
     property real radius: 2
+    property real labelPadding: 24
 
     property real mouseX: mouseTracker.mouseX
     property real mouseY: mouseTracker.mouseY
@@ -33,8 +34,8 @@ Button
     label: Row
     {
         anchors.centerIn: parent
-        leftPadding: 8
-        rightPadding: 8
+        leftPadding: control.labelPadding
+        rightPadding: control.labelPadding
         spacing: 8
 
         Image

@@ -248,6 +248,7 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
     table->setHorizontalHeader(header);

@@ -112,7 +112,7 @@ public:
         addButton(lit("Resource Pool"), [this]
             {
                 auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
-                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources()));
+                messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources(), messageBox));
                 messageBox->show();
             });
 

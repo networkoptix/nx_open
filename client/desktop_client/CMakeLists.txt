@@ -8,7 +8,6 @@ add_executable(desktop_client
 add_precompiled_header(desktop_client src/StdAfx.h FORCEINCLUDE)
 
 rdep_add_package(any/festival-vox)
-rdep_add_package(any/roboto-ttf)
 rdep_add_package(any/help)
 
 target_include_directories(desktop_client PRIVATE src)
