@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_GB" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
         <source>Language Name</source>
         <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-        <translation>English (US)</translation>
+        <translation>English (UK)</translation>
     </message>
     <message>
         <source>Locale Code</source>
