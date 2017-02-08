@@ -55,8 +55,7 @@ public:
 
     virtual ~AvFrameMemoryBufferPrivate()
     {
-        av_buffer_unref(&frame->buf[0]);
-        av_frame_free(&frame);
+        av_frame_free(&frame); //< It includes av_frame_unref
     }
 
     virtual int map(
@@ -172,7 +171,7 @@ void FfmpegVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr&
         return;
     }
 
-    // keep frame unless we call 'av_buffer_unref'
+    // keep frame unless we call 'av_frame_unref'
     codecContext->refcounted_frames = 1;
 }
 
@@ -250,7 +249,7 @@ bool FfmpegVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolu
     if (resolution.width() <= maxRes.width() && resolution.height() <= maxRes.height())
         return true;
 
-    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %1 x %2")
+    NX_LOG(lit("[ffmpeg_video_decoder] Max resolution %1 x %2 exceeded: %3 x %4")
         .arg(maxRes.width()).arg(maxRes.height())
         .arg(resolution.width()).arg(resolution.height()),
         cl_logWARNING);
@@ -325,13 +324,7 @@ int FfmpegVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
-    if (d->codecContext->codec_id == AV_CODEC_ID_MJPEG)
-    {
-        // Workaround for MJPEG decoder bug: it always sets coded_picture_number to 0, and
-        // need monotonic frame number to associate decoder's input and output frames.
-        frameNum = qMax(0, d->codecContext->frame_number - 1);
-    }
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     auto qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
 

@@ -14,7 +14,7 @@ namespace ec2
     public:
         QnStoredFileNotificationManager() {}
 
-        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran )
+        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran, NotificationSource /*source*/)
         {
             if( tran.command == ApiCommand::addStoredFile )
             {
@@ -30,7 +30,7 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran )
+        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran, NotificationSource /*source*/)
         {
             NX_ASSERT( tran.command == ApiCommand::removeStoredFile );
             emit removed( tran.params.path );

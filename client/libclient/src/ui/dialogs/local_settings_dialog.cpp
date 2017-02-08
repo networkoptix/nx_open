@@ -2,6 +2,7 @@
 #include "ui_local_settings_dialog.h"
 
 #include <client/client_settings.h>
+#include <client/client_app_info.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -97,22 +98,22 @@ void QnLocalSettingsDialog::accept()
 
     if (isRestartRequired())
     {
-        QDialogButtonBox::StandardButton result = QnMessageBox::information(
-            this,
-            tr("Information"),
-            tr("Some changes will take effect only after application restart. Do you want to restart the application now?"),
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes);
-        switch (result)
-        {
-            case QDialogButtonBox::Cancel:
-                return;
-            case QDialogButtonBox::Yes:
-                restartQueued = true;
-                break;
-            default:
-                break;
-        }
+        QnMessageBox dialog(this);
+        dialog.setText(tr("Some changes will take effect only after %1 restart")
+            .arg(QnClientAppInfo::applicationDisplayName()));
+
+        dialog.setStandardButtons(QDialogButtonBox::Cancel);
+        const auto restartNowButton = dialog.addButton(
+            tr("Restart Now"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
+
+        dialog.addButton(
+            tr("Restart Later"), QDialogButtonBox::NoRole);
+
+        if (dialog.exec() == QDialogButtonBox::Cancel)
+            return;
+
+        if (dialog.clickedButton() == restartNowButton)
+            restartQueued = true;
     }
 
     base_type::accept();

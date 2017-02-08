@@ -49,13 +49,16 @@ protected:
 class TestTcpListener: public QnTcpListener
 {
 public:
-    TestTcpListener(const QHostAddress& address, int port): QnTcpListener(address, port)
+    TestTcpListener(const QHostAddress& address, int port):
+        QnTcpListener(address, port, DEFAULT_MAX_CONNECTIONS, /*useSSL*/ false)
     {
     }
+
     virtual ~TestTcpListener() override
     {
         stop();
     }
+
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override

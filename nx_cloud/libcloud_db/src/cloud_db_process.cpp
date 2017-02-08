@@ -111,7 +111,7 @@ int CloudDBProcess::exec()
         //reading settings
         conf::Settings settings;
         //parsing command line arguments
-        settings.load( m_argc, m_argv );
+        settings.load( m_argc, (const char**) m_argv );
         if( settings.showHelp() )
         {
             settings.printCmdLineArgsHelpToCout();
@@ -285,7 +285,7 @@ int CloudDBProcess::exec()
 
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
-            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStop(); });
+            [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());
@@ -417,7 +417,7 @@ void CloudDBProcess::registerApiHandlers(
     // ec2::ConnectionManager
     // TODO: #ak remove after 3.0 release.
     registerHttpHandler(
-        kEstablishEc2TransactionConnectionDeprecatedPath,
+        kDeprecatedEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,
         ec2ConnectionManager);
 

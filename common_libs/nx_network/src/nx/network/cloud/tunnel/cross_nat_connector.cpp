@@ -70,7 +70,7 @@ CrossNatConnector::CrossNatConnector(
 {
     m_mediatorUdpClient = 
         std::make_unique<api::MediatorClientUdpConnection>(m_mediatorAddress);
-    m_mediatorUdpClient->socket()->bindToAioThread(getAioThread());
+    m_mediatorUdpClient->bindToAioThread(getAioThread());
 
     m_timer = std::make_unique<aio::Timer>();
     m_timer->bindToAioThread(getAioThread());
@@ -84,7 +84,7 @@ CrossNatConnector::~CrossNatConnector()
 void CrossNatConnector::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     AbstractCrossNatConnector::bindToAioThread(aioThread);
-    m_mediatorUdpClient->socket()->bindToAioThread(aioThread);
+    m_mediatorUdpClient->bindToAioThread(aioThread);
     m_timer->bindToAioThread(aioThread);
 }
 
@@ -228,6 +228,18 @@ void CrossNatConnector::onConnectResponse(
     const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_connectionParameters = response.params;
 
+    m_connectors = ConnectorFactory::createCloudConnectors(
+        m_targetPeerAddress,
+        m_connectSessionId,
+        response,
+        std::move(m_mediatorUdpClient->takeSocket()));
+    if (m_connectors.empty())
+    {
+        m_mediatorUdpClient.reset();
+        auto completionHandler = std::move(m_completionHandler);
+        return completionHandler(SystemError::hostUnreach, nullptr);
+    }
+
     startNatTraversing(
         effectiveConnectTimeout,
         std::move(response));
@@ -240,7 +252,9 @@ std::chrono::milliseconds CrossNatConnector::calculateTimeLeftForConnect()
     milliseconds effectiveConnectTimeout(0);
     if (m_connectTimeout)
     {
-        effectiveConnectTimeout = duration_cast<milliseconds>(m_timer->timeToEvent());
+        if (const auto timeToEvent = m_timer->timeToEvent())
+            effectiveConnectTimeout = duration_cast<milliseconds>(*timeToEvent);
+
         if (effectiveConnectTimeout == milliseconds::zero())
             effectiveConnectTimeout = milliseconds(1);   //< Zero timeout is infinity.
     }
@@ -252,12 +266,6 @@ void CrossNatConnector::startNatTraversing(
     std::chrono::milliseconds connectTimeout,
     api::ConnectResponse response)
 {
-    // Creating corresponding connectors.
-    m_connectors = ConnectorFactory::createCloudConnectors(
-        m_targetPeerAddress,
-        m_connectSessionId,
-        response,
-        std::move(m_mediatorUdpClient->takeSocket()));
     NX_ASSERT(!m_connectors.empty());
     // TODO: #ak sorting connectors by priority
     m_mediatorUdpClient.reset();

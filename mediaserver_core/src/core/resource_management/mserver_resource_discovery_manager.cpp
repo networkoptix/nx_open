@@ -74,15 +74,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 {
     // fill camera's ID
 
-    for (const auto& resource: resources)
-    {
-        QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
-        if (cameraResource) {
-            QString uniqueId = cameraResource->getUniqueId();
-            cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
-        }
-    }
-
     {
         QnMutexLocker lock(&m_discoveryMutex);
         // check foreign resources several times in case if camera is discovered not quite stable. It'll improve redundant priority for foreign cameras
@@ -93,10 +84,10 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = qnResPool->getResourceById<QnSecurityCamResource>((*itr)->getId());
+            QnSecurityCamResourcePtr existRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
-                m_tmpForeignResources.insert(camRes->getId(), camRes);
+                m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
                 itr = resources.erase(itr);
             }
             else {

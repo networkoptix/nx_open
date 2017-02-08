@@ -4,7 +4,9 @@
 #include <nx/utils/move_only_func.h>
 
 #include <api/model/cloud_credentials_data.h>
+#include <api/model/detach_from_cloud_data.h>
 #include <api/model/setup_local_system_data.h>
+#include <api/model/setup_cloud_system_data.h>
 #include <api/model/system_settings_reply.h>
 #include <network/module_information.h>
 #include <nx_ec/data/api_resource_data.h>
@@ -30,6 +32,7 @@ public:
     void saveCloudSystemCredentials(
         const CloudCredentialsData& request,
         std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult saveCloudSystemCredentials(const CloudCredentialsData& request);
 
     void getModuleInformation(
         std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler);
@@ -39,6 +42,16 @@ public:
         const SetupLocalSystemData& request,
         std::function<void(QnJsonRestResult)> completionHandler);
     QnJsonRestResult setupLocalSystem(const SetupLocalSystemData& request);
+
+    void setupCloudSystem(
+        const SetupCloudSystemData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult setupCloudSystem(const SetupCloudSystemData& request);
+
+    void detachFromCloud(
+        const DetachFromCloudData& request,
+        std::function<void(QnJsonRestResult)> completionHandler);
+    QnJsonRestResult detachFromCloud(const DetachFromCloudData& request);
 
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
@@ -75,6 +88,11 @@ private:
     ResultCode syncCallWrapper(
         void(MediaServerClient::*asyncFunc)(std::function<void(ResultCode, Output)>),
         Output* output);
+
+    template<typename ResultCode, typename Input>
+    ResultCode syncCallWrapper(
+        void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode)>),
+        const Input& input);
 
     template<typename Input>
     void performApiRequest(

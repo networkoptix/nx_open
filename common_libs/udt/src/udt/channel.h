@@ -72,15 +72,6 @@ public:
    void open(UDPSOCKET udpsock);
 
       // Functionality:
-      //    Disconnect and close the UDP entity.
-      // Parameters:
-      //    None.
-      // Returned value:
-      //    None.
-
-   void close() const;
-
-      // Functionality:
       //    Get the UDP sending buffer size.
       // Parameters:
       //    None.
@@ -154,6 +145,8 @@ public:
 
    int recvfrom(sockaddr* addr, CPacket& packet) const;
 
+   int shutdown();
+
 private:
    void setUDPSockOpt();
 
@@ -165,7 +158,15 @@ private:
 
    int m_iSndBufSize;                   // UDP sending buffer size
    int m_iRcvBufSize;                   // UDP receiving buffer size
-};
 
+      // Functionality:
+      //    Disconnect and close the UDP entity.
+      // Parameters:
+      //    None.
+      // Returned value:
+      //    None.
+
+   void closeSocket();
+};
 
 #endif

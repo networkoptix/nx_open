@@ -34,14 +34,14 @@ static uint usedBits(QtDevice::result_type number)
 QtDevice::result_type QtDevice::operator()()
 {
     static auto qrandBits = usedBits(RAND_MAX);
-    static result_type qrandMask = (1 << qrandBits) - 1;
-    static auto neededBits = usedBits(max());
+    static result_type qrandMask = ((result_type) 1 << qrandBits) - 1;
+    static auto neededBits = usedBits(max() - min());
 
     result_type result = 0;
     for (uint bits = 0; bits < neededBits; bits += qrandBits)
         result = (result << qrandBits) | (::qrand() & qrandMask);
 
-    return result;
+    return result + min();
 }
 
 double QtDevice::entropy() const
@@ -72,10 +72,14 @@ QtDevice& qtDevice()
 
 QByteArray generate(std::size_t count)
 {
+    auto& device = qtDevice();
     QByteArray data(static_cast<int>(count), Qt::Uninitialized);
     for (int i = 0; i != data.size(); ++i)
     {
-        const auto n = number<short>(0, 255);
+        // NOTE: Direct device access with simple cast works significantly faster than
+        //     uniform_int_distribution on a number of platforms (stl implemenations).
+        //     Found on iOS by profiler.
+        const auto n = device();
         data[i] = reinterpret_cast<const char&>(n);
     }
 

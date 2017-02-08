@@ -177,9 +177,9 @@ QString QnTimelineZoomLevel::suffix(qint64 tick) const {
     QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(tick, Qt::UTC);
     switch (type) {
     case Days:
-        return QLocale().monthName(dateTime.date().month());
+        return QLocale().monthName(dateTime.date().month(), QLocale::ShortFormat);
     case Months:
-        return QLocale().standaloneMonthName(dateTime.date().month());
+        return QLocale().standaloneMonthName(dateTime.date().month(), QLocale::ShortFormat);
     case Milliseconds:
         return lit("ms");
     case Seconds:
@@ -204,7 +204,7 @@ QString QnTimelineZoomLevel::longestText() const
         case Hours:
             return lit("00:00");
         case Years:
-            return lit("9999");
+            return lit("0000");
         case Days:
         case Months:
             // Cannot be evaluated accurately.

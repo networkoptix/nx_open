@@ -1,9 +1,11 @@
 #include "resource_list_view.h"
 
+#include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 namespace {
 
@@ -26,10 +28,18 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setUniformRowHeights(true);
     setHeaderHidden(true);
     setFocusPolicy(Qt::NoFocus);
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setProperty(style::Properties::kSideIndentation, qVariantFromValue(QnIndents()));
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);
     setItemDelegate(itemDelegate);
+
+    if (parent)
+    {
+        const auto scrollBar = new QnSnappedScrollBar(parent->window());
+        setVerticalScrollBar(scrollBar->proxyScrollBar());
+    }
 }
 
 QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):

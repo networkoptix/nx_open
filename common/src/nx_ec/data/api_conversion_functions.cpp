@@ -168,7 +168,7 @@ void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst
     // Validate camera unique id
     const auto dstId = dst->getId();
     const auto dstUid = dst->getUniqueId();
-    const auto uidToId = QnVirtualCameraResource::uniqueIdToId(dstUid);
+    const auto uidToId = QnVirtualCameraResource::physicalIdToId(dstUid);
     if (dstId == uidToId)
         return;
 
@@ -369,7 +369,8 @@ void fromApiToResource(const ApiEmailSettingsData& src, QnEmailSettings& dst)
 
 void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst)
 {
-    dst.uuid = src.id;
+    // Workaround against corrupted layouts in the database
+    dst.uuid = src.id.isNull() ? QnUuid::createUuid() : src.id;
     dst.flags = src.flags;
     dst.combinedGeometry = QRectF(QPointF(src.left, src.top), QPointF(src.right, src.bottom));
     dst.rotation = src.rotation;

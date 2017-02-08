@@ -30,7 +30,11 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
     m_numChannels = audioFormat.channelCount();
     m_frequency = audioFormat.sampleRate();
     m_bitsPerSample = audioFormat.sampleSize();
-    m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+    #if defined(Q_OS_ANDROID)
+        m_size = AudioDevice::internalBufferInSamples(device) * sampleSize();
+    #else
+        m_size = 0;
+    #endif
     if (m_size == 0)
     {
         m_size = bitRate() / 32; // use 30+ ms buffers
@@ -39,7 +43,6 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
         if (m_size % sampleSize)
             m_size += sampleSize - (m_size % sampleSize);
     }
-
 
     m_proxyBuffer = new quint8[m_size];
     m_proxyBufferLen = 0;

@@ -1000,7 +1000,8 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & 
             (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled))
         {
             m_needStop = true;
-            d->socket->close();
+            if (auto socket = d->socket)
+                socket->shutdown();
         }
     }
 }
@@ -1010,9 +1011,11 @@ void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & 
     Q_D(QnRtspConnectionProcessor);
 
     QnMutexLocker lock( &d->mutex );
-    if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner)) {
+    if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner))
+    {
         m_needStop = true;
-        d->socket->close();
+        if (auto socket = d->socket)
+            socket->shutdown();
     }
 }
 

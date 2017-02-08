@@ -424,9 +424,13 @@ void QnNxStylePrivate::drawTextButton(
 {
     Q_UNUSED(widget);
 
-    bool enabled = option->state.testFlag(QStyle::State_Enabled);
-    bool hovered = option->state.testFlag(QStyle::State_MouseOver);
-    bool pressed = option->state.testFlag(QStyle::State_Sunken);
+    const bool enabled = option->state.testFlag(QStyle::State_Enabled);
+    const bool hovered = option->state.testFlag(QStyle::State_MouseOver);
+    const bool pressed = option->state.testFlag(QStyle::State_Sunken);
+
+    const bool checkable = isCheckableButton(option);
+    const bool hasIcon = !option->icon.isNull();
+    const bool hasMenu = option->features.testFlag(QStyleOptionButton::HasMenu);
 
     QBrush brush = option->palette.brush(foregroundRole);
     QIcon::Mode iconMode = enabled ? QIcon::Normal : QIcon::Disabled;
@@ -440,7 +444,7 @@ void QnNxStylePrivate::drawTextButton(
 
     QRect textRect(option->rect);
 
-    if (isCheckableButton(option))
+    if (checkable)
     {
         QStyleOption switchOption(*option); //< not QStyleOptionButton for standalone switch
         switchOption.rect.setWidth(Metrics::kStandaloneSwitchSize.width());
@@ -453,7 +457,7 @@ void QnNxStylePrivate::drawTextButton(
         drawSwitch(painter, &switchOption, widget);
     }
 
-    if (!option->icon.isNull())
+    if (hasIcon)
     {
         paintLabelIcon(
             &textRect,
@@ -465,9 +469,9 @@ void QnNxStylePrivate::drawTextButton(
             iconMode);
     }
 
-    if (option->features.testFlag(QStyleOptionButton::HasMenu))
+    if (hasMenu)
     {
-        QIcon icon = pressed
+        const auto icon = pressed
             ? qnSkin->icon(lit("buttons/collapse.png"))
             : qnSkin->icon(lit("buttons/expand.png"));
 
@@ -481,12 +485,16 @@ void QnNxStylePrivate::drawTextButton(
             iconMode);
     }
 
+    const auto horizontalAlignment = hasMenu && !(checkable || hasIcon)
+        ? Qt::AlignRight
+        : Qt::AlignLeft;
+
     static const int kTextFlags = Qt::TextSingleLine
                                 | Qt::TextHideMnemonic
-                                | Qt::AlignLeft
-                                | Qt::AlignVCenter;
+                                | Qt::AlignVCenter
+                                | horizontalAlignment;
 
-    QString text = option->fontMetrics.elidedText(
+    const auto text = option->fontMetrics.elidedText(
         option->text,
         Qt::ElideRight,
         textRect.width(),
@@ -563,20 +571,18 @@ void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
     if (!area)
         return;
 
-    auto viewport = area->viewport();
+    const auto viewport = area->viewport();
     if (!viewport->underMouse())
         return;
 
-    auto globalPos = QCursor::pos(); //< relative to the primary screen
-    auto localPos = mapFromGlobal(viewport, globalPos);
+    const auto globalPos = QCursor::pos(); //< relative to the primary screen
+    const auto localPos = mapFromGlobal(viewport, globalPos);
 
-    QMouseEvent mouseMove(
-        QEvent::MouseMove,
-        localPos,
-        globalPos,
-        Qt::NoButton,
-        qApp->mouseButtons(),
+    QHoverEvent hoverMove(
+        QEvent::HoverMove,
+        localPos, //< current position
+        localPos, //< old position
         qApp->keyboardModifiers());
 
-    qApp->notify(viewport, &mouseMove);
+    qApp->notify(viewport, &hoverMove);
 }

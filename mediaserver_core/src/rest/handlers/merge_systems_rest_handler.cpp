@@ -525,10 +525,6 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
 
-    //for (auto itr = settings.settings.begin(); itr != settings.settings.end(); ++itr)
-    //    data.foreignSettings.push_back(ec2::ApiResourceParamData(itr.key(), itr.value()));
-    data.foreignUsers = users;
-
     for (const auto& userData: users)
     {
         QnUserResourcePtr user = fromApiToResource(userData);

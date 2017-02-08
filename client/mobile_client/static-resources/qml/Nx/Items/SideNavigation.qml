@@ -28,6 +28,7 @@ Drawer
             anchors.fill: parent
             anchors.topMargin: getStatusBarHeight()
             anchors.bottomMargin: bottomContent.height
+            bottomMargin: 8
             flickableDirection: Flickable.VerticalFlick
             clip: true
 
@@ -129,7 +130,6 @@ Drawer
             {
                 icon: lp("/images/settings.png")
                 text: qsTr("Settings")
-                visible: false//!liteMode
                 onClicked: Workflow.openSettingsScreen()
             }
 

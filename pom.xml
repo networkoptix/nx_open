@@ -195,7 +195,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloud.group>dev</cloud.group>
+        <cloudGroup>dev</cloudGroup>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -265,6 +265,7 @@
         <artifact.name.misc_debug>${artifact.name.prefix}-misc_debug-${artifact.name.suffix}</artifact.name.misc_debug>
         <artifact.name.libs_debug>${artifact.name.prefix}-libs_debug-${artifact.name.suffix}</artifact.name.libs_debug>
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
+        <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
     </properties>
 
@@ -313,6 +314,19 @@
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get-cloud-url-property</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${root.dir}/.cloudHost.properties</file>
+                            </files>
+                            <quiet>true</quiet>
                         </configuration>
                     </execution>
                 </executions>
@@ -744,6 +758,7 @@
                 <applauncher.binary.name>applauncher-bin</applauncher.binary.name>
                 <installation.root>/Applications/</installation.root>
                 <artifact.name.platform>mac</artifact.name.platform>
+                <qt.version>5.6.2</qt.version>
             </properties>
             <modules>
                 <module>common_libs/nx_email</module>
@@ -777,6 +792,7 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
@@ -1210,52 +1226,18 @@
             </modules>
         </profile>
         <profile>
-            <id>get-cloud-url</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>cloud.group</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>properties-maven-plugin</artifactId>
-                        <version>1.0-alpha-2</version>
-                        <executions>
-                            <execution>
-                                <id>get-cloud-url-property</id>
-                                <phase>initialize</phase>
-                                <goals>
-                                    <goal>read-project-properties</goal>
-                                </goals>
-                                <configuration>
-                                    <files>
-                                        <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
-                                    </files>
-                                    <quiet>true</quiet>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
             <id>artifacts_validator-id</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
                     <name>artifactsValidator</name>
                 </property>
-            </activation>            
+            </activation>
             <modules>
                 <module>artifacts_validator</module>
             </modules>
         </profile>
-        
+
         <!-- Artifact naming profiles -->
 
         <profile>
@@ -1275,12 +1257,12 @@
             <id>artifact-name-cloud</id>
             <activation>
                 <property>
-                    <name>cloud.group</name>
+                    <name>cloudGroup</name>
                     <value>!prod</value>
                 </property>
             </activation>
             <properties>
-                <artifact.name.cloud.suffix>-${cloud.group}</artifact.name.cloud.suffix>
+                <artifact.name.cloud.suffix>-${cloudGroup}</artifact.name.cloud.suffix>
             </properties>
         </profile>
 

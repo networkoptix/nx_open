@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/system_socket.h>
+#include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
@@ -32,20 +33,21 @@ void onBytesRead(
 
 } // namespace
 
-TEST(UdpSocket, Simple)
+void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
 {
     static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
-    UDPSocket sender(AF_INET);
+    UDPSocket sender(ipVersion);
     const auto senderCleanupGuard = makeScopedGuard([&sender]() { sender.pleaseStopSync(); });
 
     ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(sender.setSendTimeout(1000));
 
     SocketAddress senderEndpoint("127.0.0.1", sender.getLocalAddress().port);
-    ASSERT_FALSE(senderEndpoint.address.isIpAddress());
+    const auto& senderHost = senderEndpoint.address;
+    ASSERT_FALSE(senderHost.isIpAddress());
 
-    UDPSocket receiver(AF_INET);
+    UDPSocket receiver(ipVersion);
     const auto receiverCleanupGuard = makeScopedGuard([&receiver]() { receiver.pleaseStopSync(); });
     ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(receiver.setRecvTimeout(1000));
@@ -56,7 +58,7 @@ TEST(UdpSocket, Simple)
     nx::utils::promise<void> sendPromise;
     ASSERT_TRUE(sender.setNonBlockingMode(true));
     sender.sendToAsync(
-        kTestMessage, receiverEndpoint,
+        kTestMessage, SocketAddress(targetHost, receiverEndpoint.port),
         [&](SystemError::ErrorCode code, SocketAddress ip, size_t size)
         {
             ASSERT_EQ(SystemError::noError, code);
@@ -71,10 +73,34 @@ TEST(UdpSocket, Simple)
     SocketAddress remoteEndpoint;
     ASSERT_EQ(kTestMessage.size(), receiver.recvFrom(buffer.data(), buffer.size(), &remoteEndpoint));
     ASSERT_EQ(kTestMessage, buffer.left(kTestMessage.size()));
-    ASSERT_TRUE(remoteEndpoint.address.isIpAddress());
+
+    const auto& remoteHost = remoteEndpoint.address;
+    ASSERT_TRUE(remoteHost.isIpAddress());
     ASSERT_EQ(senderEndpoint.toString(), remoteEndpoint.toString());
 
+    if (ipVersion == AF_INET)
+        ASSERT_EQ(senderHost.ipV4()->s_addr, remoteHost.ipV4()->s_addr);
+    else if (ipVersion == AF_INET6)
+        ASSERT_EQ(0, memcmp(&senderHost.ipV6().get(), &remoteHost.ipV6().get(), sizeof(in6_addr)));
+    else
+        FAIL();
+
     sendPromise.get_future().wait();
+}
+
+TEST(UdpSocket, TransferIpV4) { udpSocketTransferTest(AF_INET, "127.0.0.1"); }
+TEST(UdpSocket, TransferDnsIpV4) { udpSocketTransferTest(AF_INET, "localhost"); }
+TEST(UdpSocket, TransferIpV6) { udpSocketTransferTest(AF_INET6, "127.0.0.1"); }
+TEST(UdpSocket, TransferDnsIpV6) { udpSocketTransferTest(AF_INET6, "localhost"); }
+
+TEST(UdpSocket, TransferNat64)
+{
+    HostAddress ip("12.34.56.78");
+    SocketGlobals::addressResolver().dnsResolver().addEtcHost(
+        ip.toString(), {HostAddress::localhost});
+
+    udpSocketTransferTest(AF_INET6, ip);
+    SocketGlobals::addressResolver().dnsResolver().removeEtcHost(ip.toString());
 }
 
 TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)

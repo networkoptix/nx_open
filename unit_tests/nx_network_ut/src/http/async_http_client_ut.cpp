@@ -184,6 +184,10 @@ TEST_F(AsyncHttpClientTest, FastRemove)
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
     testHttpClientForFastRemove(lit("http://doestNotExist.host/"));
+
+    testHttpClientForFastRemove(lit("https://127.0.0.1/"));
+    testHttpClientForFastRemove(lit("https://localhost/"));
+    testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
 TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
@@ -495,7 +499,7 @@ public:
         for (auto& clientContext: m_clients)
             clientContext.client->pleaseStopSync();
 
-        m_testServer.pleaseStop();
+        m_testServer.pleaseStopSync();
     }
 
 protected:
@@ -655,7 +659,7 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
             httpClient->doGet(testUrl);
         }
 
-        constexpr const auto responseWaitDelay = std::chrono::seconds(2);
+        constexpr const auto responseWaitDelay = std::chrono::seconds(3);
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
     }
@@ -681,7 +685,7 @@ public:
 
     bool bindAndListen()
     {
-        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) |
+        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) ||
             !m_serverSocket.listen())
         {
             return false;
@@ -758,7 +762,8 @@ X-Nx-Result-Code: ok
     )http");
 
     TestTcpServer testTcpServer(std::move(dataToSend));
-    ASSERT_TRUE(testTcpServer.bindAndListen());
+    ASSERT_TRUE(testTcpServer.bindAndListen())
+        << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
 
     QUrl url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));

@@ -11,7 +11,7 @@ namespace ec2
     ////////////////////////////////////////////////////////////
     //// class QnLicenseNotificationManager
     ////////////////////////////////////////////////////////////
-    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran )
+    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran, NotificationSource /*source*/)
     {
         QnLicenseList licenseList;
         fromApiToResourceList(tran.params, licenseList);
@@ -21,7 +21,7 @@ namespace ec2
         }
     }
 
-    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
+    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseData>& tran, NotificationSource /*source*/)
     {
         QnLicensePtr license(new QnLicense());
         fromApiToResource(tran.params, license);

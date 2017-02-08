@@ -29,7 +29,6 @@ Module
     {
         condition: qbs.targetOS.contains("ios")
         enableAllVendors: false
-        enableSsl: false
         enableThirdParty: false
         enableMdns: false
         enableArchive: false
@@ -41,14 +40,12 @@ Module
     {
         condition: qbs.targetOS.contains("android")
         enableAllVendors: false
-        enableSsl: false
         enableThirdParty: false
         enableMdns: false
         enableArchive: false
         enableDataProviders: false
         enableSoftwareMotionDetection: false
         enableSendMail: false
-        Android.ndk.platform: "android-16"
     }
     Properties
     {

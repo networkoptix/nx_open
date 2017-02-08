@@ -25,7 +25,8 @@ class UdpTunnelConnector:
     public cloud::test::TunnelConnector
 {
 public:
-    UdpTunnelConnector()
+    UdpTunnelConnector():
+        m_cloudConnectMaskBak(ConnectorFactory::getEnabledCloudConnectMask())
     {
         ConnectorFactory::setEnabledCloudConnectMask(
             (int)CloudConnectType::udpHp);
@@ -33,9 +34,11 @@ public:
 
     ~UdpTunnelConnector()
     {
-        ConnectorFactory::setEnabledCloudConnectMask(
-            (int)CloudConnectType::all);
+        ConnectorFactory::setEnabledCloudConnectMask(m_cloudConnectMaskBak);
     }
+
+private:
+    int m_cloudConnectMaskBak;
 };
 
 TEST_F(UdpTunnelConnector, general)

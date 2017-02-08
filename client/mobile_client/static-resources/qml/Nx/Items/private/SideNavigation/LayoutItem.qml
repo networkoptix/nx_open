@@ -32,29 +32,29 @@ SideNavigationItem
 
                 if (type == QnLayoutsModel.AllCameras)
                 {
-                    return active 
-                        ? lp("/images/all_cameras_active.png") 
+                    return active
+                        ? lp("/images/all_cameras_active.png")
                         : lp("/images/all_cameras.png")
                 }
-                    
+
                 if (type == QnLayoutsModel.Layout)
                 {
                     if (shared)
                     {
-                        return active 
-                            ? lp("/images/global_layout_active.png") 
+                        return active
+                            ? lp("/images/global_layout_active.png")
                             : lp("/images/global_layout.png")
                     }
-                    
-                    return active 
-                        ? lp("/images/layout_active.png") 
+
+                    return active
+                        ? lp("/images/layout_active.png")
                         : lp("/images/layout.png")
                 }
-                
+
                 if (type == QnLayoutsModel.LiteClient)
                 {
-                    return active 
-                        ? lp("/images/lite_client_active.png") 
+                    return active
+                        ? lp("/images/lite_client_active.png")
                         : lp("/images/lite_client.png")
                 }
 
@@ -81,7 +81,9 @@ SideNavigationItem
                 elide: Text.ElideRight
                 color: active ? ColorTheme.windowText : ColorTheme.contrast10
 
-                text: type == QnLayoutsModel.LiteClient ? "Nx1" : sideNavigationItem.text
+                text: type == QnLayoutsModel.LiteClient
+                    ? applicationInfo.liteDeviceName()
+                    : sideNavigationItem.text
             }
 
             Text

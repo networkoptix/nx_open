@@ -88,14 +88,16 @@ libnx_network \
 libnx_streaming \
 libnx_utils \
 libpostproc \
-libudt )
+libudt \
+libGLESv2 \
+libMali \
+libUMP )
 
-#additional libs for nx1 client
+# Additional libs for nx1
 if [[ "${box}" == "bpi" ]]; then
     LIBS_TO_COPY+=(
-        libGLESv2 \
-        libMali \
-        libUMP )
+    # Put nx1(bpi) specific server libs here
+    )
     if [[ ! -z "$WITH_CLIENT" ]]; then
         LIBS_TO_COPY+=( \
             ldpreloadhook \

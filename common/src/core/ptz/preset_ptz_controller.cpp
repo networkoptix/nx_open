@@ -187,14 +187,15 @@ bool QnPresetPtzController::activatePreset(const QString &presetId, qreal speed)
 
 bool QnPresetPtzController::getPresets(QnPtzPresetList *presets)
 {
-    auto activatePresetActionFunc = [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset preset)
-    {
-        presets->clear();
-        for (const QnPtzPresetRecord &record : records)
-            presets->push_back(record.preset);
+    auto activatePresetActionFunc =
+        [this, presets](QnPtzPresetRecordHash& records, QnPtzPreset /*preset*/)
+        {
+            presets->clear();
+            for (const QnPtzPresetRecord &record : records)
+                presets->push_back(record.preset);
 
-        return true;
-    };
+            return true;
+        };
 
     {
         QnMutexLocker lock(&m_mutex);

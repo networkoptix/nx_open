@@ -48,6 +48,7 @@ CloudConnectionManager::~CloudConnectionManager()
 
 void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
 {
+    NX_ASSERT(proxyEndpoint.port > 0);
     m_proxyAddress = proxyEndpoint;
 }
 
@@ -63,6 +64,57 @@ boost::optional<nx::hpm::api::SystemCredentials>
     cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
     cloudCredentials.key = m_cloudAuthKey.toUtf8();
     return cloudCredentials;
+}
+
+void CloudConnectionManager::setCloudCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_LOGX(lm("New credentials: %1:%2. Known credentials: %3:%4")
+        .arg(cloudSystemId).arg(cloudAuthKey.size()).arg(m_cloudSystemId).arg(m_cloudAuthKey.size()),
+        cl_logDEBUG2);
+
+    if (!hasCloudBindingStatusChanged(cloudSystemId, cloudAuthKey))
+        return;
+
+    m_cloudSystemId = cloudSystemId;
+    m_cloudAuthKey = cloudAuthKey;
+    const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
+    if (!boundToCloud)
+    {
+        m_cloudSystemId.clear();
+        m_cloudAuthKey.clear();
+    }
+
+    lock.unlock();
+
+    if (boundToCloud)
+    {
+        nx::hpm::api::SystemCredentials credentials(
+            cloudSystemId.toUtf8(),
+            qnCommon->moduleGUID().toSimpleString().toUtf8(),
+            cloudAuthKey.toUtf8());
+
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(std::move(credentials));
+
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
+    }
+    else
+    {
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(boost::none);
+        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+        makeSystemLocal();
+    }
+
+    emit cloudBindingStatusChanged(boundToCloud);
+    if (boundToCloud)
+        emit connectedToCloud();
+    else
+        emit disconnectedFromCloud();
 }
 
 bool CloudConnectionManager::boundToCloud() const
@@ -87,8 +139,11 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
 
     auto result = m_cdbConnectionFactory->createConnection();
     result->setCredentials(cloudSystemId.toStdString(), cloudAuthKey.toStdString());
-    result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
-    result->setProxyVia(m_proxyAddress.address.toString().toStdString(), m_proxyAddress.port);
+    if (m_proxyAddress)
+    {
+        result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
+        result->setProxyVia(m_proxyAddress->address.toString().toStdString(), m_proxyAddress->port);
+    }
     return result;
 }
 
@@ -126,7 +181,13 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
-bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
+bool CloudConnectionManager::detachSystemFromCloud()
+{
+    qnGlobalSettings->resetCloudParams();
+    return qnGlobalSettings->synchronizeNowSync();
+}
+
+bool CloudConnectionManager::resetCloudData()
 {
     qnGlobalSettings->resetCloudParams();
 
@@ -161,7 +222,32 @@ bool CloudConnectionManager::cleanUpCloudDataInLocalDb()
     return true;
 }
 
-bool CloudConnectionManager::detachSystemFromCloud()
+bool CloudConnectionManager::hasCloudBindingStatusChanged(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey) const
+{
+    const bool currentCloudBindingStatus = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
+    const bool newCloudBindingStatus = !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty();
+
+    if (currentCloudBindingStatus != newCloudBindingStatus)
+        return true;
+
+    if (currentCloudBindingStatus)
+    {
+        if (cloudSystemId != m_cloudSystemId ||
+            cloudAuthKey != m_cloudAuthKey)
+        {
+            NX_LOGX(lm("Overwriting existing cloud credentials. Old cloudSystemId %1, new cloudSystemId %2")
+                .arg(m_cloudSystemId).arg(cloudSystemId), cl_logDEBUG1);
+            return true;
+        }
+    }
+
+    NX_LOGX(lm("Cloud binding status stayed unchanged"), cl_logDEBUG2);
+    return false;
+}
+
+bool CloudConnectionManager::makeSystemLocal()
 {
     auto adminUser = qnResPool->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
@@ -173,7 +259,7 @@ bool CloudConnectionManager::detachSystemFromCloud()
         }
     }
 
-    return cleanUpCloudDataInLocalDb();
+    return resetCloudData();
 }
 
 bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
@@ -183,52 +269,7 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::cloudSettingsChanged()
 {
-    const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
-    const auto cloudAuthKey = qnGlobalSettings->cloudAuthKey();
-
-    QnMutexLocker lk(&m_mutex);
-    if (cloudSystemId == m_cloudSystemId &&
-        cloudAuthKey == m_cloudAuthKey)
-    {
-        return;
-    }
-
-    m_cloudSystemId = cloudSystemId;
-    m_cloudAuthKey = cloudAuthKey;
-    const bool boundToCloud = !m_cloudSystemId.isEmpty() && !m_cloudAuthKey.isEmpty();
-    if (!boundToCloud)
-    {
-        m_cloudSystemId.clear();
-        m_cloudAuthKey.clear();
-    }
-
-    lk.unlock();
-
-    if (boundToCloud)
-    {
-        nx::hpm::api::SystemCredentials credentials(
-            cloudSystemId.toUtf8(),
-            qnCommon->moduleGUID().toSimpleString().toUtf8(),
-            cloudAuthKey.toUtf8());
-
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(std::move(credentials));
-
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
-    }
-    else
-    {
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(boost::none);
-        MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
-    }
-
-    if (!boundToCloud)
-        detachSystemFromCloud();
-
-    emit cloudBindingStatusChanged(boundToCloud);
-    if (boundToCloud)
-        emit connectedToCloud();
-    else
-        emit disconnectedFromCloud();
+    setCloudCredentials(
+        qnGlobalSettings->cloudSystemId(),
+        qnGlobalSettings->cloudAuthKey());
 }

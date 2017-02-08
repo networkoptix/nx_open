@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
+    <width>450</width>
     <height>143</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>300</width>
+    <width>450</width>
     <height>0</height>
    </size>
   </property>
@@ -99,7 +99,7 @@
        <item>
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
-          <string notr="true"/>
+          <string>Don't show this message again</string>
          </property>
         </widget>
        </item>

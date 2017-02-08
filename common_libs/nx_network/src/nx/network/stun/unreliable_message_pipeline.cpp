@@ -4,7 +4,7 @@ namespace nx {
 namespace network {
 
 DatagramPipeline::DatagramPipeline():
-    m_socket(std::make_unique<UDPSocket>())
+    m_socket(SocketFactory::createUdpSocket())
 {
     // TODO: #ak Should report this error to the caller.
     NX_ASSERT(m_socket->setNonBlockingMode(true));
@@ -45,6 +45,11 @@ void DatagramPipeline::startReceivingMessages()
     m_readBuffer.reserve(nx::network::kMaxUDPDatagramSize);
     m_socket->recvFromAsync(
         &m_readBuffer, std::bind(&DatagramPipeline::onBytesRead, this, _1, _2, _3));
+}
+
+void DatagramPipeline::stopReceivingMessagesSync()
+{
+    m_socket->cancelIOSync(aio::etRead);
 }
 
 const std::unique_ptr<network::UDPSocket>& DatagramPipeline::socket()

@@ -86,7 +86,7 @@ public:
     void setModulesXmlUrl(QUrl url);
 
     /**
-     * Specify endpoint explicitely.
+     * Specify url explicitly.
      */
     void setUrl(QUrl url);
     /**

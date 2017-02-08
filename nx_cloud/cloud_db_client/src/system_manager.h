@@ -31,6 +31,9 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
     virtual void getSystems(
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler ) override;
+    virtual void getSystemsFiltered(
+        const api::Filter& filter,
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
     virtual void getSystem(
         const std::string& systemId,
         std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;

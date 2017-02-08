@@ -18,7 +18,10 @@ QString AppInfo::applicationDisplayName()
 
 bool AppInfo::beta()
 {
-    return ${beta};
+    static const auto betaString = QStringLiteral("${beta}").toLower();
+    static const bool beta =
+        (betaString == lit("on") || betaString == lit("true"));
+    return beta;
 }
 
 QString AppInfo::applicationVersion()
@@ -47,6 +50,27 @@ QString AppInfo::applicationFullVersion()
 
     return kFullVersion;
 }
+
+QString AppInfo::applicationPlatform()
+{
+    return QStringLiteral("${platform}");
+}
+
+QString AppInfo::applicationArch()
+{
+    return QStringLiteral("${arch}");
+}
+
+QString AppInfo::armBox()
+{
+    // TODO: #akolesnikov: For now, box value has sense on ARM devices only.
+    // On other platforms it is used by the build system for internal purposes.
+    if (isArm())
+        return QStringLiteral("${box}");
+    else
+        return QString();
+}
+
 
 } // namespace nx
 } // namespace utils

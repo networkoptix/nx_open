@@ -57,6 +57,11 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
+#ifndef DISABLE_FESTIVAL
+#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
+#endif
+
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
@@ -199,7 +204,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     return result;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 #ifdef Q_WS_X11
     XInitThreads();
@@ -212,6 +217,14 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_MAC
     mac_setLimits();
+#endif
+
+#ifndef DISABLE_FESTIVAL
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(argc, argv));
+
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
 #endif
 
     /* These attributes must be set before application instance is created. */

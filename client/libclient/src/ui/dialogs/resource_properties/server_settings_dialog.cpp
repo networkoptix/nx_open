@@ -7,6 +7,7 @@
 
 #include <nx/network/http/httptypes.h>
 
+#include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -20,6 +21,7 @@
 #include "ui/widgets/properties/storage_config_widget.h"
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 #include <core/resource/fake_media_server.h>
+#include <utils/common/html.h>
 
 QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     base_type(parent),
@@ -28,7 +30,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     m_generalPage(new QnServerSettingsWidget(this)),
     m_statisticsPage(new QnStorageAnalyticsWidget(this)),
     m_storagesPage(new QnStorageConfigWidget(this)),
-    m_webPageButton(new QPushButton(action(QnActions::WebAdminAction)->text(), this))
+    m_webPageLink(new QLabel(this))
 {
     ui->setupUi(this);
     setTabWidget(ui->tabWidget);
@@ -37,17 +39,9 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget* parent) :
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
-    connect(m_webPageButton, &QPushButton::clicked, this,
-        [this]
-        {
-            menu()->trigger(QnActions::WebAdminAction, m_server);
-        });
+    setupShowWebServerLink();
 
     //TODO: #GDM #access connect to resource pool to check if server was deleted
-
-    ui->buttonBox->addButton(m_webPageButton, QDialogButtonBox::HelpRole);
-    setHelpTopic(m_webPageButton, Qn::ServerSettings_WebClient_Help);
-
     auto selectionWatcher = new QnWorkbenchSelectionWatcher(this);
     connect(selectionWatcher, &QnWorkbenchSelectionWatcher::selectionChanged, this,
         [this](const QnResourceList& resources)
@@ -80,6 +74,23 @@ QnServerSettingsDialog::~QnServerSettingsDialog()
 {
 }
 
+void QnServerSettingsDialog::setupShowWebServerLink()
+{
+    const auto buttonsLayout = qobject_cast<QHBoxLayout*>(ui->buttonBox->layout());
+    if (!buttonsLayout)
+    {
+        NX_ASSERT(false, "Invalid QDialogButtonBox layout");
+        return;
+    }
+
+    m_webPageLink->setText(makeHref(tr("Server Web Page"), lit("#")));
+    buttonsLayout->insertWidget(0, m_webPageLink);
+    setHelpTopic(m_webPageLink, Qn::ServerSettings_WebClient_Help);
+    connect(m_webPageLink, &QLabel::linkActivated, this,
+        [this] { menu()->trigger(QnActions::WebAdminAction, m_server); });
+}
+
+
 QnMediaServerResourcePtr QnServerSettingsDialog::server() const
 {
     return m_server;
@@ -103,10 +114,10 @@ void QnServerSettingsDialog::setServer(const QnMediaServerResourcePtr& server)
     m_server = server;
 
     if (m_server)
-        connect(m_server, &QnResource::statusChanged, this, &QnServerSettingsDialog::updateWebPageButton);
+        connect(m_server, &QnResource::statusChanged, this, &QnServerSettingsDialog::updateWebPageLink);
 
     loadDataToUi();
-    updateWebPageButton();
+    updateWebPageLink();
 }
 
 void QnServerSettingsDialog::retranslateUi()
@@ -136,19 +147,24 @@ QDialogButtonBox::StandardButton QnServerSettingsDialog::showConfirmationDialog(
 {
     NX_ASSERT(m_server, Q_FUNC_INFO, "Server must exist here");
 
-    return QnMessageBox::question(
-        this,
-        tr("Server not saved"),
-        tr("Apply changes to server %1?")
-        .arg(m_server ? m_server->getName() : QString()),
-        QDialogButtonBox::Yes | QDialogButtonBox::No,
-        QDialogButtonBox::Yes);
+    const auto result = QnMessageBox::question(this,
+        tr("Apply changes before switching to another server?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+
+    if (result == QDialogButtonBox::Apply)
+        return QDialogButtonBox::Yes;
+    if (result == QDialogButtonBox::Discard)
+        return QDialogButtonBox::No;
+
+    return QDialogButtonBox::Cancel;
 }
 
-void QnServerSettingsDialog::updateWebPageButton()
+void QnServerSettingsDialog::updateWebPageLink()
 {
     bool allowed = m_server && !nx::network::isCloudServer(m_server);
 
-    m_webPageButton->setVisible(allowed);
-    m_webPageButton->setEnabled(allowed && m_server->getStatus() == Qn::Online);
+    m_webPageLink->setVisible(allowed);
+    m_webPageLink->setEnabled(allowed && m_server->getStatus() == Qn::Online);
 }

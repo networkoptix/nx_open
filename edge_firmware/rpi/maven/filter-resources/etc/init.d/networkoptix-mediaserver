@@ -44,7 +44,7 @@ process_core_dump()
 
         echo "Generate crash report (in background) $REPORT"
         echo "t apply all bt 25" |gdb "$BIN_PATH" "$CORE" 2>&1 >"/tmp/$REPORT" && \
-            mv "/tmp/$REPORT" "$HOME/$REPORT" &
+            mv "/tmp/$REPORT" "/root/$REPORT" &
 
         ls "$CORE_ORIG".* |grep -v "$CORE" |xargs rm 2>/dev/null
     fi

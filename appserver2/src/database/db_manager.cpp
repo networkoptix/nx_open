@@ -124,13 +124,10 @@ void assertSorted(std::vector<T> &data) {
 #endif // DEBUG
 }
 
-
-
 /**
-* Updaters are used to update object's fields, which are stored as a raw json string
-* Returns true if object is updated
-*/
-
+ * Updaters are used to update object fields which are stored as raw json strings.
+ * @return True if the object is updated.
+ */
 bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
 {
     if (data.actionParams.size() <= 4) //< keep empty json
@@ -140,8 +137,8 @@ bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
     return true;
 }
 
-
-// --------------------------------------- QnDbTransactionExt -----------------------------------------
+//-------------------------------------------------------------------------------------------------
+// QnDbTransactionExt
 
 bool QnDbManager::QnDbTransactionExt::beginTran()
 {
@@ -170,7 +167,8 @@ bool QnDbManager::QnDbTransactionExt::commit()
     return rez;
 }
 
-// --------------------------------------- QnDbManager -----------------------------------------
+//-------------------------------------------------------------------------------------------------
+// QnDbManager
 
 QnUuid QnDbManager::getType(const QString& typeName)
 {
@@ -1410,7 +1408,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded({ClearLog, ResyncLog});
     }
 
-    if (updateName.endsWith(lit("/83_add_default_webpages.sql")))
+    if (updateName.endsWith(lit("/85_add_default_webpages.sql")))
     {
         return ec2::database::migrations::addDefaultWebpages(m_sdb)
             && resyncIfNeeded(ResyncWebPages);
@@ -1817,6 +1815,13 @@ ErrorCode QnDbManager::removeStorage(const QnUuid& guid)
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorageData>& tran)
 {
+    if (tran.params.parentId.isNull())
+    {
+        // TODO: Improve error reporting. Currently HTTP 500 with empty error text is returned.
+        NX_LOG(lit("saveStorage: parentId is null"), cl_logERROR);
+        return ErrorCode::unsupported;
+    }
+
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
     if (result != ErrorCode::ok)
@@ -1959,6 +1964,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetReso
 
 ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
 {
+    if (params.physicalId.isEmpty())
+        return ec2::ErrorCode::forbidden;
+
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(params, &internalId);
     if (result != ErrorCode::ok)
@@ -3130,8 +3138,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     return ErrorCode::ok;
 }
 
-// ----------- getLayouts --------------------
-
+/**
+ * /ec2/getLayouts
+ */
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layouts)
 {
     if (!database::api::fetchLayouts(m_sdb, id, layouts))
@@ -3139,8 +3148,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiLayoutDataList& layout
     return ErrorCode::ok;
 }
 
-// ----------- getCameras --------------------
-
+/**
+ * /ec2/getCameras
+ */
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataList& cameraList)
 {
     QString filterStr;
@@ -3168,8 +3178,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataList& camera
     return ErrorCode::ok;
 }
 
-// ----------- getResourceStatus --------------------
-
+/**
+ * /ec2/getResourceStatus
+ */
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataList& statusList)
 {
     QString filterStr;
@@ -3191,25 +3202,22 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resId, ApiResourceStatusDataL
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList& storageList)
+ErrorCode QnDbManager::getStorages(const QString& filterStr, ApiStorageDataList& storageList)
 {
-    QString filterStr;
-    if (!mServerId.isNull())
-        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
-
     QSqlQuery queryStorage(m_sdb);
     queryStorage.setForwardOnly(true);
-    queryStorage.prepare(QString("\
-        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType, \
-        s.backup as isBackup \
-        FROM vms_resource r \
-        JOIN vms_storage s on s.resource_ptr_id = r.id \
-        %1 \
-        ORDER BY r.guid \
-    ").arg(filterStr));
+    queryStorage.prepare(lm(R"sql(
+        SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name,
+            r.url, s.space_limit as spaceLimit, s.used_for_writing as usedForWriting,
+            s.storage_type as storageType, s.backup as isBackup
+        FROM vms_resource r
+        JOIN vms_storage s on s.resource_ptr_id = r.id
+        %1
+        ORDER BY r.guid
+    )sql").arg(filterStr));
 
-    if (!queryStorage.exec()) {
+    if (!queryStorage.exec())
+    {
         qWarning() << Q_FUNC_INFO << queryStorage.lastError().text();
         return ErrorCode::dbError;
     }
@@ -3217,11 +3225,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     QnSql::fetch_many(queryStorage, &storageList);
 
     QnQueryFilter filter;
-    filter.fields.insert( RES_TYPE_FIELD, RES_TYPE_STORAGE );
+    filter.fields.insert(RES_TYPE_FIELD, RES_TYPE_STORAGE);
 
     ApiResourceParamWithRefDataList params;
-    const auto result = fetchResourceParams( filter, params );
-    if( result != ErrorCode::ok )
+    const auto result = fetchResourceParams(filter, params);
+    if (result != ErrorCode::ok)
         return result;
 
     mergeObjectListData<ApiStorageData>(
@@ -3229,13 +3237,39 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
         &ApiStorageData::addParams,
         &ApiResourceParamWithRefData::resourceId);
 
-    // Storages are generally bound to MediaServers,
-    // so it's required to be sorted by parent id
+    // Storages are generally bound to mediaservers, so it's required to be sorted by parent id.
     std::sort(storageList.begin(), storageList.end(),
-              [](const ApiStorageData& lhs, const ApiStorageData& rhs)
-              { return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122(); });
+        [](const ApiStorageData& lhs, const ApiStorageData& rhs)
+        {
+            return lhs.parentId.toRfc4122() < rhs.parentId.toRfc4122();
+        });
 
     return ErrorCode::ok;
+}
+
+/**
+ * /ec2/getStorages: get storages filtered by parentServerId.
+ */
+ErrorCode QnDbManager::doQueryNoLock(
+    const ParentId& parentId, ApiStorageDataList& storageList)
+{
+    QString filterStr;
+    if (!parentId.id.isNull())
+        filterStr = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(parentId.id));
+
+    return getStorages(filterStr, storageList);
+}
+
+/**
+ * Used for API Merge by /ec2/saveStorages: get storage by id.
+ */
+ErrorCode QnDbManager::doQueryNoLock(const QnUuid& storageId, ApiStorageDataList& storageList)
+{
+    QString filterStr;
+    if (!storageId.isNull())
+        filterStr = QString("WHERE r.guid = %1").arg(guidToSqlString(storageId));
+
+    return getStorages(filterStr, storageList);
 }
 
 ErrorCode QnDbManager::getScheduleTasks(std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList)
@@ -3400,10 +3434,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiCameraDataExList& came
     return ErrorCode::ok;
 }
 
-
-// ----------- getServers --------------------
-
-
+/**
+ * /ec2/getServers
+ */
 ErrorCode QnDbManager::doQueryNoLock(const QnUuid& id, ApiMediaServerDataList& serverList)
 {
     QSqlQuery query(m_sdb);

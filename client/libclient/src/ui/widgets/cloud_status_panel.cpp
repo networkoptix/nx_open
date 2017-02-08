@@ -99,8 +99,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     systemsMenu(nullptr),
 #endif
     originalTextColor(parent->palette().color(QPalette::ButtonText)),
-    loggedInIcon(qnSkin->icon("titlebar/cloud_logged.png")),
-    offlineIcon(qnSkin->icon("titlebar/cloud_offline.png"))
+    loggedInIcon(qnSkin->icon("cloud/cloud_20_selected.png")),
+    offlineIcon(qnSkin->icon("cloud/cloud_20_offline_disabled.png"))
 {
     Q_Q(QnCloudStatusPanel);
     loggedInMenu->setWindowFlags(loggedInMenu->windowFlags());
@@ -110,7 +110,8 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
     loggedInMenu->addAction(q->action(QnActions::LogoutFromCloud));
 
     auto offlineAction = new QAction(this);
-    offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1").arg(QnAppInfo::cloudName()));
+    offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
+        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
     offlineAction->setEnabled(false);
 
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());
@@ -154,7 +155,8 @@ void QnCloudStatusPanelPrivate::updateUi()
     switch (qnCloudStatusWatcher->status())
     {
         case QnCloudStatusWatcher::LoggedOut:
-            q->setText(QnCloudStatusPanel::tr("Log in to %1...").arg(QnAppInfo::cloudName()));
+            q->setText(QnCloudStatusPanel::tr("Log in to %1...",
+                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
             q->setIcon(QIcon());
             font.setWeight(QFont::Normal);
             fontColor = q->palette().color(QPalette::Light);

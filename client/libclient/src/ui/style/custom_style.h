@@ -11,7 +11,9 @@ void setWarningStyle(QWidget *widget);
 void setWarningStyle(QPalette *palette);
 QString setWarningStyleHtml(const QString &source);
 
-void setAccentStyle(QAbstractButton* button, bool accent = true);
+void resetButtonStyle(QAbstractButton* button);
+void setAccentStyle(QAbstractButton* button);
+void setWarningButtonStyle(QAbstractButton* button);
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape);
 

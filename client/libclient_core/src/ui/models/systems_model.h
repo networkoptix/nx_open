@@ -31,7 +31,7 @@ public:
         IsCloudSystemRoleId,
         IsRunningRoleId,
         IsReachableRoleId,
-        IsConnectibleRoleId,
+        IsConnectableRoleId,
         IsCompatibleRoleId,
         IsCompatibleVersionRoleId,
         IsCompatibleInternalRoleId,

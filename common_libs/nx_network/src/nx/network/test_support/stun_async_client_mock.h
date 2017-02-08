@@ -28,9 +28,10 @@ public:
         stopWhileInAioThread();
     }
 
-    MOCK_METHOD2(connect, void(SocketAddress, bool));
+    void connect(SocketAddress, bool, ConnectHandler) override {}
     MOCK_METHOD3(setIndicationHandler, bool(int, IndicationHandler, void*));
     MOCK_METHOD2(addOnReconnectedHandler, void(ReconnectHandler, void*));
+    MOCK_METHOD3(addConnectionTimer, void(std::chrono::milliseconds, TimerHandler, void*));
     MOCK_CONST_METHOD0(localAddress, SocketAddress());
     MOCK_CONST_METHOD0(remoteAddress, SocketAddress());
     MOCK_METHOD1(closeConnection, void(SystemError::ErrorCode));

@@ -113,7 +113,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 
     // Server has provided to the client non-cloud nonce
     // for cloud user due to no cloud connection so far.
-    if (isCloudUser && !isCloudNonce && m_cloudConnectionManager->boundToCloud())
+    if (isCloudUser && !isCloudNonce)
     {
         if (!cloudUsers.isEmpty())
         {

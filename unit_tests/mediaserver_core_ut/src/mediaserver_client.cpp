@@ -30,6 +30,19 @@ void MediaServerClient::saveCloudSystemCredentials(
     performApiRequest("api/saveCloudSystemCredentials", inputData, std::move(completionHandler));
 }
 
+QnJsonRestResult MediaServerClient::saveCloudSystemCredentials(
+    const CloudCredentialsData& request)
+{
+    using SaveCloudSystemCredentialsAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const CloudCredentialsData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<SaveCloudSystemCredentialsAsyncFuncPointer>(
+            &MediaServerClient::saveCloudSystemCredentials),
+        request);
+}
+
 void MediaServerClient::getModuleInformation(
     std::function<void(QnJsonRestResult, QnModuleInformation)> completionHandler)
 {
@@ -60,16 +73,47 @@ QnJsonRestResult MediaServerClient::setupLocalSystem(const SetupLocalSystemData&
         void(MediaServerClient::*)(
             const SetupLocalSystemData&, std::function<void(QnJsonRestResult)>);
 
-    QnJsonRestResult resultCode;
-    std::tie(resultCode) =
-        makeSyncCall<QnJsonRestResult>(
-            std::bind(
-                static_cast<SetupLocalSystemAsyncFuncPointer>(
-                    &MediaServerClient::setupLocalSystem),
-                this,
-                request,
-                std::placeholders::_1));
-    return resultCode;
+    return syncCallWrapper(
+        static_cast<SetupLocalSystemAsyncFuncPointer>(&MediaServerClient::setupLocalSystem),
+        request);
+}
+
+void MediaServerClient::setupCloudSystem(
+    const SetupCloudSystemData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/setupCloudSystem", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::setupCloudSystem(
+    const SetupCloudSystemData& request)
+{
+    using SetupCloudSystemAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const SetupCloudSystemData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<SetupCloudSystemAsyncFuncPointer>(&MediaServerClient::setupCloudSystem),
+        request);
+}
+
+void MediaServerClient::detachFromCloud(
+    const DetachFromCloudData& request,
+    std::function<void(QnJsonRestResult)> completionHandler)
+{
+    performApiRequest("api/detachFromCloud", request, std::move(completionHandler));
+}
+
+QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& request)
+{
+    using DetachFromCloudAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const DetachFromCloudData&, std::function<void(QnJsonRestResult)>);
+
+    return syncCallWrapper(
+        static_cast<DetachFromCloudAsyncFuncPointer>(
+            &MediaServerClient::detachFromCloud),
+        request);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -187,11 +231,19 @@ ResultCode MediaServerClient::syncCallWrapper(
 {
     ResultCode resultCode;
     std::tie(resultCode, *output) =
-        makeSyncCall<ResultCode, Output>(
-            std::bind(
-                asyncFunc,
-                this,
-                std::placeholders::_1));
+        makeSyncCall<ResultCode, Output>(std::bind(asyncFunc, this, std::placeholders::_1));
+    return resultCode;
+}
+
+template<typename ResultCode, typename Input>
+ResultCode MediaServerClient::syncCallWrapper(
+    void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode)>),
+    const Input& input)
+{
+    using namespace std::placeholders;
+
+    ResultCode resultCode;
+    std::tie(resultCode) = makeSyncCall<ResultCode>(std::bind(asyncFunc, this, input, _1));
     return resultCode;
 }
 

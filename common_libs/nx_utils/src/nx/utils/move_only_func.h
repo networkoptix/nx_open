@@ -116,5 +116,22 @@ public:
     }
 };
 
+template<typename Function, typename ... Args>
+void moveAndCall(Function& function, Args&& ... args)
+{
+    const auto handler = std::move(function);
+    function = nullptr;
+    handler(std::forward<Args>(args) ...);
+}
+
+template<typename Function, typename ... Args>
+void moveAndCallOptional(Function& function, Args&& ... args)
+{
+    if (!function)
+        return;
+
+    moveAndCall(function, std::forward<Args>(args) ...);
+}
+
 }   //utils
 }   //nx

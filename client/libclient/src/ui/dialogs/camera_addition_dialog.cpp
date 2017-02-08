@@ -332,14 +332,13 @@ bool QnCameraAdditionDialog::serverOnline() const {
     return m_server && m_server->getStatus() != Qn::Offline;
 }
 
-bool QnCameraAdditionDialog::ensureServerOnline() {
+bool QnCameraAdditionDialog::ensureServerOnline()
+{
     if (serverOnline())
         return true;
 
-    QnMessageBox::critical(this,
-                          tr("Error"),
-                          tr("Server is offline.") + L'\n'
-                          + tr("Device addition is possible for online servers only."));
+    QnMessageBox::critical(this, tr("Server offline"),
+        tr("Device adding is possible for online servers only."));
     return false;
 }
 
@@ -552,8 +551,11 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
         QnManualResourceSearchEntry info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualResourceSearchEntry>();
         camerasToAdd << info;
     }
-    if (camerasToAdd.empty()){
-        QnMessageBox::information(this, tr("No devices selected."), tr("Please select at least one device"));
+
+    if (camerasToAdd.empty())
+    {
+        QnMessageBox::information(this,
+            tr("No devices selected."), tr("Please select at least one device"));
         return;
     }
 
@@ -570,23 +572,23 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
     ui->scanButton->setEnabled(m_server);
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 
-    if(result.isFinished()) {
-        if(result.status() == 0) {
+    if(result.isFinished())
+    {
+        if(result.status() == 0)
+        {
             removeAddedCameras();
-            QnMessageBox::information(
-                this,
-                tr("Success"),
-                tr("%n devices added successfully.", "", camerasToAdd.size())
-                    + L'\n'
-                    + tr("It might take a few moments to populate them in the tree."),
-                QDialogButtonBox::Ok
-            );
-        } else {
-            if (!ensureServerOnline()) {
+            QnMessageBox::success(this,
+                tr("%n devices added.", "", camerasToAdd.size()),
+                tr("It might take them a few moments to appear."));
+        }
+        else
+        {
+            if (!ensureServerOnline())
+            {
                 setState(CamerasOffline);
                 return;
             }
-            QnMessageBox::critical(this, tr("Error"), tr("Error while adding %n devices.", "", camerasToAdd.size()));
+            QnMessageBox::critical(this, tr("Failed to add %n devices", "", camerasToAdd.size()));
         }
     }
     setState(CamerasFound);
@@ -677,7 +679,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
 
     if (status != 0) {
         setState(Initial);
-        QnMessageBox::warning(this, tr("Error"), tr("Error while searching for device(s)."));
+        QnMessageBox::critical(this, tr("Device search failed"));
         return;
     }
 
@@ -710,13 +712,16 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         if (m_state == Searching)
             m_server->apiConnection()->searchCameraAsyncStop(m_processUuid); //clear server cache
 
-        if (result.cameras.size() > 0) {
+        if (result.cameras.size() > 0)
+        {
             setState(CamerasFound);
             if (newCameras == 0)
-                QnMessageBox::information(this, tr("Finished"), tr("All devices are already in the resource tree."));
-        } else {
+                QnMessageBox::information(this, tr("All devices already added"));
+        }
+        else
+        {
             setState(Initial);
-            QnMessageBox::information(this, tr("Finished"), tr("No devices found."));
+            QnMessageBox::warning(this, tr("No devices found"));
         }
         m_processUuid = QnUuid();
     }

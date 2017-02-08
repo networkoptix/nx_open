@@ -16,8 +16,6 @@ public:
 
     static QnUuid getDesktopResourceUuid();
 
-    virtual QString toString() const override;
-
     virtual void addConnection(const QnMediaServerResourcePtr& server);
     virtual void removeConnection(const QnMediaServerResourcePtr& server);
 

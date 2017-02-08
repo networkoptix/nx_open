@@ -6,6 +6,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
@@ -63,6 +65,11 @@ enum IDType
      * Opens notifications settings preferences tab.
      */
     PreferencesNotificationTabAction,
+
+    /**
+    * Opens notifications settings preferences tab.
+    */
+    PreferencesCloudTabAction,
 
     /**
      * Shows / hides FPS display.
@@ -1094,6 +1101,9 @@ enum IDType
      * Opens cloud account management page in the browser.
      */
     OpenCloudManagementUrl,
+
+    /** Hide cloud promo */
+    HideCloudPromoAction,
 
     ActionCount,
 

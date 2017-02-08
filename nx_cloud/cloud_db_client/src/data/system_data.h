@@ -52,6 +52,12 @@ void serializeToUrlQuery(const SystemId& data, QUrlQuery* const urlQuery);
 
 #define SystemId_Fields (systemId)
 
+//-------------------------------------------------------------------------------------------------
+// Filter
+
+void serializeToUrlQuery(const Filter& data, QUrlQuery* const urlQuery);
+void serialize(QnJsonContext* ctx, const Filter& filter, QJsonValue* target);
+
 
 //-------------------------------------------------------------------------------------------------
 // SystemAttributesUpdate
@@ -110,6 +116,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemHealth)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::FilterField)
 
 }   //api
 }   //cdb
@@ -118,5 +125,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemAccessRole)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemStatus), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemHealth), (lexical))
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::SystemAccessRole), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::cdb::api::FilterField), (lexical))
 
 #endif //CLOUD_DB_CL_SYSTEM_DATA_H

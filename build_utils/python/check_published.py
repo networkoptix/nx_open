@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 """
 Runs through beta__builds directories tree and check if all artifacts are published
 See: https://networkoptix.atlassian.net/wiki/display/SD/Installer+Filenames
@@ -127,4 +126,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    sys.exit(0)

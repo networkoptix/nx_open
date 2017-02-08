@@ -409,7 +409,8 @@ QSize QnBusyIndicatorWidget::minimumSizeHint() const
 
 QSize QnBusyIndicatorWidget::sizeHint() const
 {
-    return minimumSizeHint();
+    /* Make sure we don't call here minimumSizeHint overridden in a descendant: */
+    return QnBusyIndicatorWidget::minimumSizeHint();
 }
 
 void QnBusyIndicatorWidget::paintEvent(QPaintEvent* event)

@@ -3,6 +3,7 @@
 #include "api_globals.h"
 #include "api_resource_data.h"
 #include <utils/common/id.h>
+#include <nx/utils/log/assert.h>
 
 namespace ec2 {
 
@@ -15,12 +16,16 @@ struct ApiCameraData: ApiResourceData
      */
     void fillId()
     {
-        // ATTENTION: This logic is similar to the one in
-        // QnSecurityCamResource::makeCameraIdFromUniqueId().
         if (!physicalId.isEmpty())
-            id = guidFromArbitraryData(physicalId.toUtf8());
+            id = physicalIdToId(physicalId);
         else
             id = QnUuid();
+    }
+
+    static QnUuid physicalIdToId(const QString& physicalId)
+    {
+        NX_ASSERT(!physicalId.isEmpty());
+        return guidFromArbitraryData(physicalId.toUtf8());
     }
 
     QnLatin1Array mac;

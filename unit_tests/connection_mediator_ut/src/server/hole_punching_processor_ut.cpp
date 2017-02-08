@@ -345,7 +345,7 @@ public:
             &m_listeningPeerPool,
             &m_statisticsCollector)
     {
-        char* args[] = {
+        const char* args[] = {
             "--cloudConnect/connectionAckAwaitTimeout=0s",
             "--cloudConnect/connectionResultWaitTimeout=1000m"  //< Equivalent of inifinite session.
         };

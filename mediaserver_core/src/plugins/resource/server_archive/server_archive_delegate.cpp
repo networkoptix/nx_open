@@ -208,7 +208,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
         }
 
         qint64 chunkOffset = 0;
-        if (newChunk.durationMs == -1) // last live chunk
+        if (newChunk.durationMs < 1) // last live chunk
         {
             if (!m_reverseMode && time - newChunk.startTimeMs*1000 > 1000 * 1000ll) 
             {
@@ -310,12 +310,12 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
 {
     QnMutexLocker lk( &m_mutex );
 
-    if (m_currentChunk.durationMs == -1)
+    if (m_currentChunk.durationMs < 1)
     {
         m_currentChunkCatalog[QnServer::StoragePool::Normal]->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
         m_currentChunkCatalog[QnServer::StoragePool::Backup]->updateChunkDuration(m_currentChunk);
     }
-    if (m_currentChunk.durationMs == -1) {
+    if (m_currentChunk.durationMs < 1) {
         if (!m_reverseMode)
             m_eof = true;
         return false;
@@ -349,13 +349,14 @@ begin_label:
     int chunkSwitchCnt = 0;
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
-        DeviceFileCatalog::TruncableChunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
         DeviceFileCatalog::UniqueChunkCont ignoreChunks;
         bool switchResult;
         DeviceFileCatalog::Chunk fallbackChunk;
 
-        do {
+        do 
+        {
+            DeviceFileCatalog::TruncableChunk chunk;
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {

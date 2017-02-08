@@ -17,9 +17,11 @@ public:
 
     virtual void execAtGlThread(std::function<void (void*)> lambda, void* opaque) override;
     virtual void execAtGlThreadAsync(std::function<void ()> lambda) override;
-private slots:
+
+private:
     void at_execLambda();
     void at_execLambdaAsync();
+
 private:
     QQuickWindow *m_window;
 

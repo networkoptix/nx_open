@@ -28,6 +28,15 @@ static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
 
 using std::make_pair;
 
+namespace {
+
+static bool logTraffic()
+{
+    return nx::network::SocketGlobals::debugConfig().httpClientTraffic;
+}
+
+} // namespace
+
 namespace nx_http
 {
     static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
@@ -350,7 +359,11 @@ namespace nx_http
     //!Returns current message body buffer, clearing it
     BufferType AsyncHttpClient::fetchMessageBodyBuffer()
     {
-        return m_httpStreamReader.fetchMessageBody();
+        const auto buffer = m_httpStreamReader.fetchMessageBody();
+        if (logTraffic())
+            NX_LOGX(lm("Response message body buffer:\n%1\n\n").str(buffer), cl_logDEBUG2);
+
+        return buffer;
     }
 
     const QUrl& AsyncHttpClient::url() const
@@ -420,9 +433,14 @@ namespace nx_http
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         if (proxyEndpoint.isNull())
+        {
             m_proxyEndpoint.reset();
+        }
         else
+        {
+            NX_ASSERT(proxyEndpoint.port > 0);
             m_proxyEndpoint = proxyEndpoint;
+        }
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)
@@ -524,7 +542,9 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lit("Http request has been successfully sent to %1").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
+        NX_LOGX(lm("Request has been successfully sent to %1: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -590,8 +610,6 @@ namespace nx_http
                 m_socket.reset();   //< Closing failed socket so that it is not reused.
             return;
         }
-
-        NX_LOGX(lm("======   %1").arg(m_responseBuffer.mid(0, bytesRead)), cl_logDEBUG2);
 
         processReceivedBytes(std::move(sharedThis), bytesRead);
     }
@@ -858,10 +876,10 @@ namespace nx_http
             return;
         }
 
-        //response read
-        NX_LOGX(lit("Http response from %1 has been successfully read. Status line: %2(%3)").
-            arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.message().response->statusLine.statusCode).
-            arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2);
+        NX_LOGX(lm("Response from %1 has been successfully read: %2").strs(
+            m_contentLocationUrl.toString(QUrl::RemovePassword),
+            logTraffic() ? response()->toString() : response()->statusLine.toString()),
+            cl_logDEBUG2);
 
         if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
             return;

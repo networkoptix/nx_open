@@ -61,7 +61,7 @@ private:
     QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
 
     static QVariant iconData(const Column& column, const QnBusinessActionData &action);
-    static QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action);
+    QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action) const;
     QString textData(const Column& column, const QnBusinessActionData &action) const;
     static int helpTopicIdData(const Column& column, const QnBusinessActionData &action);
 
@@ -73,7 +73,9 @@ private:
     static QString getUserGroupString(QnBusiness::UserGroup value);
 
     void at_resource_removed(const QnResourcePtr &resource);
-    static bool hasVideoLink(const QnBusinessActionData &action);
+    bool hasVideoLink(const QnBusinessActionData &action) const;
+    bool hasAccessToCamera(const QnUuid& cameraId) const;
+    bool hasAccessToArchive(const QnUuid& cameraId) const;
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;

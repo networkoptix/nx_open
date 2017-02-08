@@ -44,7 +44,7 @@ private:
 
     void serializationTest()
     {
-        std::cout << "    [ SUBTEST ] serialization" << std::endl;
+        std::cout << "[  SUBTEST ] serialization" << std::endl;
 
         for (const auto& testData: m_testValues)
         {
@@ -65,7 +65,7 @@ private:
 
     void deserializationTest()
     {
-        std::cout << "    [ SUBTEST ] deserialization" << std::endl;
+        std::cout << "[  SUBTEST ] deserialization" << std::endl;
 
         for (const auto& testData: m_testValues)
         {
@@ -80,7 +80,7 @@ private:
 
     void serializationReversibleTest()
     {
-        std::cout << "    [ SUBTEST ] serializationReversible" << std::endl;
+        std::cout << "[  SUBTEST ] serializationReversible" << std::endl;
 
         const Attribute originalAttribute = m_testValues.front().value;
         nx::Buffer buffer;

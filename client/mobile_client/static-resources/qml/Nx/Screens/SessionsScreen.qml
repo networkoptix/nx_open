@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 Page
@@ -23,6 +24,7 @@ Page
             flat: true
             leftPadding: 0
             rightPadding: 0
+            labelPadding: 8
             visible: cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut
             onClicked: Workflow.openCloudScreen()
         }
@@ -64,7 +66,7 @@ Page
         anchors.fill: parent
         spacing: 1
 
-        model: QnSystemsModel
+        model: OrderedSystemsModel
         {
             id: systemsModel
             minimalVersion: "2.5"
@@ -78,9 +80,9 @@ Page
             localId: model.localId
             cloudSystem: model.isCloudSystem
             ownerDescription: cloudSystem ? model.ownerDescription : ""
-            online: model.isConnectible
+            online: model.isConnectable
             compatible: model.isCompatible
-            invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
+            invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
         }
         highlight: Rectangle
         {
@@ -127,8 +129,8 @@ Page
             id: customConnectionButton
 
             text: dummyMessage.visible
-                ? qsTr("Connect to Server")
-                : qsTr("Connect to Another Server")
+                ? qsTr("Connect to Server...")
+                : qsTr("Connect to Another Server...")
 
             anchors.centerIn: parent
             width: parent.width - 16
@@ -166,6 +168,7 @@ Page
         var message = systemName ?
                     qsTr("Cannot connect to the system \"%1\"").arg(systemName) :
                     qsTr("Cannot connect to the server")
-        Workflow.openInformationDialog(message, qsTr("Check your network connection or contact a system administrator"))
+        Workflow.openStandardDialog(
+            message, qsTr("Check your network connection or contact a system administrator"))
     }
 }

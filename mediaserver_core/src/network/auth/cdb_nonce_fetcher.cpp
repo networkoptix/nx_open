@@ -135,12 +135,14 @@ nx::cdb::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
     using namespace nx::cdb::api;
 
     auto newConnection = m_cloudConnectionManager->getCloudConnection();
+    NX_ASSERT(newConnection);
+
     ResultCode resultCode = ResultCode::ok;
     NonceData cloudNonce;
     std::tie(resultCode, cloudNonce) = makeSyncCall<ResultCode, NonceData>(
         static_cast<void(AuthProvider::*)(std::function<void(ResultCode, NonceData)>)>(
             &AuthProvider::getCdbNonce),
-        m_connection->authProvider(),
+        newConnection->authProvider(),
         std::placeholders::_1);
 
     if (resultCode != ResultCode::ok)

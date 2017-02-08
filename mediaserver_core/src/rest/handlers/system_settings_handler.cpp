@@ -40,7 +40,7 @@ bool QnSystemSettingsHandler::updateSettings(
 
     namespace ahlp = ec2::access_helpers;
 
-    for (QnAbstractResourcePropertyAdaptor* setting : settings)
+    for (QnAbstractResourcePropertyAdaptor* setting: settings)
     {
         bool readAllowed = ahlp::kvSystemOnlyFilter(
             ahlp::Mode::read,

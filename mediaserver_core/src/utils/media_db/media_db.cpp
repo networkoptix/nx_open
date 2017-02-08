@@ -22,15 +22,13 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream, Error *error, QnMutex *mutex) 
+    RecordVisitor(QDataStream* stream, Error *error) 
         : m_stream(stream),
-          m_error(error),
-          m_mutex(mutex)
+          m_error(error)
     {}
    
     void operator() (const CameraOperation &camOp) const
     {
-        QnMutexLocker lk(m_mutex);
         *m_stream << camOp.part1;
         if (m_stream->status() == QDataStream::WriteFailed)
         {
@@ -55,7 +53,6 @@ public:
     template<typename StructToWrite>
     void operator() (const StructToWrite &s) const 
     { 
-        QnMutexLocker lk(m_mutex);
         *m_stream << s; 
         if (m_stream->status() == QDataStream::WriteFailed)
         {
@@ -69,7 +66,6 @@ public:
 private:
     QDataStream *m_stream;
     Error *m_error;
-    QnMutex *m_mutex;
 };
 
 } // namespace <anonymous>
@@ -87,44 +83,47 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
 
 void DbHelper::run() 
 {
-    while (1)
+    while (!m_needStop)
     {
-        QnMutexLocker lk(&m_writeQueueMutex);
+        QnMutexLocker lk(&m_mutex);
         while ((m_writeQueue.empty() || m_mode == Mode::Read) && !m_needStop)
+        {
+            NX_LOG(lit("media_db: run is going to sleep. Write queue size: %1. Mode = %2. Need to stop = %3")
+                    .arg(m_writeQueue.size())
+                    .arg(m_mode == Mode::Read ? "Read" : m_mode == Mode::Write ? "Write" : "Unknown")
+                    .arg(m_needStop), cl_logDEBUG2);
             m_cond.wait(lk.mutex());
+        }
         
         if (m_needStop)
             return;
 
-        while (!m_writeQueue.empty())
-        {
-            auto record = m_writeQueue.front();
+        auto record = m_writeQueue.front();
 
-            Error error = Error::NoError;
-            RecordVisitor vis(&m_stream, &error, &m_mutex);
-            lk.unlock();
-            boost::apply_visitor(vis, record);
-            lk.relock();
-            m_writeQueue.pop_front();
-
-            QnMutexLocker lk2(&m_mutex);
-            if (error == Error::WriteError)
-            {
-                m_handler->handleRecordWrite(error);
-                break;
-            }
-
-            error = getError();
-            if (error == Error::WriteError)
-            {
-                m_handler->handleRecordWrite(error);
-                break;
-            } 
-            else
-                m_handler->handleRecordWrite(error);
-        }
+        Error error = Error::NoError;
+        RecordVisitor vis(&m_stream, &error);
 
         lk.unlock();
+        boost::apply_visitor(vis, record);
+        lk.relock();
+
+        m_writeQueue.pop_front();
+
+        if (error == Error::WriteError)
+        {
+            m_handler->handleRecordWrite(error);
+            continue;
+        }
+
+        error = getError();
+        if (error == Error::WriteError)
+        {
+            m_handler->handleRecordWrite(error);
+            continue;
+        } 
+        else
+            m_handler->handleRecordWrite(error);
+
         m_writerDoneCond.wakeAll();
     }
 }
@@ -251,14 +250,15 @@ Error DbHelper::readRecord()
 
 void DbHelper::writeRecord(const WriteRecordType &record)
 {
+    QnMutexLocker lk(&m_mutex);
+    while (m_writeQueue.size() > kMaxWriteQueueSize)
     {
-        QnMutexLocker lk(&m_writeQueueMutex);
-        if (m_writeQueue.size() > kMaxWriteQueueSize)
-            NX_LOG(lit("%1 DB write queue overflowed. Waiting while it becomes empty...").arg(Q_FUNC_INFO), cl_logWARNING);
-        while (m_writeQueue.size() > kMaxWriteQueueSize)
-            m_writerDoneCond.wait(lk.mutex());
-        m_writeQueue.push_back(record);
+        NX_LOG(lit("media_db: Write queue overflow detected. WriteRecord is going to sleep. Write queue size: %1.")
+                .arg(m_writeQueue.size()), cl_logDEBUG2);
+        m_writerDoneCond.wait(lk.mutex());
     }
+
+    m_writeQueue.push_back(record);
     m_cond.wakeAll();
 }
 
@@ -270,23 +270,21 @@ void DbHelper::reset()
 
 void DbHelper::setMode(Mode mode)
 {
+    QnMutexLocker lk(&m_mutex);
+    if (mode == m_mode)
+        return;
+
+    while (!m_writeQueue.empty() && mode == Mode::Read)
     {
-        QnMutexLocker lk(&m_mutex);
-        if (mode == m_mode)
-            return;
+        NX_LOG(lit("media_db: SetMode is going to sleep. Write queue size: %1. Mode = %2")
+                .arg(m_writeQueue.size())
+                .arg(m_mode == Mode::Read ? "Read" : m_mode == Mode::Write ? "Write" : "Unknown"), cl_logDEBUG2);
+        m_writerDoneCond.wait(lk.mutex());
     }
 
-    {
-        QnMutexLocker lk(&m_writeQueueMutex);
-        while (!m_writeQueue.empty() && mode == Mode::Read)
-            m_writerDoneCond.wait(lk.mutex());
-    }
+    m_stream.resetStatus();
+    m_mode = mode;
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_stream.resetStatus();
-        m_mode = mode;
-    }
     m_cond.wakeAll();
 }
 

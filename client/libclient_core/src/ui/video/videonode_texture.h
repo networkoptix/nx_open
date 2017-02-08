@@ -45,7 +45,7 @@
 // We mean it.
 //
 
-#include <private/qsgvideonode_p.h>
+#include <QtMultimedia/private/qsgvideonode_p.h>
 #include <QtMultimedia/qvideosurfaceformat.h>
 
 QT_BEGIN_NAMESPACE

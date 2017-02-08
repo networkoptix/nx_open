@@ -159,8 +159,8 @@ void resetMotionGrid(MotionGrid& grid)
 /* Fill specified rectangle of motion grid with specified value: */
 void fillMotionRect(MotionGrid& grid, const QRect& rect, int value)
 {
-    NX_ASSERT(rect.top() >= 0 && rect.bottom() < grid.size());
-    NX_ASSERT(rect.left() >= 0 && rect.right() < grid[0].size());
+    NX_ASSERT(rect.top() >= 0 && rect.bottom() < (int) grid.size());
+    NX_ASSERT(rect.left() >= 0 && rect.right() < (int) grid[0].size());
 
     for (int row = rect.top(); row <= rect.bottom(); ++row)
         std::fill(grid[row].begin() + rect.left(), grid[row].begin() + rect.right() + 1, value);
@@ -169,8 +169,8 @@ void fillMotionRect(MotionGrid& grid, const QRect& rect, int value)
 /* Fill sensitivity region that contains specified position with zeros: */
 void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
 {
-    NX_ASSERT(at.y() >= 0 && at.y() < grid.size());
-    NX_ASSERT(at.x() >= 0 && at.x() < grid[0].size());
+    NX_ASSERT(at.y() >= 0 && at.y() < (int) grid.size());
+    NX_ASSERT(at.x() >= 0 && at.x() < (int) grid[0].size());
 
     int value = grid[at.y()][at.x()];
     if (value == 0)
@@ -195,7 +195,7 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
 
         /* Spread right: */
         x = p.x() + 1;
-        if (x < grid[0].size() && grid[p.y()][x] == value)
+        if (x < (int) grid[0].size() && grid[p.y()][x] == value)
         {
             grid[p.y()][x] = 0;
             pointStack.push_back({ x, p.y() });
@@ -211,7 +211,7 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
 
         /* Spread down: */
         y = p.y() + 1;
-        if (y < grid.size() && grid[y][p.x()] == value)
+        if (y < (int) grid.size() && grid[y][p.x()] == value)
         {
             grid[y][p.x()] = 0;
             pointStack.push_back({ p.x(), y });
@@ -960,9 +960,9 @@ void QnMediaResourceWidget::ensureMotionLabelPositions() const
         /* Label takes 1x2 cells. Find good areas to fit labels in,
          * going from the top to the bottom, from the left to the right:
          */
-        for (int y = 0; y < grid.size() - 1; ++y)
+        for (int y = 0; y < (int) grid.size() - 1; ++y)
         {
-            for (int x = 0; x < grid[0].size(); ++x)
+            for (int x = 0; x < (int) grid[0].size(); ++x)
             {
                 int sensitivity = grid[y][x];
 
@@ -1647,11 +1647,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
+    if (m_display->camDisplay()->isEOFReached())
+        return Qn::NoDataOverlay;
+
     if (resource->hasFlags(Qn::local_image))
     {
         if (resource->getStatus() == Qn::Offline)
-            return Qn::NoDataOverlay;
-        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
     }
@@ -1678,9 +1679,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
@@ -1690,9 +1688,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->isPaused())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         if (!states.hasVideo)
             return Qn::NoVideoDataOverlay;
 

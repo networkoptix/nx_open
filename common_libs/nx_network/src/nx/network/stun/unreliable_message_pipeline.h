@@ -39,6 +39,7 @@ public:
     SocketAddress address() const;
 
     void startReceivingMessages();
+    void stopReceivingMessagesSync();
 
     const std::unique_ptr<network::UDPSocket>& socket();
     /**

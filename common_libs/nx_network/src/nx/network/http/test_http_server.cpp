@@ -60,7 +60,7 @@ TestHttpServer::TestHttpServer():
 
 TestHttpServer::~TestHttpServer()
 {
-    m_httpServer->pleaseStop();
+    m_httpServer->pleaseStopSync();
 }
 
 bool TestHttpServer::bindAndListen()
@@ -142,7 +142,7 @@ bool TestHttpServer::registerRedirectHandler(
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
     StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock)
+    std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
     m_requestsToAnswer(nx::utils::random::number<int>(0, 3))

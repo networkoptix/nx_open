@@ -14,6 +14,8 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
+#include <nx/client/messages/resources_messages.h>
+
 #include <ui/common/palette.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/item_view_hover_tracker.h>
@@ -133,7 +135,7 @@ public:
         m_editIcon.paint(painter, iconRect, Qt::AlignCenter, QIcon::Active);
 
         /* Draw link text: */
-        QnScopedPainterPenRollback penRollback(painter, newOption.palette.color(QPalette::Normal, QPalette::Link));
+        QnScopedPainterPenRollback penRollback(painter, style::linkColor(newOption.palette, true));
         painter->drawText(textRect, kTextFlags | Qt::AlignRight, linkText);
     }
 
@@ -303,7 +305,7 @@ void QnUserManagementWidget::applyChanges()
     }
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (confirmUsersDelete(usersToDelete))
+    if (nx::client::messages::Resources::deleteResources(this, usersToDelete))
         qnResourcesChangesManager->deleteResources(usersToDelete);
     else
         m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
@@ -528,37 +530,4 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
     }
 
     return result;
-}
-
-bool QnUserManagementWidget::confirmUsersDelete(const QnUserResourceList& users)
-{
-    if (users.isEmpty())
-        return false;
-
-    /* Check if user have already silenced this warning. */
-    if (qnSettings->showOnceMessages().testFlag(Qn::ShowOnceMessage::DeleteResources))
-        return true;
-
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Delete Users..."),
-        tr("Confirm Delete Users"),
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        this);
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(tr("Do you really want to delete the following %n users?",
-        "", users.size()));
-    messageBox.setCheckBoxText(tr("Do not show this message anymore"));
-    messageBox.addCustomWidget(new QnResourceListView(users));
-
-    auto result = messageBox.exec();
-    if (messageBox.isChecked())
-    {
-        Qn::ShowOnceMessages messagesFilter = qnSettings->showOnceMessages();
-        messagesFilter |= Qn::ShowOnceMessage::DeleteResources;
-        qnSettings->setShowOnceMessages(messagesFilter);
-    }
-
-    return result == QDialogButtonBox::Ok;
 }
