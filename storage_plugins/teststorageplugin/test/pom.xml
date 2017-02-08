@@ -18,7 +18,7 @@
         <guid>${teststorageplugin_test.guid}</guid>
         <product.title>${teststorageplugin_test.name}</product.title>	
 
-        <!-- <global.libs>-lteststorageplugin</global.libs> -->
+        <linux.oslibs>-ldl</linux.oslibs>
 
         <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
         <additional.defines>NOLFS NOSSL STORAGE_EXPORTS</additional.defines>
