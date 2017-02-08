@@ -19,7 +19,11 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
-option(withTests "Enable Unit Tests" OFF)
+option(withMediaServer "Enable media server" ON)
+option(withDesktopClient "Enable desktop client" ON)
+option(withMobileClient "Enable mobile client" ON)
+option(withClouds "Enable cloud components" ON)
+option(withTests "Enable unit tests" OFF)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -98,10 +102,16 @@ add_subdirectory(common_libs)
 add_subdirectory(common)
 add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
-add_subdirectory(mediaserver_core)
-add_subdirectory(mediaserver)
-add_subdirectory(plugins)
-add_subdirectory(client)
+
+if(withMediaServer)
+    add_subdirectory(mediaserver_core)
+    add_subdirectory(mediaserver)
+    add_subdirectory(plugins)
+endif()
+
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(client)
+endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
