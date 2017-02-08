@@ -3316,6 +3316,13 @@ devices</source>
             <numerusform></numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>and %n more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnExecHttpRequestActionWidget</name>
