@@ -58,6 +58,7 @@ set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 include(properties)
+include(cloud_host)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)

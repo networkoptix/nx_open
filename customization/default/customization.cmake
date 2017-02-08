@@ -49,6 +49,8 @@ set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc
 set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 
+set(cloudName "Nx Cloud")
+
 set(liteDeviceName "Nx1")
 
 # Other customizations.
@@ -93,7 +95,3 @@ set(translation11 "zh_TW")
 set(translation12 "vi_VN")
 set(translation13 "pl")
 set(translation14 "hu")
-
-# TODO: #dklychkov Implement fetching parameters from the cloud
-set(cloudHost "cloud-test.hdw.mx")
-set(cloudName "Nx Cloud")
