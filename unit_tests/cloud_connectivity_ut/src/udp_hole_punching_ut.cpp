@@ -147,9 +147,6 @@ public:
     {
         using namespace std::placeholders;
 
-        //ConnectorFactory::setEnabledCloudConnectMask(
-        //    static_cast<int>(CloudConnectType::forwardedTcpPort));
-
         SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
             std::bind(&CloudConnectTunnel::onTunnelClosed, this, _1),
             &m_onTunnelClosedSubscriptionId);
