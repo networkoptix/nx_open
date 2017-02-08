@@ -129,7 +129,8 @@ void QnServerMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
                       configSystemData.sysIdTime = sysIdTime;
                       configSystemData.tranLogTime = tranLogTime;
                       configSystemData.wholeSystem = true;
-                      changeLocalSystemId(configSystemData);
+                      if (m_connection)
+                        changeLocalSystemId(configSystemData, m_connection->messageBus());
                   });
 }
 

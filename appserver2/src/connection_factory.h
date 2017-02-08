@@ -18,6 +18,7 @@
 #include "managers/time_manager.h"
 #include "settings.h"
 #include <transaction/transaction_log.h>
+#include <mutex/distributed_mutex_manager.h>
 
 namespace ec2 {
 
@@ -57,6 +58,8 @@ public:
 
     virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
+    virtual QnTransactionMessageBus* messageBus() const override;
+    virtual QnDistributedMutexManager* distributedMutex() const override;
 private:
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     ClientQueryProcessor m_remoteQueryProcessor;
@@ -65,6 +68,7 @@ private:
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
+    std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
     Ec2DirectConnectionPtr m_directConnection;
     Ec2ThreadPool m_ec2ThreadPool;

@@ -1,5 +1,4 @@
-#ifndef __PROXY_CONNECTION_PROCESSOR_PRIV_H_
-#define __PROXY_CONNECTION_PROCESSOR_PRIV_H_
+#pragma once
 
 #include <chrono>
 
@@ -8,13 +7,13 @@
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
 
-
 class QnProxyConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
     QnProxyConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
-        connectTimeout(5000)
+        connectTimeout(5000),
+        messageBus(nullptr)
     {
     }
     virtual ~QnProxyConnectionProcessorPrivate()
@@ -25,6 +24,5 @@ public:
     QnUniversalTcpListener* owner;
     QUrl lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
+    ec2::QnTransactionMessageBus* messageBus;
 };
-
-#endif // __PROXY_CONNECTION_PROCESSOR_PRIV_H_

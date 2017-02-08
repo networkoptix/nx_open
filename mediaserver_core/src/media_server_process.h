@@ -133,8 +133,12 @@ private:
     void updateAllowCameraCHangesIfNeed();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
-    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
+    void registerRestHandlers(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBus* messageBus);
+    bool initTcpListener(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBus* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();

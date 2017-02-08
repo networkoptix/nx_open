@@ -199,10 +199,6 @@ namespace ec2
     {
     }
 
-    void OldEcConnection::sendRuntimeData(const ec2::ApiRuntimeData& /*data*/)
-    {
-    }
-
     Timestamp OldEcConnection::getTransactionLogTime() const {
         return Timestamp();
     }

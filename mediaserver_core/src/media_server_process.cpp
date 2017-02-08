@@ -512,14 +512,14 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    for (const WinDriveInfo& drive: getWinDrivesInfo()) 
+    for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
             continue;
-        
+
         folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
      }
- 
+
 #endif
 
 #ifdef Q_OS_LINUX
@@ -1712,7 +1712,8 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 }
 
 void MediaServerProcess::registerRestHandlers(
-    CloudManagerGroup* cloudManagerGroup)
+    CloudManagerGroup* cloudManagerGroup,
+    ec2::QnTransactionMessageBus* messageBus)
 {
     auto reg =
         [](const QString& path, QnRestRequestHandler* handler,
@@ -1767,12 +1768,12 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
 
     reg("api/moduleInformationAuthenticated", new QnModuleInformationRestHandler());
-    reg("api/configure", new QnConfigureRestHandler(), kAdmin);
+    reg("api/configure", new QnConfigureRestHandler(messageBus), kAdmin);
     reg("api/detachFromCloud", new QnDetachFromCloudRestHandler(&cloudManagerGroup->connectionManager), kAdmin);
     reg("api/restoreState", new QnRestoreStateRestHandler(), kAdmin);
     reg("api/setupLocalSystem", new QnSetupLocalSystemRestHandler(), kAdmin);
     reg("api/setupCloudSystem", new QnSetupCloudSystemRestHandler(cloudManagerGroup), kAdmin);
-    reg("api/mergeSystems", new QnMergeSystemsRestHandler(), kAdmin);
+    reg("api/mergeSystems", new QnMergeSystemsRestHandler(messageBus), kAdmin);
     reg("api/backupDatabase", new QnBackupDbRestHandler());
     reg("api/discoveredPeers", new QnDiscoveredPeersRestHandler());
     reg("api/logLevel", new QnLogLevelRestHandler());
@@ -1809,7 +1810,8 @@ void MediaServerProcess::registerRestHandlers(
 }
 
 bool MediaServerProcess::initTcpListener(
-    CloudManagerGroup* const cloudManagerGroup)
+    CloudManagerGroup* const cloudManagerGroup,
+    ec2::QnTransactionMessageBus* messageBus)
 {
     m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder() );
@@ -1819,7 +1821,7 @@ bool MediaServerProcess::initTcpListener(
         m_autoRequestForwarder.get(),
         std::placeholders::_1 ) );
 
-    registerRestHandlers(cloudManagerGroup);
+    registerRestHandlers(cloudManagerGroup, messageBus);
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 #ifdef ENABLE_ACTI
@@ -1863,9 +1865,8 @@ bool MediaServerProcess::initTcpListener(
         nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
-    //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
-    m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
+    m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy", messageBus);
     //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
     m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
@@ -2138,7 +2139,6 @@ void MediaServerProcess::run()
     QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
-    QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
@@ -2267,6 +2267,7 @@ void MediaServerProcess::run()
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
 
     MediaServerStatusWatcher mediaServerStatusWatcher;
+    QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
 
     //passing settings
     std::map<QString, QVariant> confParams;
@@ -2414,7 +2415,7 @@ void MediaServerProcess::run()
         new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
-    if (!initTcpListener(&cloudManagerGroup))
+    if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
     {
         qCritical() << "Failed to bind to local port. Terminating...";
         QCoreApplication::quit();
@@ -2424,7 +2425,9 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid(), m_universalTcpListener));
 
     using namespace std::placeholders;
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(&QnUniversalRequestProcessor::isProxy);
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(
+        &QnUniversalRequestProcessor::isProxy,
+        ec2ConnectionFactory->messageBus());
     messageProcessor->registerProxySender(m_universalTcpListener);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
@@ -2558,7 +2561,6 @@ void MediaServerProcess::run()
         return;
     }
 
-    QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     qnResPool->addResource(m_mediaServer);
 
     QString moduleName = qApp->applicationName();
@@ -2618,7 +2620,10 @@ void MediaServerProcess::run()
     std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
-    std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
+    std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(
+        ec2ConnectionFactory->distributedMutex(),
+        m_mediaServer->getId()) );
+    std::unique_ptr<QnRecordingManager> recordingManager(new QnRecordingManager(ec2ConnectionFactory->distributedMutex()));
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
@@ -2820,8 +2825,7 @@ void MediaServerProcess::run()
     hlsSessionPool.reset();
     streamingChunkTranscoder.reset();
 
-    delete QnRecordingManager::instance();
-    QnRecordingManager::initStaticInstance( NULL );
+    recordingManager.reset();
 
     restProcessorPool.reset();
 
@@ -2904,9 +2908,12 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
     if (runtimeInfo.uuid != qnCommon->moduleGUID())
         return;
 
-    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
-    tran.params = runtimeInfo.data;
-    qnTransactionBus->sendTransaction(tran);
+    QnAppServerConnectionFactory::getConnection2()
+        ->getMiscManager(Qn::kSystemAccess)
+        ->saveRuntimeInfo(
+            runtimeInfo.data,
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone);
 }
 
 void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)

@@ -202,12 +202,6 @@ bool handleTransaction(
 
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
-static QnTransactionMessageBus* m_globalInstance = 0;
-
-QnTransactionMessageBus* QnTransactionMessageBus::instance()
-{
-    return m_globalInstance;
-}
 
 QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType)
     :
@@ -237,8 +231,6 @@ QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::Pe
     m_aliveSendTimer.invalidate();
     m_currentTimeTimer.restart();
 
-    NX_ASSERT(m_globalInstance == nullptr);
-    m_globalInstance = this;
     connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
     m_relativeTimer.restart();
 
@@ -273,8 +265,6 @@ void QnTransactionMessageBus::stop()
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
 {
-    m_globalInstance = nullptr;
-
     if (m_thread)
     {
         m_thread->exit();
@@ -874,7 +864,7 @@ void QnTransactionMessageBus::proxyTransaction(const QnTransaction<T> &tran, con
     transportHeader.distance++;
     if (transportHeader.flags & Qn::TT_ProxyToClient)
     {
-        QnPeerSet clients = qnTransactionBus->aliveClientPeers().keys().toSet();
+        QnPeerSet clients = aliveClientPeers().keys().toSet();
         if (clients.isEmpty())
             return;
         transportHeader.dstPeers = clients;

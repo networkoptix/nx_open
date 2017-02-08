@@ -48,13 +48,16 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         peerType == Qn::PT_Server
         ? new QnTransactionLog(m_dbManager.get())
         : nullptr),
+    m_timeSynchronizationManager(
+        new TimeSynchronizationManager(peerType, timerManager)),
+    m_transactionMessageBus(
+        new QnTransactionMessageBus(m_dbManager.get(), peerType)),
     m_serverQueryProcessor(
         peerType == Qn::PT_Server
-        ? new ServerQueryProcessorAccess(m_dbManager.get())
+        ? new ServerQueryProcessorAccess(m_dbManager.get(), m_transactionMessageBus.get())
         : nullptr),
-    m_timeSynchronizationManager(new TimeSynchronizationManager(peerType, timerManager)),
-    m_transactionMessageBus(new QnTransactionMessageBus(
-        peerType == Qn::PT_Server ? m_dbManager.get() : nullptr, peerType)),
+    m_distributedMutexManager(
+        new QnDistributedMutexManager(m_transactionMessageBus.get())),
     m_terminated(false),
     m_runningRequests(0),
     m_sslEnabled(false)
@@ -68,8 +71,6 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     // Registering ec2 types with Qt meta-type system.
     qRegisterMetaType<QnTransactionTransportHeader>("QnTransactionTransportHeader");
 
-    QnDistributedMutexManager::initStaticInstance(new QnDistributedMutexManager());
-
     // TODO: Add comment why this code is commented out.
     //m_transactionMessageBus->start();
 }
@@ -82,8 +83,6 @@ Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     // Have to do it before m_transactionMessageBus destruction since TimeSynchronizationManager
     // uses QnTransactionMessageBus.
     m_timeSynchronizationManager->pleaseStop();
-
-    QnDistributedMutexManager::initStaticInstance(0);
 }
 
 void Ec2DirectConnectionFactory::pleaseStop()
@@ -123,7 +122,7 @@ int Ec2DirectConnectionFactory::connectAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (m_transactionMessageBus->localPeer().isMobileClient())
+    if (ApiPeerData::isMobileClient(qnCommon->localPeerType()))
     {
         QUrlQuery query(url);
         query.removeQueryItem(lit("format"));
@@ -140,10 +139,10 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    httpConnectionListener->addHandler<QnTransactionTcpProcessor>(
-        "HTTP", "ec2/events");
-    httpConnectionListener->addHandler<QnHttpTransactionReceiver>(
-        "HTTP", kIncomingTransactionsPath);
+    httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
+        "HTTP", "ec2/events", m_transactionMessageBus.get());
+    httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
+        "HTTP", kIncomingTransactionsPath, m_transactionMessageBus.get());
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();
 }
@@ -1319,7 +1318,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
                 nullptr, out);
         });
 
-    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler());
+    p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_transactionMessageBus.get()));
     p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
@@ -1349,7 +1348,11 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
         if (!m_directConnection)
         {
             m_directConnection.reset(
-                new Ec2DirectConnection(m_serverQueryProcessor.get(), connectionInfo, url));
+                new Ec2DirectConnection(
+                    this,
+                    m_serverQueryProcessor.get(),
+                    connectionInfo,
+                    url));
             if (m_directConnection->initialized())
             {
                 m_timeSynchronizationManager->start(m_directConnection);
@@ -1572,8 +1575,10 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         .arg((int)errorCode).arg(connectionInfoCopy.ecUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2);
 
     AbstractECConnectionPtr connection(new RemoteEC2Connection(
+        this,
         std::make_shared<FixedUrlClientQueryProcessor>(
-            &m_remoteQueryProcessor, connectionInfoCopy.ecUrl),
+            &m_remoteQueryProcessor,
+            connectionInfoCopy.ecUrl),
         connectionInfoCopy));
     handler->done(reqId, errorCode, connection);
 
@@ -1759,6 +1764,16 @@ void Ec2DirectConnectionFactory::regFunctorWithResponse(
         lit("ec2/%1").arg(ApiCommand::toString(cmd)),
         new FlexibleQueryHttpHandler<InputType, OutputType>(cmd, std::move(handler)),
         permission);
+}
+
+QnTransactionMessageBus* Ec2DirectConnectionFactory::messageBus() const
+{
+    return m_transactionMessageBus.get();
+}
+
+QnDistributedMutexManager* Ec2DirectConnectionFactory::distributedMutex() const
+{
+    return m_distributedMutexManager.get();
 }
 
 } // namespace ec2

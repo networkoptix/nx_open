@@ -6,22 +6,24 @@
 #include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
-
+#include "connection_factory.h"
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection(ServerQueryProcessorAccess *queryProcessor,
+    Ec2DirectConnection::Ec2DirectConnection(
+        const Ec2DirectConnectionFactory* connectionFactory,
+        ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const QUrl& dbUrl)
     :
-        BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
+        BaseEc2Connection<ServerQueryProcessorAccess>( connectionFactory, queryProcessor ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )
     {
         // todo: #singletone. Only one connection for each connection factory allowed now
         m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        connectionFactory->messageBus()->setHandler( notificationManager() );
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
@@ -32,8 +34,7 @@ namespace ec2
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        m_connectionFactory->messageBus()->removeHandler(notificationManager());
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const

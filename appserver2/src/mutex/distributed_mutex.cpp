@@ -37,7 +37,7 @@ QnDistributedMutex::~QnDistributedMutex()
 
 bool QnDistributedMutex::isAllPeersReady() const
 {
-    for(const QnUuid& peer: qnTransactionBus->aliveServerPeers().keys())
+    for(const QnUuid& peer: m_owner->messageBus()->aliveServerPeers().keys())
     {
         if (!m_proccesedPeers.contains(peer))
             return false;
@@ -53,7 +53,7 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-    qnTransactionBus->sendTransaction(tran, dstPeer);
+    m_owner->messageBus()->sendTransaction(tran, dstPeer);
 }
 
 void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
@@ -92,7 +92,7 @@ void QnDistributedMutex::at_timeout()
         QnMutexLocker lock( &m_mutex );
         if (m_locked)
             return;
-        failedPeers = QSet<QnUuid>::fromList(qnTransactionBus->alivePeers().keys()) - m_proccesedPeers;
+        failedPeers = QSet<QnUuid>::fromList(m_owner->messageBus()->alivePeers().keys()) - m_proccesedPeers;
     }
     unlock();
     emit lockTimeout(failedPeers);
@@ -185,7 +185,7 @@ void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 
 void QnDistributedMutex::checkForLocked()
 {
-    if (!m_selfLock.isEmpty() && isAllPeersReady()) 
+    if (!m_selfLock.isEmpty() && isAllPeersReady())
     {
         if (m_timer) {
             m_timer->deleteLater();

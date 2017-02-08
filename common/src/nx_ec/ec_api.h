@@ -56,7 +56,9 @@ struct QnModuleInformation;
 */
 namespace ec2
 {
-class ECConnectionNotificationManager;
+    class ECConnectionNotificationManager;
+    class QnTransactionMessageBus;
+    class QnDistributedMutexManager;
 
     struct QnPeerTimeInfo {
 
@@ -627,6 +629,15 @@ class ECConnectionNotificationManager;
         }
 
         template<class TargetType, class HandlerType>
+        int saveRuntimeInfo(const ApiRuntimeData& data, TargetType* target,
+            HandlerType handler)
+        {
+            return saveRuntimeInfo(data, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                    target, handler)));
+        }
+
+        template<class TargetType, class HandlerType>
         int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
         {
             return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
@@ -646,6 +657,7 @@ class ECConnectionNotificationManager;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
         virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) = 0;
         virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
@@ -674,7 +686,6 @@ class ECConnectionNotificationManager;
 
         virtual void addRemotePeer(const QUrl& url) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual Timestamp getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(Timestamp value) = 0;
@@ -710,6 +721,7 @@ class ECConnectionNotificationManager;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+        virtual QnTransactionMessageBus* messageBus() const = 0;
         virtual ECConnectionNotificationManager* notificationManager()
         {
             NX_ASSERT(0);
@@ -815,7 +827,8 @@ class ECConnectionNotificationManager;
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-
+        virtual QnTransactionMessageBus* messageBus() const = 0;
+        virtual QnDistributedMutexManager* distributedMutex() const = 0;
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,

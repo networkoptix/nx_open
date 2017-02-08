@@ -44,7 +44,7 @@ static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(
 
 /** Returns false if socket would block in blocking mode */
 static bool readSocketNonBlock(
-    int* returnValue, AbstractStreamSocket* socket, 
+    int* returnValue, AbstractStreamSocket* socket,
     void* buffer, int bufferSize)
 {
     *returnValue = socket->recv(buffer, bufferSize, MSG_DONTWAIT);
@@ -65,6 +65,7 @@ static bool readSocketNonBlock(
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
+    ec2::QnTransactionMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
@@ -73,6 +74,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
+    d->messageBus = messageBus;
 }
 
 QnProxyConnectionProcessor::QnProxyConnectionProcessor(
@@ -153,7 +155,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
                 ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
                 tran.params.targetServer = qnCommon->moduleGUID();
                 tran.params.socketCount = socketCount;
-                qnTransactionBus->sendTransaction(tran, target);
+                d->messageBus->sendTransaction(tran, target);
             });
     } else {
         d->dstSocket.clear();

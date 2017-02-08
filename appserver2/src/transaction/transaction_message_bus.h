@@ -39,8 +39,6 @@ public:
     QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType);
     virtual ~QnTransactionMessageBus();
 
-    static QnTransactionMessageBus* instance();
-
     void addConnectionToPeer(const QUrl& url);
     void removeConnectionFromPeer(const QUrl& url);
     QList<QnTransportConnectionInfo> connectionsInfo() const;
@@ -324,4 +322,3 @@ private:
 
 } //namespace ec2
 
-#define qnTransactionBus ec2::QnTransactionMessageBus::instance()

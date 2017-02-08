@@ -115,6 +115,10 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     MergeSystemData, (json),
     (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBus* messageBus):
+    QnJsonRestHandler(),
+    m_messageBus(messageBus)
+{}
 
 int QnMergeSystemsRestHandler::executeGet(
     const QString& path,
@@ -536,7 +540,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         }
     }
 
-    if (!changeLocalSystemId(data))
+    if (!changeLocalSystemId(data, m_messageBus))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler::applyRemoteSettings. Failed to change system name"), cl_logDEBUG1);
         return false;

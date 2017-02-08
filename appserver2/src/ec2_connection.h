@@ -22,6 +22,7 @@ namespace ec2
     {
     public:
         Ec2DirectConnection(
+            const Ec2DirectConnectionFactory* connectionFactory,
             ServerQueryProcessorAccess* queryProcessor,
             const QnConnectionInfo& connectionInfo,
             const QUrl& dbUrl);

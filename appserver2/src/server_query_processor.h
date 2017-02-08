@@ -95,7 +95,10 @@ class ServerQueryProcessor;
 struct PostProcessTransactionFunction
 {
     template<class T>
-    void operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const;
+    void operator()(
+        QnTransactionMessageBus* messageBus,
+        const aux::AuditData& auditData,
+        const QnTransaction<T>& tran) const;
 };
 
 class ServerQueryProcessor
@@ -107,9 +110,11 @@ public:
     virtual ~ServerQueryProcessor() {}
 
     ServerQueryProcessor(
+        QnTransactionMessageBus* messageBus,
         detail::QnDbManager* dbManager,
         const Qn::UserAccessData &userAccessData)
         :
+        m_messageBus(messageBus),
         m_db(dbManager, userAccessData),
         m_auditManager(nullptr)
     {
@@ -375,7 +380,8 @@ private:
                     errorCode = ErrorCode::forbidden;
                     return;
                 }
-                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
+                localPostProcessList.push(std::bind(
+                    PostProcessTransactionFunction(), m_messageBus, createAuditDataCopy(), tran));
             }
 
             std::function<void()> postProcessAction;
@@ -612,7 +618,7 @@ private:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
+        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), m_messageBus, createAuditDataCopy(), tran));
 
         return errorCode;
     }
@@ -713,6 +719,7 @@ private:
 
 
 private:
+    QnTransactionMessageBus* m_messageBus;
     QnDbManagerAccess m_db;
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
@@ -729,9 +736,12 @@ private:
 };
 
 template<class T>
-void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const
+void PostProcessTransactionFunction::operator()(
+    QnTransactionMessageBus* messageBus,
+    const aux::AuditData& auditData,
+    const QnTransaction<T>& tran) const
 {
-    qnTransactionBus->sendTransaction(tran);
+    messageBus->sendTransaction(tran);
     aux::triggerNotification(auditData, tran);
 }
 
@@ -739,17 +749,22 @@ void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData,
 
 struct ServerQueryProcessorAccess
 {
-    ServerQueryProcessorAccess(detail::QnDbManager* db): m_db(db) {}
+    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBus* messageBus):
+        m_db(db),
+        m_messageBus(messageBus)
+    {
+    }
 
     detail::ServerQueryProcessor getAccess(
         const Qn::UserAccessData userAccessData)
     {
-        return detail::ServerQueryProcessor(m_db, userAccessData);
+        return detail::ServerQueryProcessor(m_messageBus, m_db, userAccessData);
     }
 
     detail::QnDbManager* getDb() const { return m_db; }
 private:
     detail::QnDbManager* m_db;
+    QnTransactionMessageBus* m_messageBus;
 };
 
 } // namespace ec2

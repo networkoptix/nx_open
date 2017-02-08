@@ -34,7 +34,7 @@
 #include "media_server/settings.h"
 #include "core/resource/camera_user_attribute_pool.h"
 #include "mutex/camera_data_handler.h"
-#include "mutex/distributed_mutex_manager.h"
+#include <mutex/distributed_mutex_manager.h>
 
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -50,10 +50,12 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
-QnRecordingManager::QnRecordingManager(): m_mutex(QnMutex::Recursive)
+QnRecordingManager::QnRecordingManager(ec2::QnDistributedMutexManager* mutexManager):
+    m_mutex(QnMutex::Recursive),
+    m_mutexManager(mutexManager)
 {
     m_tooManyRecordingCnt = 0;
-    m_licenseMutex = 0;
+    m_licenseMutex = nullptr;
     connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
     m_recordingStopTime = qMin(LICENSE_RECORDING_STOP_TIME, MSSettings::roSettings()->value("forceStopRecordingTime", LICENSE_RECORDING_STOP_TIME).toLongLong());
     m_recordingStopTime *= 1000 * 60;
@@ -326,7 +328,7 @@ bool QnRecordingManager::startOrStopRecording(
         if (!res->hasFlags(Qn::foreigner)) {
             if(!needStopHi && !needStopLow && res->getStatus() == Qn::Recording)
                 res->setStatus(Qn::Online); // may be recording thread was not runned, so reset status to online
-        }   
+        }
     }
 
     //doing anyway to stop internal cache, etc...
@@ -566,7 +568,7 @@ void QnRecordingManager::at_checkLicenses()
             {
                 // found. remove recording from some of them
 
-                m_licenseMutex = ec2::QnDistributedMutexManager::instance()->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
+                m_licenseMutex = m_mutexManager->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
                 connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
                 connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
                 m_licenseMutex->lockAsync();
@@ -635,20 +637,6 @@ void QnRecordingManager::at_licenseMutexTimeout()
     m_licenseMutex = 0;
 }
 
-//Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
-static QnRecordingManager* staticInstance = NULL;
-
-void QnRecordingManager::initStaticInstance( QnRecordingManager* recordingManager )
-{
-    staticInstance = recordingManager;
-}
-
-QnRecordingManager* QnRecordingManager::instance()
-{
-    //return qn_recordingManager_instance();
-    return staticInstance;
-}
-
 // --------------------- QnServerDataProviderFactory -------------------
 Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance)
 
@@ -689,7 +677,7 @@ QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 }
 
 int WriteBufferMultiplierManager::getSizeForCam(
-    QnServer::ChunksCatalog catalog, 
+    QnServer::ChunksCatalog catalog,
     const QnUuid& resourceId)
 {
     QnMutexLocker lock(&m_mutex);

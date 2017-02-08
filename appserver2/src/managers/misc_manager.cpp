@@ -7,7 +7,7 @@
 namespace ec2 {
 
 void QnMiscNotificationManager::triggerNotification(
-    const QnTransaction<ApiSystemIdData> &transaction, 
+    const QnTransaction<ApiSystemIdData> &transaction,
     NotificationSource /*source*/)
 {
     emit systemIdChangeRequested(transaction.params.systemId,
@@ -124,6 +124,19 @@ int QnMiscManager<T>::saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleH
     const int reqID = generateRequestID();
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::saveMiscParam, param,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
+    return reqID;
+}
+
+template<class T>
+int QnMiscManager<T>::saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::runtimeInfoChanged, data,
         [handler, reqID](ec2::ErrorCode errorCode)
     {
         handler->done(reqID, errorCode);

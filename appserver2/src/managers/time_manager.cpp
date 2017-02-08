@@ -403,10 +403,10 @@ namespace ec2
 
         onDbManagerInitialized();
 
-        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,
+        connect(connection->messageBus(), &QnTransactionMessageBus::newDirectConnectionEstablished,
                  this, &TimeSynchronizationManager::onNewConnectionEstablished,
                  Qt::DirectConnection );
-        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,
+        connect(connection->messageBus(), &QnTransactionMessageBus::peerLost,
                  this, &TimeSynchronizationManager::onPeerLost,
                  Qt::DirectConnection );
 
@@ -972,7 +972,7 @@ namespace ec2
             tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
         peerSystemTimeReceived( tran ); //remembering own system time
-        QnTransactionMessageBus::instance()->sendTransaction( tran );
+        m_connection->messageBus()->sendTransaction( tran );
     }
 
     void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )

@@ -29,17 +29,21 @@
 #include <core/resource_management/resource_data_pool.h>
 
 
-QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnUuid serverId)
-    : m_serverId(serverId)
+QnAppserverResourceProcessor::QnAppserverResourceProcessor(
+    ec2::QnDistributedMutexManager* distributedMutexManager,
+    QnUuid serverId)
+    :
+    m_distributedMutexManager(distributedMutexManager),
+    m_serverId(serverId)
 {
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
-    ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
+    m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);
     readDefaultUserAttrs();
 }
 
 QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 {
-    ec2::QnDistributedMutexManager::instance()->setUserDataHandler(0);
+    m_distributedMutexManager->setUserDataHandler(0);
     delete m_cameraDataHandler;
 }
 
@@ -79,7 +83,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
         qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
         cameraResource->hasFlags(Qn::desktop_camera);
-    if (!ec2::QnDistributedMutexManager::instance() || takeCameraWithoutLock || isOwnChangeParentId)
+    if (!m_distributedMutexManager || takeCameraWithoutLock || isOwnChangeParentId)
     {
         addNewCameraInternal(cameraResource);
         return;
@@ -101,7 +105,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
             return; // already added. Camera has been found twice
     }
 
-    ec2::QnDistributedMutex* mutex = ec2::QnDistributedMutexManager::instance()->createMutex(name);
+    ec2::QnDistributedMutex* mutex = m_distributedMutexManager->createMutex(name);
     connect(mutex, &ec2::QnDistributedMutex::locked, this, &QnAppserverResourceProcessor::at_mutexLocked, Qt::QueuedConnection);
     connect(mutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnAppserverResourceProcessor::at_mutexTimeout, Qt::QueuedConnection);
     m_lockInProgress.insert(name, LockData(mutex, cameraResource));

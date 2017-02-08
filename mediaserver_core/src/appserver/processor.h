@@ -11,6 +11,7 @@
 
 namespace ec2 {
     class QnMutexCameraDataHandler;
+    class QnDistributedMutexManager;
     struct QnCameraUserAttributes;
 }
 
@@ -19,7 +20,9 @@ class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 
 public:
-    QnAppserverResourceProcessor(QnUuid serverId);
+    QnAppserverResourceProcessor(
+        ec2::QnDistributedMutexManager* distributedMutexManager,
+        QnUuid serverId);
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
@@ -58,6 +61,7 @@ private:
     void readDefaultUserAttrs();
 private:
     QnCameraUserAttributesPtr m_defaultUserAttrs;
+    ec2::QnDistributedMutexManager* m_distributedMutexManager;
 };
 
 #endif //_server_appserver_processor_h_

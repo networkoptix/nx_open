@@ -21,6 +21,9 @@ QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
 bool backupDatabase();
 
+namespace ec2 {
+    class QnTransactionMessageBus;
+}
 
 namespace nx
 {
@@ -112,7 +115,9 @@ struct ConfigureSystemData : public PasswordData
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeLocalSystemId(const ConfigureSystemData& data);
+bool changeLocalSystemId(
+    const ConfigureSystemData& data,
+    ec2::QnTransactionMessageBus* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body

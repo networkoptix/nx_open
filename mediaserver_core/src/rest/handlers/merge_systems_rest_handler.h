@@ -7,10 +7,16 @@
 
 struct MergeSystemData;
 
-class QnMergeSystemsRestHandler : public QnJsonRestHandler
+namespace ec2 {
+    class QnTransactionMessageBus;
+}
+
+class QnMergeSystemsRestHandler: public QnJsonRestHandler
 {
     Q_OBJECT
 public:
+    QnMergeSystemsRestHandler(ec2::QnTransactionMessageBus* messageBus);
+
     virtual int executeGet(
         const QString &path,
         const QnRequestParams &params,
@@ -52,5 +58,6 @@ private:
         const QUrl &remoteUrl,
         const QString& postKey,
         const QnRestConnectionProcessor* owner);
-
+private:
+    ec2::QnTransactionMessageBus* m_messageBus;
 };

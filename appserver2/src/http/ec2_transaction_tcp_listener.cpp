@@ -30,19 +30,24 @@ class QnTransactionTcpProcessorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 
     QnTransactionTcpProcessorPrivate():
-        QnTCPConnectionProcessorPrivate()
+        QnTCPConnectionProcessorPrivate(),
+        messageBus(nullptr)
     {
     }
+
+    QnTransactionMessageBus* messageBus;
 };
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
+    QnTransactionMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* _owner)
+    QnTcpListener* /*owner*/)
     :
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
 {
-    Q_UNUSED(_owner)
+    Q_D(QnTransactionTcpProcessor);
 
+    d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
 
@@ -133,7 +138,7 @@ void QnTransactionTcpProcessor::run()
         //  but not move initializer. So, have to declare localSocket
         auto localSocket = std::move(d->socket);
         d->socket.clear();
-        QnTransactionMessageBus::instance()->gotIncomingTransactionsConnectionFromRemotePeer(
+        d->messageBus->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
             std::move(localSocket),
             remotePeer,
@@ -168,7 +173,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     ConnectionLockGuard connectionLockGuard(
-        QnTransactionMessageBus::instance()->connectionGuardSharedState(),
+        d->messageBus->connectionGuardSharedState(),
         remoteGuid,
         ConnectionLockGuard::Direction::Incoming);
 
@@ -305,7 +310,7 @@ void QnTransactionTcpProcessor::run()
             access.access = Qn::UserAccessData::Access::ReadAllResources;
         }
 
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
+        d->messageBus->gotConnectionFromRemotePeer(
             connectionGuid,
             std::move(connectionLockGuard),
             std::move(d->socket),
@@ -317,7 +322,7 @@ void QnTransactionTcpProcessor::run()
             ttFinishCallback,
             access);
 
-        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming(connectionGuid);
+        d->messageBus->moveConnectionToReadyForStreaming(connectionGuid);
     }
 }
 

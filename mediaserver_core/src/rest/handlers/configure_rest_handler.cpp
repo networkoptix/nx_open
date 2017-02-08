@@ -41,6 +41,12 @@ namespace
 
 }
 
+QnConfigureRestHandler::QnConfigureRestHandler(ec2::QnTransactionMessageBus* messageBus):
+    QnJsonRestHandler(),
+    m_messageBus(messageBus)
+{
+}
+
 int QnConfigureRestHandler::executeGet(
     const QString &path,
     const QnRequestParams &params,
@@ -91,7 +97,7 @@ int QnConfigureRestHandler::execute(
             return CODE_OK;
         }
 
-        if (!changeLocalSystemId(data))
+        if (!changeLocalSystemId(data, m_messageBus))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             return CODE_OK;

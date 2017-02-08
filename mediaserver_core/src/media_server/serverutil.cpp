@@ -198,12 +198,12 @@ bool backupDatabase() {
     return true;
 }
 
-void dropConnectionsToRemotePeers()
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBus* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
 
-    qnTransactionBus->dropConnections();
+    messageBus->dropConnections();
 }
 
 void resumeConnectionsToRemotePeers()
@@ -212,7 +212,7 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBus* messageBus)
 {
     if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
@@ -224,7 +224,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     }
 
     if (!data.wholeSystem)
-        dropConnectionsToRemotePeers();
+        dropConnectionsToRemotePeers(messageBus);
 
     auto connection = QnAppServerConnectionFactory::getConnection2();
 

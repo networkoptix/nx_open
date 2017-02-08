@@ -12,9 +12,10 @@ namespace {
 
 using namespace nx::network::cloud;
 
-QnConnectToCloudWatcher::QnConnectToCloudWatcher():
+QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBus* messageBus):
     m_cdbEndPointFetcher(
-        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>()))
+        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>())),
+    m_messageBus(messageBus)
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(kUpdateIfFailIntervalMs);
@@ -49,7 +50,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
-            qnTransactionBus->removeConnectionFromPeer(m_cloudUrl);
+            m_messageBus->removeConnectionFromPeer(m_cloudUrl);
         return;
     }
 
@@ -73,6 +74,6 @@ void QnConnectToCloudWatcher::at_updateConnection()
             m_cloudUrl.setPath(lit("/ec2/events"));
             m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
             m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
-            qnTransactionBus->addConnectionToPeer(m_cloudUrl);
+            m_messageBus->addConnectionToPeer(m_cloudUrl);
         });
 }
