@@ -5185,7 +5185,7 @@ devices</source>
     <message numerus="yes">
         <source>%n Servers</source>
         <translation>
-            <numerusform>%n Servers</numerusform>
+            <numerusform>%n Server</numerusform>
             <numerusform>%n Servers</numerusform>
         </translation>
     </message>
