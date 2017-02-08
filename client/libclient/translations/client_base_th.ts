@@ -3859,18 +3859,6 @@ devices</source>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translation>
-            <numerusform>อย่างน้อย %n %2 ที่ต้องการ</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translation>
-            <numerusform>%n %2 มีใช้อยู่ในปัจจุบัน</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>คุณไม่ได้รับใบอนุญาตถูกต้องติดตั้ง.</translation>
@@ -3978,6 +3966,18 @@ devices</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform>อย่างน้อย %n %2 ที่ต้องการ {1 ?}</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform>%n %2 มีใช้อยู่ในปัจจุบัน {1 ?}</numerusform>
+        </translation>
     </message>
 </context>
 <context>

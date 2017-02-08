@@ -3900,22 +3900,6 @@ devices</source>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translatorcomment>Have to evaluate the result to make sure</translatorcomment>
-        <translation>
-            <numerusform>É necessário pelo menos %n %2</numerusform>
-            <numerusform>É necessário pelo menos %n %2</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translatorcomment>Have to evaluate the result to make sure</translatorcomment>
-        <translation>
-            <numerusform>%n %2 está em uso</numerusform>
-            <numerusform>%n %2 estão em uso</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>Não tem uma licença válida instalada.</translation>
@@ -4023,6 +4007,20 @@ devices</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
