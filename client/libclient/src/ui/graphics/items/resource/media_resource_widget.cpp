@@ -1634,6 +1634,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
 
+    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // for live video make a quick check: status has higher priority than EOF
+    if (states.isRealTimeSource)
+    {
+        if (states.isOffline)
+            return Qn::OfflineOverlay;
+
+        if (states.isUnauthorized)
+            return Qn::UnauthorizedOverlay;
+    }
+
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
         if (states.isOffline)
