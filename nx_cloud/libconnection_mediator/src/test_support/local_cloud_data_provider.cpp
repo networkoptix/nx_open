@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "local_cloud_data_provider.h"
-
 
 namespace nx {
 namespace hpm {
@@ -29,5 +23,19 @@ void LocalCloudDataProvider::addSystem(
         std::move(systemData));
 }
 
-}   //hpm
-}   //nx
+//-------------------------------------------------------------------------------------------------
+// class CloudDataProviderStub
+
+CloudDataProviderStub::CloudDataProviderStub(AbstractCloudDataProvider* target):
+    m_target(target)
+{
+}
+
+boost::optional<AbstractCloudDataProvider::System>
+    CloudDataProviderStub::getSystem(const String& systemId) const
+{
+    return m_target->getSystem(systemId);
+}
+
+} // namespace hpm
+} // namespace nx

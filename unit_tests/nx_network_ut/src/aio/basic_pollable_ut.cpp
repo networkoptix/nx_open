@@ -189,9 +189,16 @@ TEST_F(BasicPollable, pleaseStopSync)
 //-------------------------------------------------------------------------------------------------
 // PerformanceBasicPollable
 
+template<typename Func>
 class PerformanceBasicPollable:
     public BasicPollable
 {
+public:
+    PerformanceBasicPollable(Func func):
+        m_func(func)
+    {
+    }
+
 protected:
     struct Result
     {
@@ -226,7 +233,7 @@ protected:
             if (prevCallCounter != postCallCounter)
             {
                 prevCallCounter = postCallCounter;
-                aioObject->post(
+                (aioObject.get()->*m_func)(
                     [&postCallCounter]()
                     {
                         ++postCallCounter;
@@ -255,15 +262,55 @@ protected:
 private:
     Result m_result;
     std::unique_ptr<aio::AIOService> m_customAioService;
+    Func m_func;
 };
 
-TEST_F(PerformanceBasicPollable, post)
+//-------------------------------------------------------------------------------------------------
+// post
+
+class PerformanceBasicPollablePost:
+    public PerformanceBasicPollable<decltype(&aio::BasicPollable::post)>
+{
+public:
+    PerformanceBasicPollablePost():
+        PerformanceBasicPollable<decltype(&aio::BasicPollable::post)>(&aio::BasicPollable::post)
+    {
+    }
+};
+
+TEST_F(PerformanceBasicPollablePost, defaultPollset)
 {
     runTest();
     printResult();
 }
 
-TEST_F(PerformanceBasicPollable, postWithRegularPollSet)
+TEST_F(PerformanceBasicPollablePost, regularPollSet)
+{
+    givenAioServiceWithRegularPollSet();
+    runTest();
+    printResult();
+}
+
+//-------------------------------------------------------------------------------------------------
+// dispatch
+
+class PerformanceBasicPollableDispatch:
+    public PerformanceBasicPollable<decltype(&aio::BasicPollable::dispatch)>
+{
+public:
+    PerformanceBasicPollableDispatch():
+        PerformanceBasicPollable<decltype(&aio::BasicPollable::dispatch)>(&aio::BasicPollable::dispatch)
+    {
+    }
+};
+
+TEST_F(PerformanceBasicPollableDispatch, defaultPollset)
+{
+    runTest();
+    printResult();
+}
+
+TEST_F(PerformanceBasicPollableDispatch, regularPollSet)
 {
     givenAioServiceWithRegularPollSet();
     runTest();
