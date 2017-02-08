@@ -8,10 +8,11 @@
 #include <business/business_strings_helper.h>
 #include <business/business_types_comparator.h>
 
+#include <core/resource_management/resource_pool.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 
@@ -138,7 +139,6 @@ public:
                 *dst++ = &data[j];
         }
 
-        // typedef std::function<bool(const DataIndex * /*this*/, const QnLightBusinessActionP &, const QnLightBusinessActionP &)> LessFunc;
         typedef bool (DataIndex::*LessFunc)(const QnLightBusinessActionP &, const QnLightBusinessActionP &) const;
 
         LessFunc lessThan;
@@ -253,13 +253,13 @@ bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action) const
     return false;
 }
 
-QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessActionData &action) const {
+QVariant QnEventLogModel::foregroundData(Column column, const QnBusinessActionData &action) const {
     if (column == DescriptionColumn && hasVideoLink(action))
         return m_linkBrush;
     return QVariant();
 }
 
-QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) const
+QVariant QnEventLogModel::mouseCursorData(Column column, const QnBusinessActionData &action) const
 {
     if (column == DescriptionColumn && hasVideoLink(action))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
@@ -302,7 +302,7 @@ QString QnEventLogModel::getUserNameById(const QnUuid &id)
 }
 
 
-QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
+QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData &action) {
     QnUuid resId;
     switch(column) {
     case EventCameraColumn:
@@ -360,7 +360,7 @@ QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     return QString();
 }
 
-QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action) const {
+QString QnEventLogModel::textData(Column column,const QnBusinessActionData& action) const {
     switch(column) {
     case DateTimeColumn: {
         qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
@@ -452,6 +452,62 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
     }
 }
 
+QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData &action) const
+{
+    if (column == ActionCameraColumn && action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
+    {
+        enum { kMaxShownUsersCount = 20 };
+
+        const auto& users = action.actionParams.additionalResources;
+
+        QStringList userNames;
+        if (users.empty())
+        {
+            const auto userResources = qnResPool->getResources<QnUserResource>();
+            for (const auto& resource : userResources)
+                userNames.append(resource->getName());
+        }
+        else
+        {
+            for (const auto& userId : users)
+                userNames.append(getUserNameById(userId));
+        }
+
+        if (userNames.size() > kMaxShownUsersCount)
+        {
+            const auto diffCount = (kMaxShownUsersCount - userNames.size());
+
+            userNames = userNames.mid(0, kMaxShownUsersCount);
+            userNames.append(tr("and %n users more...", "", diffCount));
+        }
+
+        return userNames.join(kDelimiter);
+    }
+
+    if (column != DescriptionColumn)
+        return QString();
+
+    QString result = textData(column, action);
+    if (action.eventParams.eventType == QnBusiness::LicenseIssueEvent
+        && action.eventParams.reasonCode == QnBusiness::LicenseRemoved)
+    {
+        QStringList disabledCameras;
+        for (const QString& stringId: action.eventParams.description.split(L';'))
+        {
+            QnUuid id = QnUuid::fromStringSafe(stringId);
+            NX_ASSERT(!id.isNull());
+            if (auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+                disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
+        }
+        NX_ASSERT(!disabledCameras.isEmpty());
+        result += L'\n' + disabledCameras.join(L'\n');
+    }
+
+
+    return result;
+}
+
+
 bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
 {
     const auto cameraResource = getResourceById(cameraId);
@@ -473,7 +529,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
     return accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
 }
 
-int QnEventLogModel::helpTopicIdData(const Column& column, const QnBusinessActionData &action) {
+int QnEventLogModel::helpTopicIdData(Column column, const QnBusinessActionData &action) {
     switch(column) {
     case EventColumn:
         return QnBusiness::eventHelpId(action.eventParams.eventType);
@@ -571,45 +627,10 @@ QVariant QnEventLogModel::data(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::ToolTipRole:
-        {
-            if (column == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
-            {
-                enum { kMaxShownUsersCount = 20 };
+            return tooltip(column, action);
 
-                const auto& users = action.actionParams.additionalResources;
-
-                QStringList userNames;
-                if (users.empty())
-                {
-                    const auto userResources = qnResPool->getResources<QnUserResource>();
-                    for (const auto& resource : userResources)
-                        userNames.append(resource->getName());
-                }
-                else
-                {
-                    for (const auto& userId : users)
-                        userNames.append(getUserNameById(userId));
-                }
-
-                if (userNames.size() > kMaxShownUsersCount)
-                {
-                    const auto diffCount = (kMaxShownUsersCount - userNames.size());
-
-                    userNames = userNames.mid(0, kMaxShownUsersCount);
-                    userNames.append(tr("and %n users more...", "", diffCount));
-                }
-
-                return userNames.join(kDelimiter);
-            }
-            else if (column != DescriptionColumn)
-            {
-                return QVariant();
-            }
-
-            // else go to Qt::DisplayRole
-        }
         case Qt::DisplayRole:
-            return QVariant(textData(column, action));
+            return textData(column, action);
 
         case Qt::DecorationRole:
             return iconData(column, action);

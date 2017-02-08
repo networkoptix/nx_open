@@ -58,12 +58,14 @@ private:
     class DataIndex;
 
     QnResourcePtr getResource(const Column &column, const QnBusinessActionData &action) const;
-    QVariant foregroundData(const Column& column, const QnBusinessActionData &action) const;
+    QVariant foregroundData(Column column, const QnBusinessActionData &action) const;
 
-    static QVariant iconData(const Column& column, const QnBusinessActionData &action);
-    QVariant mouseCursorData(const Column& column, const QnBusinessActionData &action) const;
-    QString textData(const Column& column, const QnBusinessActionData &action) const;
-    static int helpTopicIdData(const Column& column, const QnBusinessActionData &action);
+    static QVariant iconData(Column column, const QnBusinessActionData &action);
+    QVariant mouseCursorData(Column column, const QnBusinessActionData &action) const;
+    QString textData(Column column, const QnBusinessActionData &action) const;
+    QString tooltip(Column column, const QnBusinessActionData &action) const;
+
+    static int helpTopicIdData(Column column, const QnBusinessActionData &action);
 
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
