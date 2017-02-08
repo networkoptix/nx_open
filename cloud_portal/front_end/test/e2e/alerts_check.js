@@ -6,19 +6,19 @@ var AlertSuite = function () {
     this.alertTypes = {danger: 'danger', success: 'success'};
     this.alertMessages = {
         loginIncorrect: 'Login or password are incorrect',
-        loginNotActive: 'Your account wasn\'t confirmed yet',
-        registerSuccess: 'Your account was successfully registered.\nPlease, check your email to confirm it',
-        registerConfirmSuccess: 'Your account was successfully activated.',
-        registerConfirmError: 'Couldn\'t activate your account: Wrong confirmation code',
+        loginNotActive: 'This account hasn\'t been activated yet. Send activation link again',
+        registerSuccess: 'The account was successfully registered. We\'ve sent a confirmation message to your email address.\nOpen it up to activate the account.',
+        registerConfirmSuccess: 'Your account has been successfully activated.',
+        registerConfirmError: 'Couldn\'t activate your account: Account was already activated or confirmation code is incorrect.',
         accountSuccess: 'Your account was successfully saved.',
-        restorePassWrongEmail: 'Couldn\'t send confirmation email: Email isn\'t registered in portal',
+        restorePassWrongEmail: 'Couldn\'t send confirmation email: This email has not been registered in portal.',
         restorePassConfirmSent: 'We\'ve sent a password reset message to your email address. Open it up to reset the password.',
         restorePassWrongCode: 'Couldn\'t save new password: Wrong confirmation code',
         restorePassSuccess: 'Password successfully saved',
-        changePassWrongCurrent: 'Couldn\'t change your password: Current password is incorrect.',
+        changePassWrongCurrent: 'Couldn\'t change your password: Some parameters on the form are incorrect.',
         changePassSuccess: 'Your password was successfully changed.',
         systemAccessError: 'System info is unavailable: Some unexpected error has happened',
-        systemAccessRestricted: 'System info is unavailable: You have no access to this system',
+        systemAccessRestricted: 'System info is unavailable: You don\'t have access to this system.',
         permissionDeleteSuccess: 'Permissions were removed from ',
         permissionAddSuccess: 'New permissions saved'
     };

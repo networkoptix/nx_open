@@ -663,7 +663,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -676,7 +676,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-restore-all-pass', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -687,7 +687,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-account', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -698,7 +698,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-login', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -731,7 +731,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-syspage', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -742,7 +742,7 @@ module.exports = function (grunt) {
     grunt.registerTask('test-systems', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -755,7 +755,7 @@ module.exports = function (grunt) {
     grunt.registerTask('testshots', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',
@@ -766,7 +766,7 @@ module.exports = function (grunt) {
     grunt.registerTask('refshots', [
         'clean:server',
         'copy:custom_css',
-        'concurrent:test',
+        //'concurrent:test',
         'configureProxies:server',
         'autoprefixer',
         'connect:test',

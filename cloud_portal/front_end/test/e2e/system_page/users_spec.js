@@ -5,7 +5,7 @@ describe('User list', function () {
     var p = new SystemPage();
 
     beforeEach(function(){
-        p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
     });
 
     afterEach(function(){
@@ -24,24 +24,24 @@ describe('User list', function () {
         expect(p.userList.isDisplayed()).toBe(true);
     
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdmin, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailAdmin, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.userList.isDisplayed()).toBe(true);
     });
     
     it ("is not visible for other users", function() {
         p.helper.logout();
-        p.helper.login(p.helper.userEmailViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.users.count()).toBe(0);
     
         p.helper.logout();
-        p.helper.login(p.helper.userEmailLiveViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailLiveViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.users.count()).toBe(0);
     
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdvViewer, p.helper.userPassword);
+        p.helper.loginToSystems(p.helper.userEmailAdvViewer, p.helper.userPassword);
         p.ownedSystem.click();
         expect(p.users.count()).toBe(0);
     });
@@ -58,12 +58,14 @@ describe('User list', function () {
     
     it ("displays pencil and cross links for each user only on hover", function() {
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdmin);
+        p.helper.loginToSystems(p.helper.userEmailAdmin);
         p.ownedSystem.click();
         p.users.filter(function(elem, index) {
-            // Except owner and current user
+            // Except owner, admins and current user
             return elem.getText().then(function(text) {
-                return (index > 0) && (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
+                return (!p.helper.isSubstr(text, p.helper.roles.admin)) &&
+                    (!p.helper.isSubstr(text, p.helper.roles.owner)) &&
+                    (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
             });
         }).each(function(elem){
             expect(elem.element(by.css('.glyphicon-pencil')).isDisplayed()).toBe(false);
@@ -76,7 +78,7 @@ describe('User list', function () {
     
     it ("does not display edit and remove for owner row", function() {
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdmin);
+        p.helper.loginToSystems(p.helper.userEmailAdmin);
         p.ownedSystem.click();
         p.users.first().click(); // TODO: replace with hover
         expect(p.users.first().element(by.css('.glyphicon-pencil')).isPresent()).toBe(false);
@@ -85,12 +87,14 @@ describe('User list', function () {
     
     it ("removes user with confirmation, after deleting another user - message appears, user list is updated", function() {
         p.helper.logout();
-        p.helper.login(p.helper.userEmailAdmin);
+        p.helper.loginToSystems(p.helper.userEmailAdmin);
         p.ownedSystem.click();
         var firstDeletableUser =  p.users.filter(function(elem, index) {
             // Except owner and current user
             return elem.getText().then(function(text) {
-                return (index > 0) && (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
+                return (!p.helper.isSubstr(text, p.helper.roles.admin)) &&
+                    (!p.helper.isSubstr(text, p.helper.roles.owner)) &&
+                    (!p.helper.isSubstr(text, p.helper.userEmailAdmin));
             });
         }).first();
     
@@ -105,17 +109,17 @@ describe('User list', function () {
         });
     });
     
-    it ("asks for confirmation, if user deletes himself from the table", function() {
-        p.helper.logout();
-        p.helper.login(p.helper.userEmailAdmin);
-        p.ownedSystem.click();
-        var currentUsrRow = p.usrDataRow(p.helper.userEmailAdmin); // row with current user
-        currentUsrRow.click(); // TODO: replace with hover
-        currentUsrRow.element(by.css('.glyphicon-remove')).click();
-        expect(p.modalDialog.getText()).toContain(p.deleteConfirmations.self);
-        p.cancelDelUserButton.click();
-    });
-    
+    // it ("asks for confirmation, if user deletes himself from the table", function() {
+    //     p.helper.logout();
+    //     p.helper.login(p.helper.userEmailAdmin);
+    //     p.ownedSystem.click();
+    //     var currentUsrRow = p.usrDataRow(p.helper.userEmailAdmin); // row with current user
+    //     currentUsrRow.click(); // TODO: replace with hover
+    //     currentUsrRow.element(by.css('.glyphicon-remove')).click();
+    //     expect(p.modalDialog.getText()).toContain(p.deleteConfirmations.self);
+    //     p.cancelDelUserButton.click();
+    // });
+
     //xit ("If user deletes himself - he jumps to systems list", function() {
     //
     //});
@@ -125,7 +129,7 @@ describe('User list', function () {
         p.helper.createUser(p.helper.userNameCyrillic, p.helper.userNameCyrillic).then( function(userEmail) {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
     
-            p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+            p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
             p.helper.getSysPage(p.systemLink);
             p.shareButton.click();
             p.emailField.sendKeys(userEmail);
