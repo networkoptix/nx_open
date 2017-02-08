@@ -19,6 +19,8 @@ set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
+option(withTests "Enable Unit Tests" OFF)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 if(NOT WIN32)
@@ -100,5 +102,9 @@ add_subdirectory(mediaserver_core)
 add_subdirectory(mediaserver)
 add_subdirectory(plugins)
 add_subdirectory(client)
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
 
 cmake_policy(SET CMP0058 NEW)
