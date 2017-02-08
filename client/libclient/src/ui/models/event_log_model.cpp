@@ -29,8 +29,6 @@
 
 namespace
 {
-    enum { kSingleUser = 1};
-
     const auto kDelimiter = lit("\n");
 }
 typedef QnBusinessActionData* QnLightBusinessActionP;
@@ -332,7 +330,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
             }
             else if (actionType == QnBusiness::ShowOnAlarmLayoutAction) {
                 const auto &users = action.actionParams.additionalResources;
-                const bool multipleUsers = (users.empty() || (users.size() > kSingleUser));
+                const bool multipleUsers = (users.empty() || (users.size() > 1));
                 return qnResIconCache->icon(multipleUsers ?
                     QnResourceIconCache::Users : QnResourceIconCache::User);
             }
@@ -393,11 +391,10 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             if (users.empty())
                 return tr("All users");
 
-            if (users.size() == kSingleUser)
+            if (users.size() == 1)
                 return getUserNameById(users.front());
 
-            static const auto kUsersTempltate = tr("%1 users");
-            return kUsersTempltate.arg(QString::number(users.size()));
+            return tr("%n users", "", users.size());
         }
         else if (actionType == QnBusiness::ExecHttpRequestAction) {
             return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
@@ -599,7 +596,7 @@ QVariant QnEventLogModel::data(const QModelIndex& index, int role) const
                     const auto diffCount = (kMaxShownUsersCount - userNames.size());
 
                     userNames = userNames.mid(0, kMaxShownUsersCount);
-                    userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
+                    userNames.append(tr("and %n users more...", "", diffCount));
                 }
 
                 return userNames.join(kDelimiter);
