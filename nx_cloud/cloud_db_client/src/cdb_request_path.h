@@ -33,8 +33,8 @@ extern const char* kSubscribeToSystemEventsPath;
 
 extern const char* kPingPath;
 
-extern const char* kEstablishEc2TransactionConnectionDeprecatedPath;
-extern const char* kPushEc2TransactionDeprecatedPath;
+extern const char* kDeprecatedEstablishEc2TransactionConnectionPath;
+extern const char* kDeprecatedPushEc2TransactionPath;
 
 extern const char* kEstablishEc2TransactionConnectionPath;
 extern const char* kPushEc2TransactionPath;
