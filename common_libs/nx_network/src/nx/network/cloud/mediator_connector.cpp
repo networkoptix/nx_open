@@ -178,9 +178,6 @@ void MediatorConnector::fetchEndpoint()
                 false /* SSL disabled */,
                 [this](SystemError::ErrorCode code)
                 {
-                    if (!isReady(*m_future))
-                        m_promise->set_value(code == SystemError::noError);
-
                     auto setEndpoint = 
                         [this]()
                         {
@@ -192,6 +189,9 @@ void MediatorConnector::fetchEndpoint()
 
                     if (code == SystemError::noError)
                         setEndpoint();
+
+                    if (!isReady(*m_future))
+                        m_promise->set_value(code == SystemError::noError);
 
                     m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
                 });
