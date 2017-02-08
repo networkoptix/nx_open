@@ -1,22 +1,14 @@
-/**********************************************************
-* Dec 21, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef LOCAL_CLOUD_DATA_PROVIDER_H
-#define LOCAL_CLOUD_DATA_PROVIDER_H
+#pragma once
 
 #include <map>
 #include <mutex>
 
 #include "../cloud_data_provider.h"
 
-
 namespace nx {
 namespace hpm {
 
-class LocalCloudDataProvider
-:
+class LocalCloudDataProvider:
     public AbstractCloudDataProvider
 {
 public:
@@ -32,28 +24,18 @@ private:
     std::map<String, AbstractCloudDataProvider::System> m_systems;
 };
 
-class CloudDataProviderStub
-:
+class CloudDataProviderStub:
     public AbstractCloudDataProvider
 {
 public:
-    CloudDataProviderStub(AbstractCloudDataProvider* target)
-    :
-        m_target(target)
-    {
-    }
+    CloudDataProviderStub(AbstractCloudDataProvider* target);
 
     virtual boost::optional< AbstractCloudDataProvider::System >
-        getSystem(const String& systemId) const
-    {
-        return m_target->getSystem(systemId);
-    }
+        getSystem(const String& systemId) const;
 
 private:
     AbstractCloudDataProvider* m_target;
 };
 
-}   //hpm
-}   //nx
-
-#endif  //LOCAL_CLOUD_DATA_PROVIDER_H
+} // namespace hpm
+} // namespace nx

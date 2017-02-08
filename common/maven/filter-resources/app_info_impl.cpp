@@ -73,7 +73,10 @@ QString QnAppInfo::boostVersion()
 
 bool QnAppInfo::beta()
 {
-    return ${beta};
+    static const auto betaString = QStringLiteral("${beta}").toLower();
+    static const bool beta =
+        (betaString == lit("on") || betaString == lit("true"));
+    return beta;
 }
 
 QString QnAppInfo::productName()

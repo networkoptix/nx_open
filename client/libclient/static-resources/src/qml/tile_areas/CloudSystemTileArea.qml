@@ -40,11 +40,11 @@ Column
         source:
         {
            if (!context.isCloudEnabled)
-               return "qrc:/skin/welcome_page/cloud_unavailable.png";
+               return "qrc:/skin/cloud/cloud_20_offline_disabled.png";
 
            return (control.isConnectable
-            ? "qrc:/skin/welcome_page/cloud_online.png"
-            : "qrc:/skin/welcome_page/cloud_offline.png");
+            ? "qrc:/skin/cloud/cloud_20_accented.png"
+            : "qrc:/skin/cloud/cloud_20_disabled.png");
         }
     }
 }

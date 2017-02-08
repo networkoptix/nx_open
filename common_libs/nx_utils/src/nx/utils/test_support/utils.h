@@ -33,3 +33,15 @@
 { \
     NX_GTEST_ASSERT_EQ(false, expected); \
 } while (0)
+
+#define NX_GTEST_ASSERT_NO_THROW(expression) do \
+{ \
+    try \
+    { \
+        expression; \
+    } \
+    catch (std::exception& e) \
+    { \
+        ASSERT_TRUE(false) << e.what(); \
+    } \
+} while (0)

@@ -81,6 +81,13 @@ int QnConfigureRestHandler::execute(
         return CODE_OK;
     }
 
+    // Configure request must support systemName changes to maintain compatibility with NxTool
+    if (!data.systemName.isEmpty())
+    {
+        qnGlobalSettings->setSystemName(data.systemName);
+        qnGlobalSettings->synchronizeNowSync();
+    }
+
     /* set system id and move tran log time */
     const auto oldSystemId = qnGlobalSettings->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != qnGlobalSettings->localSystemId())

@@ -1,0 +1,8 @@
+add_subdirectory(cloud_db_client)
+add_subdirectory(libvms_gateway)
+add_subdirectory(libconnection_mediator)
+add_subdirectory(libcloud_db)
+
+add_subdirectory(vms_gateway)
+add_subdirectory(connection_mediator)
+add_subdirectory(cloud_db)

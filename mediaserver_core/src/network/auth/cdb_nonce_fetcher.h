@@ -85,7 +85,5 @@ private:
     void removeExpiredNonce(const QnMutexLockerBase&, qint64 curClock);
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
-
-private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };

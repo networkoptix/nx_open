@@ -282,12 +282,13 @@ void socketSimpleSyncFlags(
                 ASSERT_TRUE(accepted.get());
                 EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
             });
+        auto acceptThreadGuard = makeScopedGuard([&acceptThread]() { acceptThread.join(); });
 
         auto client = clientMaker();
         ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
             << lastError();
-        acceptThread.join();
+        acceptThreadGuard.fire();
 
         // MSG_DONTWAIT does not block on server and client:
         ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
@@ -311,18 +312,23 @@ void socketSimpleSyncFlags(
         // Send 1st part of message and start ot recv:
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread serverRecvThread([&](){ recvWaitAll(accepted.get()); });
+        auto serverRecvThreadGuard =
+            makeScopedGuard([&serverRecvThread]() { serverRecvThread.join(); });
 
         // Send 2nd part of message with delay:
         std::this_thread::sleep_for(std::chrono::microseconds(500));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        serverRecvThread.join();
+        serverRecvThreadGuard.fire();
 
         // MSG_WAITALL works an client as well:
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread clientRecvThread([&](){ recvWaitAll(accepted.get()); });
+        auto clientRecvThreadGuard =
+            makeScopedGuard([&clientRecvThread]() { clientRecvThread.join(); });
+
         std::this_thread::sleep_for(std::chrono::microseconds(500));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        clientRecvThread.join();
+        clientRecvThreadGuard.fire();
 #endif
     };
 }
@@ -1265,6 +1271,23 @@ void socketAcceptCancelAsync(
     }
 }
 
+template<typename ServerSocketMaker>
+void serverSocketPleaseStopCancelsPostedCall(
+    const ServerSocketMaker& serverMaker)
+{
+    auto serverSocket = serverMaker();
+    nx::utils::promise<void> socketStopped;
+    serverSocket->post(
+        [&serverSocket, &socketStopped]()
+        {
+            serverSocket->post([]() { ASSERT_TRUE(false); });
+            serverSocket->pleaseStopSync();
+            socketStopped.set_value();
+        });
+    socketStopped.get_future().wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx
@@ -1314,6 +1337,8 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopAsync) \
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::pleaseStop); } \
+    Type(Name, PleaseStopCancelsPostedCall) \
+        { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 
 #define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleSync) \

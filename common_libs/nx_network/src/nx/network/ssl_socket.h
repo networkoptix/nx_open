@@ -150,8 +150,7 @@ private:
     Q_DECLARE_PRIVATE(MixedSslSocket);
 };
 
-class NX_NETWORK_API SslServerSocket
-:
+class NX_NETWORK_API SslServerSocket:
     public SslSocketServerImplementationDelegate
 {
     typedef SslSocketServerImplementationDelegate base_type;
@@ -164,6 +163,7 @@ public:
     virtual bool listen(int queueLen) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(

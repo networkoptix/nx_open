@@ -15,30 +15,25 @@
 namespace
 {
     typedef QHash<int, QByteArray> RoleNames;
-    const auto kRoleNames = []() -> RoleNames
-    {
-        RoleNames result;
-        result.insert(QnSystemsModel::SystemNameRoleId, "systemName");
-        result.insert(QnSystemsModel::SystemIdRoleId, "systemId");
-        result.insert(QnSystemsModel::LocalIdRoleId, "localId");
-        result.insert(QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription");
+    const QHash<int, QByteArray> kRoleNames{
+        {QnSystemsModel::SystemNameRoleId, "systemName"},
+        {QnSystemsModel::SystemIdRoleId, "systemId"},
+        {QnSystemsModel::LocalIdRoleId, "localId"},
+        {QnSystemsModel::OwnerDescriptionRoleId, "ownerDescription"},
 
-        result.insert(QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem");
-        result.insert(QnSystemsModel::SafeModeRoleId, "safeMode");
+        {QnSystemsModel::IsFactorySystemRoleId, "isFactorySystem"},
+        {QnSystemsModel::SafeModeRoleId, "safeMode"},
 
-        result.insert(QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem");
-        result.insert(QnSystemsModel::IsRunningRoleId, "isRunning");
-        result.insert(QnSystemsModel::IsReachableRoleId, "isReachable");
-        result.insert(QnSystemsModel::IsConnectableRoleId, "isConnectable");
-        result.insert(QnSystemsModel::IsCompatibleRoleId, "isCompatible");
-        result.insert(QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion");
-        result.insert(QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal");
+        {QnSystemsModel::IsCloudSystemRoleId, "isCloudSystem"},
+        {QnSystemsModel::IsRunningRoleId, "isRunning"},
+        {QnSystemsModel::IsReachableRoleId, "isReachable"},
+        {QnSystemsModel::IsConnectableRoleId, "isConnectable"},
+        {QnSystemsModel::IsCompatibleRoleId, "isCompatible"},
+        {QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion"},
+        {QnSystemsModel::IsCompatibleInternalRoleId, "isCompatibleInternal"},
 
-        result.insert(QnSystemsModel::WrongVersionRoleId, "wrongVersion");
-        result.insert(QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion");
-
-        return result;
-    }();
+        {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
+        {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"}};
 }
 
 class QnSystemsModelPrivate: public Connective<QObject>
@@ -79,8 +74,8 @@ public:
 
     void resetModel();
 
-    QString getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
-    QString getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    QnSoftwareVersion getIncompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
+    QnSoftwareVersion getCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleInternal(const QnSystemDescriptionPtr& systemDescription) const;
@@ -212,9 +207,15 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
         case IsCompatibleVersionRoleId:
             return d->isCompatibleVersion(system);
         case WrongVersionRoleId:
-            return d->getIncompatibleVersion(system);
+        {
+            const auto version = d->getIncompatibleVersion(system);
+            return !version.isNull() ? QVariant::fromValue(version) : QVariant();
+        }
         case CompatibleVersionRoleId:
-            return d->getCompatibleVersion(system);
+        {
+            const auto version = d->getCompatibleVersion(system);
+            return !version.isNull() ? QVariant::fromValue(version) : QVariant();
+        }
 
         default:
             return QVariant();
@@ -248,12 +249,9 @@ RoleNames QnSystemsModel::roleNames() const
     return kRoleNames;
 }
 
-QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent)
-    : base_type(parent)
-    , q_ptr(parent)
-    , disconnectHelper()
-    , internalData()
-    , minimalVersion(1, 0)
+QnSystemsModelPrivate::QnSystemsModelPrivate(QnSystemsModel* parent):
+    base_type(parent),
+    q_ptr(parent)
 {
 }
 
@@ -459,7 +457,7 @@ void QnSystemsModelPrivate::resetModel()
     q->endResetModel();
 }
 
-QString QnSystemsModelPrivate::getCompatibleVersion(
+QnSoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
     const QnSystemDescriptionPtr& systemDescription) const
 {
     for (const auto& serverInfo: systemDescription->servers())
@@ -469,42 +467,48 @@ QString QnSystemsModelPrivate::getCompatibleVersion(
         {
             case Qn::IncompatibleProtocolConnectionResult:
             case Qn::IncompatibleCloudHostConnectionResult:
-                return serverInfo.version.toString(QnSoftwareVersion::BugfixFormat);
+                return serverInfo.version;
             default:
                 break;
         }
     }
 
-    return QString();
+    return QnSoftwareVersion();
 }
 
-QString QnSystemsModelPrivate::getIncompatibleVersion(
-        const QnSystemDescriptionPtr& systemDescription) const
+QnSoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
+    const QnSystemDescriptionPtr& systemDescription) const
 {
     const auto servers = systemDescription->servers();
 
     if (servers.isEmpty())
-        return QString();
+        return QnSoftwareVersion();
 
     const auto predicate =
         [this, systemDescription](const QnModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return false;
-            auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
+
+            if (!minimalVersion.isNull() && serverInfo.version < minimalVersion)
+                return true;
+
+            const auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult == Qn::IncompatibleVersionConnectionResult;
         };
 
-    const auto incompatibleIt =
-        std::find_if(servers.begin(), servers.end(), predicate);
-    return (incompatibleIt == servers.end() ? QString() :
-        incompatibleIt->version.toString(QnSoftwareVersion::BugfixFormat));
+    const auto incompatibleIt = std::find_if(servers.begin(), servers.end(), predicate);
+
+    if (incompatibleIt == servers.end())
+        return QnSoftwareVersion();
+
+    return incompatibleIt->version;
 }
 
 bool QnSystemsModelPrivate::isCompatibleVersion(
         const QnSystemDescriptionPtr& systemDescription) const
 {
-    return getIncompatibleVersion(systemDescription).isEmpty();
+    return getIncompatibleVersion(systemDescription).isNull();
 }
 
 bool QnSystemsModelPrivate::isCompatibleSystem(
@@ -512,10 +516,13 @@ bool QnSystemsModelPrivate::isCompatibleSystem(
 {
     const auto servers = systemDescription->servers();
     return std::all_of(servers.cbegin(), servers.cend(),
-        [systemDescription](const QnModuleInformation& serverInfo)
+        [this, systemDescription](const QnModuleInformation& serverInfo)
         {
             if (!systemDescription->isReachableServer(serverInfo.id))
                 return true;
+
+            if (!minimalVersion.isNull() && serverInfo.version < minimalVersion)
+                return false;
 
             auto connectionResult = QnConnectionValidator::validateConnection(serverInfo);
             return connectionResult == Qn::SuccessConnectionResult;

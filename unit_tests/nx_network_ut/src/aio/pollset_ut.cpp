@@ -52,6 +52,8 @@ TEST(PollSet, all_tests)
     PollSet::runTests<PollSet>();
 }
 
+INSTANTIATE_TYPED_TEST_CASE_P(PollSet, PollSetPerformance, aio::PollSet);
+
 } // namespace test
 } // namespace aio
 } // namespace network

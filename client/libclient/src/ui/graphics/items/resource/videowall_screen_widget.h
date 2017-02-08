@@ -1,5 +1,4 @@
-#ifndef VIDEOWALL_RESOURCE_SCREEN_WIDGET_H
-#define VIDEOWALL_RESOURCE_SCREEN_WIDGET_H
+#pragma once
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_pc_data.h>
@@ -13,24 +12,24 @@ class QGraphicsAnchorLayout;
 class QGraphicsWidget;
 
 /** Class for displaying single screen of the videowall resource on the scene. */
-class QnVideowallScreenWidget : public QnResourceWidget
+class QnVideowallScreenWidget: public QnResourceWidget
 {
     Q_OBJECT
-    typedef QnResourceWidget base_type;
-
+    using base_type = QnResourceWidget;
 public:
-    QnVideowallScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
+    QnVideowallScreenWidget(QnWorkbenchContext* context, QnWorkbenchItem* item,
+        QGraphicsItem* parent = nullptr);
 
     virtual ~QnVideowallScreenWidget();
 
     /**
      * \returns                         Videowall associated with this widget.
      */
-    const QnVideoWallResourcePtr &videowall() const;
+    QnVideoWallResourcePtr videowall() const;
 
-    typedef QHash<QnUuid, quint64> ReviewButtons;
 protected:
-    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
+    virtual Qn::RenderStatus paintChannelBackground(QPainter* painter, int channel,
+        const QRectF& channelRect, const QRectF& paintRect) override;
 
     virtual int calculateButtonsVisibility() const override;
     virtual QString calculateTitleText() const override;
@@ -38,14 +37,13 @@ protected:
 
     virtual void at_itemDataChanged(int role) override;
 
-    virtual int helpTopicAt(const QPointF &pos) const override;
+    virtual int helpTopicAt(const QPointF& pos) const override;
 
 private:
     void updateItems();
     void updateLayout(bool force = false);
-private slots:
-    void at_thumbnailReady(const QnUuid &resourceId, const QPixmap &thumbnail);
 
+    void at_thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
     void at_videoWall_itemChanged(const QnVideoWallResourcePtr& videoWall,
         const QnVideoWallItem& item,
         const QnVideoWallItem& oldItem);
@@ -55,13 +53,11 @@ private:
     QnVideoWallResourcePtr m_videowall;
     QList<QnVideoWallItem> m_items;
 
-    QGraphicsWidget* m_mainOverlayWidget;
-    QGraphicsAnchorLayout *m_mainLayout;
+    QGraphicsWidget* m_mainOverlayWidget = nullptr;
+    QGraphicsAnchorLayout* m_layout = nullptr;
 
-    bool m_layoutUpdateRequired;
+    bool m_layoutUpdateRequired = true;
 
-    QnCameraThumbnailManager *m_thumbnailManager;
+    QnCameraThumbnailManager* m_thumbnailManager = nullptr;
     QHash<QnUuid, QPixmap> m_thumbs;
 };
-
-#endif // VIDEOWALL_RESOURCE_SCREEN_WIDGET_H

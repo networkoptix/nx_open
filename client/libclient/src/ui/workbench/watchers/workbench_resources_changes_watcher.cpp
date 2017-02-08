@@ -42,7 +42,7 @@ void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList&
     QnMessageBox dialog(icon, text, extras,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindow());
-    dialog.addCustomWidget(new QnResourceListView(resources));
+    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
     dialog.exec();
 }
 
@@ -66,6 +66,6 @@ void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceL
     QnMessageBox dialog(icon, text, extras,
         QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindow());
-    dialog.addCustomWidget(new QnResourceListView(resources));
+    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
     dialog.exec();
 }

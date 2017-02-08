@@ -48,7 +48,6 @@ public:
 protected:
     void disconnectFromClient();
 
-    std::atomic<bool> m_isEnabled;
     utils::AsyncOperationGuard m_asyncGuard;
     std::shared_ptr<AbstractAsyncClient> m_client;
 };

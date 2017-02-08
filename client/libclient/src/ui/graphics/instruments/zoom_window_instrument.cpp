@@ -30,8 +30,11 @@
 
 namespace {
 
-    const qreal kZoomWindowMinSize = 0.1;
-    const qreal kZoomWindowMaxSize = 0.9;
+    constexpr qreal kZoomWindowMinSize = 0.1;
+    constexpr qreal kZoomWindowMaxSize = 0.9;
+    constexpr qreal kZoomWindowMinAspectRatio = kZoomWindowMinSize / kZoomWindowMaxSize;
+    constexpr qreal kZoomWindowMaxAspectRatio = kZoomWindowMaxSize / kZoomWindowMinSize;
+
     const int kZoomLineWidth = 2;
 
     const auto isZoomAllowed = [](QGraphicsItem* item)
@@ -768,19 +771,33 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {
-    if(target()) {
+    if(target())
+    {
         ensureSelectionItem();
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
         QRectF zoomRect = cwiseDiv(selectionItem()->rect(), target()->size());
-        if(zoomRect.width() <= kZoomWindowMinSize || zoomRect.height() <= kZoomWindowMinSize) {
-            zoomRect = movedInto(
-                expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMinSize, kZoomWindowMinSize), zoomRect.center(), Qt::KeepAspectRatioByExpanding),
-                QRectF(0.0, 0.0, 1.0, 1.0)
-            );
+        if (qFuzzyIsNull(zoomRect.width()))
+            zoomRect.setWidth(kZoomWindowMinSize);
+        if (qFuzzyIsNull(zoomRect.height()))
+            zoomRect.setHeight(kZoomWindowMinSize);
+
+        qreal ar = aspectRatio(zoomRect);
+        ar = qBound(kZoomWindowMinAspectRatio, ar, kZoomWindowMaxAspectRatio);
+
+        if (zoomRect.width() < kZoomWindowMinSize || zoomRect.height() < kZoomWindowMinSize)
+        {
+            const QSizeF minSize(kZoomWindowMinSize, kZoomWindowMinSize);
+            zoomRect = expanded(ar, minSize, zoomRect.center(), Qt::KeepAspectRatioByExpanding);
         }
-        if(zoomRect.width() >= kZoomWindowMaxSize || zoomRect.height() >= kZoomWindowMaxSize)
-            zoomRect = expanded(aspectRatio(zoomRect), QSizeF(kZoomWindowMaxSize, kZoomWindowMaxSize), zoomRect.center(), Qt::KeepAspectRatio);
+        else if (zoomRect.width() > kZoomWindowMaxSize || zoomRect.height() > kZoomWindowMaxSize)
+        {
+            const QSizeF maxSize(kZoomWindowMaxSize, kZoomWindowMaxSize);
+            zoomRect = expanded(ar, maxSize, zoomRect.center(), Qt::KeepAspectRatio);
+        }
+
+        // Coordinates are relative to source rect
+        zoomRect = movedInto(zoomRect, QRectF(0.0, 0.0, 1.0, 1.0));
 
         emit zoomRectCreated(target(), m_zoomWindowColor, zoomRect);
     }

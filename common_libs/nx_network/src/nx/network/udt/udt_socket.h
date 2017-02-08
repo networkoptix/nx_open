@@ -8,6 +8,7 @@
 #include "../aio/event_type.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
+#include "../aio/event_type.h"
 
 namespace nx {
 namespace network {
@@ -187,6 +188,8 @@ public:
 
 private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
+
+    void stopWhileInAioThread();
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };

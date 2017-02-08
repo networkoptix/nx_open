@@ -618,7 +618,7 @@ void QnLoginDialog::at_saveButton_clicked()
     {
         QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
-            tr("There is an another connection with the same name."),
+            tr("There is another connection with the same name."),
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
         dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,

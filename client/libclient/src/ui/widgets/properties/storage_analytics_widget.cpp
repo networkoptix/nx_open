@@ -224,6 +224,9 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
         this, [this]() { currentTable()->selectAll(); });
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
+
+    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
+        , qRound(ui->extraSizeSpinBox->maximum())));
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
@@ -245,6 +248,7 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
     table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
     table->setHorizontalHeader(header);
