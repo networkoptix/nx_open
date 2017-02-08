@@ -11,9 +11,10 @@
     <version>3.0.0-SNAPSHOT</version>
     <artifactId>teststorageplugin_test</artifactId>
     <packaging>pom</packaging>
-    <name>Test storage plugin test</name>	
+    <name>Nx Test storage plugin test</name>	
 
     <properties>
+        <template>app</template>
         <guid>${teststorageplugin_test.guid}</guid>
         <product.title>${teststorageplugin_test.name}</product.title>	
 
