@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -382,7 +382,6 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>...and %n more</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -2189,7 +2188,6 @@ to view more bookmarks</source>
         <source>%1 doesn&apos;t support two-way audio</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2433,7 +2431,6 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -3190,7 +3187,7 @@ devices</source>
     <message>
         <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
         <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</translation>
     </message>
 </context>
 <context>
@@ -3304,20 +3301,17 @@ devices</source>
         <source>%n users</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -4004,16 +3998,16 @@ devices</source>
     </message>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>At least %n %1 is required</numerusform>
+            <numerusform>At least %n %1s are required</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %1 is currently in use</numerusform>
+            <numerusform>%n %1s are currently in use</numerusform>
         </translation>
     </message>
 </context>
@@ -5269,7 +5263,6 @@ devices</source>
         <source>%n additional</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -5924,7 +5917,6 @@ devices</source>
         <source>%n TB</source>
         <comment>TB - terabytes</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -6804,7 +6796,6 @@ devices</source>
         <source>PC %1 - Displays %2</source>
         <comment>%2 will be substituted by _list_ of displays</comment>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
