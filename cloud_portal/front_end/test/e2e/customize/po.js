@@ -10,6 +10,13 @@ var Customization = function () {
 
     var AlertSuite = require('../alerts_check.js');
     this.alert = new AlertSuite();
+
+    var brandObj = require('../../../test-customization.json');
+    this.brandText = brandObj.text;
+
+    this.languageDropdown = element(by.id('language-dropdown'));
+    this.russianOption = element(by.css('li[language-select]')).element(by.cssContainingText('a', 'Russia'));
+
 };
 
 module.exports = Customization;

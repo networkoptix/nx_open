@@ -300,11 +300,33 @@ var Helper = function () {
         return ('/' + where + '/' + regCode); // url
     };
 
+    this.getUrlFromEmailAndCheckPortal = function(email, portalText, userEmail, subject, where) {
+        expect(email.subject).toContain(subject);
+        expect(email.subject).toContain(portalText);
+        expect(email.headers.to).toEqual(userEmail);
+
+        // extract registration token from the link in the email message
+        var pattern = new RegExp(where + '/([\\w=]+)', 'g');
+        var regCode = pattern.exec(email.html)[1];
+        console.log(regCode);
+        return ('/' + where + '/' + regCode); // url
+    };
+
     this.getEmailedLink = function(userEmail, subject, where) {
         var deferred = protractor.promise.defer();
 
         browser.controlFlow().wait(this.getEmailTo(userEmail, subject).then(function (email) {
             deferred.fulfill(h.getUrlFromEmail(email, userEmail, subject, where));
+        }));
+
+        return deferred.promise;
+    };
+
+    this.getEmailedLinkCustom = function(userEmail, portalText, subject, where) {
+        var deferred = protractor.promise.defer();
+
+        browser.controlFlow().wait(this.getEmailTo(userEmail, subject).then(function (email) {
+            deferred.fulfill(h.getUrlFromEmailAndCheckPortal(email, portalText, userEmail, subject, where));
         }));
 
         return deferred.promise;
@@ -316,6 +338,24 @@ var Helper = function () {
 
         h.register(firstName, lastName, userEmail, password).then(function () {
             h.getEmailedLink(userEmail, h.emailSubjects.register, 'activate').then( function(url) {
+                h.get(url);
+                expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
+                deferred.fulfill(userEmail);
+            });
+        }, function(errorMessage) { // on reject
+            console.log(errorMessage);
+            deferred.fulfill(userEmail);
+        });
+
+        return deferred.promise;
+    };
+
+    this.createUserCustom = function(portalText, firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+        var userEmail = email || h.getRandomEmail();
+
+        h.register(firstName, lastName, userEmail, password).then(function () {
+            h.getEmailedLinkCustom(userEmail, portalText, h.emailSubjects.register, 'activate').then( function(url) {
                 h.get(url);
                 expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
                 deferred.fulfill(userEmail);
