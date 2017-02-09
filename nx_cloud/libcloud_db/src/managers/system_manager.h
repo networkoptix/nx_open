@@ -294,6 +294,14 @@ private:
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand,
         data::AccountData* const inviteeAccount);
+    nx::db::DBResult addNewSharing(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountData& inviteeAccount,
+        const data::SystemSharing& sharing);
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
 
     nx::db::DBResult insertOrReplaceSharing(
         nx::db::QueryContext* const queryContext,
@@ -456,11 +464,6 @@ private:
     void onEc2RemoveResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
-
-    nx::db::DBResult deleteSharing(
-        nx::db::QueryContext* const queryContext,
-        const std::string& systemId,
-        const data::AccountData& inviteeAccount);
 };
 
 } // namespace cdb
