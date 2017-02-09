@@ -8,12 +8,12 @@
 /**
  * Analogue of gtest's ASSERT_EQ but supports placing in non-void methods (throws on failure).
  */
-#define NX_GTEST_ASSERT_EQ(expected, actual) do \
+#define NX_GTEST_ASSERT_TWO_ARG(GTEST_MACRO, expected, actual) do \
 { \
     bool resultE31cf27915b242999a4e22c7757d94de = false; \
     [&]() -> void \
     { \
-        ASSERT_EQ(expected, actual); \
+        GTEST_MACRO(expected, actual); \
         resultE31cf27915b242999a4e22c7757d94de = true; \
     }(); \
     if (!resultE31cf27915b242999a4e22c7757d94de) \
@@ -22,6 +22,16 @@
             "This is work around ASSERT_* inability to be used " \
             "in non-void method. Just ignore..."); \
     } \
+} while (0)
+
+#define NX_GTEST_ASSERT_EQ(expected, actual) do \
+{ \
+    NX_GTEST_ASSERT_TWO_ARG(ASSERT_EQ, expected, actual); \
+} while (0)
+
+#define NX_GTEST_ASSERT_NE(expected, actual) do \
+{ \
+    NX_GTEST_ASSERT_TWO_ARG(ASSERT_NE, expected, actual); \
 } while (0)
 
 #define NX_GTEST_ASSERT_TRUE(expected) do \

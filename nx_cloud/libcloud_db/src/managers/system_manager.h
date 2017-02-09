@@ -307,9 +307,10 @@ private:
         const std::string& inviteeEmail,
         Notification* const notification);
 
-    nx::db::DBResult scheduleSystemHasBeenSharedNotification(
+    nx::db::DBResult notifyUserAboutNewSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
+        const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
 
     /**

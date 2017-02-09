@@ -977,8 +977,8 @@ nx::db::DBResult SystemManager::shareSystem(
 
     if (notificationCommand == NotificationCommand::sendNotification)
     {
-        dbResult = scheduleSystemHasBeenSharedNotification(
-            queryContext, grantorEmail, sharing);
+        dbResult = notifyUserAboutNewSystem(
+            queryContext, grantorEmail, *inviteeAccount, sharing);
         if (dbResult != db::DBResult::ok)
             return dbResult;
     }
@@ -1041,19 +1041,41 @@ nx::db::DBResult SystemManager::fillSystemSharedNotification(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
+nx::db::DBResult SystemManager::notifyUserAboutNewSystem(
     nx::db::QueryContext* const queryContext,
     const std::string& grantorEmail,
+    const data::AccountData& inviteeAccount,
     const api::SystemSharing& sharing)
 {
-    auto notification = std::make_unique<SystemSharedNotification>();
+    std::unique_ptr<AbstractNotification> notification;
 
-    auto dbResult = fillSystemSharedNotification(
-        queryContext,
-        grantorEmail, sharing.systemId, sharing.accountEmail,
-        notification.get());
-    if (dbResult != db::DBResult::ok)
-        return dbResult;
+    switch (inviteeAccount.statusCode)
+    {
+        case api::AccountStatus::invited:
+        {
+            auto inviteNotification = std::make_unique<InviteUserNotification>();
+            auto dbResult = prepareInviteNotification(
+                queryContext, grantorEmail, inviteeAccount,
+                sharing.systemId, inviteNotification.get());
+            if (dbResult != nx::db::DBResult::ok)
+                return dbResult;
+            notification = std::move(inviteNotification);
+            break;
+        }
+
+        default:
+        {
+            auto sharingNotification = std::make_unique<SystemSharedNotification>();
+            auto dbResult = fillSystemSharedNotification(
+                queryContext,
+                grantorEmail, sharing.systemId, sharing.accountEmail,
+                sharingNotification.get());
+            if (dbResult != db::DBResult::ok)
+                return dbResult;
+            notification = std::move(sharingNotification);
+            break;
+        }
+    }
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this,
