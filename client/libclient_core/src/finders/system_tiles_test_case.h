@@ -59,7 +59,10 @@ private:
 
     void switchPageTest(CompletionHandler completionHandler);
 
-    void showMessageDelayed(const QString& message);
+    void showAutohideMessage(
+        const QString& message,
+        qint64 hideDelay);
 private:
     QnTestSystemsFinder* const m_finder;
+    QnTileTest m_currentTileTest = QnTileTest::Count;
 };

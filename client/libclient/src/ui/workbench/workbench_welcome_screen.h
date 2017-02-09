@@ -172,8 +172,6 @@ private:
 
     void handleStartupTileAction(const QString& systemId, bool initial);
 
-    void setupTestTileCase();
-
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;
 
