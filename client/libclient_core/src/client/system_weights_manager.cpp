@@ -216,3 +216,29 @@ void QnSystemsWeightsManager::setUnknownSystemsWeight(qreal value)
     emit unknownSystemsWeightChanged();
 }
 
+void QnSystemsWeightsManager::setWeight(
+    const QnUuid& localSystemId,
+    qreal weight)
+{
+    auto localWeights = qnClientCoreSettings->localSystemWeightsData();
+    const auto it = std::find_if(localWeights.begin(), localWeights.end(),
+        [localSystemId](const nx::client::core::WeightData& data)
+        {
+            return (data.localId == localSystemId);
+        });
+
+    const auto lastConnected = QDateTime::currentMSecsSinceEpoch();
+    if (it == localWeights.end())
+    {
+        localWeights.append(nx::client::core::WeightData({
+            localSystemId, weight, lastConnected, true}));
+    }
+    else
+    {
+        it->lastConnectedUtcMs = lastConnected;
+        it->weight = weight;
+    }
+
+    qnClientCoreSettings->setLocalSystemWeightsData(localWeights);
+}
+

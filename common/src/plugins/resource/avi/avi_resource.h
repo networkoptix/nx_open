@@ -10,8 +10,7 @@ class QnAviArchiveDelegate;
 
 class QnAviResource : public QnAbstractArchiveResource
 {
-    Q_OBJECT;
-
+    Q_OBJECT
 public:
     QnAviResource(const QString& file);
     ~QnAviResource();
@@ -35,10 +34,18 @@ public:
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
+
+    /**
+     * @brief imageAspecRatio Returns aspect ratio for image
+     * @return Aspect ratio if resource is image, otherwise -1
+     */
+    qreal imageAspectRatio() const;
+
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
+    qreal m_imageAspectRatio = -1.0;
 };
 
 #endif // QN_AVI_RESOURCE_H

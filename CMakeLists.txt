@@ -20,7 +20,6 @@ set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTORCC ON)
 
 if(NOT WIN32)
     set(BUILD_SHARED_LIBS ON)
@@ -39,6 +38,7 @@ include(precompiled_header)
 include(python_exec)
 include(rdep)
 include(mercurial)
+include(project_utils)
 
 detect_platform()
 rdep_configure()
@@ -52,6 +52,8 @@ set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 include(customization/default-values.cmake)
 include(${customization_dir}/customization.cmake)
 include(properties)
+include(cloud_host)
+include(vms_parts)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -69,6 +71,7 @@ rdep_add_package(any/qtsingleapplication)
 
 find_package(Qt5
     COMPONENTS
+        LinguistTools
         Core
         Gui
         Network
@@ -95,9 +98,19 @@ add_subdirectory(common_libs)
 add_subdirectory(common)
 add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
-add_subdirectory(mediaserver_core)
-add_subdirectory(mediaserver)
-add_subdirectory(plugins)
-add_subdirectory(client)
+
+if(withMediaServer)
+    add_subdirectory(mediaserver_core)
+    add_subdirectory(mediaserver)
+    add_subdirectory(plugins)
+endif()
+
+if(withDesktopClient OR withMobileClient)
+    add_subdirectory(client)
+endif()
+
+if(withTests)
+    add_subdirectory(unit_tests)
+endif()
 
 cmake_policy(SET CMP0058 NEW)

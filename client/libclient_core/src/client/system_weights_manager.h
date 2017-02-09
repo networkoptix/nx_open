@@ -30,6 +30,10 @@ public:
 
     qreal unknownSystemsWeight() const;
 
+    void setWeight(
+        const QnUuid& localSystemId,
+        qreal weight);
+
 signals:
     void weightsChanged();
 

@@ -269,7 +269,7 @@ void QnLicenseManagerWidget::updateLicenses()
                 {
                     if (helper->usedLicenses(lt) > 0)
                     {
-                        messages << setWarningStyleHtml(tr("At least %n %2 are required", "",
+                        messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
                             helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
                     }
                 }
@@ -280,7 +280,7 @@ void QnLicenseManagerWidget::updateLicenses()
                 {
                     if (helper->usedLicenses(lt) > 0)
                     {
-                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt))
+                        messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
                             .arg(QnLicense::longDisplayName(lt));
                     }
                 }

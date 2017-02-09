@@ -12,7 +12,7 @@
 #include <boost/mpl/if.hpp>
 #endif // Q_MOC_RUN
 
-#include <utils/preprocessor/variadic_seq_for_each.h>
+#include <nx/fusion/preprocessor/variadic_seq_for_each.h>
 #include <nx/utils/type_traits.h>
 
 #include "fusion_fwd.h"

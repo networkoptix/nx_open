@@ -250,6 +250,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
     q->setFixedWidth(kDialogWidth);
+    q->setStandardButtons(QDialogButtonBox::Cancel);
 
     okButton = new QnBusyIndicatorButton(q);
     okButton->setText(tr("Disconnect"));
