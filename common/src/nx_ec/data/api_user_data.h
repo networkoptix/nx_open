@@ -9,6 +9,8 @@ namespace ec2 {
 
 struct ApiUserData: ApiResourceData
 {
+    static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
+
     ApiUserData():
         isAdmin(false),
         permissions(Qn::NoGlobalPermissions),

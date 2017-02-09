@@ -13,7 +13,7 @@ namespace {
  * Assert that the list contains the storage with the specified name, retrieve this storage and
  * check its id and parentId if specified.
  */
-#define NX_TEST_FIND_STORAGE_BY_NAME(...) ASSERT_NO_FATAL_FAILURE(findStorageByName(__VA_ARGS__))
+#define NX_FIND_STORAGE_BY_NAME(...) ASSERT_NO_FATAL_FAILURE(findStorageByName(__VA_ARGS__))
 static void findStorageByName(
     const ec2::ApiStorageDataList& storages,
     ec2::ApiStorageData* outStorage,
@@ -47,7 +47,6 @@ TEST(GetStorages, saveAndMerge)
 
     ec2::ApiStorageDataList storages;
     ec2::ApiStorageData storage;
-    ec2::ApiStorageDataList::const_iterator foundStorage;
 
     NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";
@@ -59,7 +58,7 @@ TEST(GetStorages, saveAndMerge)
 
     NX_LOG("[TEST] Retrieve the created storage.", cl_logINFO);
     NX_TEST_API_GET(launcher, lit("/ec2/getStorages"), &storages);
-    NX_TEST_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Rename the storage via Merge.", cl_logINFO);
@@ -69,13 +68,13 @@ TEST(GetStorages, saveAndMerge)
 
     NX_LOG("[TEST] Check that the storage is renamed.", cl_logINFO);
     NX_TEST_API_GET(launcher, lit("/ec2/getStorages"), &storages);
-    NX_TEST_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Check the storage can be found by its parent server id.", cl_logINFO);
     NX_TEST_API_GET(launcher,
         lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages);
-    NX_TEST_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Check that no storages are found by another (non-existing) parent server id.", cl_logINFO);
