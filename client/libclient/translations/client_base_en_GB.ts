@@ -7504,7 +7504,7 @@ devices</source>
     </message>
     <message>
         <source>Screen controlled by another user</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Screen is being controlled by another user</translation>
     </message>
     <message>
         <source>Control session can&apos;t be started.</source>
@@ -7664,7 +7664,7 @@ devices</source>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
+        <translation>You are going to delete some resources that can be accessed from Video Wall only. You won&apos;t see them in your resource list afterwards and won&apos;t be able to add them to Video Wall again.</translation>
     </message>
     <message>
         <source>You will lose access to following resources:</source>
