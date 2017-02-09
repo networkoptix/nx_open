@@ -51,15 +51,36 @@ protected:
 
         nx::utils::promise<QUrl> urlFoundPromise;
         fetcher->get(
-            [&urlFoundPromise](nx_http::StatusCode::Value /*statusCode*/, QUrl url)
+            [&urlFoundPromise](nx_http::StatusCode::Value statusCode, QUrl url)
             {
-                urlFoundPromise.set_value(url);
+                if (statusCode != nx_http::StatusCode::ok)
+                {
+                    urlFoundPromise.set_exception(
+                        std::make_exception_ptr(std::logic_error(
+                            nx_http::StatusCode::toString(statusCode).toStdString())));
+                }
+                else
+                {
+                    urlFoundPromise.set_value(url);
+                }
             });
         auto url = urlFoundPromise.get_future().get();
 
         fetcher->pleaseStopSync();
 
         return url;
+    }
+
+protected:
+    TestHttpServer& httpServer()
+    {
+        return m_server;
+    }
+
+    void setModulesUrl(QUrl modulesUrl)
+    {
+        m_modulesUrl = modulesUrl;
+        m_fetcher.setModulesXmlUrl(m_modulesUrl);
     }
 
 private:
@@ -73,12 +94,11 @@ private:
             testPath,
             m_modulesXmlBody,
             "plain/text");
+
         ASSERT_TRUE(m_server.bindAndListen()) << SystemError::getLastOSErrorText().toStdString();
 
-        m_modulesUrl =
-            QUrl(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath));
-
-        m_fetcher.setModulesXmlUrl(m_modulesUrl);
+        setModulesUrl(
+            QUrl(lit("http://%1%2").arg(m_server.serverAddress().toString()).arg(testPath)));
     }
 };
 
@@ -87,38 +107,6 @@ TEST_F(CloudModuleUrlFetcher, common)
     ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
     ASSERT_EQ(QUrl("stuns://52.55.171.51:3345"), fetchModuleUrl("hpm"));
     ASSERT_EQ(QUrl("http://cloud-dev.hdw.mx:80"), fetchModuleUrl("notification_module"));
-}
-
-class FtCloudModuleUrlFetcher:
-    public CloudModuleUrlFetcher
-{
-};
-
-TEST_F(FtCloudModuleUrlFetcher, cancellation)
-{
-    for (int i = 0; i < 100; ++i)
-    {
-        for (int j = 0; j < 10; ++j)
-        {
-            cloud::CloudModuleUrlFetcher::ScopedOperation operation(&m_fetcher);
-
-            std::string s;
-            operation.get(
-                [&s](
-                    nx_http::StatusCode::Value /*resCode*/,
-                    QUrl endpoint)
-                {
-                    //if called after s desruction, will get segfault here
-                    s = endpoint.toString().toStdString();
-                });
-
-            if (j == 0)
-                std::this_thread::sleep_for(std::chrono::milliseconds(
-                    nx::utils::random::number<int>(1, 99)));
-        }
-
-        m_fetcher.pleaseStopSync();
-    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -173,6 +161,118 @@ TEST_F(CloudModuleUrlFetcherCompatibilityAutoSchemeSelection, https)
     ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("cdb"));
     ASSERT_EQ(QUrl("stun://52.55.171.51:3345"), fetchModuleUrl("hpm"));
     ASSERT_EQ(QUrl("https://cloud-dev.hdw.mx:443"), fetchModuleUrl("notification_module"));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class HanglingMsgBodySource:
+    public nx_http::AbstractMsgBodySource
+{
+public:
+    virtual nx_http::StringType mimeType() const override
+    {
+        return "text/plain";
+    }
+
+    virtual boost::optional<uint64_t> contentLength() const override
+    {
+        return 125;
+    }
+
+    virtual void readAsync(
+        nx::utils::MoveOnlyFunc<
+            void(SystemError::ErrorCode, nx_http::BufferType)
+        > /*completionHandler*/) override
+    {
+    }
+};
+
+template<typename MessageBody>
+class CustomMessageBodyProvider:
+    public nx_http::AbstractHttpRequestHandler
+{
+public:
+    CustomMessageBodyProvider()
+    {
+    }
+
+    virtual void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler) override
+    {
+        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+        requestResult.dataSource = std::make_unique<MessageBody>();
+        completionHandler(std::move(requestResult));
+    }
+};
+
+} // namespace
+
+class FtCloudModuleUrlFetcher:
+    public CloudModuleUrlFetcher
+{
+public:
+
+protected:
+    void givenServerThatSendsNoResponse()
+    {
+        httpServer().registerRequestProcessor<
+            CustomMessageBodyProvider<HanglingMsgBodySource>>("/cloud_modules.xml");
+        setModulesUrl(
+            QUrl(lit("http://%1/cloud_modules.xml").arg(httpServer().serverAddress().toString())));
+    }
+    
+    void assertUrlFetcherReportsError()
+    {
+        try
+        {
+            fetchModuleUrl("hpm");
+            GTEST_FAIL();
+        }
+        catch (std::exception& /*e*/)
+        {
+        }
+    }
+};
+
+TEST_F(FtCloudModuleUrlFetcher, no_response_from_cloud)
+{
+    givenServerThatSendsNoResponse();
+    assertUrlFetcherReportsError();
+}
+
+TEST_F(FtCloudModuleUrlFetcher, cancellation)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        for (int j = 0; j < 10; ++j)
+        {
+            cloud::CloudModuleUrlFetcher::ScopedOperation operation(&m_fetcher);
+
+            std::string s;
+            operation.get(
+                [&s](
+                    nx_http::StatusCode::Value /*resCode*/,
+                    QUrl endpoint)
+                {
+                    //if called after s desruction, will get segfault here
+                    s = endpoint.toString().toStdString();
+                });
+
+            if (j == 0)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(
+                    nx::utils::random::number<int>(1, 99)));
+            }
+        }
+
+        m_fetcher.pleaseStopSync();
+    }
 }
 
 } // namespace test

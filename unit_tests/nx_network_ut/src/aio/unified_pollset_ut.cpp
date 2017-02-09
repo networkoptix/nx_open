@@ -119,6 +119,8 @@ TEST(UnifiedPollSet, all_tests)
     UnifiedPollSet::runTests<UnifiedPollSet>();
 }
 
+INSTANTIATE_TYPED_TEST_CASE_P(UnifiedPollSet, PollSetPerformance, aio::UnifiedPollSet);
+
 } // namespace test
 } // namespace aio
 } // namespace network
