@@ -19,6 +19,7 @@
 #include <utils/common/stoppable.h>
 #include <utils/network/socket.h>
 #include <utils/network/http/httptypes.h>
+#include <utils/network/http/httpstreamreader.h>
 
 #include "soap_wrapper.h"
 
@@ -59,13 +60,15 @@ public:
         \param syncWrapper Ownership is passed to this class
         \param syncFunc Synchronous function to call
     */
-    GSoapAsyncCallWrapper( std::unique_ptr<SyncWrapper> syncWrapper, GSoapCallFuncType syncFunc )
+    GSoapAsyncCallWrapper( std::unique_ptr<SyncWrapper> syncWrapper, GSoapCallFuncType syncFunc, bool useHttpReader = false)
     :
         m_syncWrapper(std::move(syncWrapper)),
         m_syncFunc(syncFunc),
         m_state(init),
         m_responseDataPos(0),
-        m_terminatedFlagPtr(nullptr)
+        m_terminatedFlagPtr(nullptr),
+        m_totalBytesRead(0),
+        m_useHttpReader(useHttpReader)
     {
         m_responseBuffer.reserve( READ_BUF_SIZE );
     }
@@ -131,6 +134,8 @@ public:
     bool callAsync(RequestType&& request, ResultHandler&& resultHandler)
     {
         m_state = init;
+        m_totalBytesRead = 0;
+        m_httpStreamReader.flush();
         m_extCompletionHandler = std::forward<ResultHandler>(resultHandler);
         m_resultHandler = [this](int resultCode) {
             QnMutexLocker lk( &m_mutex );
@@ -282,6 +287,69 @@ private:
 
     void onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
     {
+        if (m_useHttpReader)
+            parseBytesWithHttpReader(errorCode, bytesRead);
+        else
+            parseBytesTillConnectionClosure(errorCode, bytesRead);
+    }
+
+    void parseBytesWithHttpReader(SystemError::ErrorCode errorCode, std::size_t bytesRead)
+    {
+        static const int MIN_SOCKET_READ_SIZE = 4096;
+        static const int READ_BUFFER_GROW_STEP = 4096;
+
+        bool parseResult = m_httpStreamReader.parseBytes(
+            QnByteArrayConstRef(m_responseBuffer, m_totalBytesRead, bytesRead));
+
+        bool stateIsOk = m_httpStreamReader.state() != nx_http::HttpStreamReader::parseError;
+
+        m_totalBytesRead += bytesRead;
+
+        if (!parseResult || !stateIsOk)
+        {
+            m_state = done;
+            m_resultHandler(SOAP_FAULT);
+        }
+
+        if (m_httpStreamReader.state() == nx_http::HttpStreamReader::messageDone)
+        {
+            m_state = done;
+            if (m_httpStreamReader.message().type != nx_http::MessageType::response)
+                m_resultHandler(SOAP_FAULT);   
+
+            auto resultCode = deserializeResponse();
+            m_resultHandler(resultCode);
+        }
+        else
+        {
+            QnMutexLocker lock (&m_mutex);
+
+            auto freeSpace = m_responseBuffer.capacity() - m_responseBuffer.size();
+            if (freeSpace < MIN_SOCKET_READ_SIZE)
+                m_responseBuffer.reserve(m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP);
+
+            if (!m_socket)
+                return;
+
+            auto readStatus = m_socket->readSomeAsync(
+                &m_responseBuffer,
+                [this](SystemError::ErrorCode errorCode, std::size_t bytesRead)
+                {
+                    onSomeBytesRead(errorCode, bytesRead);
+                });
+
+            if (!readStatus)
+            {
+                m_state = done;
+                lock.unlock();
+                m_resultHandler(SOAP_FAULT);
+                return;
+            }
+        }
+    }
+
+    void parseBytesTillConnectionClosure(SystemError::ErrorCode errorCode, std::size_t bytesRead)
+    {
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;
 
@@ -298,7 +366,6 @@ private:
         }
 
         //reading until connection closure
-        //TODO #ak it is better to parse http response and detect message boundary
 
         if( m_responseBuffer.capacity() - m_responseBuffer.size() < MIN_SOCKET_READ_SIZE )
             m_responseBuffer.reserve(m_responseBuffer.capacity() + READ_BUFFER_GROW_STEP);
@@ -309,8 +376,8 @@ private:
                 return;
             using namespace std::placeholders;
             if( !m_socket->readSomeAsync(
-                    &m_responseBuffer,
-                    std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
+                &m_responseBuffer,
+                std::bind(&GSoapAsyncCallWrapper::onSomeBytesRead, this, _1, _2)) )
             {
                 m_state = done;
                 lk.unlock();
@@ -343,6 +410,10 @@ private:
     std::function<void(int)> m_resultHandler;
     bool* m_terminatedFlagPtr;
     mutable QnMutex m_mutex;
+    nx_http::HttpStreamReader m_httpStreamReader;
+    std::size_t m_totalBytesRead;
+    bool m_useHttpReader;
+
 };
 
 #endif  //GSOAP_ASYNC_CALL_WRAPPER_H

@@ -7,7 +7,7 @@
 # Default-Stop:
 # X-Start-Before:    hddbootflush
 # Short-Description: nx1 boot sequence
-# Description:       Provides the ability to boot up automatically depending on available 
+# Description:       Provides the ability to boot up automatically depending on available
 #                    boot devices and ability to override boot using the boot menu.
 ### END INIT INFO
 # VERSION: ${release.version}.${buildNumber}
@@ -97,18 +97,16 @@ tweak_charger() {
 i2cset -f -y 0 0x34 0x35 0x83
 }
 
-get_serial_number() {
+get_reset_button_presense() {
     mkdir -p $MNTBOOTPART
     mount -t vfat $BOOTPART $MNTBOOTPART
     ln -s $MNTBOOTPART/backup/bootloader /tmp/fw_printenv
-    if [ -f /tmp/serial ]; then rm /tmp/serial; fi
-    SERIAL=$(/tmp/fw_printenv serial | sed 's/serial=//')
-    echo $SERIAL > /tmp/serial
-    SERIAL_SHORT=${SERIAL%???????}
-    SERIAL_CHECK=$(echo $SERIAL_SHORT | grep '14\|15')
-    if [ -z $SERIAL_CHECK ]; then RESET=true; else RESET=false; fi    
-    echo "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >&2 >/dev/kmsg
-    echo `date` "++++++++++++++ SERIAL NUMBER:"$SERIAL" ++++++++++++++" >> $NX1LOG
+    # Serial Number was used only for checking the reset button status. Removing old file.
+    rm -rf /tmp/serial
+	RESET=$(/tmp/fw_printenv reset | sed 's/reset=//')
+	RESET=${RESET:-false}
+    echo "++++++++++++++ RESET BUTTON PRESENT: "$RESET" ++++++++++++++" >&2 >/dev/kmsg
+    echo `date` "++++++++++++++ RESET BUTTON PRESENT: "$RESET" ++++++++++++++" >> $NX1LOG
     rm /tmp/fw_printenv
     umount $BOOTPART
     rm -Rf $MNTBOOTPART
@@ -353,14 +351,14 @@ upgrade() {
         umount $BOOTHDDPART
         rm -Rf $MNTBOOTHDDPART
     fi
-    get_serial_number
+    get_reset_button_presense
     chown root:root /etc/crontab
     chmod 600 /etc/crontab
 }
 
 default_sequence () {
-    get_serial_number
-    if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi    
+    get_reset_button_presense
+    if [ "$RESET" = "true" ]; then /etc/init.d/nx1button start; fi
     stop_server
     setup_hdd_environment
     echo "++++++++++++++ BOOTED FROM "$BOOTDEVICE" ++++++++++++++" >&2 >/dev/kmsg

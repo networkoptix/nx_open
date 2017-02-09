@@ -375,7 +375,8 @@ void QnTimePeriodList::overwriteTail(QnTimePeriodList& periods, const QnTimePeri
     if (!tail.isEmpty())
         erasePoint = std::min(dividerPoint, tail.cbegin()->startTimeMs);
 
-    if (periods.isEmpty() || erasePoint <= periods.first().startTimeMs) {
+    if (periods.empty() || erasePoint <= periods.cbegin()->startTimeMs)
+    {
         periods = tail;
         return;
     }

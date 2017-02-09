@@ -60,7 +60,6 @@ CameraDiagnostics::Result QnAdamResource::initInternal()
 
     if (!status)
     {
-        qDebug() << "QnAdamResource::initInternal() " << "test request has been failed";
         return CameraDiagnostics::RequestFailedResult(
             lit("Test request failed"),
             lit("couldn't get valid response from device"));
@@ -113,7 +112,6 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
 
     auto networkIssueHandler = [this](QString reason, bool isFatal)
     {
-        qDebug() << lit("Network issue on ADAM device %1: %2").arg(getUrl()).arg(reason);
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
