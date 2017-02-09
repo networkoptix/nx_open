@@ -69,16 +69,16 @@ protected:
 
     void ignoreReceivedNotification()
     {
-        NX_GTEST_ASSERT_FALSE(m_notifications.empty());
+        ASSERT_FALSE(m_notifications.empty());
         m_notifications.pop_front();
     }
 
     std::unique_ptr<InviteUserNotification> popReceivedInviteNotification()
     {
-        NX_GTEST_ASSERT_FALSE(m_notifications.empty());
+        EXPECT_FALSE(m_notifications.empty());
 
         auto notification = std::move(m_notifications.front());
-        NX_GTEST_ASSERT_TRUE(notification != nullptr);
+        EXPECT_NE(nullptr, notification);
         m_notifications.pop_front();
         return notification;
     }
