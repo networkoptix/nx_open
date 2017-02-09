@@ -34,7 +34,7 @@
         "unavailable": "Unavailable",
 
         "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
-        "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>You will be able to login to this System through local network with local administrator account.",
+        "confirmDisconnectFromCloudTitle":"<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
         "confirmDisconnectFromCloudAction": "Disconnect",
         "disconnectedSuccess": "System was disconnected successfully",
         "connectedSuccess": "System was connected successfully",
