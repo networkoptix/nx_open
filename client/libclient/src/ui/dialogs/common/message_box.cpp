@@ -52,7 +52,7 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     buttonAccent(QnButtonAccent::Standard),
     escapeButton(nullptr),
     icon(QnMessageBoxIcon::NoIcon),
-    buttonDetection(QnButtonDetection::DefaultButton | QnButtonDetection::EscapeButton)
+    buttonDetection(QnButtonDetection::DefaultButton)
 {
 }
 
@@ -646,8 +646,8 @@ int QnMessageBox::exec()
 
     if (d->buttonDetection.testFlag(QnButtonDetection::DefaultButton))
         d->detectDefaultButton();
-    if (d->buttonDetection.testFlag(QnButtonDetection::EscapeButton))
-        d->detectEscapeButton();
+
+    d->detectEscapeButton();
     if (d->buttonDetection)
         d->stylizeButtons();
 
