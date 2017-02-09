@@ -23,7 +23,7 @@ DirectTcpEndpointTunnel::DirectTcpEndpointTunnel(
     m_targetEndpoint(std::move(targetEndpoint)),
     m_controlConnection(std::move(connection))
 {
-    if (aioThread)
+    if (aioThread && m_controlConnection)
         m_controlConnection->bindToAioThread(aioThread);
 }
 
@@ -47,11 +47,15 @@ void DirectTcpEndpointTunnel::stopWhileInAioThread()
 
 void DirectTcpEndpointTunnel::start()
 {
-    NX_LOGX("Start", cl_logDEBUG2);
-    NX_ASSERT(m_controlConnection->setKeepAlive(kControlConnectionKeepAlive));
+    NX_LOGX(lm("Start %1 control connection").arg(m_controlConnection ? "with" : "without"),
+        cl_logDEBUG2);
+
+    if (!m_controlConnection)
+        return;
 
     const auto buffer = std::make_shared<Buffer>();
     buffer->reserve(1);
+    NX_ASSERT(m_controlConnection->setKeepAlive(kControlConnectionKeepAlive));
     m_controlConnection->readSomeAsync(
         buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
@@ -60,7 +64,8 @@ void DirectTcpEndpointTunnel::start()
                 size, SystemError::toString(code)), cl_logDEBUG1);
 
             m_controlConnection.reset();
-            utils::moveAndCallOptional(m_connectionClosedHandler, SystemError::connectionReset);
+            if (m_connectionClosedHandler)
+                utils::moveAndCall(m_connectionClosedHandler, SystemError::connectionReset);
         });
 }
 

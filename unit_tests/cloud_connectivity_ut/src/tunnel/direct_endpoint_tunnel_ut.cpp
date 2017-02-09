@@ -95,7 +95,6 @@ private:
     void init()
     {
         m_testServer = std::make_unique<TestHttpServer>();
-        m_testServer->server().setConnectionInactivityTimeout(std::chrono::milliseconds(1000));
         ASSERT_TRUE(m_testServer->bindAndListen());
     }
 
