@@ -568,6 +568,11 @@ module.exports = function (grunt) {
                 options: {
                     args: {specs: ['test/e2e/customize/*spec.js']}
                 }
+            },
+            smoke: {
+                options: {
+                    args: {specs: ['test/e2e/smoke/*spec.js']}
+                }
             }
         },
         protractor_webdriver: {

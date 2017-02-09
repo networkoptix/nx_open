@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/b28cdf85-8d69-4180-a123-99acce63cb70';
+    this.systemLink = '/df7a0106-ed45-4317-b78b-aa76b1ee745b';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -383,18 +383,37 @@ var Helper = function () {
         var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
 
         this.getSysPage(systemLinkCode);
+        browser.waitForAngular();
         h.forms.share.shareButton.click();
         h.forms.share.emailField.sendKeys(email);
         h.forms.share.roleField.click();
         roleOption.click();
+        browser.waitForAngular();
+
         h.forms.share.submitButton.click();
         expect(element(by.cssContainingText('td', email)).isPresent()).toBe(true);
     };
 
+    this.registerByInvite = function (firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+        var userEmail = email || h.getRandomEmail();
+
+        h.login(h.userEmailOwner);
+        h.shareSystemWith(userEmail);
+        h.getEmailedLink(userEmail, h.emailSubjects.invite, 'register').then( function(url) {
+            h.get(url);
+            deferred.fulfill(userEmail);
+        });
+        h.fillRegisterForm(firstName, lastName, userEmail, password);
+
+        return deferred.promise;
+    };
+
     this.emailSubjects = {
         register: "Confirm your account",
+        invite: "Video system was shared with you",
         restorePass: "Restore your password",
-        share: ""
+        share: "Video system was shared with you"
     };
 
     this.readPrevEmails = function() {
