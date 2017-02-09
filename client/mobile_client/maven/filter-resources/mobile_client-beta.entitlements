@@ -6,8 +6,6 @@
     <array>
         <string>${ios.group_identifier}</string>
     </array>
-    <key>beta-reports-active</key>
-    <true/>
     <key>com.apple.developer.associated-domains</key>
     <array>
         <string>applinks:${cloudHost}</string>
