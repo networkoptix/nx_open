@@ -651,6 +651,7 @@ int QnMessageBox::exec()
     d->detectEscapeButton();
     if (d->buttonDetection)
         d->stylizeButtons();
+    NX_ASSERT(d->escapeButton);
 
     adjustSize();
 
