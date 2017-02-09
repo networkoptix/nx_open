@@ -211,8 +211,8 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     userData.isAdmin = true;
     userData.isEnabled = true;
     userData.realm = QnAppInfo::realm();
-    userData.hash = userData.kCloudPasswordStub;
-    userData.digest = userData.kCloudPasswordStub;
+    userData.hash = userData.kCloudPasswordStub();
+    userData.digest = userData.kCloudPasswordStub();
 
     const auto resultCode =
         QnAppServerConnectionFactory::getConnection2()

@@ -57,7 +57,7 @@ TEST(SaveUser, fillDigestAndName)
     // Digest and name should be properly filled by the server.
     ASSERT_EQ(userData.email, receivedUserData.email);
     ASSERT_EQ(receivedUserData.email, receivedUserData.name);
-    ASSERT_EQ(userData.kCloudPasswordStub, receivedUserData.digest);
+    ASSERT_EQ(userData.kCloudPasswordStub(), receivedUserData.digest);
 }
 
 } // namespace test
