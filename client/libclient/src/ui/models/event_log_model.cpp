@@ -110,7 +110,7 @@ public:
         return lessThanTimestamp(d1, d2);
     }
 
-    bool lessLexicographically(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanLexicographically(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
     {
         int rez = d1->compareString.compare(d2->compareString);
         if (rez != 0)
@@ -147,7 +147,7 @@ public:
                 lessThan = &DataIndex::lessThanActionType;
                 break;
             default:
-                lessThan = &DataIndex::lessLexicographically;
+                lessThan = &DataIndex::lessThanLexicographically;
                 for (auto record : m_records)
                     record->compareString = m_parent->textData(m_sortCol, *record);
                 break;
