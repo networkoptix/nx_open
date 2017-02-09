@@ -150,6 +150,10 @@ footer {
 
 }
 
+.warning-label{
+    color: $brand-danger;
+}
+
 .loading .auth-visible,
 .loading .auth-hidden{
     display: none !important;
