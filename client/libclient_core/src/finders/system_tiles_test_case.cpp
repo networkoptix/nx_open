@@ -14,6 +14,7 @@ namespace {
 
 static constexpr auto kRemoveSystemTimeoutMs = 10000;
 static constexpr auto kNextActionPeriodMs = 3000;
+static constexpr auto kImmediateActionDelayMs = 0;
 
 void addServerToSystem(
     const QnSystemDescriptionPtr& baseSystem,
@@ -120,6 +121,30 @@ QnRaiiGuardPtr makeCompletionGaurd(
         });
 }
 
+QString getMessage(QnTileTest test)
+{
+    static const QHash<int, QString> kMessages =
+        {
+            { static_cast<int>(QnTileTest::ChangeWeightOnCollapse),
+                lit("change wight on tile collapse")},
+            { static_cast<int>(QnTileTest::ChangeVersion),
+                lit("change version of system")},
+            { static_cast<int>(QnTileTest::MaximizeAppOnCollapse),
+                lit("maximize app on tile collapse")},
+            { static_cast<int>(QnTileTest::SwitchPage),
+                lit("Switch page on tile collpase")}
+        };
+
+    const auto it = kMessages.find(static_cast<int>(test));
+    if (it == kMessages.end())
+    {
+        NX_ASSERT(false, "No message for specified tile test");
+        return QString();
+    }
+
+    return it.value();
+}
+
 } // namespace
 
 QnSystemTilesTestCase::QnSystemTilesTestCase(
@@ -150,6 +175,9 @@ void QnSystemTilesTestCase::startTest(
                     break;
                 case QnTileTest::ChangeVersion:
                     versionChangeTest(completionHandler);
+                    break;
+            case QnTileTest::SwitchPage:
+                    switchPageTest(completionHandler);
                     break;
                 default:
                     NX_ASSERT(false, "Wrong tile test identifier");
@@ -264,6 +292,62 @@ void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandle
     executeDelayedParented(changeServer, kNextActionPeriodMs, this);
 }
 
+void QnSystemTilesTestCase::switchPageTest(CompletionHandler completionHandler)
+{
+    const auto completionGuard = makeCompletionGaurd(
+        QnTileTest::SwitchPage, completionHandler);
+
+    QList<QnRaiiGuardPtr> systemRemoveGuards;
+
+    // We have 8 tiles per page as maximum. So, to have 2 pages we need 9 tiles.
+    static constexpr auto kTilesCountEnoughForTowPages = 9;
+    QnSystemDescriptionPtr maxWeightSystem;
+    for (auto i = 0; i != kTilesCountEnoughForTowPages; ++i)
+    {
+        maxWeightSystem = createSystem();
+        setSystemMaxWeight(maxWeightSystem);
+        systemRemoveGuards.append(addSystem(maxWeightSystem, m_finder));
+    }
+
+    const auto switchToFirstPage =
+        [this, completionGuard, systemRemoveGuards]()
+        {
+            switchPage(0);
+            executeDelayedParented([completionGuard, systemRemoveGuards](){},
+                kRemoveSystemTimeoutMs, this);
+        };
+
+    const auto switchToSecondPage =
+        [this, switchToFirstPage]()
+        {
+            emit switchPage(1);
+            executeDelayedParented(switchToFirstPage, kNextActionPeriodMs, this);
+        };
+    const auto collapseTileCallback =
+        [this, switchToSecondPage]()
+        {
+            emit collapseExpandedTile();
+            executeDelayedParented(switchToSecondPage, kImmediateActionDelayMs, this);
+        };
+
+    const auto openTileCallback =
+        [this, collapseTileCallback, id = maxWeightSystem->id()]()
+        {
+            emit openTile(id);
+            executeDelayedParented(collapseTileCallback, kNextActionPeriodMs, this);
+        };
+
+    executeDelayedParented(openTileCallback, kNextActionPeriodMs, this);
+}
+
+void QnSystemTilesTestCase::showMessageDelayed(const QString& message)
+{
+    const auto showMessage =
+        [this, message](){ emit messageChanged(message);};
+
+    executeDelayedParented(showMessage, kNextActionPeriodMs, this);
+}
+
 void QnSystemTilesTestCase::runTestSequence(
     QnTileTest current,
     int delay)
@@ -273,8 +357,13 @@ void QnSystemTilesTestCase::runTestSequence(
         {
             const auto nextTest = static_cast<QnTileTest>(static_cast<int>(test) + 1);
             if (nextTest == QnTileTest::Count)
+            {
+                showMessageDelayed(QString());
                 return;
+            }
 
+            emit messageChanged(lit("Starting test: %1").arg(getMessage(nextTest)));
+            showMessageDelayed(QString());
             runTestSequence(nextTest, delay);
         };
 

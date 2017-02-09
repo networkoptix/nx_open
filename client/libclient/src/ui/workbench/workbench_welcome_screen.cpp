@@ -604,6 +604,7 @@ void QnWorkbenchWelcomeScreen::setupTestTileCase()
     const auto test = new QnSystemTilesTestCase(testSystemsFinder, this);
 
     connect(test, &QnSystemTilesTestCase::openTile, this, &QnWorkbenchWelcomeScreen::openTile);
+    connect(test, &QnSystemTilesTestCase::switchPage, this, &QnWorkbenchWelcomeScreen::switchPage);
     connect(test, &QnSystemTilesTestCase::collapseExpandedTile, this,
         [this]() { emit openTile(QString());});
     connect(test, &QnSystemTilesTestCase::restoreApp, this,
@@ -621,5 +622,8 @@ void QnWorkbenchWelcomeScreen::setupTestTileCase()
                 maximizeAction->toggle();
         });
 
-    //test->runTestSequence(QnTileTest::First, 3000);
+    connect(test, &QnSystemTilesTestCase::messageChanged,
+        this, &QnWorkbenchWelcomeScreen::setMessage);
+
+    test->runTestSequence(QnTileTest::First, 3000);
 }
