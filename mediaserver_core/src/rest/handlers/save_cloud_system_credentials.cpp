@@ -245,10 +245,6 @@ bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
 {
     using namespace nx::cdb;
 
-    m_cloudManagerGroup->connectionManager.setCloudCredentials(
-        data.cloudSystemID,
-        data.cloudAuthKey);
-
     api::ResultCode resultCode = 
         m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();
     if (resultCode != api::ResultCode::ok)
