@@ -328,6 +328,7 @@ QPushButton* QnMessageBox::addButton(
         NX_ASSERT(!d->defaultButton, "Default button should not be set by now");
         d->defaultButton = result;
         d->buttonDetection &= ~int(QnButtonDetection::DefaultButton);
+        d->stylizeButtons();
     }
 
     return result;
