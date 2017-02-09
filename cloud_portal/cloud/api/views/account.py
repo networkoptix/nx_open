@@ -35,6 +35,7 @@ def login(request):
     # authorize user here
     # return user
     require_params(request, ('email', 'password'))
+    request.data['email'] = request.data['email'].lower()
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
@@ -131,7 +132,7 @@ def activate(request):
         if 'email' not in user_data:
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
-        email = user_data['email']
+        email = user_data['email'].lower()
         try:
             user = api.models.Account.objects.get(email=email)
             user.activated_date = timezone.now()
@@ -164,7 +165,7 @@ def restore_password(request):
 
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
-        user_email = request.data['user_email']
+        user_email = request.data['user_email'].lower()
         Account.reset_password(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
