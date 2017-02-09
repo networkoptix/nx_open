@@ -250,14 +250,12 @@ Rectangle
                         isCloudTile: model.isCloudSystem
                         safeMode: model.safeMode;
 
-                        wrongVersion: (!model.wrongVersion || model.wrongVersion.isNull()
-                            ? ""
-                            : model.wrongVersion.toString());
+                        wrongVersion: (model.wrongVersion && !model.wrongVersion.isNull()
+                            && model.wrongVersion.toString()) || "";
                         isCompatibleInternal: model.isCompatibleInternal;
-                        compatibleVersion:
-                            (!model.compatibleVersion || model.compatibleVersion.isNull()
-                                ? ""
-                                : model.compatibleVersion.toString());
+                        compatibleVersion:(model.compatibleVersion
+                            && !model.compatibleVersion.isNull()
+                            && model.compatibleVersion.toString()) || "";
 
                         isRunning: model.isRunning;
                         isReachable: model.isReachable;
