@@ -3260,21 +3260,11 @@ devices</source>
         <source>All users</source>
         <translation>所有使用者</translation>
     </message>
-    <message>
-        <source>%1 users</source>
-        <translation>%1 使用者</translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
             <numerusform>%1 (%n 次)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -3284,6 +3274,24 @@ devices</source>
     <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3856,18 +3864,6 @@ devices</source>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translation>
-            <numerusform>最少需要 %n %2</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translation>
-            <numerusform>已使用 %n %2</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>您未輸入仍任有效授權.</translation>
@@ -3975,6 +3971,18 @@ devices</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform>最少需要 %n %2 {1 ?}</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform>已使用 %n %2 {1 ?}</numerusform>
+        </translation>
     </message>
 </context>
 <context>

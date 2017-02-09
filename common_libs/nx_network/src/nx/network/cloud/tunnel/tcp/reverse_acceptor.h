@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
@@ -15,20 +16,25 @@ namespace tcp {
  * Is is safe to remove this object from any thread (destructor blocks to wait connection
  * handlers).
  */
-class NX_NETWORK_API ReverseAcceptor
+class NX_NETWORK_API ReverseAcceptor:
+    public aio::BasicPollable
 {
+    using Parent = aio::BasicPollable;
+
 public:
     typedef utils::MoveOnlyFunc<void(
         String remoteHostName,
         std::unique_ptr<AbstractStreamSocket> socket)> ConnectHandler;
 
     ReverseAcceptor(ConnectHandler clientHandler);
-    ~ReverseAcceptor();
+    virtual ~ReverseAcceptor() override;
 
     ReverseAcceptor(const ReverseAcceptor&) = delete;
     ReverseAcceptor(ReverseAcceptor&&) = delete;
     ReverseAcceptor& operator=(const ReverseAcceptor&) = delete;
     ReverseAcceptor& operator=(ReverseAcceptor&&) = delete;
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**
      * Starts accepting connections.
@@ -39,9 +45,6 @@ public:
         const SocketAddress& address,
         aio::AbstractAioThread* aioThread = nullptr);
 
-    /** Stops accepting new connections (shall be called from AIO thread) */
-    void pleaseStop();
-
     SocketAddress address() const;
     String selfHostName() const;
 
@@ -49,14 +52,17 @@ public:
     void setPoolSize(boost::optional<size_t> value);
     void setKeepAliveOptions(boost::optional<KeepAliveOptions> value);
 
+protected:
+    virtual void stopWhileInAioThread() override;
+
 private:
     void fillNxRcHeaders(nx_http::HttpHeaders* headers) const;
-    void saveConnection(String name, nx_http::HttpServerConnection* connection) const;
+    void saveConnection(String name, nx_http::HttpServerConnection* connection);
 
     class NxRcHandler: public nx_http::AbstractHttpRequestHandler
     {
     public:
-        NxRcHandler(const ReverseAcceptor* acceptor);
+        NxRcHandler(ReverseAcceptor* acceptor);
 
         void processRequest(
             nx_http::HttpServerConnection* const connection,
@@ -66,7 +72,7 @@ private:
             nx_http::RequestProcessedHandler handler) override;
 
     private:
-        const ReverseAcceptor* m_acceptor;
+        ReverseAcceptor* m_acceptor;
     };
 
     String m_selfHostName;

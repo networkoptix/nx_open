@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <list>
@@ -12,7 +7,6 @@
 #include "abstract_tunnel_connector.h"
 #include "nx/network/cloud/address_resolver.h"
 #include "nx/network/cloud/data/connect_data.h"
-
 
 namespace nx {
 namespace network {
@@ -35,13 +29,18 @@ public:
     static std::unique_ptr<AbstractCrossNatConnector>
         createCrossNatConnector(const AddressEntry& address);
     
-    /** Replace factory. Debug only! */
+    /**
+     * Replace factory with custom func. 
+     * For debug purpose only!
+     */
     static FactoryFunc setFactoryFunc(FactoryFunc newFactoryFunc);
-    /** Enable/disable cloud connectors. Debug only!
-        @param cloudConnectTypeMask Bitset with values from \a CloudConnectType
-        By default, everything is enabled
-    */
+    /**
+     * Enable/disable cloud connectors. Debug only!
+     * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::CloudConnectType enum.
+     * By default, everything is enabled.
+     */
     static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
+    static int getEnabledCloudConnectMask();
 };
 
 } // namespace cloud

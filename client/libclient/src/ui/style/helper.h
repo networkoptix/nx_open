@@ -58,6 +58,7 @@ namespace style
         static const qreal kDisabledItemOpacity;        /**< Default disabled item opacity */
         static const qreal kDisabledBrandedButtonOpacity; /**< Branded buttons disabled opacity */
         static const int kMinimumFormLabelWidth;        /**< Minimal text label width in forms */
+        static const qreal kMinimumTableRows;           /**< Space for how many rows should minimal table height ensure */
     };
 
     class Properties

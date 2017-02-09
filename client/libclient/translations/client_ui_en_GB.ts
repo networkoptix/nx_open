@@ -930,7 +930,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
         <source>Email or password is not recognized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email or password is not recognised.</translation>
     </message>
     <message>
         <location/>
@@ -1987,7 +1987,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Email or password is not recognized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email or password is not recognised.</translation>
     </message>
 </context>
 <context>
@@ -2886,7 +2886,8 @@ to the cloud&gt;</source>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation type="unfinished"></translation>
+        <translation>System time is synchronised with the Internet and is independent from server&apos;s local time.
+Selected server will be used as a time server if the system has no Internet access.</translation>
     </message>
 </context>
 <context>

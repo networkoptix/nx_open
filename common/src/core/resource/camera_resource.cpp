@@ -562,11 +562,17 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     if (!qFuzzyIsNull(customAr))
         return QnAspectRatio::closestStandardRatio(customAr);
 
-    const auto s = mediaStreams();
-    if (!s.streams.empty())
+    const auto streams = mediaStreams().streams;
+    auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
+        [](const CameraMediaStreamInfo& stream)
+        {
+            return stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX;
+        });
+
+    if (defaultStream != streams.cend())
     {
-        const QSize size = s.streams[0].getResolution();
-        return QnAspectRatio::closestStandardRatio(static_cast<qreal>(size.width()) / size.height());
+        const QSize size = defaultStream->getResolution();
+        return QnAspectRatio::closestStandardRatio( (qreal)size.width() / size.height() );
     }
 
     return QnAspectRatio();

@@ -350,7 +350,7 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
     ASSERT_GT(generator->totalBytesReceived(), 0);
 }
 
-TEST_F(SocketUdt, acceptingFirstConnection)
+TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
 {
     const std::chrono::seconds timeToWaitForSocketAccepted(1);
     const int loopLength = 71;

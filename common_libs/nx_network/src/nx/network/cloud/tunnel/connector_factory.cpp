@@ -70,6 +70,11 @@ void ConnectorFactory::setEnabledCloudConnectMask(int cloudConnectTypeMask)
     s_cloudConnectTypeMask = cloudConnectTypeMask;
 }
 
+int ConnectorFactory::getEnabledCloudConnectMask()
+{
+    return s_cloudConnectTypeMask;
+}
+
 } // namespace cloud
 } // namespace network
 } // namespace nx
