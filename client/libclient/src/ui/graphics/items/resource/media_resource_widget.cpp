@@ -598,8 +598,8 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (aviResource && aviResource->flags().testFlag(Qn::still_image))
     {
         const auto aspect = aviResource->imageAspectRatio();
-        if (aspect > 0)
-            return aspect;
+        if (aspect.isValid())
+            return aspect.toFloat();
     }
 
     /* Here we get 0.0 if no custom aspect ratio set. */
