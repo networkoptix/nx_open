@@ -78,7 +78,7 @@ protected:
         NX_GTEST_ASSERT_FALSE(m_notifications.empty());
 
         auto notification = std::move(m_notifications.front());
-        NX_GTEST_ASSERT_NE(nullptr, notification);
+        NX_GTEST_ASSERT_TRUE(notification != nullptr);
         m_notifications.pop_front();
         return notification;
     }
