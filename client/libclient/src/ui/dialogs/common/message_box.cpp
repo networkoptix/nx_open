@@ -81,7 +81,7 @@ void QnMessageBoxPrivate::init()
             }
         });
 
-    q->ui->checkBox->hide();
+    q->ui->checkBoxWidget->hide();
     q->ui->secondaryLine->hide();
     q->ui->iconLabel->hide();
 
@@ -406,6 +406,7 @@ void QnMessageBox::setDefaultButton(QAbstractButton* button, QnButtonAccent acce
 
     d->buttonAccent = accent;
     d->defaultButton = button;
+    d->buttonDetection &= ~int(QnButtonDetection::DefaultButton);
     d->stylizeButtons();
 }
 
@@ -572,7 +573,7 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
             break;
         case QnMessageBox::Layout::Content:
             ui->verticalLayout->insertWidget(
-                ui->verticalLayout->indexOf(ui->checkBox),
+                ui->verticalLayout->indexOf(ui->checkBoxWidget),
                 widget,
                 stretch,
                 alignment
@@ -617,12 +618,12 @@ void QnMessageBox::setCustomCheckBoxText(const QString& text)
 
 bool QnMessageBox::isCheckBoxEnabled() const
 {
-    return !ui->checkBox->isHidden();
+    return !ui->checkBoxWidget->isHidden();
 }
 
 void QnMessageBox::setCheckBoxEnabled(bool value)
 {
-    ui->checkBox->setVisible(value);
+    ui->checkBoxWidget->setVisible(value);
 }
 
 bool QnMessageBox::isChecked() const
@@ -652,6 +653,12 @@ int QnMessageBox::exec()
     if (d->buttonDetection)
         d->stylizeButtons();
     NX_ASSERT(d->escapeButton);
+
+    if (d->informativeLabels.isEmpty() && d->customWidgets.isEmpty() && !isCheckBoxEnabled())
+    {
+        ui->verticalLayout->removeItem(ui->verticalSpacer);
+        delete ui->verticalSpacer;
+    }
 
     adjustSize();
 
