@@ -63,6 +63,31 @@ function(nx_copy_if_different file destination)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${file} ${destination})
 endfunction()
 
+function(nx_copy_if_newer)
+    cmake_parse_arguments(_COPY "" "DESTINATION" "" ${ARGN})
+
+    if(NOT _COPY_DESTINATION)
+        message(FATAL_ERROR "DESTINATION must be provided.")
+    endif()
+
+    if(NOT EXISTS ${_COPY_DESTINATION})
+        file(MAKE_DIRECTORY ${_COPY_DESTINATION})
+    elseif(NOT IS_DIRECTORY ${_COPY_DESTINATION})
+        message(FATAL_ERROR "DESTINATION must be a directory")
+    endif()
+
+    foreach(file ${_COPY_UNPARSED_ARGUMENTS})
+        get_filename_component(dst ${file} NAME)
+        set(dst "${_COPY_DESTINATION}/${dst}")
+        file(TIMESTAMP ${file} orig_ts)
+        file(TIMESTAMP ${dst} dst_ts)
+        if(NOT "${orig_ts}" STREQUAL "${dst_ts}")
+            message(STATUS "Copying ${file} to ${dst}")
+            file(COPY ${file} DESTINATION ${_COPY_DESTINATION})
+        endif()
+    endforeach()
+endfunction()
+
 function(nx_files_differ file1 file2 var)
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E compare_files ${file1} ${file2}
