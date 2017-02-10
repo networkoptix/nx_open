@@ -9,9 +9,14 @@ nx_configure_file(
     maven/filter-resources/app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
+if(MACOSX)
+    set(mac_sources src/utils/mac_utils.mm)
+endif()
+
 nx_add_target(common LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
+        ${mac_sources}
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
@@ -29,3 +34,9 @@ target_include_directories(common
 
 target_compile_definitions(common
     PUBLIC NX_NETWORK_API=${API_IMPORT_MACRO})
+
+if(MACOSX)
+    find_library(CoreGraphics_LIBRARY CoreGraphics)
+    mark_as_advanced(CoreGraphics_LIBRARY)
+    target_link_libraries(common PUBLIC ${CoreGraphics_LIBRARY})
+endif()

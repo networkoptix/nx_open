@@ -100,6 +100,13 @@ if(LINUX)
         -Wno-ignored-qualifiers)
 endif()
 
+if(MACOSX)
+    add_compile_options(
+        -msse4.1
+        -Wno-unused-local-typedef)
+    set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+endif()
+
 # set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
 #
 # if(WIN32)

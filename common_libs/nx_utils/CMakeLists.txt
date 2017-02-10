@@ -11,3 +11,9 @@ nx_add_target(nx_utils LIBRARY
 target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
+
+if(MACOSX)
+    find_library(Foundation_LIBRARY Foundation)
+    mark_as_advanced(Foundation_LIBRARY)
+    target_link_libraries(nx_utils PUBLIC ${Foundation_LIBRARY})
+endif()
