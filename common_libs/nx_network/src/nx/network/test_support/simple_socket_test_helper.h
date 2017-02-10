@@ -782,7 +782,7 @@ void socketShutdown(
 {
     SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
 
-    const auto repeatCount = utils::TestOptions::applyArguments<size_t>(5);
+    const auto repeatCount = utils::TestOptions::applyLoadMode<size_t>(5);
     for (size_t i = 0; i < repeatCount; ++i)
     {
         const auto syncServer = syncSocketServer(serverMaker());
