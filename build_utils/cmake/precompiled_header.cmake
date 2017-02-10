@@ -72,18 +72,14 @@ function(export_all_flags _filename)
     set(_compile_definitions "$<$<BOOL:${_compile_definitions}>:-D$<JOIN:${_compile_definitions},\n-D>\n>")
     set(_compile_flags "$<$<BOOL:${_compile_flags}>:$<JOIN:${_compile_flags},\n>\n>")
     set(_compile_options "$<$<BOOL:${_compile_options}>:$<JOIN:${_compile_options},\n>\n>")
-
-    get_target_property(_pic ${_target} POSITION_INDEPENDENT_CODE)
-    if(_pic)
-        set(_fpic "-fPIC")
-    endif()
+    set(_fpic "$<$<BOOL:$<TARGET_PROPERTY:${_target},POSITION_INDEPENDENT_CODE>>:-fPIC>")
 
     file(GENERATE OUTPUT "${_filename}" CONTENT
         "${_compile_definitions}${_include_directories}${_compile_flags}${_compile_options}${_fpic}\n")
 endfunction()
 
 function(add_precompiled_header _target _input)
-    cmake_parse_arguments(_PCH "" "SOURCE_CXX:SOURCE_C" "" ${ARGN})
+    cmake_parse_arguments(_PCH "" "SOURCE_C:SOURCE_CXX" "ADDITIONAL_FLAGS" ${ARGN})
 
     get_filename_component(_input_we ${_input} NAME_WE)
     if(NOT _PCH_SOURCE_CXX)
@@ -206,7 +202,7 @@ function(add_precompiled_header _target _input)
 
     set(_pch_flags_file "${_pch_binary_dir}/compile_flags.rsp")
     export_all_flags("${_pch_flags_file}")
-    set(_compiler_FLAGS "@${_pch_flags_file}")
+    set(_compiler_FLAGS "@${_pch_flags_file}" ${_PCH_ADDITIONAL_FLAGS})
 
     add_custom_command(
         OUTPUT "${_pchfile}"
