@@ -79,15 +79,15 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia
-        OpenGL
-        Qml
-        Quick
-        QuickWidgets
-        WebKit
-        WebKitWidgets
-        X11Extras
-)
+        Multimedia)
+
+if(withDesktopClient OR withMobileClient)
+    find_package(Qt5
+        COMPONENTS
+            OpenGL
+            Qml
+            Quick)
+endif()
 
 include(compiler_options)
 

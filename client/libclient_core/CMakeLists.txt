@@ -1,4 +1,5 @@
-find_library(Qt5MultimediaQuickTools_LIBS NAMES Qt5MultimediaQuick_p HINTS "${QT_DIR}/lib")
+find_library(Qt5MultimediaQuickTools_LIBS NAMES Qt5MultimediaQuick_p
+    PATHS "${QT_DIR}/lib" NO_DEFAULT_PATH)
 
 nx_add_target(libclient_core LIBRARY
     PUBLIC_LIBS
