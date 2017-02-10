@@ -136,8 +136,7 @@ def downloads(request):
         try:
             downloads_json = downloads_json.json()
         except:
-            raise APIRequestException("Cant read downloads. Code: " + str(downloads_json.status_code) +
-                                      " Text:" + downloads_json.text)
+            raise "Cant read downloads. Code: " + str(downloads_json.status_code) + " Text:" + downloads_json.text
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
