@@ -3,9 +3,9 @@
 #include <nx/utils/url_builder.h>
 
 #include <transaction/connection_guard_shared_state.h>
+#include <test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
-#include "ec2/transaction_connection_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -18,7 +18,7 @@ class Ec2MserverCloudSynchronizationConnection:
     public CdbFunctionalTest
 {
 public:
-    TransactionConnectionHelper connectionHelper;
+    test::TransactionConnectionHelper connectionHelper;
 };
 
 TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_removal)
