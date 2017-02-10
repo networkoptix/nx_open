@@ -53,7 +53,7 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_PCH)
-        add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" FORCEINCLUDE)
+        add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
 
     target_include_directories(${name} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

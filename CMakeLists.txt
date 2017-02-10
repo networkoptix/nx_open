@@ -27,8 +27,7 @@ endif()
 
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake
-)
+    ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
 include(utils)
@@ -54,6 +53,7 @@ include(${customization_dir}/customization.cmake)
 include(properties)
 include(cloud_host)
 include(vms_parts)
+include(compiler_options)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -88,8 +88,6 @@ if(withDesktopClient OR withMobileClient)
             Qml
             Quick)
 endif()
-
-include(compiler_options)
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
