@@ -17,7 +17,7 @@ namespace utils {
 
 namespace detail {
 
-class thread
+class NX_UTILS_API thread
 :
     public QThread
 {
@@ -41,7 +41,7 @@ private:
 
 }   //namespace detail
 
-class thread
+class NX_UTILS_API thread
 {
 public:
     typedef std::thread::id id;
