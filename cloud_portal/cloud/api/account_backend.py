@@ -8,13 +8,17 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class AccountBackend(object):
     @staticmethod
+    def check_email_in_portal(email):
+        try:
+            return models.Account.objects.get(email=email)
+        except ObjectDoesNotExist:
+            raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
+
+    @staticmethod
     def authenticate(username=None, password=None):
         user = Account.get(username, password)
         if user and 'email' in user:
-            try:
-                return models.Account.objects.get(email=user['email'])
-            except ObjectDoesNotExist:
-                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
+            AccountBackend.check_email_in_portal(user['email'])
 
         return None
 

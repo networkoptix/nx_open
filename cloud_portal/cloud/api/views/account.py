@@ -141,7 +141,9 @@ def activate(request):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
         return api_success()
     elif 'user_email' in request.data:
-        Account.reactivate(request.data['user_email'])
+        user_email = request.data['user_email'].lower()
+        api.models.AccountBackend.check_email_in_portal(user_email)  # Check if account is in Cloud_db
+        Account.reactivate(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
                                   error_data={'code': ['This field is required.'],
@@ -166,6 +168,8 @@ def restore_password(request):
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
+        api.models.AccountBackend.check_email_in_portal(user_email)  # Check if account is in Cloud_db
+
         Account.reset_password(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
