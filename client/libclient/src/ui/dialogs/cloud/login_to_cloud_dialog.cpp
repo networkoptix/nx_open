@@ -210,6 +210,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
     qnClientCoreSettings->setCloudPassword(stayLoggedIn
         ? q->ui->passwordInputField->text().trimmed()
         : QString());
+    qnClientCoreSettings->save();
 
     q->accept();
 }
