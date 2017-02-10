@@ -75,7 +75,7 @@ bool MediaServerLauncher::start()
 {
     prepareToStart();
 
-    std::promise<bool> processStartedPromise;
+    nx::utils::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();
 
     connect(
