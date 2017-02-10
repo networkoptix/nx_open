@@ -33,7 +33,7 @@ public:
      * @return New connection id.
      */
     ConnectionId establishTransactionConnection(
-        const SocketAddress& appserver2Endpoint,
+        const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy = KeepAlivePolicy::enableKeepAlive);
