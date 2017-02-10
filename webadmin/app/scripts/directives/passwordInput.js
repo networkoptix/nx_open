@@ -13,6 +13,7 @@ angular.module('webadminApp')
             },
             link:function(scope, element, attrs, ngModel){
                 scope.Config = Config;
+                scope.L = L;
                 scope.fairPassword = true;
                 function loadCommonPasswords(){
                     if(!Config.commonPasswordsList) {
