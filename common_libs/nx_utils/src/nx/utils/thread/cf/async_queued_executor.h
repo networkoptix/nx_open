@@ -5,6 +5,8 @@
 #include <thread>
 #include <condition_variable>
 
+#include <nx/utils/std/thread.h>
+
 #include "common.h"
 
 namespace cf {
@@ -23,7 +25,7 @@ private:
   std::queue<detail::task_type> tasks_;
   std::mutex mutex_;
   std::condition_variable cond_;
-  std::thread thread_;
+  nx::utils::thread thread_;
   bool need_stop_;
 };
 }

@@ -15,7 +15,7 @@ public:
         std::unique_ptr<AbstractStreamSocket> _socket);
     ~TimeProtocolConnection();
 
-    void startReadingConnection();
+    void startReadingConnection(boost::optional<std::chrono::milliseconds> inactivityTimeout);
 
 protected:
     virtual void stopWhileInAioThread() override;

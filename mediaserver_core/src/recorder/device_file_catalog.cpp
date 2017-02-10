@@ -257,6 +257,8 @@ void DeviceFileCatalog::removeChunks(int storageIndex)
 
 void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
 {
+    NX_ASSERT(std::is_sorted(newCatalog.begin(), newCatalog.end()));
+
     QnMutexLocker lock( &m_mutex );
 
     std::deque<Chunk> filteredData;
@@ -312,6 +314,8 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 
 void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
 {
+    NX_ASSERT(std::is_sorted(chunks.begin(), chunks.end()));
+
     QnMutexLocker lk( &m_mutex );
 
     std::deque<Chunk> existChunks;

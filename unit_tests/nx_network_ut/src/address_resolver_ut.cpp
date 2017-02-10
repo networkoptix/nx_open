@@ -301,6 +301,55 @@ TEST_F(AddressResolverTrivialNameResolve, DoesNotInvokeDns)
     assertIfDnsResolverHasBeenInvoked();
 }
 
+class AddressResolverNat64:
+    public ::testing::Test
+{
+public:
+    AddressResolverNat64()
+    {
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
+        std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6()), HostAddress(*kV4.ipV4())};
+        SocketGlobals::addressResolver().dnsResolver().addEtcHost(kV4.toString(), ipList);
+    }
+
+    ~AddressResolverNat64()
+    {
+        SocketGlobals::addressResolver().dnsResolver().removeEtcHost("192.168.1.2");
+    }
+
+    static const HostAddress kV4;
+    static const HostAddress kV6;
+};
+
+const HostAddress AddressResolverNat64::kV4("192.168.1.2");
+const HostAddress AddressResolverNat64::kV6("2001:db8:0:2::1");
+
+TEST_F(AddressResolverNat64, IPv4) // NAT64 not in use, IP v4 is just converted for better speed.
+{
+    const auto entries = SocketGlobals::addressResolver().resolveSync(
+        kV4, NatTraversalSupport::disabled, AF_INET);
+    ASSERT_EQ(1, entries.size());
+
+    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_TRUE(entries.front().host.isIpAddress());
+    ASSERT_EQ(kV4.ipV4()->s_addr, entries.front().host.ipV4()->s_addr);
+}
+
+TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 and converted IP v4.
+{
+    const auto entries = SocketGlobals::addressResolver().resolveSync(
+        kV4, NatTraversalSupport::disabled, AF_INET6);
+    ASSERT_EQ(2, entries.size());
+
+    ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
+    ASSERT_TRUE(entries.front().host.isIpAddress());
+    ASSERT_EQ(0, memcmp(&kV6.ipV6().get(), &entries.front().host.ipV6().get(), sizeof(in6_addr)));
+
+    ASSERT_EQ(cloud::AddressType::direct, entries.back().type);
+    ASSERT_TRUE(entries.back().host.isIpAddress());
+    ASSERT_EQ(0, memcmp(&kV4.ipV6().get(), &entries.back().host.ipV6().get(), sizeof(in6_addr)));
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx

@@ -32,9 +32,17 @@ void AsyncClient::bindToAioThread(network::aio::AbstractAioThread* aioThread)
         m_connectingSocket->bindToAioThread(aioThread);
 }
 
-void AsyncClient::connect(SocketAddress endpoint, bool useSsl)
+void AsyncClient::connect(
+    SocketAddress endpoint,
+    bool useSsl,
+    ConnectHandler handler)
 {
-    connect(std::move(endpoint), useSsl, nullptr);
+    QnMutexLocker lock(&m_mutex);
+    m_endpoint = std::move(endpoint);
+    m_useSsl = useSsl;
+    NX_ASSERT(!m_connectCompletionHandler);
+    m_connectCompletionHandler = std::move(handler);
+    openConnectionImpl(&lock);
 }
 
 bool AsyncClient::setIndicationHandler(
@@ -109,8 +117,8 @@ SocketAddress AsyncClient::localAddress() const
 SocketAddress AsyncClient::remoteAddress() const
 {
     QnMutexLocker lock(&m_mutex);
-    if (m_endpoint)
-        return *m_endpoint;
+    if (m_resolvedEndpoint)
+        return *m_resolvedEndpoint;
 
     return SocketAddress();
 }
@@ -197,19 +205,6 @@ void AsyncClient::setOnConnectionClosedHandler(
     OnConnectionClosedHandler onConnectionClosedHandler)
 {
     m_onConnectionClosedHandler.swap(onConnectionClosedHandler);
-}
-
-void AsyncClient::connect(
-    SocketAddress endpoint,
-    bool useSsl,
-    ConnectCompletionHandler completionHandler)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_endpoint = std::move(endpoint);
-    m_useSsl = useSsl;
-    NX_ASSERT(!m_connectCompletionHandler);
-    m_connectCompletionHandler = std::move(completionHandler);
-    openConnectionImpl(&lock);
 }
 
 void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
@@ -341,10 +336,13 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
 
 void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 {
+    if (m_connectingSocket)
+        m_resolvedEndpoint = m_connectingSocket->getForeignAddress();
+
     NX_LOGX(lm("Connect to %1 completed with result: %2")
         .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
-    ConnectCompletionHandler connectCompletionHandler;
+    ConnectHandler connectCompletionHandler;
     const auto executeOnConnectedHandlerGuard = makeScopedGuard(
         [&connectCompletionHandler, code]()
         {

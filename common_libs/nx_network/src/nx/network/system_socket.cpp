@@ -165,6 +165,11 @@ void Socket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* aioTh
     return Pollable::bindToAioThread(aioThread);
 }
 
+template<typename InterfaceToImplement>
+bool Socket<InterfaceToImplement>::isInSelfAioThread() const
+{
+    return Pollable::isInSelfAioThread();
+}
 
 template<typename InterfaceToImplement>
 bool Socket<InterfaceToImplement>::bind( const SocketAddress& localAddress )
@@ -1774,13 +1779,14 @@ int UDPSocket::recvFrom(
     HostAddress* const sourceAddress,
     quint16* const sourcePort )
 {
-    sockaddr_in clntAddr;
-    memset(&clntAddr, 0, sizeof(clntAddr));
-    socklen_t addrLen = sizeof(clntAddr);
+    SystemSocketAddress address(SocketAddress(), m_ipVersion);
+
+    // We are the only owners of this shared ptr, so it is save to const_cast it.
+    const auto sockAddrPtr = const_cast<sockaddr*>(address.ptr.get());
 
 #ifdef _WIN32
     const auto h = handle();
-    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, (sockaddr *)&clntAddr, (socklen_t *)&addrLen);
+    int rtn = recvfrom(h, (raw_type *)buffer, bufferLen, 0, sockAddrPtr, &address.size);
     if ((rtn == SOCKET_ERROR) &&
         (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
     {
@@ -1795,15 +1801,17 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
-        std::bind( &::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen ),
-        recvTimeout );
+        std::bind(&::recvfrom, handle(), (void*)buffer, (size_t)bufferLen, 0, sockAddrPtr, &address.size),
+        recvTimeout);
 #endif
 
     if (rtn >= 0)
     {
-        *sourceAddress = HostAddress(clntAddr.sin_addr);
-        *sourcePort = ntohs(clntAddr.sin_port);
+        SocketAddress socketAddress = address;
+        *sourceAddress = socketAddress.address;
+        *sourcePort = socketAddress.port;
     }
+
     return rtn;
 }
 

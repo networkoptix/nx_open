@@ -4,6 +4,7 @@
 
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/std/thread.h>
 
 #include <ec2/outgoing_transaction_sorter.h>
 
@@ -317,7 +318,7 @@ protected:
         {
             std::vector<VmsTransactionLogCache::TranId> transactionsForThread = 
                 selectRandomTransactions(transactionPerThreadCount);
-            thread = std::thread(
+            thread = nx::utils::thread(
                 std::bind(&FtOutgoingTransactionSorter::testThreadMain, this,
                     std::move(transactionsForThread)));
         }
@@ -327,7 +328,7 @@ protected:
     }
 
 private:
-    std::vector<std::thread> m_threads;
+    std::vector<nx::utils::thread> m_threads;
 
     std::vector<VmsTransactionLogCache::TranId> selectRandomTransactions(int maxTranCount)
     {

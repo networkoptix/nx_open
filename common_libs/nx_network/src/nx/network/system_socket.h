@@ -75,6 +75,7 @@ public:
     virtual bool getSendTimeout(unsigned int* millis) const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual bool isInSelfAioThread() const override;
 
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;

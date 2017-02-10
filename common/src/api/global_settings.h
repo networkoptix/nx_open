@@ -32,6 +32,7 @@ const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
+const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
@@ -115,6 +116,7 @@ public:
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
+    int eventLogPeriodDays() const;
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -233,6 +235,7 @@ signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();
+    void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
@@ -260,6 +263,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
+    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
 
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;

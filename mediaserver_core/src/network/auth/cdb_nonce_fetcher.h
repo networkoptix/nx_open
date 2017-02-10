@@ -78,6 +78,7 @@ private:
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
+    nx::utils::TimerManager* m_timerManager;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);

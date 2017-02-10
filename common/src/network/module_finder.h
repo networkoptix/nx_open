@@ -65,7 +65,10 @@ signals:
     void modulePrimaryAddressChanged(const QnModuleInformation &moduleInformation, const SocketAddress &address);
 
 private:
-    void at_responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &endpoint);
+    void at_responseReceived(
+            const QnModuleInformation &moduleInformation,
+            const SocketAddress &endpoint, const HostAddress & ip);
+
     void at_timer_timeout();
     void at_server_auxUrlsChanged(const QnResourcePtr &resource);
 
@@ -74,6 +77,7 @@ private:
     void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, Qn::ResourceStatus status);
 
     void removeModule(const QnUuid &id);
+    void updateAddressResolver(const QString& cloudModuleId, const SocketAddress& endpoint, const HostAddress* ip);
 
     struct ModuleItem {
         QnModuleInformation moduleInformation;
@@ -115,6 +119,7 @@ private:
     QHash<QnUuid, ModuleItem> m_moduleItemById;
     QHash<SocketAddress, QnUuid> m_idByAddress;
     QHash<SocketAddress, qint64> m_lastResponse;
+    QHash<SocketAddress, HostAddress> m_ipByAddress;
 
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;

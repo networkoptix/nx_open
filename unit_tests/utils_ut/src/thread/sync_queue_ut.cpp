@@ -14,11 +14,11 @@ class SyncQueue:
     public ::testing::Test
 {
 protected:
-    std::thread push(
+    nx::utils::thread push(
         std::vector<int> values,
         std::chrono::milliseconds delay = std::chrono::milliseconds(0))
     {
-        return std::thread(
+        return nx::utils::thread(
             [this, values = std::move(values), delay]()
             {
                 for (const auto& value: values)

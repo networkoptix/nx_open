@@ -3,7 +3,7 @@
 
 namespace cf {
 async_thread_pool_executor::worker_thread::worker_thread() {
-  thread_ = std::thread([this] {
+  thread_ = nx::utils::thread([this] {
     while (!need_stop_) {
       std::unique_lock<std::mutex> lock(m_);
       start_cond_.wait(lock, [this] {
@@ -57,7 +57,7 @@ void async_thread_pool_executor::worker_thread::start_task(
 async_thread_pool_executor::async_thread_pool_executor(size_t size)
   : tp_(size),
     available_count_(size) {
-  manager_thread_ = std::thread([this] {
+  manager_thread_ = nx::utils::thread([this] {
     while (!need_stop_) {
       std::unique_lock<std::mutex> lock(mutex_);
       cond_.wait(lock, [this] {

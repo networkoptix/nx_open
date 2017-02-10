@@ -527,7 +527,7 @@ void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
 
 db::DBResult AccountManager::fillCache()
 {
-    std::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
