@@ -20,8 +20,8 @@ public:
 
     QnVirtualCameraResourceList availableCameras() const;
 
-    bool useLayouts() const;
-    void setUseLayouts(bool useLayouts);
+    bool compatibilityMode() const;
+    void setCompatiblityMode(bool compatibilityMode);
 
 signals:
     void cameraAdded(const QnResourcePtr& resource);

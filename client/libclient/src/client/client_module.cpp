@@ -225,7 +225,6 @@ void QnClientModule::startLocalSearchers()
 void QnClientModule::initMetaInfo()
 {
     Q_INIT_RESOURCE(appserver2);
-    Q_INIT_RESOURCE(libclient_core);
     Q_INIT_RESOURCE(libclient);
     QnClientMetaTypes::initialize();
 }

@@ -65,6 +65,7 @@ namespace style
     const qreal Hints::kDisabledItemOpacity = 0.3;
     const qreal Hints::kDisabledBrandedButtonOpacity = 0.2;
     const int Hints::kMinimumFormLabelWidth = 64 - Metrics::kDefaultTopLevelMargin;
+    const qreal Hints::kMinimumTableRows = 3.0;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";

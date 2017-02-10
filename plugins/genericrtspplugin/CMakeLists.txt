@@ -1,5 +1,2 @@
-find_sources(src CPP_FILES HPP_FILES)
-
-add_library(genericrtspplugin ${CPP_FILES})
-
-target_link_libraries(genericrtspplugin nx_streaming)
+nx_add_target(genericrtspplugin LIBRARY
+    NO_MOC NO_PCH PUBLIC_LIBS nx_streaming)

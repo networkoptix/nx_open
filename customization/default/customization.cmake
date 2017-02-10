@@ -7,15 +7,14 @@ set(product.name.short "hdwitness")
 set(product.appName "hdwitness")
 set(company.name "Network Optix")
 set(short.company.name Nx)
-set(company.url "http://networkoptix.com")
-set(product.url "http://networkoptix.com/nxwitness-overview/")
-set(update.url "http://networkoptix.com/download")
 
-# Notice: support link overrides support address (but address should also be filled for compatibility reasons)
-set(company.support.address "support@networkoptix.com")
-set(company.support.link "http://support.networkoptix.com")
+set(companyUrl "http://networkoptix.com")
+set(productUrl "http://networkoptix.com/nxwitness-overview")
+set(licenseEmail "support@networkoptix.com")
+set(supportEmail "support@networkoptix.com")
+set(supportUrl "http://support.networkoptix.com")
+set(supportPhone "")
 
-set(company.license.address "support@networkoptix.com")
 set(installer.name "nxwitness")
 set(android.packageName "com.networkoptix.nxwitness")
 set(android.oldPackageName "com.networkoptix.hdwitness")
@@ -49,6 +48,8 @@ set(mac.app.sign.identity "3rd Party Mac Developer Application: Network Optix, I
 set(mac.pkg.sign.identity "3rd Party Mac Developer Installer: Network Optix, Inc. (L6FE34GJWM)")
 set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
+
+set(cloudName "Nx Cloud")
 
 set(liteDeviceName "Nx1")
 
@@ -94,19 +95,3 @@ set(translation11 "zh_TW")
 set(translation12 "vi_VN")
 set(translation13 "pl")
 set(translation14 "hu")
-#translation15 fil
-#translation15 he
-set(translation15 "")
-#translation16 id
-#translation16 tr
-set(translation16 "")
-#translation17 km
-set(translation17 "")
-#translation18 pt_BR
-set(translation18 "")
-#translation18 nl_BE
-set(translation19 "")
-set(translation20 "")
-
-# Defines (in one string)
-set(customization.defines "")

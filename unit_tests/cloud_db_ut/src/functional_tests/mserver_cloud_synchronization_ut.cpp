@@ -125,7 +125,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
         {
             // Removing user locally.
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
 
@@ -208,7 +208,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         addCloudUserLocally(testAccount.email, &accountVmsData);
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -227,7 +227,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         waitForCloudAndVmsToSyncUsers();
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -393,7 +393,7 @@ TEST_F(Ec2MserverCloudSynchronization, rename_system)
 
             ::ec2::ApiResourceParamWithRefDataList resultParamList;
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                     ->getResourceManager(Qn::kSystemAccess)
                     ->saveSync(paramList, &resultParamList));

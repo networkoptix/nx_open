@@ -26,7 +26,10 @@ Item
 
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
-            videoScreenController && videoScreenController.mediaPlayer.liveMode
+            videoScreenController
+                && videoScreenController.mediaPlayer.liveMode
+                && !playbackController.paused
+        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -400,9 +403,19 @@ Item
             onClicked:
             {
                 if (paused)
+                {
+                    if (d.resumePosition > 0)
+                    {
+                        videoScreenController.setPosition(d.resumePosition)
+                        d.resumePosition = -1
+                    }
                     videoScreenController.play()
+                }
                 else
+                {
                     videoScreenController.pause()
+                    d.resumePosition = videoScreenController.mediaPlayer.position
+                }
             }
         }
 

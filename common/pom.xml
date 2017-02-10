@@ -158,6 +158,24 @@
         </profile>
 
         <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <rdep.linux.packages>quazip opengl-es-mali</rdep.linux.packages>
+            </properties>
+        </profile>
+
+        <profile>
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
