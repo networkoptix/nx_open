@@ -103,6 +103,7 @@ def downloads(request):
     if not downloads_json:
         # get updates.json
         updates_json = requests.get(settings.UPDATE_JSON)
+        updates_json.raise_for_status()
         updates_json = updates_json.json()
 
         # find settings for customizations
@@ -118,7 +119,8 @@ def downloads(request):
         updates_path = updates_record['updates_prefix']
 
         # get downloads.json for specific version
-        downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+        downloads_path = updates_path + '/' + build_number + '/downloads.json'
+        downloads_json = requests.get(downloads_path)
 
         # Check response result here
         if downloads_json.status_code != requests.codes.ok:
@@ -126,11 +128,16 @@ def downloads(request):
             # TODO: this is hardcode - remove it after release
             latest_version = updates_record['releases']['3.0']
             build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
-            downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+            downloads_path = updates_path + '/' + build_number + '/downloads.json'
+            downloads_json = requests.get(downloads_path)
             pass
 
         downloads_json.raise_for_status()
-        downloads_json = downloads_json.json()
+        try:
+            downloads_json = downloads_json.json()
+        except:
+            raise APIRequestException("Cant read downloads. Code: " + downloads_json.status_code +
+                                      " Text:" + downloads_json.text)
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
