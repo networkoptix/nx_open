@@ -97,7 +97,11 @@ private:
     {
         m_startSize = startSize;
         m_endSize = endSize;
-        m_step = step;
+        #ifndef __arm__
+            m_step = step;
+        #else
+            m_step = step * 2;
+        #endif
     }
 
     void setShouldFail(bool shouldFail)
@@ -149,7 +153,6 @@ private:
     FilterTest m_filterTest;
     bool m_shouldFail;
 };
-
 
 TEST_F(ScaleFilterTest, ImageSizes)
 {
