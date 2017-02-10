@@ -15,7 +15,7 @@ describe('Sharing.', function () {
         p.helper.changeAccountNames(newName, newName);
         p.helper.logout();
 
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
         p.ownedSystem.click();
         p.usrDataRow(viewerEmail).click();
         p.usrDataRow(viewerEmail).element(by.css('.glyphicon-pencil')).click();
@@ -27,7 +27,7 @@ describe('Sharing.', function () {
     });
 
     it ("Share button - opens dialog", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
         p.ownedSystem.click();
         p.shareButton.click();
 
@@ -37,7 +37,7 @@ describe('Sharing.', function () {
     });
 
     it ("Sharing link /systems/{system_id}/share - opens dialog", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
@@ -55,7 +55,7 @@ describe('Sharing.', function () {
     });
 
     it ("After closing dialog, called by link - clear link", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
@@ -64,18 +64,18 @@ describe('Sharing.', function () {
         expect(browser.getCurrentUrl()).not.toContain(p.systemLink +'/share');
     });
 
-    it ("Sharing roles are ordered: less access is on top of the list with options", function() {
-        p.helper.login(p.helper.userEmailOwner);
+    it ("Sharing roles are ordered: more access is on top of the list with options", function() {
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
         expect(p.permEmailFieldEnabled.isDisplayed()).toBe(true);
-        expect(p.roleField.getText()).toMatch('Live viewer\nViewer\nAdvanced viewer\nAdministrator\nCustom');
+        expect(p.roleField.getText()).toMatch('Administrator\nAdvanced Viewer\nViewer\nLive Viewer\nCustom');
         p.permDialogClose.click();
     });
 
     it ("When user selects role - special hint appears", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
@@ -123,7 +123,7 @@ describe('Sharing.', function () {
     //});
 
     it ("Edit permission works", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
         p.ownedSystem.click();
         // Change permissions of viewer to live viewer
         p.usrDataRow(p.helper.userEmailViewer).click();
@@ -132,7 +132,7 @@ describe('Sharing.', function () {
         p.selectRoleOption(p.helper.roles.liveViewer).click();
         p.permDialogSubmit.click();
         p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
-        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('Live viewer');
+        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).toContain('Live Viewer');
         // Change permissions of live viewer to viewer back
         p.usrDataRow(p.helper.userEmailViewer).click();
         p.usrDataRow(p.helper.userEmailViewer).element(by.css('.glyphicon-pencil')).click();
@@ -140,14 +140,14 @@ describe('Sharing.', function () {
         p.selectRoleOption(p.helper.roles.viewer).click();
         p.permDialogSubmit.click();
         p.alert.catchAlert(p.alert.alertMessages.permissionAddSuccess, p.alert.alertTypes.success);
-        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('live viewer');
+        expect(p.usrDataRow(p.helper.userEmailViewer).getText()).not.toContain('Live Viewer');
     });
 
     it ("Sharing works", function() {
         var newUserEmail = p.helper.getRandomEmail();
         p.helper.createUser('Mark', 'Hamill', newUserEmail);
 
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
 
         p.emailField.sendKeys(newUserEmail);
@@ -168,7 +168,7 @@ describe('Sharing.', function () {
         p.helper.createUser('Mark', 'Hamill').then( function(userEmail) {
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
 
-            p.helper.login(p.helper.userEmailOwner, p.helper.userPassword);
+            p.helper.loginToSystems(p.helper.userEmailOwner, p.helper.userPassword);
             p.helper.getSysPage(p.systemLink);
             p.shareButton.click();
             p.emailField.sendKeys(userEmail);
@@ -186,7 +186,7 @@ describe('Sharing.', function () {
     });
 
     it ("When edit share: Email label in dialog replaced with User", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);
@@ -200,7 +200,7 @@ describe('Sharing.', function () {
     });
 
     it ("Sharing dialog has cancel button, which works", function() {
-        p.helper.login(p.helper.userEmailOwner);
+        p.helper.loginToSystems(p.helper.userEmailOwner);
 
         p.helper.get(p.helper.urls.systems + p.systemLink +'/share');
         expect(p.permDialog.isPresent()).toBe(true);

@@ -1,5 +1,16 @@
 <div class="auth-visible" process-loading="gettingSystem">
-    <ng-include src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>Failed to access System</h1>
+        <p>This link is broken,<br>
+            System may be disconnected from cloud,<br>
+            Access to this System may be revoked, <br>
+            or you may be logged into a different account</p>
+        <p>
+            <a href="/systems" class="btn btn-default">Available systems list</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
     <div class="row"  ng-if="gettingSystem.success">
         <div class="col-md-4 col-md-push-8">
             <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>

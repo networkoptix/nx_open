@@ -1,13 +1,16 @@
-// An example configuration file.
+var customization = require('./test-customization.json');
 exports.config = {
+
+
     // Do not start a Selenium Standalone sever - only run this using chrome.
 
     //chromeOnly: true,
     //chromeDriver: 'node_modules/protractor/selenium/chromedriver',
 
     //baseUrl: 'http://127.0.0.1:9000', // Local grunt serve
-    baseUrl: 'http://cloud-test.hdw.mx',
+    //baseUrl: 'http://nx.cloud-demo.hdw.mx',
     //baseUrl: 'http://cloud-local', // local vagrant
+    baseUrl: customization.portal, // get portal url from ./test-customization.json (filled by grunt testallbrands)
 
 
     // Capabilities to be passed to the webdriver instance.
@@ -27,7 +30,7 @@ exports.config = {
     // Options to be passed to Jasmine-node.
     jasmineNodeOpts: {
         showColors: true,
-        defaultTimeoutInterval: 60000
+        defaultTimeoutInterval: 120000
     },
 
     allScriptsTimeout: 8000, // by default it is 11s. See Waiting For Page Sync http://www.protractortest.org/#/timeouts

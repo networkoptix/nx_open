@@ -20,8 +20,16 @@ angular.module('cloudApp')
             return $scope.system.getInfo();
         }, {
             errorCodes: {
-                forbidden: L.errorCodes.systemForbidden,
-                notFound: L.errorCodes.systemNotFound
+                forbidden: function(error){
+                    // Special handling for not having an access to the system
+                    $scope.systemNoAccess = true;
+                    return false;
+                },
+                notFound:  function(error){
+                    // Special handling for not having an access to the system
+                    $scope.systemNoAccess = true;
+                    return false;
+                },
             },
             errorPrefix:'System info is unavailable:'
         }).then(function (){

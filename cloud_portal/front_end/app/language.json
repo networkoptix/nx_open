@@ -99,8 +99,6 @@
     "emailAlreadyExists": "This email address has been already registered.",
     "oldPasswordMistmatch": "Current password is incorrect.",
     "passwordMismatch": "Wrong password",
-    "systemForbidden": "You don't have access to this system.",
-    "systemNotFound": "System not found.",
     "cantEditYourself": "Changing own permissions is not allowed.",
     "cantEditAdmin": "This user already has administrator permissions.",
     "cantOpenClient": "VMS_NAME application was not detected. <a href=\"/download\">Download</a>"

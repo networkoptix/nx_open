@@ -13,7 +13,7 @@ var SystemsListPage = function () {
 
     //These functions allows to find desired child in provided element
     this.openInNxButton = function(ancestor) {
-        return ancestor.element(by.buttonText('Open in Nx Witness'));
+        return ancestor.element(by.partialButtonText('Open in '));
     };
     this.systemOwner = function(ancestor) {
         return ancestor.element(by.css('.user-name'));

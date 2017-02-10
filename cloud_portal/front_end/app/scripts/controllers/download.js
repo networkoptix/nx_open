@@ -40,9 +40,12 @@ angular.module('cloudApp')
             'Mac OS': 'MacOS'
         }
 
-        var activeOs = $routeParams.platform ||platformMatch[window.jscd.os] || window.jscd.os;
+        var activeOs = $routeParams.platform || platformMatch[window.jscd.os] || window.jscd.os;
+
+        var foundPlatform = false;
         _.each($scope.downloads.groups,function(platform){
             platform.active = (platform.os || platform.name) === activeOs;
+            foundPlatform = platform.active || foundPlatform;
         });
 
 
@@ -50,10 +53,20 @@ angular.module('cloudApp')
             if(Config.downloads.mobile[mobile].os === activeOs){
                 if(L.downloads.mobile[Config.downloads.mobile[mobile].name].link != 'disabled'){
                     window.location.href = L.downloads.mobile[Config.downloads.mobile[mobile].name].link;
+                    return;
                 }
                 break;
             }
         }
+
+        if($routeParams.platform && !foundPlatform){
+            $location.path("404"); // Can't find this page user is looking for
+            return;
+        }
+        if(!foundPlatform){
+            $scope.downloads.groups[0] = true;
+        }
+
 
         $scope.changeHash = function(platform){
             var addHash = (platform.os || platform.name);

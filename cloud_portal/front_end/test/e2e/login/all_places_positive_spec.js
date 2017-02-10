@@ -4,6 +4,10 @@ describe('Login with correct credentials', function () {
 
     var p = new LoginPage();
 
+    beforeAll( function () {
+        p.helper.get();
+    });
+
     it("works at registration page before submit", function() {
         p.helper.get( p.helper.urls.register );
         p.loginButton.click();

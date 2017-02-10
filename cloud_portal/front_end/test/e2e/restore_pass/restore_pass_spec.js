@@ -145,6 +145,7 @@ describe('Restore password page', function () {
 
     it("should handle click I forgot my password link at restore password page", function () {
         p.helper.get(p.helper.urls.restore_password);
+        browser.sleep(100);
         p.helper.forms.login.openLink.click();
         p.iForgotPasswordLink.click();
         expect(browser.getCurrentUrl()).toContain(p.helper.urls.restore_password);
