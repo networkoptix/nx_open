@@ -652,7 +652,7 @@
             }
         },
         {
-            "keys": ["Hikvision|DS-2CD63CDF-IS"],
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
