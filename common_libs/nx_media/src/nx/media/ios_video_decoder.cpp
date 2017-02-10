@@ -364,7 +364,7 @@ int IOSVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
     if (d->frame->data[3])

@@ -349,13 +349,14 @@ begin_label:
     int chunkSwitchCnt = 0;
     while (!data || (m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000))
     {
-        DeviceFileCatalog::TruncableChunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
         DeviceFileCatalog::UniqueChunkCont ignoreChunks;
         bool switchResult;
         DeviceFileCatalog::Chunk fallbackChunk;
 
-        do {
+        do 
+        {
+            DeviceFileCatalog::TruncableChunk chunk;
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {

@@ -322,7 +322,7 @@ TEST_F(Account, bad_registration)
     url.setPort(endpoint().port);
     url.setScheme("http");
     url.setPath("/cdb/account/register");
-    std::promise<void> donePromise;
+    nx::utils::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,

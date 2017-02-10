@@ -29,13 +29,24 @@
 #include "api/model/audit/auth_session.h"
 
 namespace {
-    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat) {
+    Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
+    {
         Qn::SerializationFormat format = defaultFormat;
         QString formatString = QUrlQuery(url).queryItemValue(lit("format"));
         if (!formatString.isEmpty())
             format = QnLexical::deserialized(formatString, defaultFormat);
         return format;
     }
+
+    void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
+    {
+        //TODO #ak videowall looks strange here
+        if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+            httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+        httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
+    }
+
 } // anonymous namespace
 
 namespace ec2
@@ -86,7 +97,7 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+            addCustomHeaders(httpClient);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
 
@@ -129,11 +140,7 @@ namespace ec2
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
-
-            //TODO #ak videowall looks strange here
-            if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
-            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+            addCustomHeaders(httpClient);
 
             requestUrl.setPath( lit("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;

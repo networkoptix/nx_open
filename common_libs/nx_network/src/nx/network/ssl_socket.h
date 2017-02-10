@@ -130,6 +130,10 @@ class NX_NETWORK_API MixedSslSocket: public SslSocket
 public:
     MixedSslSocket(AbstractStreamSocket* wrappedSocket);
 
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
+    virtual bool setNonBlockingMode(bool val) override;
+
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
@@ -147,6 +151,8 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
 private:
+    bool updateInternalBlockingMode();
+
     Q_DECLARE_PRIVATE(MixedSslSocket);
 };
 

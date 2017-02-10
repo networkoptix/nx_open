@@ -99,7 +99,7 @@ if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     )
 fi
 
-#additional libs for nx1 client
+# Additional libs for nx1
 if [[ "${box}" == "bpi" ]]; then
     LIBS_TO_COPY+=(
     # Put nx1(bpi) specific server libs here

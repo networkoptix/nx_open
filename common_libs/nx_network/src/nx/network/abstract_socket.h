@@ -210,6 +210,9 @@ public:
               certaind thread type is not the same)
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
+
+    //!Returns true if this socket in own AIO thread
+    virtual bool isInSelfAioThread() const;
 };
 
 //!Interface for writing to/reading from socket

@@ -21,6 +21,7 @@ class UDPSocket;
 }   //nx
 
 struct QnModuleInformation;
+class HostAddress;
 class SocketAddress;
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
@@ -68,7 +69,9 @@ public slots:
 private slots:
     void at_moduleInformationChanged();
 signals:
-    void responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void responseReceived(
+        const QnModuleInformation &moduleInformation,
+        const SocketAddress &endpoint, const HostAddress& ip);
 
 protected:
     virtual void run() override;

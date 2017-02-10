@@ -50,7 +50,7 @@ class TestTcpListener: public QnTcpListener
 {
 public:
     TestTcpListener(const QHostAddress& address, int port):
-        QnTcpListener(address, port, DEFAULT_MAX_CONNECTIONS, false /*disable SSL*/)
+        QnTcpListener(address, port, DEFAULT_MAX_CONNECTIONS, /*useSSL*/ false)
     {
     }
 

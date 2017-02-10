@@ -1069,9 +1069,7 @@
               <function>
                 <name>manualCamera/add</name>
                 <description>
-                  Manually add camera(s). If several cameras are added, parameters
-                  "url" and "manufacturer" must be defined several times with incrementing
-                  suffix "0", "1", etc.
+                  Manually add camera(s).
 <p>
 Parameters should be passed as a JSON object in POST message body with
 content type "application/json". Example of such object:
@@ -1083,8 +1081,8 @@ content type "application/json". Example of such object:
     [
         {
             "uniqueId": "00-1A-07-00-FF-FF",
-            "url": "192.168.0.100"
-            "manufacturer": "3100",
+            "url": "192.168.0.100",
+            "manufacturer": "3100"
         }
     ]
 }
