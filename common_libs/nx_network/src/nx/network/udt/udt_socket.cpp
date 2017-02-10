@@ -911,6 +911,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 
+    if (!setNonBlockingMode(true))
+        return nullptr;
+
     acceptAsync(
         [this, &acceptedSocketPromise](
             SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
@@ -925,6 +928,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         });
 
     auto acceptedSocketPair = acceptedSocketPromise.get_future().get();
+
+    if (!setNonBlockingMode(false))
+        return nullptr;
+
     if (acceptedSocketPair.first != SystemError::noError)
     {
         SystemError::setLastErrorCode(acceptedSocketPair.first);
