@@ -121,6 +121,9 @@ public:
     QAbstractItemView* treeView() const;
     QnResourceItemDelegate* itemDelegate() const;
 
+    using base_type::update;
+    void update(const QnResourcePtr& resource);
+
 protected:
     virtual bool eventFilter(QObject *obj, QEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
