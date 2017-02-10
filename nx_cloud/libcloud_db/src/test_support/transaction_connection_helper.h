@@ -4,13 +4,13 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <transaction/connection_guard_shared_state.h>
 #include <transaction/transaction_transport_base.h>
 
-#include "transaction_transport.h"
+#include "test_transaction_transport.h"
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 enum class KeepAlivePolicy
 {
@@ -84,5 +84,6 @@ private:
         ::ec2::QnTransactionTransportBase::State /*newState*/);
 };
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

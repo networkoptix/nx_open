@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
@@ -168,5 +169,6 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     m_condition.wakeAll();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx
