@@ -452,8 +452,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_gen(m_rd()),
     m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this),
-    m_camInfoWriter(&m_camInfoWriterHandler),
-    m_camInfoReader(&m_camInfoReadHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -1009,16 +1008,15 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildCancelled)
             return; // cancel rebuild
 
-        m_camInfoReader.loadCameraInfo(
-            fi,
-            archiveCameraList,
+        nx::caminfo::ServerReaderHandler readerHandler;
+        nx::caminfo::Reader(&readerHandler, fi, 
             [&storage](const QString& filePath)
             {
                 auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
                 if (!file)
                    return QByteArray();
                 return file->readAll();
-            });
+            })(archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
         ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);

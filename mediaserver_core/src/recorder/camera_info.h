@@ -170,16 +170,15 @@ class Reader
     };
 
 public:
-    Reader(ReaderHandler* readerHandler);
+    Reader(ReaderHandler* readerHandler,
+           const QnAbstractStorageResource::FileInfo& fileInfo,
+           std::function<QByteArray(const QString&)> getFileDataFunc);
 
-    void loadCameraInfo(
-        const QnAbstractStorageResource::FileInfo &fileInfo,
-        ArchiveCameraDataList &archiveCameraList,
-        std::function<QByteArray(const QString&)> getFileDataFunc);
+    void operator()(ArchiveCameraDataList &archiveCameraList);
 
 private:
     bool initArchiveCamData();
-    bool cameraAlreadyExists() const;
+    bool cameraAlreadyExists(const ArchiveCameraDataList& camerasList) const;
     bool readFileData();
     bool parseData();
     ParseResult parseLine(const QString& line) const;

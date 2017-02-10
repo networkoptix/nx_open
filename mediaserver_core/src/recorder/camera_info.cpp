@@ -214,23 +214,18 @@ ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 }
 
 
-Reader::Reader(ReaderHandler* readerHandler):
-    m_handler(readerHandler)
+Reader::Reader(ReaderHandler* readerHandler, 
+               const QnAbstractStorageResource::FileInfo& fileInfo, 
+               std::function<QByteArray(const QString&)> getFileDataFunc):
+    m_handler(readerHandler),
+    m_fileInfo(&fileInfo),
+    m_getDataFunc(getFileDataFunc)
 {}
 
-void Reader::loadCameraInfo(
-    const QnAbstractStorageResource::FileInfo &fileInfo,
-    ArchiveCameraDataList &archiveCameraList,
-    std::function<QByteArray(const QString& filePath)> getFileDataFunc)
+void Reader::operator()(ArchiveCameraDataList &archiveCameraList)
 {
-    m_archiveCamList = &archiveCameraList;
-    m_fileInfo = &fileInfo;
-    m_getDataFunc = getFileDataFunc;
-    m_fileData.clear();
-    m_archiveCamData = ArchiveCameraData();
-
     if (!initArchiveCamData()
-        || cameraAlreadyExists()
+        || cameraAlreadyExists(archiveCameraList)
         || !readFileData()
         || !parseData())
     {
@@ -238,7 +233,7 @@ void Reader::loadCameraInfo(
         return;
     }
 
-    m_archiveCamList->push_back(m_archiveCamData);
+    archiveCameraList.push_back(m_archiveCamData);
 }
 
 bool Reader::initArchiveCamData()
@@ -276,7 +271,7 @@ bool Reader::initArchiveCamData()
     return true;
 }
 
-bool Reader::cameraAlreadyExists() const
+bool Reader::cameraAlreadyExists(const ArchiveCameraDataList& cameraList) const
 {
     if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
     {
@@ -289,8 +284,8 @@ bool Reader::cameraAlreadyExists() const
     }
 
     if(std::find_if(
-                m_archiveCamList->cbegin(),
-                m_archiveCamList->cend(),
+                cameraList.cbegin(),
+                cameraList.cend(),
                 [this](const ArchiveCameraData& cam)
                 {
                     return cam.coreData.id == m_archiveCamData.coreData.id;
