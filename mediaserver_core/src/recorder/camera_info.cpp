@@ -83,14 +83,23 @@ void Writer::write()
 
     m_lastWriteTime = std::chrono::steady_clock::now();
 }
+bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
+{
+    bool isDataAndPathValid = !infoFilePath.isEmpty() && !infoFileData.isEmpty();
+    bool isDataChanged = !m_infoPathToCameraInfo.contains(infoFilePath) || 
+                          m_infoPathToCameraInfo[infoFilePath] != infoFileData;
+
+    return isDataAndPathValid && isDataChanged;
+}
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    if (infoFilePath.isEmpty() || infoFileData.isEmpty())
-        return;
+    NX_LOG(lit("%1: write camera info to %2. Data changed: %3") 
+            .arg(Q_FUNC_INFO)
+            .arg(infoFilePath) 
+            .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
 
-    if (!m_infoPathToCameraInfo.contains(infoFilePath) ||
-        m_infoPathToCameraInfo[infoFilePath] != infoFileData)
+    if (isWriteNeeded(infoFilePath, infoFileData))
     {
         if (m_handler->handleFileData(infoFilePath, infoFileData))
             m_infoPathToCameraInfo[infoFilePath] = infoFileData;
@@ -217,6 +226,8 @@ void Reader::loadCameraInfo(
     m_archiveCamList = &archiveCameraList;
     m_fileInfo = &fileInfo;
     m_getDataFunc = getFileDataFunc;
+    m_fileData.clear();
+    m_archiveCamData = ArchiveCameraData();
 
     if (!initArchiveCamData()
         || cameraAlreadyExists()

@@ -63,6 +63,7 @@ public:
 
 private:
     void writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData);
+    bool isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const;
     static QString makeFullPath(
         const QString& storageUrl,
         QnServer::ChunksCatalog catalog,

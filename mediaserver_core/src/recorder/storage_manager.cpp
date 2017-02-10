@@ -506,6 +506,18 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
         bool doAdd = (cameraLowCatalog && !cameraLowCatalog->isEmpty()) || (cameraHiCatalog && !cameraHiCatalog->isEmpty());
         if (doAdd)
             camerasToAdd.push_back(camera);
+
+        if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2)
+        {
+            QString logMessage;
+            QTextStream logStream(&logMessage);
+
+            logStream << lit("camera info: Camera found %1").arg(camera.coreData.physicalId) << endl;
+            for (const auto& prop: camera.properties)
+                logStream << "\t" << prop.name << " : " << prop.value << endl << endl;
+
+            NX_LOG(logMessage, cl_logDEBUG2);
+        }
     }
 
     for (const auto &camera : camerasToAdd)

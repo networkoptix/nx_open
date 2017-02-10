@@ -464,6 +464,8 @@ protected:
             getDataFunc = [](const QString&) { return QByteArray(kInfoFileWithAdditionalPropPattern); };
         else
             getDataFunc = [](const QString&) { return QByteArray(); };
+
+        getDataFunc2 = [](const QString&) { return QByteArray(kInfoFilePattern); };
     }
 
     void then(ResultIs resultIsFlag)
@@ -501,6 +503,7 @@ protected:
     ReaderTestHandler readerHandler;
     nx::caminfo::Reader reader;
     std::function<QByteArray(const QString&)> getDataFunc;
+    std::function<QByteArray(const QString&)> getDataFunc2;
     QnAbstractStorageResource::FileInfo fileInfo;
     nx::caminfo::ArchiveCameraDataList camDataList;
 };
@@ -573,4 +576,25 @@ TEST_F(ReaderTest, CorrectData)
     reader.loadCameraInfo(fileInfo, camDataList, getDataFunc);
     then(ResultIs::NotEmpty);
     thenDataIsCorrect();
+}
+
+TEST_F(ReaderTest, CorrectDataMultiple)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+
+    nx::caminfo::ArchiveCameraDataList camList;
+
+    reader.loadCameraInfo(fileInfo, camList, getDataFunc2);
+    ASSERT_EQ(camList[0].properties.size(), 2);
+
+    camList.clear();
+    reader.loadCameraInfo(fileInfo, camList, getDataFunc);
+    ASSERT_EQ(camList[0].properties.size(), 3);
+
+    camList.clear();
+    reader.loadCameraInfo(fileInfo, camList, getDataFunc2);
+    ASSERT_EQ(camList[0].properties.size(), 2);
 }
