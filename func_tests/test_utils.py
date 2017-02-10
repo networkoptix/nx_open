@@ -7,10 +7,13 @@ from utils import SimpleNamespace
 from vagrant_box import Vagrant
 from server_rest_api import REST_API_USER, REST_API_PASSWORD
 from server import (
+    MEDIASERVER_LISTEN_PORT,
     MEDIASERVER_DIST_FPATH,
     Server,
     )
 
+
+DEFAULT_HTTP_SCHEMA = 'http'
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -80,9 +83,10 @@ class EnvironmentBuilder(object):
             config.assign_box(box_config.name)
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
 
-    def init_server(self, config, boxes):
+    def init_server(self, http_schema, config, boxes):
         box = boxes[config.box_name]
-        server = Server(config.name, box, box.ip_address, self._cloud_host_rest_api)
+        url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
+        server = Server(config.name, box, url, self._cloud_host_rest_api)
         server.init(config.start, self._reset_servers)
         server.storage.cleanup()
         if server.is_started() and not server.is_system_set_up() and config.setup == ServerConfig.SETUP_LOCAL:
@@ -100,7 +104,7 @@ class EnvironmentBuilder(object):
             assert server_2.is_started(), 'Requested merge of not started server: %s' % server_2
             server_1.merge_systems(server_2)
 
-    def build_environment(self, merge_servers=None, **kw):
+    def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, merge_servers=None,  **kw):
         log.info('WORK_DIR=%r', self._work_dir)
         vagrant_dir = os.path.join(self._work_dir, 'vagrant')
         if not os.path.isdir(vagrant_dir):
@@ -123,7 +127,7 @@ class EnvironmentBuilder(object):
         vagrant.init(self._boxes_config, recreate_boxes)
         if recreate_boxes:
             self._test_session.boxes_recreated = True  # recreate only before first test
-        servers = {config.name: self.init_server(config, vagrant.boxes) for config in servers_config}
+        servers = {config.name: self.init_server(http_schema, config, vagrant.boxes) for config in servers_config}
         self.run_servers_merge(merge_servers or [], servers)
         for name, server in servers.items():
             log.info('%s: %r at %s ecs_guid=%r', name.upper(), server.name, server.url, server.ecs_guid)

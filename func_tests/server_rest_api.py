@@ -1,7 +1,9 @@
 import json
 import logging
+import warnings
 import requests
 import requests.exceptions
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPDigestAuth
 
 
@@ -56,7 +58,9 @@ class ServerRestApiProxy(object):
         if timeout_sec is None:
             timeout_sec = REST_API_TIMEOUT_SEC
         try:
-            response = fn(url, auth=HTTPDigestAuth(self._user, self._password), timeout=timeout_sec, *args, **kw)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', InsecureRequestWarning)
+                response = fn(url, auth=HTTPDigestAuth(self._user, self._password), timeout=timeout_sec, verify=False, *args, **kw)
         except requests.exceptions.RequestException as x:
             log.debug('\t--> %s: %s', x.__class__.__name__, x)
             raise

@@ -146,10 +146,10 @@ class ServerPersistentInfo(object):
         
 class Server(object):
 
-    def __init__(self, name, box, ip_address, cloud_host_rest_api):
+    def __init__(self, name, box, url, cloud_host_rest_api):
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
-        self.url = 'http://%s:%d/' % (ip_address, MEDIASERVER_LISTEN_PORT)
+        self.url = url
         self.cloud_host_rest_api = cloud_host_rest_api
         self.service = Service(box, MEDIASERVER_SERVICE_NAME)
         self.user = REST_API_USER

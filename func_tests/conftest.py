@@ -38,6 +38,11 @@ def run_options(request):
         )
 
 
+@pytest.fixture(params=['http', 'https'])
+def http_schema(request):
+    return request.param
+
+
 @pytest.fixture
 def server():
     return ServerFactory()
