@@ -326,7 +326,7 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All cloud features will be disabled, cloud users will be deleted from the System.");
+    return setWarningStyleHtml(tr("All cloud users will be deleted."));
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
