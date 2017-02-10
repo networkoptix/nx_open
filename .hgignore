@@ -41,6 +41,7 @@ packages.config
 .vs
 .git
 TAGS
+*.kdev4
 
 .DS_Store
 Debug

@@ -124,6 +124,7 @@ public:
     void hideToolTip();
     void showToolTip();
 
+    void clearSelection();
 signals:
     void currentTabChanged();
     void selectionChanged();
