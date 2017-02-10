@@ -8,13 +8,13 @@ cloud_database:
     database: '$DB_NAME'
 
 cloud_db:
-    url: 'https://$CLOUD_DB_HOST:$CLOUD_DB_PORT/cdb'
+    url: 'http://$CLOUD_DB_HOST:$CLOUD_DB_PORT/cdb'
 
 cloud_portal:
     url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
-    url: 'https://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
+    url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
 mail_from: 'Nx Cloud <service@networkoptix.com>'
 
