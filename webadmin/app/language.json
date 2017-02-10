@@ -7,26 +7,26 @@
     "setup":{
         "createAccount": "create account",
         "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to your local network ot Internet"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
     },
     "passwordRequirements":
     {
         "minLengthMessage":"Password must contain at least 8 characters",
-        "requiredMessage": "Use only latin letters, numbers and keyboard \n symbols, avoid leading and trailing spaces.",
-        "weakMessage": "Use numbers, symbols in different case\n and special symbols to make your password stronger",
+        "requiredMessage": "Use only alphanumeric characters and keyboard \n symbols, avoid leading and trailing spaces.",
+        "weakMessage": "Use both upper- and lower-case letters \n and special symbols to make password stronger",
         "strongMessage": "Strong password!",
         "commonMessage": "This password is in top most popular passwords in the world"
     },
     "settings":{
-        "confirmRestart": "Do you want to restart server now?",
+        "confirmRestart": "Restart server?",
         "couldntCheckInternet": "Couldn't check cloud connection",
-        "confirmRestoreDefault": "Do you want to clear database and settings? This process will take some time and server will be restarted afterwards.",
+        "confirmRestoreDefault": "Clear database and settings? This process will take some time and server will be restarted afterwards.",
         "confirmRestoreDefaultTitle": "Restore factory defaults",
         "unexpectedError": "Can't proceed with action: unexpected error has happened",
         "connnetionError": "Connection error",
         "wrongPassword": "Wrong password.",
         "error": "Error: ",
-        "restartNeeded": "All changes saved. New settings will be applied after restart. \n Do you want to restart server now?",
+        "restartNeeded": "All changes saved. New settings will be applied after restart. \n Restart server?",
         "settingsSaved": "Settings saved",
         "confirmHardwareRestart": "Do you want to restart server's operation system?",
         "confirmRestoreSettings": "Do you want to restore all server's settings? Archive will be saved, but network settings will be reset.",
@@ -44,10 +44,10 @@
 
 
         "confirmChangePassword": "Change admin's password",
-        "confirmChangePasswordTitle":"Are you sure you want to change system password? It will affect admin user and root password for some servers",
+        "confirmChangePasswordTitle":"Change system password? It will affect user "admin" and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
 
-        "nx1ControlHint": "Client application was started. Use a keyboard or mobile application to control it."
+        "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
     },
     "join":{
@@ -55,14 +55,14 @@
         "incorrectCurrentPassword": "Incorrect current password",
         "incorrectRemotePassword": "Login or password are incorrect",
         "incompatibleVersion": "System is unreachable, doesn't exist or has incompatible version.",
-        "wrongUrl": "Unable to connect to specified server.",
+        "wrongUrl": "Unable to connect to the specified server.",
         "newSystemError": "Can't merge systems. Remote system is not configured yet",
         "safeMode": "Can't merge systems. Remote system is in safe mode.",
         "configError": "Can't merge systems. Maybe one of the systems is in safe mode.",
         "cloudError": "Can't merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
         "cloudBothError": "Can't merge systems. Both systems are connected to cloud. You need to disconnect one first.",
         "cloudHostConflict": "Can't merge systems, because servers are built with different cloud hosts",
-        "licenceError": "Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.",
+        "licenceError": "Warning: Systems with START licenses are about to be merged. As only 1 START license is allowed per System, only 1 START license will remain active. Please click Merge to confirm.",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
         "mergeFailed": "Merge failed: ",
@@ -87,11 +87,11 @@
         "serverOffline": "server is offline"
     },
     "fileUpload":{
-        "started": "Updating successfully started. It will take several minutes",
-        "upToDate": "Updating failed. The provided version is already installed.",
-        "invalidFile": "Updating failed. Provided file is not a valid update archive.",
-        "incompatibleSystem": "Updating failed. Provided file is targeted for another system.",
-        "extractionError": "Updating failed. Extraction failed, check available storage.",
+        "started": "Update successfully started. It will take several minutes",
+        "upToDate": "Update failed. The provided version is already installed.",
+        "invalidFile": "Update failed. Provided file is not a valid update archive.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another system.",
+        "extractionError": "Update failed. Insufficient space to extract archive, check available storage.",
         "installationError": "Updating failed. Couldn't execute installation script.",
         "selectFiles": "Select files"
     }
