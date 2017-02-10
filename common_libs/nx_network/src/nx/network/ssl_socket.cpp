@@ -1223,12 +1223,6 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
     if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
@@ -1247,6 +1241,12 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             d->wrappedSocket->setRecvTimeout(timeout);
 
         SystemError::setLastErrorCode(SystemError::already);
+        return -1;
+    }
+
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
         return -1;
     }
 
@@ -1296,12 +1296,6 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
     if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
@@ -1320,6 +1314,12 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
             d->wrappedSocket->setSendTimeout(timeout);
 
         SystemError::setLastErrorCode(SystemError::already);
+        return -1;
+    }
+
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
         return -1;
     }
 
