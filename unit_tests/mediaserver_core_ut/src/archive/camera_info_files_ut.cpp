@@ -512,7 +512,7 @@ TEST_F(ReaderTest, HandlerError_moduleGuid)
          ModuleGuid::NotFound,
          ArchiveCamTypeId::Found,
          GetFileData::Successfull);
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
     then(ResultIs::Empty);
 }
 
@@ -522,7 +522,7 @@ TEST_F(ReaderTest, HandlerError_cameraIsInResPool)
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Successfull);
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
     then(ResultIs::Empty);
 }
 
@@ -532,7 +532,7 @@ TEST_F(ReaderTest, HandlerError_typeIdNotFound)
          ModuleGuid::Found,
          ArchiveCamTypeId::NotFound,
          GetFileData::Successfull);
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
     then(ResultIs::Empty);
 }
 
@@ -542,7 +542,7 @@ TEST_F(ReaderTest, HandlerError_getFileDataError)
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Failed);
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
     then(ResultIs::Empty);
 }
 
@@ -561,7 +561,7 @@ TEST_F(ReaderTest, ErrorsInData)
             {
                 return QByteArray(fileData);
             }
-            )(camDataList);
+            )(&camDataList);
 
         then(ResultIs::Empty);
     }
@@ -573,7 +573,7 @@ TEST_F(ReaderTest, CorrectData)
          ModuleGuid::Found,
          ArchiveCamTypeId::Found,
          GetFileData::Successfull);
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
     then(ResultIs::NotEmpty);
     thenDataIsCorrect();
 }
@@ -585,16 +585,14 @@ TEST_F(ReaderTest, CorrectDataMultiple)
          ArchiveCamTypeId::Found,
          GetFileData::Successfull);
 
-    nx::caminfo::ArchiveCameraDataList camList;
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc2)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 2);
 
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
-    ASSERT_EQ(camList[0].properties.size(), 2);
+    camDataList.clear();
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 3);
 
-    camList.clear();
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
-    ASSERT_EQ(camList[0].properties.size(), 3);
-
-    camList.clear();
-    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(camDataList);
-    ASSERT_EQ(camList[0].properties.size(), 2);
+    camDataList.clear();
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc2)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 2);
 }

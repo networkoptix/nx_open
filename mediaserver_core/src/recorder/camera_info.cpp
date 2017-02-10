@@ -222,10 +222,10 @@ Reader::Reader(ReaderHandler* readerHandler,
     m_getDataFunc(getFileDataFunc)
 {}
 
-void Reader::operator()(ArchiveCameraDataList &archiveCameraList)
+void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
 {
     if (!initArchiveCamData()
-        || cameraAlreadyExists(archiveCameraList)
+        || cameraAlreadyExists(outArchiveCameraList)
         || !readFileData()
         || !parseData())
     {
@@ -233,7 +233,7 @@ void Reader::operator()(ArchiveCameraDataList &archiveCameraList)
         return;
     }
 
-    archiveCameraList.push_back(m_archiveCamData);
+    outArchiveCameraList->push_back(m_archiveCamData);
 }
 
 bool Reader::initArchiveCamData()
@@ -271,7 +271,7 @@ bool Reader::initArchiveCamData()
     return true;
 }
 
-bool Reader::cameraAlreadyExists(const ArchiveCameraDataList& cameraList) const
+bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
 {
     if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
     {
@@ -284,12 +284,12 @@ bool Reader::cameraAlreadyExists(const ArchiveCameraDataList& cameraList) const
     }
 
     if(std::find_if(
-                cameraList.cbegin(),
-                cameraList.cend(),
+                cameraList->cbegin(),
+                cameraList->cend(),
                 [this](const ArchiveCameraData& cam)
                 {
                     return cam.coreData.id == m_archiveCamData.coreData.id;
-                }) != m_archiveCamList->cend())
+                }) != cameraList->cend())
     {
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")

@@ -174,11 +174,11 @@ public:
            const QnAbstractStorageResource::FileInfo& fileInfo,
            std::function<QByteArray(const QString&)> getFileDataFunc);
 
-    void operator()(ArchiveCameraDataList &archiveCameraList);
+    void operator()(ArchiveCameraDataList* outArchiveCameraList);
 
 private:
     bool initArchiveCamData();
-    bool cameraAlreadyExists(const ArchiveCameraDataList& camerasList) const;
+    bool cameraAlreadyExists(const ArchiveCameraDataList* camerasList) const;
     bool readFileData();
     bool parseData();
     ParseResult parseLine(const QString& line) const;
@@ -189,7 +189,6 @@ private:
     ReaderHandler* m_handler;
     mutable ReaderErrorInfo m_lastError;
     ArchiveCameraData m_archiveCamData;
-    ArchiveCameraDataList* m_archiveCamList;
     QByteArray m_fileData;
     const QnAbstractStorageResource::FileInfo* m_fileInfo;
     std::function<QByteArray(const QString&)> m_getDataFunc;
