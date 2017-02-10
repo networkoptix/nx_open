@@ -475,6 +475,25 @@ TEST_F(QnResourceAccessManagerTest, checkDesktopCameraRemove)
     checkPermissions(camera, desired, forbidden);
 }
 
+TEST_F(QnResourceAccessManagerTest, checkRemoveCameraAsAdmin)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto target = addCamera();
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::RemovePermission));
+}
+
+// EditCameras is not enough to be able to remove cameras
+TEST_F(QnResourceAccessManagerTest, checkRemoveCameraAsEditor)
+{
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
+    auto target = addCamera();
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::WritePermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::SavePermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::RemovePermission));
+}
+
 TEST_F(QnResourceAccessManagerTest, checkUserRemoved)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
