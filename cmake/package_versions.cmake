@@ -17,6 +17,10 @@ function(detect_package_versions)
     set(_gmock_version "1.7.0")
     set(_gcc_version "4.9.4")
 
+    if(MACOSX)
+        set(_quazip_version "0.7.2")
+    endif()
+
     set(qt_version ${_qt_version} CACHE STRING "")
     set(boost_version ${_boost_version} CACHE STRING "")
     set(openssl_version ${_openssl_version} CACHE STRING "")
