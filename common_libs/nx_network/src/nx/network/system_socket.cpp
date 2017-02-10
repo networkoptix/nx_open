@@ -1374,6 +1374,12 @@ void TCPServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
+#ifdef _DEBUG
+    bool nonBlockingMode = false;
+    NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
+    NX_ASSERT(nonBlockingMode);
+#endif
+
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
 }

@@ -938,6 +938,12 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
+#ifdef _DEBUG
+    bool nonBlockingMode = false;
+    NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
+    NX_ASSERT(nonBlockingMode);
+#endif
+
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,
