@@ -137,13 +137,13 @@ def downloads(request):
             downloads_json = downloads_json.json()
         except:
             raise APIRequestException("Cant read downloads. Code: " + str(downloads_json.status_code) +
-                                      " Text:" + downloads_json.text)
+                                      " Text:" + downloads_json.text, ErrorCodes.deserialization_error)
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
         # add release notes to downloads.json
-        # evaluate file paths
-        release_notes = updates_record['release_notes']
+        # evaluate file pathss
+        # release_notes = updates_record['release_notes']
 
         cache.set(cache_key, json.dumps(downloads_json))
     else:
