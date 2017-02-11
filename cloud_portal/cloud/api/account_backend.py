@@ -22,15 +22,11 @@ class AccountBackend(object):
 
         return True
 
-
-
-
-    @staticmethod
+    @classmethod
     def authenticate(username=None, password=None):
         user = Account.get(username, password)
         if user and 'email' in user:
-            AccountBackend.check_email_in_portal(user['email'], True)
-
+            cls.check_email_in_portal(user['email'], True)
         return None
 
     @staticmethod
