@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
+from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, api_success, ErrorCodes, require_params
 
@@ -21,7 +22,7 @@ def register(request):
     lang = detect_language_by_request(request)
     data = request.data
     data['language'] = lang
-    api.models.AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
+    AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
         raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
@@ -143,7 +144,7 @@ def activate(request):
         return api_success()
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
-        api.models.AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
+        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
         Account.reactivate(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
@@ -169,7 +170,7 @@ def restore_password(request):
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
         user_email = request.data['user_email'].lower()
-        api.models.AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
+        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
 
         Account.reset_password(user_email)
     else:
