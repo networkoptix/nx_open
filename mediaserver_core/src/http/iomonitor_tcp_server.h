@@ -31,8 +31,8 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnIOMonitorConnectionProcessor);
 
+    void sendData();
     void sendNextMessage();
-    void sendNextMessage(QByteArray message);
 };
 
 #endif // QN_IOMONITOR_REST_HANDLER_H
