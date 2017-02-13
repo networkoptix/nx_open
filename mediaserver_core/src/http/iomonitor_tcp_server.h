@@ -26,7 +26,7 @@ private slots:
 private:
     void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
     void onDataSent(SystemError::ErrorCode errorCode, size_t bytesSent);
-    void setData(QnIOStateDataList&& value);
+    void addData(QnIOStateDataList&& value);
     void addData(QnIOStateData&& value);
 private:
     Q_DECLARE_PRIVATE(QnIOMonitorConnectionProcessor);

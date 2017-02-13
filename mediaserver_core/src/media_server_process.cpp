@@ -2730,7 +2730,9 @@ void MediaServerProcess::run()
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+    const bool isDiscoveryDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly && !isDiscoveryDisabled)
         QnResourceDiscoveryManager::instance()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover

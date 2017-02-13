@@ -78,7 +78,7 @@ void QnIOMonitorConnectionProcessor::run()
         using namespace std::placeholders;
         d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
 
-        setData(camera->ioStates());
+        addData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
         while (!needToStop()
                && d->socket->isConnected()
@@ -102,7 +102,7 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &reso
     QnMutexLocker lock(&d->waitMutex);
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->isInitialized()) {
-        setData(camera->ioStates());
+        addData(camera->ioStates());
         d->waitCond.wakeAll();
     }
 }
@@ -181,11 +181,12 @@ void QnIOMonitorConnectionProcessor::onDataSent(SystemError::ErrorCode errorCode
         sendNextMessage();
 }
 
-void QnIOMonitorConnectionProcessor::setData(QnIOStateDataList&& value)
+void QnIOMonitorConnectionProcessor::addData(QnIOStateDataList&& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->dataMutex);
-    d->dataToSend = value;
+    for (const auto& ioState: value)
+        d->dataToSend.push_back(ioState);
 }
 
 void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
