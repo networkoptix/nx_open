@@ -64,7 +64,7 @@ macro(combine_arguments _variable)
 endmacro()
 
 function(export_all_flags _filename)
-    set(_include_directories "$<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>")
+    set(_include_directories "$<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>" ${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES})
     set(_compile_definitions "$<TARGET_PROPERTY:${_target},COMPILE_DEFINITIONS>")
     set(_compile_flags "$<TARGET_PROPERTY:${_target},COMPILE_FLAGS>" ${CMAKE_CXX_FLAGS})
     set(_compile_options "$<TARGET_PROPERTY:${_target},COMPILE_OPTIONS>")

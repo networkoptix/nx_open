@@ -42,6 +42,8 @@ include(project_utils)
 detect_platform()
 rdep_configure()
 
+include(android-ndk-workaround)
+
 include(package_versions)
 include(ec_protocol)
 include(maven_compatibility)
