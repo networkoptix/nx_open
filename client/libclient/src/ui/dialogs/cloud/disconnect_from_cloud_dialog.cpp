@@ -396,7 +396,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
-        tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.",
+        tr("You won't be able to connect to this system with your %1 account after you disconnect this system from %1.",
             "%1 is name of cloud (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 
