@@ -214,8 +214,13 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
      * A better way would be to calculate local rotation at cursor position,
      * but currently there is not need for such precision. */
     const auto rect = widget->rect();
-    const auto rotation = qRadiansToDegrees(QnGeometry::atan2(
+    auto rotation = qRadiansToDegrees(QnGeometry::atan2(
         widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())));
+    if (section == Qt::TitleBarArea)
+    {
+        // We don't want rotated Arrow cursor.
+        rotation = 0;
+    }
     const auto cursor = QnCursorCache::instance()->cursorForWindowSection(section, rotation, 5.0);
 
     const auto newAffected = getAffectedWidgets(viewport, correctedPos);
