@@ -199,7 +199,8 @@ TEST_F(StunClientServerTest, RequestResponse)
         const auto addr = response.getAttribute<stun::attrs::XorMappedAddress>();
         ASSERT_NE(nullptr, addr);
         ASSERT_EQ(stun::attrs::XorMappedAddress::IPV4, addr->family);
-        ASSERT_EQ(ntohl(HostAddress::localhost.ipV4()->s_addr), addr->address.ipv4);
+        const auto ipv4 = ntohl(HostAddress::localhost.ipV4()->s_addr);
+        ASSERT_EQ(ipv4, addr->address.ipv4);
     }
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));
