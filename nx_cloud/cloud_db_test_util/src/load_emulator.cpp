@@ -35,7 +35,7 @@ void LoadEmulator::createRandomSystems(int systemCount)
     {
         api::SystemRegistrationData registrationData;
         registrationData.customization = QnAppInfo::customizationName().toStdString();
-        registrationData.name = utils::generateRandomName(8);
+        registrationData.name = "load_test_system_" + utils::generateRandomName(8);
 
         m_cdbClient.systemManager()->bindSystem(
             registrationData,
