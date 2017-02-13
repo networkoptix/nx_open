@@ -66,21 +66,21 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
             m_acceptHandler = std::move(handler);
             m_serverSocket->acceptAsync(
                 [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-            {
-                NX_LOGX(lm("Accepted %1 (%2)")
-                    .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
+                {
+                    NX_LOGX(lm("Accepted %1 (%2)")
+                        .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
 
-                if (code != SystemError::noError)
-                    m_state = code;
-                else
-                    m_controlConnection->resetLastKeepAlive();
+                    if (code != SystemError::noError)
+                        m_state = code;
+                    else
+                        m_controlConnection->resetLastKeepAlive();
 
-                const auto handler = std::move(m_acceptHandler);
-                m_acceptHandler = nullptr;
-                handler(
-                    SystemError::noError,
-                    std::unique_ptr<AbstractStreamSocket>(socket));
-            });
+                    const auto handler = std::move(m_acceptHandler);
+                    m_acceptHandler = nullptr;
+                    handler(
+                        SystemError::noError,
+                        std::unique_ptr<AbstractStreamSocket>(socket));
+                });
         });
 }
 
