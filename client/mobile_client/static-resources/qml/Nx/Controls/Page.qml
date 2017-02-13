@@ -12,7 +12,7 @@ PageBase
     property alias warningVisible: warningPanel.opened
     property alias toolBar: toolBar
     property alias warningPanel: warningPanel
-    property alias titleLabelOpactiy: toolBar.titleOpacity
+    property alias titleLabelOpacity: toolBar.titleOpacity
 
     signal leftButtonClicked()
 
