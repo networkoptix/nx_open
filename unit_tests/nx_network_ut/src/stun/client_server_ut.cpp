@@ -4,8 +4,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <common/common_globals.h>
-#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
@@ -13,6 +11,10 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/sync_queue.h>
+
+#include <common/common_globals.h>
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace stun {
@@ -119,11 +121,17 @@ protected:
 
 TEST_F(StunClientServerTest, Connectivity)
 {
-    EXPECT_EQ(sendTestRequestSync(), SystemError::notConnected); //< No address.
+    std::atomic<size_t> timerTicks;
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+
+    EXPECT_EQ(SystemError::notConnected, sendTestRequestSync()); //< No address.
 
     const auto address = startServer();
     server.reset();
     client->connect(address);
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
         SystemError::timedOut)); //< No server to connect.
@@ -140,10 +148,6 @@ TEST_F(StunClientServerTest, Connectivity)
 
     startServer(address);
     reconnectEvents.pop(); //< Automatic reconnect is expected.
-
-    std::atomic<size_t> timerTicks;
-    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
-    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
