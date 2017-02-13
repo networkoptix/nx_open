@@ -590,10 +590,6 @@
         <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>Không thể phân tích phản ứng thiết bị. Url %1, yêu cầu tên %2.</translation>
     </message>
@@ -704,6 +700,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp). {1 ?}</translation>
     </message>
 </context>
 <context>

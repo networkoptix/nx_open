@@ -590,10 +590,6 @@
         <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>ポートt %2 にアクセス可能か確認してください.</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>デバイス応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
@@ -704,6 +700,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>IOモジュールイニシャライズ中.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">ポートt %2 にアクセス可能か確認してください. {1 ?}</translation>
     </message>
 </context>
 <context>

@@ -554,10 +554,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -703,6 +699,10 @@
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

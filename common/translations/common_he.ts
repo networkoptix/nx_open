@@ -600,10 +600,6 @@
         <translation>וודא שהמצלמה מחוברת לרשת. נסה לאתחלה.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>וודא שפורט %2 נגישץ (כלומר שהוא מופנה).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>לא ניתן לפענח את תגובתו של ההתקן.URL %1, שם מבוקש %2.</translation>
     </message>
@@ -714,6 +710,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>כעת מתבצע תהליך איתחול מודול הקלט/פלט.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">וודא שפורט %2 נגישץ (כלומר שהוא מופנה). {1 ?}</translation>
     </message>
 </context>
 <context>

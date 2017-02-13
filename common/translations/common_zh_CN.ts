@@ -592,10 +592,6 @@
         <translation>请确认摄像机已接入网络,并重启摄像机.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>请确认端口 %2可用(如转发).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>设备无响应.URL: %1,请求名称 %2.</translation>
     </message>
@@ -706,6 +702,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>I/O模块初始化进行中.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">请确认端口 %2可用(如转发). {1 ?}</translation>
     </message>
 </context>
 <context>

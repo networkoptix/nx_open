@@ -610,10 +610,6 @@
         <translation>Убедитесь, что камера подключена к сети. Попробуйте её перезагрузить.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Убедитесь, что порт %2 доступен (напр. проброшен).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>Невозможно разобрать ответ устройства. URL %1, имя запроса %2.</translation>
     </message>
@@ -724,6 +720,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>Модуль ввода/вывода в процессе инициализации.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Убедитесь, что порт %2 доступен (напр. проброшен). {1 ?}</translation>
     </message>
 </context>
 <context>

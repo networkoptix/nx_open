@@ -590,10 +590,6 @@
         <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบกล้องเข้าสู่เครือข่าย ลองที่จะรีบูตกล้อง.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>ทำให้พอร์ต %2 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>ไม่สามารถแยกการตอบสนองอุปกรณ์ Url %1 ต้องการชื่อ %2.</translation>
     </message>
@@ -704,6 +700,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>โมดูล I/O เริ่มต้นกระบวนการในความคืบหน้า.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">ทำให้พอร์ต %2 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ). {1 ?}</translation>
     </message>
 </context>
 <context>

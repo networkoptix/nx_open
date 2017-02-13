@@ -601,10 +601,6 @@
         <translation>Stellen Sie sicher, dass die Kamera im Netzwerk angeschlossen wurde. Versuchen Sie die Kamera neu zu starten.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Stellen Sie sicher, dass Port %2 erreichbar ist (Portweiterleitung).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>Antwort des Geräts konnte nicht analysiert werden. URL %1, angeforderter Name %2.</translation>
     </message>
@@ -715,6 +711,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>I/O Modul Initialisierungsprozess in Bearbeitung.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Stellen Sie sicher, dass Port %2 erreichbar ist (Portweiterleitung). {1 ?}</translation>
     </message>
 </context>
 <context>
