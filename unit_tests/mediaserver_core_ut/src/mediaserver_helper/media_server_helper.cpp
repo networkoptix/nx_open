@@ -43,7 +43,7 @@ MediaServerHelper::MediaServerHelper(const MediaServerTestFuncTypeList& testList
         &MediaServerProcess::started,
         [this]()
         {
-            m_thread = std::thread([this]()
+            m_thread = nx::utils::thread([this]()
             {
                 for (auto test : m_testList)
                     test();

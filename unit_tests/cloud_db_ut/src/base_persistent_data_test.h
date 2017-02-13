@@ -40,7 +40,7 @@ protected:
     template<typename QueryFunc, typename... OutputData>
     nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
     {
-        std::promise<nx::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor()->executeUpdate(
             queryFunc,
             [&queryDonePromise](
@@ -56,7 +56,7 @@ protected:
     template<typename QueryFunc>
     nx::db::DBResult executeSelectQuerySync(QueryFunc queryFunc)
     {
-        std::promise<nx::db::DBResult> queryDonePromise;
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
         m_persistentDbManager->queryExecutor()->executeSelect(
             queryFunc,
             [&queryDonePromise](

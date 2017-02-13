@@ -26,7 +26,7 @@ void async_queued_executor::stop() {
 }
 
 void async_queued_executor::start() {
-  thread_ = std::thread([this] {
+  thread_ = nx::utils::thread([this] {
     while (true) {
       std::unique_lock<std::mutex> lock(mutex_);
       cond_.wait(lock, [this] { return need_stop_ || !tasks_.empty(); });

@@ -716,11 +716,11 @@ TEST(MediaDbTest, ReadWrite_MT)
     //write header explicitely
     boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
 
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     for (size_t i = 0; i < threadsNum; ++i)
     {
         threads.emplace_back(
-            std::thread([&dbHelper, &tdm, i, recordsCount]
+            nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
                         {
                             size_t j = i * recordsCount + 1;
                             for (; j < (i + 1) * recordsCount + 1; ++j)
@@ -764,7 +764,7 @@ TEST(MediaDbTest, ReadWrite_MT)
     for (size_t i = 0; i < threadsNum; ++i)
     {
             threads.emplace_back(
-                std::thread([&dbHelper, &tdm, i, recordsCount]
+                nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
                             {
                                 size_t j = i * recordsCount + 1;
                                 for (; j < (i + 1) * recordsCount + 1; ++j)
@@ -851,12 +851,16 @@ TEST(MediaDbTest, StorageDB)
     sdb.loadFullFileCatalog();
 
     QnMutex mutex;
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     TestChunkManager tcm(128);
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 1000; ++i)
+        #ifndef __arm__
+            for (int i = 0; i < 1000; ++i)
+        #else
+            for (int i = 0; i < 100; ++i)
+        #endif
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
@@ -908,9 +912,9 @@ TEST(MediaDbTest, StorageDB)
     };
 
     for (size_t i = 0; i < 3; ++i)
-        threads.push_back(std::thread(writerFunc));
+        threads.push_back(nx::utils::thread(writerFunc));
 
-    threads.push_back(std::thread(readerFunc));
+    threads.push_back(nx::utils::thread(readerFunc));
 
     for (auto &t : threads)
         t.join();

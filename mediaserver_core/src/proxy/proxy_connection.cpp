@@ -40,7 +40,7 @@ class QnTcpListener;
 
 static const int kMaxProxyTtl = 8;
 static const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
-static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(100);
+static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(1);
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -85,14 +85,25 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
     return port == 0 ? -1 : port;
 }
 
-bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
+bool QnProxyConnectionProcessor::doProxyData(
+    AbstractStreamSocket* srcSocket,
+    AbstractStreamSocket* dstSocket,
+    char* buffer,
+    int bufferSize,
+    bool* outSomeBytesRead)
 {
+    if (outSomeBytesRead)
+        *outSomeBytesRead = false;
     int readed;
     if( !readSocketNonBlock(&readed, srcSocket, buffer, bufferSize) )
         return true;
 
     if (readed < 1)
         return false;
+
+    if (outSomeBytesRead)
+        *outSomeBytesRead = true;
+
     for( ;; )
     {
         int sended = dstSocket->send(buffer, readed);
@@ -479,13 +490,16 @@ void QnProxyConnectionProcessor::doRawProxy()
         if (m_needStop || timeSinseLastIo >= kIoTimeout)
             return;
 
-        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size()))
+        bool someBytesRead1 = false;
+        bool someBytesRead2 = false;
+        if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer.data(), buffer.size(), &someBytesRead1))
             return;
 
-        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size()))
+        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), buffer.size(), &someBytesRead2))
             return;
 
-        std::this_thread::sleep_for(kPollTimeout);
+        if (!someBytesRead1 && !someBytesRead2)
+            std::this_thread::sleep_for(kPollTimeout);
     }
 }
 
@@ -503,11 +517,14 @@ void QnProxyConnectionProcessor::doSmartProxy()
         if (m_needStop || timeSinseLastIo >= kIoTimeout)
             return;
 
+        bool someBytesRead1 = false;
         int readed;
         if (readSocketNonBlock(&readed, d->socket.data(), d->tcpReadBuffer, TCP_READ_BUFFER_SIZE))
         {
             if (readed < 1)
                 return;
+
+            someBytesRead1 = true;
 
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
             if (isFullMessage(d->clientRequest))
@@ -525,7 +542,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->dstSocket->send(d->clientRequest);
                     if (isWebSocket)
                     {
-                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE))
+                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE, nullptr))
                             return; // send rest of data
 
                         doRawProxy(); // switch to binary mode
@@ -557,10 +574,12 @@ void QnProxyConnectionProcessor::doSmartProxy()
             }
         }
 
-        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE))
+        bool someBytesRead2 = false;
+        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE, &someBytesRead2))
             return;
 
-        std::this_thread::sleep_for(kPollTimeout);
+        if (!someBytesRead1 && !someBytesRead2)
+            std::this_thread::sleep_for(kPollTimeout);
     }
 }
 

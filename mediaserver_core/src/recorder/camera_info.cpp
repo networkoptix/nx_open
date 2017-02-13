@@ -83,14 +83,23 @@ void Writer::write()
 
     m_lastWriteTime = std::chrono::steady_clock::now();
 }
+bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
+{
+    bool isDataAndPathValid = !infoFilePath.isEmpty() && !infoFileData.isEmpty();
+    bool isDataChanged = !m_infoPathToCameraInfo.contains(infoFilePath) || 
+                          m_infoPathToCameraInfo[infoFilePath] != infoFileData;
+
+    return isDataAndPathValid && isDataChanged;
+}
 
 void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
 {
-    if (infoFilePath.isEmpty() || infoFileData.isEmpty())
-        return;
+    NX_LOG(lit("%1: write camera info to %2. Data changed: %3") 
+            .arg(Q_FUNC_INFO)
+            .arg(infoFilePath) 
+            .arg(isWriteNeeded(infoFilePath, infoFileData)), cl_logDEBUG2);
 
-    if (!m_infoPathToCameraInfo.contains(infoFilePath) ||
-        m_infoPathToCameraInfo[infoFilePath] != infoFileData)
+    if (isWriteNeeded(infoFilePath, infoFileData))
     {
         if (m_handler->handleFileData(infoFilePath, infoFileData))
             m_infoPathToCameraInfo[infoFilePath] = infoFileData;
@@ -205,21 +214,18 @@ ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 }
 
 
-Reader::Reader(ReaderHandler* readerHandler):
-    m_handler(readerHandler)
+Reader::Reader(ReaderHandler* readerHandler, 
+               const QnAbstractStorageResource::FileInfo& fileInfo, 
+               std::function<QByteArray(const QString&)> getFileDataFunc):
+    m_handler(readerHandler),
+    m_fileInfo(&fileInfo),
+    m_getDataFunc(getFileDataFunc)
 {}
 
-void Reader::loadCameraInfo(
-    const QnAbstractStorageResource::FileInfo &fileInfo,
-    ArchiveCameraDataList &archiveCameraList,
-    std::function<QByteArray(const QString& filePath)> getFileDataFunc)
+void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
 {
-    m_archiveCamList = &archiveCameraList;
-    m_fileInfo = &fileInfo;
-    m_getDataFunc = getFileDataFunc;
-
     if (!initArchiveCamData()
-        || cameraAlreadyExists()
+        || cameraAlreadyExists(outArchiveCameraList)
         || !readFileData()
         || !parseData())
     {
@@ -227,7 +233,7 @@ void Reader::loadCameraInfo(
         return;
     }
 
-    m_archiveCamList->push_back(m_archiveCamData);
+    outArchiveCameraList->push_back(m_archiveCamData);
 }
 
 bool Reader::initArchiveCamData()
@@ -265,7 +271,7 @@ bool Reader::initArchiveCamData()
     return true;
 }
 
-bool Reader::cameraAlreadyExists() const
+bool Reader::cameraAlreadyExists(const ArchiveCameraDataList* cameraList) const
 {
     if (m_handler->isCameraInResPool(m_archiveCamData.coreData.id))
     {
@@ -278,12 +284,12 @@ bool Reader::cameraAlreadyExists() const
     }
 
     if(std::find_if(
-                m_archiveCamList->cbegin(),
-                m_archiveCamList->cend(),
+                cameraList->cbegin(),
+                cameraList->cend(),
                 [this](const ArchiveCameraData& cam)
                 {
                     return cam.coreData.id == m_archiveCamData.coreData.id;
-                }) != m_archiveCamList->cend())
+                }) != cameraList->cend())
     {
         m_lastError = {
             lit("Camera %1 is already in the archive camera list")

@@ -3262,21 +3262,11 @@ devices</source>
         <source>All users</source>
         <translation>Minden felhasználó</translation>
     </message>
-    <message>
-        <source>%1 users</source>
-        <translation>%1 felhasználó</translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
             <numerusform>%1 (%n alkalom)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -3286,6 +3276,24 @@ devices</source>
     <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3858,18 +3866,6 @@ devices</source>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translation>
-            <numerusform>Legalább %n %2 szükséges</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translation>
-            <numerusform>%n %2 használatban</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>Nincs érvényes licence telepítve.</translation>
@@ -3977,6 +3973,18 @@ devices</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform>Legalább %n %2 szükséges {1 ?}</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform>%n %2 használatban {1 ?}</numerusform>
+        </translation>
     </message>
 </context>
 <context>

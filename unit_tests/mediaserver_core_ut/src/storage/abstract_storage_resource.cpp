@@ -588,11 +588,11 @@ TEST(Storage_load_balancing_algorithm_test, Main)
     int useInARowOverflowCount = 0;
 	std::unordered_map<int, StorageUseStats> storagesUsageData;
 	std::mutex testMutex;
-	std::vector<std::thread> recorders;
+	std::vector<nx::utils::thread> recorders;
 
 	for (size_t i = 0; i < kRecordersCount; ++i)
 	{
-		recorders.emplace_back(std::thread(
+		recorders.emplace_back(nx::utils::thread(
 		[&]
 		{
 			for (int i = 0; i < kWriteCount; ++i)

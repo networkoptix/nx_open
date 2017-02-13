@@ -19,13 +19,11 @@ BaseTile
     property bool isRunning: false;
     property bool isReachable: false;
 
-    property var wrongVersion;
-    property var compatibleVersion;
+    property string wrongVersion;
+    property string compatibleVersion;
 
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
-
-    onSystemIdChanged: { forceCollapsedState(); }
 
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !impl.isFactoryTile);

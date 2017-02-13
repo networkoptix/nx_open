@@ -487,7 +487,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
 
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t size)
@@ -503,7 +503,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
 
 static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     sender->sendAsync(
         kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -529,7 +529,7 @@ static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* rec
 
 static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
-    std::promise<void> sendPromise;
+    nx::utils::promise<void> sendPromise;
     sender->sendAsync(
         kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -542,7 +542,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
 
-    std::promise<void> readPromise;
+    nx::utils::promise<void> readPromise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t size)
@@ -582,7 +582,7 @@ void socketSyncAsyncSwitch(
     ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
 
-    std::promise<void> connectPromise;
+    nx::utils::promise<void> connectPromise;
     client->connectAsync(
         *endpointToConnectTo,
         [&](SystemError::ErrorCode code)
@@ -657,7 +657,7 @@ void socketTransferFragmentation(
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
         NX_LOG(lm("Start transfer %1").arg(runNumber), cl_logDEBUG1);
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         client->sendAsync(
             kMessage,
             [&](SystemError::ErrorCode code, size_t size)
@@ -782,9 +782,8 @@ void socketShutdown(
 {
     SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
 
-    // Takes amazingly long with UdtSocket.
-    const auto repeatCount = useAsyncPriorSync ? 5 : 14;
-    for (int i = 0; i < repeatCount; ++i)
+    const auto repeatCount = utils::TestOptions::applyLoadMode<size_t>(5);
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         const auto syncServer = syncSocketServer(serverMaker());
         syncServer->setEndpointToBindTo(endpointToBindTo);

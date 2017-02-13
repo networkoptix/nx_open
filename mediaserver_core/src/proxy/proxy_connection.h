@@ -24,7 +24,12 @@ public:
 protected:
     virtual void run() override;
 private:
-    bool doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
+    bool doProxyData(
+        AbstractStreamSocket* srcSocket,
+        AbstractStreamSocket* dstSocket,
+        char* buffer,
+        int bufferSize,
+        bool* outSomeBytesRead);
     static int getDefaultPortByProtocol(const QString& protocol);
     QString connectToRemoteHost(const QnRoute& route, const QUrl& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;

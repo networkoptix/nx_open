@@ -12,11 +12,12 @@ class QnTestCameraResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const QString MANUFACTURE;
+    static constexpr const char kManufacturer[] = "NetworkOptix";
+    static constexpr const char kModel[] = "TestCameraLive";
 
     QnTestCameraResource();
 
-    virtual int getMaxFps() const override; 
+    virtual int getMaxFps() const override;
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override; // sets the distance between I frames
 

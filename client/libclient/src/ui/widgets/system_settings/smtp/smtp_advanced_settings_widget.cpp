@@ -77,7 +77,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
 
     ui->supportInputField->setTitle(tr("Support Signature"));
-    ui->supportInputField->setPlaceholderText(QnAppInfo::supportLink());
+    ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
 
     const QString autoPort = tr("Auto");
     ui->portComboBox->addItem(autoPort, 0);

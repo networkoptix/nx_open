@@ -3287,23 +3287,12 @@ devices</source>
         <source>All users</source>
         <translation>Alle Benutzer</translation>
     </message>
-    <message>
-        <source>%1 users</source>
-        <translation>%1 Benutzer</translation>
-    </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
         <comment>%1 is description of event. Will be replaced in runtime</comment>
         <translation>
             <numerusform>%1 (%n mal)</numerusform>
             <numerusform>%1 (%n mal)</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -3313,6 +3302,27 @@ devices</source>
     <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n more...</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3888,21 +3898,6 @@ devices</source>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translatorcomment>Develeoper comment please: n of what?</translatorcomment>
-        <translation>
-            <numerusform>Mindestens %n %2 wird benötigt</numerusform>
-            <numerusform>Mindestens %n %2 werden benötigt</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translation>
-            <numerusform>Derzeit %n %2 in Verwendung</numerusform>
-            <numerusform>Derzeit %n %2 in Verwendung</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>Es ist keine gültige Lizenz installiert.</translation>
@@ -4010,6 +4005,20 @@ devices</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

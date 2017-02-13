@@ -346,9 +346,17 @@ void QnLayoutSettingsDialog::updateControls() {
         qreal width = height * targetAspectRatio;
         ui->widthSpinBox->setValue(width);
         ui->heightSpinBox->setValue(height);
-    } else {
+    }
+    else
+    {
         ui->widthSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().width());
         ui->heightSpinBox->setMaximum(qnGlobals->layoutBackgroundMaxSize().height());
+
+        if (!ui->keepAspectRatioCheckBox->isChecked())
+        {
+            ui->widthSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().width());
+            ui->heightSpinBox->setMinimum(qnGlobals->layoutBackgroundMinSize().height());
+        }
     }
 
 }

@@ -5,6 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 
 #include <utils/common/guard.h>
@@ -165,7 +166,7 @@ TEST(UdpSocket, DISABLED_Performance)
     server.bind(SocketAddress::anyPrivateAddress);
     const auto address = server.getLocalAddress();
     NX_LOG(lm("%1").str(address), cl_logINFO);
-    std::thread serverThread(
+    nx::utils::thread serverThread(
         [&]()
         {
             const auto startTime = std::chrono::steady_clock::now();
@@ -197,7 +198,7 @@ TEST(UdpSocket, DISABLED_Performance)
                     durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
         });
 
-    std::thread clientThread(
+    nx::utils::thread clientThread(
         [&]()
         {
             UDPSocket client(AF_INET);
