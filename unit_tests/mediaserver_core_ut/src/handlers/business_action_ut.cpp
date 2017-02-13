@@ -6,6 +6,7 @@
 #include "core/resource_management/resource_pool.h"
 #include <server_query_processor.h>
 #include <transaction/transaction.h>
+#include <nx/utils/std/future.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -37,8 +38,8 @@ TEST(ExecActionAccessRightsTest, main)
     auto executeTransaction = [](const Qn::UserAccessData& userAccess)
     {
         ec2::QnTransaction<ec2::ApiBusinessActionData> actionTran(ec2::ApiCommand::execAction);
-        std::promise<ec2::ErrorCode> resultPromise;
-        std::future<ec2::ErrorCode> resultFuture = resultPromise.get_future();
+        nx::utils::promise<ec2::ErrorCode> resultPromise;
+        nx::utils::future<ec2::ErrorCode> resultFuture = resultPromise.get_future();
 
         ec2::ServerQueryProcessorAccess().getAccess(userAccess).processUpdateAsync(
             actionTran,

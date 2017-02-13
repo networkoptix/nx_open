@@ -18,6 +18,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
@@ -83,7 +84,7 @@ protected:
         const QUrl url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         NX_LOGX(lm("httpsTest: %1").str(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
@@ -102,7 +103,7 @@ protected:
         const QUrl url(lit("http://%1%2")
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         NX_LOGX(lm("testResult: %1").str(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
@@ -183,6 +184,10 @@ TEST_F(AsyncHttpClientTest, FastRemove)
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
     testHttpClientForFastRemove(lit("http://doestNotExist.host/"));
+
+    testHttpClientForFastRemove(lit("https://127.0.0.1/"));
+    testHttpClientForFastRemove(lit("https://localhost/"));
+    testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
 TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
@@ -372,7 +377,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
         "not enough content");
 
     nx::utils::promise<int> serverPort;
-    std::thread serverThread(
+    nx::utils::thread serverThread(
         [&]()
         {
             const auto server = std::make_unique<nx::network::TCPServerSocket>(

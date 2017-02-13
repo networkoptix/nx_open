@@ -42,7 +42,7 @@
             <modules>
                 <module>mediaserver_core_ut</module>
             </modules>
-        </profile>    
+        </profile>
 
         <profile>
             <id>noarm</id>
@@ -63,6 +63,24 @@
             <properties>
                 <modification>ubuntu</modification>
             </properties>
+        </profile>
+
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <modules>
+                <module>../nx_cloud/libcloud_db</module> <!-- Required by mediaserver_core_ut. -->
+            </modules>
         </profile>
 
         <profile>

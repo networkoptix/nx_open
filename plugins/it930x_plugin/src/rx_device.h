@@ -162,7 +162,7 @@ namespace ite
         std::condition_variable m_cvConfig;
         std::atomic<bool> m_needStop;
         std::atomic<bool> m_running;
-        std::thread m_watchDogThread;
+        nx::utils::thread m_watchDogThread;
         bool m_configuring;
 
         std::unique_ptr<It930x> m_it930x;

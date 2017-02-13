@@ -58,7 +58,7 @@ static std::vector<SocketAddress> resolveTargets(
     }
 
     // Or resolve it.
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     const auto port = targetAddress.port;
     nx::network::SocketGlobals::addressResolver().resolveDomain(
         std::move(targetAddress.address),
@@ -165,7 +165,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
         totalConnections,
         transmissionMode);
 
-    std::promise<void> finishedPromise;
+    nx::utils::promise<void> finishedPromise;
     connectionsGenerator.setOnFinishedHandler(
         [&finishedPromise]{ finishedPromise.set_value(); });
 

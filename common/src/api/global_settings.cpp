@@ -60,6 +60,7 @@ namespace
     const int kMaxRtpRetryCountDefault(6);
 
     const int kAuditTrailPeriodDaysDefault = 183;
+    const int kEventLogPeriodDaysDefault = 30;
 }
 
 using namespace nx::settings_names;
@@ -273,6 +274,10 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kAuditTrailPeriodDaysName,
         kAuditTrailPeriodDaysDefault,
         this);
+    m_eventLogPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEventLogPeriodDaysName,
+        kEventLogPeriodDaysDefault,
+        this);
 
     m_autoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameUpdateNotificationsEnabled, true, this);
@@ -306,6 +311,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_auditTrailPeriodDaysAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailPeriodDaysChanged,         Qt::QueuedConnection);
+    connect(m_eventLogPeriodDaysAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::eventLogPeriodDaysChanged,           Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
@@ -319,6 +325,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_cameraSettingsOptimizationAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
+        << m_eventLogPeriodDaysAdaptor
         << m_autoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << m_backupQualitiesAdaptor
@@ -371,6 +378,11 @@ void QnGlobalSettings::setAuditTrailEnabled(bool value)
 int QnGlobalSettings::auditTrailPeriodDays() const
 {
     return m_auditTrailPeriodDaysAdaptor->value();
+}
+
+int QnGlobalSettings::eventLogPeriodDays() const
+{
+    return m_eventLogPeriodDaysAdaptor->value();
 }
 
 bool QnGlobalSettings::isAutoDiscoveryEnabled() const {

@@ -27,7 +27,6 @@ class NX_NETWORK_API AsyncClient:
 public:
     typedef MessagePipeline BaseConnectionType;
     typedef BaseConnectionType ConnectionType;
-    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectCompletionHandler;
     typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> OnConnectionClosedHandler;
 
     AsyncClient(Settings timeouts = Settings());
@@ -37,13 +36,19 @@ public:
 
     Q_DISABLE_COPY( AsyncClient );
 
-    virtual void connect(SocketAddress endpoint, bool useSsl = false) override;
+    virtual void connect(
+        SocketAddress endpoint,
+        bool useSsl = false,
+        ConnectHandler completionHandler = nullptr) override;
+
     virtual bool setIndicationHandler(
         int method, IndicationHandler handler, void* client = 0) override;
+    
     virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
     virtual void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
     virtual void addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
+    
     virtual SocketAddress localAddress() const override;
     virtual SocketAddress remoteAddress() const override;
     virtual void closeConnection(SystemError::ErrorCode errorCode) override;
@@ -51,10 +56,6 @@ public:
     virtual void setKeepAliveOptions(KeepAliveOptions options) override;
 
     void setOnConnectionClosedHandler(OnConnectionClosedHandler onConnectionClosedHandler);
-    void connect(
-        SocketAddress endpoint,
-        bool useSsl, 
-        ConnectCompletionHandler completionHandler);
 
 private:
     enum class State
@@ -84,6 +85,7 @@ private:
 
     mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
+    boost::optional<SocketAddress> m_resolvedEndpoint;
     bool m_useSsl;
     State m_state;
 
@@ -98,7 +100,7 @@ private:
     ConnectionTimers m_connectionTimers;
 
     OnConnectionClosedHandler m_onConnectionClosedHandler;
-    ConnectCompletionHandler m_connectCompletionHandler;
+    ConnectHandler m_connectCompletionHandler;
 
     const char* toString(State state) const;
 };

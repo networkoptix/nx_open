@@ -26,7 +26,7 @@ TEST_F(StatisticsApi, listening_peer_list)
     hpm::api::ClientBindRequest request;
     request.originatingPeerID = "someClient";
     request.tcpReverseEndpoints.push_back(SocketAddress("12.34.56.78:1234"));
-    std::promise<void> bindPromise;
+    nx::utils::promise<void> bindPromise;
     client->send(
         request,
         [&](nx::hpm::api::ResultCode code)

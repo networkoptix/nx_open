@@ -78,7 +78,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
             });
 
         //TODO #ak #msvc2015 use future/promise
-        std::promise<api::ResultCode> connectionAckResultPromise;
+        nx::utils::promise<api::ResultCode> connectionAckResultPromise;
         server1->setConnectionAckResponseHandler(
             [&connectionAckResultPromise](api::ResultCode resultCode)
                 -> MediaServerEmulator::ActionToTake
@@ -95,7 +95,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
         auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
-        std::promise<api::ResultCode> connectResultPromise;
+        nx::utils::promise<api::ResultCode> connectResultPromise;
 
         api::ConnectResponse connectResponseData;
         auto connectCompletionHandler =
@@ -284,7 +284,7 @@ TEST_F(FtHolePunchingProcessor, destruction)
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
         connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
-        std::promise<void> connectResponsePromise;
+        nx::utils::promise<void> connectResponsePromise;
         udpClient.connect(
             connectRequest,
             [&connectResponsePromise](

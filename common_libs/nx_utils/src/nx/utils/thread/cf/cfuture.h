@@ -684,7 +684,7 @@ future<detail::callable_ret_type<F>> async(F&& f) {
   promise<future_inner_type> p;
   auto result = p.get_future();
   
-  std::thread([p = std::move(p), f = std::forward<F>(f)] () mutable {
+  nx::utils::thread([p = std::move(p), f = std::forward<F>(f)] () mutable {
     try {
       p.set_value(std::forward<F>(f)());
     } catch (...) {
@@ -702,7 +702,7 @@ future<detail::callable_ret_type<F, Arg1>> async(F&& f, Arg1&& arg1) {
   promise<future_inner_type> p;
   auto result = p.get_future();
   
-  std::thread([p = std::move(p), f = std::forward<F>(f), arg1] () mutable {
+  nx::utils::thread([p = std::move(p), f = std::forward<F>(f), arg1] () mutable {
     try {
       p.set_value(std::forward<F>(f)(arg1));
     } catch (...) {
@@ -720,7 +720,7 @@ future<detail::callable_ret_type<F, Arg1, Arg2>> async(F&& f, Arg1&& arg1, Arg2&
   promise<future_inner_type> p;
   auto result = p.get_future();
   
-  std::thread([p = std::move(p), f = std::forward<F>(f), arg1, arg2] () mutable {
+  nx::utils::thread([p = std::move(p), f = std::forward<F>(f), arg1, arg2] () mutable {
     try {
       p.set_value(std::forward<F>(f)(arg1, arg2));
     } catch (...) {
@@ -791,7 +791,7 @@ future<detail::callable_ret_type<F, Args...>> async(F&& f, Args&&... args) {
   promise<future_inner_type> p;
   auto result = p.get_future();
   
-  std::thread([p = std::move(p), f = std::forward<F>(f), args...] () mutable {
+  nx::utils::thread([p = std::move(p), f = std::forward<F>(f), args...] () mutable {
     try {
       p.set_value(std::forward<F>(f)(args...));
     } catch (...) {

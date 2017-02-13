@@ -1686,7 +1686,7 @@ nx::db::DBResult SystemManager::fillCache()
 template<typename Func>
 nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
 {
-    std::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation

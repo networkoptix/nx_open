@@ -24,18 +24,19 @@ PreprocessRequestFunc keepOnlyJsonFields(const QSet<QString>& fields);
 
 PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
+/** Perform Rest API POST request synchronously. */
+#define NX_TEST_API_POST(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executePost(__VA_ARGS__))
+
+/** Perform Rest API GET request synchronously. */
+#define NX_TEST_API_GET(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executeGet(__VA_ARGS__))
+
 namespace api_requests_detail {
 
 // TODO: Consider moving to nx_http::HttpClient.
 nx_http::BufferType readResponse(nx_http::HttpClient* httpClient);
 
-} // namespace api_requests_detail
-
-/**
- * Perform HTTP POST Rest API request synchronously. To be used inside ASSERT_NO_FATAL_FAILURE().
- */
 template<class RequestData>
-void testApiPost(
+void executePost(
     const MediaServerLauncher& launcher,
     const QString& urlStr,
     const RequestData& requestData,
@@ -65,11 +66,8 @@ void testApiPost(
     ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
 }
 
-/**
- * Perform HTTP GET Rest API request synchronously. To be used inside ASSERT_NO_FATAL_FAILURE().
- */
 template<class ResponseData>
-void testApiGet(
+void executeGet(
     const MediaServerLauncher& launcher,
     const QString& urlStr,
     ResponseData* responseData = nullptr,
@@ -95,6 +93,8 @@ void testApiGet(
     if (responseData)
         ASSERT_TRUE(QJson::deserialize(response, responseData));
 }
+
+} // namespace api_requests_detail
 
 } // namespace test
 } // namespace nx
