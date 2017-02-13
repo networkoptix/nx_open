@@ -67,8 +67,11 @@ public:
 
     void setUrl(const QUrl& url);
 
+    void setSystemName(const QString& systemName);
+
 public:
     QUrl url;
+    QString systemName;
     bool suspended = false;
     bool wasConnected = false;
     QTimer* suspendTimer = nullptr;
@@ -85,9 +88,14 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
     Q_D(QnConnectionManager);
 
     connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
-        [this]()
+        [d]()
         {
-            emit systemNameChanged(qnGlobalSettings->systemName());
+            /* 2.6 servers use another property name for systemName, so in 3.0 it's always empty.
+               However we fill system name in doConnect().
+               This value won't change, but it's not so critical. */
+            const auto systemName = qnGlobalSettings->systemName();
+            if (!systemName.isEmpty())
+                d->setSystemName(systemName);
         });
 
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived,
@@ -112,7 +120,8 @@ QnConnectionManager::~QnConnectionManager()
 
 QString QnConnectionManager::systemName() const
 {
-    return qnGlobalSettings->systemName();
+    Q_D(const QnConnectionManager);
+    return d->systemName;
 }
 
 QnConnectionManager::State QnConnectionManager::connectionState() const
@@ -372,6 +381,7 @@ void QnConnectionManagerPrivate::doConnect()
                     : connectionInfo.effectiveUserName);
 
             updateConnectionState();
+            setSystemName(connectionInfo.systemName);
 
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
@@ -409,6 +419,7 @@ void QnConnectionManagerPrivate::doDisconnect()
     QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
     QnSessionManager::instance()->stop();
 
+    setSystemName(QString());
     connectionVersion = QnSoftwareVersion();
     emit q->connectionVersionChanged();
 
@@ -460,4 +471,15 @@ void QnConnectionManagerPrivate::setUrl(const QUrl& url)
         connectionType = newConnectionType;
         emit q->connectionTypeChanged();
     }
+}
+
+void QnConnectionManagerPrivate::setSystemName(const QString& systemName)
+{
+    if (this->systemName == systemName)
+        return;
+
+    Q_Q(QnConnectionManager);
+
+    this->systemName = systemName;
+    emit q->systemNameChanged(systemName);
 }
