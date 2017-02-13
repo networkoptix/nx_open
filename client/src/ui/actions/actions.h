@@ -759,7 +759,25 @@ public:
          */
         PtzCalibrateFisheyeAction,
 
+        /**
+         * Starts continuous move with given speed
+         */
+        PtzStartContinuousMoveAction,
 
+        /**
+         * Ends continuous move with given speed
+         */
+        PtzEndContinuousMoveAction,
+
+        /**
+         * Starts continuous zoom with given speed
+         */
+        PtzStartContinuousMove,
+
+        /**
+         * Ends continuous zoom with given speed
+         */
+        PtzEndContinuousZoom,
         /* Layout actions. */
 
         /**

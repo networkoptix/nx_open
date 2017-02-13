@@ -224,7 +224,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     }
 
     connect(m_ptzController, &QnAbstractPtzController::changed, this, &QnMediaResourceWidget::at_ptzController_changed);
-
+    connect(
+        nx::joystick::Manager::instance(), &nx::joystick::Manager::joystickMove,
+        this, &QnMediaResourceWidget::at_joystickMove);
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
@@ -1456,6 +1458,12 @@ void QnMediaResourceWidget::at_ptzController_changed(Qn::PtzDataFields fields) {
         updateButtonsVisibility();
     if(fields & (Qn::ActiveObjectPtzField | Qn::ToursPtzField))
         updateTitleText();
+}
+
+void QnMediaResourceWidget::at_joystickMove(const nx::joystick::State& stickState)
+{
+    QVector3D speed((double)stickState[0] / 100, (double)stickState[1] / 100, (double)stickState[2] / 100);
+    ptzController()->continuousMove(speed);
 }
 
 void QnMediaResourceWidget::updateDewarpingParams() {

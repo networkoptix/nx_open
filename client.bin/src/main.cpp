@@ -130,6 +130,12 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include <utils/common/timermanager.h>
 
+#if defined(Q_OS_WIN)
+#include <plugins/io_device/joystick/joystick_event_filter_win.h>
+#endif
+
+#include <plugins/io_device/joystick/joystick_manager.h>
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -506,6 +512,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     mainWindow->show();
+    
+    std::unique_ptr<nx::joystick::Manager> joystickManager(
+        new nx::joystick::Manager(
+            application,
+            mainWindow.data(),
+            context.data()));
+
+    joystickManager->start();
+
     if (!startupParams.fullScreenDisabled)
         context->action(QnActions::EffectiveMaximizeAction)->trigger();
     else

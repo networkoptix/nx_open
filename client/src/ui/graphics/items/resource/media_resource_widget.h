@@ -22,6 +22,8 @@
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
+#include <plugins/io_device/joystick/joystick_manager.h>
+
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
@@ -194,6 +196,7 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
+    void at_joystickMove(const nx::joystick::State& stickState);
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
