@@ -703,7 +703,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">ポートt %2 にアクセス可能か確認してください. {1 ?}</translation>
+        <translation type="unfinished">ポートt %1 にアクセス可能か確認してください.</translation>
     </message>
 </context>
 <context>

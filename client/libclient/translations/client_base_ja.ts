@@ -3971,13 +3971,13 @@ devices</source>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
         <translation type="unfinished">
-            <numerusform>最低 %n %2 が必要 {1 ?}</numerusform>
+            <numerusform>最低 %n %1 が必要</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
         <translation type="unfinished">
-            <numerusform>%n %2 が現在使用中 {1 ?}</numerusform>
+            <numerusform>%n %1 が現在使用中</numerusform>
         </translation>
     </message>
 </context>

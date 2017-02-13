@@ -3972,13 +3972,13 @@ devices</source>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
         <translation type="unfinished">
-            <numerusform>Legalább %n %2 szükséges {1 ?}</numerusform>
+            <numerusform>Legalább %n %1 szükséges</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
         <translation type="unfinished">
-            <numerusform>%n %2 használatban {1 ?}</numerusform>
+            <numerusform>%n %1 használatban</numerusform>
         </translation>
     </message>
 </context>

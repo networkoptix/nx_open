@@ -3970,13 +3970,13 @@ devices</source>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
         <translation type="unfinished">
-            <numerusform>최소한 %n %2 이 필요함 {1 ?}</numerusform>
+            <numerusform>최소한 %n %1 이 필요함</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
         <translation type="unfinished">
-            <numerusform>%n %2 현재 사용 중 {1 ?}</numerusform>
+            <numerusform>%n %1 현재 사용 중</numerusform>
         </translation>
     </message>
 </context>

@@ -705,7 +705,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">请确认端口 %2可用(如转发). {1 ?}</translation>
+        <translation type="unfinished">请确认端口 %1可用(如转发).</translation>
     </message>
 </context>
 <context>
@@ -949,13 +949,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>Activate %n more %2.  {1.?}</numerusform>
+            <numerusform>Activate %n more %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform>%n 多于 %2 将被使用 {1 ?}</numerusform>
+            <numerusform>%n 多于 %1 将被使用</numerusform>
         </translation>
     </message>
 </context>

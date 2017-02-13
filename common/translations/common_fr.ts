@@ -713,7 +713,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Assurez-vous que le port %2 est accessible. {1 ?}</translation>
+        <translation type="unfinished">Assurez-vous que le port %1 est accessible.</translation>
     </message>
 </context>
 <context>

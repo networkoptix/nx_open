@@ -723,7 +723,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Убедитесь, что порт %2 доступен (напр. проброшен). {1 ?}</translation>
+        <translation type="unfinished">Убедитесь, что порт %1 доступен (напр. проброшен).</translation>
     </message>
 </context>
 <context>

@@ -714,7 +714,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Stellen Sie sicher, dass Port %2 erreichbar ist (Portweiterleitung). {1 ?}</translation>
+        <translation type="unfinished">Stellen Sie sicher, dass Port %1 erreichbar ist (Portweiterleitung).</translation>
     </message>
 </context>
 <context>

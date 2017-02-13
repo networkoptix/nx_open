@@ -713,7 +713,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">וודא שפורט %2 נגישץ (כלומר שהוא מופנה). {1 ?}</translation>
+        <translation type="unfinished">וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
     </message>
 </context>
 <context>

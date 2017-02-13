@@ -703,7 +703,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp). {1 ?}</translation>
+        <translation type="unfinished">Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
     </message>
 </context>
 <context>
@@ -947,13 +947,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>Kích hoạt %n hơn %2. {1.?}</numerusform>
+            <numerusform>Kích hoạt %n hơn %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform>%n hơn %2 sẽ được sử dụng. {1 ?}</numerusform>
+            <numerusform>%n hơn %1 sẽ được sử dụng.</numerusform>
         </translation>
     </message>
 </context>

@@ -703,7 +703,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">請確認 %2 埠可被連結 (譬如已開啟轉發埠). {1 ?}</translation>
+        <translation type="unfinished">請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
 </context>
 <context>
@@ -947,13 +947,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>啟動 %n 更多 %2.  {1.?}</numerusform>
+            <numerusform>啟動 %n 更多 %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform>%n 更多 %2 將被使用.  {1 ?}</numerusform>
+            <numerusform>%n 更多 %1 將被使用.</numerusform>
         </translation>
     </message>
 </context>

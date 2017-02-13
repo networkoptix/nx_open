@@ -3971,13 +3971,13 @@ devices</source>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
         <translation type="unfinished">
-            <numerusform>至少需要 %n %2 {1 ?}</numerusform>
+            <numerusform>至少需要 %n %1</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
         <translation type="unfinished">
-            <numerusform>当前已用%n %2  {1 ?}</numerusform>
+            <numerusform>当前已用%n %1</numerusform>
         </translation>
     </message>
 </context>

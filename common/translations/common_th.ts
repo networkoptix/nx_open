@@ -703,7 +703,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">ทำให้พอร์ต %2 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ). {1 ?}</translation>
+        <translation type="unfinished">ทำให้พอร์ต %1 สามารถเข้าถึงได้ (ตัวอย่างเช่น การส่งต่อ).</translation>
     </message>
 </context>
 <context>
@@ -947,13 +947,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>เปิดใช้งาน %n เพิ่ม %2.  {1.?}</numerusform>
+            <numerusform>เปิดใช้งาน %n เพิ่ม %1. </numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform>%n มากขึ้น %2 จะนำไปใช้.  {1 ?}</numerusform>
+            <numerusform>%n มากขึ้น %1 จะนำไปใช้. </numerusform>
         </translation>
     </message>
 </context>

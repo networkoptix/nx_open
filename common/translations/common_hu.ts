@@ -703,7 +703,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Győződjön meg róla, hogy a %2 port elérhető (pl. át van irányítva). {1 ?}</translation>
+        <translation type="unfinished">Győződjön meg róla, hogy a %1 port elérhető (pl. át van irányítva).</translation>
     </message>
 </context>
 <context>
