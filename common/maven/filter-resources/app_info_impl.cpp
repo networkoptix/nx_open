@@ -125,22 +125,27 @@ QString QnAppInfo::mediaFolderName()
 
 QString QnAppInfo::licensingEmailAddress()
 {
-    return QStringLiteral("${company.license.address}");
+    return QStringLiteral("${licenseEmail}");
 }
 
 QString QnAppInfo::companyUrl()
 {
-    return QStringLiteral("${company.url}");
+    return QStringLiteral("${companyUrl}");
 }
 
 QString QnAppInfo::supportEmailAddress()
 {
-    return QStringLiteral("${company.support.address}");
+    return QStringLiteral("${supportEmail}");
 }
 
-QString QnAppInfo::supportLink()
+QString QnAppInfo::supportUrl()
 {
-    return QStringLiteral("${company.support.link}");
+    return QStringLiteral("${supportUrl}");
+}
+
+QString QnAppInfo::supportPhone()
+{
+    return QStringLiteral("${supportPhone}");
 }
 
 QString QnAppInfo::showcaseUrl()

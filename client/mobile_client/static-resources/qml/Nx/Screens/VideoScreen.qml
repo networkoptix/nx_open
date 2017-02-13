@@ -55,6 +55,18 @@ PageBase
                 || videoScreenController.failed)
             && !videoScreenController.mediaPlayer.playing
 
+        property real uiOpacity: 1.0
+        Behavior on uiOpacity
+        {
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
+        property real navigationOpacity: 1.0
+        Behavior on navigationOpacity
+        {
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
         Timer
         {
             id: offlineStatusDelay
@@ -69,9 +81,8 @@ PageBase
                 if (videoScreenController.serverOffline)
                 {
                     exitFullscreen()
-                    navigationLoader.opacity = 0.0
-                    navigationBarTint.opacity = 0.0
-                    toolBar.opacity = 1.0
+                    navigationOpacity = 0.0
+                    uiOpacity = 1.0
                 }
                 else if (videoScreenController.cameraOffline)
                 {
@@ -80,8 +91,7 @@ PageBase
             }
             else
             {
-                navigationLoader.opacity = 1.0
-                navigationBarTint.opacity = 1.0
+                d.navigationOpacity = 1.0
             }
         }
     }
@@ -103,7 +113,7 @@ PageBase
             source: lp("/images/toolbar_gradient.png")
         }
 
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: d.uiOpacity
 
         controls:
         [
@@ -187,6 +197,7 @@ PageBase
         anchors.right: parent.right
         anchors.rightMargin: 8
         y: header.y
+        opacity: d.uiOpacity
         active: showCameraInfo
         sourceComponent: InformationLabel
         {
@@ -228,7 +239,7 @@ PageBase
         width: parent.width
 
         visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
         sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
             ? navigationComponent : liveNavigationComponent)
@@ -312,16 +323,13 @@ PageBase
         height: video.height
         anchors.left: parent.right
         anchors.top: video.top
-
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: navigationLoader.opacity
     }
 
 
     function hideUi()
     {
-        navigationLoader.opacity = 0.0
-        toolBar.opacity = 0.0
-        navigationBarTint.opacity = 0.0
+        d.uiOpacity = 0.0
         if (Utils.isMobile())
             enterFullscreen()
     }
@@ -329,9 +337,7 @@ PageBase
     function showUi()
     {
         exitFullscreen()
-        navigationLoader.opacity = 1.0
-        toolBar.opacity = 1.0
-        navigationBarTint.opacity = 1.0
+        d.uiOpacity = 1.0
     }
 
     function toggleUi()

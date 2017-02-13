@@ -142,7 +142,9 @@ body {
         border-bottom: 0;
     }
 }
-
+.warning-label{
+  color: $brand-danger;
+}
 /* For API Documentation */
 .group {
   background: yellow;

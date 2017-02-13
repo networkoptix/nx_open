@@ -99,6 +99,10 @@
         <translation></translation>
     </message>
     <message>
+        <source>Send email</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Write to log</source>
         <translation></translation>
     </message>
@@ -107,15 +111,11 @@
         <translation></translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation></translation>
     </message>
     <message>
-        <source>Send email</source>
+        <source>Play sound</source>
         <translation></translation>
     </message>
     <message>
@@ -147,23 +147,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; Failure</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; Conflict</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server &quot;%1&quot; Started</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Conflicting Server #%1: %2</source>
-        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Any Server Issue</source>
         <translation></translation>
     </message>
@@ -192,6 +175,18 @@
         <translation></translation>
     </message>
     <message>
+        <source>Server &quot;%1&quot; Failure</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; Conflict</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; Started</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Event: %1</source>
         <translation></translation>
     </message>
@@ -208,6 +203,11 @@
         <translation></translation>
     </message>
     <message>
+        <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+        <translation></translation>
+    </message>
+    <message>
         <source>Time: %1 on %2</source>
         <comment>%1 means time, %2 means date</comment>
         <translation></translation>
@@ -216,8 +216,8 @@
         <source>First occurrence: %1 on %2 (%n times total)</source>
         <comment>%1 means time, %2 means date</comment>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>First Occurrence: %1 on %2 (%n time total)</numerusform>
+            <numerusform>First Occurrence: %1 on %2 (%n times total)</numerusform>
         </translation>
     </message>
     <message>
@@ -278,9 +278,9 @@
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>No data received during last second.</numerusform>
+            <numerusform>No data received during last %n seconds.</numerusform>
         </translation>
     </message>
     <message>
@@ -430,9 +430,9 @@
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n time, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -517,7 +517,7 @@
     </message>
     <message>
         <source>Media stream is opened but no media data was received.</source>
-        <translation>Media stream is opened but no media data has been received.</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error. Please contact support.</source>
@@ -740,7 +740,7 @@
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Couldn&apos;t initialise resampling context, error code: %1</translation>
     </message>
     <message>
         <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
@@ -925,8 +925,8 @@
     <message numerus="yes">
         <source>%n %2 are used out of %1.</source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n %2 is used out of %1.</numerusform>
+            <numerusform>%n %2 are used out of %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -989,30 +989,30 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Camera</numerusform>
+            <numerusform>%n Cameras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n camera</numerusform>
+            <numerusform>%n cameras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Device</numerusform>
+            <numerusform>%n Devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n device</numerusform>
+            <numerusform>%n devices</numerusform>
         </translation>
     </message>
     <message>
@@ -1049,16 +1049,16 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Module</numerusform>
+            <numerusform>%n I/O Modules</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O module</numerusform>
+            <numerusform>%n I/O modules</numerusform>
         </translation>
     </message>
     <message>

@@ -261,6 +261,13 @@ void QnPlAxisResource::stopInputPortMonitoringAsync()
     resetHttpClient(m_ioHttpMonitor[0].httpClient);
     resetHttpClient(m_ioHttpMonitor[1].httpClient);
     resetHttpClient(m_inputPortStateReader);
+
+    auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
+    for (const auto& state: ioStates())
+    {
+        if (state.isActive)
+            updateIOState(state.id, false /*inactive*/, timeMs, true /*override*/);
+    }
 }
 
 void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)

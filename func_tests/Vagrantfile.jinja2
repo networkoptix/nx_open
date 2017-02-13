@@ -17,6 +17,8 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
     vb.customize ["modifyvm", :id, "--ioapic", "on"]
     vb.customize ["modifyvm", :id, "--vram", "32"]
+    # network created by virtualbox by default conflicts with nx moscow local network 10.0.2.0/23
+    vb.customize ["modifyvm", :id, "--natnet1", "10.0.5/24"]
   end
 
   {% for box in boxes -%}
@@ -28,7 +30,6 @@ Vagrant.configure("2") do |config|
     end
     #box.vm.synced_folder "mediaserver-default", "/opt/networkoptix", owner: "root", group: "root"
     box.vm.hostname = "{{ box.name }}"
-    box.vm.network :forwarded_port, guest: 7001, host: {{ box.forwarded_port }}
     box.vm.provision :shell, inline: "sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-depends /vagrant/networkoptix-mediaserver.deb"
   end
 

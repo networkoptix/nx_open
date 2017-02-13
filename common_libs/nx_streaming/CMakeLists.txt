@@ -1,19 +1,5 @@
-find_sources(src CPP_FILES HPP_FILES)
-qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
+nx_add_target(nx_streaming LIBRARY PUBLIC_LIBS common)
 
-add_library(nx_streaming
-    ${CPP_FILES} ${MOC_FILES}
-    src/StdAfx.cpp src/StdAfx.h
-)
+target_include_directories(nx_streaming PRIVATE "${CMAKE_SOURCE_DIR}/common_libs/nx_network/src")
 
-add_precompiled_header(nx_streaming src/StdAfx.h FORCEINCLUDE)
-
-target_include_directories(nx_streaming
-    PRIVATE ${CMAKE_SOURCE_DIR}/common_libs/nx_network/src
-    PUBLIC src)
-
-target_compile_definitions(nx_streaming
-    PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO}
-)
-
-target_link_libraries(nx_streaming PUBLIC common)
+target_compile_definitions(nx_streaming PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})

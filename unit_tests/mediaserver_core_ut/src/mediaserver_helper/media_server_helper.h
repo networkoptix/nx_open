@@ -6,6 +6,8 @@
 #include <memory>
 #include <future>
 
+#include <nx/utils/std/thread.h>
+
 #include "media_server_process.h"
 #include "platform/platform_abstraction.h"
 #include "utils.h"
@@ -35,9 +37,9 @@ private:
     std::unique_ptr<MediaServerProcess> m_serverProcess;
     MediaServerTestFuncTypeList m_testList;
     nx::ut::utils::WorkDirResource m_workDirResource;
-    std::thread m_thread;
-    std::promise<void> m_testReadyPromise;
-    std::future<void> m_testsReadyFuture;
+    nx::utils::thread m_thread;
+    nx::utils::promise<void> m_testReadyPromise;
+    nx::utils::future<void> m_testsReadyFuture;
 };
 }
 }

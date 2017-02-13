@@ -85,6 +85,7 @@ function(nx_configure_file input output)
         set(output "${output}/${file_name}")
     endif()
 
+    message(STATUS "Generating ${output}")
     configure_file(${input} ${output}.copy)
     nx_update_if_different(${output}.copy ${output})
 endfunction()

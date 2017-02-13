@@ -305,14 +305,14 @@ class AddressResolverNat64:
     public ::testing::Test
 {
 public:
-
-    static void SetUpTestCase()
+    AddressResolverNat64()
     {
+        nx::network::SocketGlobalsHolder::instance()->reinitialize();
         std::vector<HostAddress> ipList{HostAddress(*kV6.ipV6()), HostAddress(*kV4.ipV4())};
         SocketGlobals::addressResolver().dnsResolver().addEtcHost(kV4.toString(), ipList);
     }
 
-    static void TearDownTestCase()
+    ~AddressResolverNat64()
     {
         SocketGlobals::addressResolver().dnsResolver().removeEtcHost("192.168.1.2");
     }

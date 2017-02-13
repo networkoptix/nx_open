@@ -1223,12 +1223,6 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
     if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
@@ -1247,6 +1241,12 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             d->wrappedSocket->setRecvTimeout(timeout);
 
         SystemError::setLastErrorCode(SystemError::already);
+        return -1;
+    }
+
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
         return -1;
     }
 
@@ -1296,12 +1296,6 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
     if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
@@ -1320,6 +1314,12 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
             d->wrappedSocket->setSendTimeout(timeout);
 
         SystemError::setLastErrorCode(SystemError::already);
+        return -1;
+    }
+
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
         return -1;
     }
 
@@ -1657,6 +1657,49 @@ MixedSslSocket::MixedSslSocket(AbstractStreamSocket* wrappedSocket)
         d->ssl.get(), d->wrappedSocket));
 }
 
+int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
+{
+    Q_D(MixedSslSocket);
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+    {
+        if (!updateInternalBlockingMode())
+            return -1;
+
+        return d->wrappedSocket->recv(buffer, bufferLen, flags);
+    }
+
+    return SslSocket::recv(buffer, bufferLen, flags);
+}
+
+int MixedSslSocket::send(const void* buffer, unsigned int bufferLen)
+{
+    Q_D(MixedSslSocket);
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+    {
+        if (!updateInternalBlockingMode())
+            return -1;
+
+        return d->wrappedSocket->send(buffer, bufferLen);
+    }
+
+    return SslSocket::send(buffer, bufferLen);
+}
+
+bool MixedSslSocket::setNonBlockingMode(bool val)
+{
+    Q_D(MixedSslSocket);
+    if (!SslSocket::setNonBlockingMode(val))
+        return false;
+
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+        return updateInternalBlockingMode();
+
+    return true;
+}
+
 void MixedSslSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
@@ -1756,6 +1799,22 @@ void MixedSslSocket::sendAsync(
                     helper->asyncSend(buffer, std::move(handler));
                 });
         });
+}
+
+bool MixedSslSocket::updateInternalBlockingMode()
+{
+    Q_D(MixedSslSocket);
+    bool nonBlockingMode;
+    if (!d->wrappedSocket->getNonBlockingMode(&nonBlockingMode))
+        return false;
+
+    if (d->nonBlockingMode != nonBlockingMode)
+    {
+        if (!d->wrappedSocket->setNonBlockingMode(d->nonBlockingMode))
+            return false;
+    }
+
+    return true;
 }
 
 SslServerSocket::SslServerSocket(
