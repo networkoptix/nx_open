@@ -31,6 +31,7 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
 
         const auto cameras = m_cameras;
         m_cameras.clear();
+        m_countByCameraId.clear();
         for (const auto& camera: cameras)
             emit cameraRemoved(camera);
     }
@@ -43,11 +44,10 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     if (!layout)
         return;
 
-    for (const auto& item: layout->getItems())
+    for (const auto& camera:
+         qnResPool->getResources<QnVirtualCameraResource>(layout->layoutResourceIds()))
     {
-        const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
-        if (camera)
-            addCamera(camera);
+        addCamera(camera);
     }
 
     connect(layout, &QnLayoutResource::itemAdded, this,
@@ -80,22 +80,20 @@ void LayoutCamerasWatcher::addCamera(const QnVirtualCameraResourcePtr& camera)
 {
     const auto cameraId = camera->getId();
 
-    auto it = m_cameras.find(cameraId);
-    if (it == m_cameras.end())
-    {
-        m_cameras[camera->getId()] = camera;
+    m_cameras[cameraId] = camera;
+    if (m_countByCameraId.insert(cameraId))
         emit cameraAdded(camera);
-    }
-    else
-    {
-        *it = camera;
-    }
 }
 
 void LayoutCamerasWatcher::removeCamera(const QnUuid& cameraId)
 {
-    if (const auto camera = m_cameras.take(cameraId))
-        emit cameraRemoved(camera);
+    if (m_countByCameraId.remove(cameraId))
+    {
+        const auto camera = m_cameras.take(cameraId);
+        NX_ASSERT(camera);
+        if (camera)
+            emit cameraRemoved(camera);
+    }
 }
 
 } // namespace mobile
