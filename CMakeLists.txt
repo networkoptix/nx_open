@@ -21,7 +21,7 @@ set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT ANDROID AND NOT IOS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
@@ -87,6 +87,10 @@ if(withDesktopClient OR withMobileClient)
             OpenGL
             Qml
             Quick)
+endif()
+
+if(ANDROID)
+    find_package(Qt5 COMPONENTS AndroidExtras)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER

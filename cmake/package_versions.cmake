@@ -21,6 +21,11 @@ function(detect_package_versions)
         set(_quazip_version "0.7.2")
     endif()
 
+    if(ANDROID)
+        set(_openssl_version "1.0.2g")
+        set(_openal_version "1.17.2")
+    endif()
+
     set(qt_version ${_qt_version} CACHE STRING "")
     set(boost_version ${_boost_version} CACHE STRING "")
     set(openssl_version ${_openssl_version} CACHE STRING "")

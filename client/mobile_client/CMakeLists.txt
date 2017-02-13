@@ -20,3 +20,12 @@ nx_add_target(mobile_client EXECUTABLE
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
         libclient_core)
+
+if(ANDROID)
+    target_link_libraries(mobile_client
+        PUBLIC
+            common
+            nx_streaming
+            nx_network
+            GLESv2 z log)
+endif()
