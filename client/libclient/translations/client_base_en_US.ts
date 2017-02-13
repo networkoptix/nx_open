@@ -6606,8 +6606,8 @@ devices</source>
     <message numerus="yes">
         <source>What to do with %n users with this role?</source>
         <translation>
-            <numerusform>Please select the action to perform to %n user with this role</numerusform>
-            <numerusform>Please select the action to perform to %n users with this role</numerusform>
+            <numerusform>What to do with %n user with this role?</numerusform>
+            <numerusform>What to do with %n users with this role?</numerusform>
         </translation>
     </message>
 </context>
