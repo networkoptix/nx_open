@@ -391,6 +391,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     m_syncEndTimePoint = chunk.endTimeMs();
 
     initSyncData();
+    m_syncing = true;
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
@@ -598,10 +599,6 @@ void QnScheduleSync::run()
 
         if (isItTimeForSync() == SyncCode::Ok) // we are there
         {
-            m_syncing = true;
-            if (m_forced)
-                m_failReported = false;
-
             while (true)
             {
                 bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
@@ -619,6 +616,9 @@ void QnScheduleSync::run()
 
             if (m_interrupted)
                 continue;
+
+            if (m_forced)
+                m_failReported = false;
 
             auto result = synchronize(isItTimeForSync);
             qint64 syncEndTimePointLocal = 0;
