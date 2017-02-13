@@ -37,8 +37,9 @@ def login(request):
     # authorize user here
     # return user
     require_params(request, ('email', 'password'))
-    request.data['email'] = request.data['email'].lower()
-    user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
+    email = request.data['email'].lower()
+    password = request.data['password']
+    user = django.contrib.auth.authenticate(username=email, password=password)
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
@@ -46,8 +47,8 @@ def login(request):
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
-    request.session['login'] = request.data['email']
-    request.session['password'] = request.data['password']
+    request.session['login'] = email
+    request.session['password'] = password
     # TODO: This is awful security hole! But I can't remove it now, because I need password for future requests
 
     serializer = AccountSerializer(user, many=False)
