@@ -104,7 +104,6 @@ static void prepareDbTestData(MediaServerLauncher& launcher)
 TEST(IoServerMonitorTest, main)
 {
     MediaServerLauncher launcher;
-    launcher.addSetting(QnServer::kNoResourceDiscovery, "1");
     ASSERT_TRUE(launcher.start());
     // Prevent opening stream from testCamera and moving camera to offline state
     qnGlobalSettings->setAutoUpdateThumbnailsEnabled(false);
