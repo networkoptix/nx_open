@@ -103,10 +103,60 @@ protected:
         return *m_udpServers[index];
     }
 
+    void addAdditionalServers(int serverCount)
+    {
+        for (int i = 0; i < serverCount; ++i)
+            addServer();
+    }
+
+    void issueMultipleRequestsToRandomServers(
+        stun::UdpClient* client,
+        int requestCount)
+    {
+        std::list<nx::stun::Message> requestsToSend;
+
+        for (int i = 0; i < requestCount; ++i)
+        {
+            nx::stun::Message requestMessage(
+                stun::Header(
+                    nx::stun::MessageClass::request,
+                    nx::stun::bindingMethod));
+            m_expectedTransactionIDs.insert(requestMessage.header.transactionId);
+            requestsToSend.push_back(std::move(requestMessage));
+        }
+
+        for (auto& request: requestsToSend)
+        {
+            client->sendRequestTo(
+                anyServerEndpoint(),
+                std::move(request),
+                [this](
+                    SystemError::ErrorCode errorCode,
+                    Message response)
+                {
+                    ASSERT_EQ(SystemError::noError, errorCode);
+
+                    std::unique_lock<std::mutex> lk(m_mutex);
+                    ASSERT_EQ(1, m_expectedTransactionIDs.erase(response.header.transactionId));
+                    if (m_expectedTransactionIDs.empty())
+                        m_allResponsesHaveBeenReceived.set_value();
+                });
+        }
+    }
+
+    void assertAllResponsesHaveBeenReceived()
+    {
+        m_allResponsesHaveBeenReceived.get_future().wait();
+        ASSERT_TRUE(m_expectedTransactionIDs.empty());
+    }
+
 private:
     std::vector<std::unique_ptr<ServerContext>> m_udpServers;
     size_t m_messagesToIgnore;
     size_t m_totalMessagesReceived;
+    std::mutex m_mutex;
+    nx::utils::promise<void> m_allResponsesHaveBeenReceived;
+    std::set<nx::String> m_expectedTransactionIDs;
 
     void onMessage(
         std::shared_ptr< AbstractServerConnection > connection,
@@ -175,49 +225,18 @@ TEST_F(UdpClient, client_test_sync)
     }
 }
 
-TEST_F(UdpClient, client_test_async)
+TEST_F(UdpClient, multiple_concurrent_async_requests)
 {
-    static const int kRequestToSendCount = 1000;
+    static const int kRequestToSendCount = 67;
     static const int kLocalServersCount = 10;
 
-    for (int i = 1; i < kLocalServersCount; ++i)
-        addServer();
+    addAdditionalServers(kLocalServersCount-1);
 
     stun::UdpClient client;
     auto clientGuard = makeScopedGuard([&client](){ client.pleaseStopSync(); });
 
-    std::mutex mutex;
-    nx::utils::promise<void> allResponsesHaveBeenReceived;
-    std::set<nx::String> expectedTransactionIDs;
-
-    for (int i = 0; i < kRequestToSendCount; ++i)
-    {
-        nx::stun::Message requestMessage(
-            stun::Header(
-                nx::stun::MessageClass::request,
-                nx::stun::bindingMethod));
-
-        {
-            std::unique_lock<std::mutex> lk(mutex);
-            expectedTransactionIDs.insert(requestMessage.header.transactionId);
-        }
-        client.sendRequestTo(
-            anyServerEndpoint(),
-            std::move(requestMessage),
-            [&mutex, &allResponsesHaveBeenReceived, &expectedTransactionIDs](
-                SystemError::ErrorCode errorCode,
-                Message response)
-            {
-                ASSERT_EQ(SystemError::noError, errorCode);
-                std::unique_lock<std::mutex> lk(mutex);
-                ASSERT_EQ(1, expectedTransactionIDs.erase(response.header.transactionId));
-                if (expectedTransactionIDs.empty())
-                    allResponsesHaveBeenReceived.set_value();
-            });
-    }
-
-    allResponsesHaveBeenReceived.get_future().wait();
-    ASSERT_TRUE(expectedTransactionIDs.empty());
+    issueMultipleRequestsToRandomServers(&client, kRequestToSendCount);
+    assertAllResponsesHaveBeenReceived();
 }
 
 /**
