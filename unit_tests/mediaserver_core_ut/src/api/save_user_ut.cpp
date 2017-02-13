@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log.h>
 #include <nx_ec/data/api_user_data.h>
 
 #include "test_api_requests.h"
@@ -44,11 +45,11 @@ TEST(SaveUser, fillDigestAndName)
     userData.isCloud = true;
 
     NX_LOG("[TEST] Create a Cloud user, not specifying digest.", cl_logINFO);
-    NX_TEST_API_POST(launcher, "/ec2/saveUser", userData,
+    NX_TEST_API_POST(&launcher, "/ec2/saveUser", userData,
         keepOnlyJsonFields({"fullName", "permissions", "email", "isCloud"}));
 
     NX_LOG("[TEST] Retrieve the created user.", cl_logINFO);
-    NX_TEST_API_GET(launcher, lit("/ec2/getUsers"), &users);
+    NX_TEST_API_GET(&launcher, lit("/ec2/getUsers"), &users);
     NX_FIND_USER_BY_EMAIL(users, &receivedUserData, userData.email);
 
     ASSERT_FALSE(receivedUserData.id.isNull());

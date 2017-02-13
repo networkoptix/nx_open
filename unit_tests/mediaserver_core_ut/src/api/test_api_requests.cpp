@@ -1,6 +1,9 @@
 #include "test_api_requests.h"
 
 #include <QtCore/QSet>
+#include <QtCore/QJsonDocument>
+
+#include <nx/utils/log/log.h>
 
 namespace nx {
 namespace test {
@@ -40,6 +43,59 @@ static QMap<QString, QVariant> jsonStrToMap(const QByteArray& jsonStr)
 static QByteArray jsonMapToStr(const QMap<QString, QVariant>& jsonMap)
 {
     return QJsonDocument::fromVariant(QVariant(jsonMap)).toJson();
+}
+
+void doExecutePost(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    const QByteArray& request,
+    PreprocessRequestFunc preprocessRequestFunc,
+    int httpStatus)
+{
+    nx_http::HttpClient httpClient;
+    httpClient.setUserName("admin");
+    httpClient.setUserPassword("admin");
+    QUrl url = launcher->apiUrl();
+    url.setPath(urlStr);
+
+    const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
+
+    NX_LOG(lm("[TEST] POST %1").arg(urlStr), cl_logINFO);
+    NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(actualRequest), cl_logINFO);
+
+    httpClient.doPost(url, "application/json", actualRequest);
+
+    const auto response = api_requests_detail::readResponse(&httpClient);
+    NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(response), cl_logINFO);
+    NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient.response()->statusLine.statusCode),
+        cl_logINFO);
+
+    ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
+}
+
+void doExecuteGet(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    nx_http::BufferType* outResponse,
+    int httpStatus)
+{
+    nx_http::HttpClient httpClient;
+    httpClient.setUserName("admin");
+    httpClient.setUserPassword("admin");
+    QUrl url = launcher->apiUrl();
+    url.setPath(urlStr);
+
+    NX_LOG(lm("[TEST] GET %1").arg(urlStr), cl_logINFO);
+
+    ASSERT_TRUE(httpClient.doGet(url));
+
+    NX_CRITICAL(outResponse);
+    *outResponse = readResponse(&httpClient);
+    NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(*outResponse), cl_logINFO);
+    NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient.response()->statusLine.statusCode),
+        cl_logINFO);
+
+    ASSERT_EQ(httpStatus, httpClient.response()->statusLine.statusCode);
 }
 
 } using namespace api_requests_detail;
