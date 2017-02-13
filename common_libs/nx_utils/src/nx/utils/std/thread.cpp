@@ -6,6 +6,75 @@
 namespace nx {
 namespace utils {
 
+namespace {
+
+class DetachedThreads
+{
+    DetachedThreads();
+    ~DetachedThreads();
+
+public:
+    void addThread(std::unique_ptr<detail::thread> thread);
+    static DetachedThreads* instance();
+
+private:
+    std::mutex m_mutex;
+    bool m_isTerminated = false;
+    std::list<std::unique_ptr<detail::thread>> m_garbage;
+    thread m_collector;
+};
+
+DetachedThreads::DetachedThreads():
+    m_collector(
+        [this]()
+        {
+            std::unique_lock<std::mutex> lock(m_mutex);
+            while (!m_isTerminated)
+            {
+                {
+                    lock.unlock();
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    lock.lock();
+                }
+
+                for (auto it = m_garbage.begin(); it != m_garbage.end(); )
+                {
+                    if ((*it)->isFinished())
+                        it = m_garbage.erase(it);
+                    else
+                        ++it;
+                }
+            }
+        })
+{
+}
+
+DetachedThreads::~DetachedThreads()
+{
+    {
+        std::unique_lock<std::mutex> lk(m_mutex);
+        m_isTerminated = true;
+    }
+
+    m_collector.join();
+    for (auto& thread: m_garbage)
+        thread->join();
+}
+
+void DetachedThreads::addThread(std::unique_ptr<detail::thread> thread)
+{
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_garbage.push_back(std::move(thread));
+}
+
+DetachedThreads* DetachedThreads::instance()
+{
+    static DetachedThreads object;
+    return &object;
+}
+
+} // namespace
+
 namespace detail {
 
 thread::thread(nx::utils::MoveOnlyFunc<void()> threadFunc) noexcept(false):
@@ -99,64 +168,6 @@ void thread::join() noexcept(false)
 
     m_actualThread->join();
 }
-
-class DetachedThreads
-{
-    DetachedThreads():
-        m_collector(
-            [this]()
-            {
-                QnMutexLocker lock(&m_mutex);
-                while (!m_isTerminated)
-                {
-                    {
-                        QnMutexUnlocker unlock(&lock);
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                    }
-
-                    for (auto it = m_garbage.begin(); it != m_garbage.end(); )
-                    {
-                        if ((*it)->isFinished())
-                            it = m_garbage.erase(it);
-                        else
-                            ++it;
-                    }
-                }
-            })
-    {
-    }
-
-    ~DetachedThreads()
-    {
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_isTerminated = true;
-        }
-
-        m_collector.join();
-        for (auto& thread: m_garbage)
-            thread->join();
-    }
-
-public:
-    void addThread(std::unique_ptr<detail::thread> thread)
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_garbage.push_back(std::move(thread));
-    }
-
-    static DetachedThreads* instance()
-    {
-        static DetachedThreads object;
-        return &object;
-    }
-
-private:
-    QnMutex m_mutex;
-    bool m_isTerminated = false;
-    std::list<std::unique_ptr<detail::thread>> m_garbage;
-    std::thread m_collector;
-};
 
 void thread::detach() throw (std::system_error)
 {
