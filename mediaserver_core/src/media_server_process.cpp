@@ -513,14 +513,14 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    for (const WinDriveInfo& drive: getWinDrivesInfo()) 
+    for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
             continue;
-        
+
         folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
      }
- 
+
 #endif
 
 #ifdef Q_OS_LINUX
@@ -1006,7 +1006,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
-    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
 
     parseCommandLineParameters(argc, argv);
@@ -1022,6 +1021,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
         MSSettings::initializeRunTimeSettings();
 
     addCommandLineParametersFromConfig();
+
+    const bool isStatisticsDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+
+    m_platform.reset(new QnPlatformAbstraction(
+        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -2768,14 +2773,16 @@ void MediaServerProcess::run()
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
     QnRecordingManager::instance()->start();
-    QnMServerResourceSearcher::instance()->start();
+    if (!isDiscoveryDisabled)
+        QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
     serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
+        if (!isDiscoveryDisabled)
+            m_moduleFinder->start();
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();

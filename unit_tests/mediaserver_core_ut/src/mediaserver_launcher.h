@@ -16,7 +16,7 @@ class MediaServerLauncher: public QObject
 {
     Q_OBJECT
 public:
-    MediaServerLauncher(const QString& tmpDir = QString(), bool noAutoDiscovery = true);
+    MediaServerLauncher(const QString& tmpDir = QString(), bool optimizeStartupTime = true);
     ~MediaServerLauncher();
 
     SocketAddress endpoint() const;
