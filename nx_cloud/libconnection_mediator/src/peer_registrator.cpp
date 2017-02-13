@@ -201,7 +201,7 @@ void PeerRegistrator::listen(
 
     api::ListenResponse response;
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
-    response.cloudConnectVersion = hpm::api::kCurrentCloudConnectVersion;
+    response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     completionHandler(api::ResultCode::ok, std::move(response));
 
     for (auto& indication: clientBindIndications)
