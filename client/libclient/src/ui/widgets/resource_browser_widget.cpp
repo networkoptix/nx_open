@@ -292,7 +292,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
     *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
-    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemChanging,
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_itemChange);
     *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemChanged,
         this, &QnResourceBrowserWidget::at_workbench_itemChange);
