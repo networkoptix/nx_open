@@ -574,7 +574,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
