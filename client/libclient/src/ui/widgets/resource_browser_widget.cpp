@@ -86,10 +86,10 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     if (!item)
         return;
 
-    if (const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid()))
-        tree->update(resource);
-    else
-        tree->update(); //< to be safe
+    const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    NX_ASSERT(resource);
+
+    tree->update(resource);
 }
 
 } // namespace
