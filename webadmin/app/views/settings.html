@@ -102,7 +102,7 @@
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">Learn more</a></alert>
                             <alert type="error" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</alert>
-                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connetion required to connect the system to {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet conneсtion required to connect the system to {{Config.cloud.productName}}</alert>
                             <p ng-if="canConnectToCloud"  ><button
                                     class="btn btn-default"
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
