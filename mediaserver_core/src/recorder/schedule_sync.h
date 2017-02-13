@@ -75,7 +75,7 @@ public:
     void updateLastSyncChunk();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
-
+    virtual void pleaseStop() override;
 private:
     DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
 
@@ -157,6 +157,7 @@ private:
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
     CopyError             m_lastError;
+    std::promise<void>    m_stopPromise;
 };
 
 #endif
