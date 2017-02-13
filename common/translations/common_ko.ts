@@ -947,13 +947,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>%n은 %2의 등록을 추가합니다. {1.?}</numerusform>
+            <numerusform>%n은 %1의 등록을 추가합니다.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform>%n 와(과) %2 가 사용됩니다.  {1 ?}</numerusform>
+            <numerusform>%n 와(과) %1 가 사용됩니다.</numerusform>
         </translation>
     </message>
 </context>

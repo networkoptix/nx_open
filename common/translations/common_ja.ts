@@ -947,13 +947,13 @@
     <message numerus="yes">
         <source>Activate %n more %1. </source>
         <translation type="unfinished">
-            <numerusform>アクティベートには追加で %n 以上の %2 が必要.  {1.?}</numerusform>
+            <numerusform>アクティベートには追加で %n 以上の %1 が必要.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used. </source>
         <translation type="unfinished">
-            <numerusform> %n 以上の %2 を使用.  {1 ?}</numerusform>
+            <numerusform> %n 以上の %1 を使用.</numerusform>
         </translation>
     </message>
 </context>
