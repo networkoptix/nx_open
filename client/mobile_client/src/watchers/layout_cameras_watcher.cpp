@@ -44,10 +44,11 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     if (!layout)
         return;
 
-    for (const auto& camera:
-         qnResPool->getResources<QnVirtualCameraResource>(layout->layoutResourceIds()))
+    for (const auto& item: layout->getItems())
     {
-        addCamera(camera);
+        const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+        if (camera)
+            addCamera(camera);
     }
 
     connect(layout, &QnLayoutResource::itemAdded, this,
