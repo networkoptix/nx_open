@@ -22,7 +22,7 @@ public:
     SocketAddress endpoint() const;
     int port() const;
 
-    void addSetting(const QString& name, const QString& value);
+    void addSetting(const QString& name, const QVariant& value);
 
     /**
      * Run media server at the current thread

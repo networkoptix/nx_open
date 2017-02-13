@@ -28,9 +28,9 @@ int MediaServerLauncher::port() const
     return m_mediaServerProcess->getTcpPort();
 }
 
-void MediaServerLauncher::addSetting(const QString& name, const QString& value)
+void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
 {
-    m_customSettings.emplace_back(name, value);
+    m_customSettings.emplace_back(name, value.toString());
 }
 
 void MediaServerLauncher::prepareToStart()
