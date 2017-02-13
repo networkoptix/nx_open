@@ -123,7 +123,7 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel* parent)
 
     auto offlineAction = new QAction(this);
     offlineAction->setText(QnCloudStatusPanel::tr("Cannot connect to %1",
-        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
     offlineAction->setEnabled(false);
 
     offlineMenu->setWindowFlags(offlineMenu->windowFlags());
