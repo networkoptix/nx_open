@@ -2750,11 +2750,6 @@ devices</source>
         <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Log in to %1...</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
@@ -3195,12 +3190,12 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All cloud features will be disabled, cloud users will be deleted from the System.</source>
+        <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <source>All cloud users will be deleted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

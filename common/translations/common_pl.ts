@@ -949,22 +949,6 @@
             <numerusform>%n %2 zostanie użyte na%1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>Aktywuj %n więcej %2.</numerusform>
-            <numerusform>Aktywuj %n więcej %2.</numerusform>
-            <numerusform>Aktywuj %n więcej %2.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n więcej %2 będzie użyte.</numerusform>
-            <numerusform>%n więcej %2 będzie użyte.</numerusform>
-            <numerusform>%n więcej %2 będzie użyte.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Wpisany klucz jest błędny. Sprawdź klucz i wpisz go poprawnie. Jeśli nadal problem występuje proszę skontaktuj się zpomocą techniczną.</translation>
@@ -984,6 +968,22 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more %1. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
