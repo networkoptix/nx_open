@@ -19,13 +19,13 @@ GenericUserDataProvider::GenericUserDataProvider()
 {
     connect(
         qnResPool, &QnResourcePool::resourceAdded,
-        this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
+        this, &GenericUserDataProvider::at_resourcePool_resourceAdded, Qt::DirectConnection);
     connect(
         qnResPool, &QnResourcePool::resourceChanged,
-        this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
+        this, &GenericUserDataProvider::at_resourcePool_resourceAdded, Qt::DirectConnection);
     connect(
         qnResPool, &QnResourcePool::resourceRemoved,
-        this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
+        this, &GenericUserDataProvider::at_resourcePool_resourceRemoved, Qt::DirectConnection);
 }
 
 GenericUserDataProvider::~GenericUserDataProvider()
