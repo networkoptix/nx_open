@@ -652,9 +652,16 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
         return;
     }
 
-    qreal targetAr = aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size());
-    if (targetAr > kMaxZoomWindowAr)
-        targetAr = kMaxZoomWindowAr;
+    qreal originalAr = aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size());
+
+    // Here are the special algorithm by #rvasilenko
+    int resizeCoef = 1;
+    qreal targetAr = originalAr;
+    while (targetAr > kMaxZoomWindowAr)
+    {
+        ++resizeCoef;
+        targetAr = originalAr / resizeCoef;
+    }
 
     ensureSelectionItem();
     selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), targetAr, target()->rect());
