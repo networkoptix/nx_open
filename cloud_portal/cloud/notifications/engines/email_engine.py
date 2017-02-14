@@ -62,9 +62,12 @@ def get_custom_config(customization):
 def read_template(name, location):
     filename = os.path.join(location, name + '.mustache')
     if filename not in templates_cache:
-        # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
-        with codecs.open(filename, 'r', 'utf-8') as stream:
-            templates_cache[filename] = stream.read()
+        try:
+            # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
+            with codecs.open(filename, 'r', 'utf-8') as stream:
+                templates_cache[filename] = stream.read()
+        except Exception as e:
+            raise type(e)(e.message + ' :'  +  filename)
     return templates_cache[filename]
 
 

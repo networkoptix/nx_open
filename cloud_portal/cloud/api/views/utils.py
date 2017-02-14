@@ -103,6 +103,7 @@ def downloads(request):
     if not downloads_json:
         # get updates.json
         updates_json = requests.get(settings.UPDATE_JSON)
+        updates_json.raise_for_status()
         updates_json = updates_json.json()
 
         # find settings for customizations
@@ -118,25 +119,33 @@ def downloads(request):
         updates_path = updates_record['updates_prefix']
 
         # get downloads.json for specific version
-        downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+        downloads_path = updates_path + '/' + build_number + '/downloads.json'
+        downloads_result = requests.get(downloads_path)
+        downloads_json = None
+
+        try:
+            downloads_json = downloads_result.json()
+        except:
+            pass  # we cannot parse json from the result - ignore for now, we will deal with this issue on the next line
 
         # Check response result here
-        if downloads_json.status_code != requests.codes.ok:
+        if not downloads_json or downloads_json.status_code != requests.codes.ok:
             # old or broken release - no downloads json
             # TODO: this is hardcode - remove it after release
             latest_version = updates_record['releases']['3.0']
             build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
-            downloads_json = requests.get(updates_path + '/' + build_number + '/downloads.json')
+            downloads_path = updates_path + '/' + build_number + '/downloads.json'
+            downloads_result = requests.get(downloads_path)
             pass
 
-        downloads_json.raise_for_status()
-        downloads_json = downloads_json.json()
+        downloads_result.raise_for_status()
+        downloads_json = downloads_result.json()
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
         # add release notes to downloads.json
-        # evaluate file paths
-        release_notes = updates_record['release_notes']
+        # evaluate file pathss
+        # release_notes = updates_record['release_notes']
 
         cache.set(cache_key, json.dumps(downloads_json))
     else:
