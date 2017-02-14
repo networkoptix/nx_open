@@ -124,6 +124,9 @@ TEST_F(StunClientServerTest, Connectivity)
     std::atomic<size_t> timerTicks;
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
 
     EXPECT_EQ(SystemError::notConnected, sendTestRequestSync()); //< No address.
 
@@ -143,8 +146,7 @@ TEST_F(StunClientServerTest, Connectivity)
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError);
 
-    utils::TestSyncQueue<bool> reconnectEvents;
-    client->addOnReconnectedHandler([&]{ reconnectEvents.push(true); });
+    client->addOnReconnectedHandler(reconnectHandler);
 
     startServer(address);
     reconnectEvents.pop(); //< Automatic reconnect is expected.
