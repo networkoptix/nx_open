@@ -329,8 +329,11 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserRoleId(selectedUserRoleId());
-        if (selectedRole() != Qn::UserRole::CustomPermissions)
-            m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
+
+        // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
+        m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::CustomPermissions
+            ? Qn::GlobalCustomUserPermission
+            : QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 
     if (!ui->userTypeWidget->isHidden())

@@ -79,10 +79,6 @@ void QnPermissionsWidget::applyChanges()
             value &= ~permission(checkbox);
     }
 
-    /* We must set special 'Custom' flag for the users to avoid collisions with built-in roles. */
-    if (m_permissionsModel->subject().user())
-        value |= Qn::GlobalCustomUserPermission;
-
     m_permissionsModel->setRawPermissions(value);
 }
 
