@@ -75,8 +75,8 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
                     else
                         m_controlConnection->resetLastKeepAlive();
 
-                    const auto handler = std::move(m_acceptHandler);
-                    m_acceptHandler = nullptr;
+                    decltype(m_acceptHandler) handler;
+                    handler.swap(m_acceptHandler);
                     handler(
                         SystemError::noError,
                         std::unique_ptr<AbstractStreamSocket>(socket));
