@@ -663,7 +663,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
-            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+
+            // Live viewers must not open items on archive position
+            if (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+                addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
             addToLayout(layout, resources, addParams);
         }
     }

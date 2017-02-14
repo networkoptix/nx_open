@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 
 #include <utils/common/software_version.h>
+#include <common/common_globals.h>
 #include <client/client_connection_status.h>
 
 class QnConnectionManagerPrivate;
@@ -26,11 +27,11 @@ class QnConnectionManager: public QObject
 public:
     enum State
     {
-        Disconnected = (int) QnConnectionState::Disconnected,
-        Connecting = (int) QnConnectionState::Connecting,
-        Connected = (int) QnConnectionState::Connected,
-        Reconnecting = (int) QnConnectionState::Reconnecting,
-        Ready = (int) QnConnectionState::Ready,
+        Disconnected = static_cast<int>(QnConnectionState::Disconnected),
+        Connecting = static_cast<int>(QnConnectionState::Connecting),
+        Connected = static_cast<int>(QnConnectionState::Connected),
+        Reconnecting = static_cast<int>(QnConnectionState::Reconnecting),
+        Ready = static_cast<int>(QnConnectionState::Ready),
         Suspended
     };
     Q_ENUM(State)

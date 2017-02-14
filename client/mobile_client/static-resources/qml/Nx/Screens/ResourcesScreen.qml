@@ -39,6 +39,7 @@ Page
         target: resourcesScreen
         property: "title"
         value: connectionManager.systemName
+        when: connectionManager.online
     }
 
     QtObject

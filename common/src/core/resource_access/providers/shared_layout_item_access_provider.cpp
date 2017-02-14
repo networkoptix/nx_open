@@ -7,6 +7,7 @@
 #include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 
 namespace {
 
@@ -50,30 +51,20 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
     if (!isMediaResource(resource))
         return false;
 
-    /* Method is called under the mutex. */
-    QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(subject.id());
+    // Method is called under the mutex.
+    // Using effective id as aggregators are created for users and roles separately
+    QnLayoutItemAggregatorPtr aggregator = m_aggregatorsBySubject.value(subject.effectiveId());
+
+    if (!aggregator)
+    {
+        // We may got here if role is deleted while user is not
+        NX_EXPECT(subject.isUser() && subject.user()->userRole() == Qn::UserRole::CustomUserRole);
+        aggregator = m_aggregatorsBySubject.value(subject.id());
+    }
+
     NX_ASSERT(aggregator);
     if (aggregator)
         return aggregator->hasItem(resource->getId());
-
-    /* Leaving old code for safety. */
-
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
-        qnSharedResourcesManager->sharedResources(subject));
-
-    auto resourceId = resource->getId();
-    for (const auto& layout: sharedLayouts)
-    {
-        NX_ASSERT(layout->isShared());
-        if (!layout->isShared())
-            continue;
-
-        for (const auto& item : layout->getItems())
-        {
-            if (item.resource.id == resourceId)
-                return true;
-        }
-    }
 
     return false;
 }

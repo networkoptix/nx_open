@@ -3,7 +3,8 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/streaming/config.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
+#include <utils/common/aspect_ratio.h>
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
@@ -37,15 +38,15 @@ public:
 
     /**
      * @brief imageAspecRatio Returns aspect ratio for image
-     * @return Aspect ratio if resource is image, otherwise -1
+     * @return Valid aspect ratio if resource is image
      */
-    qreal imageAspectRatio() const;
+    QnAspectRatio imageAspectRatio() const;
 
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
-    qreal m_imageAspectRatio = -1.0;
+    QnAspectRatio m_imageAspectRatio;
 };
 
 #endif // QN_AVI_RESOURCE_H

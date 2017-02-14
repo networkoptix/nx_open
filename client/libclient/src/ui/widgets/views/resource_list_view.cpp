@@ -10,7 +10,7 @@
 namespace {
 
 static const int kMaximumRows = 10;
-static const int kRecommendedWidth = 400;
+static const int kRecommendedWidth = 284;
 
 }
 
@@ -30,6 +30,7 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setFocusPolicy(Qt::NoFocus);
     setSelectionMode(QAbstractItemView::NoSelection);
     setProperty(style::Properties::kSideIndentation, qVariantFromValue(QnIndents()));
+    setProperty(style::Properties::kSuppressHoverPropery, true);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);

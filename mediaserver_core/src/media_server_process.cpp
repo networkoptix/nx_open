@@ -145,6 +145,7 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -1757,6 +1758,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     reg("api/installUpdate", new QnUpdateRestHandler());
+    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
     reg("api/moduleInformation", new QnModuleInformationRestHandler());
@@ -2167,8 +2169,9 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
-    // TODO: #3.1 Enable authentication for /api/installUpdates when offline cloud authentication is implemented.
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );

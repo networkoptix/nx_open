@@ -18,12 +18,17 @@ nx_configure_file(
     ${PROJECT_SOURCE_DIR}/cpp/maven/bin-resources/app_icons.h
     ${CMAKE_CURRENT_BINARY_DIR})
 
+if(MACOSX)
+    set(mac_sources src/ui/workaround/mac_utils.mm)
+endif()
+
 file(GLOB_RECURSE QML_FILES static-resources/src/qml/*.qml static-resources/src/qml/*.js)
 
 nx_add_target(libclient LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
         ${UIC_FILES}
+        ${mac_sources}
     ADDITIONAL_RESOURCES
         "${customization_dir}/libclient/resources"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"

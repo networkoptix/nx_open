@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utils/common/connective.h>
+#include <utils/common/counter_hash.h>
 #include <nx/utils/uuid.h>
 #include <core/resource/resource_fwd.h>
 
@@ -36,6 +37,7 @@ private:
 private:
     QnLayoutResourcePtr m_layout;
     QHash<QnUuid, QnVirtualCameraResourcePtr> m_cameras;
+    QnCounterHash<QnUuid> m_countByCameraId;
 };
 
 } // namespace mobile

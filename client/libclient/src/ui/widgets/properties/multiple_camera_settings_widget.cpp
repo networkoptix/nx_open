@@ -235,7 +235,7 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
     dialog.addButton(
         tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
 
-    dialog.setButtonAutoDetection(QnButtonDetection::EscapeButton);
+    dialog.setButtonAutoDetection(QnButtonDetection::NoDetection);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return false;
 

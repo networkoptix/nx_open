@@ -9,7 +9,7 @@ nx_configure_file(
 
 file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
-nx_add_target(mobile_client EXECUTABLE
+set(target_args
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
     ADDITIONAL_RESOURCES
@@ -20,3 +20,18 @@ nx_add_target(mobile_client EXECUTABLE
         Qt5::WebChannel Qt5::WebSockets
         qtsingleguiapplication
         libclient_core)
+
+if(ANDROID)
+    nx_add_target(mobile_client LIBRARY LIBRARY_TYPE SHARED ${target_args})
+else()
+    nx_add_target(mobile_client EXECUTABLE ${target_args})
+endif()
+
+if(ANDROID)
+    target_link_libraries(mobile_client
+        PUBLIC
+            common
+            nx_streaming
+            nx_network
+            GLESv2 z log)
+endif()
