@@ -18,6 +18,8 @@ Connection::Connection(
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
     m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
     m_maintenanceManager = std::make_unique<MaintenanceManager>(endPointFetcher);
+
+    setRequestTimeout(m_requestExecutor.requestTimeout());
 }
 
 api::AccountManager* Connection::accountManager()
@@ -79,7 +81,7 @@ void Connection::setRequestTimeout(std::chrono::milliseconds timeout)
 
 std::chrono::milliseconds Connection::requestTimeout() const
 {
-    return m_accountManager->requestTimeout();
+    return m_requestExecutor.requestTimeout();
 }
 
 void Connection::ping(
